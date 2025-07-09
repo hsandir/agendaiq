@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { FiLock, FiShield } from 'react-icons/fi';
@@ -10,12 +10,41 @@ interface SignInFormProps {
   isFirstTimeSetup?: boolean;
 }
 
+interface AdminUser {
+  email: string;
+  name: string;
+}
+
 export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
   const router = useRouter();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [trustDevice, setTrustDevice] = useState(false);
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
+  const [selectedAdminEmail, setSelectedAdminEmail] = useState('');
+
+  // Fetch admin users from database
+  useEffect(() => {
+    const fetchAdminUsers = async () => {
+      try {
+        const response = await fetch('/api/auth/admin-users');
+        if (response.ok) {
+          const data = await response.json();
+          setAdminUsers(data.adminUsers);
+          if (data.adminUsers.length > 0) {
+            setSelectedAdminEmail(data.adminUsers[0].email);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching admin users:', error);
+      }
+    };
+
+    if (isFirstTimeSetup) {
+      fetchAdminUsers();
+    }
+  }, [isFirstTimeSetup]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -28,7 +57,7 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
 
     try {
       // If first user, create admin account
-      if (isFirstTimeSetup && email === defaultAdminUser.email) {
+      if (isFirstTimeSetup && selectedAdminEmail && email === selectedAdminEmail) {
         await fetch("/api/auth/create-admin", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -65,11 +94,31 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
         </h2>
         {isFirstTimeSetup && (
           <p className="mt-2 text-center text-sm text-gray-600">
-            Use admin@school.edu as your email address
+            Select an admin user to create account
           </p>
         )}
       </div>
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        {isFirstTimeSetup && adminUsers.length > 0 && (
+          <div>
+            <label htmlFor="admin-select" className="block text-sm font-medium text-gray-700 mb-2">
+              Select Admin User
+            </label>
+            <select
+              id="admin-select"
+              value={selectedAdminEmail}
+              onChange={(e) => setSelectedAdminEmail(e.target.value)}
+              className="relative block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            >
+              {adminUsers.map((admin) => (
+                <option key={admin.email} value={admin.email}>
+                  {admin.name} ({admin.email})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        
         <div className="-space-y-px rounded-md shadow-sm">
           <div>
             <label htmlFor="email" className="sr-only">
@@ -81,7 +130,7 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
               type="email"
               autoComplete="email"
               required
-              defaultValue={isFirstTimeSetup ? 'admin@school.edu' : ''}
+              defaultValue={isFirstTimeSetup && selectedAdminEmail ? selectedAdminEmail : ''}
               className="relative block w-full rounded-t-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               placeholder="Email address"
             />

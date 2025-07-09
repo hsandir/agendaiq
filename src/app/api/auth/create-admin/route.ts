@@ -10,14 +10,6 @@ const createAdminSchema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const userCount = await prisma.user.count();
-    if (userCount > 0) {
-      return NextResponse.json(
-        { error: "Admin user already exists" },
-        { status: 400 }
-      );
-    }
-
     const body = await request.json();
     const validationResult = createAdminSchema.safeParse(body);
     
@@ -30,105 +22,83 @@ export async function POST(request: Request) {
 
     const { email, password } = validationResult.data;
     
+    // Check if user exists and has admin role
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+      include: {
+        Staff: {
+          include: {
+            Role: true
+          }
+        }
+      }
+    });
+
+    if (!existingUser) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    // Check if user has admin role
+    const hasAdminRole = existingUser.Staff.some(staff => 
+      staff.Role?.title === 'Administrator'
+    );
+
+    if (!hasAdminRole) {
+      return NextResponse.json(
+        { error: "User does not have admin role" },
+        { status: 403 }
+      );
+    }
+
+    // Check if user already has a password
+    if (existingUser.hashedPassword) {
+      return NextResponse.json(
+        { error: "Admin user already has a password set" },
+        { status: 400 }
+      );
+    }
+    
     const hashedPassword = await hash(password, 12);
     
-    // Generate a unique staffId for the admin
-    const staffId = `ADMIN-${Date.now()}`;
-    
-    // First, create a district if none exists
-    let district = await prisma.district.findFirst();
-    if (!district) {
-      district = await prisma.district.create({
-        data: {
-          name: "Main District",
-          code: "MAIN",
-          address: "Main Office"
-        }
-      });
-    }
-
-    // Create a school if none exists
-    let school = await prisma.school.findFirst();
-    if (!school) {
-      school = await prisma.school.create({
-        data: {
-          name: "Main School",
-          code: "MAIN",
-          address: "Main Campus",
-          district_id: district.id
-        }
-      });
-    }
-
-    // Create the administration department
-    let department = await prisma.department.findFirst({
-      where: { code: "ADMIN" }
-    });
-    if (!department) {
-      department = await prisma.department.create({
-        data: {
-          name: "Administration",
-          code: "ADMIN",
-          category: "Administration",
-          school_id: school.id
-        }
-      });
-    }
-
-    // Create the administrator role
-    let role = await prisma.role.findFirst({
-      where: { title: "Administrator" }
-    });
-    if (!role) {
-      role = await prisma.role.create({
-        data: {
-          title: "Administrator",
-          priority: 0, // Highest priority
-          category: "Administration",
-          department_id: department.id
-        }
-      });
-    }
-
-    // Create the user
-    const user = await prisma.user.create({
+    // Update the user with the new password
+    const updatedUser = await prisma.user.update({
+      where: { email },
       data: {
-        email: email,
-        name: "System Administrator",
-        staff_id: staffId,
         hashedPassword: hashedPassword,
         emailVerified: new Date()
+      },
+      include: {
+        Staff: {
+          include: {
+            Role: true,
+            Department: true,
+            School: true,
+            District: true
+          }
+        }
       }
     });
 
-    // Create the staff record linking user to role, department, school, and district
-    const staff = await prisma.staff.create({
-      data: {
-        user_id: user.id,
-        department_id: department.id,
-        role_id: role.id,
-        school_id: school.id,
-        district_id: district.id,
-        flags: ["admin"],
-        endorsements: []
-      }
-    });
+    const staff = updatedUser.Staff.find(s => s.Role?.title === 'Administrator');
 
     return NextResponse.json({
       success: true,
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        staffId: user.staff_id
+        id: updatedUser.id,
+        email: updatedUser.email,
+        name: updatedUser.name,
+        staffId: updatedUser.staff_id
       },
-      staff: {
+      staff: staff ? {
         id: staff.id,
-        role: role.title,
-        department: department.name,
-        school: school.name,
-        district: district.name
-      }
+        role: staff.Role?.title,
+        department: staff.Department?.name,
+        school: staff.School?.name,
+        district: staff.District?.name
+      } : null
     });
   } catch (error) {
     console.error("Error creating admin user:", error);
