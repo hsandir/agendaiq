@@ -28,7 +28,7 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
 
     try {
       // If first user, create admin account
-      if (isFirstTimeSetup && email === 'admin@school.edu') {
+      if (isFirstTimeSetup && email === defaultAdminUser.email) {
         await fetch("/api/auth/create-admin", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
