@@ -1,0 +1,651 @@
+{
+  "categories": [
+    {
+      "category_id": 1,
+      "name": "Administration"
+    },
+    {
+      "category_id": 2,
+      "name": "Instructional Staff"
+    },
+    {
+      "category_id": 3,
+      "name": "Student Support Services"
+    },
+    {
+      "category_id": 4,
+      "name": "Academic Support"
+    },
+    {
+      "category_id": 5,
+      "name": "Operations & Maintenance"
+    },
+    {
+      "category_id": 6,
+      "name": "Information Technology"
+    },
+    {
+      "category_id": 7,
+      "name": "Human Resources"
+    },
+    {
+      "category_id": 8,
+      "name": "Finance & Accounting"
+    },
+    {
+      "category_id": 9,
+      "name": "Athletics & Extracurricular"
+    },
+    {
+      "category_id": 10,
+      "name": "Temporary & Substitute Staff"
+    }
+  ],
+  "departments": [
+    {
+      "department_id": 1,
+      "name": "Elementary Education Department",
+      "category_id": null
+    },
+    {
+      "department_id": 2,
+      "name": "Middle School Department",
+      "category_id": null
+    },
+    {
+      "department_id": 3,
+      "name": "High School Department",
+      "category_id": null
+    },
+    {
+      "department_id": 4,
+      "name": "Mathematics Department",
+      "category_id": null
+    },
+    {
+      "department_id": 5,
+      "name": "Science Department",
+      "category_id": null
+    },
+    {
+      "department_id": 6,
+      "name": "English / Language Arts Department",
+      "category_id": null
+    },
+    {
+      "department_id": 7,
+      "name": "Social Studies Department",
+      "category_id": null
+    },
+    {
+      "department_id": 8,
+      "name": "World Languages Department",
+      "category_id": null
+    },
+    {
+      "department_id": 9,
+      "name": "Arts Department",
+      "category_id": null
+    },
+    {
+      "department_id": 10,
+      "name": "Physical Education & Health Department",
+      "category_id": null
+    },
+    {
+      "department_id": 11,
+      "name": "STEM & Technology Department",
+      "category_id": null
+    },
+    {
+      "department_id": 12,
+      "name": "Special Education Department",
+      "category_id": null
+    },
+    {
+      "department_id": 13,
+      "name": "English as a Second Language (ESL) Department",
+      "category_id": null
+    },
+    {
+      "department_id": 14,
+      "name": "Guidance & Counseling Department",
+      "category_id": null
+    },
+    {
+      "department_id": 15,
+      "name": "Nursing & Health Services",
+      "category_id": null
+    },
+    {
+      "department_id": 16,
+      "name": "Library & Media Center",
+      "category_id": null
+    },
+    {
+      "department_id": 17,
+      "name": "Academic Intervention Services (AIS)",
+      "category_id": null
+    },
+    {
+      "department_id": 18,
+      "name": "Speech and Language Services",
+      "category_id": null
+    },
+    {
+      "department_id": 19,
+      "name": "Psychological Services",
+      "category_id": null
+    },
+    {
+      "department_id": 20,
+      "name": "School Leadership \u2013 Campus Level",
+      "category_id": null
+    },
+    {
+      "department_id": 21,
+      "name": "School Leadership \u2013 Central Office",
+      "category_id": null
+    },
+    {
+      "department_id": 22,
+      "name": "Department-Level Coordination",
+      "category_id": null
+    },
+    {
+      "department_id": 23,
+      "name": "Curriculum & Instruction",
+      "category_id": null
+    },
+    {
+      "department_id": 24,
+      "name": "Assessment and Data Team",
+      "category_id": null
+    },
+    {
+      "department_id": 25,
+      "name": "Facilities & Maintenance",
+      "category_id": null
+    },
+    {
+      "department_id": 26,
+      "name": "Security",
+      "category_id": null
+    },
+    {
+      "department_id": 27,
+      "name": "Transportation",
+      "category_id": null
+    },
+    {
+      "department_id": 28,
+      "name": "Food Services",
+      "category_id": null
+    },
+    {
+      "department_id": 29,
+      "name": "Human Resources",
+      "category_id": null
+    },
+    {
+      "department_id": 30,
+      "name": "Finance & Budget",
+      "category_id": null
+    },
+    {
+      "department_id": 31,
+      "name": "Information Technology",
+      "category_id": null
+    },
+    {
+      "department_id": 32,
+      "name": "Clerical & Front Office",
+      "category_id": null
+    }
+  ],
+  "job_titles": [
+    {
+      "job_id": 1,
+      "title": "Superintendent",
+      "category_id": null
+    },
+    {
+      "job_id": 2,
+      "title": "Assistant Superintendent",
+      "category_id": null
+    },
+    {
+      "job_id": 3,
+      "title": "Principal",
+      "category_id": null
+    },
+    {
+      "job_id": 4,
+      "title": "Vice Principal / Assistant Principal",
+      "category_id": null
+    },
+    {
+      "job_id": 5,
+      "title": "Academic Director",
+      "category_id": null
+    },
+    {
+      "job_id": 6,
+      "title": "Department Head",
+      "category_id": null
+    },
+    {
+      "job_id": 7,
+      "title": "Grade-Level Coordinator",
+      "category_id": null
+    },
+    {
+      "job_id": 8,
+      "title": "Curriculum Coordinator",
+      "category_id": null
+    },
+    {
+      "job_id": 9,
+      "title": "Assessment Coordinator",
+      "category_id": null
+    },
+    {
+      "job_id": 10,
+      "title": "Instructional Coach",
+      "category_id": null
+    },
+    {
+      "job_id": 11,
+      "title": "Instructional Supervisor",
+      "category_id": null
+    },
+    {
+      "job_id": 12,
+      "title": "STEM Chair",
+      "category_id": null
+    },
+    {
+      "job_id": 13,
+      "title": "Director of Student Support Services",
+      "category_id": null
+    },
+    {
+      "job_id": 14,
+      "title": "Director of Accountability",
+      "category_id": null
+    },
+    {
+      "job_id": 15,
+      "title": "Elementary School Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 16,
+      "title": "Middle School Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 17,
+      "title": "High School Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 18,
+      "title": "Mathematics Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 19,
+      "title": "Science Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 20,
+      "title": "English/Language Arts Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 21,
+      "title": "Social Studies Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 22,
+      "title": "Foreign Language Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 23,
+      "title": "Art Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 24,
+      "title": "Music Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 25,
+      "title": "Physical Education Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 26,
+      "title": "Computer Science / Technology Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 27,
+      "title": "STEM Integration Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 28,
+      "title": "Special Education Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 29,
+      "title": "ESL Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 30,
+      "title": "In-Class Support Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 31,
+      "title": "Substitute Teacher (Fulltime)",
+      "category_id": null
+    },
+    {
+      "job_id": 32,
+      "title": "Teaching Assistant",
+      "category_id": null
+    },
+    {
+      "job_id": 33,
+      "title": "Intervention Specialist",
+      "category_id": null
+    },
+    {
+      "job_id": 34,
+      "title": "School Counselor",
+      "category_id": null
+    },
+    {
+      "job_id": 35,
+      "title": "Guidance Counselor",
+      "category_id": null
+    },
+    {
+      "job_id": 36,
+      "title": "College & Career Counselor",
+      "category_id": null
+    },
+    {
+      "job_id": 37,
+      "title": "School Psychologist",
+      "category_id": null
+    },
+    {
+      "job_id": 38,
+      "title": "Social Worker",
+      "category_id": null
+    },
+    {
+      "job_id": 39,
+      "title": "Behavior Interventionist",
+      "category_id": null
+    },
+    {
+      "job_id": 40,
+      "title": "Speech-Language Pathologist",
+      "category_id": null
+    },
+    {
+      "job_id": 41,
+      "title": "School Nurse",
+      "category_id": null
+    },
+    {
+      "job_id": 42,
+      "title": "Librarian / Media Specialist",
+      "category_id": null
+    },
+    {
+      "job_id": 43,
+      "title": "Library Assistant",
+      "category_id": null
+    },
+    {
+      "job_id": 44,
+      "title": "Academic Coach",
+      "category_id": null
+    },
+    {
+      "job_id": 45,
+      "title": "Testing Coordinator",
+      "category_id": null
+    },
+    {
+      "job_id": 46,
+      "title": "Facilities Manager",
+      "category_id": null
+    },
+    {
+      "job_id": 47,
+      "title": "Maintenance Technician",
+      "category_id": null
+    },
+    {
+      "job_id": 48,
+      "title": "Custodian",
+      "category_id": null
+    },
+    {
+      "job_id": 49,
+      "title": "Security Guard",
+      "category_id": null
+    },
+    {
+      "job_id": 50,
+      "title": "Safety Coordinator",
+      "category_id": null
+    },
+    {
+      "job_id": 51,
+      "title": "Transportation Coordinator",
+      "category_id": null
+    },
+    {
+      "job_id": 52,
+      "title": "Bus Driver",
+      "category_id": null
+    },
+    {
+      "job_id": 53,
+      "title": "Food Services Manager",
+      "category_id": null
+    },
+    {
+      "job_id": 54,
+      "title": "Cafeteria Worker",
+      "category_id": null
+    },
+    {
+      "job_id": 55,
+      "title": "Admin",
+      "category_id": null
+    },
+    {
+      "job_id": 56,
+      "title": "Office Manager",
+      "category_id": null
+    },
+    {
+      "job_id": 57,
+      "title": "Registrar",
+      "category_id": null
+    },
+    {
+      "job_id": 58,
+      "title": "Administrative Assistant",
+      "category_id": null
+    },
+    {
+      "job_id": 59,
+      "title": "Front Desk Secretary",
+      "category_id": null
+    },
+    {
+      "job_id": 60,
+      "title": "Human Resources Manager",
+      "category_id": null
+    },
+    {
+      "job_id": 61,
+      "title": "HR Assistant",
+      "category_id": null
+    },
+    {
+      "job_id": 62,
+      "title": "Finance Manager / Accountant",
+      "category_id": null
+    },
+    {
+      "job_id": 63,
+      "title": "Bookkeeper",
+      "category_id": null
+    },
+    {
+      "job_id": 64,
+      "title": "IT Specialist",
+      "category_id": null
+    },
+    {
+      "job_id": 65,
+      "title": "Network Administrator",
+      "category_id": null
+    },
+    {
+      "job_id": 66,
+      "title": "Data Systems Manager",
+      "category_id": null
+    },
+    {
+      "job_id": 67,
+      "title": "Substitute Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 68,
+      "title": "Long-term Substitute",
+      "category_id": null
+    },
+    {
+      "job_id": 69,
+      "title": "Volunteer Coordinator",
+      "category_id": null
+    },
+    {
+      "job_id": 70,
+      "title": "After-School Program Instructor",
+      "category_id": null
+    },
+    {
+      "job_id": 71,
+      "title": "Summer School Teacher",
+      "category_id": null
+    },
+    {
+      "job_id": 72,
+      "title": "Tutor",
+      "category_id": null
+    }
+  ],
+  "employment_statuses": [
+    {
+      "status_id": 1,
+      "status": "Full-time"
+    },
+    {
+      "status_id": 2,
+      "status": "Part-time"
+    },
+    {
+      "status_id": 3,
+      "status": "Contract"
+    },
+    {
+      "status_id": 4,
+      "status": "Temporary"
+    },
+    {
+      "status_id": 5,
+      "status": "Substitute"
+    },
+    {
+      "status_id": 6,
+      "status": "Volunteer"
+    }
+  ],
+  "endorsements": [
+    {
+      "endorsement_id": 1,
+      "name": "Elementary Education"
+    },
+    {
+      "endorsement_id": 2,
+      "name": "Secondary Education"
+    },
+    {
+      "endorsement_id": 3,
+      "name": "Special Education"
+    },
+    {
+      "endorsement_id": 4,
+      "name": "Mathematics"
+    },
+    {
+      "endorsement_id": 5,
+      "name": "Science"
+    },
+    {
+      "endorsement_id": 6,
+      "name": "English"
+    },
+    {
+      "endorsement_id": 7,
+      "name": "History"
+    },
+    {
+      "endorsement_id": 8,
+      "name": "Physical Education"
+    },
+    {
+      "endorsement_id": 9,
+      "name": "Music"
+    },
+    {
+      "endorsement_id": 10,
+      "name": "Art"
+    },
+    {
+      "endorsement_id": 11,
+      "name": "Technology"
+    },
+    {
+      "endorsement_id": 12,
+      "name": "Administration"
+    },
+    {
+      "endorsement_id": 13,
+      "name": "Counseling"
+    }
+  ],
+  "job_departments": [],
+  "employees": [],
+  "employee_endorsements": []
+}

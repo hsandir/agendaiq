@@ -1,0 +1,52 @@
+{
+  "Superintendent": {
+    "Assistant Superintendent for Instruction": {
+      "Academic Director": {
+        "STEM Chair": {
+          "Department Head \u2013 Mathematics": [
+            "Mathematics Teacher"
+          ],
+          "Department Head \u2013 Science": [
+            "Science Teacher",
+            "Computer Science / Technology Teacher"
+          ],
+          "Department Head \u2013 STEM/Technology": [
+            "STEM Integration Teacher"
+          ]
+        },
+        "Arts & Humanities Chair": {
+          "Department Head \u2013 Language Arts": [
+            "English/Language Arts Teacher"
+          ],
+          "Department Head \u2013 Social Studies": [
+            "Social Studies Teacher"
+          ],
+          "Department Head \u2013 Arts": [
+            "Art Teacher",
+            "Music Teacher"
+          ],
+          "Department Head \u2013 World Languages": [
+            "Foreign Language Teacher"
+          ]
+        },
+        "Special Programs Chair": {
+          "Department Head \u2013 Special Education": [
+            "Special Education Teacher"
+          ],
+          "Department Head \u2013 ESL": [
+            "ESL Teacher"
+          ]
+        },
+        "Grade-Level Supervisor": {}
+      },
+      "Director of Student Support Services": {}
+    },
+    "Assistant Superintendent for Operations": {
+      "Operations Director": {},
+      "Human Resources Manager": {},
+      "Finance Manager": {},
+      "Office Manager": {}
+    },
+    "Director of Accountability": {}
+  }
+}

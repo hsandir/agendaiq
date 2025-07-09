@@ -1,0 +1,19 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Please don't change the port number. If you can't start it, kill the old one first. The port number should be 3000.
+
+Whenever you make any changes, use version control, save the old version of the file via git, explaining the changes made.
+
+Use issue tracking system.
+
+When you need to add something to a file or something doesn't work there, don't recreate the entire file. Change only the necessary parts.
+
+Always monitor the server logs for any potantial issues.
+
+Before giving result of changing, check the app for all kind of errors.
+Before starting the app, check the app for all kind of errors.
+
+All feedbacks should be in english.
