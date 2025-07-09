@@ -1,37 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { APIAuthPatterns } from "@/lib/auth/api-auth";
+import { AuthenticatedUser } from "@/lib/auth/auth-utils";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/meetings - Get meetings based on user role and hierarchy
-export async function GET(request: NextRequest) {
+export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Get user and their staff record with role information
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: {
-        staff: {
-          include: {
-            role: true,
-            department: true,
-            school: true,
-            district: true
-          }
-        },
-      }
-    });
-
-    if (!user || !user.staff || user.staff.length === 0) {
+    if (!user.staff) {
       return NextResponse.json({ error: "Staff record not found" }, { status: 404 });
     }
 
-    const staffRecord = user.staff[0];
-    const isAdmin = staffRecord.role?.title === 'Administrator';
+    const staffRecord = user.staff;
+    const isAdmin = staffRecord.role.title === 'Administrator';
 
     let meetingWhereClause;
 
@@ -39,8 +19,8 @@ export async function GET(request: NextRequest) {
       // Admins can see all meetings in their organization
       meetingWhereClause = {
         OR: [
-          { school_id: staffRecord.school_id },
-          { district_id: staffRecord.district_id }
+          { school_id: staffRecord.school.id },
+          { district_id: staffRecord.district.id }
         ]
       };
     } else {
@@ -67,7 +47,7 @@ export async function GET(request: NextRequest) {
           { organizer_id: staffRecord.id },
           // Meetings they're invited to
           {
-            attendees: {
+            MeetingAttendee: {
               some: {
                 staff_id: staffRecord.id,
               },
@@ -87,35 +67,35 @@ export async function GET(request: NextRequest) {
     const meetings = await prisma.meeting.findMany({
       where: meetingWhereClause,
       include: {
-        organizer: {
+        Staff: {
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 name: true,
                 email: true,
               },
             },
-            role: true
+            Role: true
           },
         },
-        attendees: {
+        MeetingAttendee: {
           include: {
-            staff: {
+            Staff: {
               include: {
-                user: {
+                User: {
                   select: {
                     id: true,
                     name: true,
                     email: true,
                   },
                 },
-                role: true
+                Role: true
               },
             },
           },
         },
-        department: true
+        Department: true
       },
       orderBy: {
         start_time: "asc",
@@ -130,22 +110,22 @@ export async function GET(request: NextRequest) {
       startTime: meeting.start_time?.toISOString() || '',
       endTime: meeting.end_time?.toISOString() || '',
       zoomLink: meeting.zoom_join_url,
-      status: 'scheduled', // Default status since it's not in the schema
+      status: meeting.status || 'scheduled',
       organizer: {
-        id: meeting.organizer.user.id,
-        name: meeting.organizer.user.name,
-        email: meeting.organizer.user.email,
-        role: meeting.organizer.role?.title
+        id: meeting.Staff.User.id,
+        name: meeting.Staff.User.name,
+        email: meeting.Staff.User.email,
+        role: meeting.Staff.Role?.title
       },
-      attendees: meeting.attendees.map(attendee => ({
+      attendees: meeting.MeetingAttendee.map(attendee => ({
         id: attendee.id,
         status: attendee.status || 'pending',
         user: {
-          ...attendee.staff.user,
-          role: attendee.staff.role?.title
+          ...attendee.Staff.User,
+          role: attendee.Staff.Role?.title
         }
       })),
-      department: meeting.department?.name,
+      department: meeting.Department?.name,
       isOrganizer: meeting.organizer_id === staffRecord.id,
       canEdit: isAdmin || meeting.organizer_id === staffRecord.id,
     }));
@@ -153,7 +133,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ 
       meetings: transformedMeetings,
       total: transformedMeetings.length,
-      userRole: staffRecord.role?.title,
+      userRole: staffRecord.role.title,
       isAdmin
     });
   } catch (error) {
@@ -163,28 +143,16 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
 // POST /api/meetings - Create a new meeting
-export async function POST(request: NextRequest) {
+export const POST = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: {
-        staff: true,
-      }
-    });
-
-    if (!user || !user.staff || user.staff.length === 0) {
+    if (!user.staff) {
       return NextResponse.json({ error: "Staff record not found" }, { status: 404 });
     }
 
-    const staffRecord = user.staff[0];
+    const staffRecord = user.staff;
 
     const body = await request.json();
     const {
@@ -223,10 +191,10 @@ export async function POST(request: NextRequest) {
         end_time: end,
         zoom_join_url: zoomLink,
         organizer_id: staffRecord.id,
-        department_id: staffRecord.department_id,
-        school_id: staffRecord.school_id,
-        district_id: staffRecord.district_id,
-        attendees: {
+        department_id: staffRecord.department.id,
+        school_id: staffRecord.school.id,
+        district_id: staffRecord.district.id,
+        MeetingAttendee: {
           create: attendeeIds.map((staffId: string) => ({
             staff_id: parseInt(staffId),
             status: "pending",
@@ -234,9 +202,9 @@ export async function POST(request: NextRequest) {
         },
       },
       include: {
-        organizer: {
+        Staff: {
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 name: true,
@@ -245,11 +213,11 @@ export async function POST(request: NextRequest) {
             },
           },
         },
-        attendees: {
+        MeetingAttendee: {
           include: {
-            staff: {
+            Staff: {
               include: {
-                user: {
+                User: {
                   select: {
                     id: true,
                     name: true,
@@ -286,16 +254,16 @@ export async function POST(request: NextRequest) {
       startTime: meeting.start_time?.toISOString() || '',
       endTime: meeting.end_time?.toISOString() || '',
       zoomLink: meeting.zoom_join_url,
-      status: 'scheduled',
+      status: meeting.status || 'scheduled',
       organizer: {
-        id: meeting.organizer.user.id,
-        name: meeting.organizer.user.name,
-        email: meeting.organizer.user.email,
+        id: meeting.Staff.User.id,
+        name: meeting.Staff.User.name,
+        email: meeting.Staff.User.email,
       },
-      attendees: meeting.attendees.map(attendee => ({
+      attendees: meeting.MeetingAttendee.map(attendee => ({
         id: attendee.id,
         status: attendee.status || 'pending',
-        user: attendee.staff.user,
+        user: attendee.Staff.User,
       })),
       isOrganizer: true,
     };
@@ -311,33 +279,17 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
 // PUT /api/meetings - Update an existing meeting
-export async function PUT(request: NextRequest) {
+export const PUT = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: {
-        staff: {
-          include: {
-            role: true
-          }
-        },
-      }
-    });
-
-    if (!user || !user.staff || user.staff.length === 0) {
+    if (!user.staff) {
       return NextResponse.json({ error: "Staff record not found" }, { status: 404 });
     }
 
-    const staffRecord = user.staff[0];
-    const isAdmin = staffRecord.role?.title === 'Administrator';
+    const staffRecord = user.staff;
+    const isAdmin = staffRecord.role.title === 'Administrator';
 
     const body = await request.json();
     const {
@@ -363,7 +315,7 @@ export async function PUT(request: NextRequest) {
     const existingMeeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        attendees: true
+        MeetingAttendee: true
       }
     });
 
@@ -399,7 +351,7 @@ export async function PUT(request: NextRequest) {
       description: existingMeeting.description,
       start_time: existingMeeting.start_time,
       end_time: existingMeeting.end_time,
-      attendee_count: existingMeeting.attendees.length
+      attendee_count: existingMeeting.MeetingAttendee.length
     };
 
     // Update meeting
@@ -411,7 +363,7 @@ export async function PUT(request: NextRequest) {
         start_time: start,
         end_time: end,
         zoom_join_url: zoomLink,
-        attendees: {
+        MeetingAttendee: {
           deleteMany: {},
           create: attendeeIds.map((staffId: string) => ({
             staff_id: parseInt(staffId),
@@ -420,9 +372,9 @@ export async function PUT(request: NextRequest) {
         },
       },
       include: {
-        organizer: {
+        Staff: {
           include: {
-            user: {
+            User: {
               select: {
                 id: true,
                 name: true,
@@ -431,11 +383,11 @@ export async function PUT(request: NextRequest) {
             },
           },
         },
-        attendees: {
+        MeetingAttendee: {
           include: {
-            staff: {
+            Staff: {
               include: {
-                user: {
+                User: {
                   select: {
                     id: true,
                     name: true,
@@ -476,16 +428,16 @@ export async function PUT(request: NextRequest) {
       startTime: meeting.start_time?.toISOString() || '',
       endTime: meeting.end_time?.toISOString() || '',
       zoomLink: meeting.zoom_join_url,
-      status: 'scheduled',
+      status: meeting.status || 'scheduled',
       organizer: {
-        id: meeting.organizer.user.id,
-        name: meeting.organizer.user.name,
-        email: meeting.organizer.user.email,
+        id: meeting.Staff.User.id,
+        name: meeting.Staff.User.name,
+        email: meeting.Staff.User.email,
       },
-      attendees: meeting.attendees.map(attendee => ({
+      attendees: meeting.MeetingAttendee.map(attendee => ({
         id: attendee.id,
         status: attendee.status || 'pending',
-        user: attendee.staff.user,
+        user: attendee.Staff.User,
       })),
       isOrganizer: meeting.organizer_id === staffRecord.id,
     };
@@ -501,4 +453,4 @@ export async function PUT(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}); 

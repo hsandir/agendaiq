@@ -1,40 +1,29 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireAuth, AuthPresets } from "@/lib/auth/auth-utils";
 import { prisma } from "@/lib/prisma";
 import { MeetingForm } from "@/components/meetings/MeetingForm";
-import { redirect } from "next/navigation";
 
 export default async function NewMeetingPage() {
-  const session = await getServerSession(authOptions);
+  // Require staff membership to create meetings
+  const user = await requireAuth(AuthPresets.requireStaff);
 
-  if (!session) {
-    redirect("/auth/signin");
+  if (!user.staff) {
+    throw new Error("Staff record not found");
   }
 
-  const currentUserId = parseInt(session.user.id || '0');
-
-  // Fetch current user's staff record to get staff_id
-  const currentUserStaff = await prisma.staff.findFirst({
-    where: { user_id: currentUserId },
-    include: { user: true }
-  });
-
-  if (!currentUserStaff) {
-    redirect("/dashboard");
-  }
+  const currentStaff = user.staff;
 
   // Fetch all staff except the current user, with their user info
   const staff = await prisma.staff.findMany({
     where: {
       NOT: {
-        user_id: currentUserId,
+        user_id: user.id,
       },
     },
     include: {
-      user: true
+      User: true
     },
     orderBy: {
-      user: {
+      User: {
         name: "asc",
       }
     },
@@ -43,8 +32,8 @@ export default async function NewMeetingPage() {
   // Transform staff data to match MeetingForm interface
   const users = staff.map(s => ({
     id: s.id.toString(), // Use staff ID, not user ID
-    name: s.user.name,
-    email: s.user.email,
+    name: s.User.name,
+    email: s.User.email,
   }));
 
   async function createMeeting(data: {
@@ -56,27 +45,11 @@ export default async function NewMeetingPage() {
   }) {
     "use server";
 
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      throw new Error("Not authenticated");
-    }
-
-    const currentUserId = parseInt(session.user.id || '0');
-    const currentUserStaff = await prisma.staff.findFirst({
-      where: { user_id: currentUserId }
-    });
-
-    if (!currentUserStaff) {
+    // Get current user again for the server action
+    const currentUser = await requireAuth(AuthPresets.requireStaff);
+    
+    if (!currentUser.staff) {
       throw new Error("Staff record not found");
-    }
-
-    // Get the user record for audit logging
-    const user = await prisma.user.findUnique({
-      where: { id: currentUserId }
-    });
-
-    if (!user) {
-      throw new Error("User record not found");
     }
 
     // Create the meeting
@@ -86,14 +59,14 @@ export default async function NewMeetingPage() {
         description: data.description || "",
         start_time: new Date(data.startTime),
         end_time: new Date(data.endTime),
-        organizer_id: currentUserStaff.id,
-        department_id: currentUserStaff.department_id,
-        school_id: currentUserStaff.school_id,
-        district_id: currentUserStaff.district_id,
-        attendees: {
+        organizer_id: currentUser.staff.id,
+        department_id: currentUser.staff.department.id,
+        school_id: currentUser.staff.school.id,
+        district_id: currentUser.staff.district.id,
+        MeetingAttendee: {
           create: data.attendeeIds.map((staffId) => ({
             staff_id: parseInt(staffId),
-            status: "PENDING",
+            status: "pending",
           })),
         },
       },
@@ -103,7 +76,7 @@ export default async function NewMeetingPage() {
     await prisma.meetingAuditLog.create({
       data: {
         meeting_id: meeting.id,
-        user_id: user.id,
+        user_id: currentUser.id,
         action: "created",
         details: {
           title: meeting.title,

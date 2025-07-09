@@ -1,29 +1,8 @@
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { requireAuth, AuthPresets } from "@/lib/auth/auth-utils";
 
 export default async function ErrorManagementPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) {
-    redirect("/auth/signin");
-  }
-
-  // Check if user is admin
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    include: { 
-      staff: {
-        include: {
-          role: true
-        }
-      }
-    }
-  });
-
-  if (!user?.staff?.[0]?.role || user.staff[0].role.title !== "Administrator") {
-    redirect("/dashboard?error=access_denied");
-  }
+  // Require admin role to access this page
+  const user = await requireAuth(AuthPresets.adminOnly);
 
   return (
     <div className="space-y-6">
