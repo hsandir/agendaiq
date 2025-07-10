@@ -30,16 +30,22 @@ export default async function MeetingPage({ params }: PageProps) {
     where: { id: meetingId },
     include: {
       Staff: {
-        include: { User: true
+        include: { 
+          User: true
         }
       },
-      attendees: {
-        include: { Staff: {
-            include: { User: true
+      MeetingAttendee: {
+        include: { 
+          Staff: {
+            include: { 
+              User: true
             }
           }
         }
-      }
+      },
+      Department: true,
+      School: true,
+      District: true
     },
   });
 
@@ -51,16 +57,16 @@ export default async function MeetingPage({ params }: PageProps) {
   const currentUser = await prisma.user.findUnique({
     where: { email: session.user.email || "" },
     include: {
-      staff: true
+      Staff: true
     }
   });
 
-  const userStaffId = currentUser?.staff?.[0]?.id;
-  const userAttendee = meeting.attendees.find(
+  const userStaffId = currentUser?.Staff?.[0]?.id;
+  const userAttendee = meeting.MeetingAttendee.find(
     (a) => a.staff_id === userStaffId
   );
   const isOrganizer = meeting.organizer_id === userStaffId;
-  const canRespond = userAttendee && userAttendee.status === "PENDING";
+  const canRespond = userAttendee && userAttendee.status === "pending";
 
   // Transform the meeting data to match the component interface
   const transformedMeeting = {
@@ -70,20 +76,20 @@ export default async function MeetingPage({ params }: PageProps) {
     startTime: meeting.start_time?.toISOString() || new Date().toISOString(),
     endTime: meeting.end_time?.toISOString() || new Date().toISOString(),
     zoomLink: meeting.zoom_join_url || undefined,
-    status: "SCHEDULED", // Default status
-    Staff: {
-      id: meeting.organizer.user.id,
-      name: meeting.organizer.user.name,
-      email: meeting.organizer.user.email
+    status: meeting.status || "draft",
+    organizer: {
+      id: meeting.Staff.User.id,
+      name: meeting.Staff.User.name,
+      email: meeting.Staff.User.email
     },
-    attendees: meeting.attendees.map(attendee => ({
+    attendees: meeting.MeetingAttendee.map(attendee => ({
       id: attendee.id.toString(),
       status: attendee.status,
       staff: {
         user: {
-          id: attendee.staff.user.id,
-          name: attendee.staff.user.name,
-          email: attendee.staff.user.email
+          id: attendee.Staff.User.id,
+          name: attendee.Staff.User.name,
+          email: attendee.Staff.User.email
         }
       }
     })),
