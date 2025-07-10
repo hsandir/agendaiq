@@ -1,7 +1,7 @@
 import { requireAuth, AuthPresets } from "@/lib/auth/auth-utils";
 import { prisma } from "@/lib/prisma";
 import { MeetingFormStep1 } from "@/components/meetings/MeetingFormStep1";
-import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export default async function NewMeetingPage() {
   // Require staff membership to create meetings
@@ -137,8 +137,15 @@ export default async function NewMeetingPage() {
         }
       });
 
-      // Redirect to step 2 (agenda and content planning)
-      redirect(`/dashboard/meetings/${meeting.id}/edit`);
+      // Revalidate the meetings page
+      revalidatePath('/dashboard/meetings');
+
+      // Return success with meeting ID for client-side redirect
+      return { 
+        success: true, 
+        meetingId: meeting.id,
+        message: "Meeting created successfully. Redirecting to step 2..." 
+      };
       
     } catch (error) {
       console.error("Error creating meeting:", error);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,6 +53,7 @@ interface MeetingFormStep1Props {
 }
 
 export function MeetingFormStep1({ users, departments, roles, onSubmit }: MeetingFormStep1Props) {
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [startTime, setStartTime] = useState("");
@@ -68,6 +70,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Filter states
   const [departmentFilter, setDepartmentFilter] = useState("all");
@@ -119,6 +122,8 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
       const result = await onSubmit({
         title,
@@ -135,12 +140,17 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
         parentMeetingId,
       });
       
-      if (result?.message) {
+      if (result?.success && result?.meetingId) {
+        // Client-side redirect to Step 2
+        router.push(`/dashboard/meetings/${result.meetingId}/edit`);
+      } else if (result?.message) {
         alert(result.message);
       }
     } catch (error) {
       console.error("Error creating meeting:", error);
       alert("Error creating meeting. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -444,8 +454,8 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
 
       {/* Submit Button */}
       <div className="flex justify-end">
-        <Button type="submit" className="px-8">
-          Continue to Step 2
+        <Button type="submit" className="px-8" disabled={isSubmitting}>
+          {isSubmitting ? "Creating..." : "Continue to Step 2"}
         </Button>
       </div>
     </form>
