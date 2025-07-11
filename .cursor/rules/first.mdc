@@ -22,3 +22,5 @@ Before starting the app, check the app for all kind of errors.
 All feedbacks should be in English.
 
 Her islem yaptiginda sayfalarin tek bir merkezden auth olup oladigini kontrol et.
+
+Daima css'i merkezi sistemden kullan. Dosyaya ozel tasarim yapma.
