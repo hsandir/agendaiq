@@ -44,35 +44,30 @@ export default function HealthOverviewPage() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      // Mock data - replace with actual API calls
-      setHealthChecks({
-        total: 12,
-        passing: 8,
-        warning: 3,
-        failed: 1,
-        checks: [
-          { name: 'Database Connection', status: 'pass', lastCheck: '2 min ago' },
-          { name: 'API Endpoints', status: 'pass', lastCheck: '2 min ago' },
-          { name: 'File System', status: 'warning', lastCheck: '3 min ago' },
-          { name: 'Memory Usage', status: 'pass', lastCheck: '1 min ago' },
-          { name: 'Disk Space', status: 'warning', lastCheck: '2 min ago' },
-          { name: 'Network', status: 'pass', lastCheck: '1 min ago' },
-          { name: 'External Services', status: 'fail', lastCheck: '5 min ago' },
-          { name: 'SSL Certificate', status: 'pass', lastCheck: '1 hour ago' },
-          { name: 'Dependencies', status: 'pass', lastCheck: '10 min ago' },
-          { name: 'Security Scan', status: 'warning', lastCheck: '15 min ago' },
-          { name: 'Backup Status', status: 'pass', lastCheck: '30 min ago' },
-          { name: 'Log Rotation', status: 'pass', lastCheck: '1 hour ago' }
-        ]
-      });
+      // Fetch real system status
+      const statusResponse = await fetch('/api/system/status');
+      if (statusResponse.ok) {
+        const statusData = await statusResponse.json();
+        setStatus(statusData);
+      }
 
-      setStatus({
-        linting: {
-          errors: 194,
-          warnings: 12,
-          files: ['auth.ts', 'dashboard.tsx', 'api/health.ts', 'components/ui.tsx']
-        }
-      });
+      // Fetch real health check data
+      const healthResponse = await fetch('/api/system/health-check?action=quick');
+      if (healthResponse.ok) {
+        const healthData = await healthResponse.json();
+        setHealthChecks({
+          total: healthData.results?.length || 0,
+          passing: healthData.results?.filter((r: any) => r.status === 'success').length || 0,
+          warning: healthData.results?.filter((r: any) => r.status === 'warning').length || 0,
+          failed: healthData.results?.filter((r: any) => r.status === 'error').length || 0,
+          checks: healthData.results?.map((result: any) => ({
+            name: result.name,
+            status: result.status === 'success' ? 'pass' as const : 
+                   result.status === 'warning' ? 'warning' as const : 'fail' as const,
+            lastCheck: new Date(result.timestamp).toLocaleString()
+          })) || []
+        });
+      }
     } catch (error) {
       console.error('Failed to fetch health data:', error);
     } finally {
