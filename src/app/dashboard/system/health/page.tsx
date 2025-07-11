@@ -20,8 +20,11 @@ import {
   Database,
   Cpu,
   HardDrive,
-  Copy
+  Copy,
+  ArrowLeft,
+  Wrench
 } from "lucide-react";
+import Link from "next/link";
 
 interface HealthResult {
   name: string;
@@ -215,6 +218,12 @@ END OF REPORT
         </div>
         
         <div className="flex gap-2">
+          <Link href="/dashboard/system">
+            <Button variant="outline" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to System
+            </Button>
+          </Link>
           <Button 
             onClick={() => runHealthCheck(activeTab as any)}
             variant="outline"
@@ -223,6 +232,31 @@ END OF REPORT
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Re-run Check
+          </Button>
+          <Button 
+            onClick={async () => {
+              try {
+                const response = await fetch('/api/system/fix', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ action: 'check' })
+                });
+                if (response.ok) {
+                  const data = await response.json();
+                  showNotification(`System fix check completed: ${data.message}`);
+                  // Re-run health check after fix
+                  setTimeout(() => runHealthCheck(activeTab as any), 2000);
+                }
+              } catch (error) {
+                showNotification('Failed to run system fix');
+              }
+            }}
+            variant="default"
+            size="sm"
+            disabled={loading}
+          >
+            <Wrench className="h-4 w-4 mr-2" />
+            Fix the Error
           </Button>
         </div>
       </div>

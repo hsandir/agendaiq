@@ -215,7 +215,7 @@ async function checkPage(url: string, name: string) {
       headers: {
         'User-Agent': 'AgendaIQ-HealthChecker/1.0'
       },
-      signal: AbortSignal.timeout(10000) // 10 second timeout
+      signal: AbortSignal.timeout(30000) // 30 second timeout for slow APIs
     });
 
     const responseTime = Date.now() - startTime;

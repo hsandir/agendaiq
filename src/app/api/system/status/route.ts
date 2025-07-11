@@ -266,21 +266,45 @@ async function checkMissingDependencies() {
 
 async function getDatabaseStatus() {
   try {
+    // Test basic connection first
     await prisma.$connect();
     
-    // Get table count
-    const tables = await prisma.$queryRaw`
-      SELECT COUNT(*) as count 
-      FROM information_schema.tables 
-      WHERE table_schema = 'public'
-    ` as any[];
-
-    await prisma.$disconnect();
+    // Simple query to test connection
+    const result = await prisma.$queryRaw`SELECT 1 as test` as any[];
     
+    if (result && result.length > 0) {
+      // If basic query works, try to get table count
+      try {
+        const tables = await prisma.$queryRaw`
+          SELECT COUNT(*) as count 
+          FROM information_schema.tables 
+          WHERE table_schema = 'public'
+        ` as any[];
+        
+        await prisma.$disconnect();
+        
+        return {
+          connected: true,
+          status: 'PostgreSQL Connected',
+          tables: Number(tables[0]?.count || 0)
+        };
+      } catch (tableError: any) {
+        await prisma.$disconnect();
+        return {
+          connected: true,
+          status: 'PostgreSQL Connected (Basic)',
+          tables: 0,
+          note: 'Could not get table count'
+        };
+      }
+    }
+    
+    await prisma.$disconnect();
     return {
-      connected: true,
-      status: 'PostgreSQL Connected',
-      tables: Number(tables[0]?.count || 0)
+      connected: false,
+      status: 'Database Connection Failed',
+      error: 'Basic connection test failed',
+      tables: 0
     };
   } catch (error: any) {
     return {
