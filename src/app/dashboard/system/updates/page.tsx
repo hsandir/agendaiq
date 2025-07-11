@@ -69,6 +69,18 @@ export default function UpdatesPage() {
   const [updateResult, setUpdateResult] = useState<UpdateResult | null>(null);
   const [lastCheck, setLastCheck] = useState<string>("");
   const [vulnerabilities, setVulnerabilities] = useState(0);
+  const [systemHealth, setSystemHealth] = useState<{
+    cacheStatus: 'clean' | 'corrupted' | 'unknown';
+    nodeModulesStatus: 'clean' | 'corrupted' | 'unknown';
+    lastCacheClean: string;
+    suggestion: string;
+  }>({
+    cacheStatus: 'unknown',
+    nodeModulesStatus: 'unknown', 
+    lastCacheClean: '',
+    suggestion: ''
+  });
+  const [isFixing, setIsFixing] = useState(false);
 
   // Compatibility assessment function
   const assessCompatibility = (pkg: PackageUpdate): CompatibilityInfo => {
@@ -190,6 +202,9 @@ export default function UpdatesPage() {
         setUpdates(data.packages.outdated || []);
         setVulnerabilities(data.packages.vulnerabilities || 0);
         setLastCheck(new Date().toLocaleString());
+        
+        // Check system health for cache issues
+        await checkSystemHealth();
       } else {
         console.error('Failed to fetch system status');
       }
@@ -197,6 +212,61 @@ export default function UpdatesPage() {
       console.error('Failed to fetch updates:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const checkSystemHealth = async () => {
+    try {
+      const response = await fetch('/api/system/fix', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'check' })
+      });
+      
+      if (response.ok) {
+        const healthData = await response.json();
+        setSystemHealth(healthData);
+      }
+    } catch (error) {
+      console.error('Failed to check system health:', error);
+    }
+  };
+
+  const fixSystemIssues = async () => {
+    setIsFixing(true);
+    try {
+      const response = await fetch('/api/system/fix', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'fix' })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        setUpdateResult({
+          success: true,
+          message: result.message || 'System issues fixed successfully!'
+        });
+        
+        // Refresh after fix
+        setTimeout(() => {
+          fetchUpdates();
+        }, 2000);
+      } else {
+        const error = await response.json();
+        setUpdateResult({
+          success: false,
+          message: `Fix failed: ${error.error}`
+        });
+      }
+    } catch (error) {
+      console.error('Fix failed:', error);
+      setUpdateResult({
+        success: false,
+        message: 'System fix failed: ' + (error as Error).message
+      });
+    } finally {
+      setIsFixing(false);
     }
   };
 
@@ -385,6 +455,57 @@ export default function UpdatesPage() {
           </span>
         </AlertDescription>
       </Alert>
+
+      {/* System Health Check Section */}
+      {(systemHealth.cacheStatus === 'corrupted' || systemHealth.nodeModulesStatus === 'corrupted') && (
+        <Alert className="border-orange-200 bg-orange-50">
+          <AlertTriangle className="h-4 w-4 text-orange-600" />
+          <AlertDescription className="text-orange-800">
+            <div className="space-y-2">
+              <div><strong>System Issues Detected:</strong></div>
+              {systemHealth.cacheStatus === 'corrupted' && (
+                <div>• NPM cache corruption detected - this may cause update failures</div>
+              )}
+              {systemHealth.nodeModulesStatus === 'corrupted' && (
+                <div>• Node modules corruption detected - duplicate or broken packages found</div>
+              )}
+              <div className="mt-3">
+                <Button 
+                  size="sm" 
+                  onClick={fixSystemIssues}
+                  disabled={isFixing}
+                  className="bg-orange-600 hover:bg-orange-700"
+                >
+                  {isFixing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Fixing...
+                    </>
+                  ) : (
+                    <>
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      Fix System Issues
+                    </>
+                  )}
+                </Button>
+                <span className="ml-2 text-sm text-orange-700">{systemHealth.suggestion}</span>
+              </div>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {(systemHealth.cacheStatus === 'clean' && systemHealth.nodeModulesStatus === 'clean') && (
+        <Alert className="border-green-200 bg-green-50">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800">
+            <strong>System Health:</strong> NPM cache and node modules are clean. 
+            {systemHealth.lastCacheClean && (
+              <span className="ml-1">Last cache clean: {systemHealth.lastCacheClean}</span>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Update Result Alert */}
       {updateResult && (
