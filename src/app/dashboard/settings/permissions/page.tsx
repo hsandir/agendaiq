@@ -20,15 +20,15 @@ export default async function PermissionsPage() {
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
     include: { 
-      staff: {
+      Staff: {
         include: {
-          role: true
+          Role: true
         }
       }
     },
   });
 
-  if (!user || user.staff?.[0]?.role?.title !== "Administrator") {
+  if (!user || user.Staff?.[0]?.Role?.title !== "Administrator") {
     redirect("/dashboard");
   }
 

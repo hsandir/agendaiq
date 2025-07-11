@@ -15,12 +15,12 @@ export async function GET(request: NextRequest) {
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       include: { 
-        staff: {
+        Staff: {
           include: {
-            role: true,
-            school: {
+            Role: true,
+            School: {
               include: {
-                district: true
+                District: true
               }
             }
           }
@@ -28,25 +28,25 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    if (!user || !user.staff || user.staff.length === 0) {
+    if (!user || !user.Staff || user.Staff.length === 0) {
       return NextResponse.json({ error: "User staff record not found" }, { status: 404 });
     }
 
-    const staffRecord = user.staff[0];
+    const staffRecord = user.Staff[0];
 
-    if (staffRecord.role?.title === "Administrator") {
+    if (staffRecord.Role?.title === "Administrator") {
       // Admin: return all schools
       const schools = await prisma.school.findMany({
-        include: { district: true },
+        include: { District: true },
         orderBy: { name: "asc" },
       });
       return NextResponse.json(schools);
     } else {
       // Non-admin: return only user's school
-      if (!staffRecord.school) {
+      if (!staffRecord.School) {
         return NextResponse.json({ error: "No school assigned" }, { status: 404 });
       }
-      return NextResponse.json([staffRecord.school]);
+      return NextResponse.json([staffRecord.School]);
     }
   } catch (error) {
     console.error("Error fetching schools:", error);
@@ -66,15 +66,15 @@ export async function POST(request: NextRequest) {
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       include: { 
-        staff: {
+        Staff: {
           include: {
-            role: true
+            Role: true
           }
         }
       },
     });
     
-    if (!user || !user.staff?.[0] || user.staff[0].role?.title !== "Administrator") {
+    if (!user || !user.Staff?.[0] || user.Staff[0].Role?.title !== "Administrator") {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
     
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
         address,
         district_id: district.id,
       },
-      include: { district: true },
+      include: { District: true },
     });
     
     return NextResponse.json(school);
@@ -120,15 +120,15 @@ export async function PUT(request: NextRequest) {
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       include: { 
-        staff: {
+        Staff: {
           include: {
-            role: true
+            Role: true
           }
         }
       },
     });
     
-    if (!user || !user.staff?.[0] || user.staff[0].role?.title !== "Administrator") {
+    if (!user || !user.Staff?.[0] || user.Staff[0].Role?.title !== "Administrator") {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
     
@@ -145,7 +145,7 @@ export async function PUT(request: NextRequest) {
     const school = await prisma.school.update({
       where: { id: parseInt(id) },
       data: { name, address },
-      include: { district: true },
+      include: { District: true },
     });
     
     return NextResponse.json(school);
@@ -167,15 +167,15 @@ export async function DELETE(request: NextRequest) {
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       include: { 
-        staff: {
+        Staff: {
           include: {
-            role: true
+            Role: true
           }
         }
       },
     });
     
-    if (!user || !user.staff?.[0] || user.staff[0].role?.title !== "Administrator") {
+    if (!user || !user.Staff?.[0] || user.Staff[0].Role?.title !== "Administrator") {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
     

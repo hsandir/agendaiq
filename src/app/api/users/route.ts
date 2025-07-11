@@ -13,15 +13,15 @@ export async function GET(request: Request) {
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
       include: { 
-        staff: {
+        Staff: {
           include: {
-            role: true
+            Role: true
           }
         }
       },
     });
 
-    if (!user || user.staff?.[0]?.role?.title !== "Administrator") {
+    if (!user || user.Staff?.[0]?.Role?.title !== "Administrator") {
       return NextResponse.json(
         { error: "Only administrators can view all users" },
         { status: 403 }
@@ -30,11 +30,11 @@ export async function GET(request: Request) {
 
     const users = await prisma.user.findMany({
       include: {
-        staff: {
+        Staff: {
           include: {
-            role: true,
-            department: true,
-            school: true
+            Role: true,
+            Department: true,
+            School: true
           }
         }
       },
