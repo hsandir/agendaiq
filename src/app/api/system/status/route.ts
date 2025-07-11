@@ -79,44 +79,61 @@ export async function GET(request: NextRequest) {
 
 async function getPackageStatus() {
   try {
-    const { stdout } = await execAsync('npm outdated --json', { cwd: process.cwd() });
-    const outdatedPackages = JSON.parse(stdout || '{}');
+    // Use timeout to prevent hanging
+    const timeout = 10000; // 10 seconds
     
-    const outdatedList = Object.entries(outdatedPackages)
-      .map(([name, info]: [string, any]) => ({
-        name,
-        current: info.current,
-        wanted: info.wanted,
-        latest: info.latest,
-        type: getUpdateType(info.current, info.latest)
-      }))
-      .filter(pkg => {
-        // Filter out same versions
-        if (pkg.current === pkg.latest || pkg.current === pkg.wanted) {
-          return false;
-        }
-        
-        // Filter out downgrades (when "latest" is actually older)
-        if (isActualDowngrade(pkg.current, pkg.latest)) {
-          return false;
-        }
-        
-        // Filter out Node.js incompatible packages
-        if (pkg.name === 'lru-cache' && pkg.latest.includes('11.')) {
-          return false; // Skip lru-cache v11 (requires Node 20+)
-        }
-        
-        return true;
-      });
-
-    // Check for vulnerabilities
+    // Check for vulnerabilities first (faster)
     let vulnerabilities = 0;
     try {
-      const { stdout: auditOutput } = await execAsync('npm audit --json', { cwd: process.cwd() });
-      const auditData = JSON.parse(auditOutput);
+      const result = await Promise.race([
+        execAsync('npm audit --json --audit-level=moderate', { cwd: process.cwd() }),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
+      ]) as { stdout: string };
+      const auditData = JSON.parse(result.stdout);
       vulnerabilities = auditData.metadata?.vulnerabilities?.total || 0;
     } catch {
       // npm audit returns non-zero exit code when vulnerabilities are found
+    }
+
+    // Check outdated packages with timeout
+    let outdatedList: OutdatedPackage[] = [];
+    try {
+      const result = await Promise.race([
+        execAsync('npm outdated --json', { cwd: process.cwd() }),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout))
+      ]) as { stdout: string };
+      
+              const outdatedPackages = JSON.parse(result.stdout || '{}');
+      
+      outdatedList = Object.entries(outdatedPackages)
+        .map(([name, info]: [string, any]) => ({
+          name,
+          current: info.current,
+          wanted: info.wanted,
+          latest: info.latest,
+          type: getUpdateType(info.current, info.latest)
+        }))
+        .filter(pkg => {
+          // Filter out same versions
+          if (pkg.current === pkg.latest || pkg.current === pkg.wanted) {
+            return false;
+          }
+          
+          // Filter out downgrades (when "latest" is actually older)
+          if (isActualDowngrade(pkg.current, pkg.latest)) {
+            return false;
+          }
+          
+          // Filter out Node.js incompatible packages
+          if (pkg.name === 'lru-cache' && pkg.latest.includes('11.')) {
+            return false; // Skip lru-cache v11 (requires Node 20+)
+          }
+          
+          return true;
+        });
+    } catch (error) {
+      console.log('npm outdated timed out or failed, using cached data');
+      // Return empty list if command times out
     }
 
     return {
