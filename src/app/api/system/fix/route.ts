@@ -62,8 +62,10 @@ async function checkSystemHealth() {
       const modules = await readdir(nodeModulesPath);
       const problematicPatterns = [
         /.*\s+\d+$/,  // Folders with trailing numbers (like "date-fns 2")
-        /^\./,        // Hidden folders that shouldn't be there
-        /.*-[A-Za-z0-9]{8,}$/  // Temp folders with random suffixes
+        /^\.(?!bin$|cache$)/,  // Hidden folders except .bin and .cache
+        /.*-[A-Za-z0-9]{8,}$/,  // Temp folders with random suffixes
+        /^@.*\s+/,    // Scoped packages with spaces
+        /-\d{6,}$/    // Folders ending with long numbers
       ];
       
       const problematicFolders = modules.filter(folder => 
