@@ -390,7 +390,7 @@ export default function SystemManagementPage() {
                 <div className="flex gap-2 text-sm">
                   <Link href="/dashboard/system/logs" className="text-blue-600 hover:underline flex items-center">
                     <FileText className="w-4 h-4 mr-1" />
-                    View Error Logs (23)
+                    View Error Logs ({status.linting?.errors || 0})
                   </Link>
                 </div>
                 <div className="flex gap-2 text-sm">
@@ -399,6 +399,22 @@ export default function SystemManagementPage() {
                     Configure Alerts
                   </Link>
                 </div>
+                {status.health.issues.length > 0 && (
+                  <div className="flex gap-2 text-sm">
+                    <span className="text-red-600 flex items-center">
+                      <AlertCircle className="w-4 h-4 mr-1" />
+                      {status.health.issues.length} critical issues
+                    </span>
+                  </div>
+                )}
+                {status.health.warnings.length > 0 && (
+                  <div className="flex gap-2 text-sm">
+                    <span className="text-yellow-600 flex items-center">
+                      <AlertTriangle className="w-4 h-4 mr-1" />
+                      {status.health.warnings.length} warnings
+                    </span>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

@@ -76,7 +76,19 @@ export default function AlertsConfigurationPage() {
     try {
       setLoading(true);
       
-      // Mock alerts configuration for demo purposes
+      // Fetch real alerts configuration from API
+      const response = await fetch('/api/system/alerts');
+      if (response.ok) {
+        const data = await response.json();
+        setAlertsConfig(data);
+      } else {
+        throw new Error('Failed to fetch alerts configuration');
+      }
+    } catch (error) {
+      console.error('Failed to fetch alerts configuration:', error);
+      showNotification('Failed to fetch alerts configuration');
+      
+      // Fallback to mock data if API fails
       const mockAlertsConfig: AlertsConfig = {
         rules: [
           {
@@ -196,9 +208,6 @@ export default function AlertsConfigurationPage() {
       };
       
       setAlertsConfig(mockAlertsConfig);
-    } catch (error) {
-      console.error('Failed to fetch alerts configuration:', error);
-      showNotification('Failed to fetch alerts configuration');
     } finally {
       setLoading(false);
     }
@@ -208,10 +217,22 @@ export default function AlertsConfigurationPage() {
     try {
       setSaving(true);
       
-      // Mock save operation
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!alertsConfig) return;
       
-      showNotification('Alert configuration saved successfully!');
+      // Save configuration to API
+      const response = await fetch('/api/system/alerts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(alertsConfig),
+      });
+      
+      if (response.ok) {
+        showNotification('Alert configuration saved successfully!');
+      } else {
+        throw new Error('Failed to save configuration');
+      }
     } catch (error) {
       console.error('Failed to save configuration:', error);
       showNotification('Failed to save configuration');
