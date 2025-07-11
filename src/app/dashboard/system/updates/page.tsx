@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   Download,
   RefreshCw,
@@ -17,110 +18,61 @@ import {
   Shield,
   Clock,
   GitBranch,
-  Package
+  Package,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
 
 interface PackageUpdate {
   name: string;
-  currentVersion: string;
-  latestVersion: string;
-  type: 'major' | 'minor' | 'patch' | 'security';
-  description: string;
-  releaseDate: string;
-  size: string;
-  breaking: boolean;
-  securityFixes: number;
-  dependencies: number;
+  current: string;
+  wanted: string;
+  latest: string;
+  type: 'major' | 'minor' | 'patch';
+}
+
+interface UpdateResult {
+  success: boolean;
+  message: string;
+  summary?: {
+    attempted: number;
+    successful: number;
+    failed: number;
+    skipped: number;
+    details: Array<{
+      package: string;
+      status: 'success' | 'failed' | 'skipped';
+      reason?: string;
+      from?: string;
+      to?: string;
+      error?: string;
+    }>;
+  };
 }
 
 export default function UpdatesPage() {
   const [updates, setUpdates] = useState<PackageUpdate[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [selectedUpdates, setSelectedUpdates] = useState<Set<string>>(new Set());
+  const [updateResult, setUpdateResult] = useState<UpdateResult | null>(null);
+  const [lastCheck, setLastCheck] = useState<string>("");
+  const [vulnerabilities, setVulnerabilities] = useState(0);
 
   const fetchUpdates = async () => {
     setIsLoading(true);
     try {
-      // Mock data - replace with actual API calls
-      const mockUpdates: PackageUpdate[] = [
-        {
-          name: 'next',
-          currentVersion: '13.4.0',
-          latestVersion: '14.0.3',
-          type: 'major',
-          description: 'The React Framework for the Web',
-          releaseDate: '2 days ago',
-          size: '24.5 MB',
-          breaking: true,
-          securityFixes: 2,
-          dependencies: 45
-        },
-        {
-          name: 'react',
-          currentVersion: '18.2.0',
-          latestVersion: '18.2.15',
-          type: 'security',
-          description: 'React library for building user interfaces',
-          releaseDate: '1 week ago',
-          size: '2.8 MB',
-          breaking: false,
-          securityFixes: 3,
-          dependencies: 12
-        },
-        {
-          name: '@types/react',
-          currentVersion: '18.0.28',
-          latestVersion: '18.2.5',
-          type: 'minor',
-          description: 'TypeScript definitions for React',
-          releaseDate: '3 days ago',
-          size: '456 KB',
-          breaking: false,
-          securityFixes: 0,
-          dependencies: 3
-        },
-        {
-          name: 'tailwindcss',
-          currentVersion: '3.3.0',
-          latestVersion: '3.3.6',
-          type: 'patch',
-          description: 'Utility-first CSS framework',
-          releaseDate: '5 days ago',
-          size: '8.2 MB',
-          breaking: false,
-          securityFixes: 0,
-          dependencies: 18
-        },
-        {
-          name: 'eslint',
-          currentVersion: '8.40.0',
-          latestVersion: '8.56.0',
-          type: 'minor',
-          description: 'JavaScript and TypeScript linter',
-          releaseDate: '1 week ago',
-          size: '12.1 MB',
-          breaking: false,
-          securityFixes: 1,
-          dependencies: 34
-        },
-        {
-          name: 'prisma',
-          currentVersion: '4.15.0',
-          latestVersion: '5.7.1',
-          type: 'major',
-          description: 'Database toolkit and ORM',
-          releaseDate: '4 days ago',
-          size: '67.3 MB',
-          breaking: true,
-          securityFixes: 4,
-          dependencies: 28
-        }
-      ];
-      
-      setUpdates(mockUpdates);
+      const response = await fetch('/api/system/status');
+      if (response.ok) {
+        const data = await response.json();
+        setUpdates(data.packages.outdated || []);
+        setVulnerabilities(data.packages.vulnerabilities || 0);
+        setLastCheck(new Date().toLocaleString());
+      } else {
+        console.error('Failed to fetch system status');
+      }
     } catch (error) {
       console.error('Failed to fetch updates:', error);
     } finally {
@@ -128,17 +80,62 @@ export default function UpdatesPage() {
     }
   };
 
+  const performUpdate = async (packages?: string[]) => {
+    setIsUpdating(true);
+    setUpdateResult(null);
+    try {
+      const response = await fetch('/api/system/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          type: 'packages',
+          packages: packages || Array.from(selectedUpdates)
+        })
+      });
+      
+      const result = await response.json();
+      setUpdateResult(result);
+      
+      if (result.success) {
+        // Refresh the updates list after successful update
+        setTimeout(() => {
+          fetchUpdates();
+          setSelectedUpdates(new Set());
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Update failed:', error);
+      setUpdateResult({
+        success: false,
+        message: 'Update failed: ' + (error as Error).message
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const updateSecurityPackages = () => {
+    const securityPackages = updates
+      .filter(update => update.type === 'patch' || update.type === 'minor')
+      .map(update => update.name);
+    performUpdate(securityPackages);
+  };
+
+  const updateAllPatches = () => {
+    const patchPackages = updates
+      .filter(update => update.type === 'patch')
+      .map(update => update.name);
+    performUpdate(patchPackages);
+  };
+
   useEffect(() => {
     fetchUpdates();
   }, []);
 
-  const getTypeBadge = (type: string, breaking: boolean, securityFixes: number) => {
-    if (securityFixes > 0) {
-      return <Badge variant="destructive" className="bg-red-600">Security</Badge>;
-    }
+  const getTypeBadge = (type: string) => {
     switch (type) {
       case 'major':
-        return <Badge variant={breaking ? "destructive" : "outline"} className={breaking ? "bg-orange-600" : "text-orange-600 border-orange-600"}>Major</Badge>;
+        return <Badge variant="destructive" className="bg-orange-600">Major</Badge>;
       case 'minor':
         return <Badge variant="outline" className="text-blue-600 border-blue-600">Minor</Badge>;
       case 'patch':
@@ -148,10 +145,7 @@ export default function UpdatesPage() {
     }
   };
 
-  const getTypeIcon = (type: string, securityFixes: number) => {
-    if (securityFixes > 0) {
-      return <Shield className="h-4 w-4 text-red-600" />;
-    }
+  const getTypeIcon = (type: string) => {
     switch (type) {
       case 'major':
         return <AlertTriangle className="h-4 w-4 text-orange-600" />;
@@ -165,22 +159,12 @@ export default function UpdatesPage() {
   };
 
   const filteredUpdates = updates.filter(update => {
-    const matchesSearch = update.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         update.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterType === "all" || 
-                         (filterType === "security" && update.securityFixes > 0) ||
-                         (filterType === "breaking" && update.breaking) ||
-                         update.type === filterType;
+    const matchesSearch = update.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterType === "all" || update.type === filterType;
     return matchesSearch && matchesFilter;
   });
 
   const typeCounts = updates.reduce((acc, update) => {
-    if (update.securityFixes > 0) {
-      acc.security = (acc.security || 0) + 1;
-    }
-    if (update.breaking) {
-      acc.breaking = (acc.breaking || 0) + 1;
-    }
     acc[update.type] = (acc[update.type] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -194,6 +178,9 @@ export default function UpdatesPage() {
     }
     setSelectedUpdates(newSelected);
   };
+
+  const securityPackages = updates.filter(u => u.type === 'patch' || u.type === 'minor').length;
+  const patchPackages = updates.filter(u => u.type === 'patch').length;
 
   return (
     <div className="space-y-6">
@@ -216,13 +203,31 @@ export default function UpdatesPage() {
             variant="outline" 
             size="sm" 
             onClick={fetchUpdates}
-            disabled={isLoading}
+            disabled={isLoading || isUpdating}
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>
       </div>
+
+      {/* Update Result Alert */}
+      {updateResult && (
+        <Alert className={updateResult.success ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}>
+          <CheckCircle className={`h-4 w-4 ${updateResult.success ? 'text-green-600' : 'text-red-600'}`} />
+          <AlertDescription className={updateResult.success ? 'text-green-800' : 'text-red-800'}>
+            {updateResult.message}
+            {updateResult.summary && (
+              <div className="mt-2 text-sm">
+                <div>Attempted: {updateResult.summary.attempted}</div>
+                <div>Successful: {updateResult.summary.successful}</div>
+                <div>Failed: {updateResult.summary.failed}</div>
+                <div>Skipped: {updateResult.summary.skipped}</div>
+              </div>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Overview Cards */}
       <div className="grid gap-4 md:grid-cols-5">
@@ -243,8 +248,8 @@ export default function UpdatesPage() {
             <Shield className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{typeCounts.security || 0}</div>
-            <p className="text-xs text-muted-foreground">Critical fixes</p>
+            <div className="text-2xl font-bold text-red-600">{vulnerabilities}</div>
+            <p className="text-xs text-muted-foreground">Vulnerabilities</p>
           </CardContent>
         </Card>
 
@@ -301,8 +306,6 @@ export default function UpdatesPage() {
           className="border rounded px-3 py-2 text-sm"
         >
           <option value="all">All Types</option>
-          <option value="security">Security</option>
-          <option value="breaking">Breaking Changes</option>
           <option value="major">Major</option>
           <option value="minor">Minor</option>
           <option value="patch">Patch</option>
@@ -322,8 +325,19 @@ export default function UpdatesPage() {
                 <Button size="sm" variant="outline" onClick={() => setSelectedUpdates(new Set())}>
                   Clear Selection
                 </Button>
-                <Button size="sm">
-                  Update Selected
+                <Button 
+                  size="sm" 
+                  onClick={() => performUpdate()}
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Updating...
+                    </>
+                  ) : (
+                    'Update Selected'
+                  )}
                 </Button>
               </div>
             </div>
@@ -343,7 +357,7 @@ export default function UpdatesPage() {
           <div className="space-y-4">
             {filteredUpdates.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                No updates found matching your criteria
+                {isLoading ? 'Loading updates...' : 'No updates found matching your criteria'}
               </div>
             ) : (
               filteredUpdates.map((update, index) => (
@@ -355,40 +369,37 @@ export default function UpdatesPage() {
                       onChange={() => toggleUpdate(update.name)}
                       className="rounded"
                     />
-                    {getTypeIcon(update.type, update.securityFixes)}
+                    {getTypeIcon(update.type)}
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <div className="font-medium">{update.name}</div>
-                        {update.breaking && (
+                        {update.type === 'major' && (
                           <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs">
                             Breaking
                           </Badge>
                         )}
-                        {update.securityFixes > 0 && (
-                          <Badge variant="destructive" className="text-xs">
-                            {update.securityFixes} security fix{update.securityFixes > 1 ? 'es' : ''}
-                          </Badge>
-                        )}
                       </div>
-                      <div className="text-sm text-muted-foreground">{update.description}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Current: {update.current} → Latest: {update.latest}
+                      </div>
                       <div className="text-xs text-muted-foreground flex items-center gap-4 mt-1">
-                        <span>Size: {update.size}</span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {update.releaseDate}
-                        </span>
-                        <span>{update.dependencies} dependencies</span>
+                        <span>Wanted: {update.wanted}</span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <div className="text-right text-sm">
-                      <div>Current: {update.currentVersion}</div>
-                      <div className="text-muted-foreground">Latest: {update.latestVersion}</div>
-                    </div>
-                    {getTypeBadge(update.type, update.breaking, update.securityFixes)}
-                    <Button size="sm" variant="outline">
-                      Update
+                    {getTypeBadge(update.type)}
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => performUpdate([update.name])}
+                      disabled={isUpdating}
+                    >
+                      {isUpdating ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        'Update'
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -400,17 +411,43 @@ export default function UpdatesPage() {
 
       {/* Action Buttons */}
       <div className="flex gap-4">
-        <Button className="flex items-center" disabled={updates.filter(u => u.securityFixes > 0).length === 0}>
-          <Shield className="h-4 w-4 mr-2" />
-          Install Security Updates ({typeCounts.security || 0})
+        <Button 
+          className="flex items-center" 
+          disabled={securityPackages === 0 || isUpdating}
+          onClick={updateSecurityPackages}
+        >
+          {isUpdating ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Shield className="h-4 w-4 mr-2" />
+          )}
+          Install Security Updates ({securityPackages})
         </Button>
-        <Button variant="outline" className="flex items-center">
-          <Download className="h-4 w-4 mr-2" />
-          Update All Patches
+        <Button 
+          variant="outline" 
+          className="flex items-center"
+          disabled={patchPackages === 0 || isUpdating}
+          onClick={updateAllPatches}
+        >
+          {isUpdating ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Download className="h-4 w-4 mr-2" />
+          )}
+          Update All Patches ({patchPackages})
         </Button>
-        <Button variant="outline" className="flex items-center">
-          <ExternalLink className="h-4 w-4 mr-2" />
-          View Changelog
+        <Button 
+          variant="outline" 
+          className="flex items-center"
+          disabled={updates.length === 0 || isUpdating}
+          onClick={() => performUpdate(updates.map(u => u.name))}
+        >
+          {isUpdating ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <ExternalLink className="h-4 w-4 mr-2" />
+          )}
+          Update All ({updates.length})
         </Button>
       </div>
 
@@ -419,7 +456,7 @@ export default function UpdatesPage() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Download className="h-5 w-5 mr-2 text-blue-600" />
-            Update Progress
+            Update Status
           </CardTitle>
           <CardDescription>
             Current update status and recent activity
@@ -430,13 +467,18 @@ export default function UpdatesPage() {
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span>System up-to-date status</span>
-                <span>73%</span>
+                <span>{updates.length === 0 ? '100%' : `${Math.max(0, 100 - updates.length * 5)}%`}</span>
               </div>
-              <Progress value={73} className="h-2" />
+              <Progress value={updates.length === 0 ? 100 : Math.max(0, 100 - updates.length * 5)} className="h-2" />
             </div>
             <div className="text-sm text-muted-foreground">
-              Last update check: 2 minutes ago
+              Last update check: {lastCheck || 'Never'}
             </div>
+            {vulnerabilities > 0 && (
+              <div className="text-sm text-red-600">
+                ⚠️ {vulnerabilities} security vulnerabilities detected
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
