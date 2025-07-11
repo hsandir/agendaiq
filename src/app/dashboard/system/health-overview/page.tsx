@@ -191,7 +191,7 @@ export default function HealthOverviewPage() {
                 </div>
                 <div className="text-center">
                   <div className="text-sm text-muted-foreground">
-                    {status?.linting.files.length || 0} files affected
+                    {(status?.linting?.errors || 0) > 0 ? `${status?.linting?.files?.length || 0} files affected` : 'No errors found'}
                   </div>
                 </div>
                 <div className="space-y-1 max-h-20 overflow-y-auto">

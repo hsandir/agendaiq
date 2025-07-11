@@ -315,7 +315,41 @@ export default function DependenciesPage() {
                       <div className="text-muted-foreground">Required: {dep.requiredVersion}</div>
                     </div>
                     {getStatusBadge(dep.status)}
-                    <Button size="sm" variant="outline">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={async () => {
+                        if (dep.status === 'missing') {
+                          try {
+                            const response = await fetch('/api/system/fix', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ action: 'install', package: dep.name })
+                            });
+                            if (response.ok) {
+                              alert(`${dep.name} installed successfully`);
+                              fetchDependencies();
+                            }
+                          } catch (error) {
+                            alert(`Failed to install ${dep.name}`);
+                          }
+                        } else {
+                          try {
+                            const response = await fetch('/api/system/update', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ package: dep.name })
+                            });
+                            if (response.ok) {
+                              alert(`${dep.name} updated successfully`);
+                              fetchDependencies();
+                            }
+                          } catch (error) {
+                            alert(`Failed to update ${dep.name}`);
+                          }
+                        }
+                      }}
+                    >
                       {dep.status === 'missing' ? 'Install' : 'Update'}
                     </Button>
                   </div>
@@ -328,15 +362,89 @@ export default function DependenciesPage() {
 
       {/* Action Buttons */}
       <div className="flex gap-4">
-        <Button className="flex items-center">
+        <Button 
+          className="flex items-center"
+          onClick={async () => {
+            const missingDeps = dependencies.filter(d => d.status === 'missing');
+            if (missingDeps.length === 0) {
+              alert('No missing dependencies to install');
+              return;
+            }
+            
+            try {
+              const response = await fetch('/api/system/fix', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                  action: 'install-multiple', 
+                  packages: missingDeps.map(d => d.name) 
+                })
+              });
+              if (response.ok) {
+                alert(`Installing ${missingDeps.length} missing dependencies...`);
+                fetchDependencies();
+              }
+            } catch (error) {
+              alert('Failed to install missing dependencies');
+            }
+          }}
+        >
           <Download className="h-4 w-4 mr-2" />
-          Install All Missing
+          Install All Missing ({dependencies.filter(d => d.status === 'missing').length})
         </Button>
-        <Button variant="outline" className="flex items-center">
+        <Button 
+          variant="outline" 
+          className="flex items-center"
+          onClick={async () => {
+            const outdatedDeps = dependencies.filter(d => d.status === 'outdated');
+            if (outdatedDeps.length === 0) {
+              alert('No outdated dependencies to update');
+              return;
+            }
+            
+            try {
+              const response = await fetch('/api/system/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                  packages: outdatedDeps.map(d => d.name) 
+                })
+              });
+              if (response.ok) {
+                alert(`Updating ${outdatedDeps.length} outdated dependencies...`);
+                fetchDependencies();
+              }
+            } catch (error) {
+              alert('Failed to update outdated dependencies');
+            }
+          }}
+        >
           <RefreshCw className="h-4 w-4 mr-2" />
-          Update All Outdated
+          Update All Outdated ({dependencies.filter(d => d.status === 'outdated').length})
         </Button>
-        <Button variant="outline" className="flex items-center">
+        <Button 
+          variant="outline" 
+          className="flex items-center"
+          onClick={() => {
+            const report = {
+              timestamp: new Date().toISOString(),
+              total: dependencies.length,
+              missing: dependencies.filter(d => d.status === 'missing').length,
+              outdated: dependencies.filter(d => d.status === 'outdated').length,
+              vulnerable: dependencies.filter(d => d.status === 'vulnerable').length,
+              ok: dependencies.filter(d => d.status === 'ok').length,
+              details: dependencies
+            };
+            
+            const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dependencies-report-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }}
+        >
           <ExternalLink className="h-4 w-4 mr-2" />
           Export Report
         </Button>
