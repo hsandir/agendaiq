@@ -19,7 +19,9 @@ import {
   Clock,
   GitBranch,
   Package,
-  Loader2
+  Loader2,
+  Info,
+  XCircle
 } from "lucide-react";
 import Link from "next/link";
 
@@ -50,6 +52,13 @@ interface UpdateResult {
   };
 }
 
+interface CompatibilityInfo {
+  risk: 'low' | 'medium' | 'high';
+  recommendation: 'safe' | 'caution' | 'avoid';
+  reason: string;
+  details: string;
+}
+
 export default function UpdatesPage() {
   const [updates, setUpdates] = useState<PackageUpdate[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,6 +69,117 @@ export default function UpdatesPage() {
   const [updateResult, setUpdateResult] = useState<UpdateResult | null>(null);
   const [lastCheck, setLastCheck] = useState<string>("");
   const [vulnerabilities, setVulnerabilities] = useState(0);
+
+  // Compatibility assessment function
+  const assessCompatibility = (pkg: PackageUpdate): CompatibilityInfo => {
+    const { name, type, current, latest } = pkg;
+    
+    // Critical packages that need special attention
+    const criticalPackages = [
+      'next', 'react', 'react-dom', '@types/react', '@types/react-dom',
+      'typescript', 'prisma', '@prisma/client', 'tailwindcss'
+    ];
+    
+    // Node.js version compatibility check
+    const nodeVersion = '18.20.8'; // Current Node version
+    
+    // High-risk packages that often cause breaking changes
+    const highRiskPackages = [
+      'next', 'react', 'react-dom', 'typescript', 'prisma'
+    ];
+    
+    // Safe packages (usually just type definitions or utilities)
+    const safePackages = [
+      '@types/node', '@types/bcryptjs', '@types/nodemailer',
+      'lucide-react', 'date-fns', 'clsx', 'tailwind-merge'
+    ];
+
+    // Assessment logic
+    if (safePackages.includes(name)) {
+      return {
+        risk: 'low',
+        recommendation: 'safe',
+        reason: 'Safe package update',
+        details: `${name} is a safe package that rarely causes compatibility issues. This ${type} update should be safe to install.`
+      };
+    }
+
+    if (type === 'patch') {
+      return {
+        risk: 'low',
+        recommendation: 'safe',
+        reason: 'Patch update',
+        details: `Patch updates (${type}) typically contain bug fixes and security updates with minimal risk of breaking changes.`
+      };
+    }
+
+    if (type === 'minor') {
+      if (criticalPackages.includes(name)) {
+        return {
+          risk: 'medium',
+          recommendation: 'caution',
+          reason: 'Minor update to critical package',
+          details: `${name} is a critical package. Minor updates usually add new features but may introduce subtle breaking changes. Test thoroughly after update.`
+        };
+      }
+      return {
+        risk: 'low',
+        recommendation: 'safe',
+        reason: 'Minor update',
+        details: `Minor updates add new features and are generally safe, but it's good practice to test after updating.`
+      };
+    }
+
+    if (type === 'major') {
+      if (highRiskPackages.includes(name)) {
+        return {
+          risk: 'high',
+          recommendation: 'avoid',
+          reason: 'Major update to high-risk package',
+          details: `Major updates to ${name} often include breaking changes. Review changelog and migration guide before updating. Consider updating in a separate branch first.`
+        };
+      }
+      return {
+        risk: 'medium',
+        recommendation: 'caution',
+        reason: 'Major update',
+        details: `Major updates may include breaking changes. Review the changelog and test thoroughly before updating.`
+      };
+    }
+
+    return {
+      risk: 'medium',
+      recommendation: 'caution',
+      reason: 'Unknown package',
+      details: `Unknown package type. Review the changelog before updating.`
+    };
+  };
+
+  const getCompatibilityBadge = (compatibility: CompatibilityInfo) => {
+    switch (compatibility.recommendation) {
+      case 'safe':
+        return <Badge variant="outline" className="text-green-600 border-green-600">Safe</Badge>;
+      case 'caution':
+        return <Badge variant="outline" className="text-orange-600 border-orange-600">Caution</Badge>;
+      case 'avoid':
+        return <Badge variant="destructive" className="bg-red-600">Avoid</Badge>;
+      default:
+        return <Badge variant="outline">Unknown</Badge>;
+    }
+  };
+
+  const getCompatibilityIcon = (compatibility: CompatibilityInfo) => {
+    switch (compatibility.recommendation) {
+      case 'safe':
+        return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'caution':
+        return <AlertTriangle className="h-4 w-4 text-orange-600" />;
+      case 'avoid':
+        return <XCircle className="h-4 w-4 text-red-600" />;
+      default:
+        return <Info className="h-4 w-4 text-gray-600" />;
+    }
+  };
 
   const fetchUpdates = async () => {
     setIsLoading(true);
@@ -116,16 +236,33 @@ export default function UpdatesPage() {
 
   const updateSecurityPackages = () => {
     const securityPackages = updates
-      .filter(update => update.type === 'patch' || update.type === 'minor')
+      .filter(update => {
+        const compatibility = assessCompatibility(update);
+        return (update.type === 'patch' || update.type === 'minor') && 
+               compatibility.recommendation !== 'avoid';
+      })
       .map(update => update.name);
     performUpdate(securityPackages);
   };
 
   const updateAllPatches = () => {
     const patchPackages = updates
-      .filter(update => update.type === 'patch')
+      .filter(update => {
+        const compatibility = assessCompatibility(update);
+        return update.type === 'patch' && compatibility.recommendation !== 'avoid';
+      })
       .map(update => update.name);
     performUpdate(patchPackages);
+  };
+
+  const updateSafePackages = () => {
+    const safePackages = updates
+      .filter(update => {
+        const compatibility = assessCompatibility(update);
+        return compatibility.recommendation === 'safe';
+      })
+      .map(update => update.name);
+    performUpdate(safePackages);
   };
 
   useEffect(() => {
@@ -179,8 +316,26 @@ export default function UpdatesPage() {
     setSelectedUpdates(newSelected);
   };
 
-  const securityPackages = updates.filter(u => u.type === 'patch' || u.type === 'minor').length;
-  const patchPackages = updates.filter(u => u.type === 'patch').length;
+  const securityPackages = updates.filter(u => {
+    const compatibility = assessCompatibility(u);
+    return (u.type === 'patch' || u.type === 'minor') && 
+           compatibility.recommendation !== 'avoid';
+  }).length;
+
+  const patchPackages = updates.filter(u => {
+    const compatibility = assessCompatibility(u);
+    return u.type === 'patch' && compatibility.recommendation !== 'avoid';
+  }).length;
+
+  const safePackages = updates.filter(u => {
+    const compatibility = assessCompatibility(u);
+    return compatibility.recommendation === 'safe';
+  }).length;
+
+  const avoidPackages = updates.filter(u => {
+    const compatibility = assessCompatibility(u);
+    return compatibility.recommendation === 'avoid';
+  }).length;
 
   return (
     <div className="space-y-6">
@@ -189,7 +344,7 @@ export default function UpdatesPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Package Updates</h1>
           <p className="text-muted-foreground">
-            Manage available package updates and security patches
+            Manage available package updates with compatibility assessment
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -211,6 +366,26 @@ export default function UpdatesPage() {
         </div>
       </div>
 
+      {/* Compatibility Info Alert */}
+      <Alert className="border-blue-200 bg-blue-50">
+        <Info className="h-4 w-4 text-blue-600" />
+        <AlertDescription className="text-blue-800">
+          <strong>Compatibility Assessment:</strong> Each update is assessed for compatibility risk. 
+          <span className="inline-flex items-center gap-1 ml-2">
+            <Badge variant="outline" className="text-green-600 border-green-600 text-xs">Safe</Badge>
+            <span className="text-xs">- Low risk, recommended</span>
+          </span>
+          <span className="inline-flex items-center gap-1 ml-2">
+            <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs">Caution</Badge>
+            <span className="text-xs">- Medium risk, test after update</span>
+          </span>
+          <span className="inline-flex items-center gap-1 ml-2">
+            <Badge variant="destructive" className="bg-red-600 text-xs">Avoid</Badge>
+            <span className="text-xs">- High risk, review changelog first</span>
+          </span>
+        </AlertDescription>
+      </Alert>
+
       {/* Update Result Alert */}
       {updateResult && (
         <Alert className={updateResult.success ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}>
@@ -230,7 +405,7 @@ export default function UpdatesPage() {
       )}
 
       {/* Overview Cards */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Updates</CardTitle>
@@ -255,33 +430,44 @@ export default function UpdatesPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Major</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{typeCounts.major || 0}</div>
-            <p className="text-xs text-muted-foreground">Breaking changes</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Minor</CardTitle>
-            <GitBranch className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{typeCounts.minor || 0}</div>
-            <p className="text-xs text-muted-foreground">New features</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Patch</CardTitle>
+            <CardTitle className="text-sm font-medium">Safe</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{typeCounts.patch || 0}</div>
+            <div className="text-2xl font-bold text-green-600">{safePackages}</div>
+            <p className="text-xs text-muted-foreground">Low risk</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Caution</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-orange-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-600">{updates.length - safePackages - avoidPackages}</div>
+            <p className="text-xs text-muted-foreground">Medium risk</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Avoid</CardTitle>
+            <XCircle className="h-4 w-4 text-red-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-red-600">{avoidPackages}</div>
+            <p className="text-xs text-muted-foreground">High risk</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Patches</CardTitle>
+            <Package className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">{patchPackages}</div>
             <p className="text-xs text-muted-foreground">Bug fixes</p>
           </CardContent>
         </Card>
@@ -350,7 +536,7 @@ export default function UpdatesPage() {
         <CardHeader>
           <CardTitle>Available Updates</CardTitle>
           <CardDescription>
-            Review and install package updates
+            Review and install package updates with compatibility assessment
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -360,57 +546,67 @@ export default function UpdatesPage() {
                 {isLoading ? 'Loading updates...' : 'No updates found matching your criteria'}
               </div>
             ) : (
-              filteredUpdates.map((update, index) => (
-                <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <input
-                      type="checkbox"
-                      checked={selectedUpdates.has(update.name)}
-                      onChange={() => toggleUpdate(update.name)}
-                      className="rounded"
-                    />
-                    {getTypeIcon(update.type)}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <div className="font-medium">{update.name}</div>
-                        {update.type === 'major' && (
-                          <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs">
-                            Breaking
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Current: {update.current} → Latest: {update.latest}
-                      </div>
-                      <div className="text-xs text-muted-foreground flex items-center gap-4 mt-1">
-                        <span>Wanted: {update.wanted}</span>
+              filteredUpdates.map((update, index) => {
+                const compatibility = assessCompatibility(update);
+                return (
+                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center space-x-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedUpdates.has(update.name)}
+                        onChange={() => toggleUpdate(update.name)}
+                        className="rounded"
+                        disabled={compatibility.recommendation === 'avoid'}
+                      />
+                      {getCompatibilityIcon(compatibility)}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <div className="font-medium">{update.name}</div>
+                          {getCompatibilityBadge(compatibility)}
+                          {update.type === 'major' && (
+                            <Badge variant="outline" className="text-orange-600 border-orange-600 text-xs">
+                              Breaking
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Current: {update.current} → Latest: {update.latest}
+                        </div>
+                        <div className="text-xs text-muted-foreground flex items-center gap-4 mt-1">
+                          <span>Wanted: {update.wanted}</span>
+                          <span className="text-xs">{compatibility.reason}</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {compatibility.details}
+                        </div>
                       </div>
                     </div>
+                    <div className="flex items-center space-x-4">
+                      {getTypeBadge(update.type)}
+                      <Button 
+                        size="sm" 
+                        variant={compatibility.recommendation === 'avoid' ? 'outline' : 'default'}
+                        onClick={() => performUpdate([update.name])}
+                        disabled={isUpdating || compatibility.recommendation === 'avoid'}
+                        className={compatibility.recommendation === 'avoid' ? 'opacity-50' : ''}
+                      >
+                        {isUpdating ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          compatibility.recommendation === 'avoid' ? 'Review First' : 'Update'
+                        )}
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    {getTypeBadge(update.type)}
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => performUpdate([update.name])}
-                      disabled={isUpdating}
-                    >
-                      {isUpdating ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        'Update'
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </CardContent>
       </Card>
 
       {/* Action Buttons */}
-      <div className="flex gap-4">
+      <div className="flex gap-4 flex-wrap">
         <Button 
           className="flex items-center" 
           disabled={securityPackages === 0 || isUpdating}
@@ -435,6 +631,19 @@ export default function UpdatesPage() {
             <Download className="h-4 w-4 mr-2" />
           )}
           Update All Patches ({patchPackages})
+        </Button>
+        <Button 
+          variant="outline" 
+          className="flex items-center"
+          disabled={safePackages === 0 || isUpdating}
+          onClick={updateSafePackages}
+        >
+          {isUpdating ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <CheckCircle className="h-4 w-4 mr-2" />
+          )}
+          Update Safe Packages ({safePackages})
         </Button>
         <Button 
           variant="outline" 
@@ -477,6 +686,11 @@ export default function UpdatesPage() {
             {vulnerabilities > 0 && (
               <div className="text-sm text-red-600">
                 ⚠️ {vulnerabilities} security vulnerabilities detected
+              </div>
+            )}
+            {avoidPackages > 0 && (
+              <div className="text-sm text-orange-600">
+                ⚠️ {avoidPackages} high-risk updates detected - review before updating
               </div>
             )}
           </div>
