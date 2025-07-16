@@ -65,9 +65,15 @@ export default function UserRoleAssignmentPage() {
           departmentsRes.json()
         ]);
 
-        setUsers(usersData);
-        setRoles(rolesData);
-        setDepartments(departmentsData);
+        setUsers(Array.isArray(usersData) ? usersData : []);
+        setRoles(Array.isArray(rolesData) ? rolesData : (rolesData?.roles && Array.isArray(rolesData.roles) ? rolesData.roles : []));
+        setDepartments(Array.isArray(departmentsData) ? departmentsData : []);
+      } else {
+        // Set empty arrays if any request fails
+        setUsers([]);
+        setRoles([]);
+        setDepartments([]);
+        setMessage({ type: 'error', text: 'Failed to load some data' });
       }
     } catch (error) {
       console.error('Failed to fetch data:', error);
@@ -210,7 +216,7 @@ export default function UserRoleAssignmentPage() {
                   required
                 >
                   <option value="">Choose a user to assign roles...</option>
-                  {users.map((user) => (
+                  {Array.isArray(users) && users.map((user) => (
                     <option key={user.id} value={user.id}>
                       {user.name} ({user.email})
                     </option>
@@ -232,7 +238,7 @@ export default function UserRoleAssignmentPage() {
                   required
                 >
                   <option value="">Choose a role...</option>
-                  {roles.map((role) => (
+                  {Array.isArray(roles) && roles.map((role) => (
                     <option key={role.id} value={role.id}>
                       {role.title}
                       {role.Department && ` (${role.Department.name})`}
@@ -254,7 +260,7 @@ export default function UserRoleAssignmentPage() {
                   className="block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
                 >
                   <option value="">Choose a department (optional)...</option>
-                  {departments.map((dept) => (
+                  {Array.isArray(departments) && departments.map((dept) => (
                     <option key={dept.id} value={dept.id}>
                       {dept.name}
                     </option>
