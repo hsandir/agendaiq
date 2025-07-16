@@ -4,19 +4,19 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface Role {
-  id: number;
+  id: string;
   title: string;
   priority?: number;
   category?: string;
-  department_id?: number;
-  department?: {
-    id: number;
+  department_id?: string;
+  Department?: {
+    id: string;
     name: string;
   };
-  staff?: Array<{
-    id: number;
-    user: {
-      id: number;
+  Staff?: Array<{
+    id: string;
+    User: {
+      id: string;
       name: string | null;
       email: string;
     };
@@ -183,14 +183,14 @@ export function RoleHierarchyManagement() {
               <div>
                 <h4 className="font-medium">{role.title}</h4>
                 <p className="text-sm text-gray-500">
-                  Department: {role.department?.name || 'None'}
+                  Department: {role.Department?.name || 'None'}
                 </p>
                 <p className="text-sm text-gray-500">
                   Priority: {role.priority || 'Not set'}
                 </p>
-                {role.staff && role.staff.length > 0 && (
+                {role.Staff && role.Staff.length > 0 && (
                   <p className="text-sm text-gray-500">
-                    Staff: {role.staff.length} member{role.staff.length !== 1 ? 's' : ''}
+                    Staff: {role.Staff.length} member{role.Staff.length !== 1 ? 's' : ''}
                   </p>
                 )}
               </div>

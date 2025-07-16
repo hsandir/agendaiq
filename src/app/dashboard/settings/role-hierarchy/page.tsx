@@ -1,9 +1,54 @@
 'use client';
 
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { FiEye, FiEdit3, FiUsers, FiTrendingUp } from 'react-icons/fi';
 
 export default function RoleHierarchyPage() {
+  const [stats, setStats] = useState({
+    totalRoles: 0,
+    leadershipRoles: 0,
+    totalStaff: 0,
+    departments: 0
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const [rolesRes, hierarchyRes] = await Promise.all([
+        fetch('/api/admin/roles'),
+        fetch('/api/roles/hierarchy')
+      ]);
+
+      if (rolesRes.ok && hierarchyRes.ok) {
+        const [rolesData] = await Promise.all([
+          rolesRes.json(),
+          hierarchyRes.json()
+        ]);
+
+        const totalRoles = rolesData.length || 0;
+        const leadershipRoles = rolesData.filter((role: { is_leadership?: boolean }) => role.is_leadership).length || 0;
+        const totalStaff = rolesData.reduce((acc: number, role: { Staff?: Array<unknown> }) => acc + (role.Staff?.length || 0), 0);
+        const departments = new Set(rolesData.map((role: { Department?: { id: string } }) => role.Department?.id).filter(Boolean)).size;
+
+        setStats({
+          totalRoles,
+          leadershipRoles,
+          totalStaff,
+          departments
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <div className="md:flex md:items-center md:justify-between">
@@ -86,11 +131,15 @@ export default function RoleHierarchyPage() {
             </div>
             <div className="mt-4 grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">-</div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {loading ? '...' : stats.totalRoles}
+                </div>
                 <div className="text-sm text-gray-500">Total Roles</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">-</div>
+                <div className="text-2xl font-bold text-gray-900">
+                  {loading ? '...' : stats.leadershipRoles}
+                </div>
                 <div className="text-sm text-gray-500">Leadership Roles</div>
               </div>
             </div>

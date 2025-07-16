@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 import { RoleManagementForm } from "@/components/settings/RoleManagementForm";
 import { RoleHierarchyManagement } from "@/components/settings/RoleHierarchyManagement";
@@ -14,16 +14,16 @@ async function getUser() {
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
     include: {
-      staff: {
+      Staff: {
         include: {
-          role: true,
-          department: true
+          Role: true,
+          Department: true
         }
       }
     },
   });
 
-  if (!user || user.staff?.[0]?.role?.title !== "Administrator") {
+  if (!user || user.Staff?.[0]?.Role?.title !== "Administrator") {
     redirect("/dashboard");
   }
 

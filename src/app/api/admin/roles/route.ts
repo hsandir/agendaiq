@@ -13,15 +13,15 @@ async function verifyAdmin() {
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
     include: {
-      staff: {
+      Staff: {
         include: {
-          role: true
+          Role: true
         }
       }
     }
   });
 
-  if (!user || !user.staff?.[0] || user.staff[0].role?.title !== 'Administrator') {
+  if (!user || !user.Staff?.[0] || user.Staff[0].Role?.title !== 'Administrator') {
     return null;
   }
 
@@ -41,10 +41,10 @@ export async function GET() {
     // Get all roles from the database
     const roles = await prisma.role.findMany({
       include: {
-        department: true,
-        staff: {
+        Department: true,
+        Staff: {
           include: {
-            user: true
+            User: true
           }
         }
       },
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
         department_id
       },
       include: {
-        department: true
+        Department: true
       }
     });
 

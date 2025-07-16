@@ -59,15 +59,6 @@ const navigation: NavSection[] = [
       { href: "/dashboard/settings/system", label: "System Settings", icon: FiSettings },
       { href: "/dashboard/settings/audit", label: "Audit Log", icon: FiActivity },
       { href: "/dashboard/settings/backup", label: "Backup & Restore", icon: FiHardDrive },
-    ],
-  },
-  {
-    title: "System",
-    adminOnly: true,
-    items: [
-      { href: "/dashboard/settings/server", label: "Server Status", icon: FiServer },
-      { href: "/dashboard/settings/database", label: "Database", icon: FiDatabase },
-      { href: "/dashboard/settings/errors", label: "Error Tracking", icon: FiAlertTriangle },
       { href: "/dashboard/settings/admin", label: "Admin Tools", icon: FiTool },
     ],
   },
