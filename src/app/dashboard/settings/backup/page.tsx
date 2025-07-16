@@ -22,15 +22,15 @@ export default async function BackupPage() {
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
     include: { 
-      staff: {
+      Staff: {
         include: {
-          role: true
+          Role: true
         }
       }
     }
   });
 
-  if (!user?.staff?.[0]?.role || user.staff[0].role.title !== "Administrator") {
+  if (!user?.Staff?.[0]?.Role || user.Staff[0].Role.title !== "Administrator") {
     redirect("/dashboard?error=access_denied");
   }
 

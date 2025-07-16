@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import {
   FiUser,
   FiLock,
-  FiShield,
   FiUsers,
   FiUserCheck,
   FiSettings,
@@ -21,12 +20,13 @@ import {
   FiAlertTriangle,
   FiTool,
   FiHelpCircle,
+  FiTrendingUp,
 } from "react-icons/fi";
 
 interface NavItem {
   href: string;
   label: string;
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   adminOnly?: boolean;
 }
 
@@ -54,6 +54,7 @@ const navigation: NavSection[] = [
       { href: "/dashboard/settings/users", label: "User Management", icon: FiUsers },
       { href: "/dashboard/settings/staff-upload", label: "Staff Upload", icon: FiUpload },
       { href: "/dashboard/settings/roles", label: "Role Management", icon: FiUserCheck },
+      { href: "/dashboard/settings/role-hierarchy", label: "Role Hierarchy", icon: FiTrendingUp },
       { href: "/dashboard/settings/permissions", label: "Permissions", icon: FiKey },
       { href: "/dashboard/settings/system", label: "System Settings", icon: FiSettings },
       { href: "/dashboard/settings/audit", label: "Audit Log", icon: FiActivity },
