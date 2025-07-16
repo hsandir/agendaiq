@@ -59,6 +59,25 @@ export default function RoleHierarchyPage() {
           <p className="mt-1 text-sm text-gray-500">
             Manage and visualize your organization&apos;s role structure
           </p>
+          {/* Statistics inline with header */}
+          <div className="mt-3 flex space-x-6 text-sm text-gray-600">
+            <div className="flex items-center">
+              <span className="font-medium">{loading ? '...' : stats.totalRoles}</span>
+              <span className="ml-1">Total Roles</span>
+            </div>
+            <div className="flex items-center">
+              <span className="font-medium">{loading ? '...' : stats.leadershipRoles}</span>
+              <span className="ml-1">Leadership Roles</span>
+            </div>
+            <div className="flex items-center">
+              <span className="font-medium">{loading ? '...' : stats.totalStaff}</span>
+              <span className="ml-1">Total Staff</span>
+            </div>
+            <div className="flex items-center">
+              <span className="font-medium">{loading ? '...' : stats.departments}</span>
+              <span className="ml-1">Departments</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -112,38 +131,29 @@ export default function RoleHierarchyPage() {
             </div>
           </Link>
 
-          {/* Quick Stats */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <FiUsers className="w-6 h-6 text-purple-600" />
+          {/* User Role Assignment */}
+          <Link 
+            href="/dashboard/settings/role-hierarchy/user-assignment"
+            className="block group"
+          >
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                    <FiUsers className="w-6 h-6 text-purple-600" />
+                  </div>
                 </div>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-medium text-gray-900">
-                  Role Overview
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  View statistics and information about your role structure
-                </p>
+                <div className="ml-4">
+                  <h3 className="text-lg font-medium text-gray-900 group-hover:text-purple-600 transition-colors">
+                    User Role Assignment
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Assign roles and departments to users based on the defined role hierarchy
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="mt-4 grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">
-                  {loading ? '...' : stats.totalRoles}
-                </div>
-                <div className="text-sm text-gray-500">Total Roles</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">
-                  {loading ? '...' : stats.leadershipRoles}
-                </div>
-                <div className="text-sm text-gray-500">Leadership Roles</div>
-              </div>
-            </div>
-          </div>
+          </Link>
 
           {/* Quick Actions */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">

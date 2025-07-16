@@ -13,16 +13,16 @@ export async function GET(request: NextRequest) {
     // Get the user to check if they're admin - use email instead of id
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: { staff: { include: { role: true } } }
+      include: { Staff: { include: { Role: true } } }
     });
-    if (!user || !user.staff?.[0] || user.staff[0].role?.title !== "Administrator") {
+    if (!user || !user.Staff?.[0] || user.Staff[0].Role?.title !== "Administrator") {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
     const departments = await prisma.department.findMany({
       orderBy: { name: 'asc' },
       include: {
-        school: true,
-        roles: true
+        School: true,
+        Role: true
       }
     });
     return NextResponse.json(departments);
