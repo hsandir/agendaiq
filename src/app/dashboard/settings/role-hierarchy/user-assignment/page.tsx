@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FiUsers, FiUser, FiShield, FiHome, FiArrowLeft } from 'react-icons/fi';
+import { FiUsers, FiUser, FiShield, FiHome } from 'react-icons/fi';
+import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface User {
   id: string;
@@ -246,12 +248,11 @@ export default function UserRoleAssignmentPage() {
     <div className="space-y-6">
       {/* Back to Overview Link */}
       <div className="mb-4">
-        <Link
-          href="/dashboard/settings/role-hierarchy"
-          className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 transition-colors"
-        >
-          <FiArrowLeft className="w-4 h-4 mr-2" />
-          Back to Overview
+        <Link href="/dashboard/settings/role-hierarchy">
+          <Button variant="outline" size="sm">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Overview
+          </Button>
         </Link>
       </div>
 
