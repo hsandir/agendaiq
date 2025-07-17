@@ -6,8 +6,6 @@ import { cn } from "@/lib/utils";
 import {
   FiUser,
   FiLock,
-  FiUsers,
-  FiUserCheck,
   FiSettings,
   FiBell,
   FiKey,
@@ -18,7 +16,6 @@ import {
   FiUpload,
   FiHome,
   FiAlertTriangle,
-  FiTool,
   FiHelpCircle,
   FiTrendingUp,
 } from "react-icons/fi";
@@ -51,15 +48,12 @@ const navigation: NavSection[] = [
     items: [
       { href: "/dashboard/settings/setup", label: "District Setup", icon: FiSettings },
       { href: "/dashboard/settings/school", label: "School Settings", icon: FiHome },
-      { href: "/dashboard/settings/users", label: "User Management", icon: FiUsers },
       { href: "/dashboard/settings/staff-upload", label: "Staff Upload", icon: FiUpload },
-      { href: "/dashboard/settings/roles", label: "Role Management", icon: FiUserCheck },
       { href: "/dashboard/settings/role-hierarchy", label: "Role Hierarchy", icon: FiTrendingUp },
       { href: "/dashboard/settings/permissions", label: "Permissions", icon: FiKey },
       { href: "/dashboard/settings/system", label: "System Settings", icon: FiSettings },
       { href: "/dashboard/settings/audit", label: "Audit Log", icon: FiActivity },
       { href: "/dashboard/settings/backup", label: "Backup & Restore", icon: FiHardDrive },
-      { href: "/dashboard/settings/admin", label: "Admin Tools", icon: FiTool },
     ],
   },
   {
@@ -68,7 +62,7 @@ const navigation: NavSection[] = [
       { label: "Zoom Integration", href: "/dashboard/settings/zoom-integration", icon: FiSettings },
       { label: "Meeting Templates", href: "/dashboard/settings/meeting-templates", icon: FiSettings, adminOnly: true },
       { label: "Zoom User Preferences", href: "/dashboard/settings/zoom-user-preferences", icon: FiUser },
-      { label: "Meeting Management", href: "/dashboard/settings/meeting-management", icon: FiUsers, adminOnly: true },
+      { label: "Meeting Management", href: "/dashboard/settings/meeting-management", icon: FiSettings, adminOnly: true },
       { label: "Meeting Permissions", href: "/dashboard/settings/meeting-permissions", icon: FiKey, adminOnly: true },
       { label: "Meeting Audit & Logs", href: "/dashboard/settings/meeting-audit", icon: FiActivity },
       { label: "Meeting Help", href: "/dashboard/settings/meeting-help", icon: FiHelpCircle },
