@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { FiEye, FiEdit3, FiUsers, FiTrendingUp } from 'react-icons/fi';
+import { FiEye, FiEdit3, FiUsers } from 'react-icons/fi';
 
 export default function RoleHierarchyPage() {
   const [stats, setStats] = useState({
@@ -81,8 +81,38 @@ export default function RoleHierarchyPage() {
         </div>
       </div>
 
+      {/* Navigation Tabs */}
+      <div className="mt-6 border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          <Link
+            href="/dashboard/settings/role-hierarchy"
+            className="border-blue-500 text-blue-600 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
+          >
+            Overview
+          </Link>
+          <Link
+            href="/dashboard/settings/role-hierarchy/visualization"
+            className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
+          >
+            Visualization
+          </Link>
+          <Link
+            href="/dashboard/settings/role-hierarchy/management"
+            className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
+          >
+            Management
+          </Link>
+          <Link
+            href="/dashboard/settings/role-hierarchy/user-assignment"
+            className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
+          >
+            User Assignment
+          </Link>
+        </nav>
+      </div>
+
       <div className="mt-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Visualization Card */}
           <Link 
             href="/dashboard/settings/role-hierarchy/visualization"
@@ -155,44 +185,7 @@ export default function RoleHierarchyPage() {
             </div>
           </Link>
 
-          {/* Quick Actions */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <FiTrendingUp className="w-6 h-6 text-orange-600" />
-                </div>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-medium text-gray-900">
-                  Quick Actions
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  Common tasks and shortcuts
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 space-y-2">
-              <Link 
-                href="/dashboard/settings/roles"
-                className="block text-sm text-blue-600 hover:text-blue-800 transition-colors"
-              >
-                • Manage User Roles
-              </Link>
-              <Link 
-                href="/dashboard/settings/permissions"
-                className="block text-sm text-blue-600 hover:text-blue-800 transition-colors"
-              >
-                • Configure Permissions
-              </Link>
-              <Link 
-                href="/dashboard/settings/users"
-                className="block text-sm text-blue-600 hover:text-blue-800 transition-colors"
-              >
-                • User Management
-              </Link>
-            </div>
-          </div>
+
         </div>
       </div>
     </>
