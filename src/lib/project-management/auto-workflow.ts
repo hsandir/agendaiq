@@ -13,7 +13,8 @@ import { CodeGenerator } from './code-generator';
 import { ProjectTracker } from './project-tracker';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as chokidar from 'chokidar';
+// File watching temporarily disabled - will implement later
+// import * as chokidar from 'chokidar';
 
 export interface WorkflowRule {
   id: string;

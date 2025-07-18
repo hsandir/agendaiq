@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { APIAuthPatterns } from '@/lib/auth/api-auth';
 import { AuthenticatedUser } from '@/lib/auth/auth-utils';
 import { RuleEngine } from '@/lib/project-management/rule-engine';
-import { WorkflowEngine } from '@/lib/project-management/auto-workflow';
+import { WorkflowEngine } from '@/lib/project-management/auto-workflow-simple';
 
 // GET /api/project-management/rules - Get all rules and validation status
 export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {

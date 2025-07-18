@@ -9,7 +9,7 @@
  */
 
 import { ProjectTracker, ProjectTask } from './project-tracker';
-import { DynamicRBAC } from '../security/dynamic-rbac';
+import { DynamicRBAC } from '../security/dynamic-rbac-simple';
 import { AuthenticatedUser } from '../auth/auth-utils';
 import { prisma } from '../prisma';
 import * as fs from 'fs/promises';
