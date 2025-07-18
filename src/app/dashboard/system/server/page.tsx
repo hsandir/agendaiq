@@ -184,23 +184,21 @@ export default function ServerManagementPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center space-x-4">
+        <div>
+          <h1 className="text-3xl font-bold flex items-center">
+            <Server className="w-8 h-8 mr-3 text-green-600" />
+            Server Management
+          </h1>
+          <p className="text-muted-foreground">Monitor server performance and system metrics</p>
+        </div>
+        
+        <div className="flex items-center gap-2">
           <Link href="/dashboard/system">
             <Button variant="outline" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to System
             </Button>
           </Link>
-          <div>
-            <h1 className="text-3xl font-bold flex items-center">
-              <Server className="w-8 h-8 mr-3 text-green-600" />
-              Server Management
-            </h1>
-            <p className="text-muted-foreground">Monitor server performance and system metrics</p>
-          </div>
-        </div>
-        
-        <div className="flex gap-2">
           <Button 
             onClick={fetchServerMetrics}
             variant="outline"
