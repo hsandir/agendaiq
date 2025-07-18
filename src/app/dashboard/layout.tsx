@@ -3,9 +3,9 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
 import { RoleSwitch } from "@/components/dashboard/RoleSwitch";
+import { SidebarWrapper } from "@/components/dashboard/SidebarWrapper";
 
 export default async function DashboardLayout({
   children,
@@ -33,6 +33,7 @@ export default async function DashboardLayout({
   });
 
   const currentRole = user?.Staff?.[0]?.Role;
+  const isAdmin = currentRole?.title === "Administrator";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -55,7 +56,7 @@ export default async function DashboardLayout({
                 <span className="text-xs px-2 py-1 bg-gray-100 rounded-full">
                   {currentRole?.title || 'No Role'}
                 </span>
-                <RoleSwitch staff={user?.staff?.[0] || null} />
+                <RoleSwitch staff={user?.Staff?.[0] || null} />
               </div>
             </div>
           </div>
@@ -63,10 +64,8 @@ export default async function DashboardLayout({
       </nav>
 
       <div className="flex min-h-screen">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white border-r">
-          <Sidebar />
-        </aside>
+        {/* Sidebar Wrapper */}
+        <SidebarWrapper isAdmin={isAdmin} />
 
         {/* Main content */}
         <div className="flex-1 flex flex-col">
