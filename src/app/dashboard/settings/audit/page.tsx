@@ -21,27 +21,27 @@ export default async function AuditPage() {
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
     include: { 
-      staff: {
+      Staff: {
         include: {
-          role: true
+          Role: true
         }
       }
     }
   });
 
-  if (!user || user.staff?.[0]?.role?.title !== "Administrator") {
+  if (!user || user.Staff?.[0]?.Role?.title !== "Administrator") {
     redirect("/dashboard");
   }
 
   // Fetch real meeting audit logs
   const auditLogs = await prisma.meetingAuditLog.findMany({
     include: {
-      user: true,
-      meeting: {
+      User: true,
+      Meeting: {
         include: {
-          organizer: {
+          Staff: {
             include: {
-              user: true
+              User: true
             }
           }
         }
@@ -118,10 +118,10 @@ export default async function AuditPage() {
                           </div>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Meeting: {log.meeting.title}
+                          Meeting: {log.Meeting.title}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          By: {log.user.name || log.user.email}
+                          By: {log.User.name || log.User.email}
                         </p>
                         {log.details && typeof log.details === 'object' && (
                           <p className="text-sm text-muted-foreground">
