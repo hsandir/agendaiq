@@ -45,6 +45,7 @@ export default function MockDataTrackerPage() {
   const [report, setReport] = useState<MockDataReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [scanning, setScanning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<string[]>([]);
 
   const showNotification = (message: string) => {
@@ -58,137 +59,27 @@ export default function MockDataTrackerPage() {
     try {
       setScanning(true);
       setLoading(true);
+      setError(null);
       
-      // Simulate API call to scan codebase for mock data usage
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      showNotification('Starting real-time codebase scan...');
       
-      const mockReport: MockDataReport = {
-        totalFiles: 8,
-        mockOnlyFiles: 3,
-        mixedFiles: 2,
-        apiFallbackFiles: 3,
-        usage: [
-          {
-            file: "src/app/dashboard/system/server/page.tsx",
-            path: "/dashboard/system/server",
-            type: "page",
-            status: "mock_only",
-            description: "Server Management page uses mock server metrics",
-            mockDataLines: [
-              "const mockMetrics: ServerMetrics = {",
-              "  system: { platform: 'darwin', architecture: 'arm64' }",
-              "  performance: { memory: { total: 16, used: 8.5 } }"
-            ],
-            lastChecked: new Date().toISOString(),
-            priority: "high"
-          },
-          {
-            file: "src/app/dashboard/system/database/page.tsx", 
-            path: "/dashboard/system/database",
-            type: "page",
-            status: "api_fallback",
-            description: "Database Management page falls back to mock data when API fails",
-            mockDataLines: [
-              "const mockMetrics: DatabaseMetrics = {",
-              "  connection: { url: 'postgresql://postgres:****@localhost:5432/agendaiq' }",
-              "  statistics: { tables: 19, totalRecords: 25680 }"
-            ],
-            apiEndpoint: "/api/system/database",
-            lastChecked: new Date().toISOString(),
-            priority: "medium"
-          },
-          {
-            file: "src/app/dashboard/system/alerts/page.tsx",
-            path: "/dashboard/system/alerts", 
-            type: "page",
-            status: "api_fallback",
-            description: "Alerts Configuration page has mock data fallback",
-            mockDataLines: [
-              "const mockAlertsConfig: AlertsConfig = {",
-              "  rules: [ { id: '1', name: 'Database Connection Failure' } ]",
-              "  channels: [ { id: 'email', name: 'Email Notifications' } ]"
-            ],
-            apiEndpoint: "/api/system/alerts",
-            lastChecked: new Date().toISOString(),
-            priority: "low"
-          },
-          {
-            file: "src/components/meetings/MeetingDetails.tsx",
-            path: "/dashboard/meetings/[id]",
-            type: "component", 
-            status: "mock_only",
-            description: "Meeting Details component uses mock agenda items and notes",
-            mockDataLines: [
-              "// Mock data - in a real app, this would come from the API",
-              "setAgendaItems([ { id: '1', title: 'Review quarterly results' } ])",
-              "setNotes([ { id: '1', content: 'Meeting started on time' } ])"
-            ],
-            lastChecked: new Date().toISOString(),
-            priority: "high"
-          },
-          {
-            file: "src/app/dashboard/settings/database/page.tsx",
-            path: "/dashboard/settings/database",
-            type: "page",
-            status: "mock_only", 
-            description: "Settings Database page entirely uses mock metrics",
-            mockDataLines: [
-              "// Mock database metrics",
-              "const dbMetrics = { size: { total: 10, used: 4.2 } }",
-              "const tableStats = [ { name: 'users', rows: 1250 } ]"
-            ],
-            lastChecked: new Date().toISOString(),
-            priority: "medium"
-          },
-          {
-            file: "src/app/dashboard/settings/server/page.tsx", 
-            path: "/dashboard/settings/server",
-            type: "page",
-            status: "mock_only",
-            description: "Settings Server page uses mock server metrics",
-            mockDataLines: [
-              "// Mock server metrics",
-              "const serverMetrics = { cpu: { usage: 45, cores: 8 } }",
-              "uptime: '45 days 12 hours'"
-            ],
-            lastChecked: new Date().toISOString(),
-            priority: "medium"
-          },
-          {
-            file: "src/app/api/system/alerts/route.ts",
-            path: "/api/system/alerts",
-            type: "api",
-            status: "mixed",
-            description: "System Alerts API returns hardcoded alert rules",
-            mockDataLines: [
-              "const alertsConfig = { rules: [ hardcoded alert rules ] }",
-              "channels: [ { id: 'email', name: 'Email Notifications' } ]"
-            ],
-            lastChecked: new Date().toISOString(),
-            priority: "low"
-          },
-          {
-            file: "src/config/organization.ts",
-            path: "Configuration file",
-            type: "component",
-            status: "mixed", 
-            description: "Organization config has hardcoded default values",
-            mockDataLines: [
-              "defaultSchoolName: 'AgendaIQ School'",
-              "systemRoles: [ 'Administrator', 'Principal', 'Teacher' ]"
-            ],
-            lastChecked: new Date().toISOString(),
-            priority: "low"
-          }
-        ],
-        timestamp: new Date().toISOString()
-      };
+      // Call the real API endpoint
+      const response = await fetch('/api/system/mock-data-scan');
       
-      setReport(mockReport);
-      showNotification(`Scan completed: Found ${mockReport.totalFiles} files with mock data usage`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to scan codebase');
+      }
+      
+      const scanReport: MockDataReport = await response.json();
+      
+      setReport(scanReport);
+      showNotification(`Scan completed: Found ${scanReport.totalFiles} files with mock data usage`);
     } catch (error) {
       console.error('Failed to scan mock data usage:', error);
-      showNotification('Failed to scan codebase');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to scan codebase';
+      setError(errorMessage);
+      showNotification(errorMessage);
     } finally {
       setLoading(false);
       setScanning(false);
@@ -240,11 +131,74 @@ export default function MockDataTrackerPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p>Scanning codebase for mock data usage...</p>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center">
+              <Search className="w-8 h-8 mr-3 text-purple-600" />
+              Mock Data Tracker
+            </h1>
+            <p className="text-muted-foreground">Real-time codebase scanning in progress...</p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard/system">
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to System
+              </Button>
+            </Link>
+          </div>
         </div>
+
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
+            <p className="text-lg font-medium">Scanning codebase for mock data usage...</p>
+            <p className="text-sm text-gray-500 mt-2">This may take a few seconds</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center">
+              <Search className="w-8 h-8 mr-3 text-purple-600" />
+              Mock Data Tracker
+            </h1>
+            <p className="text-muted-foreground">Monitor and track mock data usage across the application</p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard/system">
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to System
+              </Button>
+            </Link>
+            <Button 
+              onClick={scanMockDataUsage}
+              variant="outline"
+              size="sm"
+              disabled={scanning}
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${scanning ? 'animate-spin' : ''}`} />
+              Retry Scan
+            </Button>
+          </div>
+        </div>
+
+        <Alert className="mb-6 border-red-200 bg-red-50">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">
+            <strong>Scan Failed:</strong> {error}
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
@@ -257,7 +211,7 @@ export default function MockDataTrackerPage() {
             <Search className="w-8 h-8 mr-3 text-purple-600" />
             Mock Data Tracker
           </h1>
-          <p className="text-muted-foreground">Monitor and track mock data usage across the application</p>
+          <p className="text-muted-foreground">Real-time monitoring of mock data usage across the application</p>
         </div>
         
         <div className="flex items-center gap-2">
@@ -274,7 +228,7 @@ export default function MockDataTrackerPage() {
             disabled={scanning}
           >
             <RefreshCw className={`w-4 h-4 mr-2 ${scanning ? 'animate-spin' : ''}`} />
-            Rescan
+            {scanning ? 'Scanning...' : 'Rescan'}
           </Button>
         </div>
       </div>
@@ -347,76 +301,92 @@ export default function MockDataTrackerPage() {
           </div>
 
           {/* Status Alert */}
-          <Alert className="mb-6">
-            <Zap className="h-4 w-4" />
-            <AlertDescription>
-              <strong>Action Required:</strong> {report.mockOnlyFiles} files are using mock data only and need API integration. 
-              {report.apiFallbackFiles} files have API fallbacks that may indicate unstable APIs.
-            </AlertDescription>
-          </Alert>
+          {(report.mockOnlyFiles > 0 || report.apiFallbackFiles > 0) && (
+            <Alert className="mb-6">
+              <Zap className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Action Required:</strong> {report.mockOnlyFiles} files are using mock data only and need API integration. 
+                {report.apiFallbackFiles} files have API fallbacks that may indicate unstable APIs.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* No mock data found message */}
+          {report.totalFiles === 0 && (
+            <Alert className="mb-6">
+              <CheckCircle className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Great!</strong> No mock data usage detected in the codebase. All pages and components appear to be using real APIs.
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Mock Data Usage Details */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Database className="h-5 w-5 mr-2 text-purple-600" />
-                Mock Data Usage Details
-              </CardTitle>
-              <CardDescription>Complete list of files using mock data with details and recommendations</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {report.usage.map((item, index) => (
-                  <div key={index} className="border rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center space-x-3">
-                        {getTypeIcon(item.type)}
-                        <div>
-                          <h4 className="font-medium text-gray-900">{item.file}</h4>
-                          <p className="text-sm text-gray-600">{item.description}</p>
-                          <p className="text-xs text-gray-500 mt-1">Path: {item.path}</p>
+          {report.usage.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Database className="h-5 w-5 mr-2 text-purple-600" />
+                  Mock Data Usage Details
+                </CardTitle>
+                <CardDescription>Complete list of files using mock data with details and recommendations</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {report.usage.map((item, index) => (
+                    <div key={index} className="border rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center space-x-3">
+                          {getTypeIcon(item.type)}
+                          <div>
+                            <h4 className="font-medium text-gray-900">{item.file}</h4>
+                            <p className="text-sm text-gray-600">{item.description}</p>
+                            <p className="text-xs text-gray-500 mt-1">Path: {item.path}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {getPriorityBadge(item.priority)}
+                          {getStatusBadge(item.status)}
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        {getPriorityBadge(item.priority)}
-                        {getStatusBadge(item.status)}
+
+                      {item.apiEndpoint && (
+                        <div className="mb-3">
+                          <span className="text-xs font-medium text-green-600">API Endpoint: </span>
+                          <code className="text-xs bg-green-50 px-2 py-1 rounded">{item.apiEndpoint}</code>
+                        </div>
+                      )}
+
+                      <div className="bg-gray-50 rounded p-3">
+                        <p className="text-xs font-medium text-gray-600 mb-2">Mock Data References:</p>
+                        {item.mockDataLines.map((line, lineIndex) => (
+                          <code key={lineIndex} className="block text-xs text-gray-700 mb-1">
+                            {line}
+                          </code>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t">
+                        <span className="text-xs text-gray-500">
+                          Last checked: {new Date(item.lastChecked).toLocaleString()}
+                        </span>
+                        <div className="flex space-x-2">
+                          {item.type === 'page' && (
+                            <Button variant="outline" size="sm" asChild>
+                              <Link href={item.path}>
+                                <ExternalLink className="w-3 h-3 mr-1" />
+                                View Page
+                              </Link>
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     </div>
-
-                    {item.apiEndpoint && (
-                      <div className="mb-3">
-                        <span className="text-xs font-medium text-green-600">API Endpoint: </span>
-                        <code className="text-xs bg-green-50 px-2 py-1 rounded">{item.apiEndpoint}</code>
-                      </div>
-                    )}
-
-                    <div className="bg-gray-50 rounded p-3">
-                      <p className="text-xs font-medium text-gray-600 mb-2">Mock Data Lines:</p>
-                      {item.mockDataLines.map((line, lineIndex) => (
-                        <code key={lineIndex} className="block text-xs text-gray-700 mb-1">
-                          {line}
-                        </code>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t">
-                      <span className="text-xs text-gray-500">
-                        Last checked: {new Date(item.lastChecked).toLocaleString()}
-                      </span>
-                      <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={item.path}>
-                            <ExternalLink className="w-3 h-3 mr-1" />
-                            View Page
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Scan Information */}
           <Card className="mt-6">
@@ -433,16 +403,16 @@ export default function MockDataTrackerPage() {
                   <span className="ml-2">{new Date(report.timestamp).toLocaleString()}</span>
                 </div>
                 <div>
-                  <span className="font-medium">Scan Duration:</span>
-                  <span className="ml-2">2.3 seconds</span>
+                  <span className="font-medium">Files Found:</span>
+                  <span className="ml-2">{report.totalFiles} with mock data usage</span>
                 </div>
                 <div>
-                  <span className="font-medium">Files Scanned:</span>
-                  <span className="ml-2">156 TypeScript/JavaScript files</span>
+                  <span className="font-medium">Scan Type:</span>
+                  <span className="ml-2">Real-time file system scan</span>
                 </div>
                 <div>
-                  <span className="font-medium">Mock Data Patterns:</span>
-                  <span className="ml-2">8 different patterns detected</span>
+                  <span className="font-medium">Detection Patterns:</span>
+                  <span className="ml-2">9 different mock data patterns</span>
                 </div>
               </div>
             </CardContent>
