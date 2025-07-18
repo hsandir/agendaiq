@@ -4,20 +4,17 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   Database, 
   ArrowLeft, 
-  Copy, 
-  RefreshCw, 
-  CheckCircle, 
+  RefreshCw,
+  CheckCircle,
   AlertCircle,
-  Clock,
-  Users,
+  Activity,
   HardDrive,
-  Zap,
-  Activity
+  Users,
+  Clock
 } from "lucide-react";
 import Link from "next/link";
 
@@ -55,6 +52,7 @@ interface DatabaseMetrics {
 export default function DatabaseManagementPage() {
   const [metrics, setMetrics] = useState<DatabaseMetrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<string[]>([]);
 
   const showNotification = (message: string) => {
@@ -64,104 +62,26 @@ export default function DatabaseManagementPage() {
     }, 5000);
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    showNotification('Copied to clipboard!');
-  };
-
   const fetchDatabaseMetrics = async () => {
     try {
       setLoading(true);
+      setError(null);
       
-      // Try to fetch from actual API
-      const response = await fetch('/api/system/database');
+      // Fetch from real database metrics API
+      const response = await fetch('/api/system/database-metrics');
       if (response.ok) {
-        const apiData = await response.json();
-        
-        // Check if API returned expected data structure
-        if (apiData.success && apiData.database) {
-          // Convert API data to expected format
-          const dbInfo = apiData.database;
-          const convertedMetrics: DatabaseMetrics = {
-            connection: {
-              url: `postgresql://${dbInfo.username}:****@${dbInfo.host}:${dbInfo.port}/${dbInfo.database}`,
-              host: dbInfo.host,
-              port: dbInfo.port.toString(),
-              database: dbInfo.database,
-              username: dbInfo.username,
-              connected: true, // If API responds, assume connected
-              uptime: "N/A" // Not available from current API
-            },
-            statistics: {
-              tables: dbInfo.tables.length,
-              totalRecords: Math.floor(Math.random() * 50000) + 10000, // Mock total records
-              totalSize: "2.1 GB", // Mock size
-              activeConnections: Math.floor(Math.random() * 20) + 5, // Mock connections
-              maxConnections: 100
-            },
-            performance: {
-              avgQueryTime: Math.floor(Math.random() * 100) + 20, // Mock query time
-              slowQueries: Math.floor(Math.random() * 5), // Mock slow queries
-              queriesPerSecond: Math.floor(Math.random() * 200) + 50, // Mock QPS
-              cacheHitRatio: Math.floor(Math.random() * 20) + 80 // Mock cache hit ratio
-            },
-            tables: dbInfo.tables.map((tableName: string, index: number) => ({
-              name: tableName,
-              rows: Math.floor(Math.random() * 10000) + 100,
-              size: `${Math.floor(Math.random() * 500) + 50} KB`,
-              lastAccess: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
-            }))
-          };
-          
-          setMetrics(convertedMetrics);
-          showNotification('Database metrics loaded from API');
-        } else {
-          throw new Error('Invalid API response format');
-        }
+        const databaseMetrics: DatabaseMetrics = await response.json();
+        setMetrics(databaseMetrics);
+        showNotification('Real-time database metrics loaded successfully');
       } else {
-        throw new Error('API response not ok');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch database metrics');
       }
     } catch (error) {
-      console.error('Failed to fetch database metrics, using mock data:', error);
-      
-      // Fallback to mock data
-      const mockMetrics: DatabaseMetrics = {
-        connection: {
-          url: "postgresql://postgres:****@localhost:5432/agendaiq",
-          host: "localhost",
-          port: "5432",
-          database: "agendaiq",
-          username: "postgres",
-          connected: true,
-          uptime: "45 days 12 hours"
-        },
-        statistics: {
-          tables: 19,
-          totalRecords: 25680,
-          totalSize: "2.1 GB",
-          activeConnections: 12,
-          maxConnections: 100
-        },
-        performance: {
-          avgQueryTime: 45,
-          slowQueries: 2,
-          queriesPerSecond: 120,
-          cacheHitRatio: 95.2
-        },
-        tables: [
-          { name: "User", rows: 1250, size: "128 MB", lastAccess: "2024-06-01T10:30:00Z" },
-          { name: "Meeting", rows: 5680, size: "512 MB", lastAccess: "2024-06-01T10:25:00Z" },
-          { name: "MeetingNote", rows: 12500, size: "1.2 GB", lastAccess: "2024-06-01T10:20:00Z" },
-          { name: "Staff", rows: 3200, size: "256 MB", lastAccess: "2024-06-01T10:15:00Z" },
-          { name: "Department", rows: 25, size: "32 KB", lastAccess: "2024-06-01T09:45:00Z" },
-          { name: "Role", rows: 15, size: "16 KB", lastAccess: "2024-06-01T09:30:00Z" },
-          { name: "School", rows: 45, size: "64 KB", lastAccess: "2024-06-01T09:15:00Z" },
-          { name: "District", rows: 8, size: "8 KB", lastAccess: "2024-06-01T09:00:00Z" }
-        ]
-      };
-      
-      setMetrics(mockMetrics);
-      showNotification('Using cached data - API temporarily unavailable');
+      console.error('Failed to fetch database metrics:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch database metrics';
+      setError(errorMessage);
+      showNotification(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -174,28 +94,74 @@ export default function DatabaseManagementPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const formatLastAccess = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / (1000 * 60));
-    
-    if (minutes < 60) {
-      return `${minutes}m ago`;
-    } else if (minutes < 1440) {
-      return `${Math.floor(minutes / 60)}h ago`;
-    } else {
-      return `${Math.floor(minutes / 1440)}d ago`;
-    }
-  };
-
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p>Loading database metrics...</p>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center">
+              <Database className="w-8 h-8 mr-3 text-blue-600" />
+              Database Management
+            </h1>
+            <p className="text-muted-foreground">Loading real-time database metrics...</p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard/system">
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to System
+              </Button>
+            </Link>
+          </div>
         </div>
+
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
+            <p className="text-lg font-medium">Loading real-time database information...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-bold flex items-center">
+              <Database className="w-8 h-8 mr-3 text-blue-600" />
+              Database Management
+            </h1>
+            <p className="text-muted-foreground">Real-time database monitoring and management</p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard/system">
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to System
+              </Button>
+            </Link>
+            <Button 
+              onClick={fetchDatabaseMetrics}
+              variant="outline"
+              size="sm"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Retry
+            </Button>
+          </div>
+        </div>
+
+        <Alert className="mb-6 border-red-200 bg-red-50">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">
+            <strong>Failed to load database metrics:</strong> {error}
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
@@ -208,7 +174,7 @@ export default function DatabaseManagementPage() {
             <Database className="w-8 h-8 mr-3 text-blue-600" />
             Database Management
           </h1>
-          <p className="text-muted-foreground">Monitor database health and performance</p>
+          <p className="text-muted-foreground">Real-time database monitoring with live Prisma data</p>
         </div>
         
         <div className="flex items-center gap-2">
@@ -222,9 +188,8 @@ export default function DatabaseManagementPage() {
             onClick={fetchDatabaseMetrics}
             variant="outline"
             size="sm"
-            disabled={loading}
           >
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
           </Button>
         </div>
@@ -242,229 +207,196 @@ export default function DatabaseManagementPage() {
 
       {metrics && (
         <>
-          {/* Connection Overview */}
+          {/* Connection Status */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Database className="h-5 w-5 mr-2 text-blue-600" />
+                Live Database Connection
+              </CardTitle>
+              <CardDescription>Real-time database connection and configuration details</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Badge variant="outline" className="text-green-600 border-green-600">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      Connected
+                    </Badge>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div><strong>Host:</strong> {metrics.connection.host}</div>
+                    <div><strong>Port:</strong> {metrics.connection.port}</div>
+                    <div><strong>Database:</strong> {metrics.connection.database}</div>
+                    <div><strong>Username:</strong> {metrics.connection.username}</div>
+                  </div>
+                </div>
+                <div>
+                  <div className="space-y-2 text-sm">
+                    <div><strong>Process Uptime:</strong> {metrics.connection.uptime}</div>
+                    <div><strong>Active Connections:</strong> {metrics.statistics.activeConnections}/{metrics.statistics.maxConnections}</div>
+                    <div><strong>Connection String:</strong> {metrics.connection.url}</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Real-time Statistics Cards */}
           <div className="grid gap-6 md:grid-cols-4 mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Connection Status</CardTitle>
+                <CardTitle className="text-sm font-medium">Database Tables</CardTitle>
                 <Database className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-2">
-                  {metrics.connection.connected ? (
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4 text-destructive" />
-                  )}
-                  <span className="text-sm font-medium">
-                    {metrics.connection.connected ? 'Connected' : 'Disconnected'}
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Uptime: {metrics.connection.uptime}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Tables</CardTitle>
-                <HardDrive className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{metrics.statistics.tables}</div>
                 <p className="text-xs text-muted-foreground">
-                  {metrics.statistics.totalRecords.toLocaleString()} total records
+                  Active Prisma tables
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Database Size</CardTitle>
+                <CardTitle className="text-sm font-medium">Total Records</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{metrics.statistics.totalRecords.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">
+                  Live record count
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Estimated Size</CardTitle>
                 <HardDrive className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{metrics.statistics.totalSize}</div>
                 <p className="text-xs text-muted-foreground">
-                  Storage used
+                  Calculated storage
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Connections</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
+                <CardTitle className="text-sm font-medium">Query Performance</CardTitle>
+                <Activity className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{metrics.statistics.activeConnections}</div>
+                <div className="text-2xl font-bold">{metrics.performance.avgQueryTime}ms</div>
                 <p className="text-xs text-muted-foreground">
-                  of {metrics.statistics.maxConnections} max
+                  Average response time
                 </p>
-                <Progress 
-                  value={(metrics.statistics.activeConnections / metrics.statistics.maxConnections) * 100} 
-                  className="mt-2 h-1"
-                />
               </CardContent>
             </Card>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 mb-8">
-            {/* Connection Details */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Database className="h-5 w-5 mr-2 text-blue-600" />
-                  Connection Details
-                </CardTitle>
-                <CardDescription>Database connection information</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Connection URL</p>
-                    <div className="flex items-center space-x-2">
-                      <code className="text-xs bg-gray-100 px-2 py-1 rounded flex-1">{metrics.connection.url}</code>
-                      <Button variant="outline" size="sm" onClick={() => copyToClipboard(metrics.connection.url)}>
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Host</p>
-                      <div className="flex items-center space-x-2">
-                        <code className="text-xs bg-gray-100 px-2 py-1 rounded">{metrics.connection.host}</code>
-                        <Button variant="outline" size="sm" onClick={() => copyToClipboard(metrics.connection.host)}>
-                          <Copy className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Port</p>
-                      <div className="flex items-center space-x-2">
-                        <code className="text-xs bg-gray-100 px-2 py-1 rounded">{metrics.connection.port}</code>
-                        <Button variant="outline" size="sm" onClick={() => copyToClipboard(metrics.connection.port)}>
-                          <Copy className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Database</p>
-                      <div className="flex items-center space-x-2">
-                        <code className="text-xs bg-gray-100 px-2 py-1 rounded">{metrics.connection.database}</code>
-                        <Button variant="outline" size="sm" onClick={() => copyToClipboard(metrics.connection.database)}>
-                          <Copy className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Username</p>
-                      <code className="text-xs bg-gray-100 px-2 py-1 rounded">{metrics.connection.username}</code>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Performance Metrics */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Zap className="h-5 w-5 mr-2 text-yellow-600" />
-                  Performance Metrics
-                </CardTitle>
-                <CardDescription>Database performance statistics</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Avg Query Time</p>
-                      <div className="text-2xl font-bold text-green-600">{metrics.performance.avgQueryTime}ms</div>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Queries/sec</p>
-                      <div className="text-2xl font-bold text-blue-600">{metrics.performance.queriesPerSecond}</div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Slow Queries</p>
-                      <div className="text-2xl font-bold text-orange-600">{metrics.performance.slowQueries}</div>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Cache Hit Ratio</p>
-                      <div className="text-2xl font-bold text-green-600">{metrics.performance.cacheHitRatio}%</div>
-                    </div>
-                  </div>
-                  
-                  {/* Performance Alerts */}
-                  {metrics.performance.avgQueryTime > 100 && (
-                    <Alert className="border-yellow-200 bg-yellow-50">
-                      <Clock className="h-4 w-4" />
-                      <AlertDescription>
-                        Average query time is above 100ms. Consider optimizing slow queries.
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                  
-                  {metrics.performance.slowQueries > 5 && (
-                    <Alert className="border-red-200 bg-red-50">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertDescription>
-                        {metrics.performance.slowQueries} slow queries detected. Review query performance.
-                      </AlertDescription>
-                    </Alert>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Table Statistics */}
-          <Card>
+          {/* Performance Metrics */}
+          <Card className="mb-6">
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Activity className="h-5 w-5 mr-2 text-green-600" />
-                Table Statistics
+                Real-time Performance Metrics
               </CardTitle>
-              <CardDescription>Individual table metrics and usage</CardDescription>
+              <CardDescription>Live database performance indicators based on actual usage</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-2 px-4 font-medium">Table Name</th>
-                      <th className="text-left py-2 px-4 font-medium">Rows</th>
-                      <th className="text-left py-2 px-4 font-medium">Size</th>
-                      <th className="text-left py-2 px-4 font-medium">Last Access</th>
-                      <th className="text-left py-2 px-4 font-medium">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {metrics.tables.map((table, index) => (
-                      <tr key={index} className="border-b hover:bg-gray-50">
-                        <td className="py-2 px-4 font-medium">{table.name}</td>
-                        <td className="py-2 px-4">{table.rows.toLocaleString()}</td>
-                        <td className="py-2 px-4">{table.size}</td>
-                        <td className="py-2 px-4 text-sm text-muted-foreground">
-                          {formatLastAccess(table.lastAccess)}
-                        </td>
-                        <td className="py-2 px-4">
-                          <Badge variant="outline" className="text-green-600 border-green-600">
-                            <CheckCircle className="w-3 h-3 mr-1" />
-                            Healthy
-                          </Badge>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">{metrics.performance.queriesPerSecond}</div>
+                  <div className="text-sm text-muted-foreground">Queries/Second</div>
+                  <div className="text-xs text-gray-500 mt-1">Estimated throughput</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">{metrics.performance.cacheHitRatio}%</div>
+                  <div className="text-sm text-muted-foreground">Cache Hit Ratio</div>
+                  <div className="text-xs text-gray-500 mt-1">Query efficiency</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-600">{metrics.performance.slowQueries}</div>
+                  <div className="text-sm text-muted-foreground">Slow Queries</div>
+                  <div className="text-xs text-gray-500 mt-1">Performance alerts</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Live Table Statistics */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Database className="h-5 w-5 mr-2 text-purple-600" />
+                Live Table Statistics
+              </CardTitle>
+              <CardDescription>Real-time table data from active Prisma queries</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {metrics.tables.map((table, index) => (
+                  <div key={table.name} className="border rounded-lg p-4 hover:bg-gray-50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <Database className="w-5 h-5 text-gray-600" />
+                        <div>
+                          <div className="flex items-center space-x-2 mb-1">
+                            <h4 className="font-medium">{table.name}</h4>
+                            <Badge variant="outline" className="text-blue-600 border-blue-600">
+                              Live Data
+                            </Badge>
+                          </div>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                            <span><strong>Records:</strong> {table.rows.toLocaleString()}</span>
+                            <span><strong>Size:</strong> {table.size}</span>
+                            <span><strong>Last Access:</strong> {new Date(table.lastAccess).toLocaleTimeString()}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Clock className="w-4 h-4 text-gray-400" />
+                        <span className="text-xs text-gray-500">
+                          {new Date(table.lastAccess).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Real-time Status */}
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <CheckCircle className="h-5 w-5 mr-2 text-green-600" />
+                Real-time Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="font-medium">Data Source:</span>
+                  <span className="ml-2">Live Prisma queries</span>
+                </div>
+                <div>
+                  <span className="font-medium">Update Frequency:</span>
+                  <span className="ml-2">Every 30 seconds</span>
+                </div>
+                <div>
+                  <span className="font-medium">Last Updated:</span>
+                  <span className="ml-2">{new Date().toLocaleTimeString()}</span>
+                </div>
+                <div>
+                  <span className="font-medium">Connection Type:</span>
+                  <span className="ml-2">PostgreSQL (Prisma ORM)</span>
+                </div>
               </div>
             </CardContent>
           </Card>
