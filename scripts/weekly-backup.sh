@@ -54,9 +54,9 @@ git push -u origin "$BACKUP_BRANCH" 2>&1 | tee -a "$LOG_FILE"
 log "Switching back to main branch"
 git checkout main 2>&1 | tee -a "$LOG_FILE"
 
-# Clean up old backup branches (keep last 8 weeks)
+# Clean up old backup branches (keep last 20 weeks)
 log "Cleaning up old backup branches"
-OLD_BACKUPS=$(git branch -r | grep "origin/backup/week-" | sort | head -n -8)
+OLD_BACKUPS=$(git branch -r | grep "origin/backup/week-" | sort | head -n -20)
 if [ -n "$OLD_BACKUPS" ]; then
     echo "$OLD_BACKUPS" | while read -r branch; do
         branch_name=$(echo "$branch" | sed 's|origin/||')
