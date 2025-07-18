@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { APIAuthPatterns } from '@/lib/auth/api-auth';
 import { AuthenticatedUser } from '@/lib/auth/auth-utils';
-import { RuleEngine } from '@/lib/project-management/rule-engine';
-import { WorkflowEngine } from '@/lib/project-management/auto-workflow-simple';
+import { RuleEngine } from '@/lib/project-management/rule-engine-full';
+import { WorkflowEngine } from '@/lib/project-management/auto-workflow-full';
 
 // GET /api/project-management/rules - Get all rules and validation status
 export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {
@@ -10,40 +10,36 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
     const ruleEngine = RuleEngine.getInstance();
     const workflowEngine = WorkflowEngine.getInstance();
     
-    // Get all rules
-    const rules = ruleEngine.getAllRules();
-    const workflowRules = workflowEngine.getAllRules();
+    // Get validation status
+    const validationStatus = await ruleEngine.getValidationStatus(user);
     
-    // Get validation results
-    const validationResults = await ruleEngine.validateAllRules();
+    // Get workflow health
+    const workflowHealth = workflowEngine.getHealthStatus();
     
-    // Calculate summary
-    const summary = {
-      totalRules: rules.length,
-      passedRules: validationResults.filter(r => r.passed).length,
-      violatedRules: validationResults.filter(r => !r.passed).length,
-      autoFixableViolations: validationResults
-        .filter(r => !r.passed)
-        .reduce((sum, r) => sum + r.fixes.filter(f => f.autoApply).length, 0),
-      workflowRules: workflowRules.length,
-      enabledWorkflowRules: workflowRules.filter(r => r.enabled).length
-    };
+    // Get recent executions
+    const recentExecutions = workflowEngine.getRecentExecutions(10);
     
     return NextResponse.json({
-      success: true,
-      data: {
-        rules,
-        workflowRules,
-        validationResults,
-        summary
-      }
+      validationStatus,
+      workflowHealth,
+      recentExecutions,
+      rules: ruleEngine.getAllRules().map(rule => ({
+        id: rule.id,
+        name: rule.name,
+        category: rule.category,
+        priority: rule.priority,
+        enforced: rule.enforced,
+        autoFix: rule.autoFix
+      })),
+      timestamp: new Date().toISOString()
     });
+    
   } catch (error) {
-    console.error("Error fetching rules:", error);
+    console.error('Error getting project management rules:', error);
     return NextResponse.json(
       { 
-        error: error instanceof Error ? error.message : "Internal server error",
-        code: "RULES_FETCH_ERROR",
+        error: 'Failed to get rules status',
+        details: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString()
       },
       { status: 500 }
@@ -51,77 +47,115 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
   }
 });
 
-// POST /api/project-management/rules - Validate rules or apply auto-fixes
+// POST /api/project-management/rules/validate - Validate specific rule
 export const POST = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {
   try {
     const body = await request.json();
-    const { action, ruleIds, autoFix } = body;
-
-    if (!action) {
-      return NextResponse.json({ error: "Action is required" }, { status: 400 });
+    const { ruleId, autoFix } = body;
+    
+    if (!ruleId) {
+      return NextResponse.json(
+        { error: 'Rule ID is required' },
+        { status: 400 }
+      );
     }
-
+    
     const ruleEngine = RuleEngine.getInstance();
-    const workflowEngine = WorkflowEngine.getInstance();
-
-    let result;
-
-    switch (action) {
-      case 'validate':
-        if (ruleIds && Array.isArray(ruleIds)) {
-          // Validate specific rules
-          const results = [];
-          for (const ruleId of ruleIds) {
-            const ruleResult = await ruleEngine.validateRule(ruleId);
-            results.push(ruleResult);
-          }
-          result = { validationResults: results };
-        } else {
-          // Validate all rules
-          const validationResults = await ruleEngine.validateAllRules();
-          result = { validationResults };
-        }
-        break;
-
-      case 'auto-fix':
-        const autoFixResult = await ruleEngine.autoFixAllViolations();
-        result = { autoFixResult };
-        break;
-
-      case 'trigger-workflow':
-        const { ruleId, filePath } = body;
-        if (!ruleId) {
-          return NextResponse.json({ error: "Rule ID is required for trigger-workflow" }, { status: 400 });
-        }
-        await workflowEngine.triggerRule(ruleId, filePath);
-        result = { message: `Workflow rule ${ruleId} triggered successfully` };
-        break;
-
-      case 'toggle-workflow':
-        const { workflowRuleId, enabled } = body;
-        if (!workflowRuleId) {
-          return NextResponse.json({ error: "Workflow rule ID is required" }, { status: 400 });
-        }
-        workflowEngine.setRuleEnabled(workflowRuleId, enabled);
-        result = { message: `Workflow rule ${workflowRuleId} ${enabled ? 'enabled' : 'disabled'}` };
-        break;
-
-      default:
-        return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
+    
+    // Validate the rule
+    const validationResult = await ruleEngine.validateRule(ruleId, user);
+    
+    // Apply auto-fix if requested and available
+    let autoFixResult = null;
+    if (autoFix && validationResult.fixes.length > 0) {
+      const applicableFixes = validationResult.fixes.filter(fix => fix.autoApply);
+      if (applicableFixes.length > 0) {
+        autoFixResult = await ruleEngine.applyFixes(applicableFixes, user);
+      }
     }
-
+    
     return NextResponse.json({
-      success: true,
-      action,
-      result
+      validationResult,
+      autoFixResult,
+      timestamp: new Date().toISOString()
     });
-
+    
   } catch (error) {
-    console.error("Error in rules API:", error);
+    console.error('Error validating rule:', error);
     return NextResponse.json(
       { 
-        error: error instanceof Error ? error.message : "Internal server error",
-        code: "RULES_ACTION_ERROR",
+        error: 'Failed to validate rule',
+        details: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      },
+      { status: 500 }
+    );
+  }
+});
+
+// PUT /api/project-management/rules/workflow - Control workflow engine
+export const PUT = APIAuthPatterns.adminOnly(async (request: NextRequest, user: AuthenticatedUser) => {
+  try {
+    const body = await request.json();
+    const { action, ruleId, enabled } = body;
+    
+    const workflowEngine = WorkflowEngine.getInstance();
+    
+    switch (action) {
+      case 'start':
+        await workflowEngine.startWatching(process.cwd(), user);
+        return NextResponse.json({ 
+          message: 'Workflow engine started',
+          timestamp: new Date().toISOString()
+        });
+        
+      case 'stop':
+        await workflowEngine.stopWatching();
+        return NextResponse.json({ 
+          message: 'Workflow engine stopped',
+          timestamp: new Date().toISOString()
+        });
+        
+      case 'toggle_rule':
+        if (!ruleId || enabled === undefined) {
+          return NextResponse.json(
+            { error: 'Rule ID and enabled status are required' },
+            { status: 400 }
+          );
+        }
+        workflowEngine.setRuleEnabled(ruleId, enabled);
+        return NextResponse.json({ 
+          message: `Rule ${ruleId} ${enabled ? 'enabled' : 'disabled'}`,
+          timestamp: new Date().toISOString()
+        });
+        
+      case 'trigger_rule':
+        if (!ruleId) {
+          return NextResponse.json(
+            { error: 'Rule ID is required' },
+            { status: 400 }
+          );
+        }
+        const execution = await workflowEngine.triggerRule(ruleId, undefined, user);
+        return NextResponse.json({
+          message: `Rule ${ruleId} triggered`,
+          execution,
+          timestamp: new Date().toISOString()
+        });
+        
+      default:
+        return NextResponse.json(
+          { error: 'Invalid action' },
+          { status: 400 }
+        );
+    }
+    
+  } catch (error) {
+    console.error('Error controlling workflow engine:', error);
+    return NextResponse.json(
+      { 
+        error: 'Failed to control workflow engine',
+        details: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString()
       },
       { status: 500 }
