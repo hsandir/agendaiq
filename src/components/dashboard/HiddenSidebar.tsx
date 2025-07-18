@@ -56,7 +56,7 @@ const navigation: NavSection[] = [
       { href: "/dashboard/settings/permissions", label: "Permissions", icon: FiKey },
       { href: "/dashboard/settings/system", label: "System Settings", icon: FiSettings },
       { href: "/dashboard/settings/audit", label: "Audit Log", icon: FiActivity },
-      { href: "/dashboard/settings/backup", label: "Backup & Restore", icon: FiHardDrive },
+      { href: "/dashboard/settings/backup", label: "Backup & Restore", icon: FiHardDrive, adminOnly: true },
     ],
   },
   {
