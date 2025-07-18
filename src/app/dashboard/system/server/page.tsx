@@ -78,7 +78,16 @@ export default function ServerManagementPage() {
     try {
       setLoading(true);
       
-      // Mock server metrics for demo purposes
+      // Try to fetch from real server metrics API
+      const response = await fetch('/api/system/server-metrics');
+      if (response.ok) {
+        const serverData = await response.json();
+        setMetrics(serverData);
+        showNotification('Server metrics updated from real-time data');
+        return;
+      }
+      
+      // Fallback to simulated metrics with real-time variations
       const mockMetrics: ServerMetrics = {
         system: {
           platform: "darwin",

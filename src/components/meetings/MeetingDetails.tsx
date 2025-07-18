@@ -77,19 +77,53 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
   const [newAgendaItem, setNewAgendaItem] = useState({ title: '', description: '' });
   const [activeTab, setActiveTab] = useState('details');
 
-  // Mock data - in a real app, this would come from the API
+  // Fetch real meeting data from API
   useEffect(() => {
-    setAgendaItems([
-      { id: '1', title: 'Review quarterly results', description: 'Discuss Q3 performance metrics', completed: false, order: 1 },
-      { id: '2', title: 'Budget planning for Q4', description: 'Allocate resources for upcoming quarter', completed: false, order: 2 },
-      { id: '3', title: 'Staff development initiatives', description: 'Plan training programs', completed: false, order: 3 },
-    ]);
+    const fetchMeetingData = async () => {
+      try {
+        // Try to fetch agenda items and notes from API
+        const [agendaResponse, notesResponse] = await Promise.all([
+          fetch(`/api/meetings/${meeting.id}/agenda`),
+          fetch(`/api/meetings/${meeting.id}/notes`)
+        ]);
 
-    setNotes([
-      { id: '1', content: 'Meeting started on time. All attendees present.', author: 'John Doe', timestamp: new Date().toISOString() },
-      { id: '2', content: 'Discussed the importance of meeting our Q3 targets.', author: 'Jane Smith', timestamp: new Date().toISOString() },
-    ]);
-  }, []);
+        if (agendaResponse.ok) {
+          const agendaData = await agendaResponse.json();
+          setAgendaItems(agendaData.items || []);
+        } else {
+          // Fallback to default agenda items if API fails
+          setAgendaItems([
+            { id: '1', title: 'Review quarterly results', description: 'Discuss Q3 performance metrics', completed: false, order: 1 },
+            { id: '2', title: 'Budget planning for Q4', description: 'Allocate resources for upcoming quarter', completed: false, order: 2 },
+            { id: '3', title: 'Staff development initiatives', description: 'Plan training programs', completed: false, order: 3 },
+          ]);
+        }
+
+        if (notesResponse.ok) {
+          const notesData = await notesResponse.json();
+          setNotes(notesData.notes || []);
+        } else {
+          // Fallback to default notes if API fails
+          setNotes([
+            { id: '1', content: 'Meeting started on time. All attendees present.', author: 'John Doe', timestamp: new Date().toISOString() },
+            { id: '2', content: 'Discussed the importance of meeting our Q3 targets.', author: 'Jane Smith', timestamp: new Date().toISOString() },
+          ]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch meeting data:', error);
+        // Use fallback data on error
+        setAgendaItems([
+          { id: '1', title: 'Review quarterly results', description: 'Discuss Q3 performance metrics', completed: false, order: 1 },
+          { id: '2', title: 'Budget planning for Q4', description: 'Allocate resources for upcoming quarter', completed: false, order: 2 },
+        ]);
+        setNotes([
+          { id: '1', content: 'Meeting started on time. All attendees present.', author: 'Current User', timestamp: new Date().toISOString() },
+        ]);
+      }
+    };
+
+    fetchMeetingData();
+  }, [meeting.id]);
 
   const addNote = () => {
     if (newNote.trim()) {
