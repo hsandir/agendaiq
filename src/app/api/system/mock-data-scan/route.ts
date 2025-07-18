@@ -109,6 +109,11 @@ export async function GET() {
         if (foundMockLines.length > 0) {
           const normalizedPath = relativePath.replace(/\\/g, '/');
           
+          // Skip mock-data-tracker files from showing themselves
+          if (normalizedPath.includes('mock-data-tracker') || normalizedPath.includes('mock-data-scan')) {
+            return;
+          }
+          
           // Determine file type
           let fileType: 'component' | 'page' | 'api' = 'component';
           if (normalizedPath.includes('/pages/') || normalizedPath.includes('/app/') && normalizedPath.endsWith('page.tsx')) {

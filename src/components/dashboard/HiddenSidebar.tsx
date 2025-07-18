@@ -18,7 +18,8 @@ import {
   FiServer,
   FiMenu,
   FiX,
-  FiHelpCircle
+  FiHelpCircle,
+  FiFileText
 } from 'react-icons/fi';
 import { cn } from '@/lib/utils';
 
@@ -69,6 +70,8 @@ const navigation: NavSection[] = [
       { href: "/dashboard/system/database", label: "Database", icon: FiDatabase },
       { href: "/dashboard/system/backup", label: "Backup", icon: FiHardDrive },
       { href: "/dashboard/system/server", label: "Server", icon: FiServer },
+      { href: "/dashboard/system/alerts", label: "Alert Configuration", icon: FiBell },
+      { href: "/dashboard/system/logs", label: "System Logs", icon: FiFileText },
       { href: "/dashboard/system/mock-data-tracker", label: "Mock Data Tracker", icon: FiSettings },
     ],
   },
