@@ -7,17 +7,17 @@ import { compare } from "bcryptjs";
 
 // Type guard for staff property
 function hasStaff(user: unknown): user is User & { staff: unknown } {
-  return 'staff' in user && user.staff !== undefined;
+  return typeof user === 'object' && user !== null && 'staff' in user && user.staff !== undefined;
 }
 
 // Type guard for token with staff
 function hasStaffToken(token: unknown): token is JWT & { staff: unknown } {
-  return 'staff' in token && token.staff !== undefined;
+  return typeof token === 'object' && token !== null && 'staff' in token && token.staff !== undefined;
 }
 
 // Type guard for user data
 function isValidUserData(data: unknown): data is User {
-  return typeof data.id === 'number' && typeof data.email === 'string';
+  return typeof data === 'object' && data !== null && typeof (data as any).id === 'number' && typeof (data as any).email === 'string';
 }
 
 export const authOptions: NextAuthOptions = {
@@ -116,13 +116,13 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token.id && typeof user.id !== 'undefined') {
+      if (token.id && typeof session.user.id !== 'undefined') {
         if (typeof token.id === 'number') {
-          user.id = token.id;
+          session.user.id = token.id;
         }
       }
       if (hasStaffToken(token)) {
-        user.staff = token.staff;
+        session.user.staff = token.staff;
       }
       return session;
     },
