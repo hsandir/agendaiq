@@ -39,15 +39,22 @@ export interface AuthenticatedUser {
 export interface AuthRequirements {
   requireAuth?: boolean;
   requireStaff?: boolean;
-  requireRole?: string[];
   requireAdminRole?: boolean;
-  allowedRoles?: string[];
-  minimumPriority?: number;
   requireLeadership?: boolean;
+  allowedRoles?: string[];
+  allowedDepartments?: string[];
+  allowedSchools?: string[];
+}
+
+export interface AuthResult {
+  authorized: boolean;
+  user?: AuthenticatedUser;
+  error?: string;
+  statusCode?: number;
 }
 
 /**
- * Get current authenticated user with complete profile information
+ * Get current user from session
  */
 export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
   try {
@@ -58,94 +65,4 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
   }
 
   return result.user!;
-}
-
-/**
- * Check if user has specific role
- */
-export function hasRole(user: AuthenticatedUser | null, roleName: string): boolean {
-  return user?.staff?.role?.title === roleName;
-}
-
-/**
- * Check if user is admin
- */
-export function isAdmin(user: AuthenticatedUser | null): boolean {
-  return hasRole(user, 'Administrator');
-}
-
-/**
- * Check if user has minimum priority
- */
-export function hasMinimumPriority(user: AuthenticatedUser | null, minPriority: number): boolean {
-  return (user?.staff?.role?.priority || 0) >= minPriority;
-}
-
-/**
- * Check if user has leadership role
- */
-export function isLeader(user: AuthenticatedUser | null): boolean {
-  return user?.staff?.role?.is_leadership || false;
-}
-
-/**
- * Get user's role title
- */
-export function getUserRole(user: AuthenticatedUser | null): string | null {
-  return user?.staff?.role?.title || null;
-}
-
-/**
- * Get user's department
- */
-export function getUserDepartment(user: AuthenticatedUser | null) {
-  return user?.staff?.department || null;
-}
-
-/**
- * Get user's school
- */
-export function getUserSchool(user: AuthenticatedUser | null) {
-  return user?.staff?.school || null;
-}
-
-/**
- * Get user's district
- */
-export function getUserDistrict(user: AuthenticatedUser | null) {
-  return user?.staff?.district || null;
-}
-
-/**
- * Common auth requirements presets
- */
-export const AuthPresets = {
-  // Basic authentication
-  requireUser: { requireAuth: true },
-  
-  // Staff member required
-  requireStaff: { requireAuth: true, requireStaff: true },
-  
-  // Admin only
-  adminOnly: { requireAuth: true, requireStaff: true, requireAdminRole: true },
-  
-  // Leadership roles
-  leadershipOnly: { requireAuth: true, requireStaff: true, requireLeadership: true },
-  
-  // High priority roles (priority >= 80)
-  highPriority: { requireAuth: true, requireStaff: true, minimumPriority: 80 },
-  
-  // Teachers and above
-  teacherAndAbove: { 
-    requireAuth: true, 
-    requireStaff: true, 
-    allowedRoles: ['Teacher', 'Principal', 'Superintendent', 'Administrator'] 
-  },
-  
-  // Management roles
-  managementOnly: { 
-    requireAuth: true, 
-    requireStaff: true, 
-    allowedRoles: ['Principal', 'Superintendent', 'Administrator'] 
-  },
-} as const; 
+} 
