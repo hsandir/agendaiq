@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   const districtCount = await prisma.district.count();
   
   // Get user with staff information first
-  const user = await prisma.user.findUnique({
+  const userWithStaff = await prisma.user.findUnique({
     where: { email: user.email! },
     include: {
       Staff: {
@@ -25,7 +25,7 @@ export default async function DashboardPage() {
     },
   });
   
-  const isAdmin = user?.Staff?.[0]?.Role?.title === "Administrator";
+  const isAdmin = userWithStaff?.Staff?.[0]?.Role?.title === "Administrator";
   
   // If no district exists and user is admin, redirect to district setup
   if (districtCount === 0 && isAdmin) {
@@ -50,7 +50,7 @@ export default async function DashboardPage() {
     );
   }
   
-  const userId = parseInt(session?.user?.id || '0');
+  const userId = user.id;
   
   // Fetch upcoming meetings for the user
   const upcomingMeetings = await prisma.meeting.findMany({
@@ -142,18 +142,18 @@ export default async function DashboardPage() {
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <div className="space-y-6">
-            {user?.Staff?.[0]?.School && (
+            {userWithStaff?.Staff?.[0]?.School && (
               <div className="bg-white p-4 rounded-lg shadow-sm border">
-                <h2 className="text-lg font-medium text-gray-900">{user.Staff[0].School.name}</h2>
-                {user.Staff[0].School.address && (
+                <h2 className="text-lg font-medium text-gray-900">{userWithStaff.Staff[0].School.name}</h2>
+                {userWithStaff.Staff[0].School.address && (
                   <p className="text-sm text-gray-500 mt-1">
-                    {user.Staff[0].School.address}
+                    {userWithStaff.Staff[0].School.address}
                   </p>
                 )}
               </div>
             )}
             
-            <h1 className="text-2xl font-bold">Welcome back, {session?.user?.name}</h1>
+            <h1 className="text-2xl font-bold">Welcome back, {user.name}</h1>
             
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -187,7 +187,7 @@ export default async function DashboardPage() {
                 </a>
               </div>
               <div className="grid gap-4">
-                {upcomingMeetings.map((meeting) => (
+                {upcomingMeetings.map((meeting: any) => (
                   <div
                     key={meeting.id}
                     className="bg-white p-4 rounded-lg shadow-sm border hover:shadow-md transition-shadow"
@@ -199,22 +199,9 @@ export default async function DashboardPage() {
                           {meeting.start_time ? new Date(meeting.start_time).toLocaleString() : 'No date set'}
                         </p>
                       </div>
-                      <span className="text-sm text-gray-500">
-                        {meeting.MeetingAttendee.length} attendees
-                      </span>
-                    </div>
-                    <div className="mt-3 flex items-center">
-                      <span className="text-sm text-gray-600">
-                        Organized by: {meeting.Staff.User.name}
-                      </span>
                     </div>
                   </div>
                 ))}
-                {upcomingMeetings.length === 0 && (
-                  <p className="text-gray-500 text-center py-4">
-                    No upcoming meetings scheduled
-                  </p>
-                )}
               </div>
             </section>
           </div>

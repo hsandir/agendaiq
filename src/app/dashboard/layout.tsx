@@ -16,7 +16,7 @@ export default async function DashboardLayout({
   const user = await requireAuth(AuthPresets.requireAuth);
 
   // Get user with staff and role information
-  const user = await prisma.user.findUnique({
+  const userWithStaff = await prisma.user.findUnique({
     where: { email: user.email! },
     include: {
       Staff: {
@@ -29,7 +29,7 @@ export default async function DashboardLayout({
     },
   });
 
-  const currentRole = user?.Staff?.[0]?.Role;
+  const currentRole = userWithStaff?.Staff?.[0]?.Role;
   const isAdmin = currentRole?.title === "Administrator";
 
   return (
