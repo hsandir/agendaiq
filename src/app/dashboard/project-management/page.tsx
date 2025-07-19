@@ -66,6 +66,7 @@ interface WorkflowExecution {
 }
 
 export default function ProjectManagementPage() {
+  const [activeTab, setActiveTab] = useState('rules');
   const [validationStatus, setValidationStatus] = useState<ValidationStatus | null>(null);
   const [workflowHealth, setWorkflowHealth] = useState<WorkflowHealth | null>(null);
   const [rules, setRules] = useState<RuleInfo[]>([]);
@@ -73,6 +74,7 @@ export default function ProjectManagementPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<Array<{message: string, type: 'success' | 'error' | 'info'}>>([]);
+  const [autoStartAttempted, setAutoStartAttempted] = useState(false);
 
   useEffect(() => {
     loadProjectManagementData();
@@ -80,6 +82,23 @@ export default function ProjectManagementPage() {
     const interval = setInterval(loadProjectManagementData, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  // Auto-start workflow engine when component mounts
+  useEffect(() => {
+    if (!autoStartAttempted && workflowHealth && !workflowHealth.isWatching) {
+      setAutoStartAttempted(true);
+      autoStartWorkflow();
+    }
+  }, [workflowHealth, autoStartAttempted]);
+
+  const autoStartWorkflow = async () => {
+    try {
+      addNotification('Auto-starting workflow engine for development mode...', 'info');
+      await controlWorkflow('start');
+    } catch (error) {
+      console.warn('Auto-start workflow failed:', error);
+    }
+  };
 
   const loadProjectManagementData = async () => {
     try {
@@ -353,7 +372,7 @@ export default function ProjectManagementPage() {
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs value="rules" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="rules">Rules & Validation</TabsTrigger>
           <TabsTrigger value="workflow">Workflow Engine</TabsTrigger>
@@ -599,6 +618,10 @@ export default function ProjectManagementPage() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Dynamic RBAC</span>
                     <Badge className="bg-green-100 text-green-800">Full Mode</Badge>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Auto GitHub Backup</span>
+                    <Badge className="bg-blue-100 text-blue-800">Enabled</Badge>
                   </div>
                 </div>
               </CardContent>
