@@ -1,147 +1,132 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { AuthenticatedUser } from '@/lib/auth/auth-utils';
-import { authOptions } from "@/lib/auth/auth-options";
+import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
 
 // GET /api/roles - List all roles
-export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+export async function GET(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAdminRole: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
 
-    // Get the user to check if they're admin
-    const user = await prisma.user.findUnique({
-      where: { email: user.email },
-      include: { Staff: {
-          include: { Role: {
-              include: { Department: true
-              }
-            }
-          }
-        }
-      }
-    });
-
-    if (!user || !user.Staff?.[0] || user.Staff[0].Role?.title !== "Administrator") {
-      return NextResponse.json({ error: "Access denied" }, { status: 403 });
-    }
-
+  try {
     const roles = await prisma.role.findMany({
-      include: { Department: true
-      },
-      orderBy: [
-        { Department: { name: 'asc' } },
-        { priority: 'asc' }
-      ],
+      orderBy: { priority: 'asc' }
     });
-
-    return NextResponse.json({ roles });
+    
+    return NextResponse.json(roles);
   } catch (error) {
-    console.error("Error fetching roles:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error fetching roles:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 // POST /api/roles - Create a new role
-export const POST = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export async function POST(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAdminRole: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
+
+  try {
+    const body = await request.json();
+    const { title, priority, is_leadership, category, description } = body;
+
+    if (!title || priority === undefined) {
+      return NextResponse.json(
+        { error: 'Title and priority are required' },
+        { status: 400 }
+      );
     }
 
-    // Check if user is admin
-    const user = await prisma.user.findUnique({
-      where: { email: user.email },
-      include: { Staff: {
-          include: { Role: {
-              include: { Department: true
-              }
-            }
-          }
-        }
-      }
+    // Check if role with same title exists
+    const existingRole = await prisma.role.findFirst({
+      where: { title }
     });
 
-    if (!user || !user.Staff?.[0] || user.Staff[0].Role?.title !== "Administrator") {
-      return NextResponse.json({ error: "Access denied" }, { status: 403 });
-    }
-
-    const body = await request.json();
-    const { title, priority, category, department_id } = body;
-
-    if (!title || !department_id) {
+    if (existingRole) {
       return NextResponse.json(
-        { error: "Title and department_id are required" },
-        { status: 400 }
+        { error: 'Role with this title already exists' },
+        { status: 409 }
       );
     }
 
     const role = await prisma.role.create({
       data: {
         title,
-        priority: priority || 10,
+        priority,
+        is_leadership: is_leadership || false,
         category,
-        department_id: Number(department_id),
-      },
-      include: { Department: true
+        description
       }
     });
 
-    return NextResponse.json(role);
+    return NextResponse.json(role, { status: 201 });
   } catch (error) {
-    console.error("Error creating role:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error creating role:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 // PUT /api/roles - Update a role
-export const PUT = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+export async function PUT(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAdminRole: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
 
-    // Check if user is admin
-    const user = await prisma.user.findUnique({
-      where: { email: user.email },
-      include: { Staff: {
-          include: { Role: {
-              include: { Department: true
-              }
-            }
-          }
-        }
-      }
-    });
-
-    if (!user || !user.Staff?.[0] || user.Staff[0].Role?.title !== "Administrator") {
-      return NextResponse.json({ error: "Access denied" }, { status: 403 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
+  try {
+    const body = await request.json();
+    const { id, title, priority, is_leadership, category, description } = body;
 
     if (!id) {
-      return NextResponse.json({ error: "Role ID is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Role ID is required' },
+        { status: 400 }
+      );
     }
 
-    const body = await request.json();
-    const { title, priority, category, department_id } = body;
+    // Check if role exists
+    const existingRole = await prisma.role.findUnique({
+      where: { id }
+    });
+
+    if (!existingRole) {
+      return NextResponse.json(
+        { error: 'Role not found' },
+        { status: 404 }
+      );
+    }
+
+    // If title is being changed, check for conflicts
+    if (title && title !== existingRole.title) {
+      const titleConflict = await prisma.role.findFirst({
+        where: { title }
+      });
+
+      if (titleConflict) {
+        return NextResponse.json(
+          { error: 'Role with this title already exists' },
+          { status: 409 }
+        );
+      }
+    }
+
+    const updateData: any = {};
+    if (title !== undefined) updateData.title = title;
+    if (priority !== undefined) updateData.priority = priority;
+    if (is_leadership !== undefined) updateData.is_leadership = is_leadership;
+    if (category !== undefined) updateData.category = category;
+    if (description !== undefined) updateData.description = description;
 
     const role = await prisma.role.update({
-      where: { id: parseInt(id) },
-      data: {
-        title,
-        priority,
-        category,
-        ...(department_id && { department_id: Number(department_id) })
-      },
-      include: { Department: true
-      }
+      where: { id },
+      data: updateData
     });
 
     return NextResponse.json(role);
   } catch (error) {
-    console.error("Error updating role:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error('Error updating role:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 } 

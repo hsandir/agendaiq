@@ -1,17 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { AuthenticatedUser } from '@/lib/auth/auth-utils';
-import { authOptions } from "@/lib/auth/auth-options";
+import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
 
 // GET /api/school - Get all schools (admin) or user's school (non-admin)
-export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+export async function GET(request: NextRequest) {
+  const authResult = await withAuth(request, { requireStaff: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
 
+  const user = authResult.user!;
+
+  try {
     // Get user and check role through staff
-    const user = await prisma.user.findUnique({
+    const userRecord = await prisma.user.findUnique({
       where: { email: user.email },
       include: { 
         Staff: {
@@ -27,11 +29,11 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
       },
     });
 
-    if (!user || !user.Staff || user.Staff.length === 0) {
+    if (!userRecord || !userRecord.Staff || userRecord.Staff.length === 0) {
       return NextResponse.json({ error: "User staff record not found" }, { status: 404 });
     }
 
-    const staffRecord = user.Staff[0];
+    const staffRecord = userRecord.Staff[0];
 
     if (staffRecord.Role?.title === "Administrator") {
       // Admin: return all schools
@@ -54,135 +56,151 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
 }
 
 // POST /api/school - Create a new school (admin only)
-export const POST = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    
-    // Check if user is admin
-    const user = await prisma.user.findUnique({
-      where: { email: user.email },
-      include: { 
-        Staff: {
-          include: {
-            Role: true
-          }
-        }
-      },
-    });
-    
-    if (!user || !user.Staff?.[0] || user.Staff[0].Role?.title !== "Administrator") {
-      return NextResponse.json({ error: "Access denied" }, { status: 403 });
-    }
-    
+export async function POST(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAdminRole: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
+
+  try {
     const body = await request.json();
-    const { name, address, city, state, zipCode, phone, website } = body;
-    
-    // Get or create district first
-    let district = await prisma.district.findFirst();
-    if (!district) {
-      district = await prisma.district.create({
-        data: {
-          name: name || 'Default District',
-          address,
-        },
-      });
+    const { name, code, address, phone, email, district_id } = body;
+
+    if (!name || !code || !district_id) {
+      return NextResponse.json(
+        { error: "Name, code, and district_id are required" },
+        { status: 400 }
+      );
     }
-    
+
+    // Check if school code already exists
+    const existingSchool = await prisma.school.findUnique({
+      where: { code },
+    });
+
+    if (existingSchool) {
+      return NextResponse.json(
+        { error: "School code already exists" },
+        { status: 409 }
+      );
+    }
+
+    // Verify district exists
+    const district = await prisma.district.findUnique({
+      where: { id: district_id },
+    });
+
+    if (!district) {
+      return NextResponse.json(
+        { error: "District not found" },
+        { status: 404 }
+      );
+    }
+
     const school = await prisma.school.create({
       data: {
         name,
+        code,
         address,
-        district_id: district.id,
+        phone,
+        email,
+        district_id,
       },
-      include: { District: true },
+      include: {
+        District: true,
+      },
     });
-    
-    return NextResponse.json(school);
+
+    return NextResponse.json(school, { status: 201 });
   } catch (error) {
     console.error("Error creating school:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-// PUT /api/school?id=schoolId - Update a school by ID (admin only)
-export const PUT = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+// PUT /api/school - Update a school (admin only)
+export async function PUT(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAdminRole: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
+
+  try {
+    const body = await request.json();
+    const { id, name, code, address, phone, email, district_id } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "School ID is required" },
+        { status: 400 }
+      );
     }
-    
-    // Check if user is admin
-    const user = await prisma.user.findUnique({
-      where: { email: user.email },
-      include: { 
-        Staff: {
-          include: {
-            Role: true
-          }
-        }
+
+    // Check if school exists
+    const existingSchool = await prisma.school.findUnique({
+      where: { id },
+    });
+
+    if (!existingSchool) {
+      return NextResponse.json(
+        { error: "School not found" },
+        { status: 404 }
+      );
+    }
+
+    // If code is being changed, check for conflicts
+    if (code && code !== existingSchool.code) {
+      const codeConflict = await prisma.school.findUnique({
+        where: { code },
+      });
+
+      if (codeConflict) {
+        return NextResponse.json(
+          { error: "School code already exists" },
+          { status: 409 }
+        );
+      }
+    }
+
+    // If district is being changed, verify it exists
+    if (district_id && district_id !== existingSchool.district_id) {
+      const district = await prisma.district.findUnique({
+        where: { id: district_id },
+      });
+
+      if (!district) {
+        return NextResponse.json(
+          { error: "District not found" },
+          { status: 404 }
+        );
+      }
+    }
+
+    const updateData: any = {};
+    if (name !== undefined) updateData.name = name;
+    if (code !== undefined) updateData.code = code;
+    if (address !== undefined) updateData.address = address;
+    if (phone !== undefined) updateData.phone = phone;
+    if (email !== undefined) updateData.email = email;
+    if (district_id !== undefined) updateData.district_id = district_id;
+
+    const school = await prisma.school.update({
+      where: { id },
+      data: updateData,
+      include: {
+        District: true,
       },
     });
-    
-    if (!user || !user.Staff?.[0] || user.Staff[0].Role?.title !== "Administrator") {
-      return NextResponse.json({ error: "Access denied" }, { status: 403 });
-    }
-    
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    
-    if (!id) {
-      return NextResponse.json({ error: "School ID is required" }, { status: 400 });
-    }
-    
-    const body = await request.json();
-    const { name, address } = body;
-    
-    const school = await prisma.school.update({
-      where: { id: parseInt(id) },
-      data: { name, address },
-      include: { District: true },
-    });
-    
+
     return NextResponse.json(school);
   } catch (error) {
     console.error("Error updating school:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
-}
-
-// DELETE /api/school?id=schoolId - Delete a school by ID (admin only)
-export const DELETE = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    
-    // Check if user is admin
-    const user = await prisma.user.findUnique({
-      where: { email: user.email },
-      include: { 
-        Staff: {
-          include: {
-            Role: true
-          }
-        }
-      },
-    });
-    
-    if (!user || !user.Staff?.[0] || user.Staff[0].Role?.title !== "Administrator") {
-      return NextResponse.json({ error: "Access denied" }, { status: 403 });
-    }
-    
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    
-    if (!id) {
-      return NextResponse.json({ error: "School ID is required" }, { status: 400 });
-    }
-    
-    await prisma.school.delete({ where: { id: parseInt(id) } });
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Error deleting school:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 } 
