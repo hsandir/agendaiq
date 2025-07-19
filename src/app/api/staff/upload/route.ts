@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/lib/auth/auth-options";
 import { parse } from "csv-parse/sync";
 import { z } from "zod";
 

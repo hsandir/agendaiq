@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 import { Header } from "@/components/dashboard/Header";
 import { RoleSwitch } from "@/components/dashboard/RoleSwitch";

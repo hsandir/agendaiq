@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/lib/auth/auth-options";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { prisma } from "@/lib/prisma";
