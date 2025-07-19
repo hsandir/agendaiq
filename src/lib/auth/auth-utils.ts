@@ -125,6 +125,83 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
 }
 
 /**
+ * Check authentication requirements for API routes
+ */
+export async function checkAuthRequirements(requirements: AuthRequirements = {}): Promise<AuthResult> {
+  try {
+    const user = await getCurrentUser();
+    
+    if (!user) {
+      return {
+        authorized: false,
+        error: 'Authentication required',
+        statusCode: 401
+      };
+    }
+
+    if (requirements.requireStaff && !user.staff) {
+      return {
+        authorized: false,
+        error: 'Staff access required',
+        statusCode: 403
+      };
+    }
+
+    if (requirements.requireAdminRole && user.staff?.role.title !== 'Administrator') {
+      return {
+        authorized: false,
+        error: 'Administrator access required',
+        statusCode: 403
+      };
+    }
+
+    if (requirements.requireLeadership && !user.staff?.role.is_leadership) {
+      return {
+        authorized: false,
+        error: 'Leadership access required',
+        statusCode: 403
+      };
+    }
+
+    if (requirements.allowedRoles && user.staff && !requirements.allowedRoles.includes(user.staff.role.title)) {
+      return {
+        authorized: false,
+        error: 'Role not permitted',
+        statusCode: 403
+      };
+    }
+
+    if (requirements.allowedDepartments && user.staff && !requirements.allowedDepartments.includes(user.staff.department.name)) {
+      return {
+        authorized: false,
+        error: 'Department not permitted',
+        statusCode: 403
+      };
+    }
+
+    if (requirements.allowedSchools && user.staff && !requirements.allowedSchools.includes(user.staff.school.name)) {
+      return {
+        authorized: false,
+        error: 'School not permitted',
+        statusCode: 403
+      };
+    }
+
+    return {
+      authorized: true,
+      user
+    };
+  } catch (error) {
+    console.error('Error checking auth requirements:', error);
+    return {
+      authorized: false,
+      error: 'Authentication error',
+      statusCode: 500
+    };
+  }
+}
+
+/**
  * Require authentication and optionally specific roles/permissions
  */
 export async function requireAuth(requirements: AuthRequirements = AuthPresets.requireAuth): Promise<AuthenticatedUser> {
