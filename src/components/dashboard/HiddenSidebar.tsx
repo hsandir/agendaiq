@@ -77,6 +77,7 @@ const navigation: NavSection[] = [
       { href: "/dashboard/system/server", label: "Server Management", icon: FiServer },
       { href: "/dashboard/system/alerts", label: "Alert Configuration", icon: FiAlertTriangle },
       { href: "/dashboard/system/logs", label: "System Logs", icon: FiFileText },
+      { href: "/dashboard/system/migration", label: "Auth Migration & Diagnostics", icon: FiTrendingUp },
       { href: "/dashboard/system/mock-data-tracker", label: "Mock Data Tracker", icon: FiSearch },
     ],
   },
