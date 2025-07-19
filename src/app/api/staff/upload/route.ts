@@ -61,7 +61,7 @@ export async function POST(request: Request) {
 
     // Check if user is admin using staff relationship
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       include: {
         staff: {
           include: {

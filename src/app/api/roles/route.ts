@@ -4,16 +4,14 @@ import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/roles - List all roles
-export async function GET(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
+export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get the user to check if they're admin
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       include: { Staff: {
           include: { Role: {
               include: { Department: true
@@ -45,16 +43,14 @@ export async function GET(request: NextRequest) {
 }
 
 // POST /api/roles - Create a new role
-export async function POST(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
+export const POST = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if user is admin
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       include: { Staff: {
           include: { Role: {
               include: { Department: true
@@ -98,16 +94,14 @@ export async function POST(request: NextRequest) {
 }
 
 // PUT /api/roles - Update a role
-export async function PUT(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
+export const PUT = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if user is admin
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       include: { Staff: {
           include: { Role: {
               include: { Department: true

@@ -11,10 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function NotificationsPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    redirect("/auth/signin");
-  }
+  const user = await requireAuth(AuthPresets.requireAuth);
 
   return (
     <div className="space-y-6">

@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       select: { user_id: true },
     });
 
-    if (!device || device.user_id !== session.user.id) {
+    if (!device || device.user_id !== user.id) {
       return new NextResponse("Device not found", { status: 404 });
     }
 
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     // Log the event
     await prisma.loginHistory.create({
       data: {
-        user_id: session.user.id,
+        user_id: user.id,
         ipAddress: request.headers.get("x-forwarded-for") || "unknown",
         userAgent: request.headers.get("user-agent") || "unknown",
         success: true,

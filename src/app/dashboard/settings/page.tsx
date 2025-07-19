@@ -3,11 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth-options";
 
 export default async function SettingsPage() {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/auth/signin");
-  }
+  const user = await requireAuth(AuthPresets.requireAuth);
 
   return (
     <div className="space-y-6 p-6">

@@ -5,13 +5,9 @@ import { prisma } from "@/lib/prisma";
 import { DistrictSetup } from "@/components/setup/DistrictSetup";
 
 export default async function DistrictSetupPage() {
-  const session = await getServerSession(authOptions);
+  const user = await requireAuth(AuthPresets.requireAuth);
 
-  if (!session) {
-    redirect("/auth/signin");
-  }
-
-  if (session.user.staff?.role?.title !== "Administrator") {
+  if (user.staff?.role?.title !== "Administrator") {
     redirect("/dashboard");
   }
 

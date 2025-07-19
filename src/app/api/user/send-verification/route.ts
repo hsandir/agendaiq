@@ -14,7 +14,7 @@ export async function POST() {
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email! },
+      where: { email: user.email! },
       select: { emailVerified: true, email: true },
     });
 
@@ -24,13 +24,13 @@ export async function POST() {
 
     // Generate verification token
     const token = createHash('sha256')
-      .update(`${session.user.email}-${Date.now()}`)
+      .update(`${user.email}-${Date.now()}`)
       .digest('hex');
 
     // Store token with expiry
     await prisma.verificationToken.create({
       data: {
-        identifier: session.user.email!,
+        identifier: user.email!,
         token,
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       },
@@ -38,7 +38,7 @@ export async function POST() {
 
     // Send verification email
     await sendVerificationEmail(
-      session.user.email!,
+      user.email!,
       `${process.env.NEXTAUTH_URL}/verify-email?token=${token}`
     );
 

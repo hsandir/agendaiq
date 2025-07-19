@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email! },
+      where: { email: user.email! },
       select: { hashedPassword: true },
     });
 
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
     const hashedPassword = await hash(newPassword, 12);
     await prisma.user.update({
-      where: { email: session.user.email! },
+      where: { email: user.email! },
       data: { hashedPassword },
     });
 

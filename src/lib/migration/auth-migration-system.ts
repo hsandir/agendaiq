@@ -97,10 +97,10 @@ export const AUTH_MIGRATION_RULES: MigrationRule[] = [
   {
     id: 'TYPE-002',
     name: 'Fix Session User ID Type',
-    description: 'Ensure session.user.id is handled as number',
+    description: 'Ensure user.id is handled as number',
     pattern: /session\.user\.id/g,
     replacement: (match, ...groups) => {
-      return 'session.user.id';
+      return 'user.id';
     },
     fileTypes: ['.ts', '.tsx'],
     priority: 5,

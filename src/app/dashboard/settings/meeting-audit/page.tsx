@@ -5,14 +5,11 @@ import { prisma } from "@/lib/prisma";
 import { format } from "date-fns";
 
 export default async function MeetingAuditLogs() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) {
-    redirect("/auth/signin");
-  }
+  const user = await requireAuth(AuthPresets.requireAuth);
 
   // Get user with staff relationship to check permissions
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: { email: user.email },
     include: {
       staff: {
         include: {

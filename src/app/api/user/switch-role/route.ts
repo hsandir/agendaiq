@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
     // Find the user and their staff record
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       include: {
         staff: {
           include: {

@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       include: { 
         Staff: {
           include: {
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
       },
     });
 
-    if (!user || user.Staff?.[0]?.Role?.title !== "Administrator") {
+    if (!user || user.staff?.Role?.title !== "Administrator") {
       return NextResponse.json(
         { error: "Only administrators can view all users" },
         { status: 403 }

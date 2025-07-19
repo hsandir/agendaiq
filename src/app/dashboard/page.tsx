@@ -5,18 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { RiCalendarLine, RiTeamLine, RiFileTextLine } from "react-icons/ri";
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/auth/signin");
-  }
+  const user = await requireAuth(AuthPresets.requireAuth);
 
   // Check if any district exists
   const districtCount = await prisma.district.count();
   
   // Get user with staff information first
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email! },
+    where: { email: user.email! },
     include: {
       Staff: {
         include: {

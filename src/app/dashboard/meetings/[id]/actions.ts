@@ -22,7 +22,7 @@ export async function respondToMeeting(
 
   // Get current user's staff record
   const currentUser = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: { email: user.email },
     include: {
       staff: true
     }

@@ -116,13 +116,13 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token.id && typeof session.user.id !== 'undefined') {
+      if (token.id && typeof user.id !== 'undefined') {
         if (typeof token.id === 'number') {
-          session.user.id = token.id;
+          user.id = token.id;
         }
       }
       if (hasStaffToken(token)) {
-        session.user.staff = token.staff;
+        user.staff = token.staff;
       }
       return session;
     },

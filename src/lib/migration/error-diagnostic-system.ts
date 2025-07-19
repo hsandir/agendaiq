@@ -291,7 +291,7 @@ export class ErrorDiagnosticEngine {
       // Use a simple import check by trying to compile a test file
       const testFile = path.join(this.projectRoot, 'temp-import-test.ts');
       const testContent = `
-        import { authOptions } from '@/lib/auth';
+        import { authOptions } from '@/lib/auth/auth-options';
         import { authOptions as newAuth } from '@/lib/auth/auth-options';
         import { AuthenticatedUser } from '@/lib/auth/auth-utils';
         import { DynamicRBAC } from '@/lib/security/dynamic-rbac-full';

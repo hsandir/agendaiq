@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
     // Check if user is admin
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       select: { role: true },
     });
 
@@ -104,7 +104,7 @@ export async function PUT(
 
     // Check if user is admin
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       select: { role: true },
     });
 

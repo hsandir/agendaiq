@@ -4,16 +4,14 @@ import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/school - Get all schools (admin) or user's school (non-admin)
-export async function GET(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
+export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get user and check role through staff
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       include: { 
         Staff: {
           include: {
@@ -55,16 +53,14 @@ export async function GET(request: NextRequest) {
 }
 
 // POST /api/school - Create a new school (admin only)
-export async function POST(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
+export const POST = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     
     // Check if user is admin
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       include: { 
         Staff: {
           include: {
@@ -109,16 +105,14 @@ export async function POST(request: NextRequest) {
 }
 
 // PUT /api/school?id=schoolId - Update a school by ID (admin only)
-export async function PUT(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
+export const PUT = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     
     // Check if user is admin
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       include: { 
         Staff: {
           include: {
@@ -156,16 +150,14 @@ export async function PUT(request: NextRequest) {
 }
 
 // DELETE /api/school?id=schoolId - Delete a school by ID (admin only)
-export async function DELETE(request: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
+export const DELETE = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     
     // Check if user is admin
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       include: { 
         Staff: {
           include: {

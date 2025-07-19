@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
     // Save secret to user
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: user.id },
       data: {
         twoFactorSecret: secret,
         twoFactorEnabled: false, // Will be enabled after verification
@@ -27,14 +27,14 @@ export async function POST(request: Request) {
 
     // Generate QR code URL
     const otpauth = authenticator.keyuri(
-      session.user.email!,
+      user.email!,
       "AgendaIQ",
       secret
     );
 
     // Send backup codes via email
     await sendEmail({
-      to: session.user.email!,
+      to: user.email!,
       subject: "Two-Factor Authentication Setup - AgendaIQ",
       html: getTwoFactorCodeHtml(secret),
     });

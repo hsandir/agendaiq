@@ -13,7 +13,7 @@ export async function POST(request: Request) {
 
     // Get current user settings
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       select: { rememberDevices: true },
     });
 
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
     // Toggle remember devices setting
     const updatedUser = await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: user.id },
       data: { rememberDevices: !user.rememberDevices },
     });
 

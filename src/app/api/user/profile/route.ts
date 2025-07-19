@@ -11,7 +11,7 @@ export async function GET() {
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       include: {
         staff: {
           include: {
@@ -61,7 +61,7 @@ export async function PUT(request: Request) {
     const { name, image } = body;
 
     const user = await prisma.user.update({
-      where: { email: session.user.email },
+      where: { email: user.email },
       data: {
         name,
         image,

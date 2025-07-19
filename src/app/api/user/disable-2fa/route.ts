@@ -13,7 +13,7 @@ export async function POST() {
 
     // Disable 2FA and remove secret
     await prisma.user.update({
-      where: { email: session.user.email! },
+      where: { email: user.email! },
       data: {
         twoFactorEnabled: false,
         twoFactorSecret: null,

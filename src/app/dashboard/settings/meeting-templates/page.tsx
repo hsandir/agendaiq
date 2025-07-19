@@ -5,14 +5,11 @@ import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 
 export default async function MeetingTemplatesSettings() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) {
-    redirect("/auth/signin");
-  }
+  const user = await requireAuth(AuthPresets.requireAuth);
 
   // Check if user is admin
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: { email: user.email },
     include: { 
       staff: {
         include: {

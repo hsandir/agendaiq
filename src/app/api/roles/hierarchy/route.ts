@@ -4,17 +4,14 @@ import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/roles/hierarchy - Get role hierarchy
-export async function GET(request: NextRequest) {
-  try {
-    // Check authentication
-    const session = await getServerSession(authOptions);
+export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get the user to check if they're admin
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: user.email },
       include: { 
         Staff: {
           include: { 

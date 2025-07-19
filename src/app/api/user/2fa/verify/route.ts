@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
     // Get user's 2FA secret
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       select: { twoFactorSecret: true },
     });
 
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 
     // Enable 2FA
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: user.id },
       data: { twoFactorEnabled: true },
     });
 

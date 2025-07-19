@@ -365,8 +365,8 @@ export default function UserRoleAssignmentPage() {
                     {Array.isArray(filteredUsers) && filteredUsers.map((user) => (
                       <option key={user.id} value={user.id}>
                         {user.name} ({user.email})
-                        {user.Staff?.[0]?.Role && ` - ${user.Staff[0].Role.title}`}
-                        {user.Staff?.[0]?.Department && ` (${user.Staff[0].Department.name})`}
+                        {user.staff?.Role && ` - ${user.Staff[0].Role.title}`}
+                        {user.staff?.Department && ` (${user.Staff[0].Department.name})`}
                       </option>
                     ))}
                   </select>

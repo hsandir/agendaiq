@@ -16,7 +16,7 @@ declare module 'next-auth' {
   }
 
   interface Session {
-    user: User & {
+    user: AuthenticatedUser & {
       id: number;
       staff?: {
         id: number;

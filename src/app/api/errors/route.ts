@@ -12,11 +12,11 @@ export async function GET() {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || user.Staff?.[0]?.Role?.title !== 'Administrator') {
+    if (!user || user.staff?.Role?.title !== 'Administrator') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -40,11 +40,11 @@ export async function POST(request: Request) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || user.Staff?.[0]?.Role?.title !== 'Administrator') {
+    if (!user || user.staff?.Role?.title !== 'Administrator') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

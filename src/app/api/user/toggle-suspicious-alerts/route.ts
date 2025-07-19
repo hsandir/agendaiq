@@ -12,7 +12,7 @@ export async function POST() {
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email! },
+      where: { email: user.email! },
       select: { suspiciousAlerts: true },
     });
 
@@ -22,7 +22,7 @@ export async function POST() {
 
     // Toggle the setting
     await prisma.user.update({
-      where: { email: session.user.email! },
+      where: { email: user.email! },
       data: { suspiciousAlerts: !user.suspiciousAlerts },
     });
 

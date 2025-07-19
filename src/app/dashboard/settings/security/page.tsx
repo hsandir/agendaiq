@@ -4,14 +4,10 @@ import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 
 export default async function SecuritySettingsPage() {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/auth/signin");
-  }
+  const user = await requireAuth(AuthPresets.requireAuth);
 
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email! },
+    where: { email: user.email! },
     select: {
       id: true,
       email: true,

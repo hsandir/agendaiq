@@ -30,8 +30,8 @@ export function Header() {
             <button className="flex items-center space-x-3 focus:outline-none">
               {session?.user?.image ? (
                 <Image
-                  src={session.user.image}
-                  alt={session.user.name || "User"}
+                  src={user.image}
+                  alt={user.name || "User"}
                   width={32}
                   height={32}
                   className="rounded-full"

@@ -12,15 +12,11 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/auth/signin");
-  }
+  const user = await requireAuth(AuthPresets.requireAuth);
 
   // Get user with staff and role information
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email! },
+    where: { email: user.email! },
     include: {
       Staff: {
         include: {
@@ -51,7 +47,7 @@ export default async function DashboardLayout({
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-500">
-                  {session.user.email}
+                  {user.email}
                 </span>
                 <span className="text-xs px-2 py-1 bg-gray-100 rounded-full">
                   {currentRole?.title || 'No Role'}

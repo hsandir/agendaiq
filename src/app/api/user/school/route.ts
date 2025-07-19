@@ -12,7 +12,7 @@ export async function GET() {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       include: { staff: { include: { school: true } } },
     });
 
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
 
     // Find user's staff record
     const userStaff = await prisma.staff.findFirst({
-      where: { user_id: session.user.id },
+      where: { user_id: user.id },
     });
 
     if (!userStaff) {
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
 
     // Get updated user with staff
     const updatedUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: user.id },
       include: { staff: { include: { school: true } } },
     });
 
@@ -95,7 +95,7 @@ export async function DELETE() {
 
     // Find user's staff record
     const userStaff = await prisma.staff.findFirst({
-      where: { user_id: session.user.id },
+      where: { user_id: user.id },
     });
 
     if (!userStaff) {

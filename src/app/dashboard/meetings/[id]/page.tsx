@@ -12,11 +12,7 @@ interface PageProps {
 }
 
 export default async function MeetingPage({ params }: PageProps) {
-  const session = await getServerSession(authOptions);
-  
-  if (!session) {
-    redirect("/auth/signin");
-  }
+  const user = await requireAuth(AuthPresets.requireAuth);
 
   const { id } = await params;
 
@@ -55,7 +51,7 @@ export default async function MeetingPage({ params }: PageProps) {
 
   // Get current user's staff record
   const currentUser = await prisma.user.findUnique({
-    where: { email: session.user.email || "" },
+    where: { email: user.email || "" },
     include: {
       Staff: true
     }
