@@ -1,34 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AuthMigrationSystem } from '@/lib/migration/auth-migration-system';
+import { AuthMigrationEngine, AuthMigrationCLI } from '@/lib/migration/auth-migration-system';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { action, dryRun = false } = body;
 
-    const migrationSystem = new AuthMigrationSystem();
+    const migrationEngine = new AuthMigrationEngine();
+    const migrationCLI = new AuthMigrationCLI();
 
     switch (action) {
       case 'preview':
-        const preview = await migrationSystem.scanFiles();
+        const preview = await migrationEngine.previewChanges();
         return NextResponse.json({
           success: true,
           preview,
-          totalFiles: preview.length
+          totalChanges: preview.length
         });
 
       case 'migrate':
-        const result = await migrationSystem.migrateAuthSystem(dryRun);
+        const result = await migrationEngine.runMigration();
         return NextResponse.json({
           success: true,
           result
         });
 
       case 'status':
-        const status = await migrationSystem.getStatus();
+        // Use CLI for status check
+        await migrationCLI.checkStatus();
         return NextResponse.json({
           success: true,
-          status
+          message: 'Status check completed - see console logs'
         });
 
       default:

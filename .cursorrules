@@ -1,0 +1,371 @@
+# AgendaIQ Project Rules - Turkish Education Management System
+
+## PROJECT OVERVIEW
+AgendaIQ is a comprehensive meeting and agenda management system for Turkish educational institutions with hierarchical role-based access control.
+
+## CORE ARCHITECTURE PRINCIPLES
+
+### 1. AUTHENTICATION & AUTHORIZATION SYSTEM
+**CRITICAL: Always use our standardized auth system:**
+
+```typescript
+// REQUIRED AUTH IMPORTS
+import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils';
+import { checkAuthRequirements } from '@/lib/auth/auth-utils';
+import { withAuth } from '@/lib/auth/api-auth';
+
+// STANDARD AUTH PATTERNS FOR PAGES
+const user = await requireAuth(AuthPresets.requireAuth);      // Basic auth
+const user = await requireAuth(AuthPresets.requireStaff);    // Staff required
+const user = await requireAuth(AuthPresets.requireAdmin);    // Admin required
+const user = await requireAuth(AuthPresets.requireLeadership); // Leadership required
+
+// STANDARD AUTH PATTERNS FOR API ROUTES
+const authResult = await withAuth(request, { requireAdminRole: true });
+if (!authResult.success) {
+  return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+}
+const user = authResult.user!;
+```
+
+### 2. USER ROLE HIERARCHY
+```typescript
+// ROLE HIERARCHY (Priority Order)
+1. Administrator (priority: 1, is_leadership: true)
+2. Principal (priority: 2, is_leadership: true)  
+3. Vice Principal (priority: 3, is_leadership: true)
+4. Department Head (priority: 4, is_leadership: true)
+5. Teacher (priority: 5, is_leadership: false)
+6. Staff (priority: 6, is_leadership: false)
+
+// USER DATA STRUCTURE
+interface AuthenticatedUser {
+  id: number;
+  email: string;
+  name: string | null;
+  staff?: {
+    id: number;
+    role: {
+      id: number;
+      title: string;
+      priority: number;
+      category: string | null;
+      is_leadership: boolean;
+    };
+    department: {
+      id: number;
+      name: string;
+      code: string;
+    };
+    school: {
+      id: number;
+      name: string;
+      code: string | null;
+    };
+    district: {
+      id: number;
+      name: string;
+      code: string | null;
+    };
+  } | null;
+}
+```
+
+### 3. DATABASE SCHEMA RULES
+```prisma
+// REQUIRED RELATIONSHIPS
+User -> Staff (1:many)
+Staff -> Role (many:1)
+Staff -> Department (many:1)  
+Staff -> School (many:1)
+Staff -> District (many:1)
+```
+
+### 4. FILE STRUCTURE STANDARDS
+
+#### Page Components (Server Components)
+```typescript
+// /src/app/[route]/page.tsx
+import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
+
+export default async function PageName() {
+  const user = await requireAuth(AuthPresets.requireAuth);
+  // Page logic here
+}
+```
+
+#### API Routes
+```typescript
+// /src/app/api/[route]/route.ts
+import { withAuth } from '@/lib/auth/api-auth';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAdminRole: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
+  
+  const user = authResult.user!;
+  // API logic here
+}
+```
+
+#### Component Structure
+```typescript
+// Client components: 'use client' at top
+// Server components: No 'use client' directive
+// Always import auth utilities correctly
+```
+
+### 5. STYLING & UI STANDARDS
+
+#### CSS Framework
+- Use Tailwind CSS exclusively
+- No custom CSS files per component
+- Use centralized theme system from `/src/lib/theme/`
+
+#### Component Patterns
+```typescript
+// Consistent button styling
+className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+
+// Consistent card styling  
+className="bg-white p-6 rounded-lg shadow-sm border"
+
+// Consistent form styling
+className="space-y-4"
+```
+
+### 6. ERROR HANDLING STANDARDS
+
+#### API Error Responses
+```typescript
+return NextResponse.json({
+  error: 'Descriptive error message',
+  code: 'ERROR_CODE',
+  timestamp: new Date().toISOString()
+}, { status: 400 });
+```
+
+#### Page Error Handling
+```typescript
+try {
+  // Operation
+} catch (error) {
+  console.error('Context:', error);
+  redirect('/dashboard?error=operation_failed');
+}
+```
+
+### 7. DATA FETCHING PATTERNS
+
+#### Server Components
+```typescript
+// Direct database calls with Prisma
+const data = await prisma.model.findMany({
+  where: { /* conditions */ },
+  include: { /* relations */ }
+});
+```
+
+#### Client Components
+```typescript
+// Use fetch with proper error handling
+const response = await fetch('/api/endpoint');
+if (!response.ok) {
+  throw new Error(`API error: ${response.status}`);
+}
+```
+
+### 8. LANGUAGE & LOCALIZATION
+- Turkish comments in code when explaining business logic
+- English for technical documentation
+- All user-facing text in Turkish
+- Error messages in Turkish for end users
+
+### 9. SECURITY REQUIREMENTS
+
+#### Authentication
+- Every page must use requireAuth() or similar
+- Every API route must use withAuth() middleware
+- No direct session access, use auth utilities
+
+#### Data Validation
+```typescript
+// Validate all inputs
+if (!email || !password) {
+  return { error: 'Required fields missing' };
+}
+
+// Sanitize user inputs
+const cleanInput = input.trim().toLowerCase();
+```
+
+### 10. MEETING SYSTEM SPECIFIC RULES
+
+#### Meeting Creation
+```typescript
+// Always associate with authenticated user
+const meeting = await prisma.meeting.create({
+  data: {
+    organizer_id: user.staff!.id,
+    // other fields
+  }
+});
+```
+
+#### Meeting Access Control
+```typescript
+// Check meeting access permissions
+const hasAccess = meeting.organizer_id === user.staff!.id || 
+                 user.staff!.role.is_leadership ||
+                 meetingAttendees.some(a => a.staff_id === user.staff!.id);
+```
+
+### 11. CODING STANDARDS
+
+#### TypeScript
+- Always use TypeScript
+- Define proper interfaces for all data structures
+- Use strict type checking
+- No `any` types unless absolutely necessary
+
+#### Functions
+```typescript
+// Prefer async/await over promises
+async function processData() {
+  const result = await operation();
+  return result;
+}
+
+// Use descriptive function names
+async function createMeetingWithAttendees() { }
+async function validateUserPermissions() { }
+```
+
+#### Import Organization
+```typescript
+// 1. External libraries
+import { NextRequest } from 'next/server';
+
+// 2. Internal utilities
+import { requireAuth } from '@/lib/auth/auth-utils';
+
+// 3. Components
+import { Button } from '@/components/ui/button';
+
+// 4. Types
+import type { AuthenticatedUser } from '@/lib/auth/auth-utils';
+```
+
+### 12. GIT & VERSION CONTROL
+
+#### Commit Messages
+- Use descriptive, detailed commit messages
+- No emojis or icons in commit messages
+- Include context and impact of changes
+- Reference issue numbers when applicable
+
+#### Branching
+- Feature branches for all new development
+- Regular merges to main branch
+- Monday backups from main/release branches
+
+### 13. TESTING REQUIREMENTS
+
+#### API Testing
+```bash
+# Always test API endpoints
+curl -X POST 'http://localhost:3000/api/endpoint' \
+  -H 'Content-Type: application/json' \
+  -d '{"test": "data"}'
+```
+
+#### Page Testing
+- Test authentication flows
+- Verify role-based access control
+- Check error handling paths
+
+### 14. PERFORMANCE STANDARDS
+
+#### Database Queries
+```typescript
+// Always include necessary relations
+const user = await prisma.user.findUnique({
+  where: { id },
+  include: {
+    Staff: {
+      include: {
+        Role: true,
+        Department: true,
+        School: true,
+        District: true
+      }
+    }
+  }
+});
+```
+
+#### Pagination
+```typescript
+// Implement pagination for large datasets
+const meetings = await prisma.meeting.findMany({
+  take: 20,
+  skip: page * 20,
+  orderBy: { start_time: 'desc' }
+});
+```
+
+### 15. DEPLOYMENT & ENVIRONMENT
+
+#### Port Configuration
+- Always use port 3000
+- Kill existing processes if port is occupied
+- Never change port numbers
+
+#### Environment Variables
+```env
+# Required environment variables
+DATABASE_URL=
+NEXTAUTH_SECRET=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+```
+
+## MANDATORY CHECKS BEFORE CODE COMPLETION
+
+1. ✅ Uses standardized auth system
+2. ✅ Proper TypeScript types
+3. ✅ Error handling implemented
+4. ✅ Consistent styling with Tailwind
+5. ✅ Database relationships respected
+6. ✅ Role-based access control applied
+7. ✅ Turkish language for user interfaces
+8. ✅ No security vulnerabilities
+9. ✅ Performance considerations addressed
+10. ✅ Testing verifies functionality
+
+## FORBIDDEN PATTERNS
+
+❌ Direct session access (use auth utilities)
+❌ Custom CSS files (use Tailwind)
+❌ Hardcoded user data (always fetch from database)
+❌ Missing authentication checks
+❌ Unhandled errors
+❌ English text in user interfaces
+❌ Emojis in commit messages
+❌ Any type usage without justification
+❌ Direct database calls without auth verification
+❌ Port number changes
+
+## EMERGENCY PROTOCOLS
+
+If authentication system fails:
+1. Check auth-utils.ts exports
+2. Verify auth-options.ts session callback
+3. Test API middleware functionality
+4. Validate database connections
+5. Review migration system status
+
+Follow these rules religiously. Any deviation must be explicitly justified and documented.
