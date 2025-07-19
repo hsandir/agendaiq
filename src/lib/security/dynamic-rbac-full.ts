@@ -6,19 +6,7 @@
 import { AuthenticatedUser } from '../auth/auth-utils';
 import { prisma } from '../prisma';
 
-export interface RolePermission {
-  id: string;
-  roleId: number;
-  resource: string;
-  action: string;
-  scope?: string;
-  conditions?: Record<string, any>;
-  priority: number;
-  granted: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
+// Enhanced RBAC system interfaces
 export interface AccessContext {
   user: AuthenticatedUser;
   resource: string;
@@ -35,32 +23,37 @@ export interface AccessResult {
   timestamp: Date;
 }
 
-export interface StaffWithRole {
+export interface RolePermission {
+  id: string;
+  roleId: number;
+  resource: string;
+  action: string;
+  scope?: 'own' | 'department' | 'school' | 'district' | 'all';
+  priority: number;
+  granted: boolean;
+  conditions?: Record<string, any>;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Staff with role relation type
+interface StaffWithRole {
   id: number;
   user_id: number;
-  department_id: number;
-  role_id: number;
-  manager_id: number | null;
   school_id: number;
-  district_id: number;
+  department_id: number;
   Role: {
     id: number;
     title: string;
     priority: number;
-    level: number;
     is_leadership: boolean;
-    parent_id: number | null;
-  };
-  Department: {
-    id: number;
-    name: string;
-    code: string;
+    department_id?: number;
   };
   School: {
     id: number;
     name: string;
   };
-  District: {
+  Department: {
     id: number;
     name: string;
   };
@@ -70,15 +63,28 @@ export class DynamicRBAC {
   private static instance: DynamicRBAC;
   private permissionsCache = new Map<string, RolePermission[]>();
   private staffCache = new Map<number, StaffWithRole[]>();
-  private hierarchyCache = new Map<number, number[]>();
-  private cacheExpiry = 5 * 60 * 1000; // 5 minutes
-  private lastCacheUpdate = 0;
+  private roleHierarchyCache = new Map<string, string[]>();
+  private cacheTimestamp = 0;
+  private readonly CACHE_TTL = 300000; // 5 minutes
 
   static getInstance(): DynamicRBAC {
     if (!DynamicRBAC.instance) {
       DynamicRBAC.instance = new DynamicRBAC();
     }
     return DynamicRBAC.instance;
+  }
+
+  // Clear cache
+  clearCache(): void {
+    this.permissionsCache.clear();
+    this.staffCache.clear();
+    this.roleHierarchyCache.clear();
+    this.cacheTimestamp = 0;
+  }
+
+  // Check if cache is still valid
+  private isCacheValid(): boolean {
+    return Date.now() - this.cacheTimestamp < this.CACHE_TTL;
   }
 
   // Check if user has access to perform action on resource
@@ -143,7 +149,7 @@ export class DynamicRBAC {
           appliedRules.push(`contextual_${staff.Role.title}`);
           return {
             granted: true,
-            reason: `Contextual access granted: ${contextAccess.reason}`,
+            reason: `Access granted through context: ${contextAccess.reason}`,
             appliedRules,
             context,
             timestamp: new Date()
@@ -153,7 +159,7 @@ export class DynamicRBAC {
 
       return {
         granted: false,
-        reason: 'No matching permissions found for any staff roles',
+        reason: 'No matching permissions found',
         appliedRules,
         context,
         timestamp: new Date()
@@ -171,34 +177,33 @@ export class DynamicRBAC {
     }
   }
 
-  // Get user's staff records with role information
+  // Get user staff records with roles
   async getUserStaff(user: AuthenticatedUser): Promise<StaffWithRole[]> {
-    const cacheKey = `user_staff_${user.id}`;
+    // Safely convert user.id to number
+    const userId = typeof user.id === 'string' ? parseInt(user.id) : Number(user.id);
+    if (isNaN(userId)) {
+      console.warn('Invalid user ID for staff lookup:', user.id);
+      return [];
+    }
+
+    const cacheKey = `user_staff_${userId}`;
     
     // Check cache first
-    if (this.isCacheValid() && this.staffCache.has(parseInt(user.id))) {
-      return this.staffCache.get(parseInt(user.id))!;
+    if (this.isCacheValid() && this.staffCache.has(userId)) {
+      return this.staffCache.get(userId)!;
     }
 
     try {
       const staffRecords = await prisma.staff.findMany({
-        where: { user_id: parseInt(user.id) },
+        where: { user_id: userId },
         include: {
           Role: {
             select: {
               id: true,
               title: true,
               priority: true,
-              level: true,
               is_leadership: true,
-              parent_id: true
-            }
-          },
-          Department: {
-            select: {
-              id: true,
-              name: true,
-              code: true
+              department_id: true
             }
           },
           School: {
@@ -207,7 +212,7 @@ export class DynamicRBAC {
               name: true
             }
           },
-          District: {
+          Department: {
             select: {
               id: true,
               name: true
@@ -216,10 +221,34 @@ export class DynamicRBAC {
         }
       });
 
+      // Type conversion for compatibility
+      const typedStaffRecords: StaffWithRole[] = staffRecords.map(record => ({
+        id: record.id,
+        user_id: record.user_id,
+        school_id: record.school_id,
+        department_id: record.department_id,
+        Role: {
+          id: record.Role.id,
+          title: record.Role.title,
+          priority: record.Role.priority,
+          is_leadership: record.Role.is_leadership,
+          department_id: record.Role.department_id || undefined
+        },
+        School: {
+          id: record.School.id,
+          name: record.School.name
+        },
+        Department: {
+          id: record.Department.id,
+          name: record.Department.name
+        }
+      }));
+
       // Cache the results
-      this.staffCache.set(parseInt(user.id), staffRecords as StaffWithRole[]);
+      this.staffCache.set(userId, typedStaffRecords);
+      this.cacheTimestamp = Date.now();
       
-      return staffRecords as StaffWithRole[];
+      return typedStaffRecords;
 
     } catch (error) {
       console.error('Error getting user staff records:', error);
@@ -265,26 +294,32 @@ export class DynamicRBAC {
     action: string
   ): Promise<{ granted: boolean; reason?: string }> {
     try {
-      // Get parent roles from hierarchy
-      const parentRoles = await this.getParentRoles(role.id);
+      // Get parent roles in hierarchy
+      const parentRoles = await this.getParentRoles(role.id.toString());
       
       for (const parentRoleId of parentRoles) {
+        // Get parent role details
         const parentRole = await prisma.role.findUnique({
-          where: { id: parentRoleId },
+          where: { id: parseInt(parentRoleId) },
           select: {
             id: true,
             title: true,
             priority: true,
-            level: true,
             is_leadership: true,
-            parent_id: true
+            department_id: true
           }
         });
 
         if (parentRole) {
+          // Convert null to undefined for type compatibility
+          const roleWithConvertedDeptId = {
+            ...parentRole,
+            department_id: parentRole.department_id || undefined
+          };
+          
           const parentAccess = await this.checkDirectRolePermissions(
-            parentRole,
-            resource,
+            roleWithConvertedDeptId, 
+            resource, 
             action
           );
           
@@ -313,7 +348,7 @@ export class DynamicRBAC {
     
     // Users can always access their own data
     if (context.resource === 'user' && context.action === 'read' && 
-        context.targetId === context.user.id) {
+        context.targetId === context.user.id.toString()) {
       return { granted: true, reason: 'Self-access granted' };
     }
 
@@ -350,75 +385,56 @@ export class DynamicRBAC {
     return { granted: false, reason: 'No contextual rules apply' };
   }
 
-  // Get parent roles recursively
-  private async getParentRoles(roleId: number): Promise<number[]> {
-    const cacheKey = `parent_roles_${roleId}`;
-    
-    if (this.hierarchyCache.has(roleId)) {
-      return this.hierarchyCache.get(roleId)!;
-    }
-
-    const parentRoles: number[] = [];
-    
-    try {
-      // Get direct parent from role table
-      const role = await prisma.role.findUnique({
-        where: { id: roleId },
-        select: { parent_id: true }
-      });
-
-      if (role?.parent_id) {
-        parentRoles.push(role.parent_id);
-        // Recursively get parents of parents
-        const grandParents = await this.getParentRoles(role.parent_id);
-        parentRoles.push(...grandParents);
-      }
-
-      // Also check role hierarchy table
-      const hierarchyRelations = await prisma.roleHierarchy.findMany({
-        where: { child_role_id: roleId },
-        select: { parent_role_id: true }
-      });
-
-      for (const relation of hierarchyRelations) {
-        if (!parentRoles.includes(relation.parent_role_id)) {
-          parentRoles.push(relation.parent_role_id);
-          // Recursively get parents of hierarchy parents
-          const hierarchyParents = await this.getParentRoles(relation.parent_role_id);
-          parentRoles.push(...hierarchyParents.filter(p => !parentRoles.includes(p)));
-        }
-      }
-
-      // Cache the results
-      this.hierarchyCache.set(roleId, parentRoles);
-      
-    } catch (error) {
-      console.error('Error getting parent roles:', error);
-    }
-
-    return parentRoles;
-  }
-
-  // Check if resource requires administrative access
+  // Check if resource is administrative
   private isAdministrativeResource(resource: string): boolean {
     const adminResources = [
-      'user_management',
-      'role_management', 
-      'system_settings',
-      'district',
-      'school_administration',
-      'staff_management',
-      'department_management'
+      'user_management', 'system', 'security', 'backup', 'database',
+      'workflow_management', 'code_modification', 'code_generation'
     ];
     return adminResources.includes(resource);
   }
 
-  // Check if resource/action requires high priority access
+  // Check if resource/action requires high priority
   private isHighPriorityResource(resource: string, action: string): boolean {
-    const highPriorityActions = ['delete', 'create', 'manage', 'admin'];
-    const highPriorityResources = ['budget', 'personnel', 'curriculum', 'assessment'];
+    const highPriorityOperations = [
+      { resource: 'staff', action: 'manage' },
+      { resource: 'role', action: 'manage' },
+      { resource: 'school', action: 'manage' },
+      { resource: 'workflow_management', action: 'execute' },
+      { resource: 'system', action: 'configure' }
+    ];
     
-    return highPriorityActions.includes(action) || highPriorityResources.includes(resource);
+    return highPriorityOperations.some(op => 
+      op.resource === resource && op.action === action
+    );
+  }
+
+  // Get parent roles in hierarchy
+  private async getParentRoles(roleId: string): Promise<string[]> {
+    const cacheKey = `parents_${roleId}`;
+    
+    if (this.isCacheValid() && this.roleHierarchyCache.has(cacheKey)) {
+      return this.roleHierarchyCache.get(cacheKey)!;
+    }
+
+    try {
+      // Get role hierarchy relationships
+      const hierarchyRecords = await prisma.roleHierarchy.findMany({
+        where: { child_role_id: parseInt(roleId) },
+        select: { parent_role_id: true }
+      });
+
+      const parentIds = hierarchyRecords.map(r => r.parent_role_id.toString());
+      
+      // Cache results
+      this.roleHierarchyCache.set(cacheKey, parentIds);
+      
+      return parentIds;
+
+    } catch (error) {
+      console.error('Error getting parent roles:', error);
+      return [];
+    }
   }
 
   // Get role-based permissions
@@ -464,9 +480,29 @@ export class DynamicRBAC {
 
     // IT Staff permissions
     if (roleLower.includes('it')) {
-      const itResources = ['system', 'technology', 'user_management', 'security'];
+      const itResources = ['system', 'technology', 'user_management', 'security', 'workflow_management', 'code_modification'];
       if (itResources.includes(resource)) {
         return { granted: true, reason: 'IT staff technical access' };
+      }
+    }
+
+    // Administrator permissions (complete system access)
+    if (roleLower.includes('administrator')) {
+      const adminResources = [
+        'system', 'user_management', 'security', 'workflow_management', 
+        'code_modification', 'code_generation', 'database', 'backup',
+        'school', 'staff', 'student', 'meeting', 'department', 'district'
+      ];
+      if (adminResources.includes(resource)) {
+        return { granted: true, reason: 'Administrator full system access' };
+      }
+    }
+
+    // Project Management permissions for development roles
+    if (roleLower.includes('developer') || roleLower.includes('tech') || roleLower.includes('admin')) {
+      const projectResources = ['workflow_management', 'code_modification', 'code_generation'];
+      if (projectResources.includes(resource)) {
+        return { granted: true, reason: 'Development role project management access' };
       }
     }
 
@@ -493,158 +529,130 @@ export class DynamicRBAC {
     return result.granted;
   }
 
-  // Helper method to check if user is admin
+  // Check if user is admin
   async isAdmin(user: AuthenticatedUser): Promise<boolean> {
-    const staff = await this.getUserStaff(user);
-    return staff.some(s => 
-      s.Role.is_leadership || 
-      s.Role.title.toLowerCase().includes('administrator') ||
-      s.Role.title.toLowerCase().includes('superintendent') ||
-      s.Role.priority >= 9
+    const userStaff = await this.getUserStaff(user);
+    return userStaff.some(staff => 
+      staff.Role.title.toLowerCase().includes('administrator') || 
+      staff.Role.is_leadership
     );
   }
 
-  // Helper method to check if user is staff
-  async isStaff(user: AuthenticatedUser): Promise<boolean> {
-    const staff = await this.getUserStaff(user);
-    return staff.length > 0;
-  }
-
-  // Helper method to check if user is in leadership
-  async isLeadership(user: AuthenticatedUser): Promise<boolean> {
-    const staff = await this.getUserStaff(user);
-    return staff.some(s => s.Role.is_leadership);
-  }
-
-  // Get user's primary staff record
+  // Get primary staff record for user
   async getPrimaryStaff(user: AuthenticatedUser): Promise<StaffWithRole | null> {
-    const staff = await this.getUserStaff(user);
-    if (staff.length === 0) return null;
+    const userStaff = await this.getUserStaff(user);
+    if (userStaff.length === 0) return null;
     
     // Return highest priority role
-    return staff.reduce((highest, current) => 
-      current.Role.priority > highest.Role.priority ? current : highest
+    return userStaff.reduce((prev, current) => 
+      current.Role.priority > prev.Role.priority ? current : prev
     );
   }
 
-  // Get user's roles
-  async getUserRoles(user: AuthenticatedUser): Promise<StaffWithRole['Role'][]> {
-    const staff = await this.getUserStaff(user);
-    return staff.map(s => s.Role);
+  // Get all roles user has access to
+  async getUserRoles(user: AuthenticatedUser): Promise<string[]> {
+    const userStaff = await this.getUserStaff(user);
+    return userStaff.map(staff => staff.Role.title);
   }
 
   // Get user's departments
-  async getUserDepartments(user: AuthenticatedUser): Promise<StaffWithRole['Department'][]> {
-    const staff = await this.getUserStaff(user);
-    const departments = staff.map(s => s.Department);
-    // Remove duplicates
-    return departments.filter((dept, index, self) => 
-      index === self.findIndex(d => d.id === dept.id)
-    );
+  async getUserDepartments(user: AuthenticatedUser): Promise<number[]> {
+    const userStaff = await this.getUserStaff(user);
+    return [...new Set(userStaff.map(staff => staff.department_id))];
   }
 
   // Get user's schools
-  async getUserSchools(user: AuthenticatedUser): Promise<StaffWithRole['School'][]> {
-    const staff = await this.getUserStaff(user);
-    const schools = staff.map(s => s.School);
-    // Remove duplicates
-    return schools.filter((school, index, self) => 
-      index === self.findIndex(s => s.id === school.id)
-    );
-  }
-
-  // Check if user can access another user's data
-  async canAccessUser(user: AuthenticatedUser, targetUserId: string): Promise<boolean> {
-    // Self access
-    if (user.id === targetUserId) return true;
-
-    // Admin access
-    if (await this.isAdmin(user)) return true;
-
-    // Manager access
+  async getUserSchools(user: AuthenticatedUser): Promise<number[]> {
     const userStaff = await this.getUserStaff(user);
-    const targetStaff = await prisma.staff.findMany({
-      where: { user_id: parseInt(targetUserId) },
-      select: { manager_id: true }
-    });
-
-    return userStaff.some(us => 
-      targetStaff.some(ts => ts.manager_id === us.id)
-    );
+    return [...new Set(userStaff.map(staff => staff.school_id))];
   }
 
-  // Check if user can access meeting
-  async canAccessMeeting(user: AuthenticatedUser, meetingId: number): Promise<boolean> {
+  // Role hierarchy management
+  async getRoleHierarchy(roleId: string): Promise<string[]> {
+    const cacheKey = `hierarchy_${roleId}`;
+    
+    if (this.isCacheValid() && this.roleHierarchyCache.has(cacheKey)) {
+      return this.roleHierarchyCache.get(cacheKey)!;
+    }
+
     try {
-      const meeting = await prisma.meeting.findUnique({
-        where: { id: meetingId },
-        select: {
-          organizer_id: true,
-          department_id: true,
-          school_id: true,
-          district_id: true
-        }
-      });
-
-      if (!meeting) return false;
-
-      const userStaff = await this.getUserStaff(user);
+      // Get all roles in hierarchy (parents and children)
+      const parentRoles = await this.getParentRoles(roleId);
+      const childRoles = await this.getChildRoles(roleId);
       
-      // Check if user is organizer
-      if (userStaff.some(s => s.id === meeting.organizer_id)) return true;
-
-      // Check if user is in same department
-      if (userStaff.some(s => s.department_id === meeting.department_id)) return true;
-
-      // Check if user is in same school (for leadership)
-      if (userStaff.some(s => s.Role.is_leadership && s.school_id === meeting.school_id)) return true;
-
-      // Check if user is attendee
-      const isAttendee = await prisma.meetingAttendee.findFirst({
-        where: {
-          meeting_id: meetingId,
-          staff_id: { in: userStaff.map(s => s.id) }
-        }
-      });
-
-      return !!isAttendee;
+      const allRoles = [roleId, ...parentRoles, ...childRoles];
+      const uniqueRoles = [...new Set(allRoles)];
+      
+      // Cache results
+      this.roleHierarchyCache.set(cacheKey, uniqueRoles);
+      
+      return uniqueRoles;
 
     } catch (error) {
-      console.error('Error checking meeting access:', error);
-      return false;
+      console.error('Error getting role hierarchy:', error);
+      return [roleId];
     }
   }
 
-  // Check if cache is still valid
-  private isCacheValid(): boolean {
-    return Date.now() - this.lastCacheUpdate < this.cacheExpiry;
+  // Get child roles
+  private async getChildRoles(roleId: string): Promise<string[]> {
+    try {
+      const hierarchyRecords = await prisma.roleHierarchy.findMany({
+        where: { parent_role_id: parseInt(roleId) },
+        select: { child_role_id: true }
+      });
+
+      return hierarchyRecords.map(r => r.child_role_id.toString());
+
+    } catch (error) {
+      console.error('Error getting child roles:', error);
+      return [];
+    }
   }
 
-  // Clear cache
-  clearCache(): void {
-    this.permissionsCache.clear();
-    this.staffCache.clear();
-    this.hierarchyCache.clear();
-    this.lastCacheUpdate = 0;
-  }
-
-  // Refresh cache
-  async refreshCache(): Promise<void> {
-    this.clearCache();
-    this.lastCacheUpdate = Date.now();
-  }
-
-  // Get all permissions for a user (for debugging/admin)
-  async getUserPermissions(user: AuthenticatedUser): Promise<RolePermission[]> {
-    const staff = await this.getUserStaff(user);
-    const permissions: RolePermission[] = [];
-
-    for (const staffRecord of staff) {
-      const rolePermissions = this.generateRolePermissions(staffRecord.Role);
-      permissions.push(...rolePermissions);
+  // Permission cache management
+  async getRolePermissions(roleId: string): Promise<RolePermission[]> {
+    const cacheKey = `role_permissions_${roleId}`;
+    
+    if (this.isCacheValid() && this.permissionsCache.has(cacheKey)) {
+      return this.permissionsCache.get(cacheKey)!;
     }
 
-    return permissions;
+    try {
+      // Get role details
+      const role = await prisma.role.findUnique({
+        where: { id: parseInt(roleId) },
+        select: {
+          id: true,
+          title: true,
+          priority: true,
+          is_leadership: true,
+          department_id: true
+        }
+      });
+
+      if (!role) {
+        return [];
+      }
+
+      // Convert null to undefined for type compatibility
+      const roleWithConvertedDeptId = {
+        ...role,
+        department_id: role.department_id || undefined
+      };
+      
+      // Generate permissions based on role
+      const permissions = this.generateRolePermissions(roleWithConvertedDeptId);
+      
+      // Cache results
+      this.permissionsCache.set(cacheKey, permissions);
+      
+      return permissions;
+
+    } catch (error) {
+      console.error('Error getting role permissions:', error);
+      return [];
+    }
   }
 
   // Generate permissions based on role
