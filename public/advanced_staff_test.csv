@@ -7,7 +7,9 @@ duplicate@school.edu,First Duplicate,DUP001,English/Language Arts Teacher,Langua
 duplicate@school.edu,Second Duplicate,DUP002,Mathematics Teacher,Mathematics Department
 invalid.email,Invalid Email Format,INV001,Art Teacher,Arts Department
 valid@school.edu,,INV002,Music Teacher,Arts Department
-another@school.edu,No Role,,Arts Department
+empty.role@school.edu,Empty Role Test,EMPTY001,,Arts Department
+empty.dept@school.edu,Empty Department,EMPTY002,Art Teacher,
+another@school.edu,No Role,NO_ROLE,Art Teacher,Arts Department
 role.test@school.edu,Invalid Role Test,ROLE001,Non-Existent Role,Arts Department
 dept.test@school.edu,Invalid Department,DEPT001,Art Teacher,Non-Existent Department
 both.invalid@school.edu,Both Invalid,BOTH001,Fake Role,Fake Department
