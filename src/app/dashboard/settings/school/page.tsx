@@ -47,7 +47,7 @@ export default function SchoolSettingsPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!session?.user || user.staff?.role?.title !== "Administrator") {
+    if (!session?.user || session.user.staff?.role?.title !== "Administrator") {
       setError('Only administrators can update school information');
       return;
     }

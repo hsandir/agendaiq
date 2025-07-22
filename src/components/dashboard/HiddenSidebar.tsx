@@ -59,6 +59,8 @@ const navigation: NavSection[] = [
     items: [
       { href: "/dashboard/settings/users", label: "User Management", icon: FiUsers },
       { href: "/dashboard/settings/roles", label: "Role Management", icon: FiShield },
+      { href: "/dashboard/settings/admin", label: "Admin Settings", icon: FiSettings },
+      { href: "/dashboard/settings/school", label: "School Management", icon: FiHome },
       { href: "/dashboard/settings/permissions", label: "Permissions", icon: FiKey },
       { href: "/dashboard/project-management", label: "Project Management", icon: FiSettings, adminOnly: false },
       { href: "/dashboard/settings/backup", label: "Backup & Restore", icon: FiHardDrive, adminOnly: true },
