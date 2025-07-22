@@ -212,7 +212,7 @@ export default function AuditLogsClient() {
               <FiActivity className="h-8 w-8 text-blue-600" />
               <div className="ml-4">
                 <p className="text-2xl font-bold text-gray-900">{summary.totalLogs}</p>
-                <p className="text-gray-600">Toplam Log</p>
+                <p className="text-gray-600">Total Logs</p>
               </div>
             </div>
           </div>
@@ -222,7 +222,7 @@ export default function AuditLogsClient() {
               <FiDatabase className="h-8 w-8 text-green-600" />
               <div className="ml-4">
                 <p className="text-2xl font-bold text-gray-900">{summary.tableStats.length}</p>
-                <p className="text-gray-600">Etkilenen Tablo</p>
+                <p className="text-gray-600">Affected Tables</p>
               </div>
             </div>
           </div>
@@ -232,7 +232,7 @@ export default function AuditLogsClient() {
               <FiUser className="h-8 w-8 text-purple-600" />
               <div className="ml-4">
                 <p className="text-2xl font-bold text-gray-900">{summary.topUsers.length}</p>
-                <p className="text-gray-600">Aktif Kullanıcı</p>
+                <p className="text-gray-600">Active Users</p>
               </div>
             </div>
           </div>
@@ -242,7 +242,7 @@ export default function AuditLogsClient() {
               <FiCalendar className="h-8 w-8 text-orange-600" />
               <div className="ml-4">
                 <p className="text-2xl font-bold text-gray-900">30</p>
-                <p className="text-gray-600">Gün Rapor</p>
+                <p className="text-gray-600">Day Report</p>
               </div>
             </div>
           </div>
@@ -252,14 +252,14 @@ export default function AuditLogsClient() {
       {/* Filters */}
       <div className="bg-white p-6 rounded-lg shadow-sm border">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-gray-900">Filtreler</h3>
+          <h3 className="text-lg font-medium text-gray-900">Filters</h3>
           <div className="flex space-x-2">
             <button
               onClick={resetFilters}
               className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
             >
               <FiRefreshCw className="h-4 w-4 mr-1 inline" />
-              Sıfırla
+              Reset
             </button>
             <button
               onClick={exportLogs}
@@ -273,13 +273,13 @@ export default function AuditLogsClient() {
         
         <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tablo</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Table</label>
             <select
               value={filters.table}
               onChange={(e) => handleFilterChange('table', e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2"
             >
-              <option value="">Tümü</option>
+              <option value="">All</option>
               <option value="users">Users</option>
               <option value="staff">Staff</option>
               <option value="roles">Roles</option>
@@ -289,13 +289,13 @@ export default function AuditLogsClient() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">İşlem</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Operation</label>
             <select
               value={filters.operation}
               onChange={(e) => handleFilterChange('operation', e.target.value)}
               className="w-full border border-gray-300 rounded-md px-3 py-2"
             >
-              <option value="">Tümü</option>
+              <option value="">All</option>
               <option value="CREATE">Create</option>
               <option value="UPDATE">Update</option>
               <option value="DELETE">Delete</option>
@@ -306,7 +306,7 @@ export default function AuditLogsClient() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Başlangıç</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
             <input
               type="date"
               value={filters.startDate}
@@ -316,7 +316,7 @@ export default function AuditLogsClient() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Bitiş</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
             <input
               type="date"
               value={filters.endDate}
@@ -326,7 +326,7 @@ export default function AuditLogsClient() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Kullanıcı ID</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
             <input
               type="number"
               value={filters.userId}
@@ -337,12 +337,12 @@ export default function AuditLogsClient() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Arama</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
             <input
               type="text"
               value={filters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
-              placeholder="Açıklama ara..."
+              placeholder="Search description..."
               className="w-full border border-gray-300 rounded-md px-3 py-2"
             />
           </div>
@@ -366,25 +366,25 @@ export default function AuditLogsClient() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tarih/Saat
+                  Date/Time
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tablo
+                  Table
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  İşlem
+                  Operation
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Kullanıcı
+                  User
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Açıklama
+                  Description
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Kaynak
+                  Source
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  İşlemler
+                  Actions
                 </th>
               </tr>
             </thead>
@@ -467,7 +467,7 @@ export default function AuditLogsClient() {
               onClick={() => loadAuditLogs(false)}
               className="px-4 py-2 text-sm font-medium text-blue-600 bg-white border border-blue-600 rounded-md hover:bg-blue-50"
             >
-              Daha Fazla Yükle
+              Load More
             </button>
           </div>
         )}
@@ -478,7 +478,7 @@ export default function AuditLogsClient() {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Audit Log Detayları</h3>
+              <h3 className="text-lg font-medium text-gray-900">Audit Log Details</h3>
               <button
                 onClick={() => setShowDetails(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -490,11 +490,11 @@ export default function AuditLogsClient() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Tablo</label>
+                  <label className="text-sm font-medium text-gray-700">Table</label>
                   <p className="text-sm text-gray-900">{selectedLog.table_name}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">İşlem</label>
+                  <label className="text-sm font-medium text-gray-700">Operation</label>
                   <p className="text-sm text-gray-900">{selectedLog.operation}</p>
                 </div>
                 <div>
@@ -502,7 +502,7 @@ export default function AuditLogsClient() {
                   <p className="text-sm text-gray-900">{selectedLog.record_id}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Tarih</label>
+                  <label className="text-sm font-medium text-gray-700">Date</label>
                   <p className="text-sm text-gray-900">{formatDate(selectedLog.created_at)}</p>
                 </div>
               </div>
@@ -518,7 +518,7 @@ export default function AuditLogsClient() {
               
               {selectedLog.old_values && (
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Eski Değerler</label>
+                  <label className="text-sm font-medium text-gray-700">Old Values</label>
                   <pre className="text-xs bg-gray-100 p-3 rounded mt-1 overflow-auto">
                     {JSON.stringify(selectedLog.old_values, null, 2)}
                   </pre>
@@ -527,7 +527,7 @@ export default function AuditLogsClient() {
               
               {selectedLog.new_values && (
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Yeni Değerler</label>
+                  <label className="text-sm font-medium text-gray-700">New Values</label>
                   <pre className="text-xs bg-gray-100 p-3 rounded mt-1 overflow-auto">
                     {JSON.stringify(selectedLog.new_values, null, 2)}
                   </pre>
@@ -536,7 +536,7 @@ export default function AuditLogsClient() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">IP Adresi</label>
+                  <label className="text-sm font-medium text-gray-700">IP Address</label>
                   <p className="text-sm text-gray-900">{selectedLog.ip_address || 'N/A'}</p>
                 </div>
                 <div>

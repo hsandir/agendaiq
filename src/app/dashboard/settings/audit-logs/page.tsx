@@ -4,7 +4,7 @@ import AuditLogsClient from './AuditLogsClient';
 
 export const metadata: Metadata = {
   title: 'Audit Logs | AgendaIQ',
-  description: 'Database işlemleri ve sistem değişikliklerinin detaylı kayıtları',
+  description: 'Detailed records of database operations and system changes',
 };
 
 export default async function AuditLogsPage() {
@@ -15,7 +15,7 @@ export default async function AuditLogsPage() {
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Database Audit Logs</h1>
         <p className="text-gray-600 mt-1">
-          Sistemde yapılan tüm database işlemlerini izleyin, geri alın veya değiştirin
+          Monitor all database operations, rollback changes, and track system modifications
         </p>
       </div>
 

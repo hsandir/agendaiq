@@ -17,14 +17,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: summary,
-      period: `${days} gün`
+      period: `${days} days`
     });
 
   } catch (error) {
     console.error('Error fetching audit summary:', error);
     return NextResponse.json({
-      error: 'Audit özet bilgileri alınırken hata oluştu',
-      details: error instanceof Error ? error.message : 'Bilinmeyen hata'
+      error: 'Failed to fetch audit summary information',
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
   }
 } 
