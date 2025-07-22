@@ -8,7 +8,10 @@ declare module 'next-auth' {
     name?: string | null;
     staff?: {
       id: number;
-      role: { title: string };
+      role: { 
+        title: string;
+        is_leadership: boolean;
+      };
       department: { name: string };
       school: { name: string };
     };
@@ -20,7 +23,10 @@ declare module 'next-auth' {
       id: number;
       staff?: {
         id: number;
-        role: { title: string };
+        role: { 
+          title: string;
+          is_leadership: boolean;
+        };
         department: { name: string };
         school: { name: string };
       };

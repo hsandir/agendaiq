@@ -74,7 +74,21 @@ export const authOptions: NextAuthOptions = {
             id: user.id,
             email: user.email,
             name: user.name,
-            ...(staff && { staff })
+            ...(staff && { 
+              staff: {
+                id: staff.id,
+                role: {
+                  title: staff.Role.title,
+                  is_leadership: staff.Role.is_leadership
+                },
+                department: {
+                  name: staff.Department.name
+                },
+                school: {
+                  name: staff.School.name
+                }
+              }
+            })
           };
 
           return userData as unknown as User;
