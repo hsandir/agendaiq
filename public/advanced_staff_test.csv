@@ -1,0 +1,55 @@
+Email,Name,StaffId,Role,Department
+existing@school.edu,Existing User Update,EXIST001,Mathematics Teacher,Mathematics Department
+michael.thompson@agendaiq.edu,Michael Thompson UPDATED,SUPER001,Administrator,Administration
+new.user1@school.edu,New Staff Member,NEW001,Science Teacher,Science Department
+sarah.williams@agendaiq.edu,Dr. Sarah Williams,ADMIN001,Superintendent,Administration
+duplicate@school.edu,First Duplicate,DUP001,English/Language Arts Teacher,Language Arts Department
+duplicate@school.edu,Second Duplicate,DUP002,Mathematics Teacher,Mathematics Department
+invalid.email,Invalid Email Format,INV001,Art Teacher,Arts Department
+valid@school.edu,,INV002,Music Teacher,Arts Department
+another@school.edu,No Role,,Arts Department
+role.test@school.edu,Invalid Role Test,ROLE001,Non-Existent Role,Arts Department
+dept.test@school.edu,Invalid Department,DEPT001,Art Teacher,Non-Existent Department
+both.invalid@school.edu,Both Invalid,BOTH001,Fake Role,Fake Department
+short@school.edu,Short Staff ID,AB,Mathematics Teacher,Mathematics Department
+toolongstaffid@school.edu,Too Long Staff ID,VERYLONGSTAFFIDTHATEXCEEDSLIMIT,Science Teacher,Science Department
+leadership1@school.edu,Leadership Conflict 1,LEAD001,Superintendent,Administration
+leadership2@school.edu,Leadership Conflict 2,LEAD002,Superintendent,Administration
+conflict1@school.edu,Role Conflict Test,CONF001,Department Head – Mathematics,Mathematics Department
+conflict2@school.edu,Department Change,CONF002,English/Language Arts Teacher,Science Department
+megan.evans@agendaiq.edu,Megan Evans - Add Role,MEGAN001,Mathematics Teacher,Mathematics Department
+robert.johnson@agendaiq.edu,Dr. Robert Johnson - Fix,ROB001,Science Teacher,Science Department
+maria.rodriguez@agendaiq.edu,Maria Rodriguez - Role Change,MARIA001,Administrator,Administration
+james.wilson@agendaiq.edu,James Wilson - Dept Change,JAMES001,Art Teacher,Arts Department
+special.chars@school.edu,Special Çhars Test,SPEC001,ESL Teacher,ESL Department
+unicode.test@school.edu,Unicode Tëst Námé,UNI001,Foreign Language Teacher,World Languages Department
+number.test@school.edu,Test User 123,NUM001,Special Education Teacher,Special Education Department
+name.update@school.edu,Name Change Test,UPDATE001,Social Studies Teacher,Social Studies Department
+admin.conflict@school.edu,Admin Role Conflict,ADMIN999,Administrator,Administration
+principal.conflict@school.edu,Principal Conflict,PRIN001,Principal,Administration
+dept.head1@school.edu,Dept Head Math Conflict,HEAD001,Department Head – Mathematics,Mathematics Department
+dept.head2@school.edu,Another Math Head,HEAD002,Department Head – Mathematics,Mathematics Department
+operations1@school.edu,Operations Conflict 1,OPS001,Operations Director,Operations
+operations2@school.edu,Operations Conflict 2,OPS002,Operations Director,Operations
+finance1@school.edu,Finance Conflict 1,FIN001,Finance Manager,Finance
+finance2@school.edu,Finance Conflict 2,FIN002,Finance Manager,Finance
+hr1@school.edu,HR Conflict 1,HR001,Human Resources Manager,Human Resources
+hr2@school.edu,HR Conflict 2,HR002,Human Resources Manager,Human Resources
+stem.chair1@school.edu,STEM Chair 1,STEM001,STEM Chair,STEM/Technology Department
+stem.chair2@school.edu,STEM Chair 2,STEM002,STEM Chair,STEM/Technology Department
+arts.chair1@school.edu,Arts Chair 1,ARTS001,Arts & Humanities Chair,Arts Department
+arts.chair2@school.edu,Arts Chair 2,ARTS002,Arts & Humanities Chair,Arts Department
+special.prog1@school.edu,Special Programs 1,SP001,Special Programs Chair,Instruction
+special.prog2@school.edu,Special Programs 2,SP002,Special Programs Chair,Instruction
+grade.super1@school.edu,Grade Supervisor 1,GS001,Grade-Level Supervisor,Instruction
+grade.super2@school.edu,Grade Supervisor 2,GS002,Grade-Level Supervisor,Instruction
+valid.new1@school.edu,Valid New User 1,VALID001,Mathematics Teacher,Mathematics Department
+valid.new2@school.edu,Valid New User 2,VALID002,Science Teacher,Science Department
+valid.new3@school.edu,Valid New User 3,VALID003,English/Language Arts Teacher,Language Arts Department
+valid.new4@school.edu,Valid New User 4,VALID004,Social Studies Teacher,Social Studies Department
+valid.new5@school.edu,Valid New User 5,VALID005,Art Teacher,Arts Department
+valid.new6@school.edu,Valid New User 6,VALID006,Music Teacher,Arts Department
+valid.new7@school.edu,Valid New User 7,VALID007,Foreign Language Teacher,World Languages Department
+valid.new8@school.edu,Valid New User 8,VALID008,Special Education Teacher,Special Education Department
+valid.new9@school.edu,Valid New User 9,VALID009,ESL Teacher,ESL Department
+valid.new10@school.edu,Valid New User 10,VALID010,STEM Integration Teacher,STEM/Technology Department 

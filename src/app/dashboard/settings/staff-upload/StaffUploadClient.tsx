@@ -56,7 +56,7 @@ export default function StaffUploadClient() {
   const [previewSummary, setPreviewSummary] = useState<PreviewSummary | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [showPreview, setShowPreview] = useState(false);
-  const [selectedRecords, setSelectedRecords] = useState<Set<number>>(new Set());
+  const [selectedRecords, setSelectedRecords] = new Set());
   const [recordActions, setRecordActions] = useState<Map<number, string>>(new Map());
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,7 +197,13 @@ export default function StaffUploadClient() {
   };
 
   const downloadTemplate = () => {
-    const csvContent = 'Email,Name,StaffId,Role,Department\nexample@school.edu,John Doe,STAFF001,Teacher,Mathematics Department\nexample2@school.edu,Jane Smith,STAFF002,Principal,Administration';
+    const csvContent = `Email,Name,StaffId,Role,Department
+new.teacher1@school.edu,John Smith,STAFF001,Mathematics Teacher,Mathematics Department
+new.teacher2@school.edu,Jane Doe,STAFF002,Science Teacher,Science Department
+update.existing@school.edu,Updated Name,STAFF003,English/Language Arts Teacher,Language Arts Department
+new.admin@school.edu,New Administrator,ADMIN001,Administrator,Administration
+conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathematics,Mathematics Department`;
+    
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');

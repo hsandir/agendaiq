@@ -212,20 +212,23 @@ export async function POST(request: NextRequest) {
         // Check if StaffId already exists (if not updating existing user)
         let existingStaffId = null;
         if (record.StaffId) {
-          existingStaffId = await prisma.staff.findFirst({
+          existingStaffId = await prisma.user.findFirst({
             where: { 
               staff_id: record.StaffId,
-              user_id: { not: existingUser?.id }
+              id: { not: existingUser?.id }
             },
             include: {
-              User: true,
-              Role: true
+              Staff: {
+                include: {
+                  Role: true
+                }
+              }
             }
           });
         }
 
         if (existingStaffId) {
-          recordErrors.push(`Staff ID "${record.StaffId}" already exists for user ${existingStaffId.User.email}`);
+          recordErrors.push(`Staff ID "${record.StaffId}" already exists for user ${existingStaffId.email}`);
         }
 
         const processedRecord: ProcessedRecord = {
@@ -252,7 +255,7 @@ export async function POST(request: NextRequest) {
           if (existingStaff) {
             processedRecord.existingData = {
               name: existingUser.name,
-              staffId: existingStaff.staff_id,
+              staffId: existingUser.staff_id || '',
               role: existingStaff.Role.title,
               department: existingStaff.Department.name
             };
@@ -267,10 +270,10 @@ export async function POST(request: NextRequest) {
                 action: 'update_name'
               });
             }
-            if (record.StaffId !== existingStaff.staff_id) {
+            if (record.StaffId !== existingUser.staff_id) {
               conflicts.push({
                 field: 'staffId',
-                existing: existingStaff.staff_id,
+                existing: existingUser.staff_id,
                 new: record.StaffId,
                 action: 'update_staff_id'
               });
@@ -329,7 +332,24 @@ export async function POST(request: NextRequest) {
         processedRecords.push(processedRecord);
 
       } catch (error) {
-        validationErrors.push(`Row ${rowNumber}: Processing error - ${error instanceof Error ? error.message : 'Unknown error'}`);
+        let errorMessage = 'Processing error';
+        
+        if (error instanceof Error) {
+          // Handle specific Prisma errors with user-friendly messages
+          if (error.message.includes('Unknown argument')) {
+            errorMessage = 'Database field validation error - please check your data format';
+          } else if (error.message.includes('Invalid `prisma.')) {
+            errorMessage = 'Database query error - invalid data format detected';
+          } else if (error.message.includes('Unique constraint')) {
+            errorMessage = 'Duplicate data detected - email or staff ID already exists';
+          } else if (error.message.includes('Foreign key constraint')) {
+            errorMessage = 'Invalid role or department - please use valid system values';
+          } else {
+            errorMessage = `Data validation error: ${error.message.split('\n')[0]}`;
+          }
+        }
+        
+        validationErrors.push(`Row ${rowNumber}: ${errorMessage}`);
       }
     }
 
@@ -382,14 +402,16 @@ export async function POST(request: NextRequest) {
             // Update existing user
             await prisma.user.update({
               where: { id: existingUser.id },
-              data: { name: record.name }
+              data: { 
+                name: record.name,
+                staff_id: record.staffId
+              }
             });
 
             if (existingUser.Staff.length > 0) {
               await prisma.staff.update({
                 where: { id: existingUser.Staff[0].id },
                 data: {
-                  staff_id: record.staffId,
                   role_id: role.id,
                   department_id: department.id
                 }
@@ -398,7 +420,6 @@ export async function POST(request: NextRequest) {
               await prisma.staff.create({
                 data: {
                   user_id: existingUser.id,
-                  staff_id: record.staffId,
                   role_id: role.id,
                   department_id: department.id,
                   school_id: adminStaff.school.id,
@@ -413,6 +434,7 @@ export async function POST(request: NextRequest) {
               data: {
                 email: record.email,
                 name: record.name,
+                staff_id: record.staffId,
                 emailVerified: new Date()
               }
             });
@@ -420,7 +442,6 @@ export async function POST(request: NextRequest) {
             await prisma.staff.create({
               data: {
                 user_id: newUser.id,
-                staff_id: record.staffId,
                 role_id: role.id,
                 department_id: department.id,
                 school_id: adminStaff.school.id,
