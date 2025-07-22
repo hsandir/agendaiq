@@ -3,6 +3,7 @@ import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
 import { parse } from "csv-parse/sync";
 import { z } from "zod";
+import { AuditLogger } from '@/lib/audit/audit-logger';
 
 // Enhanced interfaces for preview system
 interface ConflictItem {
@@ -485,6 +486,25 @@ export async function POST(request: NextRequest) {
           uploadErrors.push(`Row ${record.rowNumber}: ${error instanceof Error ? error.message : 'Upload failed'}`);
         }
       }
+
+      // Log bulk upload operation
+      await AuditLogger.logFromRequest(request, {
+        tableName: 'staff',
+        recordId: 'bulk',
+        operation: 'BULK_CREATE',
+        userId: user.id,
+        staffId: user.staff?.id,
+        source: 'BULK_UPLOAD',
+        description: `Staff bulk upload: ${created + updated} records processed (${created} created, ${updated} updated)`,
+        metadata: {
+          record_count: recordsToUpload.length,
+          created_count: created,
+          updated_count: updated,
+          error_count: uploadErrors.length,
+          file_name: file.name || 'unknown',
+          selected_records: selectedRows.length > 0 ? selectedRows.length : 'all'
+        }
+      });
 
       return NextResponse.json({
         success: true,
