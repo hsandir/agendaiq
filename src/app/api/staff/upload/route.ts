@@ -108,20 +108,34 @@ export async function POST(request: NextRequest) {
     let records: any[];
 
     try {
+      console.log('📄 CSV file size:', text.length, 'bytes');
+      console.log('📄 First 200 chars:', text.substring(0, 200));
+      
       records = parse(text, {
         columns: true,
         skip_empty_lines: true,
         trim: true,
+        delimiter: ',',
+        quote: '"',
+        escape: '"'
       });
+      
+      console.log('✅ CSV parsed successfully. Records found:', records.length);
+      console.log('📝 First record:', records[0]);
+      
     } catch (error) {
+      console.error('❌ CSV Parse Error:', error);
       return NextResponse.json({ 
-        error: 'Invalid CSV format. Please check your file and try again.' 
+        error: 'Invalid CSV format. Please check your file and try again.',
+        details: error instanceof Error ? error.message : 'Unknown parsing error',
+        hint: 'Make sure your file uses comma separators and has the correct headers: Email,Name,StaffId,Role,Department'
       }, { status: 400 });
     }
 
-    if (records.length === 0) {
+    if (!records || records.length === 0) {
       return NextResponse.json({ 
-        error: 'CSV file is empty or has no valid data rows.' 
+        error: 'CSV file is empty or has no valid data rows.',
+        hint: 'Please ensure your file contains data rows below the header row'
       }, { status: 400 });
     }
 

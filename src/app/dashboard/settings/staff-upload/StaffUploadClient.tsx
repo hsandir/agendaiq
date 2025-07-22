@@ -56,7 +56,7 @@ export default function StaffUploadClient() {
   const [previewSummary, setPreviewSummary] = useState<PreviewSummary | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [showPreview, setShowPreview] = useState(false);
-  const [selectedRecords, setSelectedRecords] = new Set());
+  const [selectedRecords, setSelectedRecords] = useState<Set<number>>(new Set());
   const [recordActions, setRecordActions] = useState<Map<number, string>>(new Map());
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +99,14 @@ export default function StaffUploadClient() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Preview failed');
+        let errorMessage = data.error || 'Preview failed';
+        if (data.details) {
+          errorMessage += `\n\nDetails: ${data.details}`;
+        }
+        if (data.hint) {
+          errorMessage += `\n\nHint: ${data.hint}`;
+        }
+        throw new Error(errorMessage);
       }
 
       setPreviewData(data.preview || []);
