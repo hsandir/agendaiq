@@ -264,7 +264,7 @@ export async function POST(request: NextRequest) {
         if (existingUser) {
           // User exists - check for conflicts
           processedRecord.status = 'update';
-          const existingStaff = existingUser.Staff[0];
+          const existingStaff = existingUser.Staff.length > 0 ? existingUser.Staff[0] : null;
           
           if (existingStaff) {
             processedRecord.existingData = {
@@ -386,10 +386,20 @@ export async function POST(request: NextRequest) {
 
     // Handle upload action
     if (action === 'upload') {
-      if (validRecords.length === 0) {
+      // Get selected rows if provided
+      const selectedRowsStr = formData.get('selectedRows') as string;
+      const selectedRows = selectedRowsStr ? JSON.parse(selectedRowsStr) : [];
+      
+      // Filter only selected and valid records
+      let recordsToUpload = validRecords;
+      if (selectedRows.length > 0) {
+        recordsToUpload = validRecords.filter(record => selectedRows.includes(record.rowNumber));
+      }
+      
+      if (recordsToUpload.length === 0) {
         return NextResponse.json({
-          error: 'No valid records to upload',
-          details: validationErrors
+          error: 'No selected records to upload',
+          details: ['Please select at least one record to upload']
         }, { status: 400 });
       }
 
@@ -397,7 +407,7 @@ export async function POST(request: NextRequest) {
       let updated = 0;
       const uploadErrors: string[] = [];
 
-      for (const record of validRecords) {
+      for (const record of recordsToUpload) {
         try {
           const role = existingRoles.find((r: any) => r.title === record.role);
           const department = existingDepartments.find((d: any) => d.name === record.department);
