@@ -1,216 +1,259 @@
-'use client';
+import { Metadata } from "next";
+import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
+import Link from 'next/link';
+import { FiUsers, FiUserCheck, FiTrendingUp, FiEye, FiEdit3, FiSettings } from 'react-icons/fi';
+import RoleManagement from '@/components/settings/RoleManagement';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { FiAlertCircle, FiCheck } from 'react-icons/fi';
+export const metadata: Metadata = {
+  title: "Role Management | AgendaIQ",
+  description: "Manage user roles and organizational hierarchy"
+};
 
-interface User {
-  id: string;
-  name: string | null;
-  email: string;
-  Staff: {
-    id: string;
-    Role: {
-      id: string;
-      title: string;
-    };
-    Department: {
-      id: string;
-      name: string;
-    };
-  }[];
-}
-
-interface Role {
-  id: string;
-  title: string;
-}
-
-export default function RoleManagementPage() {
-  const router = useRouter();
-  const { data: session } = useSession();
-  const [users, setUsers] = useState<User[]>([]);
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch users
-        const usersResponse = await fetch('/api/users');
-        const usersData = await usersResponse.json();
-
-        if (!usersResponse.ok) {
-          throw new Error(usersData.error || 'Failed to fetch users');
-        }
-
-        setUsers(usersData);
-
-        // Fetch roles
-        const rolesResponse = await fetch('/api/roles');
-        const rolesData = await rolesResponse.json();
-
-        if (!rolesResponse.ok) {
-          throw new Error(rolesData.error || 'Failed to fetch roles');
-        }
-
-        setRoles(rolesData.roles || []);
-      } catch (error) {
-        setError(error instanceof Error ? error.message : 'Failed to load data');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleRoleChange = async (userId: string, newRoleId: string) => {
-    try {
-      const response = await fetch(`/api/users/${userId}/role`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ roleId: newRoleId }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to update user role');
-      }
-
-      // Update the user in the local state
-      const updatedRole = roles.find(role => role.id === newRoleId);
-      if (updatedRole) {
-        setUsers(users.map(user => 
-          user.id === userId ? { 
-            ...user, 
-            Staff: user.Staff.map(staff => ({
-              ...staff,
-              Role: updatedRole
-            }))
-          } : user
-        ));
-      }
-      
-      setSuccess('User role updated successfully');
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to update user role');
-      setTimeout(() => setError(''), 3000);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
+export default async function RolePage() {
+  const user = await requireAuth(AuthPresets.requireAuth);
 
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div className="space-y-6">
+      {/* Header */}
       <div className="md:flex md:items-center md:justify-between">
         <div className="min-w-0 flex-1">
           <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
             Role Management
           </h2>
           <p className="mt-1 text-sm text-gray-500">
-            Manage user roles and permissions
+            Manage user roles, organizational hierarchy, and permissions across your institution
           </p>
         </div>
       </div>
 
-      <div className="mt-8">
-        {error && (
-          <div className="mb-4 rounded-md bg-red-50 p-4">
-            <div className="flex">
+      {/* Quick Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
               <div className="flex-shrink-0">
-                <FiAlertCircle className="h-5 w-5 text-red-400" />
+                <FiUsers className="h-6 w-6 text-gray-400" />
               </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">{error}</h3>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Total Roles
+                  </dt>
+                  <dd className="text-lg font-medium text-gray-900">6</dd>
+                </dl>
               </div>
             </div>
           </div>
-        )}
-
-        {success && (
-          <div className="mb-4 rounded-md bg-green-50 p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <FiCheck className="h-5 w-5 text-green-400" />
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-green-800">{success}</h3>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="overflow-hidden bg-white shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-          <table className="min-w-full divide-y divide-gray-300">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                  Name
-                </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                  Email
-                </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                  Department
-                </th>
-                <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                  Role
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 bg-white">
-              {users.map((user) => {
-                // Get the first staff record (users should have at least one)
-                const staff = user.Staff?.[0];
-                
-                return (
-                  <tr key={user.id}>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                      {user.name || 'N/A'}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {user.email}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {staff?.Department?.name || 'N/A'}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {staff ? (
-                        <select
-                          value={staff.Role.id}
-                          onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                          className="mt-1 block w-full rounded-md border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                        >
-                          {roles.map((role) => (
-                            <option key={role.id} value={role.id}>
-                              {role.title}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <span className="text-muted-foreground">No staff record</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
         </div>
+
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <FiUserCheck className="h-6 w-6 text-blue-400" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Leadership Roles
+                  </dt>
+                  <dd className="text-lg font-medium text-gray-900">4</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <FiUsers className="h-6 w-6 text-green-400" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Total Staff
+                  </dt>
+                  <dd className="text-lg font-medium text-gray-900">12</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white overflow-hidden shadow rounded-lg">
+          <div className="p-5">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <FiSettings className="h-6 w-6 text-purple-400" />
+              </div>
+              <div className="ml-5 w-0 flex-1">
+                <dl>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Departments
+                  </dt>
+                  <dd className="text-lg font-medium text-gray-900">4</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Action Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Hierarchy Overview */}
+        <Link 
+          href="/dashboard/settings/role-hierarchy"
+          className="block group"
+        >
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                  <FiTrendingUp className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                  Role Hierarchy
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  View and manage organizational hierarchy structure
+                </p>
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* Visualization */}
+        <Link 
+          href="/dashboard/settings/role-hierarchy/visualization"
+          className="block group"
+        >
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                  <FiEye className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-medium text-gray-900 group-hover:text-green-600 transition-colors">
+                  Hierarchy Visualization
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Interactive tree view of role relationships
+                </p>
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* Management */}
+        <Link 
+          href="/dashboard/settings/role-hierarchy/management"
+          className="block group"
+        >
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                  <FiEdit3 className="w-6 h-6 text-purple-600" />
+                </div>
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-medium text-gray-900 group-hover:text-purple-600 transition-colors">
+                  Role Management
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Create, edit, and manage roles
+                </p>
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* User Assignment */}
+        <Link 
+          href="/dashboard/settings/role-hierarchy/user-assignment"
+          className="block group"
+        >
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+                  <FiUserCheck className="w-6 h-6 text-orange-600" />
+                </div>
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-medium text-gray-900 group-hover:text-orange-600 transition-colors">
+                  User Assignment
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Assign users to roles and departments
+                </p>
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* Permissions */}
+        <Link 
+          href="/dashboard/settings/permissions"
+          className="block group"
+        >
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                  <FiUserCheck className="w-6 h-6 text-red-600" />
+                </div>
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-medium text-gray-900 group-hover:text-red-600 transition-colors">
+                  Permissions
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Configure role-based permissions
+                </p>
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* User Management */}
+        <Link 
+          href="/dashboard/settings/users"
+          className="block group"
+        >
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
+                  <FiUsers className="w-6 h-6 text-indigo-600" />
+                </div>
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">
+                  User Management
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Manage user accounts and profiles
+                </p>
+              </div>
+            </div>
+          </div>
+        </Link>
+      </div>
+
+      {/* Current Role Management Component */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Quick Role Management
+        </h3>
+        <RoleManagement />
       </div>
     </div>
   );
