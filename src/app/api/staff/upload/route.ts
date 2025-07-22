@@ -390,6 +390,13 @@ export async function POST(request: NextRequest) {
       const selectedRowsStr = formData.get('selectedRows') as string;
       const selectedRows = selectedRowsStr ? JSON.parse(selectedRowsStr) : [];
       
+      // Get actions and selected changes if provided
+      const actionsStr = formData.get('actions') as string;
+      const actions = actionsStr ? JSON.parse(actionsStr) : {};
+      
+      const selectedChangesStr = formData.get('selectedChanges') as string;
+      const selectedChanges = selectedChangesStr ? JSON.parse(selectedChangesStr) : {};
+      
       // Filter only selected and valid records
       let recordsToUpload = validRecords;
       if (selectedRows.length > 0) {

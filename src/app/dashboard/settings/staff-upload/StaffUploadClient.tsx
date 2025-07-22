@@ -56,8 +56,9 @@ export default function StaffUploadClient() {
   const [previewSummary, setPreviewSummary] = useState<PreviewSummary | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [showPreview, setShowPreview] = useState(false);
-  const [selectedRecords, setSelectedRecords] = useState<Set<number>>(new Set());
+  const [selectedRecords, setSelectedRecords] = new Set());
   const [recordActions, setRecordActions] = useState<Map<number, string>>(new Map());
+  const [selectedChanges, setSelectedChanges] = useState<Map<number, Set<string>>>(new Map());
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -147,6 +148,7 @@ export default function StaffUploadClient() {
       formData.append('action', 'upload');
       formData.append('selectedRows', JSON.stringify(Array.from(selectedRecords)));
       formData.append('actions', JSON.stringify(Object.fromEntries(recordActions)));
+      formData.append('selectedChanges', JSON.stringify(Object.fromEntries(selectedChanges.entries())));
 
       const response = await fetch('/api/staff/upload', {
         method: 'POST',
@@ -201,6 +203,33 @@ export default function StaffUploadClient() {
     const newActions = new Map(recordActions);
     newActions.set(rowNumber, action);
     setRecordActions(newActions);
+  };
+
+  const handleSelectChanges = (rowNumber: number, record: ProcessedRecord) => {
+    if (record.conflicts.length === 0) return;
+    
+    // Initialize with all changes selected
+    const newSelectedChanges = new Map(selectedChanges);
+    const allChanges = new Set(record.conflicts.map(c => c.field));
+    newSelectedChanges.set(rowNumber, allChanges);
+    setSelectedChanges(newSelectedChanges);
+    
+    // Show modal or inline editor - for now just set action to partial
+    setRecordAction(rowNumber, 'partial');
+  };
+
+  const toggleChangeSelection = (rowNumber: number, field: string) => {
+    const newSelectedChanges = new Map(selectedChanges);
+    const currentChanges = newSelectedChanges.get(rowNumber) || new Set();
+    
+    if (currentChanges.has(field)) {
+      currentChanges.delete(field);
+    } else {
+      currentChanges.add(field);
+    }
+    
+    newSelectedChanges.set(rowNumber, currentChanges);
+    setSelectedChanges(newSelectedChanges);
   };
 
   const downloadTemplate = () => {
@@ -544,18 +573,47 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           {record.actions.length > 0 && (
-                            <select
-                              value={recordActions.get(record.rowNumber) || record.actions[0]?.id || ''}
-                              onChange={(e) => setRecordAction(record.rowNumber, e.target.value)}
-                              className="text-xs border border-gray-300 rounded px-2 py-1"
-                              disabled={!record.canUpload}
-                            >
-                              {record.actions.map((action) => (
-                                <option key={action.id} value={action.id}>
-                                  {action.label}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="space-y-2">
+                              <select
+                                value={recordActions.get(record.rowNumber) || record.actions[0]?.id || ''}
+                                onChange={(e) => {
+                                  const action = e.target.value;
+                                  if (action === 'partial') {
+                                    handleSelectChanges(record.rowNumber, record);
+                                  } else {
+                                    setRecordAction(record.rowNumber, action);
+                                  }
+                                }}
+                                className="text-xs border border-gray-300 rounded px-2 py-1 w-full"
+                                disabled={!record.canUpload}
+                              >
+                                {record.actions.map((action) => (
+                                  <option key={action.id} value={action.id}>
+                                    {action.label}
+                                  </option>
+                                ))}
+                              </select>
+                              
+                              {/* Show change selection when partial is selected */}
+                              {recordActions.get(record.rowNumber) === 'partial' && record.conflicts.length > 0 && (
+                                <div className="bg-gray-50 p-2 rounded text-xs space-y-1">
+                                  <div className="font-medium text-gray-700">Select changes to apply:</div>
+                                  {record.conflicts.map((conflict) => (
+                                    <label key={conflict.field} className="flex items-center space-x-2">
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedChanges.get(record.rowNumber)?.has(conflict.field) || false}
+                                        onChange={() => toggleChangeSelection(record.rowNumber, conflict.field)}
+                                        className="h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                      />
+                                      <span className="text-gray-600">
+                                        {conflict.field}: {conflict.existing} → {conflict.new}
+                                      </span>
+                                    </label>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
                           )}
                         </td>
                       </tr>
