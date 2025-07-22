@@ -66,47 +66,12 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
     setExpandedRoles(newExpanded);
   };
 
-  const renderStaffList = (staff: Role['Staff'], isInline: boolean = false) => {
-    if (!staff || staff.length === 0) return null;
-
-    if (isInline && staff.length === 1) {
-      // For single staff member, show inline with role title
-      return (
-        <span className="text-sm font-medium text-blue-700 ml-2">
-          ({staff[0].User.name})
-        </span>
-      );
-    }
-
-    if (isInline && staff.length <= 3) {
-      // For few staff members, show inline
-      return (
-        <span className="text-sm text-blue-600 ml-2">
-          ({staff.map(s => s.User.name).join(', ')})
-        </span>
-      );
-    }
-
-    // For many staff members or when not inline, show as list
-    return (
-      <div className="mt-2 ml-8 space-y-1 border-l border-gray-200 ml-[120px] pl-12">
-        {staff.map((staffMember, index) => (
-          <div key={staffMember.id} className="flex items-center text-sm text-gray-600">
-            <FiUserCheck className="h-3 w-3 mr-2 text-green-500" />
-            <span className="font-medium">{staffMember.User.name}</span>
-            <span className="text-gray-400 ml-2">({staffMember.User.email})</span>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   const renderRole = (role: Role, depth = 0) => {
     const hasChildren = role.Children && role.Children.length > 0;
+    const hasStaff = role.Staff && role.Staff.length > 0;
     const isExpanded = expandedRoles.has(role.id);
     const staffCount = role.Staff?.length || 0;
-    const isBottomLevel = !hasChildren && role.level >= 4; // Level 4+ without children are bottom level
-
+    
     return (
       <div key={role.id} className="role-item">
         <div 
@@ -117,7 +82,7 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
           onClick={() => onRoleSelect?.(role)}
         >
           <div className="flex items-center flex-1">
-            {hasChildren ? (
+            {(hasChildren || hasStaff) ? (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -145,9 +110,12 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
               <div className="flex-1">
                 <div className="flex items-center">
                   <span className="font-medium text-gray-900">{role.title}</span>
-                  {/* Show staff names inline for leadership roles or single staff */}
-                  {(role.is_leadership || (!hasChildren && staffCount <= 3)) && 
-                    renderStaffList(role.Staff, true)}
+                  {/* Show staff count as badge */}
+                  {staffCount > 0 && (
+                    <span className="ml-2 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                      {staffCount} staff
+                    </span>
+                  )}
                 </div>
                 
                 <div className="text-sm text-gray-500 flex items-center gap-2 mt-1">
@@ -160,30 +128,34 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
                   }`}>
                     {role.category}
                   </span>
-                  {staffCount > 0 && (
-                    <>
-                      <span>•</span>
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                        {staffCount} staff
-                      </span>
-                    </>
-                  )}
+                  <span>•</span>
+                  <span className="text-xs">Level {role.level}</span>
                 </div>
-              </div>
-              
-              <div className="text-xs text-gray-400 ml-2">
-                Level {role.level}
               </div>
             </div>
           </div>
         </div>
         
-        {/* Show staff list for bottom level roles with many staff */}
-        {isBottomLevel && staffCount > 3 && renderStaffList(role.Staff, false)}
-        
+        {/* Show children roles when expanded */}
         {hasChildren && isExpanded && (
           <div className="mt-1">
             {role.Children!.map(childRole => renderRole(childRole, depth + 1))}
+          </div>
+        )}
+        
+        {/* Show staff list when expanded and no children (bottom level) */}
+        {hasStaff && isExpanded && !hasChildren && (
+          <div className="mt-2 ml-8 space-y-1" style={{ marginLeft: `${(depth + 1) * 20 + 40}px` }}>
+            <div className="text-xs font-medium text-gray-700 uppercase tracking-wider mb-2">
+              Staff Members ({staffCount})
+            </div>
+            {role.Staff!.map((staffMember) => (
+              <div key={staffMember.id} className="flex items-center text-sm text-gray-600 py-1 px-3 bg-gray-50 rounded">
+                <FiUserCheck className="h-3 w-3 mr-2 text-green-500" />
+                <span className="font-medium">{staffMember.User.name || 'No Name'}</span>
+                <span className="text-gray-400 ml-2">({staffMember.User.email})</span>
+              </div>
+            ))}
           </div>
         )}
       </div>
