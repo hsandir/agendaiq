@@ -1,93 +1,76 @@
 import { NextRequest, NextResponse } from "next/server";
-import { APIAuthPatterns } from '@/lib/auth/api-auth';
-import { AuthenticatedUser } from '@/lib/auth/auth-utils';
+import { withAuth } from "@/lib/auth/api-auth";
 
-// POST /api/system/migrate-auth - Run auth system migration
-export const POST = APIAuthPatterns.adminOnly(async (request: NextRequest, user: AuthenticatedUser) => {
+// GET /api/system/migrate-auth - SAFE migration status (report only)
+export async function GET(request: NextRequest) {
   try {
-    const { action, dryRun } = await request.json();
+    // REQUIRED: Auth check - only admins can access migration info
+    const authResult = await withAuth(request, { requireAdminRole: true });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+    }
 
-    // Import migration system dynamically
-    const { AuthMigrationEngine } = await import('@/lib/migration/auth-migration-system');
-    const migrationEngine = new AuthMigrationEngine();
+    const { searchParams } = new URL(request.url);
+    const action = searchParams.get('action') || 'status';
 
     switch (action) {
-      case 'preview':
-        const previewChanges = await migrationEngine.previewChanges();
+      case 'status':
         return NextResponse.json({
-          success: true,
-          action: 'preview',
-          changes: previewChanges,
-          timestamp: new Date().toISOString()
+          migration: {
+            status: 'disabled',
+            message: 'Auto-migration disabled for safety',
+            recommendation: 'Use templates for new files'
+          },
+          templates: {
+            available: true,
+            location: 'templates/cursor-templates/',
+            usage: 'Copy template content and modify placeholders'
+          },
+          authSystem: {
+            status: 'active',
+            patterns: {
+              serverComponents: 'requireAuth(AuthPresets.*)',
+              clientComponents: 'useSession() + useRouter()',
+              apiRoutes: 'withAuth(request, {...})'
+            }
+          }
         });
 
-      case 'migrate':
-        if (dryRun) {
-          const previewChanges = await migrationEngine.previewChanges();
-          return NextResponse.json({
-            success: true,
-            action: 'dry-run',
-            changes: previewChanges,
-            message: 'Dry run completed - no changes applied',
-            timestamp: new Date().toISOString()
-          });
-        } else {
-          const migrationReport = await migrationEngine.runMigration();
-          const detailedReport = await migrationEngine.generateDetailedReport();
-          
-          return NextResponse.json({
-            success: true,
-            action: 'migrate',
-            report: migrationReport,
-            detailedReportPath: 'MIGRATION_REPORT.md',
-            timestamp: new Date().toISOString()
-          });
-        }
-
-      case 'status':
-        // Check which files need migration
-        const { glob } = await import('glob');
-        const files = await glob('src/**/*.{ts,tsx}');
-        const status = await migrationEngine.getFileStatus(files);
-        
-        const needsMigration = Object.entries(status).filter(([_, s]) => s === 'needs_migration');
-        const upToDate = Object.entries(status).filter(([_, s]) => s === 'up_to_date');
-        
+      case 'preview':
         return NextResponse.json({
-          success: true,
-          action: 'status',
-          status: {
-            totalFiles: files.length,
-            needsMigration: needsMigration.length,
-            upToDate: upToDate.length,
-            files: {
-              needsMigration: needsMigration.map(([path]) => path),
-              upToDate: upToDate.map(([path]) => path)
-            }
-          },
-          timestamp: new Date().toISOString()
+          message: 'Migration preview disabled for safety',
+          alternative: 'Use templates in templates/cursor-templates/ directory',
+          files: [
+            'server-page-template.tsx - For dashboard/settings pages',
+            'client-page-template.tsx - For interactive pages',
+            'api-route-template.ts - For API endpoints'
+          ]
         });
 
       default:
-        return NextResponse.json(
-          { 
-            error: 'Invalid action. Use: preview, migrate, status',
-            availableActions: ['preview', 'migrate', 'status'],
-            timestamp: new Date().toISOString()
-          },
-          { status: 400 }
-        );
+        return NextResponse.json({
+          error: 'Invalid action. Available: status, preview'
+        }, { status: 400 });
     }
 
   } catch (error) {
-    console.error('Auth migration error:', error);
-    return NextResponse.json(
-      { 
-        error: 'Migration failed',
-        details: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
-      },
-      { status: 500 }
-    );
+    console.error('Migration API Error:', error);
+    return NextResponse.json({
+      error: 'Internal server error',
+      timestamp: new Date().toISOString()
+    }, { status: 500 });
   }
-}); 
+}
+
+// POST /api/system/migrate-auth - DISABLED for safety
+export async function POST(request: NextRequest) {
+  return NextResponse.json({
+    error: 'Migration operations disabled for safety',
+    message: 'Use templates in templates/cursor-templates/ directory instead',
+    templates: {
+      server: 'server-page-template.tsx',
+      client: 'client-page-template.tsx', 
+      api: 'api-route-template.ts'
+    }
+  }, { status: 405 });
+} 

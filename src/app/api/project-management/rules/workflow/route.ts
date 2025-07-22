@@ -1,51 +1,64 @@
 import { NextRequest, NextResponse } from "next/server";
-import { APIAuthPatterns } from '@/lib/auth/api-auth';
-import { AuthenticatedUser } from '@/lib/auth/auth-utils';
-import { WorkflowEngine } from '@/lib/project-management/auto-workflow-full';
+import { withAuth } from '@/lib/auth/api-auth';
+// DISABLED: Workflow engine to prevent corruption
+// import { WorkflowEngine } from '@/lib/project-management/auto-workflow-full';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-// PUT /api/project-management/rules/workflow - Control workflow engine
-export const PUT = APIAuthPatterns.adminOnly(async (request: NextRequest, user: AuthenticatedUser) => {
+// PUT /api/project-management/rules/workflow - SAFE workflow control (status only)
+export async function PUT(request: NextRequest) {
   try {
+    // REQUIRED: Auth check - only admins can control workflow
+    const authResult = await withAuth(request, { requireAdminRole: true });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+    }
+
+    const user = authResult.user!;
     const body = await request.json();
     const { action, ruleId, enabled } = body;
     
-    const workflowEngine = WorkflowEngine.getInstance();
+    // DISABLED: Workflow engine operations to prevent file corruption
+    // const workflowEngine = WorkflowEngine.getInstance();
     
     switch (action) {
       case 'start':
-        await workflowEngine.startWatching(process.cwd(), user);
-        
-        // Auto-commit after workflow start
-        try {
-          await execAsync('git add . && git commit -m "auto: workflow engine started - monitoring file changes" || true');
-          console.log('✅ Auto-committed workflow start');
-        } catch (error) {
-          console.warn('Auto-commit failed:', error);
-        }
-        
+        // DISABLED: Starting workflow engine
         return NextResponse.json({ 
-          message: 'Workflow engine started',
-          timestamp: new Date().toISOString()
+          message: 'Workflow engine disabled for safety - templates available in templates/cursor-templates/',
+          status: 'disabled',
+          reason: 'File corruption prevention',
+          templates: [
+            'server-page-template.tsx',
+            'client-page-template.tsx', 
+            'api-route-template.ts'
+          ]
         });
         
       case 'stop':
-        await workflowEngine.stopWatching();
-        
-        // Auto-commit after workflow stop
-        try {
-          await execAsync('git add . && git commit -m "auto: workflow engine stopped - file monitoring disabled" || true');
-          console.log('✅ Auto-committed workflow stop');
-        } catch (error) {
-          console.warn('Auto-commit failed:', error);
-        }
-        
+        // DISABLED: Stopping workflow engine  
         return NextResponse.json({ 
-          message: 'Workflow engine stopped',
-          timestamp: new Date().toISOString()
+          message: 'Workflow engine already disabled',
+          status: 'disabled'
+        });
+        
+      case 'status':
+        return NextResponse.json({
+          isWatching: false,
+          status: 'disabled',
+          message: 'Workflow engine disabled for safety',
+          templates: {
+            available: true,
+            location: 'templates/cursor-templates/',
+            files: [
+              'server-page-template.tsx',
+              'client-page-template.tsx', 
+              'api-route-template.ts',
+              'README.md'
+            ]
+          }
         });
         
       case 'toggle_rule':
@@ -55,18 +68,18 @@ export const PUT = APIAuthPatterns.adminOnly(async (request: NextRequest, user: 
             { status: 400 }
           );
         }
-        workflowEngine.setRuleEnabled(ruleId, enabled);
+        // DISABLED: workflowEngine.setRuleEnabled(ruleId, enabled);
         
         // Auto-commit rule changes
         try {
-          await execAsync(`git add . && git commit -m "auto: ${enabled ? 'enabled' : 'disabled'} workflow rule ${ruleId}" || true`);
-          console.log(`✅ Auto-committed rule ${enabled ? 'enable' : 'disable'}`);
+          // DISABLED: execAsync(`git add . && git commit -m "auto: ${enabled ? 'enabled' : 'disabled'} workflow rule ${ruleId}" || true`);
+          console.log(`✅ Auto-committed rule ${enabled ? 'enable' : 'disable'} (disabled)`);
         } catch (error) {
           console.warn('Auto-commit failed:', error);
         }
         
         return NextResponse.json({ 
-          message: `Rule ${ruleId} ${enabled ? 'enabled' : 'disabled'}`,
+          message: `Rule ${ruleId} ${enabled ? 'enabled' : 'disabled'} (disabled)`,
           timestamp: new Date().toISOString()
         });
         
@@ -77,19 +90,19 @@ export const PUT = APIAuthPatterns.adminOnly(async (request: NextRequest, user: 
             { status: 400 }
           );
         }
-        const execution = await workflowEngine.triggerRule(ruleId, undefined, user);
+        // DISABLED: const execution = await workflowEngine.triggerRule(ruleId, undefined, user);
         
         // Auto-commit after rule execution
         try {
-          await execAsync(`git add . && git commit -m "auto: executed workflow rule ${ruleId} - applied fixes" || true`);
-          console.log('✅ Auto-committed rule execution');
+          // DISABLED: execAsync(`git add . && git commit -m "auto: executed workflow rule ${ruleId} - applied fixes" || true`);
+          console.log('✅ Auto-committed rule execution (disabled)');
         } catch (error) {
           console.warn('Auto-commit failed:', error);
         }
         
         return NextResponse.json({
-          message: `Rule ${ruleId} triggered`,
-          execution,
+          message: `Rule ${ruleId} triggered (disabled)`,
+          // execution,
           timestamp: new Date().toISOString()
         });
         

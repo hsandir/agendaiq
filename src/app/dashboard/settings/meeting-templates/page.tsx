@@ -8,8 +8,7 @@ import { prisma } from "@/lib/prisma";
 export default async function MeetingTemplatesSettings() {
   const user = await requireAuth(AuthPresets.requireAuth);
 
-  // Check if user is admin
-  const user = await prisma.user.findUnique({
+  const userDetails = await prisma.user.findUnique({
     where: { email: user.email },
     include: { 
       staff: {
@@ -20,7 +19,7 @@ export default async function MeetingTemplatesSettings() {
     }
   });
 
-  if (!user || user.staff?.[0]?.role?.title !== "Administrator") {
+  if (!userDetails || userDetails.staff?.[0]?.role?.title !== "Administrator") {
     redirect("/dashboard");
   }
 

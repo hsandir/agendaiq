@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default async function SystemSettingsPage() {
   const user = await requireAuth(AuthPresets.requireAuth);
 
-  const user = await prisma.user.findUnique({
+  const userDetails = await prisma.user.findUnique({
     where: { email: user.email },
     include: { 
       Staff: {

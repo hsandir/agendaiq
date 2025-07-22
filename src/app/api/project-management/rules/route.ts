@@ -1,48 +1,70 @@
 import { NextRequest, NextResponse } from "next/server";
-import { APIAuthPatterns } from '@/lib/auth/api-auth';
-import { AuthenticatedUser } from '@/lib/auth/auth-utils';
-import { RuleEngine } from '@/lib/project-management/rule-engine-full';
-import { WorkflowEngine } from '@/lib/project-management/auto-workflow-full';
+import { withAuth } from "@/lib/auth/api-auth";
 
-// GET /api/project-management/rules - Get all rules and validation status
-export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {
+// GET /api/project-management/rules - SAFE: Status and template info only
+export async function GET(request: NextRequest) {
   try {
-    const ruleEngine = RuleEngine.getInstance();
-    const workflowEngine = WorkflowEngine.getInstance();
-    
-    // Get validation status
-    const validationStatus = await ruleEngine.getValidationStatus(user);
-    
-    // Get workflow health
-    const workflowHealth = workflowEngine.getHealthStatus();
-    
-    // Get recent executions
-    const recentExecutions = workflowEngine.getRecentExecutions(10);
-    
+    // REQUIRED: Auth check - only admins can access project management
+    const authResult = await withAuth(request, { requireAdminRole: true });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+    }
+
+    // SAFE: Return status and template information only
     return NextResponse.json({
-      validationStatus,
-      workflowHealth,
-      recentExecutions,
-      rules: ruleEngine.getAllRules().map(rule => ({
-        id: rule.id,
-        name: rule.name,
-        category: rule.category,
-        priority: rule.priority,
-        enforced: rule.enforced,
-        autoFix: rule.autoFix
-      })),
-      timestamp: new Date().toISOString()
-    });
-    
-  } catch (error) {
-    console.error('Error getting project management rules:', error);
-    return NextResponse.json(
-      { 
-        error: 'Failed to get rules status',
-        details: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
+      status: 'safe_mode',
+      message: 'Project management in safe mode - templates available',
+      workflow: {
+        enabled: false,
+        reason: 'Disabled for file corruption prevention'
       },
-      { status: 500 }
-    );
+      migration: {
+        enabled: false,
+        reason: 'Disabled for safety - use templates instead'
+      },
+      templates: {
+        location: 'templates/cursor-templates/',
+        available: [
+          'server-page-template.tsx',
+          'client-page-template.tsx', 
+          'api-route-template.ts',
+          'README.md'
+        ],
+        usage: 'Copy template content and modify placeholders'
+      },
+      rules: {
+        authStructure: 'enforced',
+        variableNaming: 'enforced',
+        templateUsage: 'required'
+      }
+    });
+
+  } catch (error) {
+    console.error('Project Management API Error:', error);
+    return NextResponse.json({
+      error: 'Internal server error',
+      timestamp: new Date().toISOString()
+    }, { status: 500 });
   }
-}); 
+}
+
+// POST /api/project-management/rules - DISABLED for safety
+export async function POST(request: NextRequest) {
+  return NextResponse.json({
+    error: 'Project management modifications disabled for safety',
+    message: 'Use templates in templates/cursor-templates/ directory',
+    templates: {
+      server: 'server-page-template.tsx',
+      client: 'client-page-template.tsx', 
+      api: 'api-route-template.ts'
+    }
+  }, { status: 405 });
+}
+
+// PUT /api/project-management/rules - DISABLED for safety
+export async function PUT(request: NextRequest) {
+  return NextResponse.json({
+    error: 'Project management modifications disabled for safety',
+    message: 'Use templates in templates/cursor-templates/ directory'
+  }, { status: 405 });
+} 

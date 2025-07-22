@@ -3,6 +3,40 @@
 ## PROJECT OVERVIEW
 AgendaIQ is a comprehensive meeting and agenda management system for Turkish educational institutions with hierarchical role-based access control.
 
+## 🎯 CURSOR TEMPLATE SYSTEM
+
+### CRITICAL: Always Use Templates
+When creating ANY new file, you MUST use the appropriate template from `templates/cursor-templates/`:
+
+#### 1. Server Components (Dashboard/Settings Pages)
+```typescript
+// Use: templates/cursor-templates/server-page-template.tsx
+// Replace: PAGE_NAME, PAGE_TITLE, PAGE_DESCRIPTION
+// Modify: Auth preset as needed
+```
+
+#### 2. Client Components (Interactive Pages)
+```typescript
+// Use: templates/cursor-templates/client-page-template.tsx  
+// Replace: PAGE_NAME, PAGE_TITLE, PAGE_DESCRIPTION
+// Modify: Admin check as needed
+```
+
+#### 3. API Routes (All Endpoints)
+```typescript
+// Use: templates/cursor-templates/api-route-template.ts
+// Replace: MODEL_NAME, REQUIRED_FIELD
+// Modify: Auth requirements as needed
+// Remove: Unused HTTP methods
+```
+
+### Template Usage Instructions
+1. **COPY** the entire template content first
+2. **REPLACE** placeholder values (PAGE_NAME, etc.)
+3. **MODIFY** auth requirements for the specific use case
+4. **ADD** your specific functionality
+5. **NEVER** skip auth checks or use different patterns
+
 ## CORE ARCHITECTURE PRINCIPLES
 
 ### 1. AUTHENTICATION & AUTHORIZATION SYSTEM

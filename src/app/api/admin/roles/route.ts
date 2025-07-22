@@ -11,7 +11,7 @@ async function verifyAdmin() {
   }
 
   const user = await prisma.user.findUnique({
-    where: { email: user.email },
+    where: { email: session.user.email },
     include: {
       Staff: {
         include: {

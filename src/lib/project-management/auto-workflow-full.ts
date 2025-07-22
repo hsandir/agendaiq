@@ -1,6 +1,7 @@
 /**
- * FULL AUTOMATIC WORKFLOW SYSTEM
- * File watching, real-time validation ve tam otomatik fix'lerle
+ * SAFE AUTOMATIC WORKFLOW SYSTEM
+ * Template validation ve controlled code generation
+ * File modifications disabled to prevent corruption
  */
 
 import { RuleEngine } from './rule-engine-full';
@@ -10,7 +11,9 @@ import { DynamicRBAC } from '../security/dynamic-rbac-full';
 import { AuthenticatedUser } from '../auth/auth-utils';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as chokidar from 'chokidar';
+
+// DISABLED: File watching to prevent corruption
+// import * as chokidar from 'chokidar';
 
 export interface WorkflowRule {
   id: string;
@@ -24,10 +27,11 @@ export interface WorkflowRule {
   cooldownMs?: number;
   maxExecutionsPerHour?: number;
   requiredPermissions?: string[];
+  safeMode: boolean; // NEW: Force safe mode
 }
 
 export interface WorkflowTrigger {
-  type: 'file_created' | 'file_modified' | 'file_deleted' | 'git_commit' | 'manual' | 'scheduled' | 'rule_violation';
+  type: 'manual' | 'template_validation' | 'rule_check_only'; // RESTRICTED: Only safe triggers
   pattern?: string;
   excludePatterns?: string[];
   debounceMs?: number;
@@ -35,19 +39,19 @@ export interface WorkflowTrigger {
 }
 
 export interface WorkflowCondition {
-  type: 'file_extension' | 'file_content' | 'file_size' | 'git_status' | 'rule_violation' | 'time_condition' | 'user_permission';
-  operator: 'equals' | 'contains' | 'not_contains' | 'greater_than' | 'less_than' | 'matches_regex';
+  type: 'file_extension' | 'file_content' | 'template_compliance' | 'auth_structure'; // SAFE CONDITIONS ONLY
+  operator: 'equals' | 'contains' | 'not_contains' | 'matches_regex';
   value: any;
   description: string;
 }
 
 export interface WorkflowAction {
-  type: 'validate_rules' | 'auto_fix' | 'generate_code' | 'create_task' | 'run_command' | 'notify' | 'git_commit' | 'backup_file';
+  type: 'validate_template' | 'check_auth' | 'report_only' | 'suggest_fix'; // SAFE ACTIONS ONLY  
   parameters: Record<string, any>;
   description: string;
   async: boolean;
-  requiresConfirmation?: boolean;
-  rollbackEnabled?: boolean;
+  requiresConfirmation: boolean; // ALWAYS REQUIRED
+  rollbackEnabled: boolean; // ALWAYS ENABLED
 }
 
 export interface WorkflowExecution {
@@ -358,7 +362,8 @@ export class WorkflowEngine {
   private codeGenerator: CodeGenerator;
   private projectTracker: ProjectTracker;
   private rbac: DynamicRBAC;
-  private watcher?: chokidar.FSWatcher;
+  // DISABLED: File watching to prevent corruption
+  // private watcher?: chokidar.FSWatcher;
   private isWatching = false;
   private pendingActions = new Map<string, NodeJS.Timeout>();
   private scheduledJobs = new Map<string, NodeJS.Timeout>();
@@ -399,176 +404,27 @@ export class WorkflowEngine {
     });
   }
 
-  // Start comprehensive file watching with enhanced features
-  async startWatching(projectRoot: string = process.cwd(), user?: AuthenticatedUser): Promise<void> {
-    if (this.isWatching) {
-      return;
-    }
-
-    console.log('🔄 Starting enhanced workflow engine file watcher...');
-
-    // Check permissions if user provided
-    if (user && !(await this.rbac.hasPermission(user, 'workflow_management', 'execute'))) {
-      throw new Error('Insufficient permissions to start workflow engine');
-    }
-
-    this.watcher = chokidar.watch([
-      'src/**/*.ts',
-      'src/**/*.tsx',
-      'src/**/*.js',
-      'src/**/*.jsx'
-    ], {
-      ignored: [
-        // Node modules and build artifacts
-        '**/node_modules/**',
-        '**/.next/**',
-        '**/dist/**',
-        '**/build/**',
-        '**/.git/**',
-        '**/coverage/**',
-        
-        // Large dependency folders that shouldn't be watched
-        '**/date-fns/**',
-        '**/react/**',
-        '**/next/**',
-        '**/typescript/**',
-        
-        // Backup and cache files
-        '**/*.backup.*',
-        '**/*.cache.*',
-        '**/.cache/**',
-        '**/tmp/**',
-        '**/temp/**',
-        
-        // Lock files and logs
-        '**/package-lock.json',
-        '**/yarn.lock',
-        '**/*.log',
-        '**/logs/**',
-        
-        // Development files
-        '**/.env*',
-        '**/.DS_Store',
-        '**/Thumbs.db',
-        
-        // Generated files
-        '**/*.d.ts',
-        '**/*.map',
-        '**/*.min.*'
-      ],
-      ignoreInitial: true,
-      persistent: true,
-      atomic: 200, // Increased stabilization time
-      awaitWriteFinish: {
-        stabilityThreshold: 300, // Increased stability threshold
-        pollInterval: 100
-      },
-      // Reduce polling frequency to prevent EMFILE
-      usePolling: false,
-      interval: 1000,
-      binaryInterval: 1000,
-      // Limit file watcher depth
-      depth: 10,
-      // Follow symlinks carefully
-      followSymlinks: false,
-      // Don't watch too many files at once
-      alwaysStat: false,
-      ignorePermissionErrors: true
-    });
-
-    // File created
-    this.watcher.on('add', (filePath) => {
-      this.handleFileEvent('file_created', filePath, user);
-    });
-
-    // File modified
-    this.watcher.on('change', (filePath) => {
-      this.handleFileEvent('file_modified', filePath, user);
-    });
-
-    // File deleted
-    this.watcher.on('unlink', (filePath) => {
-      this.handleFileEvent('file_deleted', filePath, user);
-    });
-
-    // Error handling - don't crash on EMFILE
-    this.watcher.on('error', (error) => {
-      console.error('File watcher error:', error);
-      
-      // If EMFILE error, try to restart with more conservative settings
-      if (error instanceof Error && (error as any).code === 'EMFILE') {
-        console.warn('⚠️  Too many open files detected, restarting watcher with conservative settings...');
-        this.stopWatching();
-        
-        // Restart with minimal watching after a delay
-        setTimeout(() => {
-          this.startMinimalWatching(projectRoot, user);
-        }, 2000);
-      }
-    });
-
-    this.isWatching = true;
+  // Start file watching and workflow automation - DISABLED FOR SAFETY
+  async startWatching(projectRoot: string, user: AuthenticatedUser): Promise<void> {
+    console.log('⚠️  Workflow engine startWatching() called but DISABLED for safety');
+    console.log('📁 Templates available at: templates/cursor-templates/');
+    console.log('📖 Usage guide: templates/cursor-templates/README.md');
     
-    // Start scheduled jobs
-    this.startScheduledJobs(user);
+    // DISABLED: All file watching and auto-modification disabled
+    // Original file watching code commented out for safety
     
-    console.log('✅ Enhanced workflow engine is now watching for file changes');
+    this.isWatching = false; // Always false for safety
+    console.log('✅ Workflow engine safely disabled - use templates instead');
   }
 
-  // Minimal watching mode for resource-constrained environments
-  private async startMinimalWatching(projectRoot: string, user?: AuthenticatedUser): Promise<void> {
-    if (this.isWatching) {
-      return;
-    }
-
-    console.log('🔄 Starting minimal workflow engine file watcher...');
-
-    this.watcher = chokidar.watch([
-      'src/lib/**/*.ts',
-      'src/app/**/*.ts',
-      'src/components/**/*.tsx'
-    ], {
-      ignored: [
-        '**/node_modules/**',
-        '**/.next/**',
-        '**/dist/**',
-        '**/.git/**',
-        '**/*.backup.*',
-        '**/*.d.ts'
-      ],
-      ignoreInitial: true,
-      persistent: true,
-      atomic: 500,
-      awaitWriteFinish: {
-        stabilityThreshold: 500,
-        pollInterval: 200
-      },
-      usePolling: true, // Use polling to reduce file handles
-      interval: 2000,   // Poll every 2 seconds
-      depth: 5,         // Reduced depth
-      followSymlinks: false,
-      alwaysStat: false,
-      ignorePermissionErrors: true
-    });
-
-    // Only handle critical events in minimal mode
-    this.watcher.on('change', (filePath) => {
-      if (filePath.includes('auth') || filePath.includes('security') || filePath.includes('rbac')) {
-        this.handleFileEvent('file_modified', filePath, user);
-      }
-    });
-
-    this.watcher.on('error', (error) => {
-      console.error('Minimal file watcher error:', error);
-      // If still failing, disable file watching completely
-      if (error instanceof Error && (error as any).code === 'EMFILE') {
-        console.warn('❌ File watching disabled due to system limitations');
-        this.stopWatching();
-      }
-    });
-
-    this.isWatching = true;
-    console.log('✅ Minimal workflow engine is now watching critical files');
+  // Start minimal file watching - DISABLED FOR SAFETY  
+  private async startMinimalWatching(projectRoot: string, user: AuthenticatedUser): Promise<void> {
+    console.log('⚠️  Minimal workflow engine called but DISABLED for safety');
+    console.log('🛡️  File modification disabled to prevent corruption');
+    
+    // DISABLED: All file watching disabled
+    this.isWatching = false;
+    console.log('✅ Enhanced workflow engine is safely disabled');
   }
 
   // Start scheduled jobs
@@ -604,10 +460,11 @@ export class WorkflowEngine {
 
   // Stop file watching and cleanup
   async stopWatching(): Promise<void> {
-    if (this.watcher) {
-      await this.watcher.close();
-      this.watcher = undefined;
-    }
+    // DISABLED: File watching to prevent corruption
+    // if (this.watcher) {
+    //   await this.watcher.close();
+    //   this.watcher = undefined;
+    // }
     this.isWatching = false;
     
     // Clear pending actions
