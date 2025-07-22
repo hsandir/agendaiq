@@ -1,187 +1,217 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { AuthenticatedUser } from '@/lib/auth/auth-utils';
-import { authOptions } from '@/lib/auth/auth-options';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from "@/lib/auth/api-auth";
 
-export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
+// GET Method - System alerts configuration
+export async function GET(request: NextRequest) {
+  try {
+    // REQUIRED: Auth check - Admin only for alert configuration
+    const authResult = await withAuth(request, { requireAdminRole: true });
     
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!authResult.success) {
+      return NextResponse.json(
+        { error: authResult.error }, 
+        { status: authResult.statusCode }
+      );
     }
 
-    // For now, allow all authenticated users to access alerts configuration
-    // TODO: Add proper admin role checking when role system is finalized
+    const user = authResult.user!;
 
-    // Get system alerts configuration
+    // Simple alerts configuration response
     const alertsConfig = {
       rules: [
         {
           id: "1",
           name: "Database Connection Failure",
-          description: "Alert when database connection fails or times out",
-          type: "error" as const,
-          condition: "database.connection.failed",
-          threshold: 1,
+          description: "Alert when database connection fails",
+          type: "error",
           enabled: true,
-          channels: ["email", "slack"],
-          lastTriggered: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-          triggerCount: 3
+          lastTriggered: null
         },
         {
-          id: "2",
+          id: "2", 
           name: "High Memory Usage",
-          description: "Alert when memory usage exceeds 80%",
-          type: "warning" as const,
-          condition: "system.memory.usage",
-          threshold: 80,
+          description: "Alert when server memory usage is high",
+          type: "warning",
           enabled: true,
-          channels: ["email"],
-          triggerCount: 0
-        },
-        {
-          id: "3",
-          name: "API Rate Limit Exceeded",
-          description: "Alert when API rate limits are exceeded",
-          type: "warning" as const,
-          condition: "api.ratelimit.exceeded",
-          threshold: 5,
-          enabled: true,
-          channels: ["slack"],
-          lastTriggered: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(), // 3 hours ago
-          triggerCount: 12
-        },
-        {
-          id: "4",
-          name: "Failed Login Attempts",
-          description: "Alert on multiple failed login attempts",
-          type: "warning" as const,
-          condition: "auth.failed_attempts",
-          threshold: 5,
-          enabled: false,
-          channels: ["email", "slack"],
-          triggerCount: 0
-        },
-        {
-          id: "5",
-          name: "Backup Completion",
-          description: "Notify when daily backup is completed",
-          type: "info" as const,
-          condition: "backup.completed",
-          threshold: 1,
-          enabled: true,
-          channels: ["email"],
-          lastTriggered: new Date(Date.now() - 22 * 60 * 60 * 1000).toISOString(), // 22 hours ago
-          triggerCount: 1
-        },
-        {
-          id: "6",
-          name: "System Health Degradation",
-          description: "Alert when system health status changes to degraded or critical",
-          type: "error" as const,
-          condition: "system.health.degraded",
-          threshold: 1,
-          enabled: true,
-          channels: ["email", "slack"],
-          triggerCount: 0
+          lastTriggered: null
         }
       ],
-      channels: [
-        {
-          id: "email",
-          name: "Email Notifications",
-          type: "email" as const,
-          enabled: true,
-          config: {
-            recipients: ["admin@agendaiq.com", "alerts@agendaiq.com"],
-            subject_prefix: "[AgendaIQ Alert]"
-          }
-        },
-        {
-          id: "slack",
-          name: "Slack Alerts",
-          type: "slack" as const,
-          enabled: true,
-          config: {
-            webhook_url: "https://hooks.slack.com/services/***",
-            channel: "#system-alerts",
-            username: "AgendaIQ Bot"
-          }
-        },
-        {
-          id: "webhook",
-          name: "Custom Webhook",
-          type: "webhook" as const,
-          enabled: false,
-          config: {
-            url: "https://your-webhook-url.com/alerts",
-            method: "POST"
-          }
-        },
-        {
-          id: "sms",
-          name: "SMS Alerts",
-          type: "sms" as const,
-          enabled: false,
-          config: {
-            numbers: ["+1234567890"],
-            provider: "twilio"
-          }
-        }
-      ],
-      globalSettings: {
-        enableAlerts: true,
-        quietHours: {
-          enabled: true,
-          start: "22:00",
-          end: "08:00"
-        },
-        escalation: {
-          enabled: true,
-          delay: 30
-        }
-      },
-      statistics: {
-        totalAlerts: 16,
-        alertsToday: 3,
-        activeRules: 4,
-        enabledChannels: 2
-      }
+      channels: ["email"],
+      status: "simplified"
     };
 
-    return NextResponse.json(alertsConfig);
+    return NextResponse.json({ 
+      data: alertsConfig,
+      message: "Alerts configuration retrieved" 
+    });
+
   } catch (error) {
-    console.error('Error fetching alerts configuration:', error);
+    console.error('System Alerts API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch alerts configuration' },
+      { 
+        error: "Internal server error",
+        timestamp: new Date().toISOString()
+      }, 
       { status: 500 }
     );
   }
 }
 
-export const POST = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {;
+// POST Method
+export async function POST(request: NextRequest) {
+  try {
+    // REQUIRED: Auth check
+    const authResult = await withAuth(request, { 
+      requireAuth: true,
+      // Add other requirements as needed
+    });
     
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!authResult.success) {
+      return NextResponse.json(
+        { error: authResult.error }, 
+        { status: authResult.statusCode }
+      );
     }
 
-    // For now, allow all authenticated users to save alerts configuration
-    // TODO: Add proper admin role checking when role system is finalized
+    const user = authResult.user!;
 
+    // Parse request body
     const body = await request.json();
-    
-    // Here you would typically save the configuration to database
-    // For now, we'll just return success
-    console.log('Saving alerts configuration:', body);
 
+    // REQUIRED: Input validation
+    if (!body.REQUIRED_FIELD) {
+      return NextResponse.json(
+        { error: "Required field missing" }, 
+        { status: 400 }
+      );
+    }
+
+    // Your create logic here
+    // const result = await prisma.MODEL_NAME.create({
+    //   data: {
+    //     // Your data
+    //     created_by: user.staff!.id, // If applicable
+    //   }
+    // });
+
+    // return NextResponse.json({ 
+    //   data: result,
+    //   message: "Created successfully" 
+    // }, { status: 201 });
+
+    // Placeholder for create logic
     return NextResponse.json({ 
-      success: true, 
-      message: 'Alerts configuration saved successfully' 
-    });
+      message: "Create operation not implemented" 
+    }, { status: 501 });
+
   } catch (error) {
-    console.error('Error saving alerts configuration:', error);
+    console.error('API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to save alerts configuration' },
+      { 
+        error: "Internal server error",
+        timestamp: new Date().toISOString()
+      }, 
+      { status: 500 }
+    );
+  }
+}
+
+// PUT Method
+export async function PUT(request: NextRequest) {
+  try {
+    // REQUIRED: Auth check
+    const authResult = await withAuth(request, { 
+      requireAuth: true,
+    });
+    
+    if (!authResult.success) {
+      return NextResponse.json(
+        { error: authResult.error }, 
+        { status: authResult.statusCode }
+      );
+    }
+
+    const user = authResult.user!;
+    const body = await request.json();
+
+    // Your update logic here
+    // const result = await prisma.MODEL_NAME.update({
+    //   where: { id: body.id },
+    //   data: {
+    //     // Your data
+    //     updated_by: user.staff!.id, // If applicable
+    //     updated_at: new Date(),
+    //   }
+    // });
+
+    // return NextResponse.json({ 
+    //   data: result,
+    //   message: "Updated successfully" 
+    // });
+
+    // Placeholder for update logic
+    return NextResponse.json({ 
+      message: "Update operation not implemented" 
+    }, { status: 501 });
+
+  } catch (error) {
+    console.error('API Error:', error);
+    return NextResponse.json(
+      { 
+        error: "Internal server error",
+        timestamp: new Date().toISOString()
+      }, 
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE Method
+export async function DELETE(request: NextRequest) {
+  try {
+    // REQUIRED: Auth check (usually admin only for deletes)
+    const authResult = await withAuth(request, { 
+      requireAdminRole: true,
+    });
+    
+    if (!authResult.success) {
+      return NextResponse.json(
+        { error: authResult.error }, 
+        { status: authResult.statusCode }
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID required" }, 
+        { status: 400 }
+      );
+    }
+
+    // Your delete logic here
+    // await prisma.MODEL_NAME.delete({
+    //   where: { id: parseInt(id) }
+    // });
+
+    // return NextResponse.json({ 
+    //   message: "Deleted successfully" 
+    // });
+
+    // Placeholder for delete logic
+    return NextResponse.json({ 
+      message: "Delete operation not implemented" 
+    }, { status: 501 });
+
+  } catch (error) {
+    console.error('API Error:', error);
+    return NextResponse.json(
+      { 
+        error: "Internal server error",
+        timestamp: new Date().toISOString()
+      }, 
       { status: 500 }
     );
   }

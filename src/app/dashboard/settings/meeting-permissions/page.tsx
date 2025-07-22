@@ -1,75 +1,32 @@
-import React from 'react';
-import { getServerSession } from "next-auth";
-import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils';
+import { Metadata } from "next";
+import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
 import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 
-export default async function MeetingPermissionsSettings() {
-  const user = await requireAuth(AuthPresets.requireAuth);
+export const metadata: Metadata = {
+  title: "Meeting Permissions | AgendaIQ",
+  description: "Manage meeting access permissions and role-based controls",
+};
 
-  // Check if user is admin
-  const user = await prisma.user.findUnique({
-    where: { email: user.email },
-    include: { 
-      staff: {
-        include: {
-          role: true
-        }
-      }
-    }
-  });
-
-  if (!user || user.staff?.[0]?.role?.title !== "Administrator") {
-    redirect("/dashboard");
-  }
-
+export default async function MeetingPermissionsPage() {
+  // REQUIRED: Auth check - Admin required for permission management
+  const user = await requireAuth(AuthPresets.requireAdmin);
+  
+  // REQUIRED: Your page JSX here
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Meeting Permissions & Roles</h1>
-      <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-700">
-          <strong>Admin Only:</strong> These settings control meeting permissions across the entire organization.
-        </p>
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Meeting Permissions</h1>
+        <p className="text-muted-foreground">Manage meeting access permissions and role-based controls</p>
       </div>
-      <section className="mb-6">
-        <h2 className="text-lg font-semibold mb-2">Role-based Access</h2>
-        <label className="block mb-2">Who can create meetings:
-          <select className="input input-bordered w-full">
-            <option>All Staff</option>
-            <option>Admins Only</option>
-            <option>Department Heads</option>
-          </select>
-        </label>
-        <label className="block mb-2">Who can edit meetings:
-          <select className="input input-bordered w-full">
-            <option>All Staff</option>
-            <option>Admins Only</option>
-            <option>Department Heads</option>
-          </select>
-        </label>
-        <label className="block mb-2">Who can join meetings:
-          <select className="input input-bordered w-full">
-            <option>All Staff</option>
-            <option>Admins Only</option>
-            <option>Department Heads</option>
-          </select>
-        </label>
-      </section>
-      <section>
-        <h2 className="text-lg font-semibold mb-2">Department-based Restrictions</h2>
-        <label className="block mb-2">Restrict scheduling to department:
-          <select className="input input-bordered w-full">
-            <option>None</option>
-            <option>STEM</option>
-            <option>Mathematics</option>
-            <option>Science</option>
-            <option>Administration</option>
-            {/* Add more departments as needed */}
-          </select>
-        </label>
-        <button className="px-4 py-2 bg-green-600 text-white rounded mt-2">Save Permissions</button>
-      </section>
+
+      {/* Your page content here */}
+      <div className="space-y-6">
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <h2 className="text-xl font-semibold mb-4">Permission Settings</h2>
+          <p className="text-muted-foreground">Meeting permission management will be implemented here.</p>
+        </div>
+      </div>
     </div>
   );
 } 

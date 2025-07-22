@@ -1,139 +1,79 @@
 import { NextRequest, NextResponse } from "next/server";
-import { APIAuthPatterns } from '@/lib/auth/api-auth';
-import { AuthenticatedUser } from '@/lib/auth/auth-utils';
+import { withAuth } from "@/lib/auth/api-auth";
 
-// GET /api/system/diagnostic - Run system diagnosis
-export const GET = APIAuthPatterns.adminOnly(async (request: NextRequest, user: AuthenticatedUser) => {
+// GET Method - System diagnostic (simplified)
+export async function GET(request: NextRequest) {
   try {
-    const url = new URL(request.url);
-    const action = url.searchParams.get('action') || 'full';
-
-    // Import diagnostic system dynamically
-    const { ErrorDiagnosticEngine } = await import('@/lib/migration/error-diagnostic-system');
-    const diagnosticEngine = new ErrorDiagnosticEngine();
-
-    switch (action) {
-      case 'full':
-        const fullReport = await diagnosticEngine.runDiagnosis();
-        const detailedReport = await diagnosticEngine.generateReport(fullReport);
-        
-        return NextResponse.json({
-          success: true,
-          action: 'full-diagnosis',
-          report: fullReport,
-          detailedReportPath: 'DIAGNOSTIC_REPORT.md',
-          timestamp: new Date().toISOString()
-        });
-
-      case 'quick':
-        // Quick health check without full analysis
-        const quickErrors = await diagnosticEngine.runDiagnosis();
-        const healthStatus = quickErrors.systemHealth;
-        
-        return NextResponse.json({
-          success: true,
-          action: 'quick-check',
-          health: healthStatus,
-          errorCount: quickErrors.totalErrors,
-          criticalErrors: quickErrors.errorsBySeverity.critical || 0,
-          highErrors: quickErrors.errorsBySeverity.high || 0,
-          recommendations: quickErrors.recommendations.slice(0, 3),
-          timestamp: new Date().toISOString()
-        });
-
-      case 'errors-only':
-        const errorsReport = await diagnosticEngine.runDiagnosis();
-        
-        return NextResponse.json({
-          success: true,
-          action: 'errors-only',
-          errors: errorsReport.errors,
-          errorsByType: errorsReport.errorsByType,
-          errorsBySeverity: errorsReport.errorsBySeverity,
-          timestamp: new Date().toISOString()
-        });
-
-      default:
-        return NextResponse.json(
-          { 
-            error: 'Invalid action. Use: full, quick, errors-only',
-            availableActions: ['full', 'quick', 'errors-only'],
-            timestamp: new Date().toISOString()
-          },
-          { status: 400 }
-        );
+    // REQUIRED: Auth check - Admin only for diagnostics
+    const authResult = await withAuth(request, { requireAdminRole: true });
+    
+    if (!authResult.success) {
+      return NextResponse.json(
+        { error: authResult.error }, 
+        { status: authResult.statusCode }
+      );
     }
 
+    // Simplified diagnostic response
+    const diagnostics = {
+      status: 'simplified',
+      message: 'Diagnostic system simplified - workflow and migration removed',
+      system: {
+        workflow: 'disabled',
+        migration: 'disabled',
+        templates: 'active'
+      },
+      recommendations: [
+        'Use templates in templates/cursor-templates/',
+        'Follow auth patterns in .cursorrules',
+        'Check system status via /api/system/status'
+      ],
+      timestamp: new Date().toISOString()
+    };
+
+    return NextResponse.json({ 
+      data: diagnostics,
+      message: "Diagnostic completed" 
+    });
+
   } catch (error) {
-    console.error('System diagnostic error:', error);
+    console.error('System Diagnostic API Error:', error);
     return NextResponse.json(
       { 
-        error: 'Diagnostic failed',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Internal server error",
         timestamp: new Date().toISOString()
-      },
+      }, 
       { status: 500 }
     );
   }
-});
+}
 
-// POST /api/system/diagnostic - Apply auto-fixes
-export const POST = APIAuthPatterns.adminOnly(async (request: NextRequest, user: AuthenticatedUser) => {
+// POST Method - Simplified diagnostic actions
+export async function POST(request: NextRequest) {
   try {
-    const { fixId, fixIds } = await request.json();
-
-    // Import diagnostic system dynamically
-    const { ErrorDiagnosticEngine } = await import('@/lib/migration/error-diagnostic-system');
-    const diagnosticEngine = new ErrorDiagnosticEngine();
-
-    if (fixId) {
-      // Apply single fix
-      const success = await diagnosticEngine.applyAutoFix(fixId);
-      
-      return NextResponse.json({
-        success,
-        fixId,
-        message: success ? 'Fix applied successfully' : 'Fix application failed',
-        timestamp: new Date().toISOString()
-      });
+    // REQUIRED: Auth check - Admin only
+    const authResult = await withAuth(request, { requireAdminRole: true });
+    
+    if (!authResult.success) {
+      return NextResponse.json(
+        { error: authResult.error }, 
+        { status: authResult.statusCode }
+      );
     }
 
-    if (fixIds && Array.isArray(fixIds)) {
-      // Apply multiple fixes
-      const results = [];
-      
-      for (const id of fixIds) {
-        const success = await diagnosticEngine.applyAutoFix(id);
-        results.push({ fixId: id, success });
-      }
-      
-      const successCount = results.filter(r => r.success).length;
-      
-      return NextResponse.json({
-        success: successCount === fixIds.length,
-        results,
-        message: `Applied ${successCount}/${fixIds.length} fixes successfully`,
-        timestamp: new Date().toISOString()
-      });
-    }
-
-    return NextResponse.json(
-      { 
-        error: 'Please provide fixId or fixIds parameter',
-        timestamp: new Date().toISOString()
-      },
-      { status: 400 }
-    );
+    return NextResponse.json({ 
+      message: "Diagnostic actions simplified - use templates instead",
+      templates: 'templates/cursor-templates/'
+    });
 
   } catch (error) {
-    console.error('Auto-fix error:', error);
+    console.error('System Diagnostic API Error:', error);
     return NextResponse.json(
       { 
-        error: 'Auto-fix failed',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Internal server error",
         timestamp: new Date().toISOString()
-      },
+      }, 
       { status: 500 }
     );
   }
-}); 
+} 
