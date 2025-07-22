@@ -1,7 +1,6 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth/auth-options";
 import { parse } from "csv-parse/sync";
 import { z } from "zod";
 
@@ -49,34 +48,15 @@ function validateCsvHeaders(headers: string[]): { isValid: boolean; errors: stri
   };
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Unauthorized. Please log in." },
-        { status: 401 }
-      );
+    // REQUIRED: Auth check - Leadership required for staff upload
+    const authResult = await withAuth(request, { requireLeadership: true });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    // Check if user is admin using staff relationship
-    const user = await prisma.user.findUnique({
-      where: { email: user.email },
-      include: {
-        staff: {
-          include: {
-            role: true
-          }
-        }
-      }
-    });
-
-    if (!user || !user.staff?.[0] || user.staff[0].role?.title !== "Administrator") {
-      return NextResponse.json(
-        { error: "Unauthorized. Only admins can upload staff data." },
-        { status: 401 }
-      );
-    }
+    const user = authResult.user!;
 
     const formData = await request.formData();
     const file = formData.get("file") as File;
@@ -137,11 +117,11 @@ export async function POST(request: Request) {
     const existingRoles = await prisma.role.findMany();
     const existingDepartments = await prisma.department.findMany();
     
-    const validRoles = existingRoles.map(r => r.title);
-    const validDepartments = existingDepartments.map(d => d.name);
+    const validRoles = existingRoles.map((r: any) => r.title);
+    const validDepartments = existingDepartments.map((d: any) => d.name);
 
     // Get the admin's school and district for creating staff records
-    const adminStaff = user.staff[0];
+    const adminStaff = user.staff!;
 
     // Validate records
     const validationErrors: string[] = [];
@@ -200,8 +180,8 @@ export async function POST(request: Request) {
         if (preview) continue;
 
         // Find role and department
-        const role = existingRoles.find(r => r.title === record.Role);
-        const department = existingDepartments.find(d => d.name === record.Department);
+        const role = existingRoles.find((r: any) => r.title === record.Role);
+        const department = existingDepartments.find((d: any) => d.name === record.Department);
 
         if (!role || !department) {
           validationErrors.push(`Row ${index + 1}: Could not find role "${record.Role}" or department "${record.Department}"`);
@@ -233,8 +213,8 @@ export async function POST(request: Request) {
                 user_id: existingUser.id,
                 role_id: role.id,
                 department_id: department.id,
-                school_id: adminStaff.school_id,
-                district_id: adminStaff.district_id,
+                school_id: adminStaff.school.id,
+                district_id: adminStaff.district.id,
               }
             });
           }
@@ -252,8 +232,8 @@ export async function POST(request: Request) {
               user_id: newUser.id,
               role_id: role.id,
               department_id: department.id,
-              school_id: adminStaff.school_id,
-              district_id: adminStaff.district_id,
+              school_id: adminStaff.school.id,
+              district_id: adminStaff.district.id,
             }
           });
         }

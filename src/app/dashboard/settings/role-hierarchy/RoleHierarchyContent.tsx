@@ -164,6 +164,12 @@ export default function RoleHierarchyContent() {
             </div>
             <div className="mt-4 space-y-2">
               <Link 
+                href="/dashboard/settings/staff-upload"
+                className="block text-sm text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                • Staff Upload
+              </Link>
+              <Link 
                 href="/dashboard/settings/roles"
                 className="block text-sm text-blue-600 hover:text-blue-800 transition-colors"
               >
