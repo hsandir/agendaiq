@@ -28,7 +28,7 @@ async function checkAdmin() {
     console.log('✅ Admin user found:');
     console.log('Email:', adminUser.email);
     console.log('Name:', adminUser.name);
-    console.log('Staff ID:', adminUser.staffId);
+    console.log('Staff ID:', adminUser.staff_id);
     console.log('Has hashed password:', !!adminUser.hashedPassword);
     
     if (adminUser.Staff && adminUser.Staff.length > 0) {

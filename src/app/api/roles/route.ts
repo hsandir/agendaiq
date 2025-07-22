@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 // GET /api/roles - List all roles
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  const authResult = await withAuth(request, { requireStaff: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

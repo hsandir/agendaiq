@@ -243,7 +243,7 @@ export default function UserManagement() {
                               </SelectItem>
                             ))
                           ) : (
-                            <SelectItem value="" disabled className="px-3 py-2 text-gray-500">
+                            <SelectItem value="no-roles" disabled className="px-3 py-2 text-gray-500">
                               No roles available for this department
                             </SelectItem>
                           )}
