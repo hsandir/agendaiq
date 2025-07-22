@@ -118,6 +118,21 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
                   )}
                 </div>
                 
+                {/* Show staff names in blue boxes for leadership roles */}
+                {role.is_leadership && hasStaff && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {role.Staff!.map((staffMember) => (
+                      <span 
+                        key={staffMember.id}
+                        className="inline-flex items-center px-2 py-1 rounded bg-blue-100 text-blue-800 text-xs font-medium"
+                      >
+                        <FiUser className="h-3 w-3 mr-1" />
+                        {staffMember.User.name || 'No Name'}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                
                 <div className="text-sm text-gray-500 flex items-center gap-2 mt-1">
                   <span>{role.Department?.name || 'No Department'}</span>
                   <span>•</span>
@@ -143,8 +158,8 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
           </div>
         )}
         
-        {/* Show staff list when expanded and no children (bottom level) */}
-        {hasStaff && isExpanded && !hasChildren && (
+        {/* Show staff list when expanded and no children (bottom level) and NOT leadership */}
+        {hasStaff && isExpanded && !hasChildren && !role.is_leadership && (
           <div className="mt-2 ml-8 space-y-1" style={{ marginLeft: `${(depth + 1) * 20 + 40}px` }}>
             <div className="text-xs font-medium text-gray-700 uppercase tracking-wider mb-2">
               Staff Members ({staffCount})
