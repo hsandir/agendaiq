@@ -21,7 +21,7 @@ export default async function RolePage() {
             Role Management
           </h2>
           <p className="mt-1 text-sm text-gray-500">
-            Manage user roles, organizational hierarchy, and permissions across your institution
+            Manage user roles, organizational hierarchy, and permissions
           </p>
         </div>
       </div>
@@ -103,7 +103,7 @@ export default async function RolePage() {
 
       {/* Action Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Hierarchy Overview */}
+        {/* Role Hierarchy */}
         <Link 
           href="/dashboard/settings/role-hierarchy"
           className="block group"
@@ -120,7 +120,7 @@ export default async function RolePage() {
                   Role Hierarchy
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
-                  View and manage organizational hierarchy structure
+                  View organizational hierarchy structure
                 </p>
               </div>
             </div>
@@ -144,79 +144,7 @@ export default async function RolePage() {
                   Hierarchy Visualization
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
-                  Interactive tree view of role relationships
-                </p>
-              </div>
-            </div>
-          </div>
-        </Link>
-
-        {/* Management */}
-        <Link 
-          href="/dashboard/settings/role-hierarchy/management"
-          className="block group"
-        >
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-                  <FiEdit3 className="w-6 h-6 text-purple-600" />
-                </div>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-medium text-gray-900 group-hover:text-purple-600 transition-colors">
-                  Role Management
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  Create, edit, and manage roles
-                </p>
-              </div>
-            </div>
-          </div>
-        </Link>
-
-        {/* User Assignment */}
-        <Link 
-          href="/dashboard/settings/role-hierarchy/user-assignment"
-          className="block group"
-        >
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center group-hover:bg-orange-200 transition-colors">
-                  <FiUserCheck className="w-6 h-6 text-orange-600" />
-                </div>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-medium text-gray-900 group-hover:text-orange-600 transition-colors">
-                  User Assignment
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  Assign users to roles and departments
-                </p>
-              </div>
-            </div>
-          </div>
-        </Link>
-
-        {/* Permissions */}
-        <Link 
-          href="/dashboard/settings/permissions"
-          className="block group"
-        >
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center group-hover:bg-red-200 transition-colors">
-                  <FiUserCheck className="w-6 h-6 text-red-600" />
-                </div>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-medium text-gray-900 group-hover:text-red-600 transition-colors">
-                  Permissions
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  Configure role-based permissions
+                  Interactive tree view of roles
                 </p>
               </div>
             </div>
@@ -240,7 +168,7 @@ export default async function RolePage() {
                   User Management
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
-                  Manage user accounts and profiles
+                  Manage user accounts
                 </p>
               </div>
             </div>
@@ -248,7 +176,7 @@ export default async function RolePage() {
         </Link>
       </div>
 
-      {/* Current Role Management Component */}
+      {/* Role Management Component */}
       <div className="bg-white rounded-lg shadow p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">
           Quick Role Management
