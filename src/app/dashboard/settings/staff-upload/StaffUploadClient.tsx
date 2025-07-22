@@ -56,7 +56,7 @@ export default function StaffUploadClient() {
   const [previewSummary, setPreviewSummary] = useState<PreviewSummary | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [showPreview, setShowPreview] = useState(false);
-  const [selectedRecords, setSelectedRecords] = new Set();
+  const [selectedRecords, setSelectedRecords] = useState<Set<number>>(new Set());
   const [recordActions, setRecordActions] = useState<Map<number, string>>(new Map());
   const [selectedChanges, setSelectedChanges] = useState<Map<number, Set<string>>>(new Map());
 
