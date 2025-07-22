@@ -21,9 +21,22 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 
 interface RoleData {
-  id: string;
-  name: string;
-  subordinates: string[];
+  id: number;
+  title: string;
+  priority: number;
+  category: string | null;
+  is_leadership: boolean;
+  Department?: {
+    id: number;
+    name: string;
+  };
+  Staff?: Array<{
+    id: number;
+    User: {
+      name: string | null;
+      email: string;
+    };
+  }>;
 }
 
 export default function RoleManagement() {
@@ -65,7 +78,7 @@ export default function RoleManagement() {
       <CardHeader>
         <CardTitle>Role Management</CardTitle>
         <CardDescription>
-          Manage roles and their hierarchies in the system
+          Manage roles and their properties in the system
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -73,15 +86,29 @@ export default function RoleManagement() {
           <TableHeader>
             <TableRow>
               <TableHead>Role Name</TableHead>
-              <TableHead>Subordinate Roles</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Department</TableHead>
+              <TableHead>Staff Count</TableHead>
+              <TableHead>Leadership</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {roles.map((role) => (
               <TableRow key={role.id}>
-                <TableCell className="font-medium">{role.name}</TableCell>
-                <TableCell>{role.subordinates.join(', ')}</TableCell>
+                <TableCell className="font-medium">{role.title}</TableCell>
+                <TableCell>{role.category || 'N/A'}</TableCell>
+                <TableCell>{role.Department?.name || 'No Department'}</TableCell>
+                <TableCell>{role.Staff?.length || 0}</TableCell>
+                <TableCell>
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    role.is_leadership 
+                      ? 'bg-blue-100 text-blue-800' 
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {role.is_leadership ? 'Yes' : 'No'}
+                  </span>
+                </TableCell>
                 <TableCell>
                   <Button
                     variant="outline"
@@ -95,6 +122,12 @@ export default function RoleManagement() {
             ))}
           </TableBody>
         </Table>
+        
+        {roles.length === 0 && (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No roles found. Please set up roles first.</p>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
