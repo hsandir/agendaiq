@@ -40,9 +40,6 @@ export interface AuthRequirements {
   requireStaff?: boolean;
   requireAdminRole?: boolean;
   requireLeadership?: boolean;
-  allowedRoles?: string[];
-  allowedDepartments?: string[];
-  allowedSchools?: string[];
 }
 
 export interface AuthResult {
@@ -52,71 +49,22 @@ export interface AuthResult {
   statusCode?: number;
 }
 
-// Auth presets for common use cases
-export const AuthPresets = {
-  requireAuth: { requireAuth: true },
-  requireStaff: { requireAuth: true, requireStaff: true },
-  requireAdmin: { requireAuth: true, requireAdminRole: true },
-  requireLeadership: { requireAuth: true, requireLeadership: true },
-} as const;
-
 /**
- * Get current user from session
+ * Get the current authenticated user from session
  */
 export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
   try {
     const session = await getServerSession(authOptions);
+    
     if (!session?.user?.email) {
       return null;
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: {
-        Staff: {
-          include: {
-            Role: true,
-            Department: true,
-            School: true,
-            District: true
-          }
-        }
-      }
-    });
-
-    if (!user) {
-      return null;
-    }
-
     return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      staff: user.Staff[0] ? {
-        id: user.Staff[0].id,
-        role: {
-          id: user.Staff[0].Role.id,
-          title: user.Staff[0].Role.title,
-          priority: user.Staff[0].Role.priority,
-          category: user.Staff[0].Role.category,
-          is_leadership: user.Staff[0].Role.is_leadership,
-        },
-        department: {
-          id: user.Staff[0].Department.id,
-          name: user.Staff[0].Department.name,
-          code: user.Staff[0].Department.code,
-        },
-        school: {
-          id: user.Staff[0].School.id,
-          name: user.Staff[0].School.name,
-          code: user.Staff[0].School.code,
-        },
-        district: {
-          id: user.Staff[0].District.id,
-          name: user.Staff[0].District.name,
-          code: user.Staff[0].District.code,
-        },
-      } : null
+      id: session.user.id,
+      email: session.user.email,
+      name: session.user.name,
+      staff: session.user.staff || null
     };
   } catch (error) {
     console.error('Error getting current user:', error);
@@ -125,115 +73,77 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
 }
 
 /**
- * Check authentication requirements for API routes
+ * Check authentication requirements
  */
 export async function checkAuthRequirements(requirements: AuthRequirements = {}): Promise<AuthResult> {
   try {
     const user = await getCurrentUser();
     
     if (!user) {
-      return {
-        authorized: false,
-        error: 'Authentication required',
-        statusCode: 401
+      return { 
+        authorized: false, 
+        error: 'Authentication required', 
+        statusCode: 401 
       };
     }
 
+    // Check staff requirement
     if (requirements.requireStaff && !user.staff) {
-      return {
-        authorized: false,
-        error: 'Staff access required',
-        statusCode: 403
+      return { 
+        authorized: false, 
+        error: 'Staff access required', 
+        statusCode: 403 
       };
     }
 
-    if (requirements.requireAdminRole && user.staff?.role.title !== 'Administrator') {
-      return {
-        authorized: false,
-        error: 'Administrator access required',
-        statusCode: 403
+    // Check admin role requirement
+    if (requirements.requireAdminRole && user.staff?.role?.title !== 'Administrator') {
+      return { 
+        authorized: false, 
+        error: 'Administrator access required', 
+        statusCode: 403 
       };
     }
 
-    if (requirements.requireLeadership && !user.staff?.role.is_leadership) {
-      return {
-        authorized: false,
-        error: 'Leadership access required',
-        statusCode: 403
+    // Check leadership requirement
+    if (requirements.requireLeadership && !user.staff?.role?.is_leadership) {
+      return { 
+        authorized: false, 
+        error: 'Leadership access required', 
+        statusCode: 403 
       };
     }
 
-    if (requirements.allowedRoles && user.staff && !requirements.allowedRoles.includes(user.staff.role.title)) {
-      return {
-        authorized: false,
-        error: 'Role not permitted',
-        statusCode: 403
-      };
-    }
-
-    if (requirements.allowedDepartments && user.staff && !requirements.allowedDepartments.includes(user.staff.department.name)) {
-      return {
-        authorized: false,
-        error: 'Department not permitted',
-        statusCode: 403
-      };
-    }
-
-    if (requirements.allowedSchools && user.staff && !requirements.allowedSchools.includes(user.staff.school.name)) {
-      return {
-        authorized: false,
-        error: 'School not permitted',
-        statusCode: 403
-      };
-    }
-
-    return {
-      authorized: true,
-      user
-    };
+    return { authorized: true, user };
   } catch (error) {
     console.error('Error checking auth requirements:', error);
-    return {
-      authorized: false,
-      error: 'Authentication error',
-      statusCode: 500
+    return { 
+      authorized: false, 
+      error: 'Authentication error', 
+      statusCode: 500 
     };
   }
 }
 
 /**
- * Require authentication and optionally specific roles/permissions
+ * Require authentication and redirect if not authenticated
  */
-export async function requireAuth(requirements: AuthRequirements = AuthPresets.requireAuth): Promise<AuthenticatedUser> {
-  const user = await getCurrentUser();
+export async function requireAuth(requirements: AuthRequirements = {}): Promise<AuthenticatedUser> {
+  const result = await checkAuthRequirements({ requireAuth: true, ...requirements });
   
-  if (!user) {
+  if (!result.authorized || !result.user) {
     redirect('/auth/signin');
   }
 
-  if (requirements.requireStaff && !user.staff) {
-    redirect('/auth/signin?error=staff_required');
-  }
+  return result.user;
+}
 
-  if (requirements.requireAdminRole && user.staff?.role.title !== 'Administrator') {
-    redirect('/auth/signin?error=admin_required');
-  }
-
-  if (requirements.requireLeadership && !user.staff?.role.is_leadership) {
-    redirect('/auth/signin?error=leadership_required');
-  }
-
-  if (requirements.allowedRoles && user.staff && !requirements.allowedRoles.includes(user.staff.role.title)) {
-    redirect('/auth/signin?error=role_not_allowed');
-  }
-
-  if (requirements.allowedDepartments && user.staff && !requirements.allowedDepartments.includes(user.staff.department.name)) {
-    redirect('/auth/signin?error=department_not_allowed');
-  }
-
-  if (requirements.allowedSchools && user.staff && !requirements.allowedSchools.includes(user.staff.school.name)) {
-    redirect('/auth/signin?error=school_not_allowed');
-  }
-
-  return user;
-} 
+/**
+ * Predefined auth presets for common use cases
+ */
+export const AuthPresets = {
+  requireAuth: { requireAuth: true },
+  requireStaff: { requireAuth: true, requireStaff: true },
+  requireAdmin: { requireAuth: true, requireStaff: true, requireAdminRole: true },
+  requireLeadership: { requireAuth: true, requireStaff: true, requireLeadership: true }
+}; 
