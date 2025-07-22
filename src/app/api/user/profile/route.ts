@@ -1,101 +1,103 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth/auth-options";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAuth: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
+
+  const user = authResult.user!;
+
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
+    const userProfile = await prisma.user.findUnique({
       where: { email: user.email },
       include: {
-        staff: {
+        Staff: {
           include: {
-            role: true,
-            department: true,
-            school: true
+            Role: true,
+            Department: true,
+            School: {
+              include: {
+                District: true
+              }
+            }
           }
         }
       }
     });
 
-    if (!user) {
+    if (!userProfile) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Transform user data to include staff information
-    const userProfile = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      image: user.image,
-      staff: user.staff?.[0] ? {
-        role: user.staff[0].role?.title,
-        department: user.staff[0].department?.name,
-        school: user.staff[0].school?.name
+    return NextResponse.json({
+      id: userProfile.id,
+      email: userProfile.email,
+      name: userProfile.name,
+      staff: userProfile.Staff?.[0] ? {
+        id: userProfile.Staff[0].id,
+        staff_id: userProfile.Staff[0].staff_id,
+        role: userProfile.Staff[0].Role,
+        department: userProfile.Staff[0].Department,
+        school: userProfile.Staff[0].School
       } : null
-    };
-
-    return NextResponse.json({ user: userProfile });
+    });
   } catch (error) {
     console.error("Error fetching user profile:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAuth: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
+
+  const user = authResult.user!;
+
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const body = await request.json();
-    const { name, image } = body;
+    const { name, phone } = body;
 
-    const user = await prisma.user.update({
+    const updateData: any = {};
+    if (name !== undefined) updateData.name = name;
+    if (phone !== undefined) updateData.phone = phone;
+
+    const updatedUser = await prisma.user.update({
       where: { email: user.email },
-      data: {
-        name,
-        image,
-      },
+      data: updateData,
       include: {
-        staff: {
+        Staff: {
           include: {
-            role: true,
-            department: true,
-            school: true
+            Role: true,
+            Department: true,
+            School: {
+              include: {
+                District: true
+              }
+            }
           }
         }
       }
     });
 
-    // Transform user data to include staff information
-    const userProfile = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      image: user.image,
-      staff: user.staff?.[0] ? {
-        role: user.staff[0].role?.title,
-        department: user.staff[0].department?.name,
-        school: user.staff[0].school?.name
+    return NextResponse.json({
+      id: updatedUser.id,
+      email: updatedUser.email,
+      name: updatedUser.name,
+      staff: updatedUser.Staff?.[0] ? {
+        id: updatedUser.Staff[0].id,
+        staff_id: updatedUser.Staff[0].staff_id,
+        role: updatedUser.Staff[0].Role,
+        department: updatedUser.Staff[0].Department,
+        school: updatedUser.Staff[0].School
       } : null
-    };
-
-    return NextResponse.json({ user: userProfile });
+    });
   } catch (error) {
     console.error("Error updating user profile:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

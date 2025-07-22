@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 export default async function SecuritySettingsPage() {
   const user = await requireAuth(AuthPresets.requireAuth);
 
-  const user = await prisma.user.findUnique({
+  const userDetails = await prisma.user.findUnique({
     where: { email: user.email! },
     select: {
       id: true,
@@ -18,8 +18,12 @@ export default async function SecuritySettingsPage() {
     },
   });
 
-  const hasPassword = !!user?.hashedPassword;
-  const isEmailVerified = !!user?.emailVerified;
+  if (!userDetails) {
+    redirect("/auth/signin");
+  }
+
+  const hasPassword = !!userDetails?.hashedPassword;
+  const isEmailVerified = !!userDetails?.emailVerified;
 
   return (
     <div className="space-y-6">
@@ -170,12 +174,12 @@ export default async function SecuritySettingsPage() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Email Address</label>
-            <p className="mt-1 text-sm text-gray-900">{user?.email}</p>
+            <p className="mt-1 text-sm text-gray-900">{userDetails?.email}</p>
           </div>
-          {user?.name && (
+          {userDetails?.name && (
             <div>
               <label className="block text-sm font-medium text-gray-700">Full Name</label>
-              <p className="mt-1 text-sm text-gray-900">{user.name}</p>
+              <p className="mt-1 text-sm text-gray-900">{userDetails.name}</p>
             </div>
           )}
         </div>

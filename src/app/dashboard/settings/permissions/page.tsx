@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default async function PermissionsPage() {
   const user = await requireAuth(AuthPresets.requireAuth);
 
-  const user = await prisma.user.findUnique({
+  const userDetails = await prisma.user.findUnique({
     where: { email: user.email },
     include: { 
       Staff: {
@@ -26,7 +26,7 @@ export default async function PermissionsPage() {
     },
   });
 
-  if (!user || user.staff?.Role?.title !== "Administrator") {
+  if (!userDetails || !userDetails.Staff?.[0] || userDetails.Staff[0].Role?.title !== "Administrator") {
     redirect("/dashboard");
   }
 

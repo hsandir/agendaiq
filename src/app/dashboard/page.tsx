@@ -50,7 +50,11 @@ export default async function DashboardPage() {
     );
   }
   
-  const userId = user.id;
+  const userId = userWithStaff?.id;
+  
+  if (!userId) {
+    redirect("/auth/signin");
+  }
   
   // Fetch upcoming meetings for the user
   const upcomingMeetings = await prisma.meeting.findMany({
