@@ -22,7 +22,7 @@ export interface MenuItem {
   requiredPermissions: MenuPermission[];
   visibility: MenuVisibility;
   children?: MenuItem[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface MenuPermission {
@@ -42,7 +42,7 @@ export interface MenuVisibility {
 export interface MenuCondition {
   type: 'role' | 'permission' | 'custom';
   operator: 'equals' | 'contains' | 'not_equals';
-  value: any;
+  value: unknown;
 }
 
 export interface MenuStructure {
@@ -287,7 +287,7 @@ export class DynamicMenu {
       const menuStructure = this.buildMenuHierarchy(visibleItems);
 
       const result: MenuStructure = {
-        userId: user.id,
+        userId: user.id.toString(),
         items: menuStructure,
         generatedAt: new Date(),
         permissions: permissionStrings
@@ -301,7 +301,7 @@ export class DynamicMenu {
     } catch (error) {
       console.error('Error generating menu:', error);
       return {
-        userId: user.id,
+        userId: user.id.toString(),
         items: [],
         generatedAt: new Date(),
         permissions: []

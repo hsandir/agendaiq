@@ -17,7 +17,7 @@ export interface RolePermission {
   resource: string;
   action: string;
   scope?: string;
-  conditions?: Record<string, any>;
+  conditions?: Record<string, unknown>;
   priority: number;
   granted: boolean;
   createdAt: Date;
@@ -29,7 +29,7 @@ export interface AccessContext {
   resource: string;
   action: string;
   targetId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AccessResult {

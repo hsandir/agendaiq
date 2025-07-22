@@ -12,7 +12,7 @@ export interface AccessContext {
   resource: string;
   action: string;
   targetId?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AccessResult {
@@ -31,7 +31,7 @@ export interface RolePermission {
   scope?: 'own' | 'department' | 'school' | 'district' | 'all';
   priority: number;
   granted: boolean;
-  conditions?: Record<string, any>;
+  conditions?: Record<string, unknown>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -515,7 +515,7 @@ export class DynamicRBAC {
     resource: string,
     action: string,
     targetId?: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<boolean> {
     const context: AccessContext = {
       user,

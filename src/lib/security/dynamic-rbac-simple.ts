@@ -130,7 +130,7 @@ export class DynamicRBAC {
   }
 
   // Helper method to check if user is staff
-  async isStaff(user: AuthenticatedUser): Promise<boolean> {
+  async isStaff(_user: AuthenticatedUser): Promise<boolean> {
     // For now, assume all users are staff
     return true;
   }
