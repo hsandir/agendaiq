@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -89,11 +91,21 @@ interface HealthChecks {
 }
 
 export default function SystemManagementPage() {
+  const { data: session } = useSession();
+  const router = useRouter();
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [healthChecks, setHealthChecks] = useState<HealthChecks | null>(null);
   const [loading, setLoading] = useState(true);
   const [showHealthSection, setShowHealthSection] = useState(false);
   const [notifications, setNotifications] = useState<string[]>([]);
+
+  // Auth check - only admins can access system management
+  useEffect(() => {
+    if (session && session.user?.staff?.role?.title !== 'Administrator') {
+      router.push('/dashboard');
+      return;
+    }
+  }, [session, router]);
 
   const showNotification = (message: string) => {
     setNotifications(prev => [...prev, message]);

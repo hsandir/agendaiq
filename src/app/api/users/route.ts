@@ -1,16 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth/auth-options";
+import { withAuth } from "@/lib/auth/api-auth";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authResult = await withAuth(request, { requireStaff: true });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = authResult.user!;
+
+    const userWithStaff = await prisma.user.findUnique({
       where: { email: user.email },
       include: { 
         Staff: {
@@ -18,10 +21,17 @@ export async function GET(request: Request) {
             Role: true
           }
         }
-      },
+      }
     });
 
-    if (!user || user.staff?.Role?.title !== "Administrator") {
+    if (!userWithStaff) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Check if user has admin privileges
+    const isAdmin = userWithStaff.Staff?.[0]?.Role?.title === 'Administrator';
+
+    if (!isAdmin) {
       return NextResponse.json(
         { error: "Only administrators can view all users" },
         { status: 403 }

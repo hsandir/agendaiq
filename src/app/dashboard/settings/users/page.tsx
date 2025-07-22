@@ -1,4 +1,6 @@
 import { Metadata } from "next";
+import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
+import { redirect } from "next/navigation";
 import UserManagement from "@/components/settings/UserManagement";
 
 export const metadata: Metadata = {
@@ -6,7 +8,9 @@ export const metadata: Metadata = {
   description: "Manage users, their roles, and departments",
 };
 
-export default function UsersPage() {
+export default async function UsersPage() {
+  const user = await requireAuth(AuthPresets.requireAuth);
+
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">

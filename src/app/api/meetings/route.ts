@@ -17,22 +17,18 @@ export async function GET(request: NextRequest) {
     }
 
     const staffRecord = user.staff;
-    const isAdmin = staffRecord.role.title === 'Administrator';
+    const isAdmin = staffRecord.role?.title === 'Administrator';
 
     let meetingWhereClause;
 
     if (isAdmin) {
-      // Admins can see all meetings in their organization
+      // Admins can see all meetings in their district
       meetingWhereClause = {
         Staff: {
-          School: {
-            District: {
-              id: staffRecord.school.District?.id
-            }
-          }
+          school_id: staffRecord.school.id
         }
       };
-    } else if (staffRecord.role.is_leadership) {
+    } else if (staffRecord.role?.is_leadership) {
       // Leadership roles can see meetings in their school
       meetingWhereClause = {
         OR: [
@@ -106,7 +102,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Format the response
-    const formattedMeetings = meetings.map((meeting) => ({
+    const formattedMeetings = meetings.map((meeting: any) => ({
       id: meeting.id,
       title: meeting.title,
       description: meeting.description,
@@ -120,7 +116,7 @@ export async function GET(request: NextRequest) {
         email: meeting.Staff.User.email,
         role: meeting.Staff.Role.title,
       },
-      attendees: meeting.MeetingAttendee.map((attendee) => ({
+      attendees: meeting.MeetingAttendee.map((attendee: any) => ({
         id: attendee.Staff.id,
         name: attendee.Staff.User.name,
         email: attendee.Staff.User.email,
