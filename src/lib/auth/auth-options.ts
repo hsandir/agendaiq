@@ -3,7 +3,7 @@ import type { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
-import { compare } from "bcryptjs";
+import bcrypt from "bcrypt";
 
 // Type guard for staff property
 function hasStaff(user: unknown): user is User & { staff: unknown } {
@@ -42,7 +42,10 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials): Promise<User | null> {
         try {
+          console.log('🔐 Authorize called with:', { email: credentials?.email, hasPassword: !!credentials?.password });
+          
           if (!credentials?.email || !credentials?.password) {
+            console.log('❌ Missing credentials');
             throw new Error("Missing credentials");
           }
 
@@ -59,13 +62,19 @@ export const authOptions: NextAuthOptions = {
             }
           });
 
+          console.log('🔍 User found:', !!user, 'Has password:', !!user?.hashedPassword);
+
           if (!user || !user.hashedPassword) {
+            console.log('❌ Invalid credentials - user not found or no password');
             throw new Error("Invalid credentials");
           }
 
           // Check password using bcrypt
-          const isValid = await compare(credentials.password, user.hashedPassword);
+          const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
+          console.log('🔐 Password valid:', isValid);
+          
           if (!isValid) {
+            console.log('❌ Invalid credentials - password mismatch');
             throw new Error("Invalid credentials");
           }
 
@@ -78,23 +87,31 @@ export const authOptions: NextAuthOptions = {
               staff: {
                 id: staff.id,
                 role: {
+                  id: staff.Role.id,
                   title: staff.Role.title,
+                  priority: staff.Role.priority,
+                  category: staff.Role.category,
                   is_leadership: staff.Role.is_leadership
                 },
                 department: {
-                  name: staff.Department.name
+                  id: staff.Department.id,
+                  name: staff.Department.name,
+                  code: staff.Department.code
                 },
                 school: {
-                  name: staff.School.name
+                  id: staff.School.id,
+                  name: staff.School.name,
+                  code: staff.School.code
                 }
               }
             })
           };
 
-          return userData as unknown as User;
+          console.log('✅ User authenticated:', userData.email);
+          return userData;
         } catch (error) {
-          console.error("Authorization error:", error);
-          throw new Error("Authentication failed");
+          console.error('❌ Authorization error:', error instanceof Error ? error.message : String(error));
+          return null;
         }
       },
     }),

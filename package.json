@@ -60,6 +60,7 @@
     "zod": "^3.25.65"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/bcryptjs": "^3.0.0",
     "@types/lru-cache": "7.10.9",
     "@types/node": "^24.0.14",
