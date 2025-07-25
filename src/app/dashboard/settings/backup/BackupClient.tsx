@@ -375,7 +375,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
       {/* Fixed position notifications */}
       <div className="fixed top-4 right-4 z-50 space-y-2">
         {notifications.map((notification, index) => (
-          <Alert key={index} className="bg-background border shadow-lg">
+          <Alert key={`notification-${index}-${notification}`} className="bg-background border shadow-lg">
             <CheckCircle className="h-4 w-4" />
             <AlertDescription>{notification}</AlertDescription>
           </Alert>
@@ -579,7 +579,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
                           {backup.components && backup.components.length > 0 && (
                             <div className="flex flex-wrap gap-1">
                               {backup.components.map((component, index) => (
-                                <Badge key={index} variant="secondary" className="text-xs">
+                                <Badge key={`${backup.id}-component-${index}`} variant="secondary" className="text-xs">
                                   {component}
                                 </Badge>
                               ))}
