@@ -1,8 +1,11 @@
 import { Metadata } from "next";
 import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
 import Link from 'next/link';
-import { FiUsers, FiUserCheck, FiTrendingUp, FiEye, FiEdit3, FiSettings } from 'react-icons/fi';
-import RoleManagement from '@/components/settings/RoleManagement';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { prisma } from "@/lib/prisma";
+import { FiUsers, FiUserCheck, FiTrendingUp, FiEye, FiEdit3, FiSettings, FiShield, FiBuilding, FiUserPlus } from 'react-icons/fi';
 
 export const metadata: Metadata = {
   title: "Role Management | AgendaIQ",
@@ -11,6 +14,58 @@ export const metadata: Metadata = {
 
 export default async function RolePage() {
   const user = await requireAuth(AuthPresets.requireAuth);
+
+  // Fetch real role and organizational data
+  const roles = await prisma.role.findMany({
+    include: {
+      Department: true,
+      Staff: {
+        include: {
+          User: true
+        }
+      }
+    },
+    orderBy: {
+      priority: 'asc'
+    }
+  });
+
+  const departments = await prisma.department.findMany({
+    include: {
+      Staff: {
+        include: {
+          User: true
+        }
+      }
+    }
+  });
+
+  // Calculate real statistics
+  const totalRoles = roles.length;
+  const leadershipRoles = roles.filter(role => role.is_leadership).length;
+  const totalStaff = roles.reduce((acc, role) => acc + role.Staff.length, 0);
+  const totalDepartments = departments.length;
+  const activeUsers = roles.reduce((acc, role) => 
+    acc + role.Staff.filter(staff => staff.User.emailVerified).length, 0
+  );
+
+  // Role distribution by department
+  const roleDistribution = departments.map(dept => ({
+    name: dept.name,
+    count: dept.Staff.length,
+    roles: dept.Staff.map(staff => staff.Role?.title).filter(Boolean)
+  }));
+
+  // Leadership hierarchy
+  const leadershipHierarchy = roles
+    .filter(role => role.is_leadership)
+    .sort((a, b) => a.priority - b.priority)
+    .map(role => ({
+      title: role.title,
+      priority: role.priority,
+      staffCount: role.Staff.length,
+      department: role.Department?.name || 'No Department'
+    }));
 
   return (
     <div className="space-y-6">
@@ -24,82 +79,141 @@ export default async function RolePage() {
             Manage user roles, organizational hierarchy, and permissions
           </p>
         </div>
+        <div className="flex space-x-3">
+          <Button variant="outline">
+            <FiEdit3 className="h-4 w-4 mr-2" />
+            Edit Roles
+          </Button>
+          <Button>
+            <FiUserPlus className="h-4 w-4 mr-2" />
+            Add User
+          </Button>
+        </div>
       </div>
 
-      {/* Quick Stats Cards */}
+      {/* Real Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <FiUsers className="h-6 w-6 text-gray-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Total Roles
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">6</dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Roles</CardTitle>
+            <FiUsers className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalRoles}</div>
+            <p className="text-xs text-muted-foreground">
+              Active roles in system
+            </p>
+          </CardContent>
+        </Card>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <FiUserCheck className="h-6 w-6 text-blue-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Leadership Roles
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">4</dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Leadership Roles</CardTitle>
+            <FiUserCheck className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">{leadershipRoles}</div>
+            <p className="text-xs text-muted-foreground">
+              Roles with leadership access
+            </p>
+          </CardContent>
+        </Card>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <FiUsers className="h-6 w-6 text-green-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Total Staff
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">12</dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Staff</CardTitle>
+            <FiUsers className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">{totalStaff}</div>
+            <p className="text-xs text-muted-foreground">
+              {activeUsers} active users
+            </p>
+          </CardContent>
+        </Card>
 
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <div className="p-5">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <FiSettings className="h-6 w-6 text-purple-400" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Departments
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">4</dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Departments</CardTitle>
+            <FiBuilding className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-600">{totalDepartments}</div>
+            <p className="text-xs text-muted-foreground">
+              Active departments
+            </p>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Role Hierarchy Overview */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <FiTrendingUp className="h-5 w-5 text-blue-600" />
+            Role Hierarchy Overview
+          </CardTitle>
+          <CardDescription>
+            Current organizational structure and role distribution
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {/* Leadership Hierarchy */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-3">Leadership Hierarchy</h4>
+              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                {leadershipHierarchy.map((role, index) => (
+                  <div key={role.title} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm font-medium">{role.title}</span>
+                        <Badge variant="outline" className="text-xs">
+                          Priority {role.priority}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-gray-500">{role.department}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium">{role.staffCount}</div>
+                      <p className="text-xs text-gray-500">staff</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Department Role Distribution */}
+            <div>
+              <h4 className="text-sm font-medium text-gray-700 mb-3">Department Role Distribution</h4>
+              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                {roleDistribution.map((dept) => (
+                  <div key={dept.name} className="p-3 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <h5 className="text-sm font-medium">{dept.name}</h5>
+                      <Badge variant="secondary" className="text-xs">
+                        {dept.count} staff
+                      </Badge>
+                    </div>
+                    <div className="space-y-1">
+                      {dept.roles.length > 0 ? (
+                        dept.roles.map((role, index) => (
+                          <div key={index} className="text-xs text-gray-600 flex items-center space-x-1">
+                            <FiShield className="h-3 w-3" />
+                            <span>{role}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-xs text-gray-500">No roles assigned</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Action Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -108,23 +222,25 @@ export default async function RolePage() {
           href="/dashboard/settings/role-hierarchy"
           className="block group"
         >
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                  <FiTrendingUp className="w-6 h-6 text-blue-600" />
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                    <FiTrendingUp className="w-6 h-6 text-blue-600" />
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-lg font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                    Role Hierarchy
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    View organizational hierarchy structure
+                  </p>
                 </div>
               </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
-                  Role Hierarchy
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  View organizational hierarchy structure
-                </p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </Link>
 
         {/* Visualization */}
@@ -132,23 +248,25 @@ export default async function RolePage() {
           href="/dashboard/settings/role-hierarchy/visualization"
           className="block group"
         >
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                  <FiEye className="w-6 h-6 text-green-600" />
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                    <FiEye className="w-6 h-6 text-green-600" />
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-lg font-medium text-gray-900 group-hover:text-green-600 transition-colors">
+                    Hierarchy Visualization
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Interactive tree view of roles
+                  </p>
                 </div>
               </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-medium text-gray-900 group-hover:text-green-600 transition-colors">
-                  Hierarchy Visualization
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  Interactive tree view of roles
-                </p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </Link>
 
         {/* User Management */}
@@ -156,33 +274,74 @@ export default async function RolePage() {
           href="/dashboard/settings/users"
           className="block group"
         >
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
-                  <FiUsers className="w-6 h-6 text-indigo-600" />
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
+                    <FiUsers className="w-6 h-6 text-indigo-600" />
+                  </div>
+                </div>
+                <div className="ml-4">
+                  <h3 className="text-lg font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">
+                    User Management
+                  </h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Manage user accounts
+                  </p>
                 </div>
               </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">
-                  User Management
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  Manage user accounts
-                </p>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </Link>
       </div>
 
-      {/* Role Management Component */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
-          Quick Role Management
-        </h3>
-        <RoleManagement />
-      </div>
+      {/* Recent Role Activities */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <FiSettings className="h-5 w-5 text-blue-600" />
+            Recent Role Activities
+          </CardTitle>
+          <CardDescription>
+            Latest changes and updates to roles and permissions
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {roles.slice(0, 5).map((role) => (
+              <div key={role.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <h4 className="text-sm font-medium">{role.title}</h4>
+                    {role.is_leadership && (
+                      <Badge variant="outline" className="text-xs">
+                        Leadership
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    {role.Department?.name || 'No Department'} • {role.Staff.length} staff members
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-gray-500">
+                    Priority {role.priority}
+                  </p>
+                </div>
+              </div>
+            ))}
+            
+            {roles.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <FiUsers className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No roles found.</p>
+                <p className="text-sm mt-2">Create roles to get started.</p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 } 

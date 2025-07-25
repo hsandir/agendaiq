@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { promises as fs } from 'fs';
@@ -7,6 +8,12 @@ import path from 'path';
 const execAsync = promisify(exec);
 
 export async function GET(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAdminRole: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
+  const user = authResult.user!;
+
   try {
     const url = new URL(request.url);
     const action = url.searchParams.get('action');
@@ -28,6 +35,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAdminRole: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
+  const user = authResult.user!;
+
   try {
     const { type, message, restore, components } = await request.json();
 
@@ -599,6 +612,12 @@ async function createFullSystemBackup(components: string[] = ['database', 'setti
 
 // PUT method for uploading and restoring backups
 export async function PUT(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAdminRole: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
+  const user = authResult.user!;
+
   try {
     const formData = await request.formData();
     const file = formData.get('backup') as File;

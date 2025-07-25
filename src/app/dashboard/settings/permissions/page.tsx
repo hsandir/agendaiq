@@ -1,72 +1,95 @@
 import { Metadata } from "next";
-import { getServerSession } from "next-auth";
-import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils';
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth/auth-options";
+import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
+import { Shield, Users, Settings, Building, UserCheck } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Permissions Management",
+  title: "Permissions Management | AgendaIQ",
   description: "Manage system permissions and access controls",
 };
 
 export default async function PermissionsPage() {
-  const user = await requireAuth(AuthPresets.requireAuth);
+  // Use new standardized auth system - only admins can access permissions
+  const user = await requireAuth(AuthPresets.requireAdmin);
 
-  const userDetails = await prisma.user.findUnique({
-    where: { email: user.email },
-    include: { 
+  // Fetch real permission data from database
+  const roles = await prisma.role.findMany({
+    include: {
+      Department: true,
       Staff: {
         include: {
-          Role: true
+          User: true
         }
       }
     },
+    orderBy: {
+      priority: 'asc'
+    }
   });
 
-  if (!userDetails || !userDetails.Staff?.[0] || userDetails.Staff[0].Role?.title !== "Administrator") {
-    redirect("/dashboard");
-  }
+  // Calculate permission statistics
+  const totalRoles = roles.length;
+  const totalUsers = roles.reduce((acc, role) => acc + role.Staff.length, 0);
+  const leadershipRoles = roles.filter(role => role.is_leadership).length;
+  const regularRoles = totalRoles - leadershipRoles;
 
-  const permissionGroups = [
+  // Permission categories based on role hierarchy
+  const permissionCategories = [
     {
       name: "User Management",
+      icon: Users,
+      description: "Manage user accounts and profiles",
       permissions: [
-        { id: "user.create", label: "Create Users", description: "Create new user accounts" },
-        { id: "user.edit", label: "Edit Users", description: "Modify existing user accounts" },
-        { id: "user.delete", label: "Delete Users", description: "Remove user accounts" },
-        { id: "user.view", label: "View Users", description: "View user account details" },
+        "Create new user accounts",
+        "Edit user information",
+        "Assign roles to users",
+        "View user details",
+        "Deactivate user accounts"
       ],
+      roles: roles.filter(role => role.is_leadership || role.title === "Administrator")
     },
     {
       name: "Role Management",
+      icon: Shield,
+      description: "Configure roles and permissions",
       permissions: [
-        { id: "role.create", label: "Create Roles", description: "Create new roles" },
-        { id: "role.edit", label: "Edit Roles", description: "Modify existing roles" },
-        { id: "role.delete", label: "Delete Roles", description: "Remove roles" },
-        { id: "role.assign", label: "Assign Roles", description: "Assign roles to users" },
+        "Create new roles",
+        "Edit role permissions",
+        "Delete roles",
+        "Manage role hierarchy",
+        "Assign department permissions"
       ],
+      roles: roles.filter(role => role.title === "Administrator")
     },
     {
       name: "Department Management",
+      icon: Building,
+      description: "Manage organizational structure",
       permissions: [
-        { id: "dept.create", label: "Create Departments", description: "Create new departments" },
-        { id: "dept.edit", label: "Edit Departments", description: "Modify existing departments" },
-        { id: "dept.delete", label: "Delete Departments", description: "Remove departments" },
-        { id: "dept.assign", label: "Assign Departments", description: "Assign users to departments" },
+        "Create departments",
+        "Edit department settings",
+        "Assign users to departments",
+        "Manage department hierarchy",
+        "View department statistics"
       ],
+      roles: roles.filter(role => role.is_leadership)
     },
     {
-      name: "System Settings",
+      name: "System Administration",
+      icon: Settings,
+      description: "System-wide settings and controls",
       permissions: [
-        { id: "settings.view", label: "View Settings", description: "View system settings" },
-        { id: "settings.edit", label: "Edit Settings", description: "Modify system settings" },
-        { id: "settings.security", label: "Security Settings", description: "Manage security settings" },
-        { id: "settings.backup", label: "Backup Settings", description: "Manage backup settings" },
+        "Access system settings",
+        "Manage security policies",
+        "Configure backup settings",
+        "View system logs",
+        "Manage integrations"
       ],
-    },
+      roles: roles.filter(role => role.title === "Administrator")
+    }
   ];
 
   return (
@@ -74,33 +97,189 @@ export default async function PermissionsPage() {
       <div>
         <h2 className="text-2xl font-bold tracking-tight">Permissions Management</h2>
         <p className="text-muted-foreground">
-          Configure and manage system permissions and access controls.
+          Configure and manage system permissions and access controls based on role hierarchy.
         </p>
       </div>
 
+      {/* Permission Statistics */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Roles</CardTitle>
+            <Shield className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalRoles}</div>
+            <p className="text-xs text-muted-foreground">
+              Active roles in system
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalUsers}</div>
+            <p className="text-xs text-muted-foreground">
+              Users with assigned roles
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Leadership Roles</CardTitle>
+            <UserCheck className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{leadershipRoles}</div>
+            <p className="text-xs text-muted-foreground">
+              Roles with leadership access
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Regular Roles</CardTitle>
+            <Shield className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{regularRoles}</div>
+            <p className="text-xs text-muted-foreground">
+              Standard user roles
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Permission Categories */}
       <div className="grid gap-6">
-        {permissionGroups.map((group) => (
-          <Card key={group.name}>
+        {permissionCategories.map((category) => (
+          <Card key={category.name}>
             <CardHeader>
-              <CardTitle>{group.name}</CardTitle>
-              <CardDescription>Manage {group.name.toLowerCase()} permissions.</CardDescription>
+              <div className="flex items-center space-x-2">
+                <category.icon className="h-5 w-5 text-blue-600" />
+                <CardTitle>{category.name}</CardTitle>
+              </div>
+              <CardDescription>{category.description}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {group.permissions.map((permission) => (
-                <div key={permission.id} className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <h3 className="text-sm font-medium">{permission.label}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {permission.description}
-                    </p>
-                  </div>
-                  <Switch defaultChecked />
+              {/* Permissions List */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium text-gray-700">Available Permissions:</h4>
+                <div className="grid gap-2">
+                  {category.permissions.map((permission, index) => (
+                    <div key={index} className="flex items-center space-x-2 text-sm">
+                      <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                      <span>{permission}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              {/* Roles with Access */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium text-gray-700">Roles with Access:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {category.roles.length > 0 ? (
+                    category.roles.map((role) => (
+                      <Badge key={role.id} variant="outline" className="text-xs">
+                        {role.title}
+                        {role.is_leadership && (
+                          <span className="ml-1 text-blue-600">(Leadership)</span>
+                        )}
+                      </Badge>
+                    ))
+                  ) : (
+                    <span className="text-sm text-gray-500">No roles have access to this category</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Department Information */}
+              {category.roles.some(role => role.Department) && (
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium text-gray-700">Department Access:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {category.roles
+                      .filter(role => role.Department)
+                      .map((role) => (
+                        <Badge key={role.id} variant="secondary" className="text-xs">
+                          {role.Department?.name}
+                        </Badge>
+                      ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {/* Role Hierarchy Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Shield className="h-5 w-5 text-blue-600" />
+            Role Hierarchy Information
+          </CardTitle>
+          <CardDescription>
+            Understanding how permissions flow through the role hierarchy
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <h4 className="text-sm font-medium mb-2">Leadership Roles (Priority 1-4)</h4>
+                <div className="space-y-2">
+                  {roles
+                    .filter(role => role.is_leadership)
+                    .sort((a, b) => a.priority - b.priority)
+                    .map((role) => (
+                      <div key={role.id} className="flex items-center justify-between p-2 bg-blue-50 rounded">
+                        <span className="text-sm font-medium">{role.title}</span>
+                        <Badge variant="outline" className="text-xs">
+                          Priority {role.priority}
+                        </Badge>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-sm font-medium mb-2">Regular Roles (Priority 5-6)</h4>
+                <div className="space-y-2">
+                  {roles
+                    .filter(role => !role.is_leadership)
+                    .sort((a, b) => a.priority - b.priority)
+                    .map((role) => (
+                      <div key={role.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                        <span className="text-sm font-medium">{role.title}</span>
+                        <Badge variant="outline" className="text-xs">
+                          Priority {role.priority}
+                        </Badge>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
+              <h4 className="text-sm font-medium text-yellow-800 mb-2">Permission Inheritance</h4>
+              <p className="text-sm text-yellow-700">
+                Leadership roles automatically inherit permissions from lower-priority roles. 
+                Administrators have access to all system functions, while other roles have 
+                department-specific access based on their position in the hierarchy.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 } 

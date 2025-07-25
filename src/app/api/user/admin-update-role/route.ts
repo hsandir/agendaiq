@@ -1,24 +1,15 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/auth-options";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAdminRole: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
+  const user = authResult.user!;
+
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const admin = await prisma.user.findUnique({
-      where: { id: user.id },
-      include: { staff: { include: { role: true } } },
-    });
-
-    if (!admin || admin.staff?.[0]?.role?.title !== "Administrator") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
     const body = await request.json();
     const { userId, roleId } = body;
 
@@ -50,7 +41,7 @@ export async function POST(request: Request) {
     // Get updated user with staff
     const updatedUser = await prisma.user.findUnique({
       where: { id: userId },
-      include: { staff: { include: { role: true, department: true } } },
+      include: { Staff: { include: { Role: true, Department: true } } },
     });
 
     return NextResponse.json(updatedUser);

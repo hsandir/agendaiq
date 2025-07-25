@@ -1,37 +1,16 @@
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { Metadata } from "next";
+import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
 import { RoleManagementForm } from "@/components/settings/RoleManagementForm";
 import { RoleHierarchyManagement } from "@/components/settings/RoleHierarchyManagement";
 
-async function getUser() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) {
-    redirect("/auth/signin");
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    include: {
-      Staff: {
-        include: {
-          Role: true,
-          Department: true
-        }
-      }
-    },
-  });
-
-  if (!user || user.Staff?.[0]?.Role?.title !== "Administrator") {
-    redirect("/dashboard");
-  }
-
-  return user;
-}
+export const metadata: Metadata = {
+  title: "Admin Settings | AgendaIQ",
+  description: "Administrative settings for role hierarchy management and user role assignment",
+};
 
 export default async function AdminSettingsPage() {
-  await getUser(); // Verify admin access
+  // Use new standardized auth system - only admins can access
+  const user = await requireAuth(AuthPresets.requireAdmin);
 
   return (
     <div>

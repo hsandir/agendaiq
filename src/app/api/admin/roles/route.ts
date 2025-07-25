@@ -1,41 +1,13 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/auth-options";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
 
-// Helper function to verify admin access
-async function verifyAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) {
-    return null;
+export async function GET(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAdminRole: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    include: {
-      Staff: {
-        include: {
-          Role: true
-        }
-      }
-    }
-  });
-
-  if (!user || !user.Staff?.[0] || user.Staff[0].Role?.title !== 'Administrator') {
-    return null;
-  }
-
-  return user;
-}
-
-export async function GET() {
-  const admin = await verifyAdmin();
-  if (!admin) {
-    return NextResponse.json(
-      { error: "Not authorized" },
-      { status: 403 }
-    );
-  }
+  const user = authResult.user!;
 
   try {
     // Get all roles from the database
@@ -63,14 +35,12 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
-  const admin = await verifyAdmin();
-  if (!admin) {
-    return NextResponse.json(
-      { error: "Not authorized" },
-      { status: 403 }
-    );
+export async function POST(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAdminRole: true });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
+  const user = authResult.user!;
 
   try {
     const body = await request.json();
