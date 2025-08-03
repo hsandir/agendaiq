@@ -1,0 +1,267 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  userId            Int
+  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Department {
+  id         Int       @id @default(autoincrement())
+  code       String    @unique
+  name       String
+  category   String?
+  school_id  Int
+  created_at DateTime  @default(now())
+  School     School    @relation(fields: [school_id], references: [id])
+  Meeting    Meeting[]
+  Role       Role[]
+  Staff      Staff[]
+}
+
+model District {
+  name            String
+  address         String?
+  code            String?
+  created_at      DateTime          @default(now())
+  id              Int               @id @default(autoincrement())
+  Meeting         Meeting[]
+  School          School[]
+  Staff           Staff[]
+}
+
+model Meeting {
+  title                String
+  description          String?
+  created_at           DateTime          @default(now())
+  department_id        Int
+  district_id          Int
+  end_time             DateTime?
+  organizer_id         Int
+  school_id            Int
+  start_time           DateTime?
+  zoom_join_url        String?
+  zoom_meeting_id      String?
+  id                   Int               @id @default(autoincrement())
+  repeat_type          String?
+  calendar_integration String?
+  meeting_type         String?
+  is_continuation      Boolean           @default(false)
+  parent_meeting_id    Int?
+  template_id          Int?              // Optional template reference
+  agenda               String?
+  decisions            String?
+  action_items         String?
+  notes                String?
+  status               String            @default("draft")
+  Department           Department        @relation(fields: [department_id], references: [id])
+  District             District          @relation(fields: [district_id], references: [id])
+  Staff                Staff             @relation(fields: [organizer_id], references: [id])
+  ParentMeeting        Meeting?          @relation("MeetingContinuation", fields: [parent_meeting_id], references: [id])
+  ContinuationMeetings Meeting[]         @relation("MeetingContinuation")
+  School               School            @relation(fields: [school_id], references: [id])
+  MeetingTemplate      MeetingTemplate?  @relation(fields: [template_id], references: [id])
+  MeetingAttendee      MeetingAttendee[]
+  MeetingNote          MeetingNote[]
+}
+
+model MeetingAttendee {
+  status     String?
+  created_at DateTime @default(now())
+  meeting_id Int
+  staff_id   Int
+  id         Int      @id @default(autoincrement())
+  Meeting    Meeting  @relation(fields: [meeting_id], references: [id])
+  Staff      Staff    @relation(fields: [staff_id], references: [id])
+}
+
+model MeetingNote {
+  id         Int      @id @default(autoincrement())
+  meeting_id Int
+  staff_id   Int
+  content    String
+  created_at DateTime @default(now())
+
+  Meeting Meeting @relation(fields: [meeting_id], references: [id], onDelete: Cascade)
+  Staff   Staff   @relation(fields: [staff_id], references: [id], onDelete: Cascade)
+
+  @@map("meeting_notes")
+}
+
+model AuditLog {
+  id            Int      @id @default(autoincrement())
+  table_name    String   // Which table was affected
+  record_id     String   // ID of the affected record
+  operation     String   // CREATE, UPDATE, DELETE, BULK_CREATE, BULK_UPDATE, BULK_DELETE
+  field_changes Json?    // What fields changed (for UPDATE operations)
+  old_values    Json?    // Previous values (for UPDATE/DELETE)
+  new_values    Json?    // New values (for CREATE/UPDATE)
+  user_id       Int?     // Who made the change
+  staff_id      Int?     // Staff record who made the change
+  source        String   // WEB_UI, API, BULK_UPLOAD, SYSTEM
+  description   String?  // Human readable description
+  ip_address    String?  // IP address of the user
+  user_agent    String?  // Browser/client info
+  metadata      Json?    // Additional context (file name for uploads, etc.)
+  created_at    DateTime @default(now())
+
+  User  User?  @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  Staff Staff? @relation(fields: [staff_id], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+  @@index([table_name, created_at])
+  @@index([user_id, created_at])
+  @@index([operation, created_at])
+}
+
+model Role {
+  id             Int             @id @default(autoincrement())
+  title          String          @unique
+  priority       Int
+  category       String?
+  department_id  Int?
+  parent_id      Int?
+  level          Int             @default(0)
+  is_leadership  Boolean         @default(false)
+  created_at     DateTime        @default(now())
+  Department     Department?     @relation(fields: [department_id], references: [id])
+  Parent         Role?           @relation("RoleHierarchy", fields: [parent_id], references: [id])
+  Children       Role[]          @relation("RoleHierarchy")
+  ChildHierarchy RoleHierarchy[] @relation("ChildRole")
+  RoleHierarchy  RoleHierarchy[] @relation("ParentRole")
+  Staff          Staff[]
+}
+
+model RoleHierarchy {
+  id              Int      @id @default(autoincrement())
+  parent_role_id  Int
+  child_role_id   Int
+  hierarchy_level Int      @default(1)
+  created_at      DateTime @default(now())
+  ChildRole       Role     @relation("ChildRole", fields: [child_role_id], references: [id])
+  ParentRole      Role     @relation("ParentRole", fields: [parent_role_id], references: [id])
+
+  @@unique([parent_role_id, child_role_id])
+}
+
+model School {
+  name            String
+  address         String?
+  code            String?
+  created_at      DateTime          @default(now())
+  district_id     Int
+  id              Int               @id @default(autoincrement())
+  Department      Department[]
+  Meeting         Meeting[]
+  District        District          @relation(fields: [district_id], references: [id])
+  Staff           Staff[]
+}
+
+model Session {
+  id           String   @id
+  sessionToken String   @unique
+  expires      DateTime
+  userId       Int
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Staff {
+  id              Int               @id @default(autoincrement())
+  user_id         Int
+  department_id   Int
+  role_id         Int
+  manager_id      Int?
+  flags           String[]
+  endorsements    String[]
+  school_id       Int
+  district_id     Int
+  created_at      DateTime          @default(now())
+  Meeting         Meeting[]
+  MeetingAttendee MeetingAttendee[]
+  MeetingNote     MeetingNote[]
+  Department      Department        @relation(fields: [department_id], references: [id])
+  District        District          @relation(fields: [district_id], references: [id])
+  Staff           Staff?            @relation("StaffToStaff", fields: [manager_id], references: [id])
+  other_Staff     Staff[]           @relation("StaffToStaff")
+  Role            Role              @relation(fields: [role_id], references: [id])
+  School          School            @relation(fields: [school_id], references: [id])
+  User            User              @relation(fields: [user_id], references: [id])
+  AuditLog        AuditLog[]
+  MeetingTemplate MeetingTemplate[] // Templates created by this staff member
+}
+
+model SystemSetting {
+  key   String @id
+  value Json
+}
+
+model MeetingTemplate {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  duration    Int      @default(60) // Duration in minutes
+  agenda      String?
+  attendees   String[] // Array of role titles or department names
+  is_active   Boolean  @default(true)
+  created_by  Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  
+  Staff       Staff    @relation(fields: [created_by], references: [id])
+  Meeting     Meeting[] // Meetings created from this template
+
+  @@map("meeting_templates")
+}
+
+model User {
+  id                           Int       @id @default(autoincrement())
+  email                        String    @unique
+  name                         String?
+  staff_id                     String?   @unique
+  hashedPassword              String?
+  emailVerified                DateTime?
+  image                        String?
+  is_admin                     Boolean   @default(false)
+  two_factor_enabled           Boolean   @default(false)
+  two_factor_secret            String?
+  backup_codes                 String[]
+  login_notifications_enabled Boolean   @default(true)
+  suspicious_alerts_enabled   Boolean   @default(true)
+  remember_devices_enabled     Boolean   @default(true)
+  created_at                   DateTime  @default(now())
+  updated_at                   DateTime  @updatedAt
+
+  Staff            Staff[]
+  Account          Account[]
+  Session          Session[]
+  AuditLog         AuditLog[]
+
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
