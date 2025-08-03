@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { parse } from "csv-parse/sync";
 import { z } from "zod";
 import { AuditLogger } from '@/lib/audit/audit-logger';
+import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
 
 // Enhanced interfaces for preview system
 interface ConflictItem {
@@ -88,6 +89,14 @@ function validateCsvHeaders(headers: string[]): { isValid: boolean; errors: stri
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting for staff upload operations
+    const clientId = getClientIdentifier(request);
+    const rateLimitResult = await RateLimiters.api.check(request, 20, clientId); // 20 uploads per minute
+    
+    if (!rateLimitResult.success) {
+      return RateLimiters.api.createErrorResponse(rateLimitResult);
+    }
+
     // REQUIRED: Auth check - Leadership required for staff upload
     const authResult = await withAuth(request, { requireLeadership: true });
     if (!authResult.success) {

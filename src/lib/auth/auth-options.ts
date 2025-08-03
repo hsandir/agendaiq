@@ -4,6 +4,7 @@ import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
+import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
 
 // Type guard for staff property
 function hasStaff(user: unknown): user is User & { staff: unknown } {
@@ -40,13 +41,20 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials): Promise<User | null> {
+      async authorize(credentials, req): Promise<User | null> {
         try {
-          console.log('🔐 Authorize called with:', { email: credentials?.email, hasPassword: !!credentials?.password });
-          
           if (!credentials?.email || !credentials?.password) {
-            console.log('❌ Missing credentials');
             throw new Error("Missing credentials");
+          }
+
+          // Rate limiting for authentication attempts
+          if (req) {
+            const clientId = getClientIdentifier(req);
+            const rateLimitResult = await RateLimiters.auth.check(req, 5, clientId); // 5 attempts per 15 minutes
+            
+            if (!rateLimitResult.success) {
+              throw new Error(rateLimitResult.error || "Too many login attempts. Please try again later.");
+            }
           }
 
           const user = await prisma.user.findUnique({
@@ -62,19 +70,14 @@ export const authOptions: NextAuthOptions = {
             }
           });
 
-          console.log('🔍 User found:', !!user, 'Has password:', !!user?.hashedPassword);
-
           if (!user || !user.hashedPassword) {
-            console.log('❌ Invalid credentials - user not found or no password');
             throw new Error("Invalid credentials");
           }
 
           // Check password using bcrypt
           const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
-          console.log('🔐 Password valid:', isValid);
           
           if (!isValid) {
-            console.log('❌ Invalid credentials - password mismatch');
             throw new Error("Invalid credentials");
           }
 
@@ -107,7 +110,6 @@ export const authOptions: NextAuthOptions = {
             })
           };
 
-          console.log('✅ User authenticated:', userData.email);
           return userData;
         } catch (error) {
           console.error('❌ Authorization error:', error instanceof Error ? error.message : String(error));

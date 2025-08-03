@@ -2,9 +2,18 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 import { sendEmail } from "@/lib/email/send-email";
+import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
 
 export async function POST(request: Request) {
   try {
+    // Rate limiting for password reset attempts
+    const clientId = getClientIdentifier(request);
+    const rateLimitResult = await RateLimiters.passwordReset.check(request, 5, clientId); // 5 attempts per hour
+    
+    if (!rateLimitResult.success) {
+      return RateLimiters.passwordReset.createErrorResponse(rateLimitResult);
+    }
+
     const { email } = await request.json();
 
     if (!email) {
