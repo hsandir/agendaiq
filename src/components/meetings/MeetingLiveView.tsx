@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -78,12 +78,18 @@ export function MeetingLiveView({
   const [agendaItems, setAgendaItems] = useState(meeting.MeetingAgendaItems);
   const [activeTab, setActiveTab] = useState("agenda");
   const [isConnected, setIsConnected] = useState(false);
-  const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
   const [typingUsers, setTypingUsers] = useState<Map<number, { userId: number; userName: string }>>(new Map());
+  const [isHydrated, setIsHydrated] = useState(false);
+  
+  // Set hydrated flag after mount
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // Set up real-time updates with Pusher
-  const eventHandlers = {
+  const eventHandlers = useMemo(() => ({
     [EVENTS.AGENDA_ITEM_UPDATED]: (data: any) => {
       setAgendaItems(prev => prev.map(item => 
         item.id === data.itemId ? { ...item, ...data.updates } : item
@@ -118,7 +124,7 @@ export function MeetingLiveView({
     'pusher:subscription_error': () => {
       setIsConnected(false);
     }
-  };
+  }), []);
 
   const channel = usePusherChannel(
     CHANNELS.meeting(meeting.id),
@@ -128,7 +134,7 @@ export function MeetingLiveView({
   // Set up presence channel for live user tracking
   const { members } = usePresenceChannel(
     CHANNELS.presence(meeting.id),
-    {}
+    useMemo(() => ({}), [])
   );
 
   const refreshMeeting = async () => {
@@ -416,7 +422,9 @@ export function MeetingLiveView({
             <CardContent className="pt-6">
               <div className="text-center">
                 <p className="text-sm text-gray-600">Last updated</p>
-                <p className="font-medium">{lastUpdate.toLocaleTimeString()}</p>
+                <p className="font-medium">
+                  {isHydrated ? (lastUpdate ? lastUpdate.toLocaleTimeString() : 'Not yet') : '...'}
+                </p>
               </div>
             </CardContent>
           </Card>

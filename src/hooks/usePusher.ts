@@ -33,6 +33,12 @@ export function usePusherChannel(
   const pusher = usePusher();
   const [channel, setChannel] = useState<Channel | null>(null);
   const channelRef = useRef<Channel | null>(null);
+  const handlersRef = useRef(eventHandlers);
+
+  // Update handlers ref when they change
+  useEffect(() => {
+    handlersRef.current = eventHandlers;
+  }, [eventHandlers]);
 
   useEffect(() => {
     if (!pusher || !channelName) return;
@@ -41,27 +47,33 @@ export function usePusherChannel(
     channelRef.current = pusher.subscribe(channelName);
     setChannel(channelRef.current);
 
-    // Bind event handlers
-    if (eventHandlers) {
-      Object.entries(eventHandlers).forEach(([event, handler]) => {
-        channelRef.current?.bind(event, handler);
+    // Create stable handler functions that use ref
+    const stableHandlers: Record<string, (data: any) => void> = {};
+    if (handlersRef.current) {
+      Object.entries(handlersRef.current).forEach(([event, _]) => {
+        stableHandlers[event] = (data: any) => {
+          handlersRef.current?.[event]?.(data);
+        };
       });
     }
+
+    // Bind stable handlers
+    Object.entries(stableHandlers).forEach(([event, handler]) => {
+      channelRef.current?.bind(event, handler);
+    });
 
     // Cleanup
     return () => {
       if (channelRef.current) {
-        // Unbind event handlers
-        if (eventHandlers) {
-          Object.entries(eventHandlers).forEach(([event, handler]) => {
-            channelRef.current?.unbind(event, handler);
-          });
-        }
+        // Unbind stable handlers
+        Object.entries(stableHandlers).forEach(([event, handler]) => {
+          channelRef.current?.unbind(event, handler);
+        });
         pusher.unsubscribe(channelName);
         channelRef.current = null;
       }
     };
-  }, [pusher, channelName, eventHandlers]);
+  }, [pusher, channelName]); // Remove eventHandlers from dependencies
 
   return channel;
 }
@@ -74,6 +86,12 @@ export function usePresenceChannel(
   const [channel, setChannel] = useState<PresenceChannel | null>(null);
   const [members, setMembers] = useState<any[]>([]);
   const channelRef = useRef<PresenceChannel | null>(null);
+  const handlersRef = useRef(eventHandlers);
+
+  // Update handlers ref when they change
+  useEffect(() => {
+    handlersRef.current = eventHandlers;
+  }, [eventHandlers]);
 
   useEffect(() => {
     if (!pusher || !channelName) return;
@@ -96,12 +114,20 @@ export function usePresenceChannel(
       setMembers(prev => prev.filter(m => m.id !== member.id));
     });
 
-    // Bind custom event handlers
-    if (eventHandlers) {
-      Object.entries(eventHandlers).forEach(([event, handler]) => {
-        channelRef.current?.bind(event, handler);
+    // Create stable handler functions
+    const stableHandlers: Record<string, (data: any) => void> = {};
+    if (handlersRef.current) {
+      Object.entries(handlersRef.current).forEach(([event, _]) => {
+        stableHandlers[event] = (data: any) => {
+          handlersRef.current?.[event]?.(data);
+        };
       });
     }
+
+    // Bind stable handlers
+    Object.entries(stableHandlers).forEach(([event, handler]) => {
+      channelRef.current?.bind(event, handler);
+    });
 
     // Cleanup
     return () => {
@@ -112,7 +138,7 @@ export function usePresenceChannel(
         channelRef.current = null;
       }
     };
-  }, [pusher, channelName, eventHandlers]);
+  }, [pusher, channelName]); // Remove eventHandlers from dependencies
 
   return { channel, members };
 }
