@@ -4,6 +4,7 @@ import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
+import speakeasy from "speakeasy";
 import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
 import { AuditClient } from '@/lib/audit/audit-client';
 
@@ -44,6 +45,7 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        twoFactorCode: { label: "2FA Code", type: "text", optional: true },
       },
       async authorize(credentials, req): Promise<User | null> {
         try {
@@ -104,6 +106,39 @@ export const authOptions: NextAuthOptions = {
           if (!isValid) {
             // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, 'Password mismatch');
             throw new Error("Invalid credentials");
+          }
+
+          // Check 2FA if enabled
+          if (user.two_factor_enabled) {
+            if (!credentials.twoFactorCode) {
+              throw new Error("2FA_REQUIRED");
+            }
+
+            // Verify the 2FA code
+            const isValidToken = speakeasy.totp.verify({
+              secret: user.two_factor_secret!,
+              encoding: 'base32',
+              token: credentials.twoFactorCode,
+              window: 2
+            });
+
+            // Check backup codes if TOTP fails
+            if (!isValidToken) {
+              const isBackupCode = user.backup_codes.includes(credentials.twoFactorCode);
+              
+              if (!isBackupCode) {
+                // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, '2FA code invalid');
+                throw new Error("Invalid 2FA code");
+              }
+
+              // Remove used backup code
+              await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                  backup_codes: user.backup_codes.filter(code => code !== credentials.twoFactorCode)
+                }
+              });
+            }
           }
 
           const staff = user.Staff[0];
