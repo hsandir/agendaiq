@@ -9,6 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { AgendaItemComments } from "./AgendaItemComments";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   ArrowLeft, 
   Save, 
@@ -55,7 +63,20 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
     duration_minutes: item.duration_minutes || null
   });
 
+  const [showOngoingDialog, setShowOngoingDialog] = useState(false);
+  const [ongoingChoice, setOngoingChoice] = useState<'new_meeting' | 'next_meeting' | null>(null);
+
   const handleSave = async () => {
+    // Check if status changed to Ongoing
+    if (editData.status === 'Ongoing' && item.status !== 'Ongoing') {
+      setShowOngoingDialog(true);
+      return;
+    }
+
+    await saveChanges();
+  };
+
+  const saveChanges = async () => {
     setIsSaving(true);
     try {
       const response = await fetch(`/api/meetings/${meeting.id}/agenda-items/${item.id}`, {
@@ -66,13 +87,45 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
 
       if (response.ok) {
         setIsEditing(false);
-        // Refresh the page to get updated data
+        
+        // Handle ongoing status actions
+        if (editData.status === 'Ongoing' && ongoingChoice) {
+          if (ongoingChoice === 'new_meeting') {
+            // Create new meeting with this item
+            router.push(`/dashboard/meetings/new?fromItem=${item.id}`);
+          } else if (ongoingChoice === 'next_meeting') {
+            // Add to next recurring meeting
+            await addToNextMeeting();
+          }
+        }
+        
         router.refresh();
       }
     } catch (error) {
       console.error('Error saving:', error);
     } finally {
       setIsSaving(false);
+      setShowOngoingDialog(false);
+      setOngoingChoice(null);
+    }
+  };
+
+  const addToNextMeeting = async () => {
+    // Find next recurring meeting and add this item
+    try {
+      const response = await fetch(`/api/meetings/${meeting.id}/next-recurring`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agendaItem: editData
+        })
+      });
+      
+      if (!response.ok) {
+        console.error('Failed to add to next meeting');
+      }
+    } catch (error) {
+      console.error('Error adding to next meeting:', error);
     }
   };
 
@@ -108,6 +161,29 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
       }
     } catch (error) {
       console.error('Error adding comment:', error);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch(`/api/meetings/${meeting.id}/agenda-items/${item.id}/attachments`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        router.refresh();
+      } else {
+        console.error('Upload failed');
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
     }
   };
 
@@ -293,11 +369,9 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="Assigned_to_local">Assigned to local</SelectItem>
                         <SelectItem value="Ongoing">Ongoing</SelectItem>
                         <SelectItem value="Resolved">Resolved</SelectItem>
-                        <SelectItem value="Assigned_to_local">Assigned to local</SelectItem>
-                        <SelectItem value="Deferred">Deferred</SelectItem>
                       </SelectContent>
                     </Select>
                   ) : (
@@ -319,9 +393,9 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Information_Sharing">Information Sharing</SelectItem>
-                        <SelectItem value="Discussion">Discussion</SelectItem>
                         <SelectItem value="Decision">Decision</SelectItem>
+                        <SelectItem value="Discussion">Discussion</SelectItem>
+                        <SelectItem value="Information_Sharing">Information Sharing</SelectItem>
                         <SelectItem value="Reminder">Reminder</SelectItem>
                       </SelectContent>
                     </Select>
@@ -331,6 +405,58 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                     </p>
                   )}
                 </div>
+
+                {/* Type of Solution */}
+                {(item.solution_type || isEditing) && (
+                  <div>
+                    <label className="text-sm text-gray-600">Type of Solution</label>
+                    {isEditing ? (
+                      <Select
+                        value={editData.solution_type || ''}
+                        onValueChange={(value: any) => setEditData({ ...editData, solution_type: value })}
+                      >
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Adaptive">Adaptive</SelectItem>
+                          <SelectItem value="Technical">Technical</SelectItem>
+                          <SelectItem value="Both">Both</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="font-medium text-gray-900 mt-1">
+                        {item.solution_type || 'Not specified'}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Type of Decision */}
+                {(item.decision_type || isEditing) && (
+                  <div>
+                    <label className="text-sm text-gray-600">Type of Decision</label>
+                    {isEditing ? (
+                      <Select
+                        value={editData.decision_type || ''}
+                        onValueChange={(value: any) => setEditData({ ...editData, decision_type: value })}
+                      >
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Adaptive">Adaptive</SelectItem>
+                          <SelectItem value="Technical">Technical</SelectItem>
+                          <SelectItem value="Both">Both</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <p className="font-medium text-gray-900 mt-1">
+                        {item.decision_type || 'Not specified'}
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 {/* Responsible Staff */}
                 <div>
@@ -402,9 +528,22 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                   Attachments
                 </h3>
                 {canEdit && (
-                  <Button size="sm" variant="outline" className="rounded-full">
-                    <Plus className="h-4 w-4" />
-                  </Button>
+                  <div>
+                    <input
+                      type="file"
+                      id="file-upload"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+                    />
+                    <label htmlFor="file-upload">
+                      <Button size="sm" variant="outline" className="rounded-full" asChild>
+                        <span>
+                          <Plus className="h-4 w-4" />
+                        </span>
+                      </Button>
+                    </label>
+                  </div>
                 )}
               </div>
               
@@ -426,6 +565,58 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
           </div>
         </div>
       </div>
+
+      {/* Ongoing Status Dialog */}
+      <Dialog open={showOngoingDialog} onOpenChange={setShowOngoingDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Item Status: Ongoing</DialogTitle>
+            <DialogDescription>
+              This item will be marked as ongoing. What would you like to do?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-4">
+            <button
+              onClick={() => setOngoingChoice('new_meeting')}
+              className={`w-full p-4 text-left rounded-lg border transition-colors ${
+                ongoingChoice === 'new_meeting' 
+                  ? 'border-blue-500 bg-blue-50' 
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <div className="font-medium mb-1">Create a new meeting</div>
+              <div className="text-sm text-gray-600">
+                Start a new meeting to continue working on this item
+              </div>
+            </button>
+            <button
+              onClick={() => setOngoingChoice('next_meeting')}
+              className={`w-full p-4 text-left rounded-lg border transition-colors ${
+                ongoingChoice === 'next_meeting' 
+                  ? 'border-blue-500 bg-blue-50' 
+                  : 'border-gray-200 hover:border-gray-300'
+              }`}
+            >
+              <div className="font-medium mb-1">Add to next recurring meeting</div>
+              <div className="text-sm text-gray-600">
+                This item will be added to the next scheduled meeting in this series
+              </div>
+            </button>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowOngoingDialog(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={saveChanges}
+              disabled={!ongoingChoice || isSaving}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {isSaving ? 'Saving...' : 'Continue'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

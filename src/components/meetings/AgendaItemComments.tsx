@@ -37,6 +37,8 @@ export function AgendaItemComments({ itemId, comments, onAddComment, canComment 
     try {
       await onAddComment(newComment.trim());
       setNewComment("");
+    } catch (error) {
+      console.error('Error adding comment:', error);
     } finally {
       setIsSubmitting(false);
     }

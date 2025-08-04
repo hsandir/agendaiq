@@ -349,11 +349,9 @@ export function AgendaItemLive({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Pending">Pending</SelectItem>
+                    <SelectItem value="Assigned_to_local">Assigned to local</SelectItem>
                     <SelectItem value="Ongoing">Ongoing</SelectItem>
                     <SelectItem value="Resolved">Resolved</SelectItem>
-                    <SelectItem value="Assigned_to_local">Assigned to local</SelectItem>
-                    <SelectItem value="Deferred">Deferred</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -367,9 +365,9 @@ export function AgendaItemLive({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Low">Low</SelectItem>
                     <SelectItem value="Medium">Medium</SelectItem>
                     <SelectItem value="High">High</SelectItem>
+                    <SelectItem value="Low">Low</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
