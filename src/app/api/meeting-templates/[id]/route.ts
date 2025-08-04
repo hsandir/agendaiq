@@ -71,7 +71,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -140,7 +140,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

@@ -4,6 +4,9 @@ import fs from 'fs/promises';
 import path from 'path';
 import { NextRequest } from 'next/server';
 
+// Safe metadata type for audit events
+export type AuditMetadata = Record<string, string | number | boolean | null | undefined>;
+
 // Types for different audit events
 export interface CriticalAuditEvent {
   category: AuditCategory;
@@ -17,7 +20,7 @@ export interface CriticalAuditEvent {
   success?: boolean;
   errorMessage?: string;
   riskScore?: number;
-  metadata?: Record<string, any>;
+  metadata?: AuditMetadata;
 }
 
 export interface OperationalEvent {
@@ -30,7 +33,7 @@ export interface OperationalEvent {
   duration?: number;
   userAgent?: string;
   ipAddress?: string;
-  metadata?: Record<string, any>;
+  metadata?: AuditMetadata;
 }
 
 export interface AuditEventContext {
@@ -249,7 +252,7 @@ class HybridAuditSystem {
     }, context);
   }
 
-  async logDataCritical(action: string, userId?: number, staffId?: number, targetUserId?: number, metadata?: Record<string, any>, context?: AuditEventContext): Promise<void> {
+  async logDataCritical(action: string, userId?: number, staffId?: number, targetUserId?: number, metadata?: AuditMetadata, context?: AuditEventContext): Promise<void> {
     await this.logCritical({
       category: 'DATA_CRITICAL',
       action,

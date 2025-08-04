@@ -19,7 +19,7 @@ export default async function AuditLogsPage() {
         </p>
       </div>
 
-      <AuditLogsClient />
+      <AuditLogsClient user={user} />
     </div>
   );
 } 

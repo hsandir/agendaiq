@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     return RateLimiters.api.createErrorResponse(rateLimitResult);
   }
 
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

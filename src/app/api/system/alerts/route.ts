@@ -5,7 +5,7 @@ import { withAuth } from "@/lib/auth/api-auth";
 export async function GET(request: NextRequest) {
   try {
     // REQUIRED: Auth check - Admin only for alert configuration
-    const authResult = await withAuth(request, { requireAdminRole: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
     
     if (!authResult.success) {
       return NextResponse.json(
@@ -171,6 +171,8 @@ export async function DELETE(request: NextRequest) {
   try {
     // REQUIRED: Auth check (usually admin only for deletes)
     const authResult = await withAuth(request, { 
+      requireAuth: true,
+      requireStaff: true,
       requireAdminRole: true,
     });
     

@@ -4,10 +4,33 @@ import { auditSystem } from '@/lib/audit/hybrid-audit-system';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { AuditCategory } from '@prisma/client';
 
+// Safe type definitions for audit log records
+interface BaseAuditRecord {
+  timestamp?: string;
+  created_at?: string;
+  source?: string;
+  category?: string;
+  table_name?: string;
+  action?: string;
+  operation?: string;
+  User?: { email?: string };
+  Staff?: { Role?: { title?: string } };
+  ip_address?: string;
+  risk_score?: number;
+  success?: boolean;
+  error_message?: string;
+  description?: string;
+}
+
+// Type for sortable audit records
+interface SortableAuditRecord extends BaseAuditRecord {
+  [key: string]: unknown;
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Require admin access
-    const authResult = await withAuth(request, { requireAdminRole: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
     if (!authResult.success) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
@@ -28,7 +51,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid format. Use csv or json' }, { status: 400 });
     }
 
-    let data: unknown[] = [];
+    let data: SortableAuditRecord[] = [];
 
     if (logType === 'critical' || logType === 'both') {
       const criticalLogs = await auditSystem.getRecentCriticalEvents(maxRecords, category || undefined, userId);
@@ -58,9 +81,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Sort by timestamp descending  
-    data.sort((a: any, b: any) => {
-      const timeA = new Date(a.timestamp || a.created_at).getTime();
-      const timeB = new Date(b.timestamp || b.created_at).getTime();
+    data.sort((a: SortableAuditRecord, b: SortableAuditRecord) => {
+      const timeA = new Date(a.timestamp || a.created_at || '').getTime();
+      const timeB = new Date(b.timestamp || b.created_at || '').getTime();
       return timeB - timeA;
     });
 
@@ -96,8 +119,8 @@ export async function GET(request: NextRequest) {
         'Description'
       ];
 
-      const csvRows = data.map(log => {
-        const timestamp = new Date(log.timestamp || log.created_at).toISOString();
+      const csvRows = data.map((log: BaseAuditRecord) => {
+        const timestamp = new Date(log.timestamp || log.created_at || '').toISOString();
         const type = log.source || (log.category ? 'critical' : 'legacy');
         const categoryOrTable = log.category || log.table_name || '';
         const actionOrOperation = log.action || log.operation || '';

@@ -8,7 +8,7 @@ import path from 'path';
 const execAsync = promisify(exec);
 
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -633,7 +633,7 @@ async function createFullSystemBackup(components: string[] = ['database', 'setti
 
 // PUT method for uploading and restoring backups
 export async function PUT(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -667,7 +667,7 @@ export async function PUT(request: NextRequest) {
     await execAsync(`cd "${restoreDir}" && unzip "${file.name}"`);
 
     // Restore components (simplified - in production this would be more careful)
-    let restoredComponents: string[] = [];
+    const restoredComponents: string[] = [];
 
     // Restore database
     try {

@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/roles - Create a new role
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
 // PUT /api/roles - Update a role
 export async function PUT(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

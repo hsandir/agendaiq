@@ -19,7 +19,10 @@ function hasStaffToken(token: unknown): token is JWT & { staff: unknown } {
 
 // Type guard for user data
 function isValidUserData(data: unknown): data is User {
-  return typeof data === 'object' && data !== null && typeof (data as any).id === 'number' && typeof (data as any).email === 'string';
+  return typeof data === 'object' && 
+         data !== null && 
+         typeof (data as { id?: unknown }).id === 'number' && 
+         typeof (data as { email?: unknown }).email === 'string';
 }
 
 export const authOptions: NextAuthOptions = {

@@ -1,7 +1,117 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { FiSearch, FiFilter, FiDownload, FiEye, FiTrash2, FiEdit, FiRefreshCw, FiCalendar, FiUser, FiDatabase, FiActivity, FiShield, FiAlertTriangle } from 'react-icons/fi';
+import { useState, useEffect, useCallback } from 'react';
+import { FiDownload, FiEye, FiTrash2, FiEdit, FiRefreshCw, FiUser, FiDatabase, FiActivity, FiShield, FiAlertTriangle } from 'react-icons/fi';
+
+// User interface for authentication context
+interface AuthUser {
+  id: number;
+  email: string;
+  name?: string;
+  staff?: {
+    id: number;
+    role: {
+      title: string;
+      priority: number;
+      is_leadership: boolean;
+    };
+    department: {
+      name: string;
+    };
+  };
+}
+
+// Component props interface
+interface AuditLogsClientProps {
+  user: AuthUser;
+}
+
+// Enhanced error handling types
+enum ErrorCategory {
+  NETWORK = 'NETWORK',
+  AUTHENTICATION = 'AUTHENTICATION', 
+  AUTHORIZATION = 'AUTHORIZATION',
+  VALIDATION = 'VALIDATION',
+  SERVER = 'SERVER',
+  CLIENT = 'CLIENT'
+}
+
+interface AuditError {
+  category: ErrorCategory;
+  message: string;
+  code?: string;
+  details?: string;
+}
+
+// Error categorization helper
+const categorizeError = (error: unknown, context: string): AuditError => {
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    
+    // Network errors
+    if (message.includes('fetch') || message.includes('network') || message.includes('connection')) {
+      return {
+        category: ErrorCategory.NETWORK,
+        message: `Network error while ${context}`,
+        details: error.message
+      };
+    }
+    
+    // Authentication errors
+    if (message.includes('unauthorized') || message.includes('token')) {
+      return {
+        category: ErrorCategory.AUTHENTICATION,
+        message: `Authentication required for ${context}`,
+        details: error.message
+      };
+    }
+    
+    // Authorization errors
+    if (message.includes('forbidden') || message.includes('access denied')) {
+      return {
+        category: ErrorCategory.AUTHORIZATION,
+        message: `Access denied for ${context}`,
+        details: error.message
+      };
+    }
+    
+    // Server errors
+    if (message.includes('500') || message.includes('internal server')) {
+      return {
+        category: ErrorCategory.SERVER,
+        message: `Server error while ${context}`,
+        details: error.message
+      };
+    }
+    
+    // Validation errors
+    if (message.includes('validation') || message.includes('invalid')) {
+      return {
+        category: ErrorCategory.VALIDATION,
+        message: `Invalid data for ${context}`,
+        details: error.message
+      };
+    }
+    
+    // Default to client error
+    return {
+      category: ErrorCategory.CLIENT,
+      message: `Error ${context}`,
+      details: error.message
+    };
+  }
+  
+  return {
+    category: ErrorCategory.CLIENT,
+    message: `Unknown error ${context}`,
+    details: String(error)
+  };
+};
+
+// Define safe types for audit data
+type AuditFieldValue = string | number | boolean | null | undefined;
+type AuditRecord = Record<string, AuditFieldValue>;
+type FieldChange = { old: AuditFieldValue; new: AuditFieldValue };
 
 // Legacy audit log interface
 interface LegacyAuditLog {
@@ -9,9 +119,9 @@ interface LegacyAuditLog {
   table_name: string;
   record_id: string;
   operation: string;
-  field_changes: Record<string, { old: any; new: any }> | null;
-  old_values: Record<string, any> | null;
-  new_values: Record<string, any> | null;
+  field_changes: Record<string, FieldChange> | null;
+  old_values: AuditRecord | null;
+  new_values: AuditRecord | null;
   description: string | null;
   source: string;
   ip_address: string | null;
@@ -34,7 +144,7 @@ interface CriticalAuditLog {
   staff_id: number | null;
   ip_address: string | null;
   user_agent: string | null;
-  metadata: Record<string, any> | null;
+  metadata: AuditRecord | null;
   risk_score: number;
   success: boolean;
   error_message: string | null;
@@ -66,6 +176,18 @@ interface AuditSummary {
   topUsers: { userId: number; count: number }[];
 }
 
+interface HighRiskStats {
+  total: number;
+  riskScoreDistribution: Record<string, number>;
+  categoryDistribution: Record<string, number>;
+  userDistribution: Record<string, number>;
+  ipDistribution: Record<string, number>;
+  timeRange: {
+    from: string;
+    to: string;
+  };
+}
+
 interface Filters {
   logType: 'critical' | 'legacy' | 'both';
   table: string;
@@ -81,7 +203,7 @@ interface Filters {
   search: string;
 }
 
-export default function AuditLogsClient() {
+export default function AuditLogsClient({ user }: AuditLogsClientProps) {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [summary, setSummary] = useState<AuditSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -102,7 +224,7 @@ export default function AuditLogsClient() {
     success: '',
     search: ''
   });
-  const [highRiskStats, setHighRiskStats] = useState<any>(null);
+  const [highRiskStats, setHighRiskStats] = useState<HighRiskStats | null>(null);
   const [pagination, setPagination] = useState({
     limit: 50,
     offset: 0,
@@ -110,7 +232,7 @@ export default function AuditLogsClient() {
   });
 
   // Load audit logs
-  const loadAuditLogs = async (reset: boolean = false) => {
+  const loadAuditLogs = useCallback(async (reset: boolean = false) => {
     try {
       setLoading(true);
       
@@ -161,14 +283,16 @@ export default function AuditLogsClient() {
       }
       
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error loading audit logs');
+      const auditError = categorizeError(err, 'loading audit logs');
+      console.error(`[${auditError.category}] ${auditError.message}:`, auditError.details);
+      setError(`${auditError.message}. Please try again.`);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, pagination.limit, pagination.offset]);
 
   // Load high-risk stats
-  const loadHighRiskStats = async () => {
+  const loadHighRiskStats = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/audit-logs/high-risk?limit=10');
       if (response.ok) {
@@ -176,12 +300,13 @@ export default function AuditLogsClient() {
         setHighRiskStats(data.stats);
       }
     } catch (err) {
-      console.error('Error loading high-risk stats:', err);
+      const auditError = categorizeError(err, 'loading high-risk statistics');
+      console.error(`[${auditError.category}] ${auditError.message}:`, auditError.details);
     }
-  };
+  }, []);
 
   // Load summary
-  const loadSummary = async () => {
+  const loadSummary = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/audit-logs/summary');
       if (!response.ok) throw new Error('Failed to fetch summary');
@@ -189,15 +314,16 @@ export default function AuditLogsClient() {
       const data = await response.json();
       setSummary(data.data);
     } catch (err) {
-      console.error('Error loading summary:', err);
+      const auditError = categorizeError(err, 'loading audit summary');
+      console.error(`[${auditError.category}] ${auditError.message}:`, auditError.details);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadAuditLogs(true);
     loadSummary();
     loadHighRiskStats();
-  }, [filters]);
+  }, [filters, loadAuditLogs, loadSummary, loadHighRiskStats]);
 
   const handleFilterChange = (key: keyof Filters, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -265,9 +391,33 @@ export default function AuditLogsClient() {
     return new Date(dateString).toLocaleString('en-US');
   };
 
+  // Permission validation helper
+  const canViewAuditDetails = useCallback((log: AuditLog): boolean => {
+    // Administrator can view all logs
+    if (user.staff?.role.title === 'Administrator') {
+      return true;
+    }
+
+    // Leadership can view logs from their own organization
+    if (user.staff?.role.is_leadership) {
+      // Can view logs from same user or their own staff actions
+      return log.user_id === user.id || log.staff_id === user.staff.id;
+    }
+
+    // Regular staff can only view their own audit logs
+    return log.user_id === user.id || log.staff_id === user.staff?.id;
+  }, [user]);
+
   const handleViewDetails = (log: AuditLog) => {
+    // Security validation: Check permissions before viewing details
+    if (!canViewAuditDetails(log)) {
+      setError('Access denied: You do not have permission to view this audit log.');
+      return;
+    }
+
     setSelectedLog(log);
     setShowDetails(true);
+    setError(''); // Clear any previous errors
   };
 
   const exportLogs = async (format: 'csv' | 'json' = 'csv') => {
@@ -301,7 +451,9 @@ export default function AuditLogsClient() {
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
-      setError('Export failed');
+      const auditError = categorizeError(err, 'exporting audit logs');
+      console.error(`[${auditError.category}] ${auditError.message}:`, auditError.details);
+      setError(`Export failed: ${auditError.message}`);
     }
   };
 
@@ -661,13 +813,23 @@ export default function AuditLogsClient() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleViewDetails(log)}
-                        className="text-blue-600 hover:text-blue-900 mr-3"
-                        title="View Details"
-                      >
-                        <FiEye className="h-4 w-4" />
-                      </button>
+                      {canViewAuditDetails(log) ? (
+                        <button
+                          onClick={() => handleViewDetails(log)}
+                          className="text-blue-600 hover:text-blue-900 mr-3"
+                          title="View Details"
+                        >
+                          <FiEye className="h-4 w-4" />
+                        </button>
+                      ) : (
+                        <button
+                          disabled
+                          className="text-gray-400 mr-3 cursor-not-allowed"
+                          title="Access Denied: Insufficient permissions"
+                        >
+                          <FiEye className="h-4 w-4" />
+                        </button>
+                      )}
                       {!isCritical && log.operation !== 'DELETE' && (
                         <>
                           <button className="text-green-600 hover:text-green-900 mr-3" title="Edit">
