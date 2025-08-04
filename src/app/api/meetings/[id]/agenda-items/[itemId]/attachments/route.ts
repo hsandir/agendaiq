@@ -97,7 +97,7 @@ export async function POST(
       data: {
         agenda_item_id: itemId,
         file_name: file.name,
-        file_path: `/uploads/agenda-items/${fileName}`,
+        file_url: `/uploads/agenda-items/${fileName}`,
         file_size: file.size,
         content_type: file.type,
         uploaded_by_id: user.staff!.id

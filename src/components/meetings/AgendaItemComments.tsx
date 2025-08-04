@@ -8,7 +8,7 @@ import { format } from "date-fns";
 
 interface Comment {
   id: number;
-  content: string;
+  comment: string;
   created_at: string;
   Staff: {
     User: {
@@ -97,7 +97,7 @@ export function AgendaItemComments({ itemId, comments, onAddComment, canComment 
                     </span>
                   </div>
                   <p className="text-sm text-gray-700 mt-1 whitespace-pre-wrap">
-                    {comment.content}
+                    {comment.comment}
                   </p>
                 </div>
               </div>
