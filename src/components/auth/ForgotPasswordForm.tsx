@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FiMail, FiAlertCircle } from 'react-icons/fi';
+import { Mail as FiMail, AlertCircle as FiAlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export function ForgotPasswordForm() {

@@ -77,10 +77,20 @@ export default function AlertsConfigurationPage() {
       setLoading(true);
       
       // Fetch real alerts configuration from API
-      const response = await fetch('/api/system/alerts');
+      const response = await fetch('/api/system/alerts', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (response.ok) {
-        const data = await response.json();
-        setAlertsConfig(data);
+        const result = await response.json();
+        // API returns { data: alertsConfig, message: "..." }
+        if (result.data) {
+          setAlertsConfig(result.data);
+        } else {
+          throw new Error('Invalid response format');
+        }
       } else {
         throw new Error('Failed to fetch alerts configuration');
       }
@@ -88,126 +98,23 @@ export default function AlertsConfigurationPage() {
       console.error('Failed to fetch alerts configuration:', error);
       showNotification('Failed to fetch alerts configuration');
       
-      // Fallback to mock data if API fails
-      const mockAlertsConfig: AlertsConfig = {
-        rules: [
-          {
-            id: "1",
-            name: "Database Connection Failure",
-            description: "Alert when database connection fails or times out",
-            type: "error",
-            condition: "database.connection.failed",
-            threshold: 1,
-            enabled: true,
-            channels: ["email", "slack"],
-            lastTriggered: "2024-06-01T10:45:23Z",
-            triggerCount: 3
-          },
-          {
-            id: "2",
-            name: "High Memory Usage",
-            description: "Alert when memory usage exceeds 80%",
-            type: "warning",
-            condition: "system.memory.usage",
-            threshold: 80,
-            enabled: true,
-            channels: ["email"],
-            triggerCount: 0
-          },
-          {
-            id: "3",
-            name: "API Rate Limit Exceeded",
-            description: "Alert when API rate limits are exceeded",
-            type: "warning",
-            condition: "api.ratelimit.exceeded",
-            threshold: 5,
-            enabled: true,
-            channels: ["slack"],
-            lastTriggered: "2024-06-01T09:30:12Z",
-            triggerCount: 12
-          },
-          {
-            id: "4",
-            name: "Failed Login Attempts",
-            description: "Alert on multiple failed login attempts",
-            type: "warning",
-            condition: "auth.failed_attempts",
-            threshold: 5,
-            enabled: false,
-            channels: ["email", "slack"],
-            triggerCount: 0
-          },
-          {
-            id: "5",
-            name: "Backup Completion",
-            description: "Notify when daily backup is completed",
-            type: "info",
-            condition: "backup.completed",
-            threshold: 1,
-            enabled: true,
-            channels: ["email"],
-            lastTriggered: "2024-06-01T02:00:00Z",
-            triggerCount: 1
-          }
-        ],
-        channels: [
-          {
-            id: "email",
-            name: "Email Notifications",
-            type: "email",
-            enabled: true,
-            config: {
-              recipients: ["admin@agendaiq.com", "alerts@agendaiq.com"],
-              subject_prefix: "[AgendaIQ Alert]"
-            }
-          },
-          {
-            id: "slack",
-            name: "Slack Alerts",
-            type: "slack",
-            enabled: true,
-            config: {
-              webhook_url: "https://hooks.slack.com/services/***",
-              channel: "#system-alerts",
-              username: "AgendaIQ Bot"
-            }
-          },
-          {
-            id: "webhook",
-            name: "Custom Webhook",
-            type: "webhook",
-            enabled: false,
-            config: {
-              url: "https://your-webhook-url.com/alerts",
-              method: "POST"
-            }
-          },
-          {
-            id: "sms",
-            name: "SMS Alerts",
-            type: "sms",
-            enabled: false,
-            config: {
-              numbers: ["+1234567890"],
-              provider: "twilio"
-            }
-          }
-        ],
+      // Show empty state on error instead of mock data
+      setAlertsConfig({
+        rules: [],
+        channels: [],
         globalSettings: {
-          enableAlerts: true,
+          enableAlerts: false,
           quietHours: {
-            enabled: true,
+            enabled: false,
             start: "22:00",
             end: "08:00"
           },
           escalation: {
-            enabled: true,
+            enabled: false,
             delay: 30
           }
         }
-      };
-      
-      setAlertsConfig(mockAlertsConfig);
+      });
     } finally {
       setLoading(false);
     }
@@ -222,6 +129,7 @@ export default function AlertsConfigurationPage() {
       // Save configuration to API
       const response = await fetch('/api/system/alerts', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },

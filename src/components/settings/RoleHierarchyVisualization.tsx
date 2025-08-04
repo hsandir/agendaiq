@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FiChevronDown, FiChevronRight, FiUsers, FiUser, FiUserCheck } from 'react-icons/fi';
+import { ChevronDown as FiChevronDown, ChevronRight as FiChevronRight, Users as FiUsers, User as FiUser, UserCheck as FiUserCheck } from 'lucide-react';
 
 interface Role {
   id: string;

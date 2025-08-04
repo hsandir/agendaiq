@@ -79,74 +79,24 @@ export default function ServerManagementPage() {
       setLoading(true);
       
       // Try to fetch from real server metrics API
-      const response = await fetch('/api/system/server-metrics');
+      const response = await fetch('/api/system/server', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (response.ok) {
-        const serverData = await response.json();
-        setMetrics(serverData);
-        showNotification('Server metrics updated from real-time data');
-        return;
-      }
-      
-      // Fallback to simulated metrics with real-time variations
-      const mockMetrics: ServerMetrics = {
-        system: {
-          platform: "darwin",
-          architecture: "arm64",
-          nodeVersion: "18.19.1",
-          nextVersion: "14.2.5",
-          uptime: "2 days 14 hours",
-          hostname: "AgendaIQ-Server"
-        },
-        performance: {
-          memory: {
-            total: 16,
-            used: 8.5,
-            free: 7.5,
-            usage: 53
-          },
-          cpu: {
-            usage: 35,
-            cores: 8,
-            model: "Apple M2"
-          },
-          disk: {
-            total: 500,
-            used: 285,
-            free: 215,
-            usage: 57
-          }
-        },
-        network: {
-          protocol: "HTTP",
-          host: "localhost",
-          port: 3000,
-          status: "Active"
-        },
-        health: {
-          overall: 'healthy',
-          alerts: []
+        const result = await response.json();
+        if (result.data) {
+          setMetrics(result.data);
+          showNotification('Server metrics updated from real-time data');
+          return;
         }
-      };
-      
-      // Generate health alerts based on performance
-      if (mockMetrics.performance.memory.usage > 80) {
-        mockMetrics.health.overall = 'warning';
-        mockMetrics.health.alerts.push('High memory usage detected');
       }
       
-      if (mockMetrics.performance.cpu.usage > 90) {
-        mockMetrics.health.overall = 'critical';
-        mockMetrics.health.alerts.push('Critical CPU usage');
-      }
-      
-      if (mockMetrics.performance.disk.usage > 85) {
-        if (mockMetrics.health.overall === 'healthy') {
-          mockMetrics.health.overall = 'warning';
-        }
-        mockMetrics.health.alerts.push('Low disk space available');
-      }
-      
-      setMetrics(mockMetrics);
+      // Show error state instead of mock data
+      throw new Error('Failed to fetch server metrics');
+      // No mock data - error will be handled in catch block
     } catch (error) {
       console.error('Failed to fetch server metrics:', error);
       showNotification('Failed to fetch server metrics');

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { RiDashboardLine, RiCalendarLine, RiTeamLine, RiFileTextLine, RiSettings4Line, RiToolsLine } from "react-icons/ri";
+import { LayoutDashboard, Calendar, Users, FileText, Settings, Wrench } from "lucide-react";
 import clsx from "clsx";
 
 interface SidebarProps {
@@ -10,11 +10,11 @@ interface SidebarProps {
 }
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: RiDashboardLine },
-  { name: "Meetings", href: "/dashboard/meetings", icon: RiCalendarLine },
-  { name: "Team", href: "/dashboard/team", icon: RiTeamLine },
-  { name: "Notes", href: "/dashboard/notes", icon: RiFileTextLine },
-  { name: "Settings", href: "/dashboard/settings", icon: RiSettings4Line },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Meetings", href: "/dashboard/meetings", icon: Calendar },
+  { name: "Team", href: "/dashboard/team", icon: Users },
+  { name: "Notes", href: "/dashboard/notes", icon: FileText },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 export function Sidebar({ onSettingsClick }: SidebarProps = {}) {

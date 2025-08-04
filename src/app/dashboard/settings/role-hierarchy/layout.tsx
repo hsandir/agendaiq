@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { FiEye, FiEdit3, FiTrendingUp, FiUserCheck } from 'react-icons/fi';
+import { Eye as FiEye, Edit3 as FiEdit3, TrendingUp as FiTrendingUp, UserCheck as FiUserCheck } from 'lucide-react';
 
 const submenuItems = [
   {

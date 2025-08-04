@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FiUpload, FiDownload, FiAlertCircle, FiCheck, FiEye, FiSave, FiUsers, FiFileText, FiEdit, FiTrash2, FiRefreshCw } from 'react-icons/fi';
+import { Upload as FiUpload, Download as FiDownload, AlertCircle as FiAlertCircle, Check as FiCheck, Eye as FiEye, Save as FiSave, Users as FiUsers, FileText as FiFileText, Edit as FiEdit, Trash2 as FiTrash2, RefreshCw as FiRefreshCw } from 'lucide-react';
 
 interface ConflictItem {
   field: string;

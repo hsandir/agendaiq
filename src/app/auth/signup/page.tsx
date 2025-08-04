@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { FiLock } from "react-icons/fi";
+import { Lock as FiLock } from "lucide-react";
 
 export default function SignUpPage() {
   const router = useRouter();

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { FiDownload, FiEye, FiTrash2, FiEdit, FiRefreshCw, FiUser, FiDatabase, FiActivity, FiShield, FiAlertTriangle } from 'react-icons/fi';
+import { Download as FiDownload, Eye as FiEye, Trash2 as FiTrash2, Edit as FiEdit, RefreshCw as FiRefreshCw, User as FiUser, Database as FiDatabase, Activity as FiActivity, Shield as FiShield, AlertTriangle as FiAlertTriangle } from 'lucide-react';
 
 // User interface for authentication context
 interface AuthUser {

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
-import { FiUsers, FiUserCheck, FiTrendingUp, FiEye, FiEdit3, FiSettings, FiShield, FiHome, FiUserPlus } from 'react-icons/fi';
+import { Users as FiUsers, UserCheck as FiUserCheck, TrendingUp as FiTrendingUp, Eye as FiEye, Edit3 as FiEdit3, Settings as FiSettings, Shield as FiShield, Home as FiHome, User as FiUserPlus } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: "Role Management | AgendaIQ",
@@ -81,7 +81,7 @@ export default async function RolePage() {
         </div>
         <div className="flex space-x-3">
           <Button variant="outline">
-            <FiEdit3 className="h-4 w-4 mr-2" />
+            <Edit3 as FiEdit3 className="h-4 w-4 mr-2" />
             Edit Roles
           </Button>
           <Button>

@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
-import { FiPlus, FiEdit3, FiTrash2, FiClock, FiUsers, FiFileText } from 'react-icons/fi';
+import { Plus as FiPlus, Edit3 as FiEdit3, Trash2 as FiTrash2, Clock as FiClock, Users as FiUsers, FileText as FiFileText } from 'lucide-react';
 
 interface MeetingTemplate {
   id: number;
@@ -346,7 +346,7 @@ export default function MeetingTemplatesClient({
                       onClick={() => handleEdit(template)}
                       disabled={isLoading}
                     >
-                      <FiEdit3 className="h-4 w-4 mr-1" />
+                      <Edit3 as FiEdit3 className="h-4 w-4 mr-1" />
                       Edit
                     </Button>
                     <Button

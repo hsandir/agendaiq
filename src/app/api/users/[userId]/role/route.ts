@@ -15,7 +15,7 @@ export async function PUT(
 
     // Check if the current user is an administrator via staff relation
     const currentUser = await prisma.user.findUnique({
-      where: { id: user.id },
+      where: { id: session.user.id },
       include: { Staff: { include: { Role: true } } },
     });
     const isAdmin = currentUser?.Staff?.[0]?.Role?.title === 'Administrator';

@@ -68,7 +68,14 @@ async function updatePackages(specificPackages?: string[]) {
     };
 
     // Filter packages for Node.js compatibility and actual updates needed
-    const packagesToUpdate = beforeStatus.outdated.filter(pkg => {
+    let packagesToUpdate = beforeStatus.outdated;
+    
+    // If specific packages are requested, filter for those
+    if (specificPackages && specificPackages.length > 0) {
+      packagesToUpdate = packagesToUpdate.filter(pkg => specificPackages.includes(pkg.name));
+    }
+    
+    packagesToUpdate = packagesToUpdate.filter(pkg => {
       // Skip packages that require newer Node.js versions
       if (pkg.name === 'lru-cache' && pkg.latest.includes('11.')) {
         updateReport.details.push({

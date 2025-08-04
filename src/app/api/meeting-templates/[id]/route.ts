@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await withAuth(request, { requireStaff: true });
   if (!authResult.success) {
@@ -14,7 +14,8 @@ export async function GET(
   const user = authResult.user!;
 
   try {
-    const templateId = parseInt(params.id);
+    const { id } = await params;
+    const templateId = parseInt(id);
     
     if (isNaN(templateId)) {
       return NextResponse.json(
@@ -69,7 +70,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
   if (!authResult.success) {
@@ -79,7 +80,8 @@ export async function PUT(
   const user = authResult.user!;
 
   try {
-    const templateId = parseInt(params.id);
+    const { id } = await params;
+    const templateId = parseInt(id);
     
     if (isNaN(templateId)) {
       return NextResponse.json(
@@ -138,7 +140,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
   if (!authResult.success) {
@@ -148,7 +150,8 @@ export async function DELETE(
   const user = authResult.user!;
 
   try {
-    const templateId = parseInt(params.id);
+    const { id } = await params;
+    const templateId = parseInt(id);
     
     if (isNaN(templateId)) {
       return NextResponse.json(

@@ -2,37 +2,37 @@
 
 // Feather Icons - Most commonly used
 export { 
-  FiUser, 
-  FiMail, 
-  FiLock, 
-  FiAlertCircle,
-  FiDownload,
-  FiEye,
-  FiEdit,
-  FiTrash2,
-  FiRefreshCw,
-  FiDatabase,
-  FiActivity,
-  FiShield,
-  FiAlertTriangle,
-  FiPlus,
-  FiClock,
-  FiFileText,
-  FiUsers,
-  FiCheck,
-  FiX,
-  FiUpload,
-  FiSave,
+  User as FiUser, 
+  Mail as FiMail, 
+  Lock as FiLock, 
+  AlertCircle as FiAlertCircle,
+  Download as FiDownload,
+  Eye as FiEye,
+  Edit as FiEdit,
+  Trash2 as FiTrash2,
+  RefreshCw as FiRefreshCw,
+  Database as FiDatabase,
+  Activity as FiActivity,
+  Shield as FiShield,
+  AlertTriangle as FiAlertTriangle,
+  Plus as FiPlus,
+  Clock as FiClock,
+  FileText as FiFileText,
+  Users as FiUsers,
+  Check as FiCheck,
+  X as FiX,
+  Upload as FiUpload,
+  Save as FiSave,
   FiArrowLeft,
-  FiChevronDown,
-  FiChevronRight,
-  FiUserCheck,
-  FiHome,
-  FiTrendingUp,
-  FiSettings,
+  ChevronDown,
+  ChevronRight,
+  UserCheck as FiUserCheck,
+  Home as FiHome,
+  TrendingUp as FiTrendingUp,
+  Settings as FiSettings,
   FiSearch,
   FiFilter,
-  FiCalendar,
+  Calendar as FiCalendar,
   FiMoreVertical,
   FiBell,
   FiMenu,
@@ -55,7 +55,7 @@ export {
   FiMessageCircle,
   FiSend,
   FiPaperclip,
-  FiBookmark,
+  Book as FiBookmark,
   FiHeart,
   FiStar,
   FiThumbsUp,
@@ -137,7 +137,7 @@ export {
   FiPower,
   FiToggleLeft,
   FiToggleRight
-} from 'react-icons/fi';
+} from 'lucide-react';
 
 // Remix Icons - For specific dashboard and admin features
 export {
@@ -147,7 +147,7 @@ export {
   RiFileTextLine,
   RiSettings4Line,
   RiToolsLine,
-  RiAddLine,
+  Plus,
   RiBellLine,
   RiArrowLeftLine,
   RiEdit2Line,
@@ -156,7 +156,7 @@ export {
   RiFilterLine,
   RiDownloadLine,
   RiUploadLine,
-  RiEyeLine,
+  Eye,
   RiEyeOffLine,
   RiCheckLine,
   RiCloseLine,
@@ -490,7 +490,7 @@ export {
   RiSnowyLine as RiSnowyLineAlt2,
   RiWindyLine as RiWindyLineAlt2,
   RiThunderstormsLine as RiThunderstormsLineAlt2
-} from 'react-icons/ri';
+} from 'lucide-react';
 
 // Icon type definitions for better TypeScript support
 export type FeatherIconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -498,34 +498,34 @@ export type RemixIconType = React.ComponentType<React.SVGProps<SVGSVGElement>>;
 
 // Icon categories for organized usage
 export const AuthIcons = {
-  User: FiUser,
-  Mail: FiMail,
-  Lock: FiLock,
-  UserCheck: FiUserCheck,
-  Shield: FiShield,
+  User: User as FiUser,
+  Mail: Mail as FiMail,
+  Lock: Lock as FiLock,
+  UserCheck: UserCheck as FiUserCheck,
+  Shield: Shield as FiShield,
   Key: RiKeyLine,
   Fingerprint: RiFingerprint2Line
 } as const;
 
 export const NavigationIcons = {
-  Home: FiHome,
+  Home: Home as FiHome,
   Dashboard: RiDashboardLine,
-  Settings: FiSettings,
+  Settings: Settings as FiSettings,
   ArrowLeft: FiArrowLeft,
-  ChevronDown: FiChevronDown,
-  ChevronRight: FiChevronRight,
+  ChevronDown: ChevronDown,
+  ChevronRight: ChevronRight,
   Menu: FiMenu,
   More: FiMoreVertical
 } as const;
 
 export const ActionIcons = {
-  Edit: FiEdit,
-  Delete: FiTrash2,
-  Add: FiPlus,
-  Save: FiSave,
-  Download: FiDownload,
-  Upload: FiUpload,
-  Refresh: FiRefreshCw,
+  Edit: Edit as FiEdit,
+  Delete: Trash2 as FiTrash2,
+  Add: Plus as FiPlus,
+  Save: Save as FiSave,
+  Download: Download as FiDownload,
+  Upload: Upload as FiUpload,
+  Refresh: RefreshCw as FiRefreshCw,
   Search: FiSearch,
   Filter: FiFilter,
   Copy: FiCopy,
@@ -533,10 +533,10 @@ export const ActionIcons = {
 } as const;
 
 export const StatusIcons = {
-  Check: FiCheck,
-  X: FiX,
-  AlertCircle: FiAlertCircle,
-  AlertTriangle: FiAlertTriangle,
+  Check: Check as FiCheck,
+  X: X as FiX,
+  AlertCircle: AlertCircle as FiAlertCircle,
+  AlertTriangle: AlertTriangle as FiAlertTriangle,
   Info: FiInfo,
   Bell: FiBell,
   Star: FiStar,
@@ -544,9 +544,9 @@ export const StatusIcons = {
 } as const;
 
 export const SystemIcons = {
-  Database: FiDatabase,
+  Database: Database as FiDatabase,
   Server: FiServer,
-  Activity: FiActivity,
+  Activity: Activity as FiActivity,
   Cpu: FiCpu,
   HardDrive: FiHardDrive,
   Terminal: FiTerminal,
@@ -556,7 +556,7 @@ export const SystemIcons = {
 
 export const FileIcons = {
   File: FiFile,
-  FileText: FiFileText,
+  FileText: FileText as FiFileText,
   Folder: FiFolder,
   Image: FiImage,
   Video: FiVideo,
@@ -568,48 +568,48 @@ export const CommunicationIcons = {
   MessageCircle: FiMessageCircle,
   Send: FiSend,
   Phone: FiPhone,
-  Mail: FiMail,
+  Mail: Mail as FiMail,
   Bell: FiBell,
-  Users: FiUsers
+  Users: Users as FiUsers
 } as const;
 
 // Helper function to get icon by name (useful for dynamic icon rendering)
 export function getIconByName(iconName: string): FeatherIconType | RemixIconType | null {
   const iconMap: Record<string, FeatherIconType | RemixIconType> = {
     // Auth
-    'user': FiUser,
-    'mail': FiMail,
-    'lock': FiLock,
-    'shield': FiShield,
+    'user': User as FiUser,
+    'mail': Mail as FiMail,
+    'lock': Lock as FiLock,
+    'shield': Shield as FiShield,
     
     // Navigation
-    'home': FiHome,
+    'home': Home as FiHome,
     'dashboard': RiDashboardLine,
-    'settings': FiSettings,
+    'settings': Settings as FiSettings,
     'menu': FiMenu,
     
     // Actions
-    'edit': FiEdit,
-    'delete': FiTrash2,
-    'add': FiPlus,
-    'save': FiSave,
-    'download': FiDownload,
-    'upload': FiUpload,
+    'edit': Edit as FiEdit,
+    'delete': Trash2 as FiTrash2,
+    'add': Plus as FiPlus,
+    'save': Save as FiSave,
+    'download': Download as FiDownload,
+    'upload': Upload as FiUpload,
     'search': FiSearch,
     'filter': FiFilter,
     
     // Status
-    'check': FiCheck,
-    'x': FiX,
-    'alert': FiAlertCircle,
-    'warning': FiAlertTriangle,
+    'check': Check as FiCheck,
+    'x': X as FiX,
+    'alert': AlertCircle as FiAlertCircle,
+    'warning': AlertTriangle as FiAlertTriangle,
     'info': FiInfo,
     'bell': FiBell,
     
     // System
-    'database': FiDatabase,
+    'database': Database as FiDatabase,
     'server': FiServer,
-    'activity': FiActivity,
+    'activity': Activity as FiActivity,
     'cpu': FiCpu,
     'terminal': FiTerminal,
     

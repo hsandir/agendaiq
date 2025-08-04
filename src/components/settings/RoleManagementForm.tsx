@@ -52,9 +52,24 @@ export function RoleManagementForm() {
   const fetchData = async () => {
     try {
       const [deptRes, rolesRes, usersRes] = await Promise.all([
-        fetch('/api/departments'),
-        fetch('/api/roles'),
-        fetch('/api/users')
+        fetch('/api/departments', {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }),
+        fetch('/api/roles', {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }),
+        fetch('/api/users', {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
       ]);
 
       if (!deptRes.ok || !rolesRes.ok || !usersRes.ok) {
@@ -67,9 +82,10 @@ export function RoleManagementForm() {
         usersRes.json()
       ]);
 
-      setDepartments(deptData);
-      setRoles(rolesData);
-      setUsers(usersData);
+      // Handle APIResponse format for each endpoint
+      setDepartments(Array.isArray(deptData) ? deptData : (deptData.data || deptData.departments || []));
+      setRoles(Array.isArray(rolesData) ? rolesData : (rolesData.data || rolesData.roles || []));
+      setUsers(Array.isArray(usersData) ? usersData : (usersData.data || usersData.users || []));
     } catch (error) {
       toast({
         title: 'Error',

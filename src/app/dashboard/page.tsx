@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils';
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
-import { RiCalendarLine, RiTeamLine, RiFileTextLine } from "react-icons/ri";
+import { Calendar, Users, FileText } from "lucide-react";
 
 export default async function DashboardPage() {
   const user = await requireAuth(AuthPresets.requireAuth);
@@ -135,9 +135,9 @@ export default async function DashboardPage() {
   ]);
 
   const quickStats = [
-    { name: "Upcoming Meetings", value: stats[0], icon: RiCalendarLine },
-    { name: "Organized Meetings", value: stats[1], icon: RiTeamLine },
-    { name: "Notes Created", value: stats[2], icon: RiFileTextLine },
+    { name: "Upcoming Meetings", value: stats[0], icon: Calendar },
+    { name: "Organized Meetings", value: stats[1], icon: Users },
+    { name: "Notes Created", value: stats[2], icon: FileText },
   ];
 
   return (

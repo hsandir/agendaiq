@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FiUsers, FiUser, FiShield, FiHome, FiArrowLeft } from 'react-icons/fi';
+import { Users as FiUsers, User as FiUser, Shield as FiShield, Home as FiHome, ArrowLeft as FiArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface User {

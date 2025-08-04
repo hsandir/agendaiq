@@ -1,18 +1,39 @@
 import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
+import { z } from "zod";
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
+    // SECURITY FIX: Add rate limiting for signup attempts
+    const clientId = getClientIdentifier(request);
+    const rateLimitResult = await RateLimiters.registration.check(request, 3, clientId); // 3 signups per hour
+    
+    if (!rateLimitResult.success) {
+      return RateLimiters.registration.createErrorResponse(rateLimitResult);
+    }
 
-    // Validate input
-    if (!email || !password) {
+    const body = await request.json();
+
+    // SECURITY FIX: Add input validation schema
+    const signupSchema = z.object({
+      email: z.string().email("Invalid email format").toLowerCase(),
+      password: z.string().min(8, "Password must be at least 8 characters")
+    });
+
+    const validationResult = signupSchema.safeParse(body);
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Missing email or password" },
+        { 
+          error: "Invalid input", 
+          details: validationResult.error.errors.map(e => e.message)
+        }, 
         { status: 400 }
       );
     }
+
+    const { email, password } = validationResult.data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({

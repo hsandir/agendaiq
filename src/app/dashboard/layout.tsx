@@ -53,7 +53,7 @@ export default async function DashboardLayout({
                 <span className="text-xs px-2 py-1 bg-gray-100 rounded-full">
                   {currentRole?.title || 'No Role'}
                 </span>
-                <RoleSwitch staff={user?.Staff?.[0] || null} />
+                <RoleSwitch staff={userWithStaff?.Staff?.[0] || null} />
               </div>
             </div>
           </div>

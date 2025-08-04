@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth/auth-options";
 
-export async function PUT(req: NextRequest, { params }: { params: { userId: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -11,7 +11,7 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
 
   // Check if the current user is an administrator via staff relation
   const currentUser = await prisma.user.findUnique({
-    where: { id: user.id },
+    where: { id: session.user.id },
     include: { staff: { include: { role: true } } },
   });
   const isAdmin = currentUser?.staff?.[0]?.role?.title === 'Administrator';
@@ -20,7 +20,8 @@ export async function PUT(req: NextRequest, { params }: { params: { userId: stri
   }
 
   const { departmentId } = await req.json();
-  const userId = Number(params.userId);
+  const { userId: userIdStr } = await params;
+  const userId = Number(userIdStr);
   if (isNaN(userId)) {
     return NextResponse.json({ error: 'Invalid userId' }, { status: 400 });
   }

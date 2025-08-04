@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FiUser, FiSettings, FiLock, FiUserCheck, FiCalendar, FiUsers, FiFileText } from "react-icons/fi";
+import { User as FiUser, Settings as FiSettings, Lock as FiLock, UserCheck as FiUserCheck, Calendar as FiCalendar, Users as FiUsers, FileText as FiFileText } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Meeting Audit Log",
@@ -58,21 +58,21 @@ export default async function AuditPage() {
     switch (action.toLowerCase()) {
       case 'created':
       case 'meeting_created':
-        return { icon: FiCalendar, category: 'meeting' };
+        return { icon: Calendar as FiCalendar, category: 'meeting' };
       case 'updated':
       case 'meeting_updated':
-        return { icon: FiSettings, category: 'meeting' };
+        return { icon: Settings as FiSettings, category: 'meeting' };
       case 'deleted':
       case 'meeting_deleted':
-        return { icon: FiLock, category: 'security' };
+        return { icon: Lock as FiLock, category: 'security' };
       case 'attendee_added':
-        return { icon: FiUsers, category: 'attendee' };
+        return { icon: Users as FiUsers, category: 'attendee' };
       case 'attendee_removed':
-        return { icon: FiUser, category: 'attendee' };
+        return { icon: User as FiUser, category: 'attendee' };
       case 'note_added':
-        return { icon: FiFileText, category: 'content' };
+        return { icon: FileText as FiFileText, category: 'content' };
       default:
-        return { icon: FiUserCheck, category: 'general' };
+        return { icon: UserCheck as FiUserCheck, category: 'general' };
     }
   };
 

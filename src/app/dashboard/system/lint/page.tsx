@@ -68,8 +68,42 @@ export default function LintErrorManagementPage() {
     try {
       setLoading(true);
       
-      // Fetch real system status for linting data
-      const response = await fetch('/api/system/status');
+      // First try the dedicated lint API
+      const lintResponse = await fetch('/api/system/lint', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (lintResponse.ok) {
+        const lintResult = await lintResponse.json();
+        if (lintResult.data) {
+          const lintData = lintResult.data;
+          setLintStatus({
+            summary: {
+              totalFiles: lintData.totalFiles,
+              errorFiles: lintData.errors,
+              warningFiles: lintData.warnings,
+              cleanFiles: lintData.totalFiles - lintData.errors - lintData.warnings,
+              totalErrors: lintData.errors,
+              totalWarnings: lintData.warnings
+            },
+            files: [],
+            recentFixes: []
+          });
+          showNotification('Lint status updated from API');
+          return;
+        }
+      }
+      
+      // Fallback to system status API
+      const response = await fetch('/api/system/status', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         
@@ -147,11 +181,24 @@ export default function LintErrorManagementPage() {
         });
       }, 500);
 
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Call real API to run auto-fix
+      const response = await fetch('/api/system/lint', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Auto-fix failed');
+      }
+      
+      const result = await response.json();
+      const fixedCount = result.data?.fixed || 0;
       
       setFixProgress(100);
-      showNotification('Auto-fix completed! Fixed 12 issues automatically.');
+      showNotification(`Auto-fix completed! Fixed ${fixedCount} issues automatically.`);
       
       // Refresh lint status
       await fetchLintStatus();

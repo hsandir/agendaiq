@@ -4,31 +4,31 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  FiUser, 
-  FiLock, 
-  FiBell, 
-  FiSettings, 
-  FiHome, 
-  FiUpload, 
-  FiTrendingUp, 
-  FiKey, 
-  FiActivity, 
-  FiHardDrive,
-  FiDatabase,
-  FiServer,
-  FiMenu,
-  FiX,
-  FiHelpCircle,
-  FiFileText,
-  FiUsers,
-  FiShield,
-  FiMonitor,
-  FiPackage,
-  FiDownload,
-  FiArchive,
-  FiAlertTriangle,
-  FiSearch
-} from 'react-icons/fi';
+  User as FiUser, 
+  Lock as FiLock, 
+  Bell as FiBell, 
+  Settings as FiSettings, 
+  Home as FiHome, 
+  Upload as FiUpload, 
+  TrendingUp as FiTrendingUp, 
+  Key as FiKey, 
+  Activity as FiActivity, 
+  HardDrive as FiHardDrive,
+  Database as FiDatabase,
+  Server as FiServer,
+  Menu as FiMenu,
+  X as FiX,
+  HelpCircle as FiHelpCircle,
+  FileText as FiFileText,
+  Users as FiUsers,
+  Shield as FiShield,
+  Monitor as FiMonitor,
+  Package as FiPackage,
+  Download as FiDownload,
+  Archive as FiArchive,
+  AlertTriangle as FiAlertTriangle,
+  Search as FiSearch
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {

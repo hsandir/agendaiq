@@ -11,7 +11,7 @@ async function verifyAdmin() {
   }
 
   const user = await prisma.user.findUnique({
-    where: { email: user.email },
+    where: { email: session.user.email },
     include: {
       Staff: {
         include: {
@@ -30,8 +30,9 @@ async function verifyAdmin() {
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const admin = await verifyAdmin();
   if (!admin) {
     return NextResponse.json(
@@ -53,7 +54,7 @@ export async function PUT(
 
     // Update the role
     const updatedRole = await prisma.role.update({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       data: {
         title,
         priority: priority || undefined,
@@ -82,8 +83,9 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const admin = await verifyAdmin();
   if (!admin) {
     return NextResponse.json(
@@ -95,7 +97,7 @@ export async function DELETE(
   try {
     // Delete the role
     await prisma.role.delete({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
     });
 
     return NextResponse.json({ message: "Role deleted successfully" });

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { FiUser, FiMail, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import { User as FiUser, Mail as FiMail, Check as FiCheck, AlertCircle as FiAlertCircle } from 'lucide-react';
 
 interface School {
   id: string;

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get current user
@@ -14,7 +14,8 @@ export async function PATCH(
       return NextResponse.json({ error: "Staff record not found" }, { status: 404 });
     }
 
-    const meetingId = parseInt(params.id);
+    const { id } = await params;
+    const meetingId = parseInt(id);
     if (isNaN(meetingId)) {
       return NextResponse.json({ error: "Invalid meeting ID" }, { status: 400 });
     }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { FiShield, FiCheck, FiX } from 'react-icons/fi';
+import { Shield as FiShield, Check as FiCheck, X as FiX } from 'lucide-react';
 
 export default function TwoFactorSetupPage() {
   const [step, setStep] = useState<'intro' | 'qr' | 'verify'>('intro');

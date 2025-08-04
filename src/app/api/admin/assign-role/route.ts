@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     }
 
     const currentUser = await prisma.user.findUnique({
-      where: { id: user.id },
+      where: { id: session.user.id },
       include: { staff: { include: { role: true } } },
     });
 

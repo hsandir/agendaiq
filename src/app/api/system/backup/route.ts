@@ -91,14 +91,18 @@ async function createBackup(message: string = 'Manual backup') {
     
     // Commit if there are changes
     if (status.trim()) {
-      await execAsync(`git commit -m "${message} - ${timestamp}"`, { cwd: process.cwd() });
+      // SECURITY FIX: Sanitize message input to prevent command injection
+      const sanitizedMessage = message.replace(/["`$\\]/g, '\\$&').slice(0, 100);
+      await execAsync(`git commit -m "${sanitizedMessage} - ${timestamp}"`, { cwd: process.cwd() });
     }
 
-    // Create backup branch
-    await execAsync(`git checkout -b ${branchName}`, { cwd: process.cwd() });
+    // Create backup branch - sanitize branch name
+    const sanitizedBranchName = branchName.replace(/[^a-zA-Z0-9_-]/g, '_');
+    await execAsync(`git checkout -b ${sanitizedBranchName}`, { cwd: process.cwd() });
     
-    // Return to original branch
-    await execAsync(`git checkout ${currentBranch.trim()}`, { cwd: process.cwd() });
+    // Return to original branch - sanitize branch name
+    const sanitizedCurrentBranch = currentBranch.trim().replace(/[^a-zA-Z0-9_/-]/g, '_');
+    await execAsync(`git checkout ${sanitizedCurrentBranch}`, { cwd: process.cwd() });
 
     // Save backup metadata
     await saveBackupMetadata(backupInfo);
