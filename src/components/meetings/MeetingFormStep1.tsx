@@ -141,8 +141,8 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       });
       
       if (result?.success && result?.meetingId) {
-        // Client-side redirect to Step 2
-        router.push(`/dashboard/meetings/${result.meetingId}/edit`);
+        // Client-side redirect to Step 2 (agenda items)
+        router.push(`/dashboard/meetings/${result.meetingId}/agenda`);
       } else if (result?.message) {
         alert(result.message);
       }
