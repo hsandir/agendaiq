@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 import { Users as FiUsers, UserCheck as FiUserCheck, TrendingUp as FiTrendingUp, Eye as FiEye, Edit3 as FiEdit3, Settings as FiSettings, Shield as FiShield, Home as FiHome, User as FiUserPlus } from 'lucide-react';
+import RolesPageClient from '@/components/settings/RolesPageClient';
 
 export const metadata: Metadata = {
   title: "Role Management | AgendaIQ",
@@ -184,33 +185,10 @@ export default async function RolePage() {
               </div>
             </div>
 
-            {/* Department Role Distribution */}
+            {/* Department Role Distribution with Drag & Drop */}
             <div>
               <h4 className="text-sm font-medium text-gray-700 mb-3">Department Role Distribution</h4>
-              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                {roleDistribution.map((dept) => (
-                  <div key={dept.name} className="p-3 border rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <h5 className="text-sm font-medium">{dept.name}</h5>
-                      <Badge variant="secondary" className="text-xs">
-                        {dept.count} staff
-                      </Badge>
-                    </div>
-                    <div className="space-y-1">
-                      {dept.roles.length > 0 ? (
-                        dept.roles.map((role, index) => (
-                          <div key={index} className="text-xs text-gray-600 flex items-center space-x-1">
-                            <FiShield className="h-3 w-3" />
-                            <span>{role}</span>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-xs text-gray-500">No roles assigned</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <RolesPageClient departments={departments} roles={roles} />
             </div>
           </div>
         </CardContent>

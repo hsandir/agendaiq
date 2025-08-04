@@ -76,18 +76,18 @@ export default function UserRoleAssignmentContent() {
       ]);
 
       if (usersRes.ok) {
-        const usersData = await usersRes.json();
-        setUsers(usersData);
+        const usersResponse = await usersRes.json();
+        setUsers(usersResponse.data || []);
       }
 
       if (rolesRes.ok) {
-        const rolesData = await rolesRes.json();
-        setRoles(rolesData);
+        const rolesResponse = await rolesRes.json();
+        setRoles(rolesResponse.data || []);
       }
 
       if (departmentsRes.ok) {
-        const departmentsData = await departmentsRes.json();
-        setDepartments(departmentsData);
+        const departmentsResponse = await departmentsRes.json();
+        setDepartments(departmentsResponse.data || []);
       }
     } catch (error) {
       console.error('Error loading data:', error);
