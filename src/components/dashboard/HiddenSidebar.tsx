@@ -44,6 +44,9 @@ interface NavSection {
   adminOnly?: boolean;
 }
 
+// Environment check
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 const navigation: NavSection[] = [
   {
     title: "Account",
@@ -69,22 +72,29 @@ const navigation: NavSection[] = [
     ],
   },
   {
-    title: "System Management",
+    title: "Production Monitoring",
     adminOnly: true,
     items: [
       { href: "/dashboard/system", label: "System Overview", icon: FiMonitor },
       { href: "/dashboard/system/health", label: "System Health", icon: FiActivity },
+      { href: "/dashboard/system/server", label: "Server Metrics", icon: FiServer },
+      { href: "/dashboard/system/alerts", label: "Alert Configuration", icon: FiAlertTriangle },
+      { href: "/dashboard/system/logs", label: "System Logs", icon: FiFileText },
+      { href: "/dashboard/system/backup", label: "Backup Management", icon: FiArchive },
+    ],
+  },
+  ...(isDevelopment ? [{
+    title: "Development Tools",
+    adminOnly: true,
+    items: [
       { href: "/dashboard/system/dependencies", label: "Dependencies Management", icon: FiPackage },
       { href: "/dashboard/system/updates", label: "Package Updates", icon: FiDownload },
       { href: "/dashboard/system/database", label: "Database Management", icon: FiDatabase },
-      { href: "/dashboard/system/backup", label: "Backup Management", icon: FiArchive },
-      { href: "/dashboard/system/server", label: "Server Management", icon: FiServer },
-      { href: "/dashboard/system/alerts", label: "Alert Configuration", icon: FiAlertTriangle },
-      { href: "/dashboard/system/logs", label: "System Logs", icon: FiFileText },
       { href: "/dashboard/system/migration", label: "Auth Migration & Diagnostics", icon: FiTrendingUp },
       { href: "/dashboard/system/mock-data-tracker", label: "Mock Data Tracker", icon: FiSearch },
+      { href: "/dashboard/system/lint", label: "Code Quality Tools", icon: FiSearch },
     ],
-  },
+  }] : []),
   {
     title: "Meetings & Zoom",
     items: [

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
 import { sendEmail } from "@/lib/email/send-email";
 import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
+import { Logger } from '@/lib/utils/logger';
 
 export async function POST(request: Request) {
   try {
@@ -48,13 +49,22 @@ export async function POST(request: Request) {
     // Send reset email
     const resetUrl = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${resetToken}`;
     
-    // TODO: Implement actual email sending
-    console.log("Reset URL:", resetUrl);
-    // await sendEmail({
-    //   to: user.email,
-    //   subject: "Password Reset Request",
-    //   text: `To reset your password, click the following link: ${resetUrl}`,
-    // });
+    // Import email service
+    const { sendEmail, getPasswordResetHtml } = await import('@/lib/email/email-service');
+    
+    // Send password reset email
+    const emailResult = await sendEmail({
+      to: user.email,
+      subject: "AgendaIQ - Password Reset Request",
+      html: getPasswordResetHtml(resetUrl)
+    });
+
+    if (!emailResult.success) {
+      Logger.warn("Failed to send password reset email", { 
+        error: String(emailResult.error), 
+        email: user.email 
+      }, 'auth');
+    }
 
     return new NextResponse(JSON.stringify({ message: "If an account exists with this email, you will receive a password reset link." }), {
       status: 200,

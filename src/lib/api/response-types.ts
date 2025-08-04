@@ -1,9 +1,13 @@
-// Standardized API response types for AgendaIQ
+// Enhanced standardized API response types for AgendaIQ
+
+import { NextResponse } from 'next/server';
+import { APIError, SystemError } from '@/lib/types/errors';
+import { ErrorHandler } from '@/lib/utils/error-handler';
 
 export interface APIResponse<T = unknown> {
   success: boolean;
   data?: T;
-  error?: string;
+  error?: APIError;
   message?: string;
   timestamp: string;
   requestId?: string;
@@ -15,6 +19,7 @@ export interface PaginatedResponse<T = unknown> extends APIResponse<T[]> {
     limit: number;
     total: number;
     hasMore: boolean;
+    totalPages: number;
   };
 }
 
@@ -24,41 +29,139 @@ export interface ValidationError {
   code?: string;
 }
 
-export interface APIError {
-  type: 'DATABASE_ERROR' | 'AUTH_ERROR' | 'VALIDATION_ERROR' | 'NETWORK_ERROR' | 'SERVER_ERROR' | 'CLIENT_ERROR';
-  message: string;
-  code?: string;
-  details?: string;
-  validationErrors?: ValidationError[];
-}
-
 // Helper functions for creating consistent responses
-export const createSuccessResponse = <T>(data: T, message?: string): APIResponse<T> => ({
+export const createSuccessResponse = <T>(
+  data: T, 
+  message?: string, 
+  requestId?: string
+): APIResponse<T> => ({
   success: true,
   data,
   message,
+  requestId,
   timestamp: new Date().toISOString()
 });
 
-export const createErrorResponse = (error: APIError): APIResponse => ({
-  success: false,
-  error: error.message,
-  timestamp: new Date().toISOString()
-});
+export const createErrorResponse = (
+  error: APIError | SystemError | string, 
+  requestId?: string
+): APIResponse => {
+  let apiError: APIError;
+
+  if (typeof error === 'string') {
+    apiError = {
+      type: 'INTERNAL_ERROR',
+      message: error,
+      code: 'GEN_001',
+      timestamp: new Date().toISOString()
+    };
+  } else if ('type' in error && ['DATABASE_ERROR', 'AUTH_ERROR', 'VALIDATION_ERROR', 'NETWORK_ERROR', 'UNKNOWN_ERROR'].includes(error.type)) {
+    // It's a SystemError, convert to APIError
+    apiError = ErrorHandler.systemErrorToAPIError(error as SystemError);
+  } else {
+    // It's already an APIError
+    apiError = error as APIError;
+  }
+
+  return {
+    success: false,
+    error: apiError,
+    requestId,
+    timestamp: new Date().toISOString()
+  };
+};
 
 export const createPaginatedResponse = <T>(
   data: T[], 
-  pagination: PaginatedResponse<T>['pagination'],
-  message?: string
+  page: number,
+  limit: number,
+  total: number,
+  message?: string,
+  requestId?: string
 ): PaginatedResponse<T> => ({
   success: true,
   data,
   message,
-  pagination,
+  requestId,
+  pagination: {
+    page,
+    limit,
+    total,
+    hasMore: page * limit < total,
+    totalPages: Math.ceil(total / limit)
+  },
   timestamp: new Date().toISOString()
 });
 
-// Error categorization helper
+// NextResponse helpers
+export function createSuccessNextResponse<T>(
+  data: T, 
+  message?: string, 
+  status: number = 200,
+  requestId?: string
+): NextResponse {
+  const response = createSuccessResponse(data, message, requestId);
+  return NextResponse.json(response, { status });
+}
+
+export function createErrorNextResponse(
+  error: APIError | SystemError | string,
+  status: number = 500,
+  requestId?: string
+): NextResponse {
+  const response = createErrorResponse(error, requestId);
+  return NextResponse.json(response, { status });
+}
+
+export function createPaginatedNextResponse<T>(
+  data: T[], 
+  page: number,
+  limit: number,
+  total: number,
+  message?: string,
+  status: number = 200,
+  requestId?: string
+): NextResponse {
+  const response = createPaginatedResponse(data, page, limit, total, message, requestId);
+  return NextResponse.json(response, { status });
+}
+
+// Validation helpers
+export function validatePaginationParams(
+  page?: string | null, 
+  limit?: string | null
+): { page: number; limit: number; offset: number } {
+  const validatedPage = Math.max(1, parseInt(page || '1') || 1);
+  const validatedLimit = Math.min(Math.max(1, parseInt(limit || '10') || 10), 100);
+  const offset = (validatedPage - 1) * validatedLimit;
+
+  return {
+    page: validatedPage,
+    limit: validatedLimit,
+    offset
+  };
+}
+
+export function validateRequiredFields<T extends Record<string, unknown>>(
+  data: T,
+  requiredFields: (keyof T)[]
+): ValidationError[] {
+  const errors: ValidationError[] = [];
+  
+  for (const field of requiredFields) {
+    if (data[field] === undefined || data[field] === null || data[field] === '') {
+      errors.push({
+        field: String(field),
+        message: `${String(field)} is required`,
+        code: 'REQUIRED_FIELD'
+      });
+    }
+  }
+  
+  return errors;
+}
+
+// Error categorization helper (enhanced)
 export const categorizeAPIError = (error: unknown): APIError => {
   if (error instanceof Error) {
     const message = error.message.toLowerCase();
@@ -66,18 +169,22 @@ export const categorizeAPIError = (error: unknown): APIError => {
     // Database errors
     if (message.includes('prisma') || message.includes('database') || message.includes('connection')) {
       return {
-        type: 'DATABASE_ERROR',
+        type: 'INTERNAL_ERROR',
         message: 'Database operation failed',
-        details: error.message
+        code: 'DB_001',
+        details: { originalError: error.message },
+        timestamp: new Date().toISOString()
       };
     }
     
     // Authentication errors
     if (message.includes('unauthorized') || message.includes('token') || message.includes('auth')) {
       return {
-        type: 'AUTH_ERROR',
+        type: 'UNAUTHORIZED',
         message: 'Authentication required',
-        details: error.message
+        code: 'AUTH_001',
+        details: { originalError: error.message },
+        timestamp: new Date().toISOString()
       };
     }
     
@@ -86,39 +193,38 @@ export const categorizeAPIError = (error: unknown): APIError => {
       return {
         type: 'VALIDATION_ERROR',
         message: 'Invalid request data',
-        details: error.message
+        code: 'VAL_001',
+        details: { originalError: error.message },
+        timestamp: new Date().toISOString()
       };
     }
     
     // Network errors
     if (message.includes('fetch') || message.includes('network') || message.includes('timeout')) {
       return {
-        type: 'NETWORK_ERROR',
+        type: 'INTERNAL_ERROR',
         message: 'Network operation failed',
-        details: error.message
+        code: 'NET_001',
+        details: { originalError: error.message },
+        timestamp: new Date().toISOString()
       };
     }
     
-    // Server errors
-    if (message.includes('server') || message.includes('500') || message.includes('internal')) {
-      return {
-        type: 'SERVER_ERROR',
-        message: 'Server error occurred',
-        details: error.message
-      };
-    }
-    
-    // Default to client error
+    // Default to internal error
     return {
-      type: 'CLIENT_ERROR',
-      message: 'Request failed',
-      details: error.message
+      type: 'INTERNAL_ERROR',
+      message: 'Internal server error',
+      code: 'SYS_001',
+      details: { originalError: error.message },
+      timestamp: new Date().toISOString()
     };
   }
   
   return {
-    type: 'SERVER_ERROR',
+    type: 'INTERNAL_ERROR',
     message: 'Unknown error occurred',
-    details: String(error)
+    code: 'UNK_001',
+    details: { originalError: String(error) },
+    timestamp: new Date().toISOString()
   };
 };

@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth/auth-options';
 import * as os from 'os';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { Logger } from '@/lib/utils/logger';
 
 const execAsync = promisify(exec);
 
@@ -55,7 +56,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('Fetching real-time server metrics...');
+    Logger.info('Fetching real-time server metrics', { userId: session.user.id }, 'system-metrics');
 
     // Get real system information
     const memoryUsage = process.memoryUsage();
@@ -125,7 +126,7 @@ export async function GET() {
       }
     } catch (error) {
       // Keep fallback values - already set above
-      console.warn('Could not get real disk usage, using fallback values');
+      Logger.warn('Could not get real disk usage, using fallback values', { error: String(error) }, 'system-metrics');
     }
     
     const serverMetrics: ServerMetrics = {
@@ -186,11 +187,15 @@ export async function GET() {
       serverMetrics.health.alerts.push('Low disk space available');
     }
 
-    console.log(`Server metrics fetched: ${serverMetrics.health.overall} health status`);
+    Logger.info('Server metrics fetched successfully', { 
+      healthStatus: serverMetrics.health.overall,
+      metricsCount: Object.keys(serverMetrics).length,
+      userId: session.user.id
+    }, 'system-metrics');
     
     return NextResponse.json(serverMetrics);
   } catch (error) {
-    console.error('Error fetching server metrics:', error);
+    Logger.error('Error fetching server metrics', { error: String(error) }, 'system-metrics');
     return NextResponse.json(
       { error: 'Failed to fetch server metrics', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

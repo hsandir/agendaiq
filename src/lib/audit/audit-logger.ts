@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest } from 'next/server';
+import { Logger } from '@/lib/utils/logger';
 
 // Safe audit data types
 export type AuditFieldValue = string | number | boolean | null | undefined;
@@ -44,7 +45,11 @@ export class AuditLogger {
         }
       });
     } catch (error) {
-      console.error('Failed to create audit log:', error);
+      Logger.error('Failed to create audit log', { 
+        error: String(error), 
+        tableName: data.tableName, 
+        operation: data.operation 
+      }, 'audit');
       // Don't throw - audit logging should not break the main operation
     }
   }
