@@ -118,6 +118,13 @@ export function MeetingLiveView({
         return newMap;
       });
     },
+    'comment-added': (data: any) => {
+      setAgendaItems(prev => prev.map(item => 
+        item.id === data.itemId 
+          ? { ...item, Comments: [...(item.Comments || []), data.comment] }
+          : item
+      ));
+    },
     'pusher:subscription_succeeded': () => {
       setIsConnected(true);
     },

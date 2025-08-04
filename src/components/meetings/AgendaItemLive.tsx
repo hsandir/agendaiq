@@ -22,6 +22,7 @@ import {
 import type { MeetingAgendaItem, Staff, User as PrismaUser } from "@prisma/client";
 import { usePusherChannel } from "@/hooks/usePusher";
 import { CHANNELS, EVENTS } from "@/lib/pusher";
+import { AgendaItemComments } from "./AgendaItemComments";
 
 interface ExtendedAgendaItem extends MeetingAgendaItem {
   ResponsibleStaff?: (Staff & { User: PrismaUser }) | null;
@@ -53,6 +54,7 @@ export function AgendaItemLive({
   meetingId
 }: Props) {
   const [isEditing, setIsEditing] = useState(false);
+  const [showComments, setShowComments] = useState(false);
   const [editData, setEditData] = useState({
     topic: item.topic,
     problem_statement: item.problem_statement || '',
@@ -121,6 +123,24 @@ export function AgendaItemLive({
   const handleInputChange = (field: string, value: any) => {
     setEditData({ ...editData, [field]: value });
     emitTyping();
+  };
+
+  const handleAddComment = async (content: string) => {
+    if (!meetingId) return;
+    
+    try {
+      const response = await fetch(`/api/meetings/${meetingId}/agenda-items/${item.id}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add comment');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+    }
   };
 
   const getPriorityColor = (priority: string) => {
@@ -215,17 +235,17 @@ export function AgendaItemLive({
             <label className="text-sm font-medium text-gray-700">Responsible Staff</label>
             {isEditing ? (
               <Select
-                value={editData.responsible_staff_id?.toString() || ''}
+                value={editData.responsible_staff_id?.toString() || 'none'}
                 onValueChange={(value) => setEditData({ 
                   ...editData, 
-                  responsible_staff_id: value ? parseInt(value) : null 
+                  responsible_staff_id: value === 'none' ? null : parseInt(value) 
                 })}
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Select staff member" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {staff.map((s) => (
                     <SelectItem key={s.id} value={s.id.toString()}>
                       {s.User.name} ({s.User.email})
@@ -317,34 +337,51 @@ export function AgendaItemLive({
           )}
 
           {/* Meta Info */}
-          <div className="flex items-center justify-between pt-2 border-t">
-            <div className="flex items-center space-x-4 text-sm text-gray-600">
-              <div className="flex items-center space-x-1">
-                <MessageSquare className="h-4 w-4" />
-                <span>{item.Comments?.length || 0}</span>
+          <div className="pt-2 border-t">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4 text-sm text-gray-600">
+                <button 
+                  className="flex items-center space-x-1 hover:text-gray-900 transition-colors"
+                  onClick={() => setShowComments(!showComments)}
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  <span>{item.Comments?.length || 0} Comments</span>
+                </button>
+                <div className="flex items-center space-x-1">
+                  <Paperclip className="h-4 w-4" />
+                  <span>{item.ActionItems?.length || 0}</span>
+                </div>
+                {item.future_implications && (
+                  <div className="flex items-center space-x-1 text-yellow-600">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>Future implications</span>
+                  </div>
+                )}
               </div>
-              <div className="flex items-center space-x-1">
-                <Paperclip className="h-4 w-4" />
-                <span>{item.ActionItems?.length || 0}</span>
-              </div>
-              {item.future_implications && (
-                <div className="flex items-center space-x-1 text-yellow-600">
-                  <AlertCircle className="h-4 w-4" />
-                  <span>Future implications</span>
+
+              {isEditing && (
+                <div className="flex items-center space-x-2">
+                  <Button size="sm" variant="outline" onClick={handleCancel}>
+                    <X className="h-4 w-4 mr-1" />
+                    Cancel
+                  </Button>
+                  <Button size="sm" onClick={handleSave}>
+                    <Save className="h-4 w-4 mr-1" />
+                    Save
+                  </Button>
                 </div>
               )}
             </div>
 
-            {isEditing && (
-              <div className="flex items-center space-x-2">
-                <Button size="sm" variant="outline" onClick={handleCancel}>
-                  <X className="h-4 w-4 mr-1" />
-                  Cancel
-                </Button>
-                <Button size="sm" onClick={handleSave}>
-                  <Save className="h-4 w-4 mr-1" />
-                  Save
-                </Button>
+            {/* Comments Section */}
+            {showComments && (
+              <div className="mt-4 pt-4 border-t">
+                <AgendaItemComments
+                  itemId={item.id}
+                  comments={item.Comments || []}
+                  onAddComment={handleAddComment}
+                  canComment={canEdit}
+                />
               </div>
             )}
           </div>
