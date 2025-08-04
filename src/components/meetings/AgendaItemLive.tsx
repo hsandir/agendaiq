@@ -23,6 +23,7 @@ import type { MeetingAgendaItem, Staff, User as PrismaUser } from "@prisma/clien
 import { usePusherChannel } from "@/hooks/usePusher";
 import { CHANNELS, EVENTS } from "@/lib/pusher";
 import { AgendaItemComments } from "./AgendaItemComments";
+import Link from "next/link";
 
 interface ExtendedAgendaItem extends MeetingAgendaItem {
   ResponsibleStaff?: (Staff & { User: PrismaUser }) | null;
@@ -234,6 +235,20 @@ export function AgendaItemLive({
             )}
           </div>
         </div>
+        
+        {/* View Details Link - Only when not expanded */}
+        {!isExpanded && !isEditing && meetingId && (
+          <div className="mt-2">
+            <Link 
+              href={`/dashboard/meetings/${meetingId}/agenda/${item.id}`}
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium inline-flex items-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              View Details 
+              <ChevronRight className="h-3 w-3 ml-1" />
+            </Link>
+          </div>
+        )}
       </div>
 
       {isExpanded && (
