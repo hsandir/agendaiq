@@ -8,7 +8,7 @@ import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, List, Plus } from 'lucide-react';
+import { Calendar, List, Plus, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Meeting {
@@ -91,12 +91,16 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
         meetings.map((meeting) => (
           <Card 
             key={meeting.id} 
-            className="cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => router.push(`/dashboard/meetings/${meeting.id}`)}
+            className="hover:shadow-md transition-shadow"
           >
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{meeting.title}</CardTitle>
+                <CardTitle 
+                  className="text-lg cursor-pointer hover:text-blue-600"
+                  onClick={() => router.push(`/dashboard/meetings/${meeting.id}`)}
+                >
+                  {meeting.title}
+                </CardTitle>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                   meeting.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
                   meeting.status === 'in_progress' ? 'bg-green-100 text-green-800' :
@@ -125,6 +129,22 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
                     <strong>Zoom Link:</strong> Available
                   </div>
                 )}
+                <div className="pt-3 flex gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => router.push(`/dashboard/meetings/${meeting.id}`)}
+                  >
+                    View Details
+                  </Button>
+                  <Button 
+                    size="sm"
+                    onClick={() => router.push(`/dashboard/meetings/${meeting.id}/live`)}
+                  >
+                    <Users className="mr-2 h-4 w-4" />
+                    Join Live
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

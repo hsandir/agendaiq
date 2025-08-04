@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 import { MeetingDetails } from "@/components/meetings/MeetingDetails";
-import { ArrowLeft, Edit2 } from "lucide-react";
+import { ArrowLeft, Edit2, Video, Users } from "lucide-react";
 import Link from "next/link";
 import { respondToMeeting } from "./actions";
 
@@ -108,6 +108,16 @@ export default async function MeetingPage({ params }: PageProps) {
             <h1 className="text-2xl font-bold">{meeting.title}</h1>
           </div>
           <div className="flex items-center space-x-3">
+            {/* Join Live Button - Show for all attendees and organizer */}
+            {(isOrganizer || userAttendee) && (
+              <Link
+                href={`/dashboard/meetings/${meeting.id}/live`}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <Users className="mr-2 h-5 w-5" />
+                Join Live Meeting
+              </Link>
+            )}
             {canRespond && (
               <>
                 <form action={async () => {
