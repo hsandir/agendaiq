@@ -22,17 +22,17 @@ export async function respondToMeeting(
 
   // Get current user's staff record
   const currentUser = await prisma.user.findUnique({
-    where: { email: user.email },
+    where: { email: session.user.email },
     include: {
-      staff: true
+      Staff: true
     }
   });
 
-  if (!currentUser || !currentUser.staff || currentUser.staff.length === 0) {
+  if (!currentUser || !currentUser.Staff || currentUser.Staff.length === 0) {
     throw new Error("User staff record not found");
   }
 
-  const userStaffId = currentUser.staff[0].id;
+  const userStaffId = currentUser.Staff[0].id;
 
   const attendee = await prisma.meetingAttendee.findFirst({
     where: {
@@ -54,18 +54,19 @@ export async function respondToMeeting(
     },
   });
 
+  // TODO: Add meetingAuditLog model to schema for meeting audit tracking
   // Create audit log entry for attendee response
-  await prisma.meetingAuditLog.create({
-    data: {
-      meeting_id: meetingIdInt,
-      user_id: currentUser.id,
-      action: status === "ACCEPTED" ? "joined" : "declined",
-      details: {
-        attendee_name: currentUser.name || currentUser.email,
-        response: status
-      }
-    }
-  });
+  // await prisma.meetingAuditLog.create({
+  //   data: {
+  //     meeting_id: meetingIdInt,
+  //     user_id: currentUser.id,
+  //     action: status === "ACCEPTED" ? "joined" : "declined",
+  //     details: {
+  //       attendee_name: currentUser.name || currentUser.email,
+  //       response: status
+  //     }
+  //   }
+  // });
 
   revalidatePath(`/dashboard/meetings/${meetingId}`);
   revalidatePath("/dashboard/meetings");

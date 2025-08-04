@@ -32,16 +32,16 @@ export class AuditLogger {
           table_name: data.tableName,
           record_id: data.recordId,
           operation: data.operation,
-          field_changes: data.fieldChanges || null,
-          old_values: data.oldValues || null,
-          new_values: data.newValues || null,
+          field_changes: data.fieldChanges || undefined,
+          old_values: data.oldValues || undefined,
+          new_values: data.newValues || undefined,
           user_id: data.userId || null,
           staff_id: data.staffId || null,
           source: data.source,
           description: data.description || null,
           ip_address: data.ipAddress || null,
           user_agent: data.userAgent || null,
-          metadata: data.metadata || null,
+          metadata: data.metadata || undefined,
         }
       });
     } catch (error) {
@@ -158,7 +158,7 @@ export class AuditLogger {
     limit?: number;
     offset?: number;
   } = {}) {
-    const where: Record<string, unknown> = {};
+    const where: any = {};
 
     if (filters.tableName) where.table_name = filters.tableName;
     if (filters.operation) where.operation = filters.operation;
@@ -231,15 +231,15 @@ export class AuditLogger {
 
     return {
       totalLogs,
-      operationStats: operationStats.map((stat: { _count: { operation: number }; operation: string }) => ({
+      operationStats: operationStats.map((stat: any) => ({
         operation: stat.operation,
         count: stat._count.operation
       })),
-      tableStats: tableStats.map((stat: { _count: { operation: number }; operation: string }) => ({
+      tableStats: tableStats.map((stat: any) => ({
         table: stat.table_name,
         count: stat._count.table_name
       })),
-      topUsers: userStats.map((stat: { _count: { operation: number }; operation: string }) => ({
+      topUsers: userStats.map((stat: any) => ({
         userId: stat.user_id,
         count: stat._count.user_id
       }))

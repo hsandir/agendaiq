@@ -65,8 +65,8 @@ export async function PUT(request: NextRequest) {
       try {
         const updatedSetting = await prisma.systemSetting.upsert({
           where: { key },
-          update: { value },
-          create: { key, value }
+          update: { value: value as any },
+          create: { key, value: value as any }
         });
         updatedSettings.push(updatedSetting);
       } catch (error) {

@@ -96,14 +96,14 @@ export async function POST(request: Request) {
     // Get user with staff for response
     const userWithStaff = await prisma.user.findUnique({
       where: { id: user.id },
-      include: { staff: { include: { role: true } } },
+      include: { Staff: { include: { Role: true } } },
     });
 
     return NextResponse.json({
       user: {
         id: user.id,
         email: user.email,
-        staff: userWithStaff?.staff,
+        staff: userWithStaff?.Staff,
       },
     });
   } catch (error) {

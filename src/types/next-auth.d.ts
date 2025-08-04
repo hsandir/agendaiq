@@ -39,7 +39,7 @@ declare module 'next-auth' {
 
 declare module 'next-auth/jwt' {
   interface JWT {
-    id: number;
+    id: string;
     staff?: {
       id: number;
       role: { title: string };

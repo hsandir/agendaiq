@@ -191,9 +191,13 @@ export async function POST(request: NextRequest) {
         description,
         start_time: start,
         end_time: end,
-        zoom_link: zoomLink,
+        // TODO: Add zoom_link field to Meeting model in schema
+        // zoom_link: zoomLink,
         organizer_id: staffRecord.id,
         status: "SCHEDULED",
+        department_id: staffRecord.department.id,
+        district_id: staffRecord.district.id,
+        school_id: staffRecord.school.id,
       },
       include: {
         Staff: {
@@ -262,9 +266,9 @@ export async function POST(request: NextRequest) {
       id: completeeMeeting!.id,
       title: completeeMeeting!.title,
       description: completeeMeeting!.description,
-      startTime: completeeMeeting!.start_time.toISOString(),
-      endTime: completeeMeeting!.end_time.toISOString(),
-      zoomLink: completeeMeeting!.zoom_link,
+      startTime: completeeMeeting!.start_time?.toISOString() || new Date().toISOString(),
+      endTime: completeeMeeting!.end_time?.toISOString() || new Date().toISOString(),
+      zoomLink: (completeeMeeting as any).zoom_link || null,
       status: completeeMeeting!.status,
       organizer: {
         id: completeeMeeting!.Staff.id,

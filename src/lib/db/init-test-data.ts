@@ -1,111 +1,142 @@
 import { prisma } from './prisma';
-import { Role, Department, SchoolType } from '@prisma/client';
 
 export async function initializeTestData() {
   try {
     // Create district
-    const district = await prisma.district.upsert({
-      where: { name: 'Central Jersey College Prep Charter School' },
-      update: {},
-      create: {
-        name: 'Central Jersey College Prep Charter School',
-        address: '101 Mettlers Road',
-        city: 'Somerset',
-        state: 'NJ',
-        zipCode: '08873',
-      },
+    let district = await prisma.district.findFirst({
+      where: { name: 'Central Jersey College Prep Charter School' }
     });
+    
+    if (!district) {
+      district = await prisma.district.create({
+        data: {
+          name: 'Central Jersey College Prep Charter School',
+          code: 'CJCPCS'
+        },
+      });
+    }
 
     // Create school
-    const school = await prisma.school.create({
+    const existingSchool = await prisma.school.findFirst({
+      where: { 
+        name: 'Central Jersey College Prep Charter School',
+        district_id: district.id
+      }
+    });
+
+    const school = existingSchool || await prisma.school.create({
       data: {
         name: 'Central Jersey College Prep Charter School',
         address: '101 Mettlers Road',
-        city: 'Somerset',
-        state: 'NJ',
-        zipCode: '08873',
-        phone: '(732) 649-3954',
-        website: 'www.cjcollegeprep.org',
-        districtId: district.id,
-        departments: [
-          Department.STEM,
-          Department.MATH,
-          Department.SCIENCE,
-          Department.ENGLISH,
-          Department.HISTORY,
-          Department.ARTS,
-          Department.PHYSICAL_EDUCATION,
-        ],
+        code: 'CJCPCS-MAIN',
+        district_id: district.id,
       },
     });
 
-    // Create campus
-    const campus = await prisma.campus.create({
-      data: {
-        name: 'Somerset Campus',
-        type: SchoolType.HIGH_SCHOOL,
-        schoolId: school.id,
-      },
-    });
+    // Get roles
+    const adminRole = await prisma.role.findFirst({ where: { title: 'Administrator' } });
+    const deptHeadRole = await prisma.role.findFirst({ where: { title: 'Department Head' } });
+    const teacherRole = await prisma.role.findFirst({ where: { title: 'Teacher' } });
+
+    if (!adminRole || !deptHeadRole || !teacherRole) {
+      throw new Error('Required roles not found. Please run initializeRoles() first.');
+    }
+
+    // Create departments
+    const departments = [
+      { name: 'STEM', code: 'STEM' },
+      { name: 'Mathematics', code: 'MATH' },
+      { name: 'Science', code: 'SCI' },
+      { name: 'English', code: 'ENG' },
+      { name: 'History', code: 'HIST' },
+    ];
+
+    const createdDepartments: any[] = [];
+    for (const dept of departments) {
+      const department = await prisma.department.upsert({
+        where: { code: dept.code },
+        update: {},
+        create: {
+          name: dept.name,
+          code: dept.code,
+          school_id: school.id,
+        },
+      });
+      createdDepartments.push(department);
+    }
 
     // Create test users with different roles
     const users = [
       {
         email: 'admin@cjcollegeprep.org',
         name: 'Admin User',
-        role: Role.ADMIN,
-        department: Department.STEM,
+        roleId: adminRole.id,
+        departmentId: createdDepartments[0].id, // STEM
       },
       {
         email: 'stem.chair@cjcollegeprep.org',
         name: 'STEM Department Chair',
-        role: Role.DEPARTMENT_HEAD,
-        department: Department.STEM,
+        roleId: deptHeadRole.id,
+        departmentId: createdDepartments[0].id, // STEM
       },
       {
         email: 'math.chair@cjcollegeprep.org',
         name: 'Math Department Chair',
-        role: Role.DEPARTMENT_HEAD,
-        department: Department.MATH,
+        roleId: deptHeadRole.id,
+        departmentId: createdDepartments[1].id, // Math
       },
       {
         email: 'science.chair@cjcollegeprep.org',
         name: 'Science Department Chair',
-        role: Role.DEPARTMENT_HEAD,
-        department: Department.SCIENCE,
+        roleId: deptHeadRole.id,
+        departmentId: createdDepartments[2].id, // Science
       },
       {
         email: 'math.teacher@cjcollegeprep.org',
         name: 'Math Teacher',
-        role: Role.TEACHER,
-        department: Department.MATH,
+        roleId: teacherRole.id,
+        departmentId: createdDepartments[1].id, // Math
       },
       {
         email: 'science.teacher@cjcollegeprep.org',
         name: 'Science Teacher',
-        role: Role.TEACHER,
-        department: Department.SCIENCE,
+        roleId: teacherRole.id,
+        departmentId: createdDepartments[2].id, // Science
       },
     ];
 
     for (const userData of users) {
-      await prisma.user.upsert({
+      // Create user
+      const user = await prisma.user.upsert({
         where: { email: userData.email },
-        update: {
-          role: userData.role,
-          department: userData.department,
-        },
+        update: {},
         create: {
           email: userData.email,
           name: userData.name,
-          role: userData.role,
-          department: userData.department,
+          hashedPassword: '$2b$10$xvCqgBtCYhHCg1aG7UYu6.6cuzckuI9E0JQH3vMXrH.kLWCVF5/OW', // password: "password"
         },
       });
+
+      // Create staff record
+      const existingStaff = await prisma.staff.findFirst({
+        where: { user_id: user.id }
+      });
+      
+      if (!existingStaff) {
+        await prisma.staff.create({
+          data: {
+            user_id: user.id,
+            role_id: userData.roleId,
+            department_id: userData.departmentId,
+            school_id: school.id,
+            district_id: district.id,
+          },
+        });
+      }
     }
 
     console.log('Test data initialized successfully');
-    return { district, school, campus };
+    return { district, school, departments: createdDepartments };
   } catch (error) {
     console.error('Error initializing test data:', error);
     throw error;

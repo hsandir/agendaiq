@@ -65,27 +65,28 @@ export async function PATCH(
       data: updateData,
     });
 
+    // TODO: Add meetingAuditLog model to schema
     // Create audit log entry for meeting update
-    await prisma.meetingAuditLog.create({
-      data: {
-        meeting_id: updatedMeeting.id,
-        user_id: user.id,
-        action: status === 'scheduled' ? "completed_step_2" : "updated",
-        details: {
-          old_values: oldValues,
-          new_values: {
-            title: updatedMeeting.title,
-            description: updatedMeeting.description,
-            start_time: updatedMeeting.start_time,
-            end_time: updatedMeeting.end_time,
-            agenda: updatedMeeting.agenda,
-            notes: updatedMeeting.notes,
-            status: updatedMeeting.status,
-            attendee_count: oldValues.attendee_count
-          }
-        }
-      }
-    });
+    // await prisma.meetingAuditLog.create({
+    //   data: {
+    //     meeting_id: updatedMeeting.id,
+    //     user_id: user.id,
+    //     action: status === 'scheduled' ? "completed_step_2" : "updated",
+    //     details: {
+    //       old_values: oldValues,
+    //       new_values: {
+    //         title: updatedMeeting.title,
+    //         description: updatedMeeting.description,
+    //         start_time: updatedMeeting.start_time,
+    //         end_time: updatedMeeting.end_time,
+    //         agenda: updatedMeeting.agenda,
+    //         notes: updatedMeeting.notes,
+    //         status: updatedMeeting.status,
+    //         attendee_count: oldValues.attendee_count
+    //       }
+    //     }
+    //   }
+    // });
 
     return NextResponse.json({ 
       success: true, 

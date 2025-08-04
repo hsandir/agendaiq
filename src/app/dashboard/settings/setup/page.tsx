@@ -180,7 +180,7 @@ export default function SetupPage() {
                         <p className="text-sm text-gray-500">{school.address || "No address"}</p>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" onClick={() => openEditModal(school)}><Edit2 as FiEdit2 className="mr-1" />Edit</Button>
+                        <Button variant="outline" onClick={() => openEditModal(school)}><FiEdit2 className="mr-1" />Edit</Button>
                         <Button variant="destructive" onClick={() => handleDelete(school)} disabled={saving}><FiTrash2 className="mr-1" />Delete</Button>
                       </div>
                     </div>
@@ -210,7 +210,7 @@ export default function SetupPage() {
                   </Button>
                 </div>
                 <div className="border rounded-lg p-4 text-center">
-                  <Book as FiBook className="mx-auto h-8 w-8 text-gray-400" />
+                  <FiBook className="mx-auto h-8 w-8 text-gray-400" />
                   <h3 className="mt-2 font-medium">Import Students</h3>
                   <p className="text-sm text-gray-500 mt-1">Upload student data from Excel</p>
                   <Button variant="outline" className="mt-4">

@@ -122,7 +122,7 @@ export class PerformanceMonitor {
   private static logPerformanceMetrics(metrics: PerformanceMetrics, error?: unknown) {
     const logData = {
       ...metrics,
-      ...(error && { error: String(error) })
+      ...(error ? { error: String(error) } : {})
     };
 
     if (metrics.duration > this.slowRouteThreshold) {
@@ -136,7 +136,7 @@ export class PerformanceMonitor {
   private static logDatabaseMetrics(metrics: DatabaseQueryMetrics, error?: unknown) {
     const logData = {
       ...metrics,
-      ...(error && { error: String(error) })
+      ...(error ? { error: String(error) } : {})
     };
 
     if (metrics.duration > this.slowQueryThreshold) {

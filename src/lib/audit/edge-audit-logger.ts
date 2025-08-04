@@ -166,7 +166,7 @@ export class EdgeAuditLogger {
       userAgent: request.headers.get('user-agent'),
       success,
       errorMessage,
-      metadata,
+      ...metadata,
       timestamp: new Date().toISOString()
     };
   }

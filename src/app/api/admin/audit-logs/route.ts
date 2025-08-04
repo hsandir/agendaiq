@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     if (logType === 'critical') {
       // Get critical audit logs from hybrid system
-      const criticalLogs = await auditSystem.getRecentCriticalEvents(limit, category, userId);
+      const criticalLogs = await auditSystem.getRecentCriticalEvents(limit, category || undefined, userId);
       
       response = {
         success: true,
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
     } else {
       // Get both types (default for admin dashboard)
       const [criticalLogs, legacyLogs] = await Promise.all([
-        auditSystem.getRecentCriticalEvents(Math.floor(limit / 2), category, userId),
+        auditSystem.getRecentCriticalEvents(Math.floor(limit / 2), category || undefined, userId),
         AuditLogger.getAuditLogs({
           userId,
           staffId,

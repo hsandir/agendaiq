@@ -57,7 +57,8 @@ export async function POST(request: NextRequest) {
         priority,
         is_leadership: is_leadership || false,
         category,
-        description
+        // TODO: Add description field to Role model in schema
+        // description
       }
     });
 
@@ -117,7 +118,8 @@ export async function PUT(request: NextRequest) {
     if (priority !== undefined) updateData.priority = priority;
     if (is_leadership !== undefined) updateData.is_leadership = is_leadership;
     if (category !== undefined) updateData.category = category;
-    if (description !== undefined) updateData.description = description;
+    // TODO: Add description field to Role model in schema
+    // if (description !== undefined) updateData.description = description;
 
     const role = await prisma.role.update({
       where: { id },

@@ -12,15 +12,15 @@ export async function GET() {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: user.id },
-      include: { staff: { include: { school: true } } },
+      where: { id: session.user.id },
+      include: { Staff: { include: { School: true } } },
     });
 
-    if (!user?.staff?.[0]?.school) {
+    if (!user?.Staff?.[0]?.School) {
       return new NextResponse("School not found", { status: 404 });
     }
 
-    return new NextResponse(JSON.stringify(user.staff[0].school), {
+    return new NextResponse(JSON.stringify(user.Staff[0].School), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
 
     // Find user's staff record
     const userStaff = await prisma.staff.findFirst({
-      where: { user_id: user.id },
+      where: { user_id: session.user.id },
     });
 
     if (!userStaff) {
@@ -71,11 +71,11 @@ export async function POST(request: Request) {
 
     // Get updated user with staff
     const updatedUser = await prisma.user.findUnique({
-      where: { id: user.id },
-      include: { staff: { include: { school: true } } },
+      where: { id: session.user.id },
+      include: { Staff: { include: { School: true } } },
     });
 
-    return new NextResponse(JSON.stringify(updatedUser?.staff?.[0]?.school), {
+    return new NextResponse(JSON.stringify(updatedUser?.Staff?.[0]?.School), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -95,7 +95,7 @@ export async function DELETE() {
 
     // Find user's staff record
     const userStaff = await prisma.staff.findFirst({
-      where: { user_id: user.id },
+      where: { user_id: session.user.id },
     });
 
     if (!userStaff) {

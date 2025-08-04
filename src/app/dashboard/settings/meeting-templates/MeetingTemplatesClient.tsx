@@ -346,7 +346,7 @@ export default function MeetingTemplatesClient({
                       onClick={() => handleEdit(template)}
                       disabled={isLoading}
                     >
-                      <Edit3 as FiEdit3 className="h-4 w-4 mr-1" />
+                      <FiEdit3 className="h-4 w-4 mr-1" />
                       Edit
                     </Button>
                     <Button

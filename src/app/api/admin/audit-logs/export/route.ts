@@ -5,26 +5,27 @@ import { AuditLogger } from '@/lib/audit/audit-logger';
 import { AuditCategory } from '@prisma/client';
 
 // Safe type definitions for audit log records
-interface BaseAuditRecord {
+interface SortableAuditRecord {
+  id?: number;
   timestamp?: string;
-  created_at?: string;
+  created_at?: string | Date;
   source?: string;
   category?: string;
   table_name?: string;
   action?: string;
   operation?: string;
-  User?: { email?: string };
-  Staff?: { Role?: { title?: string } };
+  User?: any;
+  Staff?: any;
   ip_address?: string;
   risk_score?: number;
   success?: boolean;
   error_message?: string;
   description?: string;
-}
-
-// Type for sortable audit records
-interface SortableAuditRecord extends BaseAuditRecord {
-  [key: string]: unknown;
+  metadata?: any;
+  user_id?: number | null;
+  staff_id?: number | null;
+  record_id?: number | string | null;
+  [key: string]: any;
 }
 
 export async function GET(request: NextRequest) {
@@ -73,10 +74,17 @@ export async function GET(request: NextRequest) {
         offset: 0
       });
 
+      const processedLegacyLogs = legacyLogs.map(log => ({
+        ...log,
+        created_at: log.created_at instanceof Date ? log.created_at.toISOString() : log.created_at,
+        User: log.User || undefined,
+        Staff: log.Staff || undefined
+      })) as SortableAuditRecord[];
+
       if (logType === 'legacy') {
-        data = legacyLogs;
+        data = processedLegacyLogs;
       } else {
-        data.push(...legacyLogs.map(log => ({ ...log, source: 'legacy' })));
+        data.push(...processedLegacyLogs.map(log => ({ ...log, source: 'legacy' })));
       }
     }
 
@@ -119,7 +127,7 @@ export async function GET(request: NextRequest) {
         'Description'
       ];
 
-      const csvRows = data.map((log: BaseAuditRecord) => {
+      const csvRows = data.map((log: SortableAuditRecord) => {
         const timestamp = new Date(log.timestamp || log.created_at || '').toISOString();
         const type = log.source || (log.category ? 'critical' : 'legacy');
         const categoryOrTable = log.category || log.table_name || '';

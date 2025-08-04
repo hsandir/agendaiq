@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User as FiUser, Settings as FiSettings, Lock as FiLock, UserCheck as FiUserCheck, Calendar as FiCalendar, Users as FiUsers, FileText as FiFileText } from "lucide-react";
+import { User, Settings, Lock, UserCheck, Calendar, Users, FileText } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Meeting Audit Log",
@@ -29,50 +29,54 @@ export default async function AuditPage() {
     }
   });
 
-  if (!userDetails || userDetails.staff?.Role?.title !== "Administrator") {
+  if (!userDetails || userDetails.Staff?.[0]?.Role?.title !== "Administrator") {
     redirect("/dashboard");
   }
 
+  // TODO: Add meetingAuditLog model to schema for meeting audit tracking
   // Fetch real meeting audit logs
-  const auditLogs = await prisma.meetingAuditLog.findMany({
-    include: {
-      User: true,
-      Meeting: {
-        include: {
-          Staff: {
-            include: {
-              User: true
-            }
-          }
-        }
-      }
-    },
-    orderBy: {
-      created_at: 'desc'
-    },
-    take: 50 // Limit to last 50 logs
-  });
+  // const auditLogs = await prisma.meetingAuditLog.findMany({
+  //   include: {
+  //     User: true,
+  //     Meeting: {
+  //       include: {
+  //         Staff: {
+  //           include: {
+  //             User: true
+  //           }
+  //         }
+  //       }
+  //     }
+  //   },
+  //   orderBy: {
+  //     created_at: 'desc'
+  //   },
+  //   take: 50 // Limit to last 50 logs
+  // });
+  
+  // For now, return empty array since meetingAuditLog model doesn't exist
+  const auditLogs: any[] = [];
 
   // Map action types to icons and descriptions
   const getActionDetails = (action: string) => {
     switch (action.toLowerCase()) {
       case 'created':
       case 'meeting_created':
-        return { icon: Calendar as FiCalendar, category: 'meeting' };
+        return { icon: Calendar, category: 'meeting' };
       case 'updated':
       case 'meeting_updated':
-        return { icon: Settings as FiSettings, category: 'meeting' };
+        return { icon: Settings, category: 'meeting' };
       case 'deleted':
       case 'meeting_deleted':
-        return { icon: Lock as FiLock, category: 'security' };
+        return { icon: Lock, category: 'security' };
       case 'attendee_added':
-        return { icon: Users as FiUsers, category: 'attendee' };
+        return { icon: Users, category: 'attendee' };
       case 'attendee_removed':
-        return { icon: User as FiUser, category: 'attendee' };
+        return { icon: User, category: 'attendee' };
       case 'note_added':
-        return { icon: FileText as FiFileText, category: 'content' };
+        return { icon: FileText, category: 'content' };
       default:
-        return { icon: UserCheck as FiUserCheck, category: 'general' };
+        return { icon: UserCheck, category: 'general' };
     }
   };
 
@@ -111,7 +115,7 @@ export default async function AuditPage() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
                           <h4 className="font-medium leading-none">
-                            {log.action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            {log.action.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                           </h4>
                           <div className="ml-auto text-sm text-muted-foreground">
                             {new Date(log.created_at).toLocaleString()}

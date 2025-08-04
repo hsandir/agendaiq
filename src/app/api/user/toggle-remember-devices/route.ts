@@ -11,30 +11,28 @@ export async function POST(request: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    // TODO: Add rememberDevices field to User model in schema
     // Get current user settings
     const user = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { rememberDevices: true },
+      where: { id: session.user.id },
+      select: { 
+        id: true,
+        // rememberDevices: true 
+      },
     });
 
     if (!user) {
       return new NextResponse("User not found", { status: 404 });
     }
 
-    // Toggle remember devices setting
-    const updatedUser = await prisma.user.update({
-      where: { id: user.id },
-      data: { rememberDevices: !user.rememberDevices },
-    });
+    // TODO: Toggle remember devices setting once field is added
+    // const updatedUser = await prisma.user.update({
+    //   where: { id: session.user.id },
+    //   data: { rememberDevices: !user.rememberDevices },
+    // });
 
-    return new NextResponse(JSON.stringify({
-      rememberDevices: updatedUser.rememberDevices,
-    }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    // For now, return error since rememberDevices field doesn't exist
+    return new NextResponse("Remember devices feature not available", { status: 501 });
   } catch (error) {
     console.error("Error toggling remember devices setting:", error);
     return new NextResponse("Internal Server Error", { status: 500 });

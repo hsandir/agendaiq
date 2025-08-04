@@ -373,7 +373,7 @@ export default function MockDataTrackerPage() {
                         <div className="flex space-x-2">
                           {item.type === 'page' && (
                             <Button variant="outline" size="sm" asChild>
-                              <Link href={item.path}>
+                              <Link href={item.path as any}>
                                 <ExternalLink className="w-3 h-3 mr-1" />
                                 View Page
                               </Link>

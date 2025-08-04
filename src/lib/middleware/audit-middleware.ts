@@ -17,7 +17,7 @@ export async function auditMiddleware(request: NextRequest): Promise<NextRespons
   try {
     const token = await getToken({ req: request });
     if (token?.id) {
-      userId = token.id as number;
+      userId = parseInt(token.id); // Convert string id to number
       staffId = token.staff?.id as number;
     }
   } catch (error) {

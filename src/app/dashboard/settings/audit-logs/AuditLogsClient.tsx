@@ -401,11 +401,21 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
     // Leadership can view logs from their own organization
     if (user.staff?.role.is_leadership) {
       // Can view logs from same user or their own staff actions
-      return log.user_id === user.id || log.staff_id === user.staff.id;
+      if (isCriticalLog(log)) {
+        return log.user_id === user.id || log.staff_id === user.staff.id;
+      } else {
+        // For legacy logs, check the User/Staff relations
+        return log.User?.id === user.id || log.Staff?.id === user.staff.id;
+      }
     }
 
     // Regular staff can only view their own audit logs
-    return log.user_id === user.id || log.staff_id === user.staff?.id;
+    if (isCriticalLog(log)) {
+      return log.user_id === user.id || log.staff_id === user.staff?.id;
+    } else {
+      // For legacy logs, check the User/Staff relations
+      return log.User?.id === user.id || log.Staff?.id === user.staff?.id;
+    }
   }, [user]);
 
   const handleViewDetails = (log: AuditLog) => {

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { prisma } from "@/lib/db/prisma";
+import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth/auth-options";
 import { authenticator } from "otplib";
 import { sendEmail, getTwoFactorCodeHtml } from "@/lib/email/email-service";
@@ -16,25 +16,26 @@ export async function POST(request: Request) {
     // Generate secret
     const secret = authenticator.generateSecret();
 
+    // TODO: Add twoFactorSecret and twoFactorEnabled fields to User model in schema
     // Save secret to user
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        twoFactorSecret: secret,
-        twoFactorEnabled: false, // Will be enabled after verification
-      },
-    });
+    // await prisma.user.update({
+    //   where: { id: session.user.id },
+    //   data: {
+    //     twoFactorSecret: secret,
+    //     twoFactorEnabled: false, // Will be enabled after verification
+    //   },
+    // });
 
     // Generate QR code URL
     const otpauth = authenticator.keyuri(
-      user.email!,
+      session.user.email!,
       "AgendaIQ",
       secret
     );
 
     // Send backup codes via email
     await sendEmail({
-      to: user.email!,
+      to: session.user.email!,
       subject: "Two-Factor Authentication Setup - AgendaIQ",
       html: getTwoFactorCodeHtml(secret),
     });

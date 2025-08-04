@@ -120,22 +120,23 @@ export default async function NewMeetingPage() {
         },
       });
 
+      // TODO: Add meetingAuditLog model to schema for meeting audit tracking
       // Create audit log entry for meeting creation
-      await prisma.meetingAuditLog.create({
-        data: {
-          meeting_id: meeting.id,
-          user_id: currentUser.id,
-          action: "created",
-          details: {
-            title: meeting.title,
-            start_time: meeting.start_time,
-            end_time: meeting.end_time,
-            meeting_type: meeting.meeting_type,
-            is_continuation: meeting.is_continuation,
-            attendee_count: data.attendeeIds.length
-          }
-        }
-      });
+      // await prisma.meetingAuditLog.create({
+      //   data: {
+      //     meeting_id: meeting.id,
+      //     user_id: currentUser.id,
+      //     action: "created",
+      //     details: {
+      //       title: meeting.title,
+      //       start_time: meeting.start_time,
+      //       end_time: meeting.end_time,
+      //       meeting_type: meeting.meeting_type,
+      //       is_continuation: meeting.is_continuation,
+      //       attendee_count: data.attendeeIds.length
+      //     }
+      //   }
+      // });
 
       // Revalidate the meetings page
       revalidatePath('/dashboard/meetings');

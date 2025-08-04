@@ -212,8 +212,8 @@ export const APIAuthPatterns = {
   managementOnly: (handler: (request: NextRequest, user: AuthenticatedUser) => Promise<NextResponse>) =>
     withAPIAuth(handler, { 
       requireAuth: true, 
-      requireStaff: true, 
-      allowedRoles: ['Principal', 'Superintendent', 'Administrator'] 
+      requireStaff: true,
+      requireLeadership: true
     }),
 } as const;
 

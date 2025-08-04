@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if school code already exists
-    const existingSchool = await prisma.school.findUnique({
+    const existingSchool = await prisma.school.findFirst({
       where: { code },
     });
 
@@ -102,8 +102,9 @@ export async function POST(request: NextRequest) {
         name,
         code,
         address,
-        phone,
-        email,
+        // TODO: Add phone and email fields to School model in schema
+        // phone,
+        // email,
         district_id,
       },
       include: {
@@ -153,7 +154,7 @@ export async function PUT(request: NextRequest) {
 
     // If code is being changed, check for conflicts
     if (code && code !== existingSchool.code) {
-      const codeConflict = await prisma.school.findUnique({
+      const codeConflict = await prisma.school.findFirst({
         where: { code },
       });
 

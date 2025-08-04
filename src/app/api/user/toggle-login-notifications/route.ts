@@ -11,25 +11,27 @@ export async function POST() {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    // TODO: Add loginNotifications field to User model in schema
     const user = await prisma.user.findUnique({
-      where: { email: user.email! },
-      select: { loginNotifications: true },
+      where: { email: session.user?.email! },
+      select: { 
+        email: true,
+        // loginNotifications: true 
+      },
     });
 
     if (!user) {
       return new NextResponse("User not found", { status: 404 });
     }
 
-    // Toggle the setting
-    await prisma.user.update({
-      where: { email: user.email! },
-      data: { loginNotifications: !user.loginNotifications },
-    });
+    // TODO: Toggle the setting once loginNotifications field is added
+    // await prisma.user.update({
+    //   where: { email: session.user?.email! },
+    //   data: { loginNotifications: !user.loginNotifications },
+    // });
 
-    return new NextResponse(
-      `Login notifications ${!user.loginNotifications ? "enabled" : "disabled"}`,
-      { status: 200 }
-    );
+    // For now, return error since loginNotifications field doesn't exist
+    return new NextResponse("Login notifications feature not available", { status: 501 });
   } catch (error) {
     console.error("Error toggling login notifications:", error);
     return new NextResponse("Internal server error", { status: 500 });

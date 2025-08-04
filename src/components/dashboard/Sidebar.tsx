@@ -58,7 +58,7 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
           return (
             <Link
               key={item.name}
-              href={item.href}
+              href={item.href as any}
               className={clsx(
                 "flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors",
                 {

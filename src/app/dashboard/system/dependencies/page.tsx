@@ -77,11 +77,13 @@ interface BackupInfo {
 export default function DependenciesPage() {
   const [dependencies, setDependencies] = useState<Dependency[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [operations, setOperations] = useState<UpdateOperation[]>([]);
   const [backups, setBackups] = useState<BackupInfo[]>([]);
   const [notifications, setNotifications] = useState<string[]>([]);
+  const [updateResult, setUpdateResult] = useState<{success: boolean; message: string; details?: any} | null>(null);
 
   const showNotification = (message: string) => {
     setNotifications(prev => [...prev, message]);

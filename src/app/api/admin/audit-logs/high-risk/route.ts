@@ -32,10 +32,10 @@ export async function GET(request: NextRequest) {
     // Calculate statistics
     const stats = {
       total: highRiskEvents.length,
-      riskScoreDistribution: {},
-      categoryDistribution: {},
-      userDistribution: {},
-      ipDistribution: {},
+      riskScoreDistribution: {} as Record<string, number>,
+      categoryDistribution: {} as Record<string, number>,
+      userDistribution: {} as Record<string, number>,
+      ipDistribution: {} as Record<string, number>,
       timeRange: {
         from: new Date(Date.now() - hoursBack * 60 * 60 * 1000).toISOString(),
         to: new Date().toISOString()

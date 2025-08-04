@@ -94,7 +94,7 @@ export default async function EditMeetingPage({ params }: PageProps) {
       id: attendee.Staff.id.toString(),
       name: attendee.Staff.User.name || attendee.Staff.User.email || '',
       email: attendee.Staff.User.email || '',
-      status: attendee.status
+      status: attendee.status || 'pending'
     }))
   };
 

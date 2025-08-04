@@ -278,7 +278,7 @@ export async function POST(request: NextRequest) {
           
           if (existingStaff) {
             processedRecord.existingData = {
-              name: existingUser.name,
+              name: existingUser.name || '',
               staffId: existingUser.staff_id || '',
               role: existingStaff.Role.title,
               department: existingStaff.Department.name
@@ -289,7 +289,7 @@ export async function POST(request: NextRequest) {
             if (record.Name !== existingUser.name) {
               conflicts.push({
                 field: 'name',
-                existing: existingUser.name,
+                existing: existingUser.name || '',
                 new: record.Name,
                 action: 'update_name'
               });

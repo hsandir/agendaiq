@@ -31,12 +31,13 @@ export async function GET(request: NextRequest) {
     // }
 
     // Your API logic here
-    const data = await prisma.MODEL_NAME.findMany({
-      // Your query
-    });
+    // Replace MODEL_NAME with your actual model name (e.g., user, staff, meeting)
+    // const data = await prisma.MODEL_NAME.findMany({
+    //   // Your query
+    // });
 
     return NextResponse.json({ 
-      data,
+      data: [],
       message: "Success" 
     });
 
@@ -74,23 +75,25 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // REQUIRED: Input validation
-    if (!body.REQUIRED_FIELD) {
-      return NextResponse.json(
-        { error: "Required field missing" }, 
-        { status: 400 }
-      );
-    }
+    // Replace REQUIRED_FIELD with actual field name
+    // if (!body.REQUIRED_FIELD) {
+    //   return NextResponse.json(
+    //     { error: "Required field missing" }, 
+    //     { status: 400 }
+    //   );
+    // }
 
     // Your create logic here
-    const result = await prisma.MODEL_NAME.create({
-      data: {
-        // Your data
-        created_by: user.staff!.id, // If applicable
-      }
-    });
+    // Replace MODEL_NAME with your actual model name
+    // const result = await prisma.MODEL_NAME.create({
+    //   data: {
+    //     // Your data
+    //     created_by: user.staff?.id, // If applicable
+    //   }
+    // });
 
     return NextResponse.json({ 
-      data: result,
+      data: {},
       message: "Created successfully" 
     }, { status: 201 });
 
@@ -125,17 +128,18 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
 
     // Your update logic here
-    const result = await prisma.MODEL_NAME.update({
-      where: { id: body.id },
-      data: {
-        // Your data
-        updated_by: user.staff!.id, // If applicable
-        updated_at: new Date(),
-      }
-    });
+    // Replace MODEL_NAME with your actual model name
+    // const result = await prisma.MODEL_NAME.update({
+    //   where: { id: body.id },
+    //   data: {
+    //     // Your data
+    //     updated_by: user.staff?.id, // If applicable
+    //     updated_at: new Date(),
+    //   }
+    // });
 
     return NextResponse.json({ 
-      data: result,
+      data: {},
       message: "Updated successfully" 
     });
 
@@ -177,9 +181,10 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Your delete logic here
-    await prisma.MODEL_NAME.delete({
-      where: { id: parseInt(id) }
-    });
+    // Replace MODEL_NAME with your actual model name
+    // await prisma.MODEL_NAME.delete({
+    //   where: { id: parseInt(id) }
+    // });
 
     return NextResponse.json({ 
       message: "Deleted successfully" 

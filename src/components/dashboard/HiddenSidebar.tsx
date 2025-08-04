@@ -225,7 +225,7 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
                       return (
                         <Link
                           key={item.href}
-                          href={item.href}
+                          href={item.href as any}
                           onClick={() => setIsOpen(false)}
                           className={cn(
                             "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors group",

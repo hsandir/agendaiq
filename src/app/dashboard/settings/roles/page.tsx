@@ -34,7 +34,8 @@ export default async function RolePage() {
     include: {
       Staff: {
         include: {
-          User: true
+          User: true,
+          Role: true
         }
       }
     }
@@ -81,7 +82,7 @@ export default async function RolePage() {
         </div>
         <div className="flex space-x-3">
           <Button variant="outline">
-            <Edit3 as FiEdit3 className="h-4 w-4 mr-2" />
+            <FiEdit3 className="h-4 w-4 mr-2" />
             Edit Roles
           </Button>
           <Button>

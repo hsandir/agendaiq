@@ -49,9 +49,17 @@ export default async function MeetingTemplatesPage() {
     }
   });
 
+  // Transform templates to match the expected interface
+  const transformedTemplates = templates.map(template => ({
+    ...template,
+    created_at: template.created_at.toISOString(),
+    updated_at: template.updated_at.toISOString(),
+    creator: template.Staff.User.name || template.Staff.User.email || 'Unknown'
+  }));
+
   return (
     <MeetingTemplatesClient 
-      initialTemplates={templates}
+      initialTemplates={transformedTemplates}
       roles={roles}
       departments={departments}
     />

@@ -12,24 +12,24 @@ export default async function MeetingManagementDashboard() {
   const userDetails = await prisma.user.findUnique({
     where: { email: user.email },
     include: { 
-      staff: {
+      Staff: {
         include: {
-          role: true
+          Role: true
         }
       }
     }
   });
 
-  if (!userDetails || userDetails.staff?.[0]?.role?.title !== "Administrator") {
+  if (!userDetails || userDetails.Staff?.[0]?.Role?.title !== "Administrator") {
     redirect("/dashboard");
   }
 
   // Fetch all meetings for admin view
   const meetings = await prisma.meeting.findMany({
     include: {
-      organizer: {
+      Staff: {
         include: {
-          user: {
+          User: {
             select: {
               id: true,
               name: true,
@@ -38,11 +38,11 @@ export default async function MeetingManagementDashboard() {
           },
         },
       },
-      attendees: {
+      MeetingAttendee: {
         include: {
-          staff: {
+          Staff: {
             include: {
-              user: {
+              User: {
                 select: {
                   id: true,
                   name: true,
@@ -108,15 +108,16 @@ export default async function MeetingManagementDashboard() {
                       {meeting.start_time ? new Date(meeting.start_time).toLocaleString() : 'TBD'}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-900">
-                      {meeting.organizer.user.name || meeting.organizer.user.email}
+                      {meeting.Staff.User.name || meeting.Staff.User.email}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-900">
-                      {meeting.attendees.length} attendees
+                      {meeting.MeetingAttendee.length} attendees
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm font-medium">
                       <Link href={`/dashboard/meetings/${meeting.id}`} className="text-blue-600 hover:text-blue-900 mr-3">
                         View
                       </Link>
+                      {/* TODO: Add zoom_join_url field to Meeting model
                       {meeting.zoom_join_url && (
                         <a 
                           href={meeting.zoom_join_url} 
@@ -126,7 +127,7 @@ export default async function MeetingManagementDashboard() {
                         >
                           Join
                         </a>
-                      )}
+                      )} */}
                     </td>
                   </tr>
                 ))}
@@ -165,10 +166,10 @@ export default async function MeetingManagementDashboard() {
                       {meeting.start_time ? new Date(meeting.start_time).toLocaleString() : 'TBD'}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-900">
-                      {meeting.organizer.user.name || meeting.organizer.user.email}
+                      {meeting.Staff.User.name || meeting.Staff.User.email}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-900">
-                      {meeting.attendees.length} attendees
+                      {meeting.MeetingAttendee.length} attendees
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm font-medium">
                       <Link href={`/dashboard/meetings/${meeting.id}`} className="text-blue-600 hover:text-blue-900">

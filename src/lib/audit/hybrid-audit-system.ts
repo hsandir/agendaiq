@@ -171,7 +171,8 @@ class HybridAuditSystem {
       await this.logOperational({
         action: 'AUDIT_LOG_FAILURE',
         metadata: { 
-          originalEvent: event,
+          eventCategory: event.category,
+          eventAction: event.action,
           error: error instanceof Error ? error.message : 'Unknown error'
         }
       });

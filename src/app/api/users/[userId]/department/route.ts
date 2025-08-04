@@ -12,9 +12,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
   // Check if the current user is an administrator via staff relation
   const currentUser = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: { staff: { include: { role: true } } },
+    include: { Staff: { include: { Role: true } } },
   });
-  const isAdmin = currentUser?.staff?.[0]?.role?.title === 'Administrator';
+  const isAdmin = currentUser?.Staff?.[0]?.Role?.title === 'Administrator';
   if (!isAdmin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
@@ -38,7 +38,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
   const updatedStaff = await prisma.staff.update({
     where: { id: staff.id },
     data: { department_id: departmentId },
-    include: { role: true, department: true },
+    include: { Role: true, Department: true },
   });
 
   return NextResponse.json({ staff: updatedStaff });

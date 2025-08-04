@@ -2,45 +2,57 @@ import { prisma } from './prisma';
 
 const DEFAULT_ROLES = [
   {
-    name: 'ADMIN',
-    subordinates: ['STEM_CHAIR', 'DEPARTMENT_CHAIR', 'TEACHER'],
+    title: 'Administrator',
+    priority: 1,
+    category: 'ADMIN',
+    is_leadership: true,
   },
   {
-    name: 'STEM_CHAIR',
-    subordinates: ['DEPARTMENT_CHAIR', 'TEACHER'],
+    title: 'Superintendent',
+    priority: 2,
+    category: 'DISTRICT',
+    is_leadership: true,
   },
   {
-    name: 'DEPARTMENT_CHAIR',
-    subordinates: ['TEACHER'],
+    title: 'Principal',
+    priority: 3,
+    category: 'SCHOOL',
+    is_leadership: true,
   },
   {
-    name: 'TEACHER',
-    subordinates: [],
+    title: 'Vice Principal',
+    priority: 4,
+    category: 'SCHOOL',
+    is_leadership: true,
+  },
+  {
+    title: 'Department Head',
+    priority: 5,
+    category: 'DEPARTMENT',
+    is_leadership: true,
+  },
+  {
+    title: 'Teacher',
+    priority: 6,
+    category: 'STAFF',
+    is_leadership: false,
+  },
+  {
+    title: 'Staff',
+    priority: 7,
+    category: 'STAFF',
+    is_leadership: false,
   },
 ];
 
 export async function initializeRoles() {
   try {
-    // Create roles first
-    for (const role of DEFAULT_ROLES) {
-      await prisma.roleHierarchy.upsert({
-        where: { name: role.name },
+    // Create roles
+    for (const roleData of DEFAULT_ROLES) {
+      await prisma.role.upsert({
+        where: { title: roleData.title },
         update: {}, // No updates needed if exists
-        create: {
-          name: role.name,
-        },
-      });
-    }
-
-    // Set up relationships after all roles exist
-    for (const role of DEFAULT_ROLES) {
-      await prisma.roleHierarchy.update({
-        where: { name: role.name },
-        data: {
-          subordinateRoles: {
-            connect: role.subordinates.map(name => ({ name })),
-          },
-        },
+        create: roleData,
       });
     }
 
