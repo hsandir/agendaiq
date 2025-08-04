@@ -4,6 +4,29 @@
 
 This document establishes the rules and guidelines for Claude AI when working with the AgendaIQ project - a comprehensive meeting and agenda management system for Turkish educational institutions.
 
+## 🔄 **MODEL SWITCHING STRATEGY**
+
+**AUTOMATIC MODEL SWITCHING PROTOCOL:**
+- **Claude Sonnet 4**: Default for regular coding, implementation, debugging, and maintenance tasks
+- **Claude Opus**: Automatically switch when encountering:
+  - Complex architectural decisions requiring creative problem-solving
+  - Advanced algorithm design and optimization challenges  
+  - Sophisticated system integration problems
+  - Edge cases requiring deep technical analysis
+  - Performance bottlenecks needing innovative solutions
+  - Security architecture requiring multi-layered approach
+
+**SWITCHING TRIGGER PHRASES:**
+- "🚨 CLAUDE OPUS RECOMMENDATION NEEDED" - Switch to Opus immediately
+- "Complex architectural problem" - Indicates Opus needed
+- "Advanced algorithm required" - Switch for better optimization
+- "Security architecture design" - Switch for comprehensive security
+
+**RETURN CONDITIONS:**
+- Task completed successfully by Opus
+- Sonnet 4 can handle the remaining implementation
+- User explicitly requests return to Sonnet 4
+
 **🔗 SOURCE FILES:** This document consolidates rules from:
 - `.cursorrules` - Main project development standards
 - `.cursor/rules/first` - Additional development constraints  

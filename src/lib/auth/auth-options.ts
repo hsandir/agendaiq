@@ -5,6 +5,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
+import { AuditClient } from '@/lib/audit/audit-client';
 
 // Type guard for staff property
 function hasStaff(user: unknown): user is User & { staff: unknown } {
@@ -43,7 +44,11 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials, req): Promise<User | null> {
         try {
+          // Log login attempt
+          await AuditClient.logAuthEvent('login_attempt', undefined, undefined, req);
+
           if (!credentials?.email || !credentials?.password) {
+            await AuditClient.logSecurityEvent('login_missing_credentials', undefined, undefined, req, 'Missing email or password');
             throw new Error("Missing credentials");
           }
 
@@ -53,6 +58,7 @@ export const authOptions: NextAuthOptions = {
             const rateLimitResult = await RateLimiters.auth.check(req, 5, clientId); // 5 attempts per 15 minutes
             
             if (!rateLimitResult.success) {
+              await AuditClient.logSecurityEvent('login_rate_limited', undefined, undefined, req, `Rate limit exceeded: ${clientId}`);
               throw new Error(rateLimitResult.error || "Too many login attempts. Please try again later.");
             }
           }
@@ -71,6 +77,7 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (!user || !user.hashedPassword) {
+            await AuditClient.logAuthEvent('login_failure', undefined, undefined, req, 'User not found or no password');
             throw new Error("Invalid credentials");
           }
 
@@ -78,6 +85,7 @@ export const authOptions: NextAuthOptions = {
           const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
           
           if (!isValid) {
+            await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, 'Password mismatch');
             throw new Error("Invalid credentials");
           }
 
@@ -110,9 +118,16 @@ export const authOptions: NextAuthOptions = {
             })
           };
 
+          // Log successful login
+          await AuditClient.logAuthEvent('login_success', userData.id, staff?.id, req);
+          
           return userData;
         } catch (error) {
           console.error('❌ Authorization error:', error instanceof Error ? error.message : String(error));
+          
+          // Log authentication error
+          await AuditClient.logSecurityEvent('auth_error', undefined, undefined, req, error instanceof Error ? error.message : 'Unknown error');
+          
           return null;
         }
       },
