@@ -164,41 +164,66 @@ export function AgendaItemLive({
   };
 
   return (
-    <Card className={`transition-all ${item.responsible_staff_id === currentUserId ? 'ring-2 ring-blue-500' : ''}`}>
-      <CardHeader className="cursor-pointer" onClick={onToggleExpand}>
+    <div className={`bg-white rounded-xl shadow-sm border transition-all hover:shadow-md ${
+      item.responsible_staff_id === currentUserId 
+        ? 'border-blue-500 shadow-blue-100' 
+        : 'border-gray-200'
+    }`}>
+      <div 
+        className="p-5 cursor-pointer" 
+        onClick={onToggleExpand}
+      >
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-3 flex-1">
-            <div className="mt-1">
-              {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            <div className="mt-0.5">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                isExpanded ? 'bg-gray-100' : 'bg-gray-50'
+              }`}>
+                {isExpanded ? 
+                  <ChevronDown className="h-4 w-4 text-gray-600" /> : 
+                  <ChevronRight className="h-4 w-4 text-gray-600" />
+                }
+              </div>
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               {isEditing ? (
                 <Input
                   value={editData.topic}
                   onChange={(e) => handleInputChange('topic', e.target.value)}
                   onClick={(e) => e.stopPropagation()}
-                  className="font-medium"
+                  className="font-semibold text-lg border-gray-300 focus:border-blue-500"
                 />
               ) : (
-                <h3 className="font-medium">{item.topic}</h3>
+                <h3 className="font-semibold text-lg text-gray-900 mb-1">{item.topic}</h3>
               )}
               {item.problem_statement && !isEditing && (
-                <p className="text-sm text-gray-600 mt-1">{item.problem_statement}</p>
+                <p className="text-sm text-gray-600 line-clamp-2">{item.problem_statement}</p>
+              )}
+              
+              {/* Assigned User Pill */}
+              {item.ResponsibleStaff && !isEditing && (
+                <div className="flex items-center gap-2 mt-2">
+                  <div className="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-xs font-medium">
+                    <User className="h-3 w-3" />
+                    <span>{item.ResponsibleStaff.User.name}</span>
+                  </div>
+                </div>
               )}
             </div>
           </div>
           
           <div className="flex items-center space-x-2 ml-4">
-            <Badge className={getPriorityColor(item.priority)} variant="outline">
+            <Badge className={`${getPriorityColor(item.priority)} border-0 font-medium`}>
               {item.priority}
             </Badge>
-            <Badge className={getStatusColor(item.status)} variant="outline">
+            <Badge className={`${getStatusColor(item.status)} border-0 font-medium`}>
               {item.status.replace('_', ' ')}
             </Badge>
             {canEdit && !isEditing && (
               <Button
                 size="sm"
                 variant="ghost"
+                className="rounded-full h-8 w-8 p-0"
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsEditing(true);
@@ -209,10 +234,10 @@ export function AgendaItemLive({
             )}
           </div>
         </div>
-      </CardHeader>
+      </div>
 
       {isExpanded && (
-        <CardContent className="space-y-4">
+        <div className="px-5 pb-5 space-y-4 border-t border-gray-100 pt-4">
           {/* Problem Statement */}
           {(item.problem_statement || isEditing) && (
             <div>
@@ -385,8 +410,8 @@ export function AgendaItemLive({
               </div>
             )}
           </div>
-        </CardContent>
+        </div>
       )}
-    </Card>
+    </div>
   );
 }

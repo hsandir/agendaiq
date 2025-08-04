@@ -21,11 +21,16 @@ import {
   ChevronRight,
   Wifi,
   WifiOff,
-  Eye
+  Eye,
+  ArrowLeft,
+  Grid,
+  List,
+  FileText
 } from "lucide-react";
 import { AgendaItemLive } from "./AgendaItemLive";
 import { usePusherChannel, usePresenceChannel } from "@/hooks/usePusher";
 import { CHANNELS, EVENTS } from "@/lib/pusher";
+import Link from "next/link";
 import type { 
   Meeting, 
   MeetingAgendaItem, 
@@ -230,211 +235,321 @@ export function MeetingLiveView({
 
   const meetingStatus = getMeetingStatus();
 
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+
   return (
-    <div className="max-w-7xl mx-auto p-4 space-y-4">
-      {/* Header */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="text-2xl">{meeting.title}</CardTitle>
-              <p className="text-gray-600 mt-1">{meeting.description}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge className={meetingStatus.color}>
-                {meetingStatus.label}
-              </Badge>
-              <div className="flex items-center gap-2">
-                {isConnected ? (
-                  <div className="flex items-center gap-1 text-green-600">
-                    <Wifi className="h-4 w-4" />
-                    <span className="text-sm">Live</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1 text-red-600">
-                    <WifiOff className="h-4 w-4" />
-                    <span className="text-sm">Offline</span>
-                  </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Modern Header with Gradient */}
+      <div className="bg-white border-b shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="py-4">
+            {/* Back Link */}
+            <Link 
+              href="/dashboard/meetings" 
+              className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Meetings
+            </Link>
+            
+            {/* Meeting Header */}
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-bold text-gray-900">{meeting.title}</h1>
+                  <Badge className={`${meetingStatus.color} px-3 py-1`}>
+                    {meetingStatus.label}
+                  </Badge>
+                </div>
+                {meeting.description && (
+                  <p className="text-gray-600 mt-2 text-lg">{meeting.description}</p>
                 )}
+                
+                {/* Meeting Info Pills */}
+                <div className="flex flex-wrap gap-3 mt-4">
+                  <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full text-sm">
+                    <Calendar className="h-4 w-4 text-gray-600" />
+                    <span className="text-gray-700">{new Date(meeting.start_time!).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full text-sm">
+                    <Clock className="h-4 w-4 text-gray-600" />
+                    <span className="text-gray-700">
+                      {new Date(meeting.start_time!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                      {new Date(meeting.end_time!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full text-sm">
+                    <Users className="h-4 w-4 text-gray-600" />
+                    <span className="text-gray-700">{meeting.MeetingAttendee.length} attendees</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full text-sm">
+                    <User className="h-4 w-4 text-gray-600" />
+                    <span className="text-gray-700">Host: {meeting.Staff.User.name}</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3 ml-6">
+                {/* Connection Status */}
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${
+                  isConnected 
+                    ? 'bg-green-100 text-green-700' 
+                    : 'bg-red-100 text-red-700'
+                }`}>
+                  {isConnected ? (
+                    <><Wifi className="h-4 w-4" /><span>Live</span></>
+                  ) : (
+                    <><WifiOff className="h-4 w-4" /><span>Offline</span></>
+                  )}
+                </div>
+                
                 <Button
-                  variant="outline"
-                  size="sm"
                   onClick={refreshMeeting}
+                  variant="outline"
+                  className="rounded-full"
                 >
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Refresh
+                  <RefreshCw className="h-4 w-4" />
                 </Button>
               </div>
             </div>
           </div>
-          
-          <div className="flex flex-wrap gap-4 mt-4 text-sm">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-gray-500" />
-              <span>{new Date(meeting.start_time!).toLocaleDateString()}</span>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Main Content - 3 columns */}
+          <div className="lg:col-span-3">
+            {/* Agenda Header with View Toggle */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">Agenda Items</h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {agendaItems.length} items • 
+                    {agendaItems.filter(i => i.status === 'Resolved').length} completed
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  {/* View Mode Toggle */}
+                  <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                        viewMode === 'list' 
+                          ? 'bg-white text-gray-900 shadow-sm' 
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      <List className="h-4 w-4 inline mr-1" />
+                      List
+                    </button>
+                    <button
+                      onClick={() => setViewMode('grid')}
+                      className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                        viewMode === 'grid' 
+                          ? 'bg-white text-gray-900 shadow-sm' 
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      <Grid className="h-4 w-4 inline mr-1" />
+                      Grid
+                    </button>
+                  </div>
+                  
+                  {(isOrganizer || isAdmin) && (
+                    <Button 
+                      onClick={addNewAgendaItem} 
+                      className="rounded-full bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Item
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-gray-500" />
-              <span>
-                {new Date(meeting.start_time!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
-                {new Date(meeting.end_time!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-gray-500" />
-              <span>{meeting.MeetingAttendee.length} attendees</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <User className="h-4 w-4 text-gray-500" />
-              <span>Organizer: {meeting.Staff.User.name}</span>
+
+            {/* Agenda Items */}
+            <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'space-y-4'}>
+              {agendaItems.length === 0 ? (
+                <div className="bg-white rounded-xl p-12 text-center col-span-full">
+                  <div className="max-w-sm mx-auto">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FileText className="h-8 w-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No agenda items yet</h3>
+                    <p className="text-gray-600 mb-4">Get started by adding your first agenda item</p>
+                    {(isOrganizer || isAdmin) && (
+                      <Button onClick={addNewAgendaItem} className="rounded-full">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add First Item
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                agendaItems.map((item) => {
+                  const typingUser = typingUsers.get(item.id);
+                  return (
+                    <div key={item.id} className="relative">
+                      <AgendaItemLive
+                        item={item}
+                        staff={allStaff}
+                        isExpanded={expandedItems.has(item.id)}
+                        onToggleExpand={() => toggleItemExpanded(item.id)}
+                        onUpdate={(updates) => handleItemUpdate(item.id, updates)}
+                        canEdit={isOrganizer || isAdmin || item.responsible_staff_id === currentUser.staff?.id}
+                        currentUserId={currentUser.id}
+                        currentUserName={currentUser.name}
+                        meetingId={meeting.id}
+                      />
+                      {typingUser && typingUser.userId !== currentUser.id && (
+                        <div className="absolute -bottom-2 left-4 bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full shadow-sm">
+                          {typingUser.userName} is typing...
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
-        </CardHeader>
-      </Card>
 
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Agenda Items - Main Column */}
-        <div className="lg:col-span-2">
-          <Card className="h-full">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Agenda Items</CardTitle>
-                {(isOrganizer || isAdmin) && (
-                  <Button onClick={addNewAgendaItem} size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Item
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {agendaItems.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    No agenda items yet. Add one to get started.
-                  </div>
-                ) : (
-                  agendaItems.map((item) => {
-                    const typingUser = typingUsers.get(item.id);
-                    return (
-                      <div key={item.id} className="relative">
-                        <AgendaItemLive
-                          item={item}
-                          staff={allStaff}
-                          isExpanded={expandedItems.has(item.id)}
-                          onToggleExpand={() => toggleItemExpanded(item.id)}
-                          onUpdate={(updates) => handleItemUpdate(item.id, updates)}
-                          canEdit={isOrganizer || isAdmin || item.responsible_staff_id === currentUser.staff?.id}
-                          currentUserId={currentUser.id}
-                          currentUserName={currentUser.name}
-                          meetingId={meeting.id}
-                        />
-                        {typingUser && typingUser.userId !== currentUser.id && (
-                          <div className="absolute -bottom-2 left-4 bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
-                            {typingUser.userName} is typing...
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-4">
-          {/* Attendees */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Attendees</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
+          {/* Sidebar - 1 column */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Attendees Card */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
+                <Users className="h-5 w-5 mr-2 text-gray-600" />
+                Attendees
+              </h3>
+              <div className="space-y-3">
                 {meeting.MeetingAttendee.map((attendee) => (
-                  <div key={attendee.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-50">
-                    <div>
-                      <p className="font-medium text-sm">{attendee.Staff.User.name}</p>
-                      <p className="text-xs text-gray-600">{attendee.Staff.Role.title}</p>
+                  <div key={attendee.id} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                        {attendee.Staff.User.name?.charAt(0) || 'U'}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{attendee.Staff.User.name}</p>
+                        <p className="text-xs text-gray-500">{attendee.Staff.Role.title}</p>
+                      </div>
                     </div>
-                    <Badge variant={attendee.status === 'attended' ? 'default' : 'outline'} className="text-xs">
+                    <Badge 
+                      variant={attendee.status === 'attended' ? 'default' : 'outline'} 
+                      className={`text-xs ${
+                        attendee.status === 'attended' 
+                          ? 'bg-green-100 text-green-700 border-green-200' 
+                          : 'bg-gray-100 text-gray-600'
+                      }`}
+                    >
                       {attendee.status}
                     </Badge>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Live Users */}
-          {members.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Eye className="h-4 w-4" />
+            {/* Live Users */}
+            {members.length > 0 && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2" />
                   Live Now ({members.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-1">
+                </h3>
+                <div className="space-y-2">
                   {members.map((member: any) => (
-                    <div key={member.id} className="flex items-center gap-2 text-sm">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      <span>{member.info.name}</span>
-                      <span className="text-gray-500 text-xs">({member.info.role})</span>
+                    <div key={member.id} className="flex items-center gap-3 text-sm">
+                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                      </div>
+                      <div>
+                        <span className="text-gray-900">{member.info.name}</span>
+                        <span className="text-gray-500 text-xs ml-1">• {member.info.role}</span>
+                      </div>
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            )}
 
-          {/* Quick Stats */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Progress</CardTitle>
-            </CardHeader>
-            <CardContent>
+            {/* Progress Stats */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">Progress Overview</h3>
               <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Total Items</span>
-                  <span className="font-medium">{agendaItems.length}</span>
+                {/* Progress Bar */}
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">Completion</span>
+                    <span className="font-medium text-gray-900">
+                      {agendaItems.length > 0 
+                        ? Math.round((agendaItems.filter(i => i.status === 'Resolved').length / agendaItems.length) * 100)
+                        : 0}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: agendaItems.length > 0 
+                          ? `${(agendaItems.filter(i => i.status === 'Resolved').length / agendaItems.length) * 100}%`
+                          : '0%'
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Resolved</span>
-                  <span className="font-medium text-green-600">
-                    {agendaItems.filter(i => i.status === 'Resolved').length}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Ongoing</span>
-                  <span className="font-medium text-yellow-600">
-                    {agendaItems.filter(i => i.status === 'Ongoing').length}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Pending</span>
-                  <span className="font-medium text-gray-600">
-                    {agendaItems.filter(i => i.status === 'Pending').length}
-                  </span>
+                
+                {/* Stats */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-sm text-gray-600">Total Items</span>
+                    <span className="font-semibold text-gray-900">{agendaItems.length}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-sm text-gray-600 flex items-center">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
+                      Resolved
+                    </span>
+                    <span className="font-semibold text-green-600">
+                      {agendaItems.filter(i => i.status === 'Resolved').length}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-sm text-gray-600 flex items-center">
+                      <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2" />
+                      Ongoing
+                    </span>
+                    <span className="font-semibold text-yellow-600">
+                      {agendaItems.filter(i => i.status === 'Ongoing').length}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-sm text-gray-600 flex items-center">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full mr-2" />
+                      Pending
+                    </span>
+                    <span className="font-semibold text-gray-600">
+                      {agendaItems.filter(i => i.status === 'Pending').length}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Last Update */}
-          <Card>
-            <CardContent className="pt-6">
+            {/* Last Update */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
               <div className="text-center">
+                <Clock className="h-8 w-8 text-gray-400 mx-auto mb-2" />
                 <p className="text-sm text-gray-600">Last updated</p>
-                <p className="font-medium">
+                <p className="font-semibold text-gray-900">
                   {isHydrated ? (lastUpdate ? lastUpdate.toLocaleTimeString() : 'Not yet') : '...'}
                 </p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>
