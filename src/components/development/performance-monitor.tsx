@@ -103,7 +103,14 @@ export default function PerformanceMonitor() {
     <div className="space-y-6">
       {/* Overview Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {metrics.map((metric) => {
+        {metrics.length === 0 ? (
+          <Card className="col-span-full">
+            <CardContent className="text-center py-8">
+              <p className="text-muted-foreground">Loading metrics...</p>
+            </CardContent>
+          </Card>
+        ) : (
+          metrics.map((metric) => {
           const status = getMetricStatus(metric)
           return (
             <Card key={metric.name} className={status === 'critical' ? 'border-red-500' : ''}>
@@ -127,7 +134,7 @@ export default function PerformanceMonitor() {
               </CardContent>
             </Card>
           )
-        })}
+        }))}
       </div>
 
       {/* Detailed Metrics */}

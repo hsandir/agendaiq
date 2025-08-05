@@ -9,29 +9,40 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Get table count from Prisma models
-    const modelNames = Object.keys(prisma).filter(key => 
-      !key.startsWith('$') && !key.startsWith('_')
-    );
+    // Get actual table count from database
+    const tableCountResult = await prisma.$queryRaw<Array<{ count: bigint }>>`
+      SELECT COUNT(*) as count 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      AND table_type = 'BASE TABLE'
+    `;
     
-    // Get total record counts
+    const tableCount = Number(tableCountResult[0]?.count || 0);
+    
+    // Get total record counts with error handling
     let totalRecords = 0;
     
-    // Count records in main tables
-    const counts = await Promise.all([
-      prisma.user.count(),
-      prisma.staff.count(),
-      prisma.school.count(),
-      prisma.district.count(),
-      prisma.meeting.count(),
-      prisma.agendaItem.count(),
-      prisma.auditLog.count(),
-    ]);
-    
-    totalRecords = counts.reduce((sum, count) => sum + count, 0);
+    try {
+      // Count records in main tables
+      const counts = await Promise.all([
+        prisma.user.count().catch(() => 0),
+        prisma.staff.count().catch(() => 0),
+        prisma.school.count().catch(() => 0),
+        prisma.district.count().catch(() => 0),
+        prisma.meeting.count().catch(() => 0),
+        prisma.agendaItem.count().catch(() => 0),
+        prisma.auditLog.count().catch(() => 0),
+        prisma.role.count().catch(() => 0),
+        prisma.department.count().catch(() => 0),
+      ]);
+      
+      totalRecords = counts.reduce((sum, count) => sum + count, 0);
+    } catch (error) {
+      console.error('Error counting records:', error);
+    }
 
     return NextResponse.json({
-      tables: modelNames.length || 24, // Fallback to known table count
+      tables: tableCount || 24, // Fallback to known table count
       records: totalRecords
     });
   } catch (error) {

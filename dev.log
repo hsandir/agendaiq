@@ -3801,3 +3801,2002 @@ Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
  ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
 Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
  GET /dashboard/development 200 in 1230ms
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+Failed to fetch database stats: TypeError: Cannot read properties of undefined (reading 'count')
+    at GET (src/app/api/dev/database/stats/route.ts:27:24)
+  25 |       prisma.district.count(),
+  26 |       prisma.meeting.count(),
+> 27 |       prisma.agendaItem.count(),
+     |                        ^
+  28 |       prisma.auditLog.count(),
+  29 |     ]);
+  30 |     
+ GET /api/dev/database/stats 500 in 13235ms
+Failed to fetch database stats: TypeError: Cannot read properties of undefined (reading 'count')
+    at GET (src/app/api/dev/database/stats/route.ts:27:24)
+  25 |       prisma.district.count(),
+  26 |       prisma.meeting.count(),
+> 27 |       prisma.agendaItem.count(),
+     |                        ^
+  28 |       prisma.auditLog.count(),
+  29 |     ]);
+  30 |     
+ GET /api/dev/database/stats 500 in 13393ms
+ GET /api/dev/database/backups 200 in 13439ms
+ GET /api/dev/database/backups 200 in 13453ms
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+Failed to fetch metrics: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    createdAt: {
+    ~~~~~~~~~
+      gte: new Date("2025-08-05T16:01:11.659Z")
+    },
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   operation?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  select: {
+    operation: true,
+    tableName: true,
+    createdAt: true
+  }
+}
+
+Unknown argument `createdAt`. Did you mean `created_at`? Available options are marked with ?.
+    at async GET (src/app/api/dev/metrics/route.ts:25:23)
+  23 |     
+  24 |     // Get application metrics from recent audit logs
+> 25 |     const recentLogs = await prisma.auditLog.findMany({
+     |                       ^
+  26 |       where: {
+  27 |         createdAt: {
+  28 |           gte: new Date(Date.now() - 60000) // Last minute {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/metrics 500 in 1224ms
+Failed to fetch metrics: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    createdAt: {
+    ~~~~~~~~~
+      gte: new Date("2025-08-05T16:01:11.661Z")
+    },
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   operation?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  select: {
+    operation: true,
+    tableName: true,
+    createdAt: true
+  }
+}
+
+Unknown argument `createdAt`. Did you mean `created_at`? Available options are marked with ?.
+    at async GET (src/app/api/dev/metrics/route.ts:25:23)
+  23 |     
+  24 |     // Get application metrics from recent audit logs
+> 25 |     const recentLogs = await prisma.auditLog.findMany({
+     |                       ^
+  26 |       where: {
+  27 |         createdAt: {
+  28 |           gte: new Date(Date.now() - 60000) // Last minute {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/metrics 500 in 6690ms
+Failed to fetch metrics: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    createdAt: {
+    ~~~~~~~~~
+      gte: new Date("2025-08-05T16:01:11.661Z")
+    },
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   operation?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  select: {
+    operation: true,
+    tableName: true,
+    createdAt: true
+  }
+}
+
+Unknown argument `createdAt`. Did you mean `created_at`? Available options are marked with ?.
+    at async GET (src/app/api/dev/metrics/route.ts:25:23)
+  23 |     
+  24 |     // Get application metrics from recent audit logs
+> 25 |     const recentLogs = await prisma.auditLog.findMany({
+     |                       ^
+  26 |       where: {
+  27 |         createdAt: {
+  28 |           gte: new Date(Date.now() - 60000) // Last minute {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/metrics 500 in 6836ms
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+Failed to fetch logs: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {},
+  take: 100,
+  skip: 0,
+  orderBy: {
+    createdAt: "desc",
+    ~~~~~~~~~
+?   id?: SortOrder,
+?   table_name?: SortOrder,
+?   record_id?: SortOrder,
+?   operation?: SortOrder,
+?   field_changes?: SortOrder | SortOrderInput,
+?   old_values?: SortOrder | SortOrderInput,
+?   new_values?: SortOrder | SortOrderInput,
+?   user_id?: SortOrder | SortOrderInput,
+?   staff_id?: SortOrder | SortOrderInput,
+?   source?: SortOrder,
+?   description?: SortOrder | SortOrderInput,
+?   ip_address?: SortOrder | SortOrderInput,
+?   user_agent?: SortOrder | SortOrderInput,
+?   metadata?: SortOrder | SortOrderInput,
+?   created_at?: SortOrder,
+?   User?: UserOrderByWithRelationInput,
+?   Staff?: StaffOrderByWithRelationInput
+  },
+  include: {
+    user: {
+      select: {
+        id: true,
+        email: true,
+        name: true
+      }
+    },
+    staff: {
+      select: {
+        id: true,
+        first_name: true,
+        last_name: true
+      }
+    }
+  }
+}
+
+Unknown argument `createdAt`. Did you mean `created_at`? Available options are marked with ?.
+    at async GET (src/app/api/dev/logs/route.ts:30:17)
+  28 |
+  29 |     // Fetch logs from audit_logs table
+> 30 |     const logs = await prisma.auditLog.findMany({
+     |                 ^
+  31 |       where,
+  32 |       take: limit,
+  33 |       skip: offset, {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/logs?level=all&context=all&limit=100&offset=0 500 in 2600ms
+Failed to fetch logs: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {},
+  take: 100,
+  skip: 0,
+  orderBy: {
+    createdAt: "desc",
+    ~~~~~~~~~
+?   id?: SortOrder,
+?   table_name?: SortOrder,
+?   record_id?: SortOrder,
+?   operation?: SortOrder,
+?   field_changes?: SortOrder | SortOrderInput,
+?   old_values?: SortOrder | SortOrderInput,
+?   new_values?: SortOrder | SortOrderInput,
+?   user_id?: SortOrder | SortOrderInput,
+?   staff_id?: SortOrder | SortOrderInput,
+?   source?: SortOrder,
+?   description?: SortOrder | SortOrderInput,
+?   ip_address?: SortOrder | SortOrderInput,
+?   user_agent?: SortOrder | SortOrderInput,
+?   metadata?: SortOrder | SortOrderInput,
+?   created_at?: SortOrder,
+?   User?: UserOrderByWithRelationInput,
+?   Staff?: StaffOrderByWithRelationInput
+  },
+  include: {
+    user: {
+      select: {
+        id: true,
+        email: true,
+        name: true
+      }
+    },
+    staff: {
+      select: {
+        id: true,
+        first_name: true,
+        last_name: true
+      }
+    }
+  }
+}
+
+Unknown argument `createdAt`. Did you mean `created_at`? Available options are marked with ?.
+    at async GET (src/app/api/dev/logs/route.ts:30:17)
+  28 |
+  29 |     // Fetch logs from audit_logs table
+> 30 |     const logs = await prisma.auditLog.findMany({
+     |                 ^
+  31 |       where,
+  32 |       take: limit,
+  33 |       skip: offset, {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/logs?level=all&context=all&limit=100&offset=0 500 in 2745ms
+Failed to fetch logs: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {},
+  take: 100,
+  skip: 0,
+  orderBy: {
+    createdAt: "desc",
+    ~~~~~~~~~
+?   id?: SortOrder,
+?   table_name?: SortOrder,
+?   record_id?: SortOrder,
+?   operation?: SortOrder,
+?   field_changes?: SortOrder | SortOrderInput,
+?   old_values?: SortOrder | SortOrderInput,
+?   new_values?: SortOrder | SortOrderInput,
+?   user_id?: SortOrder | SortOrderInput,
+?   staff_id?: SortOrder | SortOrderInput,
+?   source?: SortOrder,
+?   description?: SortOrder | SortOrderInput,
+?   ip_address?: SortOrder | SortOrderInput,
+?   user_agent?: SortOrder | SortOrderInput,
+?   metadata?: SortOrder | SortOrderInput,
+?   created_at?: SortOrder,
+?   User?: UserOrderByWithRelationInput,
+?   Staff?: StaffOrderByWithRelationInput
+  },
+  include: {
+    user: {
+      select: {
+        id: true,
+        email: true,
+        name: true
+      }
+    },
+    staff: {
+      select: {
+        id: true,
+        first_name: true,
+        last_name: true
+      }
+    }
+  }
+}
+
+Unknown argument `createdAt`. Did you mean `created_at`? Available options are marked with ?.
+    at async GET (src/app/api/dev/logs/route.ts:30:17)
+  28 |
+  29 |     // Fetch logs from audit_logs table
+> 30 |     const logs = await prisma.auditLog.findMany({
+     |                 ^
+  31 |       where,
+  32 |       take: limit,
+  33 |       skip: offset, {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/logs?level=all&context=all&limit=100&offset=0 500 in 2882ms
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+Failed to fetch test history: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  take: 30,
+  select: {
+    createdAt: true,
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/tests/history/route.ts:14:21)
+  12 |     // Get test history from audit logs or create a test_runs table in future
+  13 |     // For now, we'll use audit logs to track test runs
+> 14 |     const testLogs = await prisma.auditLog.findMany({
+     |                     ^
+  15 |       where: {
+  16 |         tableName: 'test_run',
+  17 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/tests/history 500 in 5974ms
+Failed to fetch test history: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  take: 30,
+  select: {
+    createdAt: true,
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/tests/history/route.ts:14:21)
+  12 |     // Get test history from audit logs or create a test_runs table in future
+  13 |     // For now, we'll use audit logs to track test runs
+> 14 |     const testLogs = await prisma.auditLog.findMany({
+     |                     ^
+  15 |       where: {
+  16 |         tableName: 'test_run',
+  17 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/tests/history 500 in 6154ms
+ GET /api/tests/generate 200 in 6162ms
+ GET /api/tests/generate 200 in 6163ms
+ GET /api/tests/suites 200 in 6164ms
+ GET /api/tests/suites 200 in 6163ms
+ ⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button onClick={function onClick} className=... children=...>
+                  ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '544169516'
+}
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/development 200 in 2565ms
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+Failed to fetch test history: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  take: 30,
+  select: {
+    createdAt: true,
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/tests/history/route.ts:14:21)
+  12 |     // Get test history from audit logs or create a test_runs table in future
+  13 |     // For now, we'll use audit logs to track test runs
+> 14 |     const testLogs = await prisma.auditLog.findMany({
+     |                     ^
+  15 |       where: {
+  16 |         tableName: 'test_run',
+  17 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/tests/history 500 in 728ms
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ GET /api/auth/session 200 in 6928ms
+ GET /api/tests/suites 200 in 6968ms
+ GET /api/tests/generate 200 in 6991ms
+Failed to fetch test history: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  take: 30,
+  select: {
+    createdAt: true,
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/tests/history/route.ts:14:21)
+  12 |     // Get test history from audit logs or create a test_runs table in future
+  13 |     // For now, we'll use audit logs to track test runs
+> 14 |     const testLogs = await prisma.auditLog.findMany({
+     |                     ^
+  15 |       where: {
+  16 |         tableName: 'test_run',
+  17 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/tests/history 500 in 6329ms
+Failed to fetch dev stats: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findFirst()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  select: {
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/dev/stats/route.ts:13:26)
+  11 |   try {
+  12 |     // Get test coverage from recent test runs
+> 13 |     const latestTestRun = await prisma.auditLog.findFirst({
+     |                          ^
+  14 |       where: {
+  15 |         tableName: 'test_run',
+  16 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/stats 500 in 7651ms
+ GET /api/tests/suites 200 in 7635ms
+Failed to fetch dev stats: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findFirst()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  select: {
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/dev/stats/route.ts:13:26)
+  11 |   try {
+  12 |     // Get test coverage from recent test runs
+> 13 |     const latestTestRun = await prisma.auditLog.findFirst({
+     |                          ^
+  14 |       where: {
+  15 |         tableName: 'test_run',
+  16 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/stats 500 in 1632ms
+ GET /api/auth/session 200 in 1633ms
+Failed to fetch test history: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  take: 30,
+  select: {
+    createdAt: true,
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/tests/history/route.ts:14:21)
+  12 |     // Get test history from audit logs or create a test_runs table in future
+  13 |     // For now, we'll use audit logs to track test runs
+> 14 |     const testLogs = await prisma.auditLog.findMany({
+     |                     ^
+  15 |       where: {
+  16 |         tableName: 'test_run',
+  17 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/tests/history 500 in 1865ms
+ GET /api/tests/generate 200 in 2202ms
+ GET /api/tests/suites 200 in 2180ms
+ GET /api/tests/generate 200 in 2080ms
+Failed to fetch dev stats: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findFirst()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  select: {
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/dev/stats/route.ts:13:26)
+  11 |   try {
+  12 |     // Get test coverage from recent test runs
+> 13 |     const latestTestRun = await prisma.auditLog.findFirst({
+     |                          ^
+  14 |       where: {
+  15 |         tableName: 'test_run',
+  16 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/stats 500 in 397ms
+Failed to fetch database stats: TypeError: Cannot read properties of undefined (reading 'count')
+    at GET (src/app/api/dev/database/stats/route.ts:27:24)
+  25 |       prisma.district.count(),
+  26 |       prisma.meeting.count(),
+> 27 |       prisma.agendaItem.count(),
+     |                        ^
+  28 |       prisma.auditLog.count(),
+  29 |     ]);
+  30 |     
+ GET /api/dev/database/stats 500 in 519ms
+ GET /api/auth/session 200 in 539ms
+ GET /api/dev/database/backups 200 in 513ms
+Failed to fetch database stats: TypeError: Cannot read properties of undefined (reading 'count')
+    at GET (src/app/api/dev/database/stats/route.ts:27:24)
+  25 |       prisma.district.count(),
+  26 |       prisma.meeting.count(),
+> 27 |       prisma.agendaItem.count(),
+     |                        ^
+  28 |       prisma.auditLog.count(),
+  29 |     ]);
+  30 |     
+ GET /api/dev/database/stats 500 in 624ms
+ GET /api/dev/database/backups 200 in 604ms
+Failed to fetch metrics: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    createdAt: {
+    ~~~~~~~~~
+      gte: new Date("2025-08-05T16:01:36.318Z")
+    },
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   operation?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  select: {
+    operation: true,
+    tableName: true,
+    createdAt: true
+  }
+}
+
+Unknown argument `createdAt`. Did you mean `created_at`? Available options are marked with ?.
+    at async GET (src/app/api/dev/metrics/route.ts:25:23)
+  23 |     
+  24 |     // Get application metrics from recent audit logs
+> 25 |     const recentLogs = await prisma.auditLog.findMany({
+     |                       ^
+  26 |       where: {
+  27 |         createdAt: {
+  28 |           gte: new Date(Date.now() - 60000) // Last minute {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/metrics 500 in 340ms
+Failed to fetch logs: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {},
+  take: 100,
+  skip: 0,
+  orderBy: {
+    createdAt: "desc",
+    ~~~~~~~~~
+?   id?: SortOrder,
+?   table_name?: SortOrder,
+?   record_id?: SortOrder,
+?   operation?: SortOrder,
+?   field_changes?: SortOrder | SortOrderInput,
+?   old_values?: SortOrder | SortOrderInput,
+?   new_values?: SortOrder | SortOrderInput,
+?   user_id?: SortOrder | SortOrderInput,
+?   staff_id?: SortOrder | SortOrderInput,
+?   source?: SortOrder,
+?   description?: SortOrder | SortOrderInput,
+?   ip_address?: SortOrder | SortOrderInput,
+?   user_agent?: SortOrder | SortOrderInput,
+?   metadata?: SortOrder | SortOrderInput,
+?   created_at?: SortOrder,
+?   User?: UserOrderByWithRelationInput,
+?   Staff?: StaffOrderByWithRelationInput
+  },
+  include: {
+    user: {
+      select: {
+        id: true,
+        email: true,
+        name: true
+      }
+    },
+    staff: {
+      select: {
+        id: true,
+        first_name: true,
+        last_name: true
+      }
+    }
+  }
+}
+
+Unknown argument `createdAt`. Did you mean `created_at`? Available options are marked with ?.
+    at async GET (src/app/api/dev/logs/route.ts:30:17)
+  28 |
+  29 |     // Fetch logs from audit_logs table
+> 30 |     const logs = await prisma.auditLog.findMany({
+     |                 ^
+  31 |       where,
+  32 |       take: limit,
+  33 |       skip: offset, {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/logs?level=all&context=all&limit=100&offset=0 500 in 546ms
+Failed to fetch metrics: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    createdAt: {
+    ~~~~~~~~~
+      gte: new Date("2025-08-05T16:01:36.841Z")
+    },
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   operation?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  select: {
+    operation: true,
+    tableName: true,
+    createdAt: true
+  }
+}
+
+Unknown argument `createdAt`. Did you mean `created_at`? Available options are marked with ?.
+    at async GET (src/app/api/dev/metrics/route.ts:25:23)
+  23 |     
+  24 |     // Get application metrics from recent audit logs
+> 25 |     const recentLogs = await prisma.auditLog.findMany({
+     |                       ^
+  26 |       where: {
+  27 |         createdAt: {
+  28 |           gte: new Date(Date.now() - 60000) // Last minute {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/metrics 500 in 833ms
+Failed to fetch logs: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {},
+  take: 100,
+  skip: 0,
+  orderBy: {
+    createdAt: "desc",
+    ~~~~~~~~~
+?   id?: SortOrder,
+?   table_name?: SortOrder,
+?   record_id?: SortOrder,
+?   operation?: SortOrder,
+?   field_changes?: SortOrder | SortOrderInput,
+?   old_values?: SortOrder | SortOrderInput,
+?   new_values?: SortOrder | SortOrderInput,
+?   user_id?: SortOrder | SortOrderInput,
+?   staff_id?: SortOrder | SortOrderInput,
+?   source?: SortOrder,
+?   description?: SortOrder | SortOrderInput,
+?   ip_address?: SortOrder | SortOrderInput,
+?   user_agent?: SortOrder | SortOrderInput,
+?   metadata?: SortOrder | SortOrderInput,
+?   created_at?: SortOrder,
+?   User?: UserOrderByWithRelationInput,
+?   Staff?: StaffOrderByWithRelationInput
+  },
+  include: {
+    user: {
+      select: {
+        id: true,
+        email: true,
+        name: true
+      }
+    },
+    staff: {
+      select: {
+        id: true,
+        first_name: true,
+        last_name: true
+      }
+    }
+  }
+}
+
+Unknown argument `createdAt`. Did you mean `created_at`? Available options are marked with ?.
+    at async GET (src/app/api/dev/logs/route.ts:30:17)
+  28 |
+  29 |     // Fetch logs from audit_logs table
+> 30 |     const logs = await prisma.auditLog.findMany({
+     |                 ^
+  31 |       where,
+  32 |       take: limit,
+  33 |       skip: offset, {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/logs?level=all&context=all&limit=100&offset=0 500 in 963ms
+ GET /api/tests/suites 200 in 999ms
+Failed to fetch test history: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  take: 30,
+  select: {
+    createdAt: true,
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/tests/history/route.ts:14:21)
+  12 |     // Get test history from audit logs or create a test_runs table in future
+  13 |     // For now, we'll use audit logs to track test runs
+> 14 |     const testLogs = await prisma.auditLog.findMany({
+     |                     ^
+  15 |       where: {
+  16 |         tableName: 'test_run',
+  17 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/tests/history 500 in 634ms
+ GET /api/tests/generate 200 in 304ms
+Failed to fetch test history: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  take: 30,
+  select: {
+    createdAt: true,
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/tests/history/route.ts:14:21)
+  12 |     // Get test history from audit logs or create a test_runs table in future
+  13 |     // For now, we'll use audit logs to track test runs
+> 14 |     const testLogs = await prisma.auditLog.findMany({
+     |                     ^
+  15 |       where: {
+  16 |         tableName: 'test_run',
+  17 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/tests/history 500 in 245ms
+ GET /api/tests/suites 200 in 481ms
+ GET /api/tests/generate 200 in 285ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+EdgeAuditLogger: Could not determine client IP address from headers
+EdgeAuditLogger: Could not determine client IP address from headers
+EdgeAuditLogger: Could not determine client IP address from headers
+EdgeAuditLogger: Could not determine client IP address from headers
+EdgeAuditLogger: Could not determine client IP address from headers
+EdgeAuditLogger: Could not determine client IP address from headers
+EdgeAuditLogger: Could not determine client IP address from headers
+EdgeAuditLogger: Could not determine client IP address from headers
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button onClick={function onClick} className=... children=...>
+                  ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '544169516'
+}
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/development 200 in 31690ms
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ POST /api/auth/_log 200 in 66568ms
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ GET /api/auth/session 200 in 39507ms
+ GET /api/tests/generate 200 in 39673ms
+ GET /api/tests/suites 200 in 39683ms
+ GET /api/tests/suites 200 in 6211ms
+ GET /api/tests/generate 200 in 75ms
+ GET /api/auth/session 200 in 60ms
+Failed to fetch dev stats: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findFirst()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  select: {
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/dev/stats/route.ts:13:26)
+  11 |   try {
+  12 |     // Get test coverage from recent test runs
+> 13 |     const latestTestRun = await prisma.auditLog.findFirst({
+     |                          ^
+  14 |       where: {
+  15 |         tableName: 'test_run',
+  16 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/stats 500 in 40356ms
+Failed to fetch test history: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  take: 30,
+  select: {
+    createdAt: true,
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/tests/history/route.ts:14:21)
+  12 |     // Get test history from audit logs or create a test_runs table in future
+  13 |     // For now, we'll use audit logs to track test runs
+> 14 |     const testLogs = await prisma.auditLog.findMany({
+     |                     ^
+  15 |       where: {
+  16 |         tableName: 'test_run',
+  17 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/tests/history 500 in 40464ms
+Failed to fetch test history: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  take: 30,
+  select: {
+    createdAt: true,
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/tests/history/route.ts:14:21)
+  12 |     // Get test history from audit logs or create a test_runs table in future
+  13 |     // For now, we'll use audit logs to track test runs
+> 14 |     const testLogs = await prisma.auditLog.findMany({
+     |                     ^
+  15 |       where: {
+  16 |         tableName: 'test_run',
+  17 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/tests/history 500 in 874ms
+Failed to fetch test history: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findMany()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  take: 30,
+  select: {
+    createdAt: true,
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/tests/history/route.ts:14:21)
+  12 |     // Get test history from audit logs or create a test_runs table in future
+  13 |     // For now, we'll use audit logs to track test runs
+> 14 |     const testLogs = await prisma.auditLog.findMany({
+     |                     ^
+  15 |       where: {
+  16 |         tableName: 'test_run',
+  17 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/tests/history 500 in 897ms
+ GET /api/tests/suites 200 in 974ms
+Failed to fetch dev stats: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findFirst()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  select: {
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/dev/stats/route.ts:13:26)
+  11 |   try {
+  12 |     // Get test coverage from recent test runs
+> 13 |     const latestTestRun = await prisma.auditLog.findFirst({
+     |                          ^
+  14 |       where: {
+  15 |         tableName: 'test_run',
+  16 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/stats 500 in 282ms
+ GET /api/auth/session 200 in 272ms
+ GET /api/tests/generate 200 in 303ms
+ ⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button onClick={function onClick} className=... children=...>
+                  ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '544169516'
+}
+Failed to fetch dev stats: Error [PrismaClientValidationError]: 
+Invalid `prisma.auditLog.findFirst()` invocation:
+
+{
+  where: {
+    tableName: "test_run",
+    ~~~~~~~~~
+    operation: "CREATE",
+?   AND?: AuditLogWhereInput | AuditLogWhereInput[],
+?   OR?: AuditLogWhereInput[],
+?   NOT?: AuditLogWhereInput | AuditLogWhereInput[],
+?   id?: IntFilter | Int,
+?   table_name?: StringFilter | String,
+?   record_id?: StringFilter | String,
+?   field_changes?: JsonNullableFilter,
+?   old_values?: JsonNullableFilter,
+?   new_values?: JsonNullableFilter,
+?   user_id?: IntNullableFilter | Int | Null,
+?   staff_id?: IntNullableFilter | Int | Null,
+?   source?: StringFilter | String,
+?   description?: StringNullableFilter | String | Null,
+?   ip_address?: StringNullableFilter | String | Null,
+?   user_agent?: StringNullableFilter | String | Null,
+?   metadata?: JsonNullableFilter,
+?   created_at?: DateTimeFilter | DateTime,
+?   User?: UserNullableScalarRelationFilter | UserWhereInput | Null,
+?   Staff?: StaffNullableScalarRelationFilter | StaffWhereInput | Null
+  },
+  orderBy: {
+    createdAt: "desc"
+  },
+  select: {
+    changes: true
+  }
+}
+
+Unknown argument `tableName`. Did you mean `table_name`? Available options are marked with ?.
+    at async GET (src/app/api/dev/stats/route.ts:13:26)
+  11 |   try {
+  12 |     // Get test coverage from recent test runs
+> 13 |     const latestTestRun = await prisma.auditLog.findFirst({
+     |                          ^
+  14 |       where: {
+  15 |         tableName: 'test_run',
+  16 |         operation: 'CREATE' {
+  clientVersion: '6.13.0'
+}
+ GET /api/dev/stats 500 in 2976ms
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button onClick={function onClick} className=... children=...>
+                  ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '544169516'
+}
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/development 200 in 2677ms
+ GET /dashboard/development 200 in 624ms

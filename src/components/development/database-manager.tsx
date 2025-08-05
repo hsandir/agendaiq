@@ -86,6 +86,29 @@ export default function DatabaseManager() {
     }
   }
 
+  const seedDevData = async () => {
+    setIsLoading(true)
+    try {
+      const response = await fetch('/api/dev/database/seed-dev', {
+        method: 'POST'
+      })
+      const data = await response.json()
+      
+      if (data.success) {
+        alert(`Development data seeded! Created ${data.counts.newLogs} new logs.`)
+        loadStats()
+        loadBackups()
+      } else {
+        alert('Failed to seed development data')
+      }
+    } catch (error) {
+      console.error('Seed dev data failed:', error)
+      alert('Failed to seed development data')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const resetDatabase = async () => {
     if (!confirm('Are you sure you want to reset the database? This will delete all data!')) {
       return
@@ -192,6 +215,15 @@ export default function DatabaseManager() {
                 >
                   <UploadIcon className="mr-2 h-4 w-4" />
                   Seed Database
+                </Button>
+                <Button
+                  onClick={seedDevData}
+                  variant="outline"
+                  disabled={isLoading}
+                  className="w-full"
+                >
+                  <DatabaseIcon className="mr-2 h-4 w-4" />
+                  Seed Dev Data
                 </Button>
                 <Button
                   onClick={resetDatabase}

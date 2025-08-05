@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
     const metrics = [
       { 
         name: 'CPU Usage', 
-        value: Math.round(cpuUsage), 
+        value: Math.round(cpuUsage) || 0, 
         unit: '%', 
         threshold: 80, 
         trend: cpuUsage > 50 ? 'up' : cpuUsage < 30 ? 'down' : 'stable' 
