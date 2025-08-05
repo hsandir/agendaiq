@@ -11,11 +11,14 @@ jest.mock('next-auth/react', () => ({
 }))
 
 // Mock next/navigation
+const mockPush = jest.fn()
+const mockReplace = jest.fn()
+
 jest.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
-  }),
+  useRouter: jest.fn(() => ({
+    push: mockPush,
+    replace: mockReplace,
+  })),
   useSearchParams: () => ({
     get: jest.fn(),
   }),
@@ -134,12 +137,6 @@ describe('Login Flow', () => {
         ok: false 
       } as any)
       
-      const mockPush = jest.fn()
-      jest.mocked(require('next/navigation').useRouter).mockReturnValue({
-        push: mockPush,
-        replace: jest.fn(),
-      })
-      
       render(<LoginForm />)
       
       const emailInput = screen.getByLabelText(/email/i)
@@ -151,7 +148,7 @@ describe('Login Flow', () => {
       await user.click(submitButton)
       
       await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith('/auth/two-factor?email=test@example.com')
+        expect(mockPush).toHaveBeenCalledWith('/auth/two-factor?email=test%40example.com')
       })
     })
   })

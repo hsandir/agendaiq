@@ -1,5 +1,7 @@
 import '@testing-library/jest-dom'
 import { TextEncoder, TextDecoder } from 'util'
+import 'whatwg-fetch'
+import { ReadableStream, WritableStream, TransformStream } from 'web-streams-polyfill'
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -92,6 +94,20 @@ global.TextDecoder = TextDecoder
 
 // Mock fetch for tests
 global.fetch = jest.fn()
+
+// Add missing globals for MSW
+global.TransformStream = TransformStream
+global.ReadableStream = ReadableStream
+global.WritableStream = WritableStream
+global.BroadcastChannel = class BroadcastChannel {
+  constructor(name) {
+    this.name = name
+  }
+  postMessage() {}
+  close() {}
+  addEventListener() {}
+  removeEventListener() {}
+}
 
 // Suppress console errors in tests unless explicitly testing error handling
 const originalError = console.error

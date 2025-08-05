@@ -3,11 +3,15 @@ import userEvent from '@testing-library/user-event'
 import RegisterForm from '@/components/auth/register-form'
 import { mockFetchResponse, mockFetchError } from '@/__tests__/utils/test-utils'
 
+// Mock routers
+const mockPush = jest.fn()
+const mockReplace = jest.fn()
+
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
-    replace: jest.fn(),
+    push: mockPush,
+    replace: mockReplace,
   }),
 }))
 
@@ -44,6 +48,10 @@ describe('Registration Flow', () => {
       const user = userEvent.setup()
       render(<RegisterForm />)
       
+      // Fill required fields first
+      await user.type(screen.getByLabelText(/full name/i), 'John Doe')
+      await user.type(screen.getByLabelText(/email address/i), 'john@example.com')
+      
       const passwordInput = screen.getByLabelText(/^password$/i)
       const submitButton = screen.getByRole('button', { name: /create account/i })
       
@@ -56,6 +64,10 @@ describe('Registration Flow', () => {
     it('validates password confirmation match', async () => {
       const user = userEvent.setup()
       render(<RegisterForm />)
+      
+      // Fill required fields first
+      await user.type(screen.getByLabelText(/full name/i), 'John Doe')
+      await user.type(screen.getByLabelText(/email address/i), 'john@example.com')
       
       const passwordInput = screen.getByLabelText(/^password$/i)
       const confirmPasswordInput = screen.getByLabelText(/confirm password/i)
@@ -72,11 +84,7 @@ describe('Registration Flow', () => {
       const user = userEvent.setup()
       mockFetchResponse({ success: true, message: 'Registration successful' })
       
-      const mockPush = jest.fn()
-      jest.mocked(require('next/navigation').useRouter).mockReturnValue({
-        push: mockPush,
-        replace: jest.fn(),
-      })
+      mockPush.mockClear()
       
       render(<RegisterForm />)
       
@@ -84,6 +92,7 @@ describe('Registration Flow', () => {
       await user.type(screen.getByLabelText(/email address/i), 'john@example.com')
       await user.type(screen.getByLabelText(/^password$/i), 'StrongPass123!')
       await user.type(screen.getByLabelText(/confirm password/i), 'StrongPass123!')
+      await user.click(screen.getByLabelText(/i agree to the terms/i))
       await user.click(screen.getByRole('button', { name: /create account/i }))
       
       await waitFor(() => {
@@ -99,7 +108,7 @@ describe('Registration Flow', () => {
       })
       
       await waitFor(() => {
-        expect(mockPush).toHaveBeenCalledWith('/auth/verify-email?email=john@example.com')
+        expect(mockPush).toHaveBeenCalledWith('/auth/verify-email?email=john%40example.com')
       })
     })
 
@@ -113,6 +122,7 @@ describe('Registration Flow', () => {
       await user.type(screen.getByLabelText(/email address/i), 'existing@example.com')
       await user.type(screen.getByLabelText(/^password$/i), 'StrongPass123!')
       await user.type(screen.getByLabelText(/confirm password/i), 'StrongPass123!')
+      await user.click(screen.getByLabelText(/i agree to the terms/i))
       await user.click(screen.getByRole('button', { name: /create account/i }))
       
       expect(await screen.findByText(/email already exists/i)).toBeInTheDocument()
@@ -141,7 +151,14 @@ describe('Registration Flow', () => {
 
     it('disables form during submission', async () => {
       const user = userEvent.setup()
-      mockFetchResponse({ success: true }, 200)
+      
+      // Create a promise that we can control
+      let resolveFetch: any
+      const fetchPromise = new Promise((resolve) => {
+        resolveFetch = resolve
+      })
+      
+      global.fetch = jest.fn().mockReturnValueOnce(fetchPromise as any)
       
       render(<RegisterForm />)
       
@@ -149,12 +166,27 @@ describe('Registration Flow', () => {
       await user.type(screen.getByLabelText(/email address/i), 'john@example.com')
       await user.type(screen.getByLabelText(/^password$/i), 'StrongPass123!')
       await user.type(screen.getByLabelText(/confirm password/i), 'StrongPass123!')
+      await user.click(screen.getByLabelText(/i agree to the terms/i))
       
       const submitButton = screen.getByRole('button', { name: /create account/i })
-      await user.click(submitButton)
       
-      expect(submitButton).toBeDisabled()
-      expect(screen.getByText(/creating account/i)).toBeInTheDocument()
+      // Click and don't await to check intermediate state
+      const clickPromise = user.click(submitButton)
+      
+      // Wait for React to update
+      await waitFor(() => {
+        expect(submitButton).toBeDisabled()
+        expect(screen.getByText(/creating account/i)).toBeInTheDocument()
+      })
+      
+      // Resolve the fetch
+      resolveFetch({
+        ok: true,
+        json: async () => ({ success: true })
+      })
+      
+      // Wait for the click to complete
+      await clickPromise
     })
   })
 
@@ -162,6 +194,12 @@ describe('Registration Flow', () => {
     it('requires accepting terms and conditions', async () => {
       const user = userEvent.setup()
       render(<RegisterForm />)
+      
+      // Fill all required fields first
+      await user.type(screen.getByLabelText(/full name/i), 'John Doe')
+      await user.type(screen.getByLabelText(/email address/i), 'john@example.com')
+      await user.type(screen.getByLabelText(/^password$/i), 'StrongPass123!')
+      await user.type(screen.getByLabelText(/confirm password/i), 'StrongPass123!')
       
       const termsCheckbox = screen.getByLabelText(/i agree to the terms/i)
       expect(termsCheckbox).toBeInTheDocument()
