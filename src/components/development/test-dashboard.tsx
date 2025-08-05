@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input'
 import { 
   PlayIcon, 
-  StopIcon, 
+  SquareIcon, 
   RefreshCwIcon, 
   CheckCircleIcon, 
   XCircleIcon,
@@ -25,7 +25,8 @@ import {
   AlertCircleIcon,
   TrendingUpIcon,
   TrendingDownIcon,
-  Loader2Icon
+  Loader2Icon,
+  TestTube2Icon
 } from 'lucide-react'
 
 interface TestSuite {
@@ -412,7 +413,7 @@ export default function TestDashboard() {
                   <div className="space-y-2">
                     {testResults.length === 0 ? (
                       <div className="text-center py-8">
-                        <TestTubeIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                        <TestTube2Icon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                         <p className="text-muted-foreground">No test results yet</p>
                         <p className="text-sm text-muted-foreground">Run tests to see results</p>
                       </div>

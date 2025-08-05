@@ -1519,3 +1519,314 @@ Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
  ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/meetings/2/agenda/7. Please move it to viewport export instead.
 Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
  GET /dashboard/meetings/2/agenda/7 200 in 504ms
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/meetings/2/live. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/meetings/2/live. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/meetings/2/live 200 in 92ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 124ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 67ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 125ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 173ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 222ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 274ms
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/development 200 in 28ms
+ ⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button onClick={function onClick} className=... children=...>
+                  ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '544169516'
+}
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⨯ ReferenceError: TestTubeIcon is not defined
+    at TestDashboard (src/components/development/test-dashboard.tsx:415:25)
+  413 |                     {testResults.length === 0 ? (
+  414 |                       <div className="text-center py-8">
+> 415 |                         <TestTubeIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+      |                         ^
+  416 |                         <p className="text-muted-foreground">No test results yet</p>
+  417 |                         <p className="text-sm text-muted-foreground">Run tests to see results</p>
+  418 |                       </div> {
+  digest: '3027788287'
+}
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/development 500 in 1148ms
+ GET /api/auth/session 200 in 46ms
+ GET /api/auth/session 200 in 23ms
+ GET /api/auth/session 200 in 31ms
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/api/test-sentry/route.ts
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+EdgeAuditLogger: Could not determine client IP address from headers
+EdgeAuditLogger: Could not determine client IP address from headers
+EdgeAuditLogger: Could not determine client IP address from headers
+EdgeAuditLogger: Could not determine client IP address from headers
+ ⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button onClick={function onClick} className=... children=...>
+                  ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '544169516'
+}
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⨯ ReferenceError: TestTubeIcon is not defined
+    at TestDashboard (src/components/development/test-dashboard.tsx:416:25)
+  414 |                     {testResults.length === 0 ? (
+  415 |                       <div className="text-center py-8">
+> 416 |                         <TestTubeIcon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+      |                         ^
+  417 |                         <p className="text-muted-foreground">No test results yet</p>
+  418 |                         <p className="text-sm text-muted-foreground">Run tests to see results</p>
+  419 |                       </div> {
+  digest: '2432785240'
+}
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/development 500 in 3218ms
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/api/test-sentry/route.ts
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /api/auth/session 200 in 2553ms
+ GET /api/auth/session 200 in 2412ms
+ GET /api/auth/session 200 in 2413ms
+EdgeAuditLogger: Could not determine client IP address from headers
+EdgeAuditLogger: Could not determine client IP address from headers
+EdgeAuditLogger: Could not determine client IP address from headers
+EdgeAuditLogger: Could not determine client IP address from headers
+ POST /api/auth/_log 200 in 24ms
+ POST /api/auth/_log 200 in 25ms
+ POST /api/auth/_log 200 in 25ms
+ ⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button onClick={function onClick} className=... children=...>
+                  ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '544169516'
+}
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/development 200 in 1020ms
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/api/test-sentry/route.ts
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/api/test-sentry/route.ts
+Server Error: {
+  name: 'Error',
+  message: 'Test error from Sentry test endpoint',
+  stack: 'Error: Test error from Sentry test endpoint\n' +
+    '    at GET (webpack-internal:///(rsc)/./src/app/api/test-sentry/route.ts:30:23)\n' +
+    '    at AsyncLocalStorage.run (node:async_hooks:327:14)\n' +
+    '    at AppRouteRouteModule.do (/Users/hs/Project/agendaiq/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:34191)\n' +
+    '    at /Users/hs/Project/agendaiq/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:43872\n' +
+    '    at /Users/hs/Project/agendaiq/node_modules/next/dist/server/lib/trace/tracer.js:169:36\n' +
+    '    at NoopContextManager.with (/Users/hs/Project/agendaiq/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)\n' +
+    '    at ContextAPI.with (/Users/hs/Project/agendaiq/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)\n' +
+    '    at NoopTracer.startActiveSpan (/Users/hs/Project/agendaiq/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)\n' +
+    '    at ProxyTracer.startActiveSpan (/Users/hs/Project/agendaiq/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)\n' +
+    '    at /Users/hs/Project/agendaiq/node_modules/next/dist/server/lib/trace/tracer.js:151:103\n' +
+    '    at NoopContextManager.with (/Users/hs/Project/agendaiq/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)\n' +
+    '    at ContextAPI.with (/Users/hs/Project/agendaiq/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)\n' +
+    '    at NextTracerImpl.trace (/Users/hs/Project/agendaiq/node_modules/next/dist/server/lib/trace/tracer.js:151:28)\n' +
+    '    at /Users/hs/Project/agendaiq/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:43733\n' +
+    '    at AsyncLocalStorage.run (node:async_hooks:338:14)\n' +
+    '    at /Users/hs/Project/agendaiq/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:41457\n' +
+    '    at AsyncLocalStorage.run (node:async_hooks:338:14)\n' +
+    '    at /Users/hs/Project/agendaiq/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:41414\n' +
+    '    at AsyncLocalStorage.run (node:async_hooks:338:14)\n' +
+    '    at AppRouteRouteModule.handle (/Users/hs/Project/agendaiq/node_modules/next/dist/compiled/next-server/app-route.runtime.dev.js:26:41368)\n' +
+    '    at async doRender (/Users/hs/Project/agendaiq/node_modules/next/dist/server/base-server.js:1518:42)'
+}
+ GET /api/test-sentry?type=simple 500 in 1457ms
+ GET /api/auth/session 200 in 2906ms
+ GET /api/auth/session 200 in 3010ms
+ GET /api/tests/suites 200 in 4882ms
+ GET /api/tests/suites 200 in 4796ms
+ GET /api/tests/generate 200 in 4884ms
+ GET /api/tests/generate 200 in 4803ms
+ GET /api/tests/generate 200 in 126ms
+ GET /api/auth/session 200 in 128ms
+ GET /api/tests/suites 200 in 160ms
