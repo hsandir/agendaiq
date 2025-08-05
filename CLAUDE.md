@@ -474,6 +474,48 @@ When Claude receives a task:
 5. **Test**: Provide testing guidance
 6. **Document**: Add relevant comments and documentation
 
+## 📂 SESSION MANAGEMENT RULES
+
+### Session Persistence
+Claude MUST maintain session continuity across restarts:
+
+1. **On Every Significant Action**:
+   - Update `.claude/session.json` with current state
+   - Log progress in `.claude/history.md`
+   - Track active tasks and next steps
+
+2. **Before Session Exit**:
+   ```json
+   // Update .claude/session.json
+   {
+     "lastUpdated": "ISO timestamp",
+     "currentTask": "What was being worked on",
+     "nextSteps": ["Priority 1", "Priority 2"],
+     "uncommittedChanges": true/false,
+     "serverRunning": true/false
+   }
+   ```
+
+3. **On Session Resume**:
+   - Read `.claude/session.json` automatically
+   - Check git status for uncommitted work
+   - Continue from last task WITHOUT asking
+   - Only announce: "Resuming work on: [current task]"
+
+4. **Session Commands**:
+   - "hadi devam edelim" = Resume without questions
+   - "exit" = Save state and prepare for closure
+   - "status" = Show current session state
+
+### Auto-Resume Protocol
+When user says "hadi devam edelim" or similar:
+1. ✅ Load session state silently
+2. ✅ Announce current task briefly
+3. ✅ Continue work immediately
+4. ❌ Do NOT ask "what were we doing?"
+5. ❌ Do NOT list all previous work
+6. ❌ Do NOT wait for confirmation
+
 ## 🚨 EMERGENCY PROCEDURES
 
 If Claude encounters authentication issues:
