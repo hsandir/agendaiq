@@ -48,44 +48,20 @@ export default function PerformanceMonitor() {
     return () => clearInterval(interval)
   }, [])
 
-  const loadMetrics = () => {
-    // Mock performance metrics
-    setMetrics([
-      { name: 'CPU Usage', value: 45, unit: '%', threshold: 80, trend: 'stable' },
-      { name: 'Memory Usage', value: 62, unit: '%', threshold: 85, trend: 'up' },
-      { name: 'Response Time', value: 125, unit: 'ms', threshold: 200, trend: 'down' },
-      { name: 'Requests/sec', value: 850, unit: 'req/s', threshold: 1000, trend: 'up' },
-      { name: 'Error Rate', value: 0.5, unit: '%', threshold: 1, trend: 'stable' },
-      { name: 'DB Connections', value: 15, unit: 'active', threshold: 50, trend: 'stable' },
-    ])
-
-    // Mock API endpoint metrics
-    setApiEndpoints([
-      { 
-        path: '/api/meetings', 
-        method: 'GET', 
-        avgResponseTime: 95, 
-        p95ResponseTime: 150,
-        requestsPerMinute: 450,
-        errorRate: 0.1
-      },
-      { 
-        path: '/api/users', 
-        method: 'GET', 
-        avgResponseTime: 45, 
-        p95ResponseTime: 85,
-        requestsPerMinute: 320,
-        errorRate: 0.2
-      },
-      { 
-        path: '/api/auth/login', 
-        method: 'POST', 
-        avgResponseTime: 250, 
-        p95ResponseTime: 450,
-        requestsPerMinute: 85,
-        errorRate: 2.5
-      },
-    ])
+  const loadMetrics = async () => {
+    try {
+      const response = await fetch('/api/dev/metrics')
+      if (!response.ok) throw new Error('Failed to fetch metrics')
+      
+      const data = await response.json()
+      setMetrics(data.metrics)
+      setApiEndpoints(data.apiEndpoints)
+    } catch (error) {
+      console.error('Failed to load metrics:', error)
+      // Show empty state instead of mock data
+      setMetrics([])
+      setApiEndpoints([])
+    }
   }
 
   const getMetricIcon = (name: string) => {

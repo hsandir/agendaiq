@@ -42,53 +42,36 @@ export default function LogViewer() {
       const interval = setInterval(loadLogs, 2000)
       return () => clearInterval(interval)
     }
-  }, [isLive, isPaused])
+  }, [isLive, isPaused, levelFilter, contextFilter])
 
   const loadLogs = async () => {
-    // Mock log data
-    const mockLogs: LogEntry[] = [
-      {
-        id: '1',
-        timestamp: new Date().toISOString(),
-        level: 'info',
-        context: 'auth',
-        message: 'User login successful',
-        data: { email: 'user@example.com' },
-        userId: 1,
-        requestId: 'req-123',
-      },
-      {
-        id: '2',
-        timestamp: new Date(Date.now() - 1000).toISOString(),
-        level: 'warn',
-        context: 'meetings',
-        message: 'Meeting creation rate limit warning',
-        data: { userId: 2, attempts: 9 },
-        requestId: 'req-124',
-      },
-      {
-        id: '3',
-        timestamp: new Date(Date.now() - 2000).toISOString(),
-        level: 'error',
-        context: 'database',
-        message: 'Database connection timeout',
-        data: { error: 'ETIMEDOUT', host: 'localhost' },
-      },
-      {
-        id: '4',
-        timestamp: new Date(Date.now() - 3000).toISOString(),
-        level: 'debug',
-        context: 'api',
-        message: 'API request received',
-        data: { method: 'GET', path: '/api/users' },
-        requestId: 'req-125',
-      },
-    ]
-
-    setLogs(prevLogs => {
-      const newLogs = [...mockLogs, ...prevLogs]
-      return newLogs.slice(0, 1000) // Keep last 1000 logs
-    })
+    try {
+      const params = new URLSearchParams({
+        level: levelFilter,
+        context: contextFilter,
+        limit: '100',
+        offset: '0'
+      })
+      
+      const response = await fetch(`/api/dev/logs?${params}`)
+      if (!response.ok) throw new Error('Failed to fetch logs')
+      
+      const data = await response.json()
+      
+      if (isLive && !isPaused) {
+        // In live mode, prepend new logs
+        setLogs(prevLogs => {
+          const existingIds = new Set(prevLogs.map(log => log.id))
+          const newLogs = data.logs.filter((log: LogEntry) => !existingIds.has(log.id))
+          return [...newLogs, ...prevLogs].slice(0, 1000) // Keep last 1000 logs
+        })
+      } else {
+        // In normal mode, replace logs
+        setLogs(data.logs)
+      }
+    } catch (error) {
+      console.error('Failed to load logs:', error)
+    }
   }
 
   const clearLogs = () => {

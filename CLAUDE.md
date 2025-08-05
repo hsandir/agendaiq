@@ -315,11 +315,16 @@ Claude must include testing considerations:
 - Check the app for all kinds of errors before starting
 - Check the app for all kinds of errors before giving results
 
-#### Data Handling Rules
+#### Data Handling Rules - CRITICAL
 - **NEVER** use mock data or api_fallback mock
 - **ALWAYS** write code that generates real-time data
 - **NEVER** use static data
 - **ALWAYS** pull data from original positions every time
+- **NEVER** hardcode statistics, numbers, or sample data
+- **NEVER** create arrays with fake/example data
+- **ALWAYS** fetch all data from database or calculate in real-time
+- **NEVER** use placeholder values like "82.5%", "3m 24s", "12,543"
+- **If data doesn't exist, show "No data" or loading state, NEVER fake it**
 
 #### File Modification Policy
 - **NEVER** recreate entire files when changes are needed
@@ -340,6 +345,23 @@ Claude must include testing considerations:
 ## 🚫 FORBIDDEN PATTERNS FOR CLAUDE
 
 Claude must NEVER do the following:
+
+❌ **Use any form of mock data**
+```typescript
+// WRONG - Mock data arrays
+const mockLogs = [
+  { id: '1', message: 'Test log', level: 'info' },
+  { id: '2', message: 'Another log', level: 'warn' }
+];
+
+// WRONG - Hardcoded statistics
+<div className="text-2xl font-bold">82.5%</div>
+<p className="text-xs">3m 24s</p>
+
+// CORRECT - Fetch from API or calculate
+const { data: logs } = await fetch('/api/logs');
+const coverage = calculateCoverage(testResults);
+```
 
 ❌ **Skip authentication checks**
 ```typescript

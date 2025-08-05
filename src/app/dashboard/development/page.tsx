@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
@@ -28,6 +28,28 @@ import LogViewer from '@/components/development/log-viewer'
 
 export default function DevelopmentTools() {
   const [activeTab, setActiveTab] = useState('tests')
+  const [stats, setStats] = useState({
+    testCoverage: { value: 0, formatted: '0%', changeFormatted: '+0%' },
+    buildStatus: { status: 'unknown', timeFormatted: 'N/A' },
+    apiHealth: { status: 'unknown', message: 'Loading...' },
+    activeErrors: { count: 0, requiresAttention: false }
+  })
+
+  useEffect(() => {
+    loadStats()
+  }, [])
+
+  const loadStats = async () => {
+    try {
+      const response = await fetch('/api/dev/stats')
+      if (response.ok) {
+        const data = await response.json()
+        setStats(data)
+      }
+    } catch (error) {
+      console.error('Failed to load stats:', error)
+    }
+  }
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -47,8 +69,8 @@ export default function DevelopmentTools() {
             <CardTitle className="text-sm font-medium">Test Coverage</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">82.5%</div>
-            <p className="text-xs text-muted-foreground">+2.3% from last week</p>
+            <div className="text-2xl font-bold">{stats.testCoverage.formatted}</div>
+            <p className="text-xs text-muted-foreground">{stats.testCoverage.changeFormatted} from last run</p>
           </CardContent>
         </Card>
 
@@ -58,8 +80,10 @@ export default function DevelopmentTools() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center space-x-2">
-              <Badge variant="success">Passing</Badge>
-              <span className="text-sm text-muted-foreground">3m 24s</span>
+              <Badge variant={stats.buildStatus.status === 'passing' ? 'success' : 'destructive'}>
+                {stats.buildStatus.status === 'passing' ? 'Passing' : 'Failed'}
+              </Badge>
+              <span className="text-sm text-muted-foreground">{stats.buildStatus.timeFormatted}</span>
             </div>
           </CardContent>
         </Card>
@@ -70,8 +94,11 @@ export default function DevelopmentTools() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center space-x-2">
-              <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-sm">All systems operational</span>
+              <div className={`h-2 w-2 rounded-full animate-pulse ${
+                stats.apiHealth.status === 'operational' ? 'bg-green-500' :
+                stats.apiHealth.status === 'degraded' ? 'bg-yellow-500' : 'bg-red-500'
+              }`} />
+              <span className="text-sm">{stats.apiHealth.message}</span>
             </div>
           </CardContent>
         </Card>
@@ -81,8 +108,12 @@ export default function DevelopmentTools() {
             <CardTitle className="text-sm font-medium">Active Errors</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">3</div>
-            <p className="text-xs text-muted-foreground">Requires attention</p>
+            <div className={`text-2xl font-bold ${stats.activeErrors.count > 0 ? 'text-red-600' : 'text-green-600'}`}>
+              {stats.activeErrors.count}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {stats.activeErrors.requiresAttention ? 'Requires attention' : 'No issues'}
+            </p>
           </CardContent>
         </Card>
       </div>

@@ -104,12 +104,16 @@ export default function TestDashboard() {
   }
 
   const loadTestHistory = async () => {
-    // Mock history data
-    setTestHistory([
-      { date: '2024-01-20', passed: 245, failed: 3, coverage: 78.5, duration: 180 },
-      { date: '2024-01-21', passed: 248, failed: 2, coverage: 79.2, duration: 175 },
-      { date: '2024-01-22', passed: 250, failed: 0, coverage: 82.5, duration: 182 },
-    ])
+    try {
+      const response = await fetch('/api/tests/history')
+      if (!response.ok) throw new Error('Failed to fetch test history')
+      
+      const data = await response.json()
+      setTestHistory(data.history || [])
+    } catch (error) {
+      console.error('Failed to load test history:', error)
+      setTestHistory([])
+    }
   }
 
   const loadUntestedFiles = async () => {

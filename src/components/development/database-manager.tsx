@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -24,6 +24,37 @@ export default function DatabaseManager() {
   const [isLoading, setIsLoading] = useState(false)
   const [query, setQuery] = useState('')
   const [queryResults, setQueryResults] = useState<any>(null)
+  const [backups, setBackups] = useState<Array<{name: string, size: string, date: string}>>([])
+  const [stats, setStats] = useState({ tables: 0, records: 0 })
+
+  useEffect(() => {
+    loadStats()
+    loadBackups()
+  }, [])
+
+  const loadStats = async () => {
+    try {
+      const response = await fetch('/api/dev/database/stats')
+      if (response.ok) {
+        const data = await response.json()
+        setStats(data)
+      }
+    } catch (error) {
+      console.error('Failed to load stats:', error)
+    }
+  }
+
+  const loadBackups = async () => {
+    try {
+      const response = await fetch('/api/dev/database/backups')
+      if (response.ok) {
+        const data = await response.json()
+        setBackups(data.backups || [])
+      }
+    } catch (error) {
+      console.error('Failed to load backups:', error)
+    }
+  }
 
   const runMigrations = async () => {
     setIsLoading(true)
@@ -113,7 +144,7 @@ export default function DatabaseManager() {
             <CardTitle className="text-sm font-medium">Tables</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
+            <div className="text-2xl font-bold">{stats.tables || 0}</div>
             <p className="text-xs text-muted-foreground">Active tables</p>
           </CardContent>
         </Card>
@@ -123,7 +154,7 @@ export default function DatabaseManager() {
             <CardTitle className="text-sm font-medium">Records</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12,543</div>
+            <div className="text-2xl font-bold">{stats.records?.toLocaleString() || '0'}</div>
             <p className="text-xs text-muted-foreground">Total records</p>
           </CardContent>
         </Card>
@@ -276,11 +307,10 @@ export default function DatabaseManager() {
               <div>
                 <h3 className="font-medium mb-2">Recent Backups</h3>
                 <div className="space-y-2">
-                  {[
-                    { name: 'backup-2024-01-22.sql', size: '45.2 MB', date: '2024-01-22 10:30' },
-                    { name: 'backup-2024-01-21.sql', size: '44.8 MB', date: '2024-01-21 10:30' },
-                    { name: 'backup-2024-01-20.sql', size: '44.5 MB', date: '2024-01-20 10:30' },
-                  ].map((backup) => (
+                  {backups.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">No backups available</p>
+                  ) : (
+                    backups.map((backup) => (
                     <div key={backup.name} className="flex justify-between items-center p-3 border rounded-lg">
                       <div>
                         <p className="font-medium text-sm">{backup.name}</p>
@@ -290,7 +320,7 @@ export default function DatabaseManager() {
                         <DownloadIcon className="h-4 w-4" />
                       </Button>
                     </div>
-                  ))}
+                  )))}
                 </div>
               </div>
             </CardContent>
