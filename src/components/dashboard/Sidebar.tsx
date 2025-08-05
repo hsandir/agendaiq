@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Calendar, Users, FileText, Settings, Wrench } from "lucide-react";
+import { LayoutDashboard, Calendar, Users, FileText, Settings, Wrench, FlaskConical } from "lucide-react";
 import clsx from "clsx";
 
 interface SidebarProps {
@@ -14,6 +14,7 @@ const navigation = [
   { name: "Meetings", href: "/dashboard/meetings", icon: Calendar },
   { name: "Team", href: "/dashboard/team", icon: Users },
   { name: "Notes", href: "/dashboard/notes", icon: FileText },
+  { name: "Development", href: "/dashboard/development", icon: FlaskConical },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 

@@ -9,7 +9,8 @@ import {
   UserCheck,
   Shield,
   Lock,
-  Activity
+  Activity,
+  FlaskConical
 } from "lucide-react";
 
 export interface NavigationItem {
@@ -47,6 +48,11 @@ export const sidebarItems: NavigationSection[] = [
         href: "/dashboard/notes",
         label: "Notes",
         icon: FileText,
+      },
+      {
+        href: "/dashboard/development",
+        label: "Development Tools",
+        icon: FlaskConical,
       },
     ],
   },

@@ -526,6 +526,118 @@ When providing code solutions, Claude should:
 7. **Confirm** real-time data implementation
 8. **Check** centralized authentication
 
+## 🧪 AUTOMATIC TEST GENERATION RULES
+
+### Test Creation Requirements
+
+When Claude creates ANY new component or API endpoint, it MUST:
+
+1. **Automatically generate corresponding test file**
+```typescript
+// When creating: src/components/user-profile.tsx
+// MUST also create: src/__tests__/unit/components/user-profile.test.tsx
+
+// When creating: src/app/api/users/route.ts
+// MUST also create: src/__tests__/unit/api/users.test.ts
+```
+
+2. **Use TestGenerator utility for consistent test structure**
+```typescript
+import { TestGenerator } from '@/lib/testing/test-generator'
+
+// Generate test automatically
+const { testPath, content } = await TestGenerator.generateTestForFile(componentPath)
+```
+
+3. **Include minimum test coverage**
+- Component tests: Render, props, events, state changes
+- API tests: Auth, validation, success/error cases, rate limiting
+- Minimum 80% coverage for new code
+
+4. **Follow test naming conventions**
+```typescript
+describe('ComponentName', () => {
+  it('renders without crashing', () => {})
+  it('handles user interactions', () => {})
+  it('displays correct data', () => {})
+})
+```
+
+5. **Test file structure**
+```
+src/__tests__/
+├── unit/
+│   ├── components/   # Component unit tests
+│   ├── api/         # API endpoint tests
+│   └── utils/       # Utility function tests
+├── integration/     # Integration tests
+└── e2e/            # End-to-end tests
+```
+
+### Test Implementation Standards
+
+1. **Always use test utilities**
+```typescript
+import { renderWithProviders, mockSession } from '@/__tests__/utils/test-utils'
+```
+
+2. **Mock external dependencies**
+```typescript
+jest.mock('@/lib/prisma')
+jest.mock('next-auth/react')
+```
+
+3. **Test security features**
+```typescript
+// Always test authentication
+it('requires authentication', async () => {})
+it('enforces role-based access', async () => {})
+```
+
+4. **Test error scenarios**
+```typescript
+it('handles network errors gracefully', async () => {})
+it('displays user-friendly error messages', async () => {})
+```
+
+### Automated Test Generation Process
+
+When creating new files:
+
+1. **Component Creation Flow**
+```bash
+# Claude creates component
+src/components/meeting-card.tsx
+
+# Claude MUST immediately generate test
+src/__tests__/unit/components/meeting-card.test.tsx
+```
+
+2. **API Endpoint Creation Flow**
+```bash
+# Claude creates API route
+src/app/api/meetings/stats/route.ts
+
+# Claude MUST immediately generate test
+src/__tests__/unit/api/meetings-stats.test.ts
+```
+
+3. **Update Test Dashboard**
+- New tests automatically appear in test dashboard
+- Coverage metrics update in real-time
+- Failed tests trigger notifications
+
+### Test Quality Checklist
+
+Before completing any task, Claude must verify:
+
+1. ✅ **Test File Created**: Corresponding test exists
+2. ✅ **Test Passes**: All tests are green
+3. ✅ **Coverage Met**: Minimum 80% coverage
+4. ✅ **Edge Cases**: Error states tested
+5. ✅ **Security Tested**: Auth and permissions verified
+6. ✅ **Accessibility**: ARIA attributes tested
+
 ## 🎯 SUCCESS METRICS
 
 Claude's success is measured by:
@@ -535,6 +647,8 @@ Claude's success is measured by:
 - **Functionality**: Code works as intended
 - **Maintainability**: Easy to understand and modify
 - **Performance**: Optimized for production use
+- **Test Coverage**: Minimum 80% coverage for all new code
+- **Test Quality**: Comprehensive test scenarios
 
 ---
 
