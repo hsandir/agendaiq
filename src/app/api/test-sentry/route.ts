@@ -6,6 +6,7 @@ import { addBreadcrumb, Performance } from '@/lib/sentry/sentry-utils';
 /**
  * Test endpoint for Sentry error tracking
  * This endpoint is for development/testing purposes only
+ * No authentication required for testing
  */
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;

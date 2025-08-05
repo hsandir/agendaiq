@@ -25,8 +25,7 @@ Sentry.init({
   
   // Integrations
   integrations: [
-    // Prisma integration for better database error tracking
-    Sentry.prismaIntegration(),
+    // Database monitoring will be added when needed
   ],
   
   // Filtering

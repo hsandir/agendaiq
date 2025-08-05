@@ -74,7 +74,7 @@ export async function middleware(request: NextRequest) {
   // Protect API routes
   if (path.startsWith("/api/")) {
     // Skip auth for public endpoints
-    const publicEndpoints = ['/api/auth', '/api/health', '/api/setup/check'];
+    const publicEndpoints = ['/api/auth', '/api/health', '/api/setup/check', '/api/test-sentry'];
     const isPublic = publicEndpoints.some(endpoint => path.startsWith(endpoint));
     
     if (!isPublic && !token) {
