@@ -2,6 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, AuthPresets } from "@/lib/auth/auth-utils";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/lib/auth/api-auth";
+import { Logger } from "@/lib/utils/logger";
+import { MeetingUpdateData } from "@/types/meeting";
+import { sanitizeMeetingData } from "@/lib/utils/sanitization";
+import { z } from "zod";
+
+// Validation schema for updating meetings
+const updateMeetingSchema = z.object({
+  title: z.string().min(1).max(255).optional(),
+  description: z.string().optional(),
+  startTime: z.string().datetime().optional(),
+  endTime: z.string().datetime().optional(),
+  agenda: z.string().optional(),
+  notes: z.string().optional(),
+  status: z.string().optional(),
+  zoomLink: z.string().url().optional()
+});
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -124,12 +140,25 @@ export async function GET(request: NextRequest, props: Props) {
       return NextResponse.json({ error: "Not authorized to view this meeting" }, { status: 403 });
     }
 
+    // Audit log the view
+    await prisma.meetingAuditLog.create({
+      data: {
+        meeting_id: meetingId,
+        user_id: user.id,
+        staff_id: user.staff?.id,
+        action: 'VIEW',
+        details: 'Viewed meeting details',
+        ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
+        user_agent: request.headers.get('user-agent'),
+      }
+    }).catch(() => {}); // Don't fail if audit log fails
+    
     return NextResponse.json({
       success: true,
       meeting
     });
   } catch (error) {
-    console.error("Error fetching meeting:", error);
+    await Logger.error("Failed to fetch meeting", { error: String(error) }, "meetings");
     return NextResponse.json(
       { error: "Failed to fetch meeting details" },
       { status: 500 }
@@ -139,24 +168,44 @@ export async function GET(request: NextRequest, props: Props) {
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  props: Props
 ) {
   try {
-    // Get current user
-    const user = await requireAuth(AuthPresets.requireStaff);
+    const params = await props.params;
+    
+    // Use consistent auth pattern
+    const authResult = await withAuth(request, { requireStaff: true });
+    if (!authResult.success) {
+      return NextResponse.json(
+        { error: authResult.error },
+        { status: authResult.statusCode }
+      );
+    }
+    const user = authResult.user!;
     
     if (!user.staff) {
       return NextResponse.json({ error: "Staff record not found" }, { status: 404 });
     }
 
-    const { id } = await params;
+    const { id } = params;
     const meetingId = parseInt(id);
     if (isNaN(meetingId)) {
       return NextResponse.json({ error: "Invalid meeting ID" }, { status: 400 });
     }
 
     const body = await request.json();
-    const { agenda, notes, status } = body;
+    
+    // Validate request data
+    const validationResult = updateMeetingSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: "Invalid input", details: validationResult.error.errors },
+        { status: 400 }
+      );
+    }
+    
+    // Sanitize input data
+    const sanitizedData = sanitizeMeetingData(validationResult.data);
 
     // Check permissions
     const existingMeeting = await prisma.meeting.findUnique({
@@ -187,12 +236,17 @@ export async function PATCH(
       attendee_count: existingMeeting.MeetingAttendee.length
     };
 
-    // Prepare update data
-    const updateData: any = {};
+    // Prepare update data with proper types
+    const updateData: MeetingUpdateData = {};
     
-    if (agenda !== undefined) updateData.agenda = agenda;
-    if (notes !== undefined) updateData.notes = notes;
-    if (status !== undefined) updateData.status = status;
+    if (sanitizedData.title !== undefined) updateData.title = sanitizedData.title;
+    if (sanitizedData.description !== undefined) updateData.description = sanitizedData.description;
+    if (sanitizedData.agenda !== undefined) updateData.agenda = sanitizedData.agenda;
+    if (sanitizedData.notes !== undefined) updateData.notes = sanitizedData.notes;
+    if (sanitizedData.status !== undefined) updateData.status = sanitizedData.status;
+    if (sanitizedData.startTime !== undefined) updateData.start_time = new Date(sanitizedData.startTime);
+    if (sanitizedData.endTime !== undefined) updateData.end_time = new Date(sanitizedData.endTime);
+    if (sanitizedData.zoomLink !== undefined) updateData.zoom_join_url = sanitizedData.zoomLink;
 
     // Update meeting
     const updatedMeeting = await prisma.meeting.update({
@@ -200,28 +254,31 @@ export async function PATCH(
       data: updateData,
     });
 
-    // TODO: Add meetingAuditLog model to schema
     // Create audit log entry for meeting update
-    // await prisma.meetingAuditLog.create({
-    //   data: {
-    //     meeting_id: updatedMeeting.id,
-    //     user_id: user.id,
-    //     action: status === 'scheduled' ? "completed_step_2" : "updated",
-    //     details: {
-    //       old_values: oldValues,
-    //       new_values: {
-    //         title: updatedMeeting.title,
-    //         description: updatedMeeting.description,
-    //         start_time: updatedMeeting.start_time,
-    //         end_time: updatedMeeting.end_time,
-    //         agenda: updatedMeeting.agenda,
-    //         notes: updatedMeeting.notes,
-    //         status: updatedMeeting.status,
-    //         attendee_count: oldValues.attendee_count
-    //       }
-    //     }
-    //   }
-    // });
+    await prisma.meetingAuditLog.create({
+      data: {
+        meeting_id: updatedMeeting.id,
+        user_id: user.id,
+        staff_id: user.staff?.id,
+        action: 'UPDATE',
+        details: `Updated meeting: ${updatedMeeting.title}`,
+        changes: {
+          old_values: oldValues,
+          new_values: {
+            title: updatedMeeting.title,
+            description: updatedMeeting.description,
+            start_time: updatedMeeting.start_time,
+            end_time: updatedMeeting.end_time,
+            agenda: updatedMeeting.agenda,
+            notes: updatedMeeting.notes,
+            status: updatedMeeting.status,
+            attendee_count: oldValues.attendee_count
+          }
+        },
+        ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
+        user_agent: request.headers.get('user-agent'),
+      }
+    });
 
     return NextResponse.json({ 
       success: true, 
@@ -229,7 +286,7 @@ export async function PATCH(
     });
 
   } catch (error) {
-    console.error("Error updating meeting:", error);
+    await Logger.error("Failed to update meeting", { error: String(error) }, "meetings");
     return NextResponse.json(
       { error: "Failed to update meeting" }, 
       { status: 500 }

@@ -126,6 +126,12 @@ export const RateLimiters = {
     interval: 60 * 60 * 1000, // 1 hour
     uniqueTokenPerInterval: 1000,
   }),
+
+  // Moderate rate limiting for meeting operations
+  meetings: rateLimit({
+    interval: 5 * 60 * 1000, // 5 minutes
+    uniqueTokenPerInterval: 1000,
+  }),
 };
 
 // Helper function to get client identifier

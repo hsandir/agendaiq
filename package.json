@@ -46,6 +46,7 @@
     "cmdk": "^1.1.1",
     "csv-parse": "^5.6.0",
     "date-fns": "^3.6.0",
+    "isomorphic-dompurify": "^2.26.0",
     "lucide-react": "^0.515.0",
     "next": "15.3.3",
     "next-auth": "^4.24.11",
@@ -75,6 +76,7 @@
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/bcryptjs": "^3.0.0",
+    "@types/dompurify": "^3.0.5",
     "@types/lru-cache": "7.10.9",
     "@types/node": "^24.1.0",
     "@types/nodemailer": "^6.4.17",

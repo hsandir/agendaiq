@@ -1,6 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
+import { Logger } from "@/lib/utils/logger";
+import { MeetingWithRelations, MeetingResponse, CreateMeetingRequest } from "@/types/meeting";
+import { sanitizeMeetingData } from "@/lib/utils/sanitization";
+import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
+import { z } from "zod";
+
+// Validation schema for creating meetings
+const createMeetingSchema = z.object({
+  title: z.string().min(1).max(255),
+  description: z.string().optional(),
+  startTime: z.string().datetime(),
+  endTime: z.string().datetime(),
+  zoomLink: z.string().url().optional(),
+  attendeeIds: z.array(z.number()).optional().default([])
+});
 
 // GET /api/meetings - Get meetings based on user role and hierarchy
 export async function GET(request: NextRequest) {
@@ -101,14 +116,14 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // Format the response
-    const formattedMeetings = meetings.map((meeting: any) => ({
+    // Format the response with proper types
+    const formattedMeetings: MeetingResponse[] = meetings.map((meeting) => ({
       id: meeting.id,
       title: meeting.title,
       description: meeting.description,
-      startTime: meeting.start_time.toISOString(),
-      endTime: meeting.end_time.toISOString(),
-      zoomLink: meeting.zoom_link,
+      startTime: meeting.start_time?.toISOString() || new Date().toISOString(),
+      endTime: meeting.end_time?.toISOString() || new Date().toISOString(),
+      zoomLink: meeting.zoom_join_url || meeting.zoom_meeting_id ? `/api/meetings/${meeting.id}/zoom` : null,
       status: meeting.status,
       organizer: {
         id: meeting.Staff.id,
@@ -116,19 +131,19 @@ export async function GET(request: NextRequest) {
         email: meeting.Staff.User.email,
         role: meeting.Staff.Role.title,
       },
-      attendees: meeting.MeetingAttendee.map((attendee: any) => ({
+      attendees: meeting.MeetingAttendee.map((attendee) => ({
         id: attendee.Staff.id,
         name: attendee.Staff.User.name,
         email: attendee.Staff.User.email,
         role: attendee.Staff.Role.title,
-        status: attendee.status,
+        status: attendee.status || 'PENDING',
       })),
     }));
 
     return NextResponse.json({ meetings: formattedMeetings });
   } catch (error) {
-    console.error("Error fetching meetings:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    await Logger.error("Failed to fetch meetings", { error: String(error), userId: user.id, staffId: user.staff?.id }, "meetings");
+    return NextResponse.json({ error: "Failed to fetch meetings" }, { status: 500 });
   }
 }
 
@@ -140,6 +155,14 @@ export async function POST(request: NextRequest) {
   }
 
   const user = authResult.user!;
+  
+  // Rate limiting check
+  const clientId = getClientIdentifier(request);
+  const rateLimitResult = await RateLimiters.meetings.check(request, 10, clientId);
+  if (!rateLimitResult.success) {
+    await Logger.warn("Meeting creation rate limit exceeded", { userId: user.id }, "meetings");
+    return RateLimiters.meetings.createErrorResponse(rateLimitResult);
+  }
 
   try {
     if (!user.staff) {
@@ -149,22 +172,19 @@ export async function POST(request: NextRequest) {
     const staffRecord = user.staff;
 
     const body = await request.json();
-    const {
-      title,
-      description,
-      startTime,
-      endTime,
-      zoomLink,
-      attendeeIds = [],
-    } = body;
-
-    // Validate required fields
-    if (!title || !startTime || !endTime) {
+    
+    // Validate request data
+    const validationResult = createMeetingSchema.safeParse(body);
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Title, start time, and end time are required" },
+        { error: "Invalid input", details: validationResult.error.errors },
         { status: 400 }
       );
     }
+    
+    // Sanitize input data
+    const sanitizedData = sanitizeMeetingData(validationResult.data);
+    const { title, description, startTime, endTime, zoomLink, attendeeIds } = sanitizedData as CreateMeetingRequest;
 
     // Validate date/time
     const start = new Date(startTime);
@@ -191,8 +211,7 @@ export async function POST(request: NextRequest) {
         description,
         start_time: start,
         end_time: end,
-        // TODO: Add zoom_link field to Meeting model in schema
-        // zoom_link: zoomLink,
+        zoom_join_url: zoomLink,
         organizer_id: staffRecord.id,
         status: "SCHEDULED",
         department_id: staffRecord.department.id,
@@ -216,7 +235,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Add attendees if provided
-    if (attendeeIds.length > 0) {
+    if (attendeeIds && attendeeIds.length > 0) {
       await prisma.meetingAttendee.createMany({
         data: attendeeIds.map((staffId: number) => ({
           meeting_id: meeting.id,
@@ -268,7 +287,7 @@ export async function POST(request: NextRequest) {
       description: completeeMeeting!.description,
       startTime: completeeMeeting!.start_time?.toISOString() || new Date().toISOString(),
       endTime: completeeMeeting!.end_time?.toISOString() || new Date().toISOString(),
-      zoomLink: (completeeMeeting as any).zoom_link || null,
+      zoomLink: completeeMeeting!.zoom_join_url || null,
       status: completeeMeeting!.status,
       organizer: {
         id: completeeMeeting!.Staff.id,
@@ -276,18 +295,34 @@ export async function POST(request: NextRequest) {
         email: completeeMeeting!.Staff.User.email,
         role: completeeMeeting!.Staff.Role.title,
       },
-      attendees: completeeMeeting!.MeetingAttendee.map((attendee: any) => ({
+      attendees: completeeMeeting!.MeetingAttendee.map((attendee) => ({
         id: attendee.Staff.id,
         name: attendee.Staff.User.name,
         email: attendee.Staff.User.email,
         role: attendee.Staff.Role.title,
-        status: attendee.status,
+        status: attendee.status || 'PENDING',
       })),
     };
 
     return NextResponse.json({ meeting: formattedMeeting }, { status: 201 });
+    // Audit log the meeting creation
+    await prisma.meetingAuditLog.create({
+      data: {
+        meeting_id: completeeMeeting!.id,
+        user_id: user.id,
+        staff_id: user.staff?.id,
+        action: 'CREATE',
+        details: `Created meeting: ${title}`,
+        ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
+        user_agent: request.headers.get('user-agent'),
+      }
+    });
+    
+    await Logger.info("Meeting created successfully", { meetingId: completeeMeeting!.id, title }, "meetings", { userId: user.id });
+
+    return NextResponse.json({ meeting: formattedMeeting }, { status: 201 });
   } catch (error) {
-    console.error("Error creating meeting:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    await Logger.error("Failed to create meeting", { error: String(error), userId: user.id, staffId: user.staff?.id }, "meetings");
+    return NextResponse.json({ error: "Failed to create meeting" }, { status: 500 });
   }
 } 
