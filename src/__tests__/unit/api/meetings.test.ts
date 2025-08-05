@@ -80,7 +80,21 @@ describe('Meetings API', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    
+    // Reset all mocks to default values
+    ;(prisma.meeting.findUnique as jest.Mock).mockReset()
+    ;(prisma.meeting.create as jest.Mock).mockReset()
+    ;(prisma.meeting.update as jest.Mock).mockReset()
+    ;(prisma.meeting.findMany as jest.Mock).mockReset()
+    ;(prisma.meetingAttendee.createMany as jest.Mock).mockReset()
+    ;(prisma.meetingAuditLog.create as jest.Mock).mockReset()
+    
+    // Reset rate limiter mocks
+    const { RateLimiters } = require('@/lib/utils/rate-limit')
+    RateLimiters.meetings.check.mockResolvedValue({ success: true })
+    
     // Default auth success
+    ;(withAuth as jest.Mock).mockReset()
     ;(withAuth as jest.Mock).mockResolvedValue({
       success: true,
       user: {
@@ -309,9 +323,7 @@ describe('Meetings API', () => {
       RateLimiters.meetings.check.mockResolvedValue({ success: true })
     })
 
-    it.skip('creates audit log entry - skipped due to API bug', async () => {
-      // TODO: This test is skipped because the API has a bug - the audit log code is unreachable
-      // due to an early return statement. The API needs to be fixed first.
+    it('creates audit log entry', async () => {
       const createdMeeting = { ...mockMeeting, id: 123 }
       ;(prisma.meeting.create as jest.Mock).mockResolvedValue(createdMeeting)
       ;(prisma.meeting.findUnique as jest.Mock).mockResolvedValue({
@@ -405,8 +417,7 @@ describe('Meetings API', () => {
       )
     })
 
-    it.skip('prevents unauthorized updates - skipped due to test ordering issue', async () => {
-      // This test passes in isolation but fails when run with other tests due to mock interference
+    it('prevents unauthorized updates', async () => {
       // Ensure non-admin user for this test
       ;(withAuth as jest.Mock).mockResolvedValueOnce({
         success: true,

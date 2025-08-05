@@ -304,7 +304,6 @@ export async function POST(request: NextRequest) {
       })),
     };
 
-    return NextResponse.json({ meeting: formattedMeeting }, { status: 201 });
     // Audit log the meeting creation
     await prisma.meetingAuditLog.create({
       data: {
