@@ -467,3 +467,1055 @@ Server Error: {
 }
  GET /api/test-sentry?type=breadcrumb 500 in 26ms
  GET /api/test-sentry?type=user-context 200 in 41ms
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/api/test-sentry/route.ts
+ ⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button onClick={function onClick} className=... children=...>
+                  ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '544169516'
+}
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard 200 in 1945ms
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/api/test-sentry/route.ts
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/api/test-sentry/route.ts
+ GET /api/auth/session 200 in 506ms
+ GET /api/auth/session 200 in 508ms
+ GET /api/auth/session 200 in 555ms
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/api/test-sentry/route.ts
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/api/test-sentry/route.ts
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/development. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/development 200 in 3915ms
+ ⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button onClick={function onClick} className=... children=...>
+                  ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '3833021978'
+}
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/meetings/2/live. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/meetings/2/live. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/meetings/2/live 200 in 8045ms
+ GET /api/auth/session 200 in 45ms
+ GET /api/auth/session 200 in 39ms
+ GET /api/auth/session 200 in 45ms
+ GET /api/auth/session 200 in 14ms
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/api/test-sentry/route.ts
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 962ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 1041ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 1087ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 1137ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 1194ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 1385ms
+ ⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button onClick={function onClick} className=... children=...>
+                  ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '544169516'
+}
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard 200 in 837ms
+ GET /api/auth/session 200 in 126ms
+ GET /api/auth/session 200 in 223ms
+ GET /api/auth/session 200 in 225ms
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard 200 in 86ms
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/meetings. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/meetings. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/meetings 200 in 1645ms
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ GET /api/meetings 200 in 1422ms
+ GET /api/meetings 200 in 1424ms
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/meetings/2. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/meetings/2. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/meetings/2. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/meetings/2. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/meetings/2. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/meetings/2. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/meetings/2 200 in 1133ms
+ GET /dashboard/meetings/2 200 in 1944ms
+ GET /dashboard/meetings/2 200 in 903ms
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/meetings/2/live. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/meetings/2/live. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/meetings/2/live. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/meetings/2/live. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/meetings/2/live 200 in 97ms
+ GET /dashboard/meetings/2/live 200 in 117ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 385ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 76ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 275ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 412ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 599ms
+Pusher auth error: SyntaxError: Unexpected token s in JSON at position 0
+    at JSON.parse (<anonymous>)
+    at async POST (src/app/api/pusher/auth/route.ts:19:17)
+  17 |
+  18 |     // Get the request body
+> 19 |     const body = await request.json();
+     |                 ^
+  20 |     const socketId = body.socket_id;
+  21 |     const channel = body.channel_name;
+  22 |
+ POST /api/pusher/auth 500 in 677ms
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./src/components/development/test-dashboard.tsx
+Attempted import error: 'StopIcon' is not exported from '__barrel_optimize__?names=AlertCircleIcon,BarChart2Icon,CheckCircleIcon,ClockIcon,DownloadIcon,FilterIcon,Loader2Icon,PlayIcon,RefreshCwIcon,SearchIcon,StopIcon,TrendingUpIcon,XCircleIcon!=!lucide-react' (imported as 'StopIcon').
+
+Import trace for requested module:
+./src/components/development/test-dashboard.tsx
+./src/app/dashboard/development/page.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/meetings/2/agenda/7. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/meetings/2/agenda/7. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/meetings/2/agenda/7 200 in 1801ms
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button onClick={function onClick} className=... children=...>
+                  ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '544169516'
+}
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/meetings/2/agenda/7. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/meetings/2/agenda/7. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ GET /dashboard/meetings/2/agenda/7 200 in 1374ms
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ GET /api/test-sentry?type=none 200 in 1044ms
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/not-found.tsx
+ ⚠ ./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/global-error.tsx
+
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+Critical dependency: the request of a dependency is an expression
+
+Import trace for requested module:
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/instrumentation.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/node/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/platform/index.js
+./node_modules/@prisma/instrumentation/node_modules/@opentelemetry/instrumentation/build/esm/index.js
+./node_modules/@prisma/instrumentation/dist/index.js
+./node_modules/@sentry/node/build/cjs/integrations/tracing/prisma.js
+./node_modules/@sentry/node/build/cjs/index.js
+./node_modules/@sentry/nextjs/build/cjs/index.server.js
+./src/app/api/test-sentry/route.ts
+ POST /api/meetings/2/agenda-items/7/comments 200 in 2247ms
+ ⨯ Error: Event handlers cannot be passed to Client Component props.
+  <button onClick={function onClick} className=... children=...>
+                  ^^^^^^^^^^^^^^^^^^
+If you need interactivity, consider converting part of this to a Client Component.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+    at stringify (<anonymous>) {
+  digest: '544169516'
+}
+ ⚠ Unsupported metadata themeColor is configured in metadata export in /dashboard/meetings/2/agenda/7. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ ⚠ Unsupported metadata viewport is configured in metadata export in /dashboard/meetings/2/agenda/7. Please move it to viewport export instead.
+Read more: https://nextjs.org/docs/app/api-reference/functions/generate-viewport
+ GET /dashboard/meetings/2/agenda/7 200 in 504ms

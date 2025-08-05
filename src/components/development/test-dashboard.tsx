@@ -271,7 +271,7 @@ export default function TestDashboard() {
               >
                 {isRunning ? (
                   <>
-                    <StopIcon className="mr-2 h-4 w-4" />
+                    <SquareIcon className="mr-2 h-4 w-4" />
                     Running...
                   </>
                 ) : (
