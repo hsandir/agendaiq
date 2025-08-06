@@ -79,7 +79,8 @@ export async function middleware(request: NextRequest) {
       '/api/health', 
       '/api/setup/check', 
       '/api/test-sentry',
-      '/api/dev'  // Development tools - accessible without auth in dev mode
+      '/api/dev',  // Development tools - accessible without auth in dev mode
+      '/api/tests' // Test endpoints for development
     ];
     const isPublic = publicEndpoints.some(endpoint => path.startsWith(endpoint));
     

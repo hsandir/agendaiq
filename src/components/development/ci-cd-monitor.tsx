@@ -94,6 +94,7 @@ export default function CICDMonitor() {
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [filterStatus, setFilterStatus] = useState<'all' | 'failure' | 'success'>('all');
   const [usingMockData, setUsingMockData] = useState(false);
+  const [activeTab, setActiveTab] = useState('runs');
 
   const fetchRuns = async () => {
     try {
@@ -420,7 +421,7 @@ export default function CICDMonitor() {
       )}
 
       {/* Main Content */}
-      <Tabs defaultValue="runs" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="runs">Workflow Runs</TabsTrigger>
           <TabsTrigger value="autofix">Auto-Fix Center</TabsTrigger>
