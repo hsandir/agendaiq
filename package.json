@@ -56,6 +56,8 @@
     "@types/serviceworker": "^0.0.149",
     "@types/speakeasy": "^2.0.10",
     "@types/uuid": "^10.0.0",
+    "@upstash/ratelimit": "^2.0.6",
+    "@upstash/redis": "^1.35.3",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
