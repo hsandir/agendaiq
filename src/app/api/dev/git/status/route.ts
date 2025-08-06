@@ -1,0 +1,102 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
+
+export async function GET(request: NextRequest) {
+  // Only allow in development
+  if (process.env.NODE_ENV !== 'development') {
+    return NextResponse.json(
+      { error: 'This endpoint is only available in development' },
+      { status: 403 }
+    );
+  }
+
+  try {
+    // Get current branch
+    const { stdout: branch } = await execAsync('git rev-parse --abbrev-ref HEAD');
+    
+    // Get status
+    const { stdout: statusOutput } = await execAsync('git status --porcelain');
+    
+    // Get ahead/behind info
+    let ahead = 0, behind = 0;
+    try {
+      const { stdout: revList } = await execAsync(`git rev-list --left-right --count origin/${branch.trim()}...HEAD`);
+      const [behindStr, aheadStr] = revList.trim().split('\t');
+      behind = parseInt(behindStr) || 0;
+      ahead = parseInt(aheadStr) || 0;
+    } catch (e) {
+      // Remote might not exist
+    }
+    
+    // Parse status output
+    const lines = statusOutput.split('\n').filter(Boolean);
+    const staged: string[] = [];
+    const modified: string[] = [];
+    const untracked: string[] = [];
+    const deleted: string[] = [];
+    const changes: any[] = [];
+    
+    lines.forEach(line => {
+      const status = line.substring(0, 2);
+      const file = line.substring(3);
+      
+      // Parse status codes
+      const indexStatus = status[0];
+      const workingStatus = status[1];
+      
+      let fileStatus = '??';
+      if (indexStatus === 'M' || workingStatus === 'M') fileStatus = 'M';
+      else if (indexStatus === 'A') fileStatus = 'A';
+      else if (indexStatus === 'D' || workingStatus === 'D') fileStatus = 'D';
+      else if (indexStatus === 'R') fileStatus = 'R';
+      else if (status === '??') fileStatus = '??';
+      
+      changes.push({
+        path: file,
+        status: fileStatus,
+        additions: 0, // Would need diff for accurate counts
+        deletions: 0
+      });
+      
+      // Categorize files
+      if (indexStatus !== ' ' && indexStatus !== '?') {
+        staged.push(file);
+      }
+      if (workingStatus === 'M') {
+        modified.push(file);
+      }
+      if (status === '??') {
+        untracked.push(file);
+      }
+      if (indexStatus === 'D' || workingStatus === 'D') {
+        deleted.push(file);
+      }
+    });
+    
+    return NextResponse.json({
+      status: {
+        branch: branch.trim(),
+        ahead,
+        behind,
+        staged,
+        modified,
+        untracked,
+        deleted
+      },
+      changes,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    console.error('Git status error:', error);
+    return NextResponse.json(
+      { 
+        error: 'Failed to get git status',
+        details: error.message 
+      },
+      { status: 500 }
+    );
+  }
+}

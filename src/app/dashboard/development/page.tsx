@@ -26,6 +26,7 @@ import PerformanceMonitor from '@/components/development/performance-monitor'
 import ApiTester from '@/components/development/api-tester'
 import LogViewer from '@/components/development/log-viewer'
 import CICDMonitor from '@/components/development/ci-cd-monitor'
+import GitOperations from '@/components/development/git-operations'
 
 export default function DevelopmentTools() {
   const [activeTab, setActiveTab] = useState('tests')
@@ -180,19 +181,7 @@ export default function DevelopmentTools() {
         </TabsContent>
 
         <TabsContent value="git" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Git Operations</CardTitle>
-              <CardDescription>Version control management</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Alert>
-                <AlertDescription>
-                  Git operations panel coming soon...
-                </AlertDescription>
-              </Alert>
-            </CardContent>
-          </Card>
+          <GitOperations />
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-4">
