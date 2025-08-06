@@ -1,0 +1,136 @@
+name: Codebase Statistics
+
+on:
+  schedule:
+    # Run every Sunday at midnight UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  analyze:
+    name: Analyze Codebase
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install -g cloc
+
+      - name: Count lines of code
+        run: |
+          echo "## Code Statistics" > stats.md
+          echo "" >> stats.md
+          echo "### Lines of Code by Language" >> stats.md
+          echo '```' >> stats.md
+          cloc src/ --exclude-dir=node_modules,.next --md >> stats.md
+          echo '```' >> stats.md
+
+      - name: Analyze code complexity
+        run: |
+          echo "" >> stats.md
+          echo "### Code Complexity" >> stats.md
+          echo '```' >> stats.md
+          npx ts-complexity-analysis src/**/*.{ts,tsx} --max-complexity 10 >> stats.md || true
+          echo '```' >> stats.md
+
+      - name: Bundle size analysis
+        run: |
+          npm run build
+          echo "" >> stats.md
+          echo "### Bundle Size Analysis" >> stats.md
+          echo '```' >> stats.md
+          du -sh .next/static/* | sort -rh | head -20 >> stats.md
+          echo '```' >> stats.md
+
+      - name: Dependency analysis
+        run: |
+          echo "" >> stats.md
+          echo "### Dependencies" >> stats.md
+          echo "- Total dependencies: $(npm list --depth=0 2>/dev/null | wc -l)" >> stats.md
+          echo "- Production dependencies: $(npm list --prod --depth=0 2>/dev/null | wc -l)" >> stats.md
+          echo "- Dev dependencies: $(npm list --dev --depth=0 2>/dev/null | wc -l)" >> stats.md
+
+      - name: Test coverage summary
+        run: |
+          echo "" >> stats.md
+          echo "### Test Coverage" >> stats.md
+          if [ -f coverage/coverage-summary.json ]; then
+            echo '```json' >> stats.md
+            cat coverage/coverage-summary.json | jq '.total' >> stats.md
+            echo '```' >> stats.md
+          else
+            echo "No coverage data available" >> stats.md
+          fi
+
+      - name: Git statistics
+        run: |
+          echo "" >> stats.md
+          echo "### Git Statistics" >> stats.md
+          echo "- Total commits: $(git rev-list --all --count)" >> stats.md
+          echo "- Total contributors: $(git shortlog -sn --all | wc -l)" >> stats.md
+          echo "- Total branches: $(git branch -r | wc -l)" >> stats.md
+          echo "- Repository size: $(du -sh .git | cut -f1)" >> stats.md
+          echo "" >> stats.md
+          echo "### Top Contributors (by commits)" >> stats.md
+          echo '```' >> stats.md
+          git shortlog -sn --all | head -10 >> stats.md
+          echo '```' >> stats.md
+
+      - name: File statistics
+        run: |
+          echo "" >> stats.md
+          echo "### File Statistics" >> stats.md
+          echo "- Total TypeScript files: $(find src -name '*.ts' -o -name '*.tsx' | wc -l)" >> stats.md
+          echo "- Total React components: $(find src/components -name '*.tsx' | wc -l)" >> stats.md
+          echo "- Total API routes: $(find src/app/api -name 'route.ts' | wc -l)" >> stats.md
+          echo "- Total test files: $(find src/__tests__ -name '*.test.ts' -o -name '*.test.tsx' | wc -l)" >> stats.md
+
+      - name: TODO/FIXME analysis
+        run: |
+          echo "" >> stats.md
+          echo "### Technical Debt Markers" >> stats.md
+          echo "- TODOs: $(grep -r 'TODO' src/ --include='*.ts' --include='*.tsx' | wc -l)" >> stats.md
+          echo "- FIXMEs: $(grep -r 'FIXME' src/ --include='*.ts' --include='*.tsx' | wc -l)" >> stats.md
+          echo "- HACKs: $(grep -r 'HACK' src/ --include='*.ts' --include='*.tsx' | wc -l)" >> stats.md
+
+      - name: Performance metrics
+        run: |
+          echo "" >> stats.md
+          echo "### Build Performance" >> stats.md
+          echo '```' >> stats.md
+          time npm run build 2>&1 | tail -3 >> stats.md
+          echo '```' >> stats.md
+
+      - name: Create issue with stats
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const stats = fs.readFileSync('stats.md', 'utf8');
+            const date = new Date().toISOString().split('T')[0];
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `📊 Weekly Codebase Statistics - ${date}`,
+              body: stats,
+              labels: ['statistics', 'automated']
+            });
+
+      - name: Upload statistics artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: codebase-statistics
+          path: stats.md

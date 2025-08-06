@@ -1,0 +1,198 @@
+name: Dependency Updates
+
+on:
+  schedule:
+    # Run every Monday at 9 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  update-dependencies:
+    name: Update Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Check for outdated packages
+        id: outdated
+        run: |
+          npm outdated --json > outdated.json || true
+          echo "outdated_count=$(cat outdated.json | jq 'length')" >> $GITHUB_OUTPUT
+
+      - name: Update dependencies
+        if: steps.outdated.outputs.outdated_count > 0
+        run: |
+          # Update non-breaking changes
+          npm update
+          
+          # Update specific critical packages
+          critical_packages=(
+            "@prisma/client"
+            "prisma"
+            "next"
+            "next-auth"
+            "react"
+            "react-dom"
+            "@sentry/nextjs"
+          )
+          
+          for package in "${critical_packages[@]}"; do
+            echo "Checking $package..."
+            latest=$(npm view $package version)
+            current=$(npm list $package --depth=0 --json | jq -r ".dependencies.\"$package\".version")
+            
+            if [ "$latest" != "$current" ]; then
+              echo "Updating $package from $current to $latest"
+              npm install $package@latest
+            fi
+          done
+
+      - name: Run tests after update
+        run: |
+          npm run lint
+          npm run type-check
+          npm run test:unit
+        continue-on-error: true
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: Update dependencies to latest versions
+          title: 'chore: Weekly dependency updates'
+          body: |
+            ## Weekly Dependency Updates
+            
+            This PR contains automated dependency updates for the week.
+            
+            ### Changes
+            - Updated npm dependencies to their latest compatible versions
+            - Focused on critical packages for security and performance
+            
+            ### Checklist
+            - [ ] All tests pass
+            - [ ] No breaking changes detected
+            - [ ] Application builds successfully
+            - [ ] Manual testing completed
+            
+            Please review the changes and ensure everything works as expected.
+          branch: deps/weekly-update
+          delete-branch: true
+          labels: |
+            dependencies
+            automated
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        id: audit
+        run: |
+          audit_output=$(npm audit --json || true)
+          high_vulns=$(echo "$audit_output" | jq '.metadata.vulnerabilities.high // 0')
+          critical_vulns=$(echo "$audit_output" | jq '.metadata.vulnerabilities.critical // 0')
+          
+          echo "high_vulns=$high_vulns" >> $GITHUB_OUTPUT
+          echo "critical_vulns=$critical_vulns" >> $GITHUB_OUTPUT
+          
+          if [ "$critical_vulns" -gt 0 ] || [ "$high_vulns" -gt 0 ]; then
+            echo "⚠️ Found $critical_vulns critical and $high_vulns high vulnerabilities"
+            npm audit
+          fi
+
+      - name: Try to fix vulnerabilities
+        if: steps.audit.outputs.critical_vulns > 0 || steps.audit.outputs.high_vulns > 0
+        run: |
+          npm audit fix
+          npm audit fix --force
+        continue-on-error: true
+
+      - name: Create security issue
+        if: steps.audit.outputs.critical_vulns > 0
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '⚠️ Critical security vulnerabilities detected';
+            const body = `## Security Alert
+            
+            Critical vulnerabilities: ${{ steps.audit.outputs.critical_vulns }}
+            High vulnerabilities: ${{ steps.audit.outputs.high_vulns }}
+            
+            Please run \`npm audit\` locally and fix the vulnerabilities.
+            
+            ### Recommended actions:
+            1. Run \`npm audit fix\`
+            2. Update affected packages manually if needed
+            3. Review and test the changes
+            4. Deploy the fixes as soon as possible`;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['security', 'critical', 'dependencies']
+            });
+
+  license-check:
+    name: License Compatibility Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check licenses
+        run: |
+          npx license-checker --production --summary --excludePrivatePackages > licenses.txt
+          
+          # Check for problematic licenses
+          problematic_licenses=(
+            "GPL"
+            "AGPL"
+            "LGPL"
+            "CC-BY-SA"
+          )
+          
+          for license in "${problematic_licenses[@]}"; do
+            if grep -q "$license" licenses.txt; then
+              echo "⚠️ Found potentially problematic license: $license"
+              grep "$license" licenses.txt
+            fi
+          done
+
+      - name: Upload license report
+        uses: actions/upload-artifact@v4
+        with:
+          name: license-report
+          path: licenses.txt

@@ -1,0 +1,67 @@
+# Configuration for GitHub labeler action
+
+# Frontend labels
+frontend:
+  - src/components/**/*
+  - src/app/**/*.tsx
+  - src/styles/**/*
+  - '*.css'
+  - '*.scss'
+
+# Backend labels
+backend:
+  - src/app/api/**/*
+  - src/lib/auth/**/*
+  - src/lib/db/**/*
+  - prisma/**/*
+
+# Documentation
+documentation:
+  - '**/*.md'
+  - docs/**/*
+
+# Configuration
+configuration:
+  - .github/**/*
+  - .env.example
+  - next.config.*
+  - tsconfig.json
+  - package.json
+  - .eslintrc.*
+  - .prettierrc.*
+
+# Testing
+testing:
+  - src/__tests__/**/*
+  - '**/*.test.ts'
+  - '**/*.test.tsx'
+  - jest.config.*
+  - playwright.config.*
+
+# Database
+database:
+  - prisma/**/*
+  - src/lib/prisma.ts
+
+# Security
+security:
+  - src/lib/auth/**/*
+  - src/lib/utils/rate-limit.ts
+  - src/middleware.ts
+
+# Dependencies
+dependencies:
+  - package.json
+  - package-lock.json
+  - yarn.lock
+
+# CI/CD
+ci-cd:
+  - .github/workflows/**/*
+  - .github/actions/**/*
+
+# Performance
+performance:
+  - src/lib/utils/cache.ts
+  - src/lib/utils/performance.ts
+  - '**/*optimization*'
