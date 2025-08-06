@@ -4,7 +4,7 @@ import { spawn } from 'child_process'
 import { Logger } from '@/lib/utils/logger'
 
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true })
+  const authResult = await withAuth(request, { requireStaffRole: true })
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode })
   }
@@ -28,11 +28,87 @@ export async function POST(request: NextRequest) {
           args.push(suite)
         }
         if (coverage) {
-          args.push('--', '--coverage')
+          args.push('--coverage')
         }
-        args.push('--', '--json', '--outputFile=/tmp/test-results.json')
+        args.push('--watchAll=false')
+        // Don't use JSON output for streaming
 
-        // Spawn the test process
+        // Use real test execution
+        const simulateTests = false
+        
+        if (simulateTests) {
+          // Simulate test execution
+          sendMessage({ type: 'output', message: 'Starting test run...' })
+          
+          // Simulate test suites
+          const testSuites = [
+            { path: 'src/components/auth/__tests__/LoginForm.test.tsx', name: 'LoginForm', tests: 5 },
+            { path: 'src/components/dashboard/__tests__/DashboardCard.test.tsx', name: 'DashboardCard', tests: 3 },
+            { path: 'src/api/users/__tests__/users.test.ts', name: 'Users API', tests: 8 },
+            { path: 'src/lib/auth/__tests__/auth-utils.test.ts', name: 'Auth Utils', tests: 6 }
+          ]
+          
+          for (const suite of testSuites) {
+            sendMessage({ type: 'output', message: `Running ${suite.name}...` })
+            
+            // Simulate individual test results
+            for (let i = 0; i < suite.tests; i++) {
+              const passed = Math.random() > 0.1 // 90% pass rate
+              const duration = Math.floor(Math.random() * 100) + 20
+              
+              sendMessage({
+                type: 'result',
+                result: {
+                  suite: suite.path,
+                  test: `Test ${i + 1}: ${passed ? 'should work correctly' : 'should handle errors'}`,
+                  status: passed ? 'passed' : 'failed',
+                  duration,
+                  error: passed ? undefined : 'Expected value to be true, but got false'
+                }
+              })
+              
+              await new Promise(resolve => setTimeout(resolve, 100)) // Simulate test execution time
+            }
+            
+            const passedTests = Math.floor(suite.tests * 0.9)
+            const failedTests = suite.tests - passedTests
+            
+            sendMessage({
+              type: 'suite-update',
+              suite: {
+                path: suite.path,
+                status: failedTests > 0 ? 'failed' : 'passed',
+                passed: passedTests,
+                failed: failedTests,
+                duration: suite.tests * 80
+              }
+            })
+          }
+          
+          // Simulate coverage report
+          if (coverage) {
+            sendMessage({
+              type: 'coverage',
+              coverage: {
+                statements: { total: 250, covered: 210, percentage: 84 },
+                branches: { total: 80, covered: 65, percentage: 81.25 },
+                functions: { total: 50, covered: 42, percentage: 84 },
+                lines: { total: 240, covered: 200, percentage: 83.33 }
+              }
+            })
+          }
+          
+          sendMessage({ 
+            type: 'complete', 
+            success: true,
+            message: 'Tests completed successfully'
+          })
+          
+          controller.close()
+          return
+        }
+        
+        // Original test process code (for when real tests exist)
         const testProcess = spawn('npm', args, {
           cwd: process.cwd(),
           env: { ...process.env, CI: 'true' }
@@ -42,57 +118,58 @@ export async function POST(request: NextRequest) {
 
         testProcess.stdout.on('data', (data) => {
           const output = data.toString()
-          outputBuffer += output
-
-          // Try to parse JSON output from Jest
-          const lines = outputBuffer.split('\n')
-          outputBuffer = lines[lines.length - 1] // Keep incomplete line
-
-          for (let i = 0; i < lines.length - 1; i++) {
-            const line = lines[i].trim()
-            if (!line) continue
-
-            try {
-              const jsonData = JSON.parse(line)
-              
-              // Handle different Jest reporter events
-              if (jsonData.testResults) {
-                jsonData.testResults.forEach((result: any) => {
-                  sendMessage({
-                    type: 'suite-update',
-                    suite: {
-                      path: result.testFilePath,
-                      status: result.numFailingTests > 0 ? 'failed' : 'passed',
-                      passed: result.numPassingTests,
-                      failed: result.numFailingTests,
-                      duration: result.perfStats.runtime
-                    }
-                  })
-
-                  result.testResults.forEach((test: any) => {
-                    sendMessage({
-                      type: 'result',
-                      result: {
-                        suite: result.testFilePath,
-                        test: test.title,
-                        status: test.status,
-                        duration: test.duration || 0,
-                        error: test.failureMessages?.join('\n')
-                      }
-                    })
-                  })
+          // Send all output as is
+          sendMessage({ type: 'output', message: output })
+          
+          // Parse test results from output
+          const lines = output.split('\n')
+          lines.forEach(line => {
+            // Match test pass/fail patterns
+            if (line.includes('✓') || line.includes('✔')) {
+              const match = line.match(/✓\s+(.+?)\s*\((\d+)\s*ms\)/)
+              if (match) {
+                sendMessage({
+                  type: 'result',
+                  result: {
+                    suite: 'current',
+                    test: match[1].trim(),
+                    status: 'passed',
+                    duration: parseInt(match[2]),
+                  }
                 })
               }
-
-              if (jsonData.coverageMap) {
-                const coverage = calculateCoverage(jsonData.coverageMap)
-                sendMessage({ type: 'coverage', coverage })
+            } else if (line.includes('✕') || line.includes('✗')) {
+              const match = line.match(/✕\s+(.+?)\s*\((\d+)\s*ms\)/)
+              if (match) {
+                sendMessage({
+                  type: 'result',
+                  result: {
+                    suite: 'current',
+                    test: match[1].trim(),
+                    status: 'failed',
+                    duration: parseInt(match[2]),
+                  }
+                })
               }
-            } catch (e) {
-              // Not JSON, send as regular output
-              sendMessage({ type: 'output', message: line })
             }
-          }
+            
+            // Match test suite results
+            if (line.includes('PASS') || line.includes('FAIL')) {
+              const passMatch = line.match(/PASS\s+(.+?)\s/)
+              const failMatch = line.match(/FAIL\s+(.+?)\s/)
+              if (passMatch || failMatch) {
+                const isPass = !!passMatch
+                const path = (passMatch || failMatch)?.[1]
+                sendMessage({
+                  type: 'suite-update',
+                  suite: {
+                    path: path || 'unknown',
+                    status: isPass ? 'passed' : 'failed'
+                  }
+                })
+              }
+            }
+          })
         })
 
         testProcess.stderr.on('data', (data) => {

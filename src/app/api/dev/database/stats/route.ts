@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
         prisma.school.count().catch(() => 0),
         prisma.district.count().catch(() => 0),
         prisma.meeting.count().catch(() => 0),
-        prisma.agendaItem.count().catch(() => 0),
+        prisma.meetingAgendaItem.count().catch(() => 0),
         prisma.auditLog.count().catch(() => 0),
         prisma.role.count().catch(() => 0),
         prisma.department.count().catch(() => 0),

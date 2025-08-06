@@ -24,14 +24,14 @@ export async function GET(request: NextRequest) {
     // Get application metrics from recent audit logs
     const recentLogs = await prisma.auditLog.findMany({
       where: {
-        createdAt: {
+        created_at: {
           gte: new Date(Date.now() - 60000) // Last minute
         }
       },
       select: {
         operation: true,
-        tableName: true,
-        createdAt: true
+        table_name: true,
+        created_at: true
       }
     });
     
@@ -91,12 +91,12 @@ export async function GET(request: NextRequest) {
 
     // Get API endpoint metrics
     const endpointStats = await prisma.auditLog.groupBy({
-      by: ['tableName'],
+      by: ['table_name'],
       where: {
-        createdAt: {
+        created_at: {
           gte: new Date(Date.now() - 300000) // Last 5 minutes
         },
-        tableName: {
+        table_name: {
           not: null
         }
       },
@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
     });
 
     const apiEndpoints = endpointStats.map(stat => ({
-      path: `/api/${stat.tableName}`,
+      path: `/api/${stat.table_name}`,
       method: 'GET',
       avgResponseTime: Math.floor(Math.random() * 50) + 50,
       p95ResponseTime: Math.floor(Math.random() * 100) + 100,

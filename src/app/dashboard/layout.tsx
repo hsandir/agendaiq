@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { Header } from "@/components/dashboard/Header";
 import { RoleSwitch } from "@/components/dashboard/RoleSwitch";
 import { SidebarWrapper } from "@/components/dashboard/SidebarWrapper";
+import { isUserAdmin } from "@/lib/auth/admin-check";
 
 export default async function DashboardLayout({
   children,
@@ -30,7 +31,7 @@ export default async function DashboardLayout({
   });
 
   const currentRole = userWithStaff?.Staff?.[0]?.Role;
-  const isAdmin = currentRole?.title === "Administrator";
+  const isAdmin = isUserAdmin(userWithStaff);
 
   return (
     <div className="min-h-screen bg-gray-50">

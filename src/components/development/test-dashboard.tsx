@@ -86,6 +86,7 @@ export default function TestDashboard() {
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [testHistory, setTestHistory] = useState<TestHistory[]>([])
   const [untestedFiles, setUntestedFiles] = useState<{ components: string[], apis: string[] }>({ components: [], apis: [] })
+  const [activeTab, setActiveTab] = useState('results')
 
   useEffect(() => {
     loadTestSuites()
@@ -403,7 +404,7 @@ export default function TestDashboard() {
             <CardTitle>Test Results & Analytics</CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="results">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid grid-cols-5 w-full">
                 <TabsTrigger value="results">Results</TabsTrigger>
                 <TabsTrigger value="coverage">Coverage</TabsTrigger>

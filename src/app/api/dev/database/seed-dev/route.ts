@@ -23,19 +23,20 @@ export async function POST(request: NextRequest) {
       const tableName = tables[Math.floor(Math.random() * tables.length)];
       
       auditLogs.push({
-        tableName,
-        recordId: `${i + 1}`,
+        table_name: tableName,
+        record_id: `${i + 1}`,
         operation,
-        userId: authResult.user.id,
-        staffId: authResult.user.staff?.id,
-        changes: {
+        source: 'SYSTEM',
+        user_id: authResult.user.id,
+        staff_id: authResult.user.staff?.id,
+        field_changes: {
           before: { field: 'old_value' },
           after: { field: 'new_value' }
         },
-        ipAddress: request.headers.get('x-forwarded-for') || '127.0.0.1',
-        userAgent: request.headers.get('user-agent') || 'Development Seeder',
+        ip_address: request.headers.get('x-forwarded-for') || '127.0.0.1',
+        user_agent: request.headers.get('user-agent') || 'Development Seeder',
         description: `${operation} operation on ${tableName}`,
-        createdAt: new Date(Date.now() - Math.random() * 86400000 * 7) // Random time in last 7 days
+        created_at: new Date(Date.now() - Math.random() * 86400000 * 7) // Random time in last 7 days
       });
     }
     
@@ -53,21 +54,22 @@ export async function POST(request: NextRequest) {
       const duration = Math.floor(Math.random() * 300) + 60;
       
       testRuns.push({
-        tableName: 'test_run',
-        recordId: `test-${Date.now()}-${i}`,
+        table_name: 'test_run',
+        record_id: `test-${Date.now()}-${i}`,
         operation: 'CREATE',
-        userId: authResult.user.id,
-        staffId: authResult.user.staff?.id,
-        changes: {
+        source: 'SYSTEM',
+        user_id: authResult.user.id,
+        staff_id: authResult.user.staff?.id,
+        field_changes: {
           passed,
           failed,
           coverage,
           duration
         },
-        ipAddress: request.headers.get('x-forwarded-for') || '127.0.0.1',
-        userAgent: request.headers.get('user-agent') || 'Test Runner',
+        ip_address: request.headers.get('x-forwarded-for') || '127.0.0.1',
+        user_agent: request.headers.get('user-agent') || 'Test Runner',
         description: `Test run completed: ${passed} passed, ${failed} failed`,
-        createdAt: new Date(Date.now() - i * 86400000) // One per day going back
+        created_at: new Date(Date.now() - i * 86400000) // One per day going back
       });
     }
     
@@ -77,11 +79,11 @@ export async function POST(request: NextRequest) {
     
     // Log this operation
     await AuditLogger.logFromRequest(request, {
-      tableName: 'system',
-      recordId: 'seed-dev',
+      table_name: 'system',
+      record_id: 'seed-dev',
       operation: 'CREATE',
-      userId: authResult.user.id,
-      staffId: authResult.user.staff?.id,
+      user_id: authResult.user.id,
+      staff_id: authResult.user.staff?.id,
       description: 'Development data seeded'
     });
     

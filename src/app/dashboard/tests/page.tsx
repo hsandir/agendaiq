@@ -9,7 +9,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { 
   PlayIcon, 
-  StopIcon, 
+  SquareIcon, 
   RefreshCwIcon, 
   CheckCircleIcon, 
   XCircleIcon,
@@ -152,7 +152,7 @@ export default function TestDashboard() {
           >
             {isRunning ? (
               <>
-                <StopIcon className="mr-2 h-4 w-4" />
+                <SquareIcon className="mr-2 h-4 w-4" />
                 Running...
               </>
             ) : (

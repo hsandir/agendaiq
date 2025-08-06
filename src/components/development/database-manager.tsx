@@ -26,6 +26,7 @@ export default function DatabaseManager() {
   const [queryResults, setQueryResults] = useState<any>(null)
   const [backups, setBackups] = useState<Array<{name: string, size: string, date: string}>>([])
   const [stats, setStats] = useState({ tables: 0, records: 0 })
+  const [activeTab, setActiveTab] = useState('operations')
 
   useEffect(() => {
     loadStats()
@@ -183,7 +184,7 @@ export default function DatabaseManager() {
         </Card>
       </div>
 
-      <Tabs defaultValue="operations">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="operations">Operations</TabsTrigger>
           <TabsTrigger value="query">Query Runner</TabsTrigger>

@@ -12,42 +12,42 @@ export async function GET(request: NextRequest) {
     // Get test coverage from recent test runs
     const latestTestRun = await prisma.auditLog.findFirst({
       where: {
-        tableName: 'test_run',
+        table_name: 'test_run',
         operation: 'CREATE'
       },
-      orderBy: { createdAt: 'desc' },
-      select: { changes: true }
+      orderBy: { created_at: 'desc' },
+      select: { field_changes: true }
     });
     
-    const testCoverage = (latestTestRun?.changes as any)?.coverage || 0;
+    const testCoverage = (latestTestRun?.field_changes as any)?.coverage || 0;
     
     // Get previous coverage for comparison
     const previousTestRun = await prisma.auditLog.findFirst({
       where: {
-        tableName: 'test_run',
+        table_name: 'test_run',
         operation: 'CREATE',
-        createdAt: {
-          lt: latestTestRun?.createdAt || new Date()
+        created_at: {
+          lt: latestTestRun?.created_at || new Date()
         }
       },
-      orderBy: { createdAt: 'desc' },
-      select: { changes: true }
+      orderBy: { created_at: 'desc' },
+      select: { field_changes: true }
     });
     
-    const previousCoverage = (previousTestRun?.changes as any)?.coverage || 0;
+    const previousCoverage = (previousTestRun?.field_changes as any)?.coverage || 0;
     const coverageChange = testCoverage - previousCoverage;
     
     // Check build status (simulated for now)
     const buildStatus = 'passing';
     const buildTime = latestTestRun ? 
-      ((latestTestRun.changes as any)?.duration || 0) : 
+      ((latestTestRun.field_changes as any)?.duration || 0) : 
       0;
     
     // Check API health by counting recent errors
     const recentErrors = await prisma.auditLog.count({
       where: {
         operation: 'ERROR',
-        createdAt: {
+        created_at: {
           gte: new Date(Date.now() - 3600000) // Last hour
         }
       }
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
     const activeErrors = await prisma.auditLog.count({
       where: {
         operation: 'ERROR',
-        createdAt: {
+        created_at: {
           gte: new Date(Date.now() - 86400000) // Last 24 hours
         }
       }

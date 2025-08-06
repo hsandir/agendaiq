@@ -4,6 +4,7 @@ import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils'
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 import { Calendar, Users, FileText } from "lucide-react";
+import { isUserAdmin } from "@/lib/auth/admin-check";
 
 export default async function DashboardPage() {
   const user = await requireAuth(AuthPresets.requireAuth);
@@ -25,7 +26,7 @@ export default async function DashboardPage() {
     },
   });
   
-  const isAdmin = userWithStaff?.Staff?.[0]?.Role?.title === "Administrator";
+  const isAdmin = isUserAdmin(userWithStaff);
   
   // If no district exists and user is admin, redirect to district setup
   if (districtCount === 0 && isAdmin) {

@@ -10,13 +10,6 @@ export const metadata = {
   title: "AgendaIQ - School Meeting Management",
   description: "Efficiently manage and track school meetings and notes",
   manifest: "/manifest.json",
-  themeColor: "#2563eb",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -36,6 +29,14 @@ export const metadata = {
     title: "AgendaIQ - School Meeting Management",
     description: "Efficiently manage and track school meetings and notes",
   },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: "#2563eb",
 };
 
 export default function RootLayout({

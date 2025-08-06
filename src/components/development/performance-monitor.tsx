@@ -41,6 +41,7 @@ export default function PerformanceMonitor() {
   const [metrics, setMetrics] = useState<PerformanceMetric[]>([])
   const [apiEndpoints, setApiEndpoints] = useState<ApiEndpoint[]>([])
   const [isMonitoring, setIsMonitoring] = useState(false)
+  const [activeTab, setActiveTab] = useState('realtime')
 
   useEffect(() => {
     loadMetrics()
@@ -138,7 +139,7 @@ export default function PerformanceMonitor() {
       </div>
 
       {/* Detailed Metrics */}
-      <Tabs defaultValue="realtime">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="realtime">Real-time</TabsTrigger>
           <TabsTrigger value="endpoints">API Endpoints</TabsTrigger>
