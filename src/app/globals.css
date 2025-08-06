@@ -76,6 +76,30 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  /* Custom scrollbar styles */
+  .overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #718096 #1a202c;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: #2d3748;
+    border-radius: 4px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #718096;
+    border-radius: 4px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+  }
 }
 
 @layer components {

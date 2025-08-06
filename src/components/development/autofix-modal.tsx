@@ -472,8 +472,8 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
-        <DialogHeader className="flex-shrink-0">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0 pb-4">
           <DialogTitle className="flex items-center gap-2">
             <Wrench className="h-5 w-5" />
             Auto-Fix {type === 'cicd' ? 'CI/CD' : 'Test'} Errors
@@ -483,8 +483,8 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 pr-4">
-          <div className="space-y-4">
+        <div className="flex-1 overflow-y-auto pr-2">
+          <div className="space-y-4 pb-4">
           {/* Fix Strategy Selection */}
           {!isFixing && !result && (
             <div className="flex gap-2">
@@ -519,7 +519,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
           {/* Fix Steps */}
           <Card className="p-4">
             <h3 className="font-semibold mb-3">Fix Steps</h3>
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
               {steps.map((step, index) => (
                 <div
                   key={step.id}
@@ -559,11 +559,11 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
                 <Terminal className="h-4 w-4" />
                 Command Output
               </h3>
-              <ScrollArea className="h-48 bg-gray-900 text-gray-100 p-3 rounded">
+              <div className="h-48 bg-gray-900 text-gray-100 p-3 rounded overflow-y-auto">
                 <pre className="text-xs font-mono">
                   {currentOutput.length > 0 ? currentOutput.join('\n') : 'Waiting for output...'}
                 </pre>
-              </ScrollArea>
+              </div>
             </Card>
           )}
 
@@ -635,7 +635,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
             )}
           </div>
         </div>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );
