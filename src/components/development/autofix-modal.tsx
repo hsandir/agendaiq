@@ -472,8 +472,8 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Wrench className="h-5 w-5" />
             Auto-Fix {type === 'cicd' ? 'CI/CD' : 'Test'} Errors
@@ -483,7 +483,8 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <ScrollArea className="flex-1 pr-4">
+          <div className="space-y-4">
           {/* Fix Strategy Selection */}
           {!isFixing && !result && (
             <div className="flex gap-2">
@@ -634,6 +635,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
             )}
           </div>
         </div>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

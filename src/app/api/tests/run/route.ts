@@ -33,8 +33,20 @@ export async function POST(request: NextRequest) {
         const simulateTests = true
         
         if (simulateTests) {
-          // Simulate test execution
-          sendMessage({ type: 'output', message: 'Starting test run...' })
+          // Simulate test execution with detailed output
+          sendMessage({ type: 'output', message: '> npm test' })
+          sendMessage({ type: 'output', message: '' })
+          sendMessage({ type: 'output', message: '> agendaiq@0.1.0 test' })
+          sendMessage({ type: 'output', message: '> jest --watchAll=false' })
+          sendMessage({ type: 'output', message: '' })
+          sendMessage({ type: 'output', message: 'PASS src/components/auth/__tests__/LoginForm.test.tsx' })
+          sendMessage({ type: 'output', message: '  LoginForm' })
+          sendMessage({ type: 'output', message: '    ✓ renders without crashing (45ms)' })
+          sendMessage({ type: 'output', message: '    ✓ validates email input (23ms)' })
+          sendMessage({ type: 'output', message: '    ✓ validates password input (18ms)' })
+          sendMessage({ type: 'output', message: '    ✓ handles form submission (67ms)' })
+          sendMessage({ type: 'output', message: '    ✓ shows error messages (12ms)' })
+          sendMessage({ type: 'output', message: '' })
           
           // Simulate test suites
           const testSuites = [
@@ -45,26 +57,33 @@ export async function POST(request: NextRequest) {
           ]
           
           for (const suite of testSuites) {
-            sendMessage({ type: 'output', message: `Running ${suite.name}...` })
+            const hasFailed = Math.random() > 0.8; // 20% fail rate for suites
+            sendMessage({ type: 'output', message: `${hasFailed ? 'FAIL' : 'PASS'} ${suite.path}` })
+            sendMessage({ type: 'output', message: `  ${suite.name}` })
             
             // Simulate individual test results
             for (let i = 0; i < suite.tests; i++) {
-              const passed = Math.random() > 0.1 // 90% pass rate
+              const passed = hasFailed && i === 0 ? false : Math.random() > 0.1 // 90% pass rate
               const duration = Math.floor(Math.random() * 100) + 20
+              const testName = `should ${i === 0 ? 'render correctly' : i === 1 ? 'handle user input' : i === 2 ? 'validate data' : 'perform action'} #${i + 1}`
+              
+              sendMessage({ type: 'output', message: `    ${passed ? '✓' : '✕'} ${testName} (${duration}ms)` })
               
               sendMessage({
                 type: 'result',
                 result: {
                   suite: suite.path,
-                  test: `Test ${i + 1}: ${passed ? 'should work correctly' : 'should handle errors'}`,
+                  test: testName,
                   status: passed ? 'passed' : 'failed',
                   duration,
                   error: passed ? undefined : 'Expected value to be true, but got false'
                 }
               })
               
-              await new Promise(resolve => setTimeout(resolve, 100)) // Simulate test execution time
+              await new Promise(resolve => setTimeout(resolve, 50)) // Simulate test execution time
             }
+            
+            sendMessage({ type: 'output', message: '' })
             
             const passedTests = Math.floor(suite.tests * 0.9)
             const failedTests = suite.tests - passedTests
@@ -81,8 +100,25 @@ export async function POST(request: NextRequest) {
             })
           }
           
+          // Add test summary output
+          sendMessage({ type: 'output', message: '─'.repeat(60) })
+          sendMessage({ type: 'output', message: 'Test Suites: 3 passed, 1 failed, 4 total' })
+          sendMessage({ type: 'output', message: 'Tests:       20 passed, 2 failed, 22 total' })
+          sendMessage({ type: 'output', message: 'Snapshots:   0 total' })
+          sendMessage({ type: 'output', message: 'Time:        4.567s' })
+          sendMessage({ type: 'output', message: 'Ran all test suites.' })
+          
           // Simulate coverage report
           if (coverage) {
+            sendMessage({ type: 'output', message: '' })
+            sendMessage({ type: 'output', message: '─'.repeat(60) })
+            sendMessage({ type: 'output', message: 'Coverage Summary:' })
+            sendMessage({ type: 'output', message: 'Statements   : 84% (210/250)' })
+            sendMessage({ type: 'output', message: 'Branches     : 81.25% (65/80)' })
+            sendMessage({ type: 'output', message: 'Functions    : 84% (42/50)' })
+            sendMessage({ type: 'output', message: 'Lines        : 83.33% (200/240)' })
+            sendMessage({ type: 'output', message: '─'.repeat(60) })
+            
             sendMessage({
               type: 'coverage',
               coverage: {
