@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
+import AutofixModal from './autofix-modal'
 import { 
   PlayIcon, 
   SquareIcon, 
@@ -26,7 +27,8 @@ import {
   TrendingUpIcon,
   TrendingDownIcon,
   Loader2Icon,
-  TestTube2Icon
+  TestTube2Icon,
+  WrenchIcon
 } from 'lucide-react'
 
 interface TestSuite {
@@ -87,6 +89,7 @@ export default function TestDashboard() {
   const [testHistory, setTestHistory] = useState<TestHistory[]>([])
   const [untestedFiles, setUntestedFiles] = useState<{ components: string[], apis: string[] }>({ components: [], apis: [] })
   const [activeTab, setActiveTab] = useState('results')
+  const [showAutofixModal, setShowAutofixModal] = useState(false)
 
   useEffect(() => {
     loadTestSuites()
@@ -401,7 +404,19 @@ export default function TestDashboard() {
         {/* Results and Analytics */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Test Results & Analytics</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Test Results & Analytics</CardTitle>
+              {testResults.some(r => r.status === 'failed') && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setShowAutofixModal(true)}
+                >
+                  <WrenchIcon className="h-4 w-4 mr-2" />
+                  Fix the Errors
+                </Button>
+              )}
+            </div>
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -565,7 +580,10 @@ export default function TestDashboard() {
                   <div>
                     <h3 className="font-medium mb-2">Recent Test Runs</h3>
                     <div className="space-y-2">
-                      {testHistory.map((run, index) => (
+                      {testHistory
+                        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                        .slice(0, 10)
+                        .map((run, index) => (
                         <div key={index} className="p-3 border rounded-lg">
                           <div className="flex justify-between items-center">
                             <div>
@@ -640,6 +658,14 @@ export default function TestDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Autofix Modal */}
+      <AutofixModal
+        isOpen={showAutofixModal}
+        onClose={() => setShowAutofixModal(false)}
+        type="test"
+        failedItems={testResults.filter(r => r.status === 'failed')}
+      />
     </div>
   )
 }

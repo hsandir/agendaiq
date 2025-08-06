@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import AutofixModal from './autofix-modal';
 import {
   AlertCircle,
   CheckCircle,
@@ -95,6 +96,8 @@ export default function CICDMonitor() {
   const [filterStatus, setFilterStatus] = useState<'all' | 'failure' | 'success'>('all');
   const [usingMockData, setUsingMockData] = useState(false);
   const [activeTab, setActiveTab] = useState('runs');
+  const [showAutofixModal, setShowAutofixModal] = useState(false);
+  const [autoFixOnFailure, setAutoFixOnFailure] = useState(false);
 
   const fetchRuns = async () => {
     try {
@@ -229,6 +232,22 @@ export default function CICDMonitor() {
     }
   }, [autoRefresh, filterStatus]);
 
+  // Auto-fix on failure detection
+  useEffect(() => {
+    if (autoFixOnFailure && runs.some(r => r.conclusion === 'failure')) {
+      const recentFailures = runs.filter(r => {
+        const runTime = new Date(r.created_at).getTime();
+        const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+        return r.conclusion === 'failure' && runTime > fiveMinutesAgo;
+      });
+      
+      if (recentFailures.length > 0) {
+        console.log('Auto-fix triggered for recent failures:', recentFailures);
+        setShowAutofixModal(true);
+      }
+    }
+  }, [runs, autoFixOnFailure]);
+
   useEffect(() => {
     if (selectedRun && selectedRun.conclusion === 'failure') {
       fetchAutofixSuggestions(selectedRun);
@@ -309,6 +328,16 @@ export default function CICDMonitor() {
           <p className="text-sm text-gray-600">Monitor and fix GitHub Actions workflows</p>
         </div>
         <div className="flex gap-2">
+          {runs.some(r => r.conclusion === 'failure') && (
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setShowAutofixModal(true)}
+            >
+              <Wrench className="h-4 w-4 mr-2" />
+              Fix the Errors
+            </Button>
+          )}
           <Button
             variant={emailNotifications ? 'default' : 'outline'}
             size="sm"
@@ -674,8 +703,12 @@ export default function CICDMonitor() {
                   <p className="font-medium">Auto-fix on Failure</p>
                   <p className="text-sm text-gray-600">Automatically attempt to fix common errors</p>
                 </div>
-                <Button variant="outline" size="sm" disabled>
-                  Coming Soon
+                <Button 
+                  variant={autoFixOnFailure ? 'default' : 'outline'} 
+                  size="sm"
+                  onClick={() => setAutoFixOnFailure(!autoFixOnFailure)}
+                >
+                  {autoFixOnFailure ? 'Enabled' : 'Disabled'}
                 </Button>
               </div>
 
@@ -731,6 +764,14 @@ export default function CICDMonitor() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Autofix Modal */}
+      <AutofixModal
+        isOpen={showAutofixModal}
+        onClose={() => setShowAutofixModal(false)}
+        type="cicd"
+        failedItems={runs.filter(r => r.conclusion === 'failure')}
+      />
     </div>
   );
 }
