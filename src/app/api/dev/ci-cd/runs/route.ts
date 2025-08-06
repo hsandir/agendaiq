@@ -171,11 +171,11 @@ export async function GET(request: NextRequest) {
 
     // Parse query parameters
     const { searchParams } = new URL(request.url);
-    const params = querySchema.parse({
-      limit: searchParams.get('limit'),
+    const params = {
+      limit: parseInt(searchParams.get('limit') || '30'),
       status: searchParams.get('status') || 'all',
-      branch: searchParams.get('branch'),
-    });
+      branch: searchParams.get('branch') || undefined,
+    };
 
     // If no GitHub token, return mock data for development
     if (!GITHUB_TOKEN) {
