@@ -142,26 +142,24 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <main className="py-10">
-        <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <div className="space-y-6">
-            {userWithStaff?.Staff?.[0]?.School && (
-              <div className="bg-white p-4 rounded-lg shadow-sm border">
-                <h2 className="text-lg font-medium text-gray-900">{userWithStaff.Staff[0].School.name}</h2>
-                {userWithStaff.Staff[0].School.address && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    {userWithStaff.Staff[0].School.address}
-                  </p>
-                )}
-              </div>
-            )}
-            
-            <h1 className="text-2xl font-bold">Welcome back, {user.name}</h1>
-            
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+      
+      {userWithStaff?.Staff?.[0]?.School && (
+        <div className="bg-white p-4 rounded-lg shadow-sm border">
+          <h2 className="text-lg font-medium text-gray-900">{userWithStaff.Staff[0].School.name}</h2>
+          {userWithStaff.Staff[0].School.address && (
+            <p className="text-sm text-gray-500 mt-1">
+              {userWithStaff.Staff[0].School.address}
+            </p>
+          )}
+        </div>
+      )}
+      
+      <h2 className="text-2xl font-bold">Welcome back, {user.name}</h2>
+      
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {quickStats.map((stat) => (
                 <div
                   key={stat.name}
@@ -178,10 +176,10 @@ export default async function DashboardPage() {
                   </div>
                 </div>
               ))}
-            </div>
-            
-            {/* Upcoming Meetings */}
-            <section>
+      </div>
+      
+      {/* Upcoming Meetings */}
+      <section>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold">Upcoming Meetings</h2>
                 <a
@@ -207,11 +205,13 @@ export default async function DashboardPage() {
                     </div>
                   </div>
                 ))}
+                {upcomingMeetings.length === 0 && (
+                  <div className="bg-white p-8 rounded-lg shadow-sm border text-center">
+                    <p className="text-gray-500">No upcoming meetings</p>
+                  </div>
+                )}
               </div>
-            </section>
-          </div>
-        </div>
-      </main>
+      </section>
     </div>
   );
 } 
