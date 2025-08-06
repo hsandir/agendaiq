@@ -71,17 +71,26 @@ export async function POST(request: NextRequest) {
     console.log('Autofix POST API called');
 
     const body = await request.json();
-    const { suggestionId, errorType, errorMessage, dryRun = true } = body;
+    const { suggestionId, errorType, errorMessage, dryRun = true, customSuggestion } = body;
 
-    // Generate suggestions and find the one to apply
-    const suggestions = await generateAutofixSuggestions(errorType, errorMessage);
-    const suggestion = suggestions.find(s => s.id === suggestionId);
-
-    if (!suggestion) {
-      return NextResponse.json(
-        { error: 'Suggestion not found' },
-        { status: 404 }
-      );
+    // Use custom suggestion if provided, otherwise generate and find
+    let suggestion: AutofixSuggestion;
+    
+    if (customSuggestion) {
+      suggestion = customSuggestion;
+      console.log('Using custom suggestion:', suggestion.title);
+    } else {
+      // Generate suggestions and find the one to apply
+      const suggestions = await generateAutofixSuggestions(errorType || '', errorMessage || '');
+      const found = suggestions.find(s => s.id === suggestionId);
+      
+      if (!found) {
+        return NextResponse.json(
+          { error: 'Suggestion not found' },
+          { status: 404 }
+        );
+      }
+      suggestion = found;
     }
 
     const results = {

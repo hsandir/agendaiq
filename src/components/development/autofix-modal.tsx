@@ -312,31 +312,110 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
         };
       }
 
-      // Make API call to execute fix
+      // First, get suggestions based on error type
+      const errorType = detectErrorType();
+      const errorMessage = extractErrorMessage();
+      
+      // Get autofix suggestions
+      const suggestionsResponse = await fetch(
+        `/api/dev/ci-cd/autofix?errorType=${encodeURIComponent(errorType)}&errorMessage=${encodeURIComponent(errorMessage)}`
+      );
+      
+      if (!suggestionsResponse.ok) {
+        throw new Error('Failed to get autofix suggestions');
+      }
+      
+      const suggestionsData = await suggestionsResponse.json();
+      const suggestions = suggestionsData.suggestions || [];
+      
+      // Find matching suggestion for this step
+      const matchingSuggestion = suggestions.find((s: any) => 
+        s.id === step.id || 
+        s.commands.some((cmd: string) => cmd.includes(step.command!.split(' ')[0]))
+      );
+      
+      if (!matchingSuggestion) {
+        // If no matching suggestion, execute command directly via a new endpoint
+        setCurrentOutput(prev => [...prev, `⚠️ No autofix suggestion found, executing command directly...`]);
+        
+        // Create a custom suggestion
+        const customSuggestion = {
+          id: step.id,
+          title: step.name,
+          description: step.description,
+          confidence: 'medium',
+          commands: [step.command],
+          files: [],
+          preventive: false
+        };
+        
+        // Execute the fix
+        const response = await fetch('/api/dev/ci-cd/autofix', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            suggestionId: customSuggestion.id,
+            errorType: errorType,
+            errorMessage: errorMessage,
+            dryRun: false,
+            customSuggestion // Pass the custom suggestion
+          })
+        });
+
+        const data = await response.json();
+        
+        // Process results
+        if (data.results && data.results.applied) {
+          data.results.applied.forEach((line: string) => {
+            setCurrentOutput(prev => [...prev, line]);
+          });
+        }
+        
+        if (data.results && data.results.failed && data.results.failed.length > 0) {
+          data.results.failed.forEach((fail: any) => {
+            setCurrentOutput(prev => [...prev, `❌ ${fail.action}: ${fail.error}`]);
+          });
+        }
+
+        return {
+          success: data.success,
+          output: data.results?.applied?.join('\n') || 'Command executed',
+          error: data.results?.failed?.[0]?.error,
+          duration: Date.now() - startTime
+        };
+      }
+      
+      // Execute the matching suggestion
       const response = await fetch('/api/dev/ci-cd/autofix', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          command: step.command,
-          stepId: step.id,
+          suggestionId: matchingSuggestion.id,
+          errorType: errorType,
+          errorMessage: errorMessage,
           dryRun: false
         })
       });
 
       const data = await response.json();
       
-      // Stream output
-      if (data.output) {
-        const outputLines = data.output.split('\n');
-        outputLines.forEach(line => {
+      // Process results
+      if (data.results && data.results.applied) {
+        data.results.applied.forEach((line: string) => {
           setCurrentOutput(prev => [...prev, line]);
+        });
+      }
+      
+      if (data.results && data.results.failed && data.results.failed.length > 0) {
+        data.results.failed.forEach((fail: any) => {
+          setCurrentOutput(prev => [...prev, `❌ ${fail.action}: ${fail.error}`]);
         });
       }
 
       return {
         success: data.success,
-        output: data.output || 'Command executed successfully',
-        error: data.error,
+        output: data.results?.applied?.join('\n') || 'Command executed successfully',
+        error: data.results?.failed?.[0]?.error,
         duration: Date.now() - startTime
       };
     } catch (error) {
@@ -347,6 +426,33 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
         duration: Date.now() - startTime
       };
     }
+  };
+  
+  const detectErrorType = (): string => {
+    // Analyze failed items to detect error type
+    if (failedItems.length === 0) return 'Unknown Error';
+    
+    const errorMessages = failedItems.map(item => 
+      item.error || item.logs || item.conclusion || ''
+    ).join(' ');
+    
+    if (errorMessages.includes('npm') || errorMessages.includes('node_modules')) return 'NPM Error';
+    if (errorMessages.includes('TypeError') || errorMessages.includes('TS')) return 'TypeScript Error';
+    if (errorMessages.includes('ESLint') || errorMessages.includes('Prettier')) return 'Lint Error';
+    if (errorMessages.includes('test') || errorMessages.includes('expect')) return 'Test Failure';
+    if (errorMessages.includes('build') || errorMessages.includes('webpack')) return 'Build Failure';
+    if (errorMessages.includes('prisma') || errorMessages.includes('database')) return 'Database Error';
+    
+    return 'Unknown Error';
+  };
+  
+  const extractErrorMessage = (): string => {
+    // Extract meaningful error message from failed items
+    if (failedItems.length === 0) return '';
+    
+    return failedItems.slice(0, 3).map(item => 
+      item.error || item.logs || `${item.suite || item.name} failed`
+    ).join('\n');
   };
 
   const getStepIcon = (status: string) => {
