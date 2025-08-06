@@ -25,6 +25,7 @@ import DatabaseManager from '@/components/development/database-manager'
 import PerformanceMonitor from '@/components/development/performance-monitor'
 import ApiTester from '@/components/development/api-tester'
 import LogViewer from '@/components/development/log-viewer'
+import CICDMonitor from '@/components/development/ci-cd-monitor'
 
 export default function DevelopmentTools() {
   const [activeTab, setActiveTab] = useState('tests')
@@ -119,7 +120,11 @@ export default function DevelopmentTools() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid grid-cols-7 w-full">
+        <TabsList className="grid grid-cols-8 w-full">
+          <TabsTrigger value="cicd" className="flex items-center gap-2">
+            <PlayIcon className="h-4 w-4" />
+            CI/CD
+          </TabsTrigger>
           <TabsTrigger value="tests" className="flex items-center gap-2">
             <TestTubeIcon className="h-4 w-4" />
             Tests
@@ -130,11 +135,11 @@ export default function DevelopmentTools() {
           </TabsTrigger>
           <TabsTrigger value="api" className="flex items-center gap-2">
             <CodeIcon className="h-4 w-4" />
-            API Tester
+            API
           </TabsTrigger>
           <TabsTrigger value="performance" className="flex items-center gap-2">
             <ActivityIcon className="h-4 w-4" />
-            Performance
+            Perf
           </TabsTrigger>
           <TabsTrigger value="logs" className="flex items-center gap-2">
             <FileTextIcon className="h-4 w-4" />
@@ -149,6 +154,10 @@ export default function DevelopmentTools() {
             Settings
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="cicd" className="space-y-4">
+          <CICDMonitor />
+        </TabsContent>
 
         <TabsContent value="tests" className="space-y-4">
           <TestDashboard />
