@@ -99,29 +99,26 @@ export default function CICDMonitor() {
     try {
       const response = await fetch(`/api/dev/ci-cd/runs?status=${filterStatus}&limit=50`);
       
-      let data;
+      // Always read the response body once
+      const data = await response.json();
       
       if (!response.ok) {
         // Handle specific error cases
-        if (response.status === 500) {
-          const errorData = await response.json();
-          if (errorData.code === 'MISSING_GITHUB_TOKEN') {
-            console.info('GitHub token not configured, using mock data');
-            setUsingMockData(true);
-            // Don't throw error, the API returns mock data
-            return;
-          }
-        } else {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-      } else {
-        data = await response.json();
-        // Check if we're using mock data based on the run URLs
-        if (data.runs && data.runs.length > 0 && data.runs[0].url === '#') {
+        if (response.status === 500 && data.code === 'MISSING_GITHUB_TOKEN') {
+          console.info('GitHub token not configured, using mock data');
           setUsingMockData(true);
+          // Don't throw error, the API returns mock data
+          return;
         } else {
-          setUsingMockData(false);
+          throw new Error(data.error || `HTTP error! status: ${response.status}`);
         }
+      }
+      
+      // Check if we're using mock data based on the run URLs
+      if (data.runs && data.runs.length > 0 && data.runs[0].url === '#') {
+        setUsingMockData(true);
+      } else {
+        setUsingMockData(false);
       }
       
       setRuns(data.runs || []);
