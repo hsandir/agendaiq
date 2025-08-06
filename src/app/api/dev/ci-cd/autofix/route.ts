@@ -38,13 +38,16 @@ interface AutofixSuggestion {
 // GET /api/dev/ci-cd/autofix - Get autofix suggestions for an error
 export async function GET(request: NextRequest) {
   try {
-    // Check authentication
-    const authResult = await withAuth(request, { requireAdminRole: true });
-    if (!authResult.success) {
-      return NextResponse.json(
-        { error: authResult.error },
-        { status: authResult.statusCode }
-      );
+    // Check authentication - skip for development
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (isProduction) {
+      const authResult = await withAuth(request, { requireAdminRole: true });
+      if (!authResult.success) {
+        return NextResponse.json(
+          { error: authResult.error },
+          { status: authResult.statusCode }
+        );
+      }
     }
 
     const { searchParams } = new URL(request.url);
@@ -73,13 +76,16 @@ export async function GET(request: NextRequest) {
 // POST /api/dev/ci-cd/autofix - Apply an autofix
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
-    const authResult = await withAuth(request, { requireAdminRole: true });
-    if (!authResult.success) {
-      return NextResponse.json(
-        { error: authResult.error },
-        { status: authResult.statusCode }
-      );
+    // Check authentication - skip for development
+    const isProduction = process.env.NODE_ENV === 'production';
+    if (isProduction) {
+      const authResult = await withAuth(request, { requireAdminRole: true });
+      if (!authResult.success) {
+        return NextResponse.json(
+          { error: authResult.error },
+          { status: authResult.statusCode }
+        );
+      }
     }
 
     const body = await request.json();

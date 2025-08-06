@@ -93,23 +93,52 @@ export default function CICDMonitor() {
   const [expandedRuns, setExpandedRuns] = useState<Set<number>>(new Set());
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [filterStatus, setFilterStatus] = useState<'all' | 'failure' | 'success'>('all');
+  const [usingMockData, setUsingMockData] = useState(false);
 
   const fetchRuns = async () => {
     try {
       const response = await fetch(`/api/dev/ci-cd/runs?status=${filterStatus}&limit=50`);
-      if (!response.ok) throw new Error('Failed to fetch runs');
       
-      const data = await response.json();
-      setRuns(data.runs);
-      setStats(data.stats);
+      let data;
+      
+      if (!response.ok) {
+        // Handle specific error cases
+        if (response.status === 500) {
+          const errorData = await response.json();
+          if (errorData.code === 'MISSING_GITHUB_TOKEN') {
+            console.info('GitHub token not configured, using mock data');
+            setUsingMockData(true);
+            // Don't throw error, the API returns mock data
+            return;
+          }
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } else {
+        data = await response.json();
+        // Check if we're using mock data based on the run URLs
+        if (data.runs && data.runs.length > 0 && data.runs[0].url === '#') {
+          setUsingMockData(true);
+        } else {
+          setUsingMockData(false);
+        }
+      }
+      
+      setRuns(data.runs || []);
+      setStats(data.stats || null);
       
       // Auto-expand failed runs
-      const failedRunIds = data.runs
-        .filter((r: WorkflowRun) => r.conclusion === 'failure')
-        .map((r: WorkflowRun) => r.id);
-      setExpandedRuns(new Set(failedRunIds.slice(0, 3)));
+      if (data.runs && data.runs.length > 0) {
+        const failedRunIds = data.runs
+          .filter((r: WorkflowRun) => r.conclusion === 'failure')
+          .map((r: WorkflowRun) => r.id);
+        setExpandedRuns(new Set(failedRunIds.slice(0, 3)));
+      }
     } catch (error) {
       console.error('Error fetching CI/CD runs:', error);
+      // Set empty data on error
+      setRuns([]);
+      setStats(null);
     } finally {
       setLoading(false);
     }
@@ -300,6 +329,28 @@ export default function CICDMonitor() {
           </Button>
         </div>
       </div>
+
+      {/* Mock Data Notice */}
+      {usingMockData && (
+        <Card className="p-4 bg-yellow-50 border-yellow-200">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-5 w-5 text-yellow-600" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-yellow-800">Using Mock Data</p>
+              <p className="text-xs text-yellow-700">
+                GitHub token not configured. Add GITHUB_TOKEN to your .env.local file to see real workflow data.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => window.open('https://github.com/settings/tokens', '_blank')}
+            >
+              Get Token
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {/* Statistics */}
       {stats && (
