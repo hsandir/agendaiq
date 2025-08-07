@@ -6,19 +6,14 @@ import { generateCSSVariables } from '@/lib/theme/theme-utils';
 
 export function ThemeInitializer() {
   useEffect(() => {
-    console.log('ThemeInitializer: Starting theme initialization...');
-    
     // Get theme from localStorage or default
     const savedTheme = localStorage.getItem('agendaiq-theme') || 'classic-light';
-    console.log('ThemeInitializer: Saved theme:', savedTheme);
     
     // Find theme
     const theme = themes.find(t => t.id === savedTheme) || themes[1];
-    console.log('ThemeInitializer: Using theme:', theme.name);
     
     // Generate and apply CSS variables
     const cssVars = generateCSSVariables(theme);
-    console.log('ThemeInitializer: Applying', Object.keys(cssVars).length, 'CSS variables');
     
     Object.entries(cssVars).forEach(([key, value]) => {
       document.documentElement.style.setProperty(key, value);
@@ -53,8 +48,6 @@ export function ThemeInitializer() {
       document.documentElement.classList.add('light');
     }
     
-    console.log('ThemeInitializer: Theme applied successfully!');
-    
     // Also apply basic styles to body as fallback
     document.body.style.backgroundColor = theme.colors.background;
     document.body.style.color = theme.colors.text;
@@ -62,7 +55,6 @@ export function ThemeInitializer() {
     // Listen for theme changes
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'agendaiq-theme' && e.newValue) {
-        console.log('ThemeInitializer: Theme changed to:', e.newValue);
         window.location.reload(); // Simple reload for now
       }
     };

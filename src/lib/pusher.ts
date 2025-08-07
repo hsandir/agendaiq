@@ -5,7 +5,6 @@
 export const pusherServer = {
   trigger: async (channel: string, event: string, data: any) => {
     // No-op - real-time features temporarily disabled
-    console.log('Real-time event skipped:', { channel, event });
     return Promise.resolve();
   }
 };
