@@ -78,7 +78,7 @@ export function AgendaItemForm({
       <CardHeader className="cursor-move">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <GripVertical className="h-5 w-5 text-gray-400" />
+            <GripVertical className="h-5 w-5 text-muted-foreground" />
             <CardTitle className="text-lg">
               {item.topic || `Agenda Item ${index + 1}`}
             </CardTitle>
@@ -86,7 +86,7 @@ export function AgendaItemForm({
           <div className="flex items-center space-x-2">
             {item.priority && (
               <span className={`text-xs px-2 py-1 rounded-full ${
-                item.priority === 'High' ? 'bg-red-100 text-red-700' :
+                item.priority === 'High' ? 'bg-destructive/10 text-destructive' :
                 item.priority === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
                 'bg-green-100 text-green-700'
               }`}>
@@ -250,7 +250,7 @@ export function AgendaItemForm({
             <div>
               <Label htmlFor={`duration-${index}`}>Duration (minutes)</Label>
               <div className="relative">
-                <Clock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id={`duration-${index}`}
                   type="number"
@@ -331,7 +331,7 @@ export function AgendaItemForm({
           )}
 
           {/* Future Implications */}
-          <div className="flex items-center space-x-2 bg-gray-50 p-4 rounded-lg">
+          <div className="flex items-center space-x-2 bg-muted p-4 rounded-lg">
             <AlertCircle className="h-5 w-5 text-yellow-600" />
             <Switch
               id={`implications-${index}`}

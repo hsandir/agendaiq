@@ -101,18 +101,18 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-3xl py-6 sm:px-6 lg:px-8">
-      <div className="overflow-hidden rounded-lg bg-white shadow">
+      <div className="overflow-hidden rounded-lg bg-card shadow">
         <div className="px-4 py-5 sm:p-6">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Profile Settings</h1>
-            <p className="mt-1 text-sm text-gray-600">
+            <h1 className="text-2xl font-bold text-foreground">Profile Settings</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
               Update your personal information and school assignment.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="block text-sm font-medium text-foreground">
                 Name
               </label>
               <div className="mt-1">
@@ -122,13 +122,13 @@ export default function ProfilePage() {
                   type="text"
                   value={formData.name}
                   onChange={handleChange}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-foreground">
                 Email
               </label>
               <div className="mt-1">
@@ -138,13 +138,13 @@ export default function ProfilePage() {
                   type="email"
                   value={formData.email}
                   readOnly
-                  className="block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="block w-full rounded-md border-border bg-muted shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="department" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="department" className="block text-sm font-medium text-foreground">
                 Department
               </label>
               <div className="mt-1">
@@ -154,13 +154,13 @@ export default function ProfilePage() {
                   type="text"
                   value={formData.department}
                   readOnly
-                  className="block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="block w-full rounded-md border-border bg-muted shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="role" className="block text-sm font-medium text-foreground">
                 Role
               </label>
               <div className="mt-1">
@@ -170,13 +170,13 @@ export default function ProfilePage() {
                   type="text"
                   value={formData.role}
                   readOnly
-                  className="block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="block w-full rounded-md border-border bg-muted shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="schoolId" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="schoolId" className="block text-sm font-medium text-foreground">
                 School Assignment
               </label>
               <div className="mt-1">
@@ -185,7 +185,7 @@ export default function ProfilePage() {
                   name="schoolId"
                   value={formData.schoolId}
                   onChange={handleChange}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
                 >
                   <option value="">Select a school</option>
                   {schools.map((school) => (
@@ -196,19 +196,19 @@ export default function ProfilePage() {
                   ))}
                 </select>
               </div>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Select the school you are assigned to. This helps organize meetings and staff assignments.
               </p>
             </div>
 
             {error && (
-              <div className="rounded-md bg-red-50 p-4">
+              <div className="rounded-md bg-destructive/10 p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <FiAlertCircle className="h-5 w-5 text-red-400" aria-hidden="true" />
+                    <FiAlertCircle className="h-5 w-5 text-destructive" aria-hidden="true" />
                   </div>
                   <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">{error}</h3>
+                    <h3 className="text-sm font-medium text-destructive">{error}</h3>
                   </div>
                 </div>
               </div>
@@ -231,7 +231,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+                className="flex w-full justify-center rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50"
               >
                 {isLoading ? 'Saving...' : 'Save Changes'}
               </button>

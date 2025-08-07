@@ -125,7 +125,7 @@ export function DateTimePicker({
         <Label htmlFor={id} className="flex items-center gap-2">
           <Calendar className="h-4 w-4" />
           {label}
-          {required && <span className="text-red-500">*</span>}
+          {required && <span className="text-destructive">*</span>}
         </Label>
       )}
       

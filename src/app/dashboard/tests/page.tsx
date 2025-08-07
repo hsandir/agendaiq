@@ -124,18 +124,18 @@ export default function TestDashboard() {
       case 'passed':
         return <CheckCircleIcon className="h-4 w-4 text-green-500" />
       case 'failed':
-        return <XCircleIcon className="h-4 w-4 text-red-500" />
+        return <XCircleIcon className="h-4 w-4 text-destructive" />
       case 'running':
-        return <RefreshCwIcon className="h-4 w-4 animate-spin text-blue-500" />
+        return <RefreshCwIcon className="h-4 w-4 animate-spin text-primary" />
       default:
-        return <ClockIcon className="h-4 w-4 text-gray-400" />
+        return <ClockIcon className="h-4 w-4 text-muted-foreground" />
     }
   }
 
   const getCoverageColor = (percentage: number) => {
     if (percentage >= 80) return 'text-green-600'
     if (percentage >= 50) return 'text-yellow-600'
-    return 'text-red-600'
+    return 'text-destructive'
   }
 
   return (
@@ -189,7 +189,7 @@ export default function TestDashboard() {
                     className={`p-3 rounded-lg border cursor-pointer transition-colors ${
                       selectedSuite === suite.path
                         ? 'border-primary bg-primary/5'
-                        : 'hover:bg-gray-50'
+                        : 'hover:bg-muted'
                     }`}
                     onClick={() => setSelectedSuite(suite.path)}
                   >
@@ -288,10 +288,10 @@ export default function TestDashboard() {
               </TabsContent>
 
               <TabsContent value="output" className="mt-4">
-                <ScrollArea className="h-[400px] bg-gray-900 text-gray-100 p-4 rounded-lg">
+                <ScrollArea className="h-[400px] bg-background text-muted-foreground p-4 rounded-lg">
                   <pre className="text-xs font-mono">
                     {output.length === 0 ? (
-                      <span className="text-gray-500">No output yet...</span>
+                      <span className="text-muted-foreground">No output yet...</span>
                     ) : (
                       output.join('\n')
                     )}
@@ -310,14 +310,14 @@ export default function TestDashboard() {
                             {data.percentage.toFixed(1)}%
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full bg-muted rounded-full h-2">
                           <div
                             className={`h-2 rounded-full transition-all ${
                               data.percentage >= 80
                                 ? 'bg-green-500'
                                 : data.percentage >= 50
                                 ? 'bg-yellow-500'
-                                : 'bg-red-500'
+                                : 'bg-destructive/10'
                             }`}
                             style={{ width: `${data.percentage}%` }}
                           />

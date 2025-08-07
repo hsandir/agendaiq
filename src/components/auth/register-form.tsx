@@ -105,13 +105,13 @@ export default function RegisterForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded">
           {error}
         </div>
       )}
       
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="name" className="block text-sm font-medium text-foreground">
           Full Name
         </label>
         <input
@@ -121,12 +121,12 @@ export default function RegisterForm() {
           value={formData.name}
           onChange={handleChange}
           required
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-blue-500"
         />
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="email" className="block text-sm font-medium text-foreground">
           Email Address
         </label>
         <input
@@ -136,12 +136,12 @@ export default function RegisterForm() {
           value={formData.email}
           onChange={handleChange}
           required
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-blue-500"
         />
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="password" className="block text-sm font-medium text-foreground">
           Password
         </label>
         <input
@@ -152,13 +152,13 @@ export default function RegisterForm() {
           onChange={handleChange}
           required
           minLength={8}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-blue-500"
         />
         {passwordStrength && (
           <div className="mt-1">
             <div className="text-sm">
               Password strength: <span className={
-                passwordStrength === 'Weak' ? 'text-red-600' :
+                passwordStrength === 'Weak' ? 'text-destructive' :
                 passwordStrength === 'Fair' ? 'text-yellow-600' :
                 passwordStrength === 'Medium' ? 'text-green-600' :
                 'text-green-700 font-semibold'
@@ -169,7 +169,7 @@ export default function RegisterForm() {
       </div>
 
       <div>
-        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground">
           Confirm Password
         </label>
         <input
@@ -179,7 +179,7 @@ export default function RegisterForm() {
           value={formData.confirmPassword}
           onChange={handleChange}
           required
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-blue-500"
         />
       </div>
 
@@ -190,9 +190,9 @@ export default function RegisterForm() {
           type="checkbox"
           checked={acceptedTerms}
           onChange={(e) => setAcceptedTerms(e.target.checked)}
-          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          className="h-4 w-4 text-primary focus:ring-ring border-border rounded"
         />
-        <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
+        <label htmlFor="terms" className="ml-2 block text-sm text-foreground">
           I agree to the terms and conditions
         </label>
       </div>
@@ -200,7 +200,7 @@ export default function RegisterForm() {
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+        className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-foreground bg-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50"
       >
         {isLoading ? 'Creating account...' : 'Create account'}
       </button>

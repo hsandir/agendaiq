@@ -306,7 +306,7 @@ export default function ApiTester() {
                   savedRequests.map((request) => (
                     <div
                       key={request.id}
-                      className="p-2 border rounded-lg cursor-pointer hover:bg-gray-50"
+                      className="p-2 border rounded-lg cursor-pointer hover:bg-muted"
                       onClick={() => loadRequest(request)}
                     >
                       <div className="flex justify-between items-center">
@@ -342,7 +342,7 @@ export default function ApiTester() {
                   history.map((item) => (
                     <div
                       key={item.id}
-                      className="p-2 border rounded-lg cursor-pointer hover:bg-gray-50"
+                      className="p-2 border rounded-lg cursor-pointer hover:bg-muted"
                       onClick={() => setUrl(item.url)}
                     >
                       <div className="flex justify-between items-center">

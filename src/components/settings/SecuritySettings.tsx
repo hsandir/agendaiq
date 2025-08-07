@@ -98,9 +98,9 @@ export function SecuritySettings({ user }: { user: any }) {
   return (
     <div className="space-y-8">
       {/* Two-Factor Authentication Section */}
-      <section className="bg-white p-6 rounded-lg shadow-sm border">
+      <section className="bg-card p-6 rounded-lg shadow-sm border">
         <div className="flex items-center mb-4">
-          <Shield className="h-5 w-5 text-blue-600 mr-2" />
+          <Shield className="h-5 w-5 text-primary mr-2" />
           <h2 className="text-lg font-semibold">Two-Factor Authentication</h2>
         </div>
 
@@ -108,7 +108,7 @@ export function SecuritySettings({ user }: { user: any }) {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Two-factor authentication is currently enabled for your account.
                 </p>
               </div>
@@ -126,12 +126,12 @@ export function SecuritySettings({ user }: { user: any }) {
                   onChange={(e) => setTwoFactorCode(e.target.value)}
                   placeholder="Enter 2FA code"
                   maxLength={6}
-                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                 />
                 <button
                   onClick={disable2FA}
                   disabled={isDisabling2FA || twoFactorCode.length !== 6}
-                  className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 disabled:opacity-50"
+                  className="bg-destructive/10 text-foreground px-4 py-2 rounded-md hover:bg-destructive/10 disabled:opacity-50"
                 >
                   {isDisabling2FA ? "Disabling..." : "Disable 2FA"}
                 </button>
@@ -144,12 +144,12 @@ export function SecuritySettings({ user }: { user: any }) {
               <TwoFactorSetup />
             ) : (
               <div className="space-y-4">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Enhance your account security by enabling two-factor authentication.
                 </p>
                 <button
                   onClick={() => setShow2FASetup(true)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                  className="bg-primary text-foreground px-4 py-2 rounded-md hover:bg-primary"
                 >
                   Enable 2FA
                 </button>
@@ -160,27 +160,27 @@ export function SecuritySettings({ user }: { user: any }) {
       </section>
 
       {/* Device Management Section */}
-      <section className="bg-white p-6 rounded-lg shadow-sm border">
+      <section className="bg-card p-6 rounded-lg shadow-sm border">
         <div className="flex items-center mb-4">
-          <Smartphone className="h-5 w-5 text-blue-600 mr-2" />
+          <Smartphone className="h-5 w-5 text-primary mr-2" />
           <h2 className="text-lg font-semibold">Device Management</h2>
         </div>
 
         {isLoading ? (
-          <p className="text-sm text-gray-500">Loading devices...</p>
+          <p className="text-sm text-muted-foreground">Loading devices...</p>
         ) : devices.length === 0 ? (
-          <p className="text-sm text-gray-500">No devices registered yet.</p>
+          <p className="text-sm text-muted-foreground">No devices registered yet.</p>
         ) : (
           <div className="space-y-3">
             {devices.map((device) => (
               <div
                 key={device.id}
-                className="border rounded-lg p-4 hover:bg-gray-50"
+                className="border rounded-lg p-4 hover:bg-muted"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h3 className="font-medium">{device.device_name}</h3>
-                    <div className="mt-1 text-sm text-gray-500 space-y-1">
+                    <div className="mt-1 text-sm text-muted-foreground space-y-1">
                       <p>Type: {device.device_type} • OS: {device.device_os} • Browser: {device.browser}</p>
                       <p>IP: {device.ip_address}</p>
                       <p>Last active: {new Date(device.last_active).toLocaleString()}</p>
@@ -194,14 +194,14 @@ export function SecuritySettings({ user }: { user: any }) {
                     ) : (
                       <button
                         onClick={() => trustDevice(device.id, true)}
-                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded hover:bg-blue-200"
+                        className="px-2 py-1 bg-primary text-primary text-xs rounded hover:bg-primary"
                       >
                         Trust
                       </button>
                     )}
                     <button
                       onClick={() => removeDevice(device.id)}
-                      className="text-red-600 hover:text-red-700"
+                      className="text-destructive hover:text-destructive"
                     >
                       <AlertTriangle className="h-4 w-4" />
                     </button>
@@ -212,13 +212,13 @@ export function SecuritySettings({ user }: { user: any }) {
           </div>
         )}
 
-        <div className="mt-4 text-sm text-gray-600">
+        <div className="mt-4 text-sm text-muted-foreground">
           <p>Trusted devices won't require 2FA verification when signing in.</p>
         </div>
       </section>
 
       {/* Security Notifications */}
-      <section className="bg-white p-6 rounded-lg shadow-sm border">
+      <section className="bg-card p-6 rounded-lg shadow-sm border">
         <h2 className="text-lg font-semibold mb-4">Security Notifications</h2>
         
         <div className="space-y-4">
@@ -227,7 +227,7 @@ export function SecuritySettings({ user }: { user: any }) {
             <input
               type="checkbox"
               checked={user.login_notifications_enabled}
-              className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+              className="h-4 w-4 text-primary rounded focus:ring-ring"
               disabled
             />
           </label>
@@ -237,7 +237,7 @@ export function SecuritySettings({ user }: { user: any }) {
             <input
               type="checkbox"
               checked={user.suspicious_alerts_enabled}
-              className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+              className="h-4 w-4 text-primary rounded focus:ring-ring"
               disabled
             />
           </label>
@@ -247,7 +247,7 @@ export function SecuritySettings({ user }: { user: any }) {
             <input
               type="checkbox"
               checked={user.remember_devices_enabled}
-              className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+              className="h-4 w-4 text-primary rounded focus:ring-ring"
               disabled
             />
           </label>

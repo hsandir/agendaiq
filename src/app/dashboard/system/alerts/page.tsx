@@ -195,13 +195,13 @@ export default function AlertsConfigurationPage() {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'error':
-        return <AlertCircle className="w-4 h-4 text-red-600" />;
+        return <AlertCircle className="w-4 h-4 text-destructive" />;
       case 'warning':
         return <AlertTriangle className="w-4 h-4 text-yellow-600" />;
       case 'info':
-        return <CheckCircle className="w-4 h-4 text-blue-600" />;
+        return <CheckCircle className="w-4 h-4 text-primary" />;
       default:
-        return <Bell className="w-4 h-4 text-gray-600" />;
+        return <Bell className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
@@ -234,7 +234,7 @@ export default function AlertsConfigurationPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold flex items-center">
-            <Bell className="w-8 h-8 mr-3 text-purple-600" />
+            <Bell className="w-8 h-8 mr-3 text-secondary" />
             Alert Configuration
           </h1>
           <p className="text-muted-foreground">Configure system alerts and notifications</p>
@@ -292,7 +292,7 @@ export default function AlertsConfigurationPage() {
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Settings className="h-5 w-5 mr-2 text-gray-600" />
+                <Settings className="h-5 w-5 mr-2 text-muted-foreground" />
                 Global Settings
               </CardTitle>
               <CardDescription>Configure global alert settings and behavior</CardDescription>
@@ -426,7 +426,7 @@ export default function AlertsConfigurationPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Bell className="h-5 w-5 mr-2 text-blue-600" />
+                  <Bell className="h-5 w-5 mr-2 text-primary" />
                   Notification Channels
                 </CardTitle>
                 <CardDescription>Configure how alerts are delivered</CardDescription>
@@ -482,7 +482,7 @@ export default function AlertsConfigurationPage() {
             <CardContent>
               <div className="grid gap-4 md:grid-cols-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-primary">
                     {alertsConfig.rules.filter(r => r.enabled).length}
                   </div>
                   <div className="text-sm text-muted-foreground">Active Rules</div>
@@ -500,7 +500,7 @@ export default function AlertsConfigurationPage() {
                   <div className="text-sm text-muted-foreground">Total Triggers</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">
+                  <div className="text-2xl font-bold text-secondary">
                     {alertsConfig.rules.filter(r => r.lastTriggered).length}
                   </div>
                   <div className="text-sm text-muted-foreground">Recently Active</div>

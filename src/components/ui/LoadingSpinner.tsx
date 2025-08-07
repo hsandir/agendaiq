@@ -15,9 +15,9 @@ const sizeClasses = {
 };
 
 const colorClasses = {
-  primary: 'text-blue-600',
-  secondary: 'text-gray-600',
-  white: 'text-white'
+  primary: 'text-primary',
+  secondary: 'text-muted-foreground',
+  white: 'text-foreground'
 };
 
 export function LoadingSpinner({ 
@@ -58,10 +58,10 @@ export function LoadingOverlay({
     <div className={cn('relative', className)}>
       {children}
       {isLoading && (
-        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="absolute inset-0 bg-card/80 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="flex flex-col items-center gap-3">
             <LoadingSpinner size="lg" />
-            <p className="text-sm text-gray-600 font-medium">{loadingText}</p>
+            <p className="text-sm text-muted-foreground font-medium">{loadingText}</p>
           </div>
         </div>
       )}
@@ -79,7 +79,7 @@ export function Skeleton({ className, width, height }: SkeletonProps) {
   return (
     <div
       className={cn(
-        'animate-pulse bg-gray-200 rounded',
+        'animate-pulse bg-muted rounded',
         className
       )}
       style={{

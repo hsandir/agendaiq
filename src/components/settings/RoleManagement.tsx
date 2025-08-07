@@ -103,8 +103,8 @@ export default function RoleManagement() {
                 <TableCell>
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     role.is_leadership 
-                      ? 'bg-blue-100 text-blue-800' 
-                      : 'bg-gray-100 text-gray-800'
+                      ? 'bg-primary text-primary' 
+                      : 'bg-muted text-foreground'
                   }`}>
                     {role.is_leadership ? 'Yes' : 'No'}
                   </span>
@@ -125,7 +125,7 @@ export default function RoleManagement() {
         
         {roles.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-gray-500">No roles found. Please set up roles first.</p>
+            <p className="text-muted-foreground">No roles found. Please set up roles first.</p>
           </div>
         )}
       </CardContent>

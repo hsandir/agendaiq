@@ -29,23 +29,23 @@ export default function PAGE_NAME() {
   // REQUIRED: Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div className="flex items-center justify-center min-h-screen bg-background text-foreground">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ring"></div>
       </div>
     );
   }
 
   // REQUIRED: Your page JSX here
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 bg-background text-foreground">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">PAGE_TITLE</h1>
         <p className="text-muted-foreground">PAGE_DESCRIPTION</p>
       </div>
 
       {error && (
-        <div className="mb-4 rounded-md bg-red-50 p-4">
-          <div className="text-sm text-red-800">{error}</div>
+        <div className="mb-4 rounded-md bg-destructive/10 p-4">
+          <div className="text-sm text-destructive">{error}</div>
         </div>
       )}
 

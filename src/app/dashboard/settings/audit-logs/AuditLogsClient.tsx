@@ -350,28 +350,28 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
   const getOperationBadge = (operation: string) => {
     const colors = {
       CREATE: 'bg-green-100 text-green-800',
-      UPDATE: 'bg-blue-100 text-blue-800',
-      DELETE: 'bg-red-100 text-red-800',
-      BULK_CREATE: 'bg-purple-100 text-purple-800',
-      BULK_UPDATE: 'bg-indigo-100 text-indigo-800',
+      UPDATE: 'bg-primary text-primary',
+      DELETE: 'bg-destructive/10 text-destructive',
+      BULK_CREATE: 'bg-secondary text-secondary',
+      BULK_UPDATE: 'bg-primary text-primary',
       BULK_DELETE: 'bg-pink-100 text-pink-800'
     };
-    return colors[operation as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[operation as keyof typeof colors] || 'bg-muted text-foreground';
   };
 
   const getCategoryBadge = (category: string) => {
     const colors = {
-      AUTH: 'bg-blue-100 text-blue-800',
-      SECURITY: 'bg-red-100 text-red-800',
-      DATA_CRITICAL: 'bg-purple-100 text-purple-800',
+      AUTH: 'bg-primary text-primary',
+      SECURITY: 'bg-destructive/10 text-destructive',
+      DATA_CRITICAL: 'bg-secondary text-secondary',
       PERMISSION: 'bg-yellow-100 text-yellow-800',
-      SYSTEM: 'bg-gray-100 text-gray-800'
+      SYSTEM: 'bg-muted text-foreground'
     };
-    return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[category as keyof typeof colors] || 'bg-muted text-foreground';
   };
 
   const getRiskBadge = (riskScore: number) => {
-    if (riskScore >= 80) return 'bg-red-100 text-red-800';
+    if (riskScore >= 80) return 'bg-destructive/10 text-destructive';
     if (riskScore >= 60) return 'bg-orange-100 text-orange-800';
     if (riskScore >= 40) return 'bg-yellow-100 text-yellow-800';
     return 'bg-green-100 text-green-800';
@@ -379,12 +379,12 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
 
   const getSourceBadge = (source: string) => {
     const colors = {
-      WEB_UI: 'bg-blue-100 text-blue-800',
+      WEB_UI: 'bg-primary text-primary',
       API: 'bg-green-100 text-green-800',
-      BULK_UPLOAD: 'bg-purple-100 text-purple-800',
-      SYSTEM: 'bg-gray-100 text-gray-800'
+      BULK_UPLOAD: 'bg-secondary text-secondary',
+      SYSTEM: 'bg-muted text-foreground'
     };
-    return colors[source as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[source as keyof typeof colors] || 'bg-muted text-foreground';
   };
 
   const formatDate = (dateString: string) => {
@@ -473,32 +473,32 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         {summary && (
           <>
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="bg-card p-6 rounded-lg shadow-sm border">
               <div className="flex items-center">
-                <FiActivity className="h-8 w-8 text-blue-600" />
+                <FiActivity className="h-8 w-8 text-primary" />
                 <div className="ml-4">
-                  <p className="text-2xl font-bold text-gray-900">{summary.totalLogs}</p>
-                  <p className="text-gray-600">Total Logs</p>
+                  <p className="text-2xl font-bold text-foreground">{summary.totalLogs}</p>
+                  <p className="text-muted-foreground">Total Logs</p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="bg-card p-6 rounded-lg shadow-sm border">
               <div className="flex items-center">
                 <FiDatabase className="h-8 w-8 text-green-600" />
                 <div className="ml-4">
-                  <p className="text-2xl font-bold text-gray-900">{summary.tableStats.length}</p>
-                  <p className="text-gray-600">Affected Tables</p>
+                  <p className="text-2xl font-bold text-foreground">{summary.tableStats.length}</p>
+                  <p className="text-muted-foreground">Affected Tables</p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="bg-card p-6 rounded-lg shadow-sm border">
               <div className="flex items-center">
-                <FiUser className="h-8 w-8 text-purple-600" />
+                <FiUser className="h-8 w-8 text-secondary" />
                 <div className="ml-4">
-                  <p className="text-2xl font-bold text-gray-900">{summary.topUsers.length}</p>
-                  <p className="text-gray-600">Active Users</p>
+                  <p className="text-2xl font-bold text-foreground">{summary.topUsers.length}</p>
+                  <p className="text-muted-foreground">Active Users</p>
                 </div>
               </div>
             </div>
@@ -507,22 +507,22 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
         
         {highRiskStats && (
           <>
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="bg-card p-6 rounded-lg shadow-sm border">
               <div className="flex items-center">
-                <FiShield className="h-8 w-8 text-red-600" />
+                <FiShield className="h-8 w-8 text-destructive" />
                 <div className="ml-4">
-                  <p className="text-2xl font-bold text-gray-900">{highRiskStats.total}</p>
-                  <p className="text-gray-600">High Risk Events</p>
+                  <p className="text-2xl font-bold text-foreground">{highRiskStats.total}</p>
+                  <p className="text-muted-foreground">High Risk Events</p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <div className="bg-card p-6 rounded-lg shadow-sm border">
               <div className="flex items-center">
                 <FiAlertTriangle className="h-8 w-8 text-orange-600" />
                 <div className="ml-4">
-                  <p className="text-2xl font-bold text-gray-900">24h</p>
-                  <p className="text-gray-600">Time Range</p>
+                  <p className="text-2xl font-bold text-foreground">24h</p>
+                  <p className="text-muted-foreground">Time Range</p>
                 </div>
               </div>
             </div>
@@ -531,13 +531,13 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
+      <div className="bg-card p-6 rounded-lg shadow-sm border">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-gray-900">Filters</h3>
+          <h3 className="text-lg font-medium text-foreground">Filters</h3>
           <div className="flex space-x-2">
             <button
               onClick={resetFilters}
-              className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              className="px-3 py-2 text-sm font-medium text-foreground bg-card border border-border rounded-md hover:bg-muted"
             >
               <FiRefreshCw className="h-4 w-4 mr-1 inline" />
               Reset
@@ -545,14 +545,14 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
             <div className="flex space-x-2">
               <button
                 onClick={() => exportLogs('csv')}
-                className="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
+                className="px-3 py-2 text-sm font-medium text-foreground bg-primary border border-transparent rounded-md hover:bg-primary"
               >
                 <FiDownload className="h-4 w-4 mr-1 inline" />
                 Export CSV
               </button>
               <button
                 onClick={() => exportLogs('json')}
-                className="px-3 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700"
+                className="px-3 py-2 text-sm font-medium text-foreground bg-green-600 border border-transparent rounded-md hover:bg-green-700"
               >
                 <FiDownload className="h-4 w-4 mr-1 inline" />
                 Export JSON
@@ -563,11 +563,11 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Log Type</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Log Type</label>
             <select
               value={filters.logType}
               onChange={(e) => handleFilterChange('logType', e.target.value as 'critical' | 'legacy' | 'both')}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
             >
               <option value="both">Both Types</option>
               <option value="critical">Critical Events</option>
@@ -576,11 +576,11 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Category</label>
             <select
               value={filters.category}
               onChange={(e) => handleFilterChange('category', e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
               disabled={filters.logType === 'legacy'}
             >
               <option value="">All Categories</option>
@@ -593,11 +593,11 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Table</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Table</label>
             <select
               value={filters.table}
               onChange={(e) => handleFilterChange('table', e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
               disabled={filters.logType === 'critical'}
             >
               <option value="">All Tables</option>
@@ -610,11 +610,11 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Risk Score</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Risk Score</label>
             <select
               value={filters.minRiskScore}
               onChange={(e) => handleFilterChange('minRiskScore', e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
               disabled={filters.logType === 'legacy'}
             >
               <option value="">Any Risk</option>
@@ -627,11 +627,11 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
         
         <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Operation</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Operation</label>
             <select
               value={filters.operation}
               onChange={(e) => handleFilterChange('operation', e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
               disabled={filters.logType === 'critical'}
             >
               <option value="">All Operations</option>
@@ -645,154 +645,154 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Action</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Action</label>
             <input
               type="text"
               value={filters.action}
               onChange={(e) => handleFilterChange('action', e.target.value)}
               placeholder="Action name..."
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
               disabled={filters.logType === 'legacy'}
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Start Date</label>
             <input
               type="date"
               value={filters.startDate}
               onChange={(e) => handleFilterChange('startDate', e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+            <label className="block text-sm font-medium text-foreground mb-1">End Date</label>
             <input
               type="date"
               value={filters.endDate}
               onChange={(e) => handleFilterChange('endDate', e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
+            <label className="block text-sm font-medium text-foreground mb-1">User ID</label>
             <input
               type="number"
               value={filters.userId}
               onChange={(e) => handleFilterChange('userId', e.target.value)}
               placeholder="User ID"
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Staff ID</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Staff ID</label>
             <input
               type="number"
               value={filters.staffId}
               onChange={(e) => handleFilterChange('staffId', e.target.value)}
               placeholder="Staff ID"
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
             />
           </div>
         </div>
       </div>
 
       {/* Audit Logs Table */}
-      <div className="bg-white shadow-sm border rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
+      <div className="bg-card shadow-sm border rounded-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-border">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium text-gray-900">
+            <h3 className="text-lg font-medium text-foreground">
               {filters.logType === 'critical' ? 'Critical Security Events' : 
                filters.logType === 'legacy' ? 'Legacy Database Audit Logs' : 
                'Hybrid Audit System - All Events'}
             </h3>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-muted-foreground">
               Showing {auditLogs.length} events
             </div>
           </div>
         </div>
         
         {error && (
-          <div className="p-4 bg-red-50 border-l-4 border-red-400">
-            <p className="text-red-700">{error}</p>
+          <div className="p-4 bg-destructive/10 border-l-4 border-destructive">
+            <p className="text-destructive">{error}</p>
           </div>
         )}
         
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Date/Time
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Type
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Category/Table
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Action/Operation
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Risk/Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Description
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-card divide-y divide-gray-200">
               {auditLogs.map((log) => {
                 const isCritical = isCriticalLog(log);
                 const timestamp = isCritical ? log.timestamp : log.created_at;
                 return (
-                  <tr key={`${isCritical ? 'critical' : 'legacy'}-${log.id}`} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <tr key={`${isCritical ? 'critical' : 'legacy'}-${log.id}`} className="hover:bg-muted">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                       {formatDate(timestamp)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        isCritical ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+                        isCritical ? 'bg-destructive/10 text-destructive' : 'bg-primary text-primary'
                       }`}>
                         {isCritical ? 'CRITICAL' : 'LEGACY'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        isCritical ? getCategoryBadge(log.category) : 'bg-gray-100 text-gray-800'
+                        isCritical ? getCategoryBadge(log.category) : 'bg-muted text-foreground'
                       }`}>
                         {isCritical ? log.category : log.table_name}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        isCritical ? 'bg-gray-100 text-gray-800' : getOperationBadge(log.operation)
+                        isCritical ? 'bg-muted text-foreground' : getOperationBadge(log.operation)
                       }`}>
                         {isCritical ? log.action : log.operation}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                       {log.User ? (
                         <div>
                           <div className="font-medium">{log.User.name || log.User.email}</div>
                           {log.Staff && (
-                            <div className="text-gray-500 text-xs">
+                            <div className="text-muted-foreground text-xs">
                               {log.Staff.Role.title} - {log.Staff.Department.name}
                             </div>
                           )}
                         </div>
                       ) : (
-                        <span className="text-gray-500">System</span>
+                        <span className="text-muted-foreground">System</span>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -802,7 +802,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                             Risk: {log.risk_score}
                           </span>
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            log.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            log.success ? 'bg-green-100 text-green-800' : 'bg-destructive/10 text-destructive'
                           }`}>
                             {log.success ? 'SUCCESS' : 'FAILED'}
                           </span>
@@ -813,7 +813,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm text-foreground">
                       <div className="max-w-xs truncate">
                         {isCritical ? (
                           log.error_message || log.description || 'No description'
@@ -826,7 +826,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                       {canViewAuditDetails(log) ? (
                         <button
                           onClick={() => handleViewDetails(log)}
-                          className="text-blue-600 hover:text-blue-900 mr-3"
+                          className="text-primary hover:text-primary mr-3"
                           title="View Details"
                         >
                           <FiEye className="h-4 w-4" />
@@ -834,7 +834,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                       ) : (
                         <button
                           disabled
-                          className="text-gray-400 mr-3 cursor-not-allowed"
+                          className="text-muted-foreground mr-3 cursor-not-allowed"
                           title="Access Denied: Insufficient permissions"
                         >
                           <FiEye className="h-4 w-4" />
@@ -845,7 +845,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                           <button className="text-green-600 hover:text-green-900 mr-3" title="Edit">
                             <FiEdit className="h-4 w-4" />
                           </button>
-                          <button className="text-red-600 hover:text-red-900" title="Delete">
+                          <button className="text-destructive hover:text-destructive" title="Delete">
                             <FiTrash2 className="h-4 w-4" />
                           </button>
                         </>
@@ -871,7 +871,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
           <div className="p-4 text-center border-t">
             <button
               onClick={() => loadAuditLogs(false)}
-              className="px-4 py-2 text-sm font-medium text-blue-600 bg-white border border-blue-600 rounded-md hover:bg-blue-50"
+              className="px-4 py-2 text-sm font-medium text-primary bg-card border border-blue-600 rounded-md hover:bg-primary"
             >
               Load More
             </button>
@@ -881,15 +881,15 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
 
       {/* Detail Modal */}
       {showDetails && selectedLog && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div className="fixed inset-0 bg-background bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-card">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">
+              <h3 className="text-lg font-medium text-foreground">
                 {isCriticalLog(selectedLog) ? 'Critical Event Details' : 'Legacy Audit Log Details'}
               </h3>
               <button
                 onClick={() => setShowDetails(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-muted-foreground hover:text-muted-foreground"
               >
                 ✕
               </button>
@@ -900,38 +900,38 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                 {isCriticalLog(selectedLog) ? (
                   <>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Category</label>
-                      <p className="text-sm text-gray-900">{selectedLog.category}</p>
+                      <label className="text-sm font-medium text-foreground">Category</label>
+                      <p className="text-sm text-foreground">{selectedLog.category}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Action</label>
-                      <p className="text-sm text-gray-900">{selectedLog.action}</p>
+                      <label className="text-sm font-medium text-foreground">Action</label>
+                      <p className="text-sm text-foreground">{selectedLog.action}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Risk Score</label>
-                      <p className="text-sm text-gray-900">
+                      <label className="text-sm font-medium text-foreground">Risk Score</label>
+                      <p className="text-sm text-foreground">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskBadge(selectedLog.risk_score)}`}>
                           {selectedLog.risk_score}/100
                         </span>
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Success</label>
-                      <p className="text-sm text-gray-900">
+                      <label className="text-sm font-medium text-foreground">Success</label>
+                      <p className="text-sm text-foreground">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          selectedLog.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          selectedLog.success ? 'bg-green-100 text-green-800' : 'bg-destructive/10 text-destructive'
                         }`}>
                           {selectedLog.success ? 'SUCCESS' : 'FAILED'}
                         </span>
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Date</label>
-                      <p className="text-sm text-gray-900">{formatDate(selectedLog.timestamp)}</p>
+                      <label className="text-sm font-medium text-foreground">Date</label>
+                      <p className="text-sm text-foreground">{formatDate(selectedLog.timestamp)}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">User/Staff ID</label>
-                      <p className="text-sm text-gray-900">
+                      <label className="text-sm font-medium text-foreground">User/Staff ID</label>
+                      <p className="text-sm text-foreground">
                         User: {selectedLog.user_id || 'N/A'}, Staff: {selectedLog.staff_id || 'N/A'}
                       </p>
                     </div>
@@ -939,20 +939,20 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                 ) : (
                   <>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Table</label>
-                      <p className="text-sm text-gray-900">{selectedLog.table_name}</p>
+                      <label className="text-sm font-medium text-foreground">Table</label>
+                      <p className="text-sm text-foreground">{selectedLog.table_name}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Operation</label>
-                      <p className="text-sm text-gray-900">{selectedLog.operation}</p>
+                      <label className="text-sm font-medium text-foreground">Operation</label>
+                      <p className="text-sm text-foreground">{selectedLog.operation}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Record ID</label>
-                      <p className="text-sm text-gray-900">{selectedLog.record_id}</p>
+                      <label className="text-sm font-medium text-foreground">Record ID</label>
+                      <p className="text-sm text-foreground">{selectedLog.record_id}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Date</label>
-                      <p className="text-sm text-gray-900">{formatDate(selectedLog.created_at)}</p>
+                      <label className="text-sm font-medium text-foreground">Date</label>
+                      <p className="text-sm text-foreground">{formatDate(selectedLog.created_at)}</p>
                     </div>
                   </>
                 )}
@@ -962,15 +962,15 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                 <>
                   {selectedLog.error_message && (
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Error Message</label>
-                      <p className="text-sm text-red-600 bg-red-50 p-3 rounded">{selectedLog.error_message}</p>
+                      <label className="text-sm font-medium text-foreground">Error Message</label>
+                      <p className="text-sm text-destructive bg-destructive/10 p-3 rounded">{selectedLog.error_message}</p>
                     </div>
                   )}
                   
                   {selectedLog.metadata && (
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Metadata</label>
-                      <pre className="text-xs bg-gray-100 p-3 rounded mt-1 overflow-auto">
+                      <label className="text-sm font-medium text-foreground">Metadata</label>
+                      <pre className="text-xs bg-muted p-3 rounded mt-1 overflow-auto">
                         {JSON.stringify(selectedLog.metadata, null, 2)}
                       </pre>
                     </div>
@@ -980,8 +980,8 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                 <>
                   {selectedLog.field_changes && (
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Field Changes</label>
-                      <pre className="text-xs bg-gray-100 p-3 rounded mt-1 overflow-auto">
+                      <label className="text-sm font-medium text-foreground">Field Changes</label>
+                      <pre className="text-xs bg-muted p-3 rounded mt-1 overflow-auto">
                         {JSON.stringify(selectedLog.field_changes, null, 2)}
                       </pre>
                     </div>
@@ -989,8 +989,8 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                   
                   {selectedLog.old_values && (
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Old Values</label>
-                      <pre className="text-xs bg-gray-100 p-3 rounded mt-1 overflow-auto">
+                      <label className="text-sm font-medium text-foreground">Old Values</label>
+                      <pre className="text-xs bg-muted p-3 rounded mt-1 overflow-auto">
                         {JSON.stringify(selectedLog.old_values, null, 2)}
                       </pre>
                     </div>
@@ -998,8 +998,8 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                   
                   {selectedLog.new_values && (
                     <div>
-                      <label className="text-sm font-medium text-gray-700">New Values</label>
-                      <pre className="text-xs bg-gray-100 p-3 rounded mt-1 overflow-auto">
+                      <label className="text-sm font-medium text-foreground">New Values</label>
+                      <pre className="text-xs bg-muted p-3 rounded mt-1 overflow-auto">
                         {JSON.stringify(selectedLog.new_values, null, 2)}
                       </pre>
                     </div>
@@ -1009,19 +1009,19 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">IP Address</label>
-                  <p className="text-sm text-gray-900">{selectedLog.ip_address || 'N/A'}</p>
+                  <label className="text-sm font-medium text-foreground">IP Address</label>
+                  <p className="text-sm text-foreground">{selectedLog.ip_address || 'N/A'}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">User Agent</label>
-                  <p className="text-sm text-gray-900 truncate">{selectedLog.user_agent || 'N/A'}</p>
+                  <label className="text-sm font-medium text-foreground">User Agent</label>
+                  <p className="text-sm text-foreground truncate">{selectedLog.user_agent || 'N/A'}</p>
                 </div>
               </div>
               
               {selectedLog.description && (
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Description</label>
-                  <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded">{selectedLog.description}</p>
+                  <label className="text-sm font-medium text-foreground">Description</label>
+                  <p className="text-sm text-foreground bg-muted p-3 rounded">{selectedLog.description}</p>
                 </div>
               )}
             </div>

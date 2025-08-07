@@ -17,12 +17,12 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-muted px-4">
       <div className="max-w-md w-full">
-        <div className="bg-white shadow-lg rounded-lg p-8">
-          <div className="flex items-center justify-center w-16 h-16 mx-auto bg-red-100 rounded-full">
+        <div className="bg-card shadow-lg rounded-lg p-8">
+          <div className="flex items-center justify-center w-16 h-16 mx-auto bg-destructive/10 rounded-full">
             <svg
-              className="w-8 h-8 text-red-600"
+              className="w-8 h-8 text-destructive"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -36,23 +36,23 @@ export default function Error({
             </svg>
           </div>
 
-          <h1 className="mt-6 text-2xl font-bold text-center text-gray-900">
+          <h1 className="mt-6 text-2xl font-bold text-center text-foreground">
             Something went wrong!
           </h1>
 
-          <p className="mt-4 text-center text-gray-600">
+          <p className="mt-4 text-center text-muted-foreground">
             We apologize for the inconvenience. An unexpected error has occurred. 
             Our team has been notified and is working to fix the issue.
           </p>
 
           {process.env.NODE_ENV === 'development' && error.message && (
-            <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-              <p className="text-sm font-medium text-gray-700">Error details:</p>
-              <p className="mt-1 text-sm text-gray-600 break-words">
+            <div className="mt-6 p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium text-foreground">Error details:</p>
+              <p className="mt-1 text-sm text-muted-foreground break-words">
                 {error.message}
               </p>
               {error.digest && (
-                <p className="mt-2 text-xs text-gray-500">
+                <p className="mt-2 text-xs text-muted-foreground">
                   Error ID: {error.digest}
                 </p>
               )}
@@ -62,14 +62,14 @@ export default function Error({
           <div className="mt-8 flex flex-col sm:flex-row gap-3">
             <button
               onClick={reset}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="flex-1 px-4 py-2 bg-primary text-foreground rounded-md hover:bg-primary transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
               Try again
             </button>
             
             <Link
               href="/dashboard"
-              className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors text-center focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              className="flex-1 px-4 py-2 bg-muted text-foreground rounded-md hover:bg-muted transition-colors text-center focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
               Go to Dashboard
             </Link>
@@ -78,7 +78,7 @@ export default function Error({
           <div className="mt-6 text-center">
             <Link
               href="/"
-              className="text-sm text-blue-600 hover:text-blue-700"
+              className="text-sm text-primary hover:text-primary"
             >
               Return to homepage
             </Link>

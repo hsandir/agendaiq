@@ -83,7 +83,7 @@ export default function DragDropRoleDistribution({
             <>
               <button
                 onClick={handleReset}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm border rounded-md hover:bg-gray-50"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm border rounded-md hover:bg-muted"
               >
                 <RefreshCw className="h-4 w-4" />
                 Reset
@@ -91,7 +91,7 @@ export default function DragDropRoleDistribution({
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm bg-primary text-foreground rounded-md hover:bg-primary disabled:opacity-50"
               >
                 <Save className="h-4 w-4" />
                 {isSaving ? 'Saving...' : 'Save Changes'}
@@ -105,14 +105,14 @@ export default function DragDropRoleDistribution({
         {roles.map((role, index) => (
           <div
             key={role.id}
-            className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-sm transition-shadow"
+            className="flex items-center justify-between p-3 bg-card border rounded-lg hover:shadow-sm transition-shadow"
           >
             <div className="flex items-center gap-3">
               <div className="flex flex-col gap-1">
                 <button
                   onClick={() => moveRole(index, 'up')}
                   disabled={index === 0}
-                  className="p-1 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="p-1 hover:bg-muted rounded disabled:opacity-30 disabled:cursor-not-allowed"
                   title="Move up"
                 >
                   <ChevronUp className="h-4 w-4" />
@@ -120,7 +120,7 @@ export default function DragDropRoleDistribution({
                 <button
                   onClick={() => moveRole(index, 'down')}
                   disabled={index === roles.length - 1}
-                  className="p-1 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="p-1 hover:bg-muted rounded disabled:opacity-30 disabled:cursor-not-allowed"
                   title="Move down"
                 >
                   <ChevronDown className="h-4 w-4" />
@@ -129,20 +129,20 @@ export default function DragDropRoleDistribution({
               
               <div className="flex items-center gap-2">
                 {role.is_leadership ? (
-                  <Shield className="h-5 w-5 text-blue-600" />
+                  <Shield className="h-5 w-5 text-primary" />
                 ) : (
-                  <Users className="h-5 w-5 text-gray-400" />
+                  <Users className="h-5 w-5 text-muted-foreground" />
                 )}
                 <div>
                   <div className="font-medium">{role.title}</div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-muted-foreground">
                     Priority: {role.priority} • {role._count?.Staff || 0} staff members
                   </div>
                 </div>
               </div>
             </div>
             
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-muted-foreground">
               #{index + 1}
             </div>
           </div>
@@ -150,7 +150,7 @@ export default function DragDropRoleDistribution({
       </div>
       
       {roles.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-muted-foreground">
           No roles available
         </div>
       )}

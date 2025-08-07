@@ -191,9 +191,9 @@ END OF REPORT
       case 'warning':
         return <AlertTriangle className="w-4 h-4 text-yellow-600" />;
       case 'error':
-        return <AlertCircle className="w-4 h-4 text-red-600" />;
+        return <AlertCircle className="w-4 h-4 text-destructive" />;
       default:
-        return <AlertCircle className="w-4 h-4 text-gray-600" />;
+        return <AlertCircle className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
@@ -213,7 +213,7 @@ END OF REPORT
   const getResponseTimeColor = (time: number) => {
     if (time < 1000) return 'text-green-600';
     if (time < 3000) return 'text-yellow-600';
-    return 'text-red-600';
+    return 'text-destructive';
   };
 
   useEffect(() => {
@@ -322,10 +322,10 @@ END OF REPORT
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Failed</CardTitle>
-              <AlertCircle className="h-4 w-4 text-red-600" />
+              <AlertCircle className="h-4 w-4 text-destructive" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{summary.failed}</div>
+              <div className="text-2xl font-bold text-destructive">{summary.failed}</div>
               <p className="text-xs text-muted-foreground">Require fixing</p>
             </CardContent>
           </Card>
@@ -451,7 +451,7 @@ END OF REPORT
                 <div 
                   key={index}
                   className={`border rounded-lg p-4 ${
-                    result.status === 'error' ? 'border-red-200 bg-red-50' :
+                    result.status === 'error' ? 'border-destructive bg-destructive/10' :
                     result.status === 'warning' ? 'border-yellow-200 bg-yellow-50' :
                     'border-green-200 bg-green-50'
                   }`}

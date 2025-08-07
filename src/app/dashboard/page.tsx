@@ -37,13 +37,13 @@ export default async function DashboardPage() {
   // If no district exists and user is not admin, show waiting message
   if (districtCount === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-muted">
         <div className="max-w-md w-full space-y-8 p-6">
           <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-foreground">
               Waiting for Setup
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
+            <p className="mt-2 text-center text-sm text-muted-foreground">
               Please wait while an administrator sets up the district.
             </p>
           </div>
@@ -144,13 +144,13 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+      <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
       
       {userWithStaff?.Staff?.[0]?.School && (
-        <div className="bg-white p-4 rounded-lg shadow-sm border">
-          <h2 className="text-lg font-medium text-gray-900">{userWithStaff.Staff[0].School.name}</h2>
+        <div className="bg-card p-4 rounded-lg shadow-sm border">
+          <h2 className="text-lg font-medium text-foreground">{userWithStaff.Staff[0].School.name}</h2>
           {userWithStaff.Staff[0].School.address && (
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               {userWithStaff.Staff[0].School.address}
             </p>
           )}
@@ -164,15 +164,15 @@ export default async function DashboardPage() {
               {quickStats.map((stat) => (
                 <div
                   key={stat.name}
-                  className="bg-white p-6 rounded-lg shadow-sm border"
+                  className="bg-card p-6 rounded-lg shadow-sm border"
                 >
                   <div className="flex items-center">
-                    <div className="p-3 rounded-full bg-blue-50">
-                      <stat.icon className="h-6 w-6 text-blue-600" />
+                    <div className="p-3 rounded-full bg-primary">
+                      <stat.icon className="h-6 w-6 text-primary" />
                     </div>
                     <div className="ml-4">
-                      <h3 className="text-sm font-medium text-gray-500">{stat.name}</h3>
-                      <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
+                      <h3 className="text-sm font-medium text-muted-foreground">{stat.name}</h3>
+                      <p className="text-2xl font-semibold text-foreground">{stat.value}</p>
                     </div>
                   </div>
                 </div>
@@ -185,7 +185,7 @@ export default async function DashboardPage() {
                 <h2 className="text-xl font-semibold">Upcoming Meetings</h2>
                 <a
                   href="/dashboard/meetings"
-                  className="text-sm text-blue-600 hover:text-blue-700"
+                  className="text-sm text-primary hover:text-primary"
                 >
                   View all
                 </a>
@@ -194,12 +194,12 @@ export default async function DashboardPage() {
                 {upcomingMeetings.map((meeting: any) => (
                   <div
                     key={meeting.id}
-                    className="bg-white p-4 rounded-lg shadow-sm border hover:shadow-md transition-shadow"
+                    className="bg-card p-4 rounded-lg shadow-sm border hover:shadow-md transition-shadow"
                   >
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-medium">{meeting.title}</h3>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                           {safeFormatDateTime(meeting.start_time, undefined, 'No date set')}
                         </p>
                       </div>
@@ -207,8 +207,8 @@ export default async function DashboardPage() {
                   </div>
                 ))}
                 {upcomingMeetings.length === 0 && (
-                  <div className="bg-white p-8 rounded-lg shadow-sm border text-center">
-                    <p className="text-gray-500">No upcoming meetings</p>
+                  <div className="bg-card p-8 rounded-lg shadow-sm border text-center">
+                    <p className="text-muted-foreground">No upcoming meetings</p>
                   </div>
                 )}
               </div>

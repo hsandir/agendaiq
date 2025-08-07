@@ -243,39 +243,39 @@ export function RepeatMeetingModal({
                 onValueChange={(value) => setConfig({ ...config, pattern: value as any })}
               >
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted">
                     <RadioGroupItem value="daily" id="daily" />
                     <Label htmlFor="daily" className="cursor-pointer flex-1">
                       <div className="font-medium">Daily</div>
-                      <div className="text-xs text-gray-500">Every day</div>
+                      <div className="text-xs text-muted-foreground">Every day</div>
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted">
                     <RadioGroupItem value="weekly" id="weekly" />
                     <Label htmlFor="weekly" className="cursor-pointer flex-1">
                       <div className="font-medium">Weekly</div>
-                      <div className="text-xs text-gray-500">Same day every week</div>
+                      <div className="text-xs text-muted-foreground">Same day every week</div>
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted">
                     <RadioGroupItem value="biweekly" id="biweekly" />
                     <Label htmlFor="biweekly" className="cursor-pointer flex-1">
                       <div className="font-medium">Bi-weekly</div>
-                      <div className="text-xs text-gray-500">Every two weeks</div>
+                      <div className="text-xs text-muted-foreground">Every two weeks</div>
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50">
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted">
                     <RadioGroupItem value="monthly" id="monthly" />
                     <Label htmlFor="monthly" className="cursor-pointer flex-1">
                       <div className="font-medium">Monthly</div>
-                      <div className="text-xs text-gray-500">Same date every month</div>
+                      <div className="text-xs text-muted-foreground">Same date every month</div>
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-gray-50 col-span-2">
+                  <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted col-span-2">
                     <RadioGroupItem value="custom" id="custom" />
                     <Label htmlFor="custom" className="cursor-pointer flex-1">
                       <div className="font-medium">Custom</div>
-                      <div className="text-xs text-gray-500">Select specific days and intervals</div>
+                      <div className="text-xs text-muted-foreground">Select specific days and intervals</div>
                     </Label>
                   </div>
                 </div>
@@ -284,7 +284,7 @@ export function RepeatMeetingModal({
 
             {/* Custom Pattern Options */}
             {config.pattern === 'custom' && (
-              <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+              <div className="space-y-4 p-4 bg-muted rounded-lg">
                 <div>
                   <Label htmlFor="interval">Repeat every</Label>
                   <div className="flex items-center gap-2 mt-2">
@@ -331,7 +331,7 @@ export function RepeatMeetingModal({
 
             {/* Monthly Pattern Options */}
             {config.pattern === 'monthly' && (
-              <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+              <div className="space-y-4 p-4 bg-muted rounded-lg">
                 <RadioGroup
                   value={config.monthDay ? 'day' : 'weekday'}
                   onValueChange={(value) => {
@@ -436,10 +436,10 @@ export function RepeatMeetingModal({
             </div>
 
             {/* Agenda Options */}
-            <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-primary rounded-lg">
               <div>
                 <Label htmlFor="include-agenda" className="font-medium">Copy agenda to all meetings</Label>
-                <p className="text-xs text-gray-600 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   Use the same agenda items for all meetings in the series
                 </p>
               </div>
@@ -464,7 +464,7 @@ export function RepeatMeetingModal({
                 <div className="mt-4 space-y-4 p-4 border rounded-lg">
                   <div>
                     <Label>Exclude dates (holidays, etc.)</Label>
-                    <p className="text-xs text-gray-600 mb-2">Select dates to skip in the series</p>
+                    <p className="text-xs text-muted-foreground mb-2">Select dates to skip in the series</p>
                     <div className="flex gap-2">
                       <Input
                         type="date"
@@ -483,7 +483,7 @@ export function RepeatMeetingModal({
                             {safeFormat(date, 'MMM dd, yyyy')}
                             <button
                               onClick={() => setSelectedExceptionDates(selectedExceptionDates.filter(d => d !== date))}
-                              className="ml-1 hover:text-red-500"
+                              className="ml-1 hover:text-destructive"
                             >
                               ×
                             </button>
@@ -501,12 +501,12 @@ export function RepeatMeetingModal({
               <Label className="text-base font-semibold mb-3 block">
                 Preview (First 10 occurrences)
               </Label>
-              <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="p-4 bg-muted rounded-lg">
                 {previewDates.length > 0 ? (
                   <div className="grid grid-cols-2 gap-2">
                     {previewDates.map((date, index) => (
                       <div key={index} className="flex items-center gap-2 text-sm">
-                        <CalendarDays className="h-4 w-4 text-gray-400" />
+                        <CalendarDays className="h-4 w-4 text-muted-foreground" />
                         <span>{safeFormat(date, 'EEE, MMM dd, yyyy')}</span>
                         {index === 0 && (
                           <Badge variant="outline" className="text-xs">Original</Badge>
@@ -515,15 +515,15 @@ export function RepeatMeetingModal({
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500">No meetings scheduled</p>
+                  <p className="text-sm text-muted-foreground">No meetings scheduled</p>
                 )}
                 {config.endType === 'never' && (
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     Series continues indefinitely...
                   </p>
                 )}
                 {config.endType === 'after' && config.occurrences && config.occurrences > 10 && (
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     ...and {config.occurrences - 10} more meetings
                   </p>
                 )}

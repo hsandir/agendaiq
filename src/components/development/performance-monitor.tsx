@@ -80,8 +80,8 @@ export default function PerformanceMonitor() {
   const getTrendIcon = (trend: string) => {
     switch (trend) {
       case 'up': return <TrendingUpIcon className="h-3 w-3 text-green-500" />
-      case 'down': return <TrendingDownIcon className="h-3 w-3 text-red-500" />
-      default: return <span className="h-3 w-3 text-gray-500">-</span>
+      case 'down': return <TrendingDownIcon className="h-3 w-3 text-destructive" />
+      default: return <span className="h-3 w-3 text-muted-foreground">-</span>
     }
   }
 
@@ -94,7 +94,7 @@ export default function PerformanceMonitor() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'critical': return 'text-red-600'
+      case 'critical': return 'text-destructive'
       case 'warning': return 'text-yellow-600'
       default: return 'text-green-600'
     }
@@ -114,7 +114,7 @@ export default function PerformanceMonitor() {
           metrics.map((metric) => {
           const status = getMetricStatus(metric)
           return (
-            <Card key={metric.name} className={status === 'critical' ? 'border-red-500' : ''}>
+            <Card key={metric.name} className={status === 'critical' ? 'border-destructive' : ''}>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   {getMetricIcon(metric.name)}
@@ -166,7 +166,7 @@ export default function PerformanceMonitor() {
             <CardContent>
               <div className="space-y-4">
                 {/* Performance Chart Placeholder */}
-                <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
                   <p className="text-muted-foreground">Performance Chart</p>
                 </div>
 
@@ -306,7 +306,7 @@ export default function PerformanceMonitor() {
                     <CardTitle className="text-sm">Hit Rate</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-gray-400">-</div>
+                    <div className="text-2xl font-bold text-muted-foreground">-</div>
                     <Progress value={0} className="mt-2" />
                   </CardContent>
                 </Card>

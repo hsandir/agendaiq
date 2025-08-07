@@ -318,9 +318,9 @@ export default function MeetingTemplatesClient({
         {templates.length === 0 ? (
           <Card>
             <CardContent className="text-center py-8">
-              <FiFileText className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-500">No meeting templates defined yet.</p>
-              <p className="text-sm text-gray-400 mt-2">Create your first template to get started.</p>
+              <FiFileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">No meeting templates defined yet.</p>
+              <p className="text-sm text-muted-foreground mt-2">Create your first template to get started.</p>
             </CardContent>
           </Card>
         ) : (
@@ -364,15 +364,15 @@ export default function MeetingTemplatesClient({
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                       <FiClock className="h-4 w-4" />
                       <span>{template.duration} minutes</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                       <FiUsers className="h-4 w-4" />
                       <span>{template.attendees.length} default attendees</span>
                     </div>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-muted-foreground">
                       Created by: {template.creator}
                     </div>
                   </div>
@@ -387,7 +387,7 @@ export default function MeetingTemplatesClient({
                           </Badge>
                         ))
                       ) : (
-                        <span className="text-sm text-gray-500">No default attendees</span>
+                        <span className="text-sm text-muted-foreground">No default attendees</span>
                       )}
                     </div>
                   </div>
@@ -396,7 +396,7 @@ export default function MeetingTemplatesClient({
                 {template.agenda && (
                   <div className="mt-4 pt-4 border-t">
                     <div className="text-sm font-medium mb-2">Default Agenda:</div>
-                    <div className="text-sm text-gray-600 whitespace-pre-line">
+                    <div className="text-sm text-muted-foreground whitespace-pre-line">
                       {template.agenda}
                     </div>
                   </div>

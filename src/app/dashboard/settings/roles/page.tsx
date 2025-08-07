@@ -74,10 +74,10 @@ export default async function RolePage() {
       {/* Header */}
       <div className="md:flex md:items-center md:justify-between">
         <div className="min-w-0 flex-1">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+          <h2 className="text-2xl font-bold leading-7 text-foreground sm:truncate sm:text-3xl sm:tracking-tight">
             Role Management
           </h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Manage user roles, organizational hierarchy, and permissions
           </p>
         </div>
@@ -114,7 +114,7 @@ export default async function RolePage() {
             <FiUserCheck className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{leadershipRoles}</div>
+            <div className="text-2xl font-bold text-primary">{leadershipRoles}</div>
             <p className="text-xs text-muted-foreground">
               Roles with leadership access
             </p>
@@ -140,7 +140,7 @@ export default async function RolePage() {
             <FiHome className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-purple-600">{totalDepartments}</div>
+            <div className="text-2xl font-bold text-secondary">{totalDepartments}</div>
             <p className="text-xs text-muted-foreground">
               Active departments
             </p>
@@ -152,7 +152,7 @@ export default async function RolePage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <FiTrendingUp className="h-5 w-5 text-blue-600" />
+            <FiTrendingUp className="h-5 w-5 text-primary" />
             Role Hierarchy Overview
           </CardTitle>
           <CardDescription>
@@ -163,7 +163,7 @@ export default async function RolePage() {
           <div className="space-y-6">
             {/* Leadership Hierarchy */}
             <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Leadership Hierarchy</h4>
+              <h4 className="text-sm font-medium text-foreground mb-3">Leadership Hierarchy</h4>
               <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                 {leadershipHierarchy.map((role, index) => (
                   <div key={role.title} className="flex items-center justify-between p-3 border rounded-lg">
@@ -174,11 +174,11 @@ export default async function RolePage() {
                           Priority {role.priority}
                         </Badge>
                       </div>
-                      <p className="text-xs text-gray-500">{role.department}</p>
+                      <p className="text-xs text-muted-foreground">{role.department}</p>
                     </div>
                     <div className="text-right">
                       <div className="text-sm font-medium">{role.staffCount}</div>
-                      <p className="text-xs text-gray-500">staff</p>
+                      <p className="text-xs text-muted-foreground">staff</p>
                     </div>
                   </div>
                 ))}
@@ -187,7 +187,7 @@ export default async function RolePage() {
 
             {/* Department Role Distribution with Drag & Drop */}
             <div>
-              <h4 className="text-sm font-medium text-gray-700 mb-3">Department Role Distribution</h4>
+              <h4 className="text-sm font-medium text-foreground mb-3">Department Role Distribution</h4>
               <RolesPageClient departments={departments} roles={roles} />
             </div>
           </div>
@@ -205,15 +205,15 @@ export default async function RolePage() {
             <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                    <FiTrendingUp className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center group-hover:bg-primary transition-colors">
+                    <FiTrendingUp className="w-6 h-6 text-primary" />
                   </div>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-lg font-medium text-foreground group-hover:text-primary transition-colors">
                     Role Hierarchy
                   </h3>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     View organizational hierarchy structure
                   </p>
                 </div>
@@ -236,10 +236,10 @@ export default async function RolePage() {
                   </div>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-medium text-gray-900 group-hover:text-green-600 transition-colors">
+                  <h3 className="text-lg font-medium text-foreground group-hover:text-green-600 transition-colors">
                     Hierarchy Visualization
                   </h3>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Interactive tree view of roles
                   </p>
                 </div>
@@ -257,15 +257,15 @@ export default async function RolePage() {
             <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
-                    <FiUsers className="w-6 h-6 text-indigo-600" />
+                  <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center group-hover:bg-primary transition-colors">
+                    <FiUsers className="w-6 h-6 text-primary" />
                   </div>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-medium text-gray-900 group-hover:text-indigo-600 transition-colors">
+                  <h3 className="text-lg font-medium text-foreground group-hover:text-primary transition-colors">
                     User Management
                   </h3>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Manage user accounts
                   </p>
                 </div>
@@ -279,7 +279,7 @@ export default async function RolePage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <FiSettings className="h-5 w-5 text-blue-600" />
+            <FiSettings className="h-5 w-5 text-primary" />
             Recent Role Activities
           </CardTitle>
           <CardDescription>
@@ -299,12 +299,12 @@ export default async function RolePage() {
                       </Badge>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     {role.Department?.name || 'No Department'} • {role.Staff.length} staff members
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     Priority {role.priority}
                   </p>
                 </div>
@@ -312,7 +312,7 @@ export default async function RolePage() {
             ))}
             
             {roles.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-muted-foreground">
                 <FiUsers className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>No roles found.</p>
                 <p className="text-sm mt-2">Create roles to get started.</p>

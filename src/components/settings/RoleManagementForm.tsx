@@ -162,7 +162,7 @@ export function RoleManagementForm() {
                 id="userId"
                 name="userId"
                 required
-                className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border border-border py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
                 onChange={(e) => {
                   const user = users.find(u => u.id === e.target.value);
                   setSelectedUser(user || null);
@@ -186,7 +186,7 @@ export function RoleManagementForm() {
                     name="role"
                     required
                     defaultValue={selectedUser.role?.id}
-                    className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border border-border py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
                   >
                     <option value="">Select a role</option>
                     {roles.map((role) => (
@@ -204,7 +204,7 @@ export function RoleManagementForm() {
                     name="department"
                     required
                     defaultValue={selectedUser.department?.id}
-                    className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border border-border py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
                   >
                     <option value="">Select a department</option>
                     {departments.map((dept) => (
@@ -221,7 +221,7 @@ export function RoleManagementForm() {
                     id="manager"
                     name="manager"
                     defaultValue={selectedUser.manager?.id}
-                    className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md border border-border py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
                   >
                     <option value="">No manager</option>
                     {users.map((user) => (

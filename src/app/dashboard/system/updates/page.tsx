@@ -174,7 +174,7 @@ export default function UpdatesPage() {
       case 'caution':
         return <Badge variant="outline" className="text-orange-600 border-orange-600">Caution</Badge>;
       case 'avoid':
-        return <Badge variant="destructive" className="bg-red-600">Avoid</Badge>;
+        return <Badge variant="destructive" className="bg-destructive/10">Avoid</Badge>;
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
@@ -187,9 +187,9 @@ export default function UpdatesPage() {
       case 'caution':
         return <AlertTriangle className="h-4 w-4 text-orange-600" />;
       case 'avoid':
-        return <XCircle className="h-4 w-4 text-red-600" />;
+        return <XCircle className="h-4 w-4 text-destructive" />;
       default:
-        return <Info className="h-4 w-4 text-gray-600" />;
+        return <Info className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -344,7 +344,7 @@ export default function UpdatesPage() {
       case 'major':
         return <Badge variant="destructive" className="bg-orange-600">Major</Badge>;
       case 'minor':
-        return <Badge variant="outline" className="text-blue-600 border-blue-600">Minor</Badge>;
+        return <Badge variant="outline" className="text-primary border-blue-600">Minor</Badge>;
       case 'patch':
         return <Badge variant="outline" className="text-green-600 border-green-600">Patch</Badge>;
       default:
@@ -357,11 +357,11 @@ export default function UpdatesPage() {
       case 'major':
         return <AlertTriangle className="h-4 w-4 text-orange-600" />;
       case 'minor':
-        return <GitBranch className="h-4 w-4 text-blue-600" />;
+        return <GitBranch className="h-4 w-4 text-primary" />;
       case 'patch':
         return <CheckCircle className="h-4 w-4 text-green-600" />;
       default:
-        return <Package className="h-4 w-4 text-gray-600" />;
+        return <Package className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -437,9 +437,9 @@ export default function UpdatesPage() {
       </div>
 
       {/* Compatibility Info Alert */}
-      <Alert className="border-blue-200 bg-blue-50">
-        <Info className="h-4 w-4 text-blue-600" />
-        <AlertDescription className="text-blue-800">
+      <Alert className="border-blue-200 bg-primary">
+        <Info className="h-4 w-4 text-primary" />
+        <AlertDescription className="text-primary">
           <strong>Compatibility Assessment:</strong> Each update is assessed for compatibility risk. 
           <span className="inline-flex items-center gap-1 ml-2">
             <Badge variant="outline" className="text-green-600 border-green-600 text-xs">Safe</Badge>
@@ -450,7 +450,7 @@ export default function UpdatesPage() {
             <span className="text-xs">- Medium risk, test after update</span>
           </span>
           <span className="inline-flex items-center gap-1 ml-2">
-            <Badge variant="destructive" className="bg-red-600 text-xs">Avoid</Badge>
+            <Badge variant="destructive" className="bg-destructive/10 text-xs">Avoid</Badge>
             <span className="text-xs">- High risk, review changelog first</span>
           </span>
         </AlertDescription>
@@ -509,9 +509,9 @@ export default function UpdatesPage() {
 
       {/* Update Result Alert */}
       {updateResult && (
-        <Alert className={updateResult.success ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}>
-          <CheckCircle className={`h-4 w-4 ${updateResult.success ? 'text-green-600' : 'text-red-600'}`} />
-          <AlertDescription className={updateResult.success ? 'text-green-800' : 'text-red-800'}>
+        <Alert className={updateResult.success ? "border-green-200 bg-green-50" : "border-destructive bg-destructive/10"}>
+          <CheckCircle className={`h-4 w-4 ${updateResult.success ? 'text-green-600' : 'text-destructive'}`} />
+          <AlertDescription className={updateResult.success ? 'text-green-800' : 'text-destructive'}>
             {updateResult.message}
             {updateResult.summary && (
               <div className="mt-2 text-sm">
@@ -541,10 +541,10 @@ export default function UpdatesPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Security</CardTitle>
-            <Shield className="h-4 w-4 text-red-600" />
+            <Shield className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{vulnerabilities}</div>
+            <div className="text-2xl font-bold text-destructive">{vulnerabilities}</div>
             <p className="text-xs text-muted-foreground">Vulnerabilities</p>
           </CardContent>
         </Card>
@@ -574,10 +574,10 @@ export default function UpdatesPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Avoid</CardTitle>
-            <XCircle className="h-4 w-4 text-red-600" />
+            <XCircle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{avoidPackages}</div>
+            <div className="text-2xl font-bold text-destructive">{avoidPackages}</div>
             <p className="text-xs text-muted-foreground">High risk</p>
           </CardContent>
         </Card>
@@ -585,10 +585,10 @@ export default function UpdatesPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Patches</CardTitle>
-            <Package className="h-4 w-4 text-blue-600" />
+            <Package className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{patchPackages}</div>
+            <div className="text-2xl font-bold text-primary">{patchPackages}</div>
             <p className="text-xs text-muted-foreground">Bug fixes</p>
           </CardContent>
         </Card>
@@ -621,11 +621,11 @@ export default function UpdatesPage() {
 
       {/* Bulk Actions */}
       {selectedUpdates.size > 0 && (
-        <Card className="bg-blue-50 border-blue-200">
+        <Card className="bg-primary border-blue-200">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-blue-600" />
+                <CheckCircle className="h-5 w-5 text-primary" />
                 <span className="font-medium">{selectedUpdates.size} package(s) selected</span>
               </div>
               <div className="flex gap-2">
@@ -785,7 +785,7 @@ export default function UpdatesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
-            <Download className="h-5 w-5 mr-2 text-blue-600" />
+            <Download className="h-5 w-5 mr-2 text-primary" />
             Update Status
           </CardTitle>
           <CardDescription>
@@ -805,7 +805,7 @@ export default function UpdatesPage() {
               Last update check: {lastCheck || 'Never'}
             </div>
             {vulnerabilities > 0 && (
-              <div className="text-sm text-red-600">
+              <div className="text-sm text-destructive">
                 ⚠️ {vulnerabilities} security vulnerabilities detected
               </div>
             )}

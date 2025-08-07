@@ -60,22 +60,22 @@ const designSystems = [
     description: 'Zoom benzeri temiz ve minimal tasarım',
     config: {
       colors: {
-        primary: 'bg-blue-600 hover:bg-blue-700',
-        secondary: 'bg-gray-50',
-        accent: 'bg-blue-50',
-        text: 'text-gray-900',
-        muted: 'text-gray-600',
-        border: 'border-gray-200',
-        surface: 'bg-white',
+        primary: 'bg-primary hover:bg-primary',
+        secondary: 'bg-muted',
+        accent: 'bg-primary',
+        text: 'text-foreground',
+        muted: 'text-muted-foreground',
+        border: 'border-border',
+        surface: 'bg-card',
         success: 'bg-green-100 text-green-800',
         warning: 'bg-yellow-100 text-yellow-800',
-        error: 'bg-red-100 text-red-800'
+        error: 'bg-destructive/10 text-destructive'
       },
       typography: {
-        heading: 'font-bold text-gray-900',
-        body: 'text-gray-700',
-        caption: 'text-sm text-gray-500',
-        accent: 'font-medium text-blue-600'
+        heading: 'font-bold text-foreground',
+        body: 'text-foreground',
+        caption: 'text-sm text-muted-foreground',
+        accent: 'font-medium text-primary'
       },
       spacing: {
         container: 'p-6',
@@ -86,8 +86,8 @@ const designSystems = [
       borderRadius: 'rounded-lg',
       shadows: 'shadow-sm hover:shadow-md',
       layout: 'max-w-7xl mx-auto',
-      sidebar: 'w-64 bg-white border-r border-gray-200',
-      header: 'bg-white border-b border-gray-200'
+      sidebar: 'w-64 bg-card border-r border-border',
+      header: 'bg-card border-b border-border'
     }
   },
   {
@@ -96,22 +96,22 @@ const designSystems = [
     description: 'Otter benzeri koyu profesyonel tema',
     config: {
       colors: {
-        primary: 'bg-gray-900 hover:bg-gray-800',
-        secondary: 'bg-gray-800',
-        accent: 'bg-blue-600',
-        text: 'text-white',
-        muted: 'text-gray-400',
-        border: 'border-gray-700',
-        surface: 'bg-gray-900',
+        primary: 'bg-background hover:bg-background',
+        secondary: 'bg-background',
+        accent: 'bg-primary',
+        text: 'text-foreground',
+        muted: 'text-muted-foreground',
+        border: 'border-border',
+        surface: 'bg-background',
         success: 'bg-green-900 text-green-300',
         warning: 'bg-yellow-900 text-yellow-300',
-        error: 'bg-red-900 text-red-300'
+        error: 'bg-destructive/10 text-destructive'
       },
       typography: {
-        heading: 'font-bold text-white',
-        body: 'text-gray-300',
-        caption: 'text-sm text-gray-500',
-        accent: 'font-medium text-blue-400'
+        heading: 'font-bold text-foreground',
+        body: 'text-muted-foreground',
+        caption: 'text-sm text-muted-foreground',
+        accent: 'font-medium text-primary'
       },
       spacing: {
         container: 'p-8',
@@ -122,8 +122,8 @@ const designSystems = [
       borderRadius: 'rounded-xl',
       shadows: 'shadow-2xl hover:shadow-3xl',
       layout: 'max-w-6xl mx-auto',
-      sidebar: 'w-72 bg-gray-800 border-r border-gray-700',
-      header: 'bg-gray-900 border-b border-gray-700'
+      sidebar: 'w-72 bg-background border-r border-border',
+      header: 'bg-background border-b border-border'
     }
   },
   {
@@ -132,22 +132,22 @@ const designSystems = [
     description: 'Notion benzeri renkli ve yaratıcı',
     config: {
       colors: {
-        primary: 'bg-purple-600 hover:bg-purple-700',
+        primary: 'bg-secondary hover:bg-secondary',
         secondary: 'bg-yellow-50',
         accent: 'bg-pink-100',
-        text: 'text-gray-900',
-        muted: 'text-gray-600',
+        text: 'text-foreground',
+        muted: 'text-muted-foreground',
         border: 'border-purple-200',
-        surface: 'bg-white',
+        surface: 'bg-card',
         success: 'bg-green-100 text-green-800',
         warning: 'bg-orange-100 text-orange-800',
-        error: 'bg-red-100 text-red-800'
+        error: 'bg-destructive/10 text-destructive'
       },
       typography: {
-        heading: 'font-bold text-gray-900',
-        body: 'text-gray-700',
-        caption: 'text-sm text-gray-500',
-        accent: 'font-medium text-purple-600'
+        heading: 'font-bold text-foreground',
+        body: 'text-foreground',
+        caption: 'text-sm text-muted-foreground',
+        accent: 'font-medium text-secondary'
       },
       spacing: {
         container: 'p-8',
@@ -159,7 +159,7 @@ const designSystems = [
       shadows: 'shadow-lg hover:shadow-xl',
       layout: 'max-w-7xl mx-auto',
       sidebar: 'w-80 bg-gradient-to-b from-purple-50 to-pink-50 border-r border-purple-200',
-      header: 'bg-white border-b border-purple-200'
+      header: 'bg-card border-b border-purple-200'
     }
   },
   {
@@ -174,10 +174,10 @@ const designSystems = [
         text: 'text-slate-900',
         muted: 'text-slate-600',
         border: 'border-slate-200',
-        surface: 'bg-white',
+        surface: 'bg-card',
         success: 'bg-emerald-100 text-emerald-800',
         warning: 'bg-amber-100 text-amber-800',
-        error: 'bg-red-100 text-red-800'
+        error: 'bg-destructive/10 text-destructive'
       },
       typography: {
         heading: 'font-semibold text-slate-900',
@@ -195,7 +195,7 @@ const designSystems = [
       shadows: 'shadow-md hover:shadow-lg',
       layout: 'max-w-6xl mx-auto',
       sidebar: 'w-64 bg-slate-50 border-r border-slate-200',
-      header: 'bg-white border-b border-slate-200'
+      header: 'bg-card border-b border-slate-200'
     }
   },
   {
@@ -207,16 +207,16 @@ const designSystems = [
         primary: 'bg-cyan-600 hover:bg-cyan-700',
         secondary: 'bg-slate-900',
         accent: 'bg-cyan-500',
-        text: 'text-white',
+        text: 'text-foreground',
         muted: 'text-cyan-200',
         border: 'border-cyan-700',
         surface: 'bg-slate-800',
         success: 'bg-green-900 text-green-300',
         warning: 'bg-yellow-900 text-yellow-300',
-        error: 'bg-red-900 text-red-300'
+        error: 'bg-destructive/10 text-destructive'
       },
       typography: {
-        heading: 'font-bold text-white',
+        heading: 'font-bold text-foreground',
         body: 'text-cyan-100',
         caption: 'text-sm text-cyan-300',
         accent: 'font-medium text-cyan-400'
@@ -243,18 +243,18 @@ const designSystems = [
         primary: 'bg-orange-500 hover:bg-orange-600',
         secondary: 'bg-orange-50',
         accent: 'bg-amber-100',
-        text: 'text-gray-900',
-        muted: 'text-gray-600',
+        text: 'text-foreground',
+        muted: 'text-muted-foreground',
         border: 'border-orange-200',
-        surface: 'bg-white',
+        surface: 'bg-card',
         success: 'bg-green-100 text-green-800',
         warning: 'bg-orange-100 text-orange-800',
-        error: 'bg-red-100 text-red-800'
+        error: 'bg-destructive/10 text-destructive'
       },
       typography: {
-        heading: 'font-bold text-gray-900',
-        body: 'text-gray-700',
-        caption: 'text-sm text-gray-500',
+        heading: 'font-bold text-foreground',
+        body: 'text-foreground',
+        caption: 'text-sm text-muted-foreground',
         accent: 'font-medium text-orange-600'
       },
       spacing: {
@@ -267,7 +267,7 @@ const designSystems = [
       shadows: 'shadow-md hover:shadow-lg',
       layout: 'max-w-6xl mx-auto',
       sidebar: 'w-64 bg-orange-50 border-r border-orange-200',
-      header: 'bg-white border-b border-orange-200'
+      header: 'bg-card border-b border-orange-200'
     }
   },
   {
@@ -276,22 +276,22 @@ const designSystems = [
     description: 'Cesur ve güvenli tasarım',
     config: {
       colors: {
-        primary: 'bg-red-600 hover:bg-red-700',
-        secondary: 'bg-red-50',
-        accent: 'bg-red-100',
-        text: 'text-gray-900',
-        muted: 'text-gray-600',
-        border: 'border-red-200',
-        surface: 'bg-white',
+        primary: 'bg-destructive/10 hover:bg-destructive/10',
+        secondary: 'bg-destructive/10',
+        accent: 'bg-destructive/10',
+        text: 'text-foreground',
+        muted: 'text-muted-foreground',
+        border: 'border-destructive',
+        surface: 'bg-card',
         success: 'bg-green-100 text-green-800',
         warning: 'bg-yellow-100 text-yellow-800',
-        error: 'bg-red-100 text-red-800'
+        error: 'bg-destructive/10 text-destructive'
       },
       typography: {
-        heading: 'font-bold text-gray-900',
-        body: 'text-gray-700',
-        caption: 'text-sm text-gray-500',
-        accent: 'font-medium text-red-600'
+        heading: 'font-bold text-foreground',
+        body: 'text-foreground',
+        caption: 'text-sm text-muted-foreground',
+        accent: 'font-medium text-destructive'
       },
       spacing: {
         container: 'p-8',
@@ -302,8 +302,8 @@ const designSystems = [
       borderRadius: 'rounded-lg',
       shadows: 'shadow-lg hover:shadow-xl',
       layout: 'max-w-7xl mx-auto',
-      sidebar: 'w-64 bg-red-50 border-r border-red-200',
-      header: 'bg-white border-b border-red-200'
+      sidebar: 'w-64 bg-destructive/10 border-r border-destructive',
+      header: 'bg-card border-b border-destructive'
     }
   },
   {
@@ -315,18 +315,18 @@ const designSystems = [
         primary: 'bg-rose-400 hover:bg-rose-500',
         secondary: 'bg-rose-50',
         accent: 'bg-pink-100',
-        text: 'text-gray-900',
-        muted: 'text-gray-600',
+        text: 'text-foreground',
+        muted: 'text-muted-foreground',
         border: 'border-rose-200',
-        surface: 'bg-white',
+        surface: 'bg-card',
         success: 'bg-green-100 text-green-800',
         warning: 'bg-yellow-100 text-yellow-800',
-        error: 'bg-red-100 text-red-800'
+        error: 'bg-destructive/10 text-destructive'
       },
       typography: {
-        heading: 'font-semibold text-gray-900',
-        body: 'text-gray-700',
-        caption: 'text-sm text-gray-500',
+        heading: 'font-semibold text-foreground',
+        body: 'text-foreground',
+        caption: 'text-sm text-muted-foreground',
         accent: 'font-medium text-rose-600'
       },
       spacing: {
@@ -339,7 +339,7 @@ const designSystems = [
       shadows: 'shadow-sm hover:shadow-md',
       layout: 'max-w-6xl mx-auto',
       sidebar: 'w-64 bg-rose-50 border-r border-rose-200',
-      header: 'bg-white border-b border-rose-200'
+      header: 'bg-card border-b border-rose-200'
     }
   },
   {
@@ -351,18 +351,18 @@ const designSystems = [
         primary: 'bg-green-500 hover:bg-green-600',
         secondary: 'bg-green-50',
         accent: 'bg-lime-100',
-        text: 'text-gray-900',
-        muted: 'text-gray-600',
+        text: 'text-foreground',
+        muted: 'text-muted-foreground',
         border: 'border-green-200',
-        surface: 'bg-white',
+        surface: 'bg-card',
         success: 'bg-green-100 text-green-800',
         warning: 'bg-yellow-100 text-yellow-800',
-        error: 'bg-red-100 text-red-800'
+        error: 'bg-destructive/10 text-destructive'
       },
       typography: {
-        heading: 'font-bold text-gray-900',
-        body: 'text-gray-700',
-        caption: 'text-sm text-gray-500',
+        heading: 'font-bold text-foreground',
+        body: 'text-foreground',
+        caption: 'text-sm text-muted-foreground',
         accent: 'font-medium text-green-600'
       },
       spacing: {
@@ -375,7 +375,7 @@ const designSystems = [
       shadows: 'shadow-lg hover:shadow-xl',
       layout: 'max-w-7xl mx-auto',
       sidebar: 'w-64 bg-green-50 border-r border-green-200',
-      header: 'bg-white border-b border-green-200'
+      header: 'bg-card border-b border-green-200'
     }
   },
   {
@@ -387,18 +387,18 @@ const designSystems = [
         primary: 'bg-teal-600 hover:bg-teal-700',
         secondary: 'bg-teal-50',
         accent: 'bg-teal-100',
-        text: 'text-gray-900',
-        muted: 'text-gray-600',
+        text: 'text-foreground',
+        muted: 'text-muted-foreground',
         border: 'border-teal-200',
-        surface: 'bg-white',
+        surface: 'bg-card',
         success: 'bg-green-100 text-green-800',
         warning: 'bg-yellow-100 text-yellow-800',
-        error: 'bg-red-100 text-red-800'
+        error: 'bg-destructive/10 text-destructive'
       },
       typography: {
-        heading: 'font-semibold text-gray-900',
-        body: 'text-gray-700',
-        caption: 'text-sm text-gray-500',
+        heading: 'font-semibold text-foreground',
+        body: 'text-foreground',
+        caption: 'text-sm text-muted-foreground',
         accent: 'font-medium text-teal-600'
       },
       spacing: {
@@ -411,7 +411,7 @@ const designSystems = [
       shadows: 'shadow-sm hover:shadow-md',
       layout: 'max-w-6xl mx-auto',
       sidebar: 'w-64 bg-teal-50 border-r border-teal-200',
-      header: 'bg-white border-b border-teal-200'
+      header: 'bg-card border-b border-teal-200'
     }
   }
 ];
@@ -505,7 +505,7 @@ export default function DesignSystemDemoPage() {
                 </Select>
               </div>
               
-              <Button className={`${design.colors.primary} text-white`}>
+              <Button className={`${design.colors.primary} text-foreground`}>
                 <Plus className="w-4 h-4 mr-2" />
                 New Meeting
               </Button>
@@ -555,7 +555,7 @@ export default function DesignSystemDemoPage() {
                 </Button>
               </div>
               
-              <div className="pt-4 border-t border-gray-200">
+              <div className="pt-4 border-t border-border">
                 <h3 className={`text-sm font-medium ${design.typography.caption} mb-2`}>
                   Quick Actions
                 </h3>
@@ -643,7 +643,7 @@ export default function DesignSystemDemoPage() {
           <div className={`flex items-center justify-between ${design.spacing.section}`}>
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   type="text"
                   placeholder="Search meetings..."
@@ -829,7 +829,7 @@ export default function DesignSystemDemoPage() {
               Quick Actions
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Button className={`${design.colors.primary} text-white`}>
+              <Button className={`${design.colors.primary} text-foreground`}>
                 <Plus className="w-4 h-4 mr-2" />
                 New Meeting
               </Button>

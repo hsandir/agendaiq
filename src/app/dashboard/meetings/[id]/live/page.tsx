@@ -106,7 +106,7 @@ export default async function MeetingLivePage(props: Props) {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted">
       <MeetingLiveView
         meeting={meeting}
         currentUser={user}

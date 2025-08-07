@@ -311,11 +311,11 @@ export default async function NewMeetingPage() {
   return (
     <div className="max-w-4xl mx-auto py-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Create New Meeting - Step 1</h1>
-        <p className="text-gray-600">Set up basic meeting information and select attendees</p>
+        <h1 className="text-2xl font-bold text-foreground">Create New Meeting - Step 1</h1>
+        <p className="text-muted-foreground">Set up basic meeting information and select attendees</p>
       </div>
       
-      <div className="bg-white shadow-sm rounded-lg">
+      <div className="bg-card shadow-sm rounded-lg">
         <div className="px-6 py-6">
           <MeetingFormStep1 
             users={users} 

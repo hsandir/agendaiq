@@ -77,19 +77,19 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
         <CardContent>
           <div className="space-y-3">
             {meetings.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">No meetings scheduled</p>
+              <p className="text-center text-muted-foreground py-8">No meetings scheduled</p>
             ) : (
               meetings.map(meeting => (
-                <div key={meeting.id} className="border rounded-lg p-3 hover:bg-gray-50">
+                <div key={meeting.id} className="border rounded-lg p-3 hover:bg-muted">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <h4 className="font-medium">{meeting.title}</h4>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         <Clock className="inline h-3 w-3 mr-1" />
                         {safeFormatDateTime(meeting.startTime)} - {safeFormatTime(meeting.endTime)}
                       </p>
                       {meeting.description && (
-                        <p className="text-sm text-gray-600 mt-1">{meeting.description}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{meeting.description}</p>
                       )}
                     </div>
                     <Badge variant={meeting.status === 'completed' ? 'secondary' : 'default'}>
@@ -101,7 +101,7 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
                       href={meeting.zoomLink} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="text-blue-600 text-sm hover:underline mt-2 inline-block"
+                      className="text-primary text-sm hover:underline mt-2 inline-block"
                     >
                       Join Meeting
                     </a>
@@ -151,12 +151,12 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
       <CardContent>
         <div className="grid grid-cols-7 gap-0 border-t border-l">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="border-r border-b p-2 text-center text-sm font-medium bg-gray-50">
+            <div key={day} className="border-r border-b p-2 text-center text-sm font-medium bg-muted">
               {day}
             </div>
           ))}
           {paddingDays.map((_, index) => (
-            <div key={`padding-${index}`} className="border-r border-b p-2 min-h-[80px] bg-gray-50" />
+            <div key={`padding-${index}`} className="border-r border-b p-2 min-h-[80px] bg-muted" />
           ))}
           {days.map(day => {
             const dayMeetings = getMeetingsForDay(day);
@@ -166,9 +166,9 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
             return (
               <div
                 key={day.toISOString()}
-                className={`border-r border-b p-2 min-h-[80px] cursor-pointer hover:bg-gray-50 ${
-                  !isCurrentMonth ? 'bg-gray-50 text-gray-400' : ''
-                } ${isTodayDate ? 'bg-blue-50' : ''} ${
+                className={`border-r border-b p-2 min-h-[80px] cursor-pointer hover:bg-muted ${
+                  !isCurrentMonth ? 'bg-muted text-muted-foreground' : ''
+                } ${isTodayDate ? 'bg-primary' : ''} ${
                   selectedDate && isSameDay(day, selectedDate) ? 'ring-2 ring-blue-500' : ''
                 }`}
                 onClick={() => setSelectedDate(day)}
@@ -179,14 +179,14 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
                 {dayMeetings.slice(0, 2).map(meeting => (
                   <div
                     key={meeting.id}
-                    className="text-xs bg-blue-100 text-blue-700 rounded px-1 py-0.5 mb-1 truncate"
+                    className="text-xs bg-primary text-primary rounded px-1 py-0.5 mb-1 truncate"
                     title={meeting.title}
                   >
                     {safeFormatTime(meeting.startTime)} {meeting.title}
                   </div>
                 ))}
                 {dayMeetings.length > 2 && (
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-muted-foreground">
                     +{dayMeetings.length - 2} more
                   </div>
                 )}
@@ -196,18 +196,18 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
         </div>
         
         {selectedDate && (
-          <div className="mt-4 p-3 bg-gray-50 rounded">
+          <div className="mt-4 p-3 bg-muted rounded">
             <h3 className="font-medium mb-2">
               Meetings on {format(selectedDate, 'MMMM d, yyyy')}
             </h3>
             <div className="space-y-2">
               {getMeetingsForDay(selectedDate).length === 0 ? (
-                <p className="text-sm text-gray-500">No meetings scheduled</p>
+                <p className="text-sm text-muted-foreground">No meetings scheduled</p>
               ) : (
                 getMeetingsForDay(selectedDate).map(meeting => (
-                  <div key={meeting.id} className="bg-white p-2 rounded border">
+                  <div key={meeting.id} className="bg-card p-2 rounded border">
                     <div className="font-medium text-sm">{meeting.title}</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-muted-foreground">
                       {safeFormatTime(meeting.startTime)} - {safeFormatTime(meeting.endTime)}
                     </div>
                   </div>

@@ -232,18 +232,18 @@ export default function TestDashboard() {
       case 'passed':
         return <CheckCircleIcon className="h-4 w-4 text-green-500" />
       case 'failed':
-        return <XCircleIcon className="h-4 w-4 text-red-500" />
+        return <XCircleIcon className="h-4 w-4 text-destructive" />
       case 'running':
-        return <Loader2Icon className="h-4 w-4 animate-spin text-blue-500" />
+        return <Loader2Icon className="h-4 w-4 animate-spin text-primary" />
       default:
-        return <ClockIcon className="h-4 w-4 text-gray-400" />
+        return <ClockIcon className="h-4 w-4 text-muted-foreground" />
     }
   }
 
   const getCoverageColor = (percentage: number) => {
     if (percentage >= 80) return 'text-green-600'
     if (percentage >= 50) return 'text-yellow-600'
-    return 'text-red-600'
+    return 'text-destructive'
   }
 
   const getCategoryBadgeVariant = (category: string) => {
@@ -311,7 +311,7 @@ export default function TestDashboard() {
         <CardContent>
           <div className="flex space-x-4">
             <div className="flex-1 relative">
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="Search test suites..."
                 value={filter}
@@ -353,7 +353,7 @@ export default function TestDashboard() {
                     className={`p-3 rounded-lg border cursor-pointer transition-all ${
                       selectedSuite === suite.path
                         ? 'border-primary bg-primary/5 shadow-sm'
-                        : 'hover:bg-gray-50 hover:shadow-sm'
+                        : 'hover:bg-muted hover:shadow-sm'
                     }`}
                     onClick={() => setSelectedSuite(suite.path)}
                   >
@@ -378,7 +378,7 @@ export default function TestDashboard() {
                         />
                         <div className="flex justify-between text-xs mt-1">
                           <span className="text-green-600">{suite.passed} passed</span>
-                          {suite.failed > 0 && <span className="text-red-600">{suite.failed} failed</span>}
+                          {suite.failed > 0 && <span className="text-destructive">{suite.failed} failed</span>}
                         </div>
                       </div>
                     )}
@@ -433,7 +433,7 @@ export default function TestDashboard() {
                   <div className="space-y-2">
                     {testResults.length === 0 ? (
                       <div className="text-center py-8">
-                        <TestTube2Icon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                        <TestTube2Icon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                         <p className="text-muted-foreground">No test results yet</p>
                         <p className="text-sm text-muted-foreground">Run tests to see results</p>
                       </div>
@@ -442,7 +442,7 @@ export default function TestDashboard() {
                         <div
                           key={index}
                           className={`p-3 border rounded-lg ${
-                            result.status === 'failed' ? 'border-red-200 bg-red-50' : ''
+                            result.status === 'failed' ? 'border-destructive bg-destructive/10' : ''
                           }`}
                         >
                           <div className="flex items-center justify-between">
@@ -458,7 +458,7 @@ export default function TestDashboard() {
                                 {result.duration}ms
                               </span>
                               {result.file && (
-                                <p className="text-xs text-blue-600 cursor-pointer hover:underline">
+                                <p className="text-xs text-primary cursor-pointer hover:underline">
                                   {result.file}:{result.line}
                                 </p>
                               )}
@@ -531,7 +531,7 @@ export default function TestDashboard() {
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <BarChart2Icon className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                    <BarChart2Icon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <p className="text-muted-foreground">No coverage data available</p>
                     <p className="text-sm text-muted-foreground">Run tests with coverage to see results</p>
                   </div>
@@ -539,10 +539,10 @@ export default function TestDashboard() {
               </TabsContent>
 
               <TabsContent value="output" className="mt-4">
-                <ScrollArea className="h-[500px] bg-gray-900 text-gray-100 p-4 rounded-lg">
+                <ScrollArea className="h-[500px] bg-background text-muted-foreground p-4 rounded-lg">
                   <pre className="text-xs font-mono">
                     {output.length === 0 ? (
-                      <span className="text-gray-500">No output yet...</span>
+                      <span className="text-muted-foreground">No output yet...</span>
                     ) : (
                       output.join('\n')
                     )}

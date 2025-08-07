@@ -33,7 +33,7 @@ export function MobileSidebar() {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg md:hidden"
+        className="fixed top-4 left-4 z-50 p-2 bg-card rounded-lg shadow-lg md:hidden"
         aria-label="Toggle menu"
       >
         {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -49,7 +49,7 @@ export function MobileSidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-72 bg-gray-50 border-r border-gray-200 z-40 transform transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed top-0 left-0 h-full w-72 bg-muted border-r border-border z-40 transform transition-transform duration-300 ease-in-out md:hidden ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -57,10 +57,10 @@ export function MobileSidebar() {
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b">
             <Link href={"/dashboard" as any} className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">AQ</span>
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-foreground font-bold text-sm">AQ</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">AgendaIQ</span>
+              <span className="text-xl font-bold text-foreground">AgendaIQ</span>
             </Link>
           </div>
 
@@ -68,7 +68,7 @@ export function MobileSidebar() {
           <nav className="flex-1 overflow-y-auto p-4">
             {sidebarItems.map((section) => (
               <div key={section.title} className="mb-6">
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                   {section.title}
                 </h3>
                 <ul className="space-y-1">
@@ -84,8 +84,8 @@ export function MobileSidebar() {
                             <summary
                               className={`flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors ${
                                 isActive
-                                  ? 'bg-blue-50 text-blue-700'
-                                  : 'text-gray-700 hover:bg-gray-100'
+                                  ? 'bg-primary text-primary'
+                                  : 'text-foreground hover:bg-muted'
                               }`}
                             >
                               <div className="flex items-center">
@@ -101,8 +101,8 @@ export function MobileSidebar() {
                                     href={child.href as any}
                                     className={`block px-3 py-2 text-sm rounded-md transition-colors ${
                                       pathname === child.href
-                                        ? 'bg-blue-50 text-blue-700 font-medium'
-                                        : 'text-gray-600 hover:bg-gray-100'
+                                        ? 'bg-primary text-primary font-medium'
+                                        : 'text-muted-foreground hover:bg-muted'
                                     }`}
                                   >
                                     {child.label}
@@ -116,8 +116,8 @@ export function MobileSidebar() {
                             href={item.href as any}
                             className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                               isActive
-                                ? 'bg-blue-50 text-blue-700'
-                                : 'text-gray-700 hover:bg-gray-100'
+                                ? 'bg-primary text-primary'
+                                : 'text-foreground hover:bg-muted'
                             }`}
                           >
                             <Icon className="h-5 w-5 mr-3 flex-shrink-0" />

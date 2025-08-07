@@ -135,26 +135,26 @@ export function MeetingHistoryModal({
       case "completed":
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case "cancelled":
-        return <XCircle className="h-4 w-4 text-red-500" />;
+        return <XCircle className="h-4 w-4 text-destructive" />;
       case "in_progress":
         return <AlertCircle className="h-4 w-4 text-yellow-500" />;
       default:
-        return <Clock className="h-4 w-4 text-gray-500" />;
+        return <Clock className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
   const getMeetingTypeColor = (type: string) => {
     switch (type) {
       case "department":
-        return "bg-blue-100 text-blue-800";
+        return "bg-primary text-primary";
       case "project":
-        return "bg-purple-100 text-purple-800";
+        return "bg-secondary text-secondary";
       case "one_on_one":
         return "bg-green-100 text-green-800";
       case "all_hands":
         return "bg-orange-100 text-orange-800";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted text-foreground";
     }
   };
 
@@ -217,7 +217,7 @@ export function MeetingHistoryModal({
           {/* Search and Filters */}
           <div className="flex gap-2">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search meetings by title..."
                 value={searchQuery}
@@ -242,7 +242,7 @@ export function MeetingHistoryModal({
             </TabsList>
 
             {/* Filter Options */}
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg space-y-3">
+            <div className="mt-4 p-4 bg-muted rounded-lg space-y-3">
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <Label>Department</Label>
@@ -322,9 +322,9 @@ export function MeetingHistoryModal({
             <TabsContent value={activeTab} className="mt-4">
               <ScrollArea className="h-[400px] pr-4">
                 {loading ? (
-                  <div className="text-center py-8 text-gray-500">Loading meetings...</div>
+                  <div className="text-center py-8 text-muted-foreground">Loading meetings...</div>
                 ) : filterMeetings().length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">No meetings found</div>
+                  <div className="text-center py-8 text-muted-foreground">No meetings found</div>
                 ) : (
                   <div className="space-y-3">
                     {filterMeetings().map((meeting) => (
@@ -356,7 +356,7 @@ export function MeetingHistoryModal({
                                   </Badge>
                                 )}
                               </CardTitle>
-                              <p className="text-sm text-gray-500 mt-1">
+                              <p className="text-sm text-muted-foreground mt-1">
                                 {meeting.description || "No description"}
                               </p>
                             </div>
@@ -368,31 +368,31 @@ export function MeetingHistoryModal({
                         <CardContent className="pt-0">
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4 text-gray-400" />
+                              <Calendar className="h-4 w-4 text-muted-foreground" />
                               <span>{safeFormat(meeting.start_time, "MMM dd, yyyy")}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-gray-400" />
+                              <Clock className="h-4 w-4 text-muted-foreground" />
                               <span>{safeFormat(meeting.start_time, "HH:mm")} - {safeFormat(meeting.end_time, "HH:mm")}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <User className="h-4 w-4 text-gray-400" />
+                              <User className="h-4 w-4 text-muted-foreground" />
                               <span>{meeting.organizer.name}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Users className="h-4 w-4 text-gray-400" />
+                              <Users className="h-4 w-4 text-muted-foreground" />
                               <span>{meeting.attendees} attendees</span>
                             </div>
                           </div>
 
                           <div className="flex gap-4 mt-3 pt-3 border-t">
                             <div className="flex items-center gap-1">
-                              <FileText className="h-4 w-4 text-gray-400" />
+                              <FileText className="h-4 w-4 text-muted-foreground" />
                               <span className="text-sm">{meeting.agendaItems} agenda items</span>
                             </div>
                             {meeting.actionItems !== undefined && (
                               <div className="flex items-center gap-1">
-                                <Hash className="h-4 w-4 text-gray-400" />
+                                <Hash className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm">
                                   {meeting.completedActions || 0}/{meeting.actionItems} actions completed
                                 </span>
@@ -400,7 +400,7 @@ export function MeetingHistoryModal({
                             )}
                             {meeting.department && (
                               <div className="flex items-center gap-1">
-                                <Building className="h-4 w-4 text-gray-400" />
+                                <Building className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm">{meeting.department}</span>
                               </div>
                             )}
@@ -409,10 +409,10 @@ export function MeetingHistoryModal({
                           {selectedMeeting?.id === meeting.id && (
                             <div className="mt-3 pt-3 border-t">
                               <div className="flex items-center justify-between">
-                                <span className="text-sm font-medium text-blue-600">
+                                <span className="text-sm font-medium text-primary">
                                   Selected for continuation
                                 </span>
-                                <ChevronRight className="h-4 w-4 text-blue-600" />
+                                <ChevronRight className="h-4 w-4 text-primary" />
                               </div>
                             </div>
                           )}
@@ -428,7 +428,7 @@ export function MeetingHistoryModal({
 
         {/* Footer */}
         <div className="flex justify-between items-center pt-4 border-t">
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-muted-foreground">
             {selectedMeeting ? (
               <span>Selected: <strong>{selectedMeeting.title}</strong></span>
             ) : (

@@ -191,7 +191,7 @@ export default function SystemMigrationPage() {
           </Link>
           <div>
             <h1 className="text-3xl font-bold flex items-center">
-              <Database className="w-8 h-8 mr-3 text-blue-600" />
+              <Database className="w-8 h-8 mr-3 text-primary" />
               System Migration & Diagnostics
             </h1>
             <p className="text-muted-foreground">Monitor and manage system migrations and diagnostics</p>
@@ -337,7 +337,7 @@ export default function SystemMigrationPage() {
                   {/* Authentication */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <Users className="w-4 h-4 text-blue-600" />
+                      <Users className="w-4 h-4 text-primary" />
                       <div>
                         <p className="text-sm font-medium">Authentication System</p>
                         <p className="text-xs text-muted-foreground">User authentication and sessions</p>
@@ -352,7 +352,7 @@ export default function SystemMigrationPage() {
                   {/* Database */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <Database className="w-4 h-4 text-blue-600" />
+                      <Database className="w-4 h-4 text-primary" />
                       <div>
                         <p className="text-sm font-medium">Database Schema</p>
                         <p className="text-xs text-muted-foreground">Tables and relationships</p>
@@ -367,7 +367,7 @@ export default function SystemMigrationPage() {
                   {/* Permissions */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <Settings className="w-4 h-4 text-blue-600" />
+                      <Settings className="w-4 h-4 text-primary" />
                       <div>
                         <p className="text-sm font-medium">Role-Based Permissions</p>
                         <p className="text-xs text-muted-foreground">User roles and access control</p>
@@ -416,19 +416,19 @@ export default function SystemMigrationPage() {
                   
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Issues Resolved</span>
-                    <Badge variant="outline" className="text-blue-600 border-blue-600">
+                    <Badge variant="outline" className="text-primary border-blue-600">
                       {migrationStatus.diagnostics.resolved}
                     </Badge>
                   </div>
                   
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Pending Issues</span>
-                    <Badge variant="outline" className="text-gray-600 border-gray-600">
+                    <Badge variant="outline" className="text-muted-foreground border-border">
                       {migrationStatus.diagnostics.pending}
                     </Badge>
                   </div>
 
-                  <Alert className="border-blue-200 bg-blue-50">
+                  <Alert className="border-blue-200 bg-primary">
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
                       System diagnostics show excellent health. All critical components are functioning properly.

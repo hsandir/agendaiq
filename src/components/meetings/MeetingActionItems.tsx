@@ -124,11 +124,11 @@ export function MeetingActionItems({
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "urgent": return "bg-red-100 text-red-800";
+      case "urgent": return "bg-destructive/10 text-destructive";
       case "high": return "bg-orange-100 text-orange-800";
       case "medium": return "bg-yellow-100 text-yellow-800";
       case "low": return "bg-green-100 text-green-800";
-      default: return "bg-gray-100 text-gray-800";
+      default: return "bg-muted text-foreground";
     }
   };
 
@@ -136,8 +136,8 @@ export function MeetingActionItems({
     switch (status) {
       case "completed": return <CheckCircle className="h-4 w-4 text-green-500" />;
       case "in_progress": return <Clock className="h-4 w-4 text-yellow-500" />;
-      case "cancelled": return <AlertCircle className="h-4 w-4 text-red-500" />;
-      default: return <Target className="h-4 w-4 text-gray-500" />;
+      case "cancelled": return <AlertCircle className="h-4 w-4 text-destructive" />;
+      default: return <Target className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -218,28 +218,28 @@ export function MeetingActionItems({
           </div>
 
           {/* Summary Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted rounded-lg">
             <div className="text-center">
               <div className="text-2xl font-bold">{actionItems.length}</div>
-              <div className="text-sm text-gray-500">Total Actions</div>
+              <div className="text-sm text-muted-foreground">Total Actions</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-yellow-600">
                 {actionItems.filter(i => i.status === "pending").length}
               </div>
-              <div className="text-sm text-gray-500">Pending</div>
+              <div className="text-sm text-muted-foreground">Pending</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-primary">
                 {actionItems.filter(i => i.status === "in_progress").length}
               </div>
-              <div className="text-sm text-gray-500">In Progress</div>
+              <div className="text-sm text-muted-foreground">In Progress</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">
                 {actionItems.filter(i => i.status === "completed").length}
               </div>
-              <div className="text-sm text-gray-500">Completed</div>
+              <div className="text-sm text-muted-foreground">Completed</div>
             </div>
           </div>
         </CardContent>
@@ -355,10 +355,10 @@ export function MeetingActionItems({
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <User className="h-5 w-5 text-gray-500" />
+                    <User className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <h3 className="font-semibold">{assignee?.name || "Unknown"}</h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-muted-foreground">
                         {assignee?.role} • {assignee?.department} • {items.length} action items
                       </p>
                     </div>
@@ -376,7 +376,7 @@ export function MeetingActionItems({
                     <div
                       key={item.originalIndex}
                       className={`border rounded-lg p-4 transition-all ${
-                        item.status === "completed" ? "bg-gray-50" : ""
+                        item.status === "completed" ? "bg-muted" : ""
                       }`}
                     >
                       <div className="flex justify-between items-start">
@@ -384,7 +384,7 @@ export function MeetingActionItems({
                           <div className="flex items-center gap-2 mb-2">
                             {getStatusIcon(item.status)}
                             <h4 className={`font-medium ${
-                              item.status === "completed" ? "line-through text-gray-500" : ""
+                              item.status === "completed" ? "line-through text-muted-foreground" : ""
                             }`}>
                               {item.title}
                             </h4>
@@ -399,10 +399,10 @@ export function MeetingActionItems({
                           </div>
                           
                           {item.description && (
-                            <p className="text-sm text-gray-600 mb-2">{item.description}</p>
+                            <p className="text-sm text-muted-foreground mb-2">{item.description}</p>
                           )}
 
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
                               Due: {safeFormat(item.dueDate, "MMM dd, yyyy")}
@@ -478,10 +478,10 @@ export function MeetingActionItems({
                               )}
                               
                               {showLinkedMeetings && item.linkedMeetingId && (
-                                <div className="p-2 bg-blue-50 rounded text-sm">
+                                <div className="p-2 bg-primary rounded text-sm">
                                   <div className="flex items-center gap-2">
-                                    <FileText className="h-4 w-4 text-blue-600" />
-                                    <span className="text-blue-700">
+                                    <FileText className="h-4 w-4 text-primary" />
+                                    <span className="text-primary">
                                       From meeting: {item.linkedMeetingTitle}
                                     </span>
                                   </div>
@@ -506,7 +506,7 @@ export function MeetingActionItems({
                               size="sm"
                               variant="ghost"
                               onClick={() => removeActionItem(item.originalIndex)}
-                              className="text-red-600 hover:text-red-700"
+                              className="text-destructive hover:text-destructive"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -525,8 +525,8 @@ export function MeetingActionItems({
       {filteredItems.length === 0 && (
         <Card>
           <CardContent className="text-center py-8">
-            <Target className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">No action items found</p>
+            <Target className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+            <p className="text-muted-foreground">No action items found</p>
           </CardContent>
         </Card>
       )}

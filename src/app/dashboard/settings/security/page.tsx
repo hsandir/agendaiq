@@ -29,21 +29,21 @@ export default async function SecuritySettingsPage() {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold">Security Settings</h2>
-        <p className="text-gray-500">Manage your account security and authentication methods.</p>
+        <p className="text-muted-foreground">Manage your account security and authentication methods.</p>
       </div>
 
       {/* Password Management */}
-      <div className="bg-white shadow rounded-lg p-6">
+      <div className="bg-card shadow rounded-lg p-6">
         <h3 className="text-lg font-medium mb-4">Password</h3>
         <div className="space-y-4">
           {hasPassword ? (
             <>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Your account is protected with a password. You can change it at any time.
               </p>
               <form action="/api/user/change-password" method="POST" className="space-y-4">
                 <div>
-                  <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="currentPassword" className="block text-sm font-medium text-foreground">
                     Current Password
                   </label>
                   <input
@@ -51,11 +51,11 @@ export default async function SecuritySettingsPage() {
                     id="currentPassword"
                     name="currentPassword"
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="newPassword" className="block text-sm font-medium text-foreground">
                     New Password
                   </label>
                   <input
@@ -64,11 +64,11 @@ export default async function SecuritySettingsPage() {
                     name="newPassword"
                     required
                     minLength={8}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground">
                     Confirm New Password
                   </label>
                   <input
@@ -77,12 +77,12 @@ export default async function SecuritySettingsPage() {
                     name="confirmPassword"
                     required
                     minLength={8}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-blue-500"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-foreground bg-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
                 >
                   Change Password
                 </button>
@@ -90,12 +90,12 @@ export default async function SecuritySettingsPage() {
             </>
           ) : (
             <>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Set up a password to add an extra layer of security to your account.
               </p>
               <form action="/api/user/set-password" method="POST" className="space-y-4">
                 <div>
-                  <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="newPassword" className="block text-sm font-medium text-foreground">
                     New Password
                   </label>
                   <input
@@ -104,11 +104,11 @@ export default async function SecuritySettingsPage() {
                     name="newPassword"
                     required
                     minLength={8}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground">
                     Confirm Password
                   </label>
                   <input
@@ -117,12 +117,12 @@ export default async function SecuritySettingsPage() {
                     name="confirmPassword"
                     required
                     minLength={8}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-blue-500"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-foreground bg-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
                 >
                   Set Password
                 </button>
@@ -133,7 +133,7 @@ export default async function SecuritySettingsPage() {
       </div>
 
       {/* Email Verification */}
-      <div className="bg-white shadow rounded-lg p-6">
+      <div className="bg-card shadow rounded-lg p-6">
         <h3 className="text-lg font-medium mb-4">Email Verification</h3>
         <div className="space-y-4">
           {isEmailVerified ? (
@@ -146,19 +146,19 @@ export default async function SecuritySettingsPage() {
                 </span>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">Email verified</p>
-                <p className="text-sm text-gray-500">Your email address has been verified.</p>
+                <p className="text-sm font-medium text-foreground">Email verified</p>
+                <p className="text-sm text-muted-foreground">Your email address has been verified.</p>
               </div>
             </div>
           ) : (
             <>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Verify your email address to enhance account security.
               </p>
               <form action="/api/user/send-verification" method="POST">
                 <button
                   type="submit"
-                  className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="inline-flex justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-foreground bg-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
                 >
                   Send Verification Email
                 </button>
@@ -169,24 +169,24 @@ export default async function SecuritySettingsPage() {
       </div>
 
       {/* Account Information */}
-      <div className="bg-white shadow rounded-lg p-6">
+      <div className="bg-card shadow rounded-lg p-6">
         <h3 className="text-lg font-medium mb-4">Account Information</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email Address</label>
-            <p className="mt-1 text-sm text-gray-900">{userDetails?.email}</p>
+            <label className="block text-sm font-medium text-foreground">Email Address</label>
+            <p className="mt-1 text-sm text-foreground">{userDetails?.email}</p>
           </div>
           {userDetails?.name && (
             <div>
-              <label className="block text-sm font-medium text-gray-700">Full Name</label>
-              <p className="mt-1 text-sm text-gray-900">{userDetails.name}</p>
+              <label className="block text-sm font-medium text-foreground">Full Name</label>
+              <p className="mt-1 text-sm text-foreground">{userDetails.name}</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Security Actions */}
-      <div className="bg-white shadow rounded-lg p-6">
+      <div className="bg-card shadow rounded-lg p-6">
         <h3 className="text-lg font-medium mb-4">Security Actions</h3>
         <div className="space-y-4">
           <div className="border rounded-md p-4 bg-yellow-50 border-yellow-200">

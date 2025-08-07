@@ -126,7 +126,7 @@ export default function HealthOverviewPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{healthChecks?.total || 0}</div>
+                    <div className="text-2xl font-bold text-primary">{healthChecks?.total || 0}</div>
                     <div className="text-sm text-muted-foreground">Total Checks</div>
                   </div>
                   <div className="text-center">
@@ -140,7 +140,7 @@ export default function HealthOverviewPage() {
                     <div className="text-sm text-muted-foreground">Warning</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">{healthChecks?.failed || 0}</div>
+                    <div className="text-2xl font-bold text-destructive">{healthChecks?.failed || 0}</div>
                     <div className="text-sm text-muted-foreground">Failed</div>
                   </div>
                 </div>
@@ -181,7 +181,7 @@ export default function HealthOverviewPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">{status?.linting.errors || 0}</div>
+                    <div className="text-2xl font-bold text-destructive">{status?.linting.errors || 0}</div>
                     <div className="text-sm text-muted-foreground">Errors</div>
                   </div>
                   <div className="text-center">
@@ -216,7 +216,7 @@ export default function HealthOverviewPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
-            <CheckCircle className="h-5 w-5 mr-2 text-blue-600" />
+            <CheckCircle className="h-5 w-5 mr-2 text-primary" />
             System Overview
           </CardTitle>
           <CardDescription>
@@ -230,10 +230,10 @@ export default function HealthOverviewPage() {
               <div className="text-2xl font-bold text-green-600">99.8%</div>
               <div className="text-sm text-green-600">Last 30 days</div>
             </div>
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-lg font-semibold text-blue-700">Response Time</div>
-              <div className="text-2xl font-bold text-blue-600">145ms</div>
-              <div className="text-sm text-blue-600">Average</div>
+            <div className="text-center p-4 bg-primary rounded-lg">
+              <div className="text-lg font-semibold text-primary">Response Time</div>
+              <div className="text-2xl font-bold text-primary">145ms</div>
+              <div className="text-sm text-primary">Average</div>
             </div>
             <div className="text-center p-4 bg-orange-50 rounded-lg">
               <div className="text-lg font-semibold text-orange-700">Last Check</div>

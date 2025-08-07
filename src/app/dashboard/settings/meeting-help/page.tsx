@@ -23,7 +23,7 @@ export default function MeetingHelpDocumentation() {
       </section>
       <section>
         <h2 className="text-lg font-semibold mb-2">Support</h2>
-        <p>For further assistance, contact <a href="mailto:support@school.edu" className="text-blue-600 underline">support@school.edu</a>.</p>
+        <p>For further assistance, contact <a href="mailto:support@school.edu" className="text-primary underline">support@school.edu</a>.</p>
       </section>
     </div>
   );

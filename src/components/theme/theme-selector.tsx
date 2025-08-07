@@ -57,7 +57,7 @@ export function ThemeSelector({
         disabled={isChanging}
         className={`
           relative overflow-hidden rounded-lg border-2 p-4 text-left transition-all
-          ${cardColors[theme.id as keyof typeof cardColors] || 'bg-gray-50 border-gray-200'}
+          ${cardColors[theme.id as keyof typeof cardColors] || 'bg-muted border-border'}
           ${isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
           ${isChanging ? 'opacity-50 cursor-wait' : 'hover:scale-105 cursor-pointer'}
           ${variant === 'compact' ? 'flex items-center gap-3' : 'block'}
@@ -106,7 +106,7 @@ export function ThemeSelector({
   return (
     <div className={`w-full ${className}`}>
       {showDescription && variant === 'grid' && (
-        <p className="text-gray-600 mb-6">
+        <p className="text-muted-foreground mb-6">
           Choose a theme that suits your preference. Changes are applied immediately and saved automatically.
         </p>
       )}
@@ -122,11 +122,11 @@ export function ThemeSelector({
       </div>
       
       {currentTheme && (
-        <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h4 className="font-semibold text-gray-900 mb-1">
+        <div className="mt-8 p-4 bg-primary border border-blue-200 rounded-lg">
+          <h4 className="font-semibold text-foreground mb-1">
             Current Theme: {currentTheme.name}
           </h4>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             {currentTheme.description}
           </p>
         </div>

@@ -262,9 +262,9 @@ export default function GitOperations() {
     switch (status) {
       case 'M': return <Edit className="h-4 w-4 text-yellow-500" />;
       case 'A': return <Plus className="h-4 w-4 text-green-500" />;
-      case 'D': return <Trash2 className="h-4 w-4 text-red-500" />;
-      case '??': return <AlertCircle className="h-4 w-4 text-gray-500" />;
-      default: return <FileText className="h-4 w-4 text-gray-400" />;
+      case 'D': return <Trash2 className="h-4 w-4 text-destructive" />;
+      case '??': return <AlertCircle className="h-4 w-4 text-muted-foreground" />;
+      default: return <FileText className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -282,7 +282,7 @@ export default function GitOperations() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <RefreshCw className="h-8 w-8 animate-spin text-blue-600" />
+        <RefreshCw className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -293,7 +293,7 @@ export default function GitOperations() {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">Git Operations</h2>
-          <p className="text-sm text-gray-600">Version control management</p>
+          <p className="text-sm text-muted-foreground">Version control management</p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -364,19 +364,19 @@ export default function GitOperations() {
           <CardContent>
             <div className="grid grid-cols-4 gap-4 text-sm">
               <div>
-                <span className="text-gray-500">Staged:</span>
+                <span className="text-muted-foreground">Staged:</span>
                 <span className="ml-2 font-medium">{gitStatus.staged.length}</span>
               </div>
               <div>
-                <span className="text-gray-500">Modified:</span>
+                <span className="text-muted-foreground">Modified:</span>
                 <span className="ml-2 font-medium">{gitStatus.modified.length}</span>
               </div>
               <div>
-                <span className="text-gray-500">Untracked:</span>
+                <span className="text-muted-foreground">Untracked:</span>
                 <span className="ml-2 font-medium">{gitStatus.untracked.length}</span>
               </div>
               <div>
-                <span className="text-gray-500">Deleted:</span>
+                <span className="text-muted-foreground">Deleted:</span>
                 <span className="ml-2 font-medium">{gitStatus.deleted.length}</span>
               </div>
             </div>
@@ -429,7 +429,7 @@ export default function GitOperations() {
                     {fileChanges.map((file) => (
                       <div
                         key={file.path}
-                        className="flex items-center justify-between p-2 hover:bg-gray-50 rounded"
+                        className="flex items-center justify-between p-2 hover:bg-muted rounded"
                       >
                         <div className="flex items-center gap-2">
                           <input
@@ -457,12 +457,12 @@ export default function GitOperations() {
                         </div>
                         <div className="flex items-center gap-2 text-xs">
                           <span className="text-green-600">+{file.additions}</span>
-                          <span className="text-red-600">-{file.deletions}</span>
+                          <span className="text-destructive">-{file.deletions}</span>
                         </div>
                       </div>
                     ))}
                     {fileChanges.length === 0 && (
-                      <div className="text-center py-8 text-gray-500">
+                      <div className="text-center py-8 text-muted-foreground">
                         No changes to commit
                       </div>
                     )}
@@ -484,12 +484,12 @@ export default function GitOperations() {
               <ScrollArea className="h-[500px]">
                 <div className="space-y-2">
                   {commits.map((commit) => (
-                    <div key={commit.hash} className="p-3 border rounded-lg hover:bg-gray-50">
+                    <div key={commit.hash} className="p-3 border rounded-lg hover:bg-muted">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <GitCommit className="h-4 w-4 text-gray-400" />
-                            <code className="text-xs bg-gray-100 px-1 py-0.5 rounded">
+                            <GitCommit className="h-4 w-4 text-muted-foreground" />
+                            <code className="text-xs bg-muted px-1 py-0.5 rounded">
                               {commit.shortHash}
                             </code>
                             <Button
@@ -502,7 +502,7 @@ export default function GitOperations() {
                             </Button>
                           </div>
                           <p className="font-medium text-sm">{commit.message}</p>
-                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <User className="h-3 w-3" />
                               {commit.author}
@@ -516,14 +516,14 @@ export default function GitOperations() {
                               {commit.files} files
                             </span>
                             <span className="text-green-600">+{commit.insertions}</span>
-                            <span className="text-red-600">-{commit.deletions}</span>
+                            <span className="text-destructive">-{commit.deletions}</span>
                           </div>
                         </div>
                       </div>
                     </div>
                   ))}
                   {commits.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="text-center py-8 text-muted-foreground">
                       No commits found
                     </div>
                   )}
@@ -567,7 +567,7 @@ export default function GitOperations() {
                     <div
                       key={branch.name}
                       className={`p-3 border rounded-lg ${
-                        branch.current ? 'border-blue-500 bg-blue-50' : 'hover:bg-gray-50'
+                        branch.current ? 'border-blue-500 bg-primary' : 'hover:bg-muted'
                       }`}
                     >
                       <div className="flex justify-between items-center">
@@ -602,13 +602,13 @@ export default function GitOperations() {
                           )}
                         </div>
                       </div>
-                      <div className="mt-2 text-xs text-gray-500">
+                      <div className="mt-2 text-xs text-muted-foreground">
                         Last commit: {branch.lastCommit}
                       </div>
                     </div>
                   ))}
                   {branches.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="text-center py-8 text-muted-foreground">
                       No branches found
                     </div>
                   )}
@@ -626,10 +626,10 @@ export default function GitOperations() {
               <CardDescription>Recent git command outputs</CardDescription>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[500px] bg-gray-900 text-gray-100 p-4 rounded-lg">
+              <ScrollArea className="h-[500px] bg-background text-muted-foreground p-4 rounded-lg">
                 <pre className="text-xs font-mono">
                   {terminalOutput.length === 0 ? (
-                    <span className="text-gray-500">No commands executed yet...</span>
+                    <span className="text-muted-foreground">No commands executed yet...</span>
                   ) : (
                     terminalOutput.join('\n')
                   )}

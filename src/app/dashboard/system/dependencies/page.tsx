@@ -586,13 +586,13 @@ export default function DependenciesPage() {
     switch (status) {
       case 'missing':
       case 'vulnerable':
-        return <AlertTriangle className="h-4 w-4 text-red-600" />;
+        return <AlertTriangle className="h-4 w-4 text-destructive" />;
       case 'outdated':
         return <Download className="h-4 w-4 text-yellow-600" />;
       case 'ok':
         return <CheckCircle className="h-4 w-4 text-green-600" />;
       default:
-        return <Package className="h-4 w-4 text-gray-600" />;
+        return <Package className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -653,10 +653,10 @@ export default function DependenciesPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Missing</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-600" />
+            <AlertTriangle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{statusCounts.missing || 0}</div>
+            <div className="text-2xl font-bold text-destructive">{statusCounts.missing || 0}</div>
             <p className="text-xs text-muted-foreground">Need installation</p>
           </CardContent>
         </Card>
@@ -675,10 +675,10 @@ export default function DependenciesPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Vulnerable</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-red-600" />
+            <AlertTriangle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{statusCounts.vulnerable || 0}</div>
+            <div className="text-2xl font-bold text-destructive">{statusCounts.vulnerable || 0}</div>
             <p className="text-xs text-muted-foreground">Security issues</p>
           </CardContent>
         </Card>
@@ -686,9 +686,9 @@ export default function DependenciesPage() {
 
       {/* Update Result Alert */}
       {updateResult && (
-        <Alert className={updateResult.success ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}>
-          <CheckCircle className={`h-4 w-4 ${updateResult.success ? 'text-green-600' : 'text-red-600'}`} />
-          <AlertDescription className={updateResult.success ? 'text-green-800' : 'text-red-800'}>
+        <Alert className={updateResult.success ? "border-green-200 bg-green-50" : "border-destructive bg-destructive/10"}>
+          <CheckCircle className={`h-4 w-4 ${updateResult.success ? 'text-green-600' : 'text-destructive'}`} />
+          <AlertDescription className={updateResult.success ? 'text-green-800' : 'text-destructive'}>
             {updateResult.message}
             {updateResult.details && (
               <div className="mt-2 text-sm">
@@ -703,9 +703,9 @@ export default function DependenciesPage() {
       {notifications.length > 0 && (
         <div className="fixed top-4 right-4 z-50 space-y-2">
           {notifications.map((notification, index) => (
-            <Alert key={index} className="border-blue-200 bg-blue-50 max-w-md">
-              <Info className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-blue-800">
+            <Alert key={index} className="border-blue-200 bg-primary max-w-md">
+              <Info className="h-4 w-4 text-primary" />
+              <AlertDescription className="text-primary">
                 {notification}
               </AlertDescription>
             </Alert>
@@ -911,7 +911,7 @@ export default function DependenciesPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Clock className="h-5 w-5 mr-2 text-blue-600" />
+              <Clock className="h-5 w-5 mr-2 text-primary" />
               Update Operations
             </CardTitle>
             <CardDescription>
@@ -923,9 +923,9 @@ export default function DependenciesPage() {
               {operations.slice(-5).map((operation) => (
                 <div key={operation.id} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center space-x-3">
-                    {operation.status === 'running' && <Loader2 className="h-4 w-4 animate-spin text-blue-600" />}
+                    {operation.status === 'running' && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
                     {operation.status === 'completed' && <CheckCircle className="h-4 w-4 text-green-600" />}
-                    {operation.status === 'failed' && <XCircle className="h-4 w-4 text-red-600" />}
+                    {operation.status === 'failed' && <XCircle className="h-4 w-4 text-destructive" />}
                     <div>
                       <div className="font-medium">{operation.packageName}</div>
                       <div className="text-sm text-muted-foreground">
@@ -948,7 +948,7 @@ export default function DependenciesPage() {
                       }
                       className={
                         operation.status === 'completed' ? 'text-green-600 border-green-600' : 
-                        operation.status === 'failed' ? '' : 'text-blue-600 border-blue-600'
+                        operation.status === 'failed' ? '' : 'text-primary border-blue-600'
                       }
                     >
                       {operation.status}
@@ -966,7 +966,7 @@ export default function DependenciesPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Archive className="h-5 w-5 mr-2 text-purple-600" />
+              <Archive className="h-5 w-5 mr-2 text-secondary" />
               Backup Management
             </CardTitle>
             <CardDescription>
@@ -978,7 +978,7 @@ export default function DependenciesPage() {
               {backups.slice(-10).map((backup) => (
                 <div key={backup.id} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <Archive className="h-4 w-4 text-purple-600" />
+                    <Archive className="h-4 w-4 text-secondary" />
                     <div>
                       <div className="font-medium">{backup.packageName}</div>
                       <div className="text-sm text-muted-foreground">
@@ -995,7 +995,7 @@ export default function DependenciesPage() {
                       variant="outline"
                       onClick={() => handleRollback(backup.id)}
                       disabled={isUpdating}
-                      className="text-purple-600 border-purple-600 hover:bg-purple-50"
+                      className="text-secondary border-purple-600 hover:bg-secondary"
                     >
                       {isUpdating ? (
                         <Loader2 className="h-4 w-4 animate-spin" />

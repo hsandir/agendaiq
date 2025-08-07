@@ -47,7 +47,7 @@ export function AgendaItemComments({ itemId, comments, onAddComment, canComment 
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+      <div className="flex items-center gap-2 text-sm font-medium text-foreground">
         <MessageSquare className="h-4 w-4" />
         <span>Comments ({comments.length})</span>
       </div>
@@ -78,29 +78,29 @@ export function AgendaItemComments({ itemId, comments, onAddComment, canComment 
       {/* Comments List */}
       <div className="space-y-3">
         {comments.length === 0 ? (
-          <p className="text-sm text-gray-500 text-center py-4">
+          <p className="text-sm text-muted-foreground text-center py-4">
             No comments yet. Be the first to comment!
           </p>
         ) : (
           comments.map((comment) => (
-            <div key={comment.id} className="bg-gray-50 rounded-lg p-3">
+            <div key={comment.id} className="bg-muted rounded-lg p-3">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="h-4 w-4 text-gray-600" />
+                <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
+                  <User className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-baseline gap-2">
                     <span className="font-medium text-sm">
                       {comment.Staff.User.name || comment.Staff.User.email}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-muted-foreground">
                       {(() => {
                         const date = getSafeDate(comment.created_at);
                         return date ? format(date, "MMM d, h:mm a") : 'Unknown time';
                       })()}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-700 mt-1 whitespace-pre-wrap">
+                  <p className="text-sm text-foreground mt-1 whitespace-pre-wrap">
                     {comment.comment}
                   </p>
                 </div>

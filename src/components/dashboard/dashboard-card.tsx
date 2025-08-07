@@ -45,11 +45,11 @@ export default function DashboardCard({
   };
 
   const variantClasses = {
-    default: 'bg-white border',
-    primary: 'bg-white border-blue-200',
-    success: 'bg-white border-green-200',
-    warning: 'bg-white border-yellow-200',
-    danger: 'bg-white border-red-200'
+    default: 'bg-card border',
+    primary: 'bg-card border-blue-200',
+    success: 'bg-card border-green-200',
+    warning: 'bg-card border-yellow-200',
+    danger: 'bg-card border-destructive'
   };
 
   const cardClasses = `p-6 rounded-lg shadow-sm ${variantClasses[variant]} ${className}`;
@@ -68,14 +68,14 @@ export default function DashboardCard({
     <div data-testid="dashboard-card" className={cardClasses}>
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="mt-2 text-3xl font-semibold text-gray-900">{formatValue(value)}</p>
+          <p className="text-sm font-medium text-muted-foreground">{title}</p>
+          <p className="mt-2 text-3xl font-semibold text-foreground">{formatValue(value)}</p>
           {description && (
-            <p className="mt-2 text-sm text-gray-500">{description}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{description}</p>
           )}
           {trend && (
             <div className={`mt-2 text-sm flex items-center ${
-              (trend.direction === 'up' || trend.isPositive) ? 'text-green-600' : 'text-red-600'
+              (trend.direction === 'up' || trend.isPositive) ? 'text-green-600' : 'text-destructive'
             }`}>
               <span data-testid={trend.direction === 'up' ? 'trend-up-icon' : 'trend-down-icon'}>
                 {(trend.direction === 'up' || trend.isPositive) ? '↑' : '↓'}
@@ -87,13 +87,13 @@ export default function DashboardCard({
           )}
         </div>
         {Icon && (
-          <div className="p-3 bg-blue-50 rounded-full">
+          <div className="p-3 bg-primary rounded-full">
             {typeof Icon === 'string' ? (
-              <div data-testid="card-icon" className={`text-blue-600 ${iconSizeClasses[iconSize]}`}>
+              <div data-testid="card-icon" className={`text-primary ${iconSizeClasses[iconSize]}`}>
                 {Icon}
               </div>
             ) : (
-              <Icon data-testid="card-icon" className={`text-blue-600 ${iconSizeClasses[iconSize]}`} />
+              <Icon data-testid="card-icon" className={`text-primary ${iconSizeClasses[iconSize]}`} />
             )}
           </div>
         )}

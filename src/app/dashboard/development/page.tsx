@@ -128,7 +128,7 @@ export default function DevelopmentTools() {
             <div className="flex items-center space-x-2">
               <div className={`h-2 w-2 rounded-full animate-pulse ${
                 stats.apiHealth.status === 'operational' ? 'bg-green-500' :
-                stats.apiHealth.status === 'degraded' ? 'bg-yellow-500' : 'bg-red-500'
+                stats.apiHealth.status === 'degraded' ? 'bg-yellow-500' : 'bg-destructive/10'
               }`} />
               <span className="text-sm">{stats.apiHealth.message}</span>
             </div>
@@ -140,7 +140,7 @@ export default function DevelopmentTools() {
             <CardTitle className="text-sm font-medium">Active Errors</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${stats.activeErrors.count > 0 ? 'text-red-600' : 'text-green-600'}`}>
+            <div className={`text-2xl font-bold ${stats.activeErrors.count > 0 ? 'text-destructive' : 'text-green-600'}`}>
               {stats.activeErrors.count}
             </div>
             <p className="text-xs text-muted-foreground">

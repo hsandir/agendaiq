@@ -224,12 +224,12 @@ export default function UserManagement() {
                         <SelectTrigger className="w-[200px]">
                           <SelectValue placeholder="Select department" />
                         </SelectTrigger>
-                        <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                        <SelectContent className="bg-card border border-border shadow-lg z-50">
                           {departments.map((department) => (
                             <SelectItem 
                               key={department.id} 
                               value={department.id}
-                              className="cursor-pointer hover:bg-gray-100 px-3 py-2"
+                              className="cursor-pointer hover:bg-muted px-3 py-2"
                             >
                               {department.name}
                             </SelectItem>
@@ -249,19 +249,19 @@ export default function UserManagement() {
                         <SelectTrigger className="w-[200px]">
                           <SelectValue placeholder="Select role" />
                         </SelectTrigger>
-                        <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                        <SelectContent className="bg-card border border-border shadow-lg z-50">
                           {departmentRoles.length > 0 ? (
                             departmentRoles.map((role) => (
                               <SelectItem 
                                 key={role.id} 
                                 value={role.id}
-                                className="cursor-pointer hover:bg-gray-100 px-3 py-2"
+                                className="cursor-pointer hover:bg-muted px-3 py-2"
                               >
                                 {role.title}
                               </SelectItem>
                             ))
                           ) : (
-                            <SelectItem value="no-roles" disabled className="px-3 py-2 text-gray-500">
+                            <SelectItem value="no-roles" disabled className="px-3 py-2 text-muted-foreground">
                               No roles available for this department
                             </SelectItem>
                           )}

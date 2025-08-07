@@ -271,7 +271,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
       case 'completed':
         return <Badge variant="outline" className="text-green-600 border-green-600"><CheckCircle className="w-3 h-3 mr-1" />Completed</Badge>;
       case 'running':
-        return <Badge variant="outline" className="text-blue-600 border-blue-600"><RefreshCw className="w-3 h-3 mr-1 animate-spin" />Running</Badge>;
+        return <Badge variant="outline" className="text-primary border-blue-600"><RefreshCw className="w-3 h-3 mr-1 animate-spin" />Running</Badge>;
       case 'failed':
         return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Failed</Badge>;
       default:
@@ -284,9 +284,9 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
       case 'automatic':
         return <Badge variant="outline">Auto</Badge>;
       case 'manual':
-        return <Badge variant="outline" className="text-blue-600 border-blue-600">Manual</Badge>;
+        return <Badge variant="outline" className="text-primary border-blue-600">Manual</Badge>;
       case 'full-system':
-        return <Badge variant="outline" className="text-purple-600 border-purple-600">Full System</Badge>;
+        return <Badge variant="outline" className="text-secondary border-purple-600">Full System</Badge>;
       default:
         return <Badge variant="secondary">Unknown</Badge>;
     }
@@ -339,9 +339,9 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
           </div>
         </div>
 
-        <Alert className="mb-6 border-red-200 bg-red-50">
-          <AlertCircle className="h-4 w-4 text-red-600" />
-          <AlertDescription className="text-red-800">
+        <Alert className="mb-6 border-destructive bg-destructive/10">
+          <AlertCircle className="h-4 w-4 text-destructive" />
+          <AlertDescription className="text-destructive">
             <strong>Failed to load backup data:</strong> {error}
           </AlertDescription>
         </Alert>
@@ -354,7 +354,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold flex items-center">
-            <FileArchive className="w-8 h-8 mr-3 text-purple-600" />
+            <FileArchive className="w-8 h-8 mr-3 text-secondary" />
             Full System Backup & Restore
           </h1>
           <p className="text-muted-foreground">Complete system backup including database, settings, files, and configurations</p>
@@ -388,7 +388,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Archive className="h-5 w-5 mr-2 text-purple-600" />
+              <Archive className="h-5 w-5 mr-2 text-secondary" />
               Create Full System Backup
             </CardTitle>
             <CardDescription>Generate a complete backup ZIP file containing all selected components</CardDescription>
@@ -399,18 +399,18 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
               {backupComponents.map((component) => (
                 <div key={component.id} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <component.icon className="w-5 h-5 text-gray-600" />
+                    <component.icon className="w-5 h-5 text-muted-foreground" />
                     <div>
                       <h5 className="font-medium text-sm">{component.name}</h5>
-                      <p className="text-xs text-gray-600">{component.description}</p>
-                      {component.size && <p className="text-xs text-gray-500">Est. size: {component.size}</p>}
+                      <p className="text-xs text-muted-foreground">{component.description}</p>
+                      {component.size && <p className="text-xs text-muted-foreground">Est. size: {component.size}</p>}
                     </div>
                   </div>
                   <input
                     type="checkbox"
                     checked={selectedComponents.includes(component.id)}
                     onChange={() => toggleComponent(component.id)}
-                    className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    className="w-4 h-4 text-secondary border-border rounded focus:ring-ring"
                   />
                 </div>
               ))}
@@ -440,16 +440,16 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Upload className="h-5 w-5 mr-2 text-blue-600" />
+              <Upload className="h-5 w-5 mr-2 text-primary" />
               Upload & Restore Backup
             </CardTitle>
             <CardDescription>Upload a backup ZIP file to restore your system</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+              <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
               <p className="text-sm font-medium mb-1">Upload Backup File</p>
-              <p className="text-xs text-gray-600 mb-4">Select a ZIP backup file to restore</p>
+              <p className="text-xs text-muted-foreground mb-4">Select a ZIP backup file to restore</p>
               
               <input
                 type="file"
@@ -553,7 +553,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <FileArchive className="h-5 w-5 mr-2 text-purple-600" />
+                <FileArchive className="h-5 w-5 mr-2 text-secondary" />
                 Backup History
               </CardTitle>
               <CardDescription>List of all full system backups and restore points</CardDescription>
@@ -561,17 +561,17 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
             <CardContent>
               <div className="space-y-4">
                 {backupData.backups.map((backup) => (
-                  <div key={backup.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                  <div key={backup.id} className="border rounded-lg p-4 hover:bg-muted">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <FileArchive className="w-5 h-5 text-purple-600" />
+                        <FileArchive className="w-5 h-5 text-secondary" />
                         <div>
                           <div className="flex items-center space-x-2 mb-1">
                             <h4 className="font-medium">{backup.filename}</h4>
                             {getTypeBadge(backup.type)}
                             {getStatusBadge(backup.status)}
                           </div>
-                          <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                          <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-2">
                             <span>Size: {backup.size}</span>
                             <span>Created: {new Date(backup.timestamp).toLocaleString()}</span>
                             {backup.duration && <span>Duration: {backup.duration}</span>}
@@ -617,7 +617,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
                 ))}
                 
                 {backupData.backups.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     <FileArchive className="w-12 h-12 mx-auto mb-4 opacity-50" />
                     <p>No full system backups found. Create your first backup to get started.</p>
                     <p className="text-sm mt-2">Use the backup creation tool above to generate a complete system backup.</p>

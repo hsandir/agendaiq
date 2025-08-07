@@ -52,19 +52,19 @@ export default function TwoFactorSetupPage() {
 
   return (
     <div className="mx-auto max-w-3xl py-6 sm:px-6 lg:px-8">
-      <div className="overflow-hidden rounded-lg bg-white shadow">
+      <div className="overflow-hidden rounded-lg bg-card shadow">
         <div className="px-4 py-5 sm:p-6">
           {step === 'intro' && (
             <div className="text-center">
-              <FiShield className="mx-auto h-12 w-12 text-indigo-600" />
-              <h2 className="mt-2 text-lg font-medium text-gray-900">Two-Factor Authentication</h2>
-              <p className="mt-1 text-sm text-gray-500">
+              <FiShield className="mx-auto h-12 w-12 text-primary" />
+              <h2 className="mt-2 text-lg font-medium text-foreground">Two-Factor Authentication</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
                 Add an extra layer of security to your account by requiring both a password and an authentication code.
               </p>
               <div className="mt-6">
                 <button
                   onClick={handleEnable2FA}
-                  className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  className="inline-flex items-center rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
                   Enable 2FA
                 </button>
@@ -74,24 +74,24 @@ export default function TwoFactorSetupPage() {
 
           {step === 'qr' && (
             <div className="text-center">
-              <h2 className="text-lg font-medium text-gray-900">Scan QR Code</h2>
-              <p className="mt-1 text-sm text-gray-500">
+              <h2 className="text-lg font-medium text-foreground">Scan QR Code</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
                 Scan this QR code with your authenticator app (like Google Authenticator or Authy).
               </p>
               <div className="mt-4 flex justify-center">
-                <div className="bg-gray-100 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-2">Setup URL:</p>
+                <div className="bg-muted p-4 rounded-lg">
+                  <p className="text-sm text-muted-foreground mb-2">Setup URL:</p>
                   <div className="flex items-center gap-2">
-                    <code className="text-xs break-all bg-white p-2 rounded">{qrCode}</code>
+                    <code className="text-xs break-all bg-card p-2 rounded">{qrCode}</code>
                     <button
                       onClick={() => navigator.clipboard.writeText(qrCode)}
-                      className="p-2 hover:bg-gray-200 rounded"
+                      className="p-2 hover:bg-muted rounded"
                       title="Copy to clipboard"
                     >
                       <Copy className="h-4 w-4" />
                     </button>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     Copy this URL and add it to your authenticator app manually
                   </p>
                 </div>
@@ -102,11 +102,11 @@ export default function TwoFactorSetupPage() {
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value)}
                   placeholder="Enter verification code"
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  className="block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
                 />
                 <button
                   onClick={handleVerify}
-                  className="mt-4 inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                  className="mt-4 inline-flex items-center rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
                   Verify
                 </button>
@@ -119,21 +119,21 @@ export default function TwoFactorSetupPage() {
               {success ? (
                 <div>
                   <FiCheck className="mx-auto h-12 w-12 text-green-500" />
-                  <h2 className="mt-2 text-lg font-medium text-gray-900">2FA Enabled</h2>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <h2 className="mt-2 text-lg font-medium text-foreground">2FA Enabled</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
                     Two-factor authentication has been successfully enabled for your account.
                   </p>
                 </div>
               ) : (
                 <div>
-                  <FiX className="mx-auto h-12 w-12 text-red-500" />
-                  <h2 className="mt-2 text-lg font-medium text-gray-900">Verification Failed</h2>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <FiX className="mx-auto h-12 w-12 text-destructive" />
+                  <h2 className="mt-2 text-lg font-medium text-foreground">Verification Failed</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
                     The verification code you entered was incorrect. Please try again.
                   </p>
                   <button
                     onClick={() => setStep('qr')}
-                    className="mt-4 inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    className="mt-4 inline-flex items-center rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   >
                     Try Again
                   </button>
@@ -143,13 +143,13 @@ export default function TwoFactorSetupPage() {
           )}
 
           {error && (
-            <div className="mt-4 rounded-md bg-red-50 p-4">
+            <div className="mt-4 rounded-md bg-destructive/10 p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <FiX className="h-5 w-5 text-red-400" aria-hidden="true" />
+                  <FiX className="h-5 w-5 text-destructive" aria-hidden="true" />
                 </div>
                 <div className="ml-3">
-                  <h3 className="text-sm font-medium text-red-800">{error}</h3>
+                  <h3 className="text-sm font-medium text-destructive">{error}</h3>
                 </div>
               </div>
             </div>

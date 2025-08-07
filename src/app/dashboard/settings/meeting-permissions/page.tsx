@@ -22,7 +22,7 @@ export default async function MeetingPermissionsPage() {
 
       {/* Your page content here */}
       <div className="space-y-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <div className="bg-card p-6 rounded-lg shadow-sm border">
           <h2 className="text-xl font-semibold mb-4">Permission Settings</h2>
           <p className="text-muted-foreground">Meeting permission management will be implemented here.</p>
         </div>

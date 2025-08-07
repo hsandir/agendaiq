@@ -262,11 +262,11 @@ export default async function MeetingAgendaPage(props: Props) {
   return (
     <div className="max-w-4xl mx-auto py-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Create Meeting - Step 2</h1>
-        <p className="text-gray-600">Add agenda items for: {meeting.title}</p>
+        <h1 className="text-2xl font-bold text-foreground">Create Meeting - Step 2</h1>
+        <p className="text-muted-foreground">Add agenda items for: {meeting.title}</p>
       </div>
       
-      <div className="bg-white shadow-sm rounded-lg">
+      <div className="bg-card shadow-sm rounded-lg">
         <div className="px-6 py-6">
           <MeetingFormStep2
             meetingId={meetingId}

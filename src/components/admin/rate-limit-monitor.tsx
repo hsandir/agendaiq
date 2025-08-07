@@ -123,17 +123,17 @@ export default function RateLimitMonitor() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <RefreshCw className="h-8 w-8 animate-spin text-blue-600" />
+        <RefreshCw className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
         <div className="flex items-center">
-          <AlertTriangle className="h-5 w-5 text-red-600 mr-2" />
-          <span className="text-red-800">{error}</span>
+          <AlertTriangle className="h-5 w-5 text-destructive mr-2" />
+          <span className="text-destructive">{error}</span>
         </div>
       </div>
     );
@@ -170,17 +170,17 @@ export default function RateLimitMonitor() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Clients</p>
+              <p className="text-sm text-muted-foreground">Total Clients</p>
               <p className="text-2xl font-bold">{metrics.summary.totalClients}</p>
             </div>
-            <Users className="h-8 w-8 text-blue-600" />
+            <Users className="h-8 w-8 text-primary" />
           </div>
         </Card>
 
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total Requests</p>
+              <p className="text-sm text-muted-foreground">Total Requests</p>
               <p className="text-2xl font-bold">{metrics.summary.totalRequests.toLocaleString()}</p>
             </div>
             <TrendingUp className="h-8 w-8 text-green-600" />
@@ -190,17 +190,17 @@ export default function RateLimitMonitor() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Blocked Requests</p>
+              <p className="text-sm text-muted-foreground">Blocked Requests</p>
               <p className="text-2xl font-bold">{metrics.summary.totalBlocked.toLocaleString()}</p>
             </div>
-            <XCircle className="h-8 w-8 text-red-600" />
+            <XCircle className="h-8 w-8 text-destructive" />
           </div>
         </Card>
 
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Block Rate</p>
+              <p className="text-sm text-muted-foreground">Block Rate</p>
               <p className="text-2xl font-bold">{blockRate.toFixed(1)}%</p>
             </div>
             {isHealthy ? (
@@ -228,15 +228,15 @@ export default function RateLimitMonitor() {
           <h3 className="text-lg font-semibold mb-4">Top Blocked Clients</h3>
           <div className="space-y-2">
             {metrics.summary.topOffenders.map((offender, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+              <div key={index} className="flex items-center justify-between p-3 bg-muted rounded">
                 <div>
                   <p className="font-mono text-sm">{offender.identifier}</p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-muted-foreground">
                     {offender.blockedRequests} blocked / {offender.totalRequests} total
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm font-semibold text-red-600">
+                  <span className="text-sm font-semibold text-destructive">
                     {((offender.blockedRequests / offender.totalRequests) * 100).toFixed(1)}% blocked
                   </span>
                 </div>
@@ -329,7 +329,7 @@ export default function RateLimitMonitor() {
                   <td className="py-2 font-mono text-xs">{key}</td>
                   <td className="text-right py-2">{value.totalRequests}</td>
                   <td className="text-right py-2 text-green-600">{value.allowedRequests}</td>
-                  <td className="text-right py-2 text-red-600">{value.blockedRequests}</td>
+                  <td className="text-right py-2 text-destructive">{value.blockedRequests}</td>
                   <td className="text-right py-2">{value.peakRequestsPerMinute.toFixed(0)}</td>
                 </tr>
               ))}

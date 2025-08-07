@@ -87,13 +87,13 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
   };
 
   return (
-    <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-6 shadow-lg">
+    <div className="w-full max-w-md space-y-8 rounded-lg bg-card p-6 shadow-lg">
       <div>
-        <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900">
+        <h2 className="text-center text-3xl font-bold tracking-tight text-foreground">
           {isFirstTimeSetup ? 'Create Admin Account' : 'Sign in to your account'}
         </h2>
         {isFirstTimeSetup && (
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-muted-foreground">
             Select an admin user to create account
           </p>
         )}
@@ -101,14 +101,14 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
       <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
         {isFirstTimeSetup && adminUsers.length > 0 && (
           <div>
-            <label htmlFor="admin-select" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="admin-select" className="block text-sm font-medium text-foreground mb-2">
               Select Admin User
             </label>
             <select
               id="admin-select"
               value={selectedAdminEmail}
               onChange={(e) => setSelectedAdminEmail(e.target.value)}
-              className="relative block w-full rounded-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="relative block w-full rounded-md border-0 py-1.5 text-foreground ring-1 ring-inset ring-gray-300 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
             >
               {adminUsers.map((admin) => (
                 <option key={admin.email} value={admin.email}>
@@ -131,7 +131,7 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
               autoComplete="email"
               required
               defaultValue={isFirstTimeSetup && selectedAdminEmail ? selectedAdminEmail : ''}
-              className="relative block w-full rounded-t-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="relative block w-full rounded-t-md border-0 py-1.5 text-foreground ring-1 ring-inset ring-gray-300 placeholder:text-muted-foreground focus:z-10 focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
               placeholder="Email address"
             />
           </div>
@@ -145,7 +145,7 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
               type="password"
               autoComplete={isFirstTimeSetup ? 'new-password' : 'current-password'}
               required
-              className="relative block w-full rounded-b-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="relative block w-full rounded-b-md border-0 py-1.5 text-foreground ring-1 ring-inset ring-gray-300 placeholder:text-muted-foreground focus:z-10 focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
               placeholder={isFirstTimeSetup ? 'Create password' : 'Password'}
             />
           </div>
@@ -160,9 +160,9 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
               />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-foreground">
                 Remember me
               </label>
             </div>
@@ -174,9 +174,9 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
                 type="checkbox"
                 checked={trustDevice}
                 onChange={(e) => setTrustDevice(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
               />
-              <label htmlFor="trust-device" className="ml-2 block text-sm text-gray-900">
+              <label htmlFor="trust-device" className="ml-2 block text-sm text-foreground">
                 Trust this device for 30 days
               </label>
             </div>
@@ -184,13 +184,13 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
         )}
 
         {error && (
-          <div className="rounded-md bg-red-50 p-4">
+          <div className="rounded-md bg-destructive/10 p-4">
             <div className="flex">
               <div className="flex-shrink-0">
-                <FiShield className="h-5 w-5 text-red-400" aria-hidden="true" />
+                <FiShield className="h-5 w-5 text-destructive" aria-hidden="true" />
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">{error}</h3>
+                <h3 className="text-sm font-medium text-destructive">{error}</h3>
               </div>
             </div>
           </div>
@@ -200,10 +200,10 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
           <button
             type="submit"
             disabled={isLoading}
-            className="group relative flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50"
+            className="group relative flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-foreground hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50"
           >
             <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-              <FiLock className="h-5 w-5 text-indigo-500 group-hover:text-indigo-400" aria-hidden="true" />
+              <FiLock className="h-5 w-5 text-primary group-hover:text-primary" aria-hidden="true" />
             </span>
             {isLoading ? 'Signing in...' : (isFirstTimeSetup ? 'Create Account' : 'Sign in')}
           </button>
@@ -213,7 +213,7 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
           <div className="text-center">
             <Link
               href="/auth/forgot-password"
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+              className="text-sm font-medium text-primary hover:text-primary"
             >
               Forgot your password?
             </Link>

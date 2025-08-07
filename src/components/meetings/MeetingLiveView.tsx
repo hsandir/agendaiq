@@ -229,9 +229,9 @@ export function MeetingLiveView({
     const start = getSafeDate(meeting.start_time);
     const end = getSafeDate(meeting.end_time);
 
-    if (!start || !end) return { status: "unknown", label: "Unknown", color: "bg-gray-100 text-gray-700" };
-    if (now < start) return { status: "upcoming", label: "Upcoming", color: "bg-blue-100 text-blue-700" };
-    if (now > end) return { status: "completed", label: "Completed", color: "bg-gray-100 text-gray-700" };
+    if (!start || !end) return { status: "unknown", label: "Unknown", color: "bg-muted text-foreground" };
+    if (now < start) return { status: "upcoming", label: "Upcoming", color: "bg-primary text-primary" };
+    if (now > end) return { status: "completed", label: "Completed", color: "bg-muted text-foreground" };
     return { status: "in-progress", label: "In Progress", color: "bg-green-100 text-green-700" };
   };
 
@@ -242,13 +242,13 @@ export function MeetingLiveView({
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Modern Header with Gradient */}
-      <div className="bg-white border-b shadow-sm">
+      <div className="bg-card border-b shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-4">
             {/* Back Link */}
             <Link 
               href="/dashboard/meetings" 
-              className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+              className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Meetings
@@ -258,35 +258,35 @@ export function MeetingLiveView({
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3">
-                  <h1 className="text-3xl font-bold text-gray-900">{meeting.title}</h1>
+                  <h1 className="text-3xl font-bold text-foreground">{meeting.title}</h1>
                   <Badge className={`${meetingStatus.color} px-3 py-1`}>
                     {meetingStatus.label}
                   </Badge>
                 </div>
                 {meeting.description && (
-                  <p className="text-gray-600 mt-2 text-lg">{meeting.description}</p>
+                  <p className="text-muted-foreground mt-2 text-lg">{meeting.description}</p>
                 )}
                 
                 {/* Meeting Info Pills */}
                 <div className="flex flex-wrap gap-3 mt-4">
-                  <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full text-sm">
-                    <Calendar className="h-4 w-4 text-gray-600" />
-                    <span className="text-gray-700">{safeFormatDate(meeting.start_time, undefined, 'No date')}</span>
+                  <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-sm">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-foreground">{safeFormatDate(meeting.start_time, undefined, 'No date')}</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full text-sm">
-                    <Clock className="h-4 w-4 text-gray-600" />
-                    <span className="text-gray-700">
+                  <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-sm">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-foreground">
                       {safeFormatTime(meeting.start_time, { hour: '2-digit', minute: '2-digit' }, 'No time')} - 
                       {safeFormatTime(meeting.end_time, { hour: '2-digit', minute: '2-digit' }, 'No time')}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full text-sm">
-                    <Users className="h-4 w-4 text-gray-600" />
-                    <span className="text-gray-700">{meeting.MeetingAttendee.length} attendees</span>
+                  <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-sm">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-foreground">{meeting.MeetingAttendee.length} attendees</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full text-sm">
-                    <User className="h-4 w-4 text-gray-600" />
-                    <span className="text-gray-700">Host: {meeting.Staff.User.name}</span>
+                  <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-sm">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-foreground">Host: {meeting.Staff.User.name}</span>
                   </div>
                 </div>
               </div>
@@ -297,7 +297,7 @@ export function MeetingLiveView({
                 <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${
                   isConnected 
                     ? 'bg-green-100 text-green-700' 
-                    : 'bg-red-100 text-red-700'
+                    : 'bg-destructive/10 text-destructive'
                 }`}>
                   {isConnected ? (
                     <><Wifi className="h-4 w-4" /><span>Live</span></>
@@ -325,24 +325,24 @@ export function MeetingLiveView({
           {/* Main Content - 3 columns */}
           <div className="lg:col-span-3">
             {/* Agenda Header with View Toggle */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+            <div className="bg-card rounded-xl shadow-sm border border-border p-6 mb-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900">Agenda Items</h2>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <h2 className="text-xl font-semibold text-foreground">Agenda Items</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
                     {agendaItems.length} items • 
                     {agendaItems.filter(i => i.status === 'Resolved').length} completed
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
                   {/* View Mode Toggle */}
-                  <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                  <div className="flex items-center bg-muted rounded-lg p-1">
                     <button
                       onClick={() => setViewMode('list')}
                       className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                         viewMode === 'list' 
-                          ? 'bg-white text-gray-900 shadow-sm' 
-                          : 'text-gray-600 hover:text-gray-900'
+                          ? 'bg-card text-foreground shadow-sm' 
+                          : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       <List className="h-4 w-4 inline mr-1" />
@@ -352,8 +352,8 @@ export function MeetingLiveView({
                       onClick={() => setViewMode('grid')}
                       className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                         viewMode === 'grid' 
-                          ? 'bg-white text-gray-900 shadow-sm' 
-                          : 'text-gray-600 hover:text-gray-900'
+                          ? 'bg-card text-foreground shadow-sm' 
+                          : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       <Grid className="h-4 w-4 inline mr-1" />
@@ -364,7 +364,7 @@ export function MeetingLiveView({
                   {(isOrganizer || isAdmin) && (
                     <Button 
                       onClick={addNewAgendaItem} 
-                      className="rounded-full bg-blue-600 hover:bg-blue-700"
+                      className="rounded-full bg-primary hover:bg-primary"
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Add Item
@@ -377,13 +377,13 @@ export function MeetingLiveView({
             {/* Agenda Items */}
             <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'space-y-4'}>
               {agendaItems.length === 0 ? (
-                <div className="bg-white rounded-xl p-12 text-center col-span-full">
+                <div className="bg-card rounded-xl p-12 text-center col-span-full">
                   <div className="max-w-sm mx-auto">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <FileText className="h-8 w-8 text-gray-400" />
+                    <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FileText className="h-8 w-8 text-muted-foreground" />
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No agenda items yet</h3>
-                    <p className="text-gray-600 mb-4">Get started by adding your first agenda item</p>
+                    <h3 className="text-lg font-medium text-foreground mb-2">No agenda items yet</h3>
+                    <p className="text-muted-foreground mb-4">Get started by adding your first agenda item</p>
                     {(isOrganizer || isAdmin) && (
                       <Button onClick={addNewAgendaItem} className="rounded-full">
                         <Plus className="h-4 w-4 mr-2" />
@@ -409,7 +409,7 @@ export function MeetingLiveView({
                         meetingId={meeting.id}
                       />
                       {typingUser && typingUser.userId !== currentUser.id && (
-                        <div className="absolute -bottom-2 left-4 bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full shadow-sm">
+                        <div className="absolute -bottom-2 left-4 bg-primary text-primary text-xs px-3 py-1 rounded-full shadow-sm">
                           {typingUser.userName} is typing...
                         </div>
                       )}
@@ -423,21 +423,21 @@ export function MeetingLiveView({
           {/* Sidebar - 1 column */}
           <div className="lg:col-span-1 space-y-6">
             {/* Attendees Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-                <Users className="h-5 w-5 mr-2 text-gray-600" />
+            <div className="bg-card rounded-xl shadow-sm border border-border p-5">
+              <h3 className="font-semibold text-foreground mb-4 flex items-center">
+                <Users className="h-5 w-5 mr-2 text-muted-foreground" />
                 Attendees
               </h3>
               <div className="space-y-3">
                 {meeting.MeetingAttendee.map((attendee) => (
                   <div key={attendee.id} className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-foreground text-sm font-medium">
                         {attendee.Staff.User.name?.charAt(0) || 'U'}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{attendee.Staff.User.name}</p>
-                        <p className="text-xs text-gray-500">{attendee.Staff.Role.title}</p>
+                        <p className="text-sm font-medium text-foreground">{attendee.Staff.User.name}</p>
+                        <p className="text-xs text-muted-foreground">{attendee.Staff.Role.title}</p>
                       </div>
                     </div>
                     <Badge 
@@ -445,7 +445,7 @@ export function MeetingLiveView({
                       className={`text-xs ${
                         attendee.status === 'attended' 
                           ? 'bg-green-100 text-green-700 border-green-200' 
-                          : 'bg-gray-100 text-gray-600'
+                          : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       {attendee.status}
@@ -457,8 +457,8 @@ export function MeetingLiveView({
 
             {/* Live Users */}
             {members.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
+              <div className="bg-card rounded-xl shadow-sm border border-border p-5">
+                <h3 className="font-semibold text-foreground mb-4 flex items-center">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2" />
                   Live Now ({members.length})
                 </h3>
@@ -469,8 +469,8 @@ export function MeetingLiveView({
                         <div className="w-2 h-2 bg-green-500 rounded-full" />
                       </div>
                       <div>
-                        <span className="text-gray-900">{member.info.name}</span>
-                        <span className="text-gray-500 text-xs ml-1">• {member.info.role}</span>
+                        <span className="text-foreground">{member.info.name}</span>
+                        <span className="text-muted-foreground text-xs ml-1">• {member.info.role}</span>
                       </div>
                     </div>
                   ))}
@@ -479,20 +479,20 @@ export function MeetingLiveView({
             )}
 
             {/* Progress Stats */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">Progress Overview</h3>
+            <div className="bg-card rounded-xl shadow-sm border border-border p-5">
+              <h3 className="font-semibold text-foreground mb-4">Progress Overview</h3>
               <div className="space-y-3">
                 {/* Progress Bar */}
                 <div className="mb-4">
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Completion</span>
-                    <span className="font-medium text-gray-900">
+                    <span className="text-muted-foreground">Completion</span>
+                    <span className="font-medium text-foreground">
                       {agendaItems.length > 0 
                         ? Math.round((agendaItems.filter(i => i.status === 'Resolved').length / agendaItems.length) * 100)
                         : 0}%
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-muted rounded-full h-2">
                     <div 
                       className="bg-green-600 h-2 rounded-full transition-all duration-300"
                       style={{ 
@@ -507,11 +507,11 @@ export function MeetingLiveView({
                 {/* Stats */}
                 <div className="space-y-2">
                   <div className="flex justify-between items-center py-1">
-                    <span className="text-sm text-gray-600">Total Items</span>
-                    <span className="font-semibold text-gray-900">{agendaItems.length}</span>
+                    <span className="text-sm text-muted-foreground">Total Items</span>
+                    <span className="font-semibold text-foreground">{agendaItems.length}</span>
                   </div>
                   <div className="flex justify-between items-center py-1">
-                    <span className="text-sm text-gray-600 flex items-center">
+                    <span className="text-sm text-muted-foreground flex items-center">
                       <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
                       Resolved
                     </span>
@@ -520,7 +520,7 @@ export function MeetingLiveView({
                     </span>
                   </div>
                   <div className="flex justify-between items-center py-1">
-                    <span className="text-sm text-gray-600 flex items-center">
+                    <span className="text-sm text-muted-foreground flex items-center">
                       <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2" />
                       Ongoing
                     </span>
@@ -529,11 +529,11 @@ export function MeetingLiveView({
                     </span>
                   </div>
                   <div className="flex justify-between items-center py-1">
-                    <span className="text-sm text-gray-600 flex items-center">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full mr-2" />
+                    <span className="text-sm text-muted-foreground flex items-center">
+                      <div className="w-2 h-2 bg-muted rounded-full mr-2" />
                       Pending
                     </span>
-                    <span className="font-semibold text-gray-600">
+                    <span className="font-semibold text-muted-foreground">
                       {agendaItems.filter(i => i.status === 'Pending').length}
                     </span>
                   </div>
@@ -542,11 +542,11 @@ export function MeetingLiveView({
             </div>
 
             {/* Last Update */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div className="bg-card rounded-xl shadow-sm border border-border p-5">
               <div className="text-center">
-                <Clock className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-600">Last updated</p>
-                <p className="font-semibold text-gray-900">
+                <Clock className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">Last updated</p>
+                <p className="font-semibold text-foreground">
                   {isHydrated ? (lastUpdate ? lastUpdate.toLocaleTimeString() : 'Not yet') : '...'}
                 </p>
               </div>

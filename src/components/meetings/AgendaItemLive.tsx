@@ -146,10 +146,10 @@ export function AgendaItemLive({
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'High': return 'bg-red-100 text-red-700';
+      case 'High': return 'bg-destructive/10 text-destructive';
       case 'Medium': return 'bg-yellow-100 text-yellow-700';
       case 'Low': return 'bg-green-100 text-green-700';
-      default: return 'bg-gray-100 text-gray-700';
+      default: return 'bg-muted text-foreground';
     }
   };
 
@@ -157,18 +157,18 @@ export function AgendaItemLive({
     switch (status) {
       case 'Resolved': return 'bg-green-100 text-green-700';
       case 'Ongoing': return 'bg-yellow-100 text-yellow-700';
-      case 'Pending': return 'bg-gray-100 text-gray-700';
-      case 'Assigned_to_local': return 'bg-blue-100 text-blue-700';
+      case 'Pending': return 'bg-muted text-foreground';
+      case 'Assigned_to_local': return 'bg-primary text-primary';
       case 'Deferred': return 'bg-orange-100 text-orange-700';
-      default: return 'bg-gray-100 text-gray-700';
+      default: return 'bg-muted text-foreground';
     }
   };
 
   return (
-    <div className={`bg-white rounded-xl shadow-sm border transition-all hover:shadow-md ${
+    <div className={`bg-card rounded-xl shadow-sm border transition-all hover:shadow-md ${
       item.responsible_staff_id === currentUserId 
         ? 'border-blue-500 shadow-blue-100' 
-        : 'border-gray-200'
+        : 'border-border'
     }`}>
       <div 
         className="p-5 cursor-pointer" 
@@ -178,11 +178,11 @@ export function AgendaItemLive({
           <div className="flex items-start space-x-3 flex-1">
             <div className="mt-0.5">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                isExpanded ? 'bg-gray-100' : 'bg-gray-50'
+                isExpanded ? 'bg-muted' : 'bg-muted'
               }`}>
                 {isExpanded ? 
-                  <ChevronDown className="h-4 w-4 text-gray-600" /> : 
-                  <ChevronRight className="h-4 w-4 text-gray-600" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" /> : 
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 }
               </div>
             </div>
@@ -192,19 +192,19 @@ export function AgendaItemLive({
                   value={editData.topic}
                   onChange={(e) => handleInputChange('topic', e.target.value)}
                   onClick={(e) => e.stopPropagation()}
-                  className="font-semibold text-lg border-gray-300 focus:border-blue-500"
+                  className="font-semibold text-lg border-border focus:border-blue-500"
                 />
               ) : (
-                <h3 className="font-semibold text-lg text-gray-900 mb-1">{item.topic}</h3>
+                <h3 className="font-semibold text-lg text-foreground mb-1">{item.topic}</h3>
               )}
               {item.problem_statement && !isEditing && (
-                <p className="text-sm text-gray-600 line-clamp-2">{item.problem_statement}</p>
+                <p className="text-sm text-muted-foreground line-clamp-2">{item.problem_statement}</p>
               )}
               
               {/* Assigned User Pill */}
               {item.ResponsibleStaff && !isEditing && (
                 <div className="flex items-center gap-2 mt-2">
-                  <div className="flex items-center gap-1.5 bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-xs font-medium">
+                  <div className="flex items-center gap-1.5 bg-primary text-primary px-2.5 py-1 rounded-full text-xs font-medium">
                     <User className="h-3 w-3" />
                     <span>{item.ResponsibleStaff.User.name}</span>
                   </div>
@@ -241,7 +241,7 @@ export function AgendaItemLive({
           <div className="mt-2">
             <Link 
               href={`/dashboard/meetings/${meetingId}/agenda/${item.id}`}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium inline-flex items-center"
+              className="text-sm text-primary hover:text-primary font-medium inline-flex items-center"
               onClick={(e) => e.stopPropagation()}
             >
               View Details 
@@ -252,11 +252,11 @@ export function AgendaItemLive({
       </div>
 
       {isExpanded && (
-        <div className="px-5 pb-5 space-y-4 border-t border-gray-100 pt-4">
+        <div className="px-5 pb-5 space-y-4 border-t border-border pt-4">
           {/* Problem Statement */}
           {(item.problem_statement || isEditing) && (
             <div>
-              <label className="text-sm font-medium text-gray-700">Problem/Need Statement</label>
+              <label className="text-sm font-medium text-foreground">Problem/Need Statement</label>
               {isEditing ? (
                 <Textarea
                   value={editData.problem_statement}
@@ -272,7 +272,7 @@ export function AgendaItemLive({
 
           {/* Responsible Staff */}
           <div>
-            <label className="text-sm font-medium text-gray-700">Responsible Staff</label>
+            <label className="text-sm font-medium text-foreground">Responsible Staff</label>
             {isEditing ? (
               <Select
                 value={editData.responsible_staff_id?.toString() || 'none'}
@@ -295,7 +295,7 @@ export function AgendaItemLive({
               </Select>
             ) : (
               <div className="mt-1 flex items-center space-x-2">
-                <User className="h-4 w-4 text-gray-500" />
+                <User className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm">
                   {item.ResponsibleStaff ? item.ResponsibleStaff.User.name : 'Unassigned'}
                   {item.staff_initials && ` (${item.staff_initials})`}
@@ -307,7 +307,7 @@ export function AgendaItemLive({
           {/* Proposed Solution */}
           {(item.proposed_solution || isEditing) && (
             <div>
-              <label className="text-sm font-medium text-gray-700">Proposed Solution</label>
+              <label className="text-sm font-medium text-foreground">Proposed Solution</label>
               {isEditing ? (
                 <Textarea
                   value={editData.proposed_solution}
@@ -323,7 +323,7 @@ export function AgendaItemLive({
 
           {/* Decisions & Actions */}
           <div>
-            <label className="text-sm font-medium text-gray-700">Decision(s) & Action(s)</label>
+            <label className="text-sm font-medium text-foreground">Decision(s) & Action(s)</label>
             {isEditing ? (
               <Textarea
                 value={editData.decisions_actions}
@@ -340,7 +340,7 @@ export function AgendaItemLive({
           {isEditing && (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-700">Status</label>
+                <label className="text-sm font-medium text-foreground">Status</label>
                 <Select
                   value={editData.status}
                   onValueChange={(value: any) => setEditData({ ...editData, status: value })}
@@ -356,7 +356,7 @@ export function AgendaItemLive({
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700">Priority</label>
+                <label className="text-sm font-medium text-foreground">Priority</label>
                 <Select
                   value={editData.priority}
                   onValueChange={(value: any) => setEditData({ ...editData, priority: value })}
@@ -377,9 +377,9 @@ export function AgendaItemLive({
           {/* Meta Info */}
           <div className="pt-2 border-t">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                 <button 
-                  className="flex items-center space-x-1 hover:text-gray-900 transition-colors"
+                  className="flex items-center space-x-1 hover:text-foreground transition-colors"
                   onClick={() => setShowComments(!showComments)}
                 >
                   <MessageSquare className="h-4 w-4" />

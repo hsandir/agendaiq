@@ -458,15 +458,15 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
   const getStepIcon = (status: string) => {
     switch (status) {
       case 'running':
-        return <Loader2 className="h-4 w-4 animate-spin text-blue-500" />;
+        return <Loader2 className="h-4 w-4 animate-spin text-primary" />;
       case 'success':
         return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'failed':
-        return <XCircle className="h-4 w-4 text-red-500" />;
+        return <XCircle className="h-4 w-4 text-destructive" />;
       case 'skipped':
-        return <AlertCircle className="h-4 w-4 text-gray-400" />;
+        return <AlertCircle className="h-4 w-4 text-muted-foreground" />;
       default:
-        return <Clock className="h-4 w-4 text-gray-400" />;
+        return <Clock className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -524,20 +524,20 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
                 <div
                   key={step.id}
                   className={`flex items-start gap-3 p-2 rounded ${
-                    index === currentStep && isFixing ? 'bg-blue-50' : ''
+                    index === currentStep && isFixing ? 'bg-primary' : ''
                   }`}
                 >
                   {getStepIcon(step.status)}
                   <div className="flex-1">
                     <div className="font-medium text-sm">{step.name}</div>
-                    <div className="text-xs text-gray-600">{step.description}</div>
+                    <div className="text-xs text-muted-foreground">{step.description}</div>
                     {step.command && (
-                      <code className="text-xs bg-gray-100 px-1 py-0.5 rounded mt-1 inline-block">
+                      <code className="text-xs bg-muted px-1 py-0.5 rounded mt-1 inline-block">
                         {step.command}
                       </code>
                     )}
                     {step.duration && (
-                      <span className="text-xs text-gray-500 ml-2">
+                      <span className="text-xs text-muted-foreground ml-2">
                         ({(step.duration / 1000).toFixed(1)}s)
                       </span>
                     )}
@@ -559,7 +559,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
                 <Terminal className="h-4 w-4" />
                 Command Output
               </h3>
-              <div className="h-48 bg-gray-900 text-gray-100 p-3 rounded overflow-y-auto">
+              <div className="h-48 bg-background text-muted-foreground p-3 rounded overflow-y-auto">
                 <pre className="text-xs font-mono">
                   {currentOutput.length > 0 ? currentOutput.join('\n') : 'Waiting for output...'}
                 </pre>
@@ -574,8 +574,8 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
               <div className="space-y-1">
                 {executedCommands.map((cmd, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-xs">
-                    <ChevronRight className="h-3 w-3 text-gray-400" />
-                    <code className="bg-gray-100 px-2 py-1 rounded flex-1">{cmd}</code>
+                    <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                    <code className="bg-muted px-2 py-1 rounded flex-1">{cmd}</code>
                   </div>
                 ))}
               </div>
@@ -589,7 +589,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
                 {result.success ? (
                   <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />
                 ) : (
-                  <XCircle className="h-5 w-5 text-red-500 mt-0.5" />
+                  <XCircle className="h-5 w-5 text-destructive mt-0.5" />
                 )}
                 <div className="flex-1">
                   <AlertDescription>

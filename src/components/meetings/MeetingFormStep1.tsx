@@ -19,7 +19,7 @@ import type { RepeatConfig } from "@/components/meetings/RepeatMeetingModal";
 const RepeatMeetingModal = dynamic(
   () => import('@/components/meetings/RepeatMeetingModal').then(mod => mod.RepeatMeetingModal),
   {
-    loading: () => <div className="text-sm text-gray-500">Loading...</div>,
+    loading: () => <div className="text-sm text-muted-foreground">Loading...</div>,
     ssr: false
   }
 );
@@ -27,7 +27,7 @@ const RepeatMeetingModal = dynamic(
 const MeetingHistoryModal = dynamic(
   () => import('@/components/meetings/MeetingHistoryModal').then(mod => mod.MeetingHistoryModal),
   {
-    loading: () => <div className="text-sm text-gray-500">Loading...</div>,
+    loading: () => <div className="text-sm text-muted-foreground">Loading...</div>,
     ssr: false
   }
 );
@@ -458,12 +458,12 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
               </div>
               
               {selectedPreviousMeeting && (
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="p-4 bg-primary border border-blue-200 rounded-lg">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-medium text-blue-900">Continuing from:</p>
-                      <p className="text-sm text-blue-700 mt-1">{selectedPreviousMeeting.title}</p>
-                      <p className="text-xs text-blue-600 mt-1">
+                      <p className="font-medium text-primary">Continuing from:</p>
+                      <p className="text-sm text-primary mt-1">{selectedPreviousMeeting.title}</p>
+                      <p className="text-xs text-primary mt-1">
                         {safeFormatDate(selectedPreviousMeeting.start_time)} • 
                         {selectedPreviousMeeting.attendees} attendees • 
                         {selectedPreviousMeeting.agendaItems} agenda items
@@ -486,7 +486,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
                 </div>
               )}
               
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-muted-foreground">
                 Or search manually:
               </div>
               <div className="flex gap-2">
@@ -514,11 +514,11 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
                     {searchResults.map((meeting) => (
                       <div
                         key={meeting.id}
-                        className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
+                        className="p-3 border rounded-lg cursor-pointer hover:bg-muted"
                         onClick={() => setParentMeetingId(meeting.id)}
                       >
                         <div className="font-medium">{meeting.title}</div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-muted-foreground">
                           {safeFormatDate(meeting.start_time)} - {meeting.description}
                         </div>
                       </div>

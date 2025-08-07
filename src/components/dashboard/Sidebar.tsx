@@ -29,7 +29,7 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 py-6">
-        <h2 className="text-2xl font-bold text-gray-800">AgendaIQ</h2>
+        <h2 className="text-2xl font-bold text-foreground">AgendaIQ</h2>
       </div>
       <nav className="flex-1 px-2 py-4 space-y-1">
         {navigation.map((item) => {
@@ -40,15 +40,15 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
               className={clsx(
                 "flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors",
                 {
-                  "bg-gray-100 text-gray-900": isActive(item.href),
-                  "text-gray-600 hover:bg-gray-50 hover:text-gray-900": !isActive(item.href),
+                  "bg-muted text-foreground": isActive(item.href),
+                  "text-muted-foreground hover:bg-muted hover:text-foreground": !isActive(item.href),
                 }
               )}
             >
               <item.icon
                 className={clsx("mr-3 h-5 w-5", {
-                  "text-gray-500": isActive(item.href),
-                  "text-gray-400": !isActive(item.href),
+                  "text-muted-foreground": isActive(item.href),
+                  "text-muted-foreground": !isActive(item.href),
                 })}
               />
               {item.name}

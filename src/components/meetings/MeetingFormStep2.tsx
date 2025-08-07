@@ -167,15 +167,15 @@ export function MeetingFormStep2({
         <CardContent>
           <div className="flex flex-wrap gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-gray-500" />
+              <Calendar className="h-4 w-4 text-muted-foreground" />
               <span>{safeFormatDate(meetingDate, undefined, 'No date')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-gray-500" />
+              <Clock className="h-4 w-4 text-muted-foreground" />
               <span>{safeFormatTime(meetingDate, { hour: '2-digit', minute: '2-digit' }, 'No time')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-gray-500" />
+              <Users className="h-4 w-4 text-muted-foreground" />
               <span>{attendees.length} attendees</span>
             </div>
           </div>
@@ -195,7 +195,7 @@ export function MeetingFormStep2({
         {agendaItems.length === 0 ? (
           <Card>
             <CardContent className="text-center py-8">
-              <p className="text-gray-500 mb-4">No agenda items added yet.</p>
+              <p className="text-muted-foreground mb-4">No agenda items added yet.</p>
               <Button onClick={addAgendaItem}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add First Agenda Item
@@ -209,7 +209,7 @@ export function MeetingFormStep2({
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <GripVertical className="h-4 w-4 text-gray-400" />
+                      <GripVertical className="h-4 w-4 text-muted-foreground" />
                       <span className="font-medium">Item {index + 1}</span>
                     </div>
                     <div className="flex gap-1">
@@ -233,7 +233,7 @@ export function MeetingFormStep2({
                         size="sm"
                         variant="ghost"
                         onClick={() => removeAgendaItem(index)}
-                        className="text-red-600 hover:text-red-700"
+                        className="text-destructive hover:text-destructive"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

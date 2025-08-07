@@ -252,7 +252,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
   const getStatusBadge = (record: ProcessedRecord) => {
     if (record.errors.length > 0) {
       return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-destructive/10 text-destructive">
           Error
         </span>
       );
@@ -266,13 +266,13 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
     }
     if (record.status === 'update') {
       return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary text-primary">
           Update
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-foreground">
         Unknown
       </span>
     );
@@ -282,10 +282,10 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <div className="md:flex md:items-center md:justify-between">
         <div className="min-w-0 flex-1">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+          <h2 className="text-2xl font-bold leading-7 text-foreground sm:truncate sm:text-3xl sm:tracking-tight">
             Staff Upload
           </h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Upload CSV files to bulk import or update staff records with comprehensive validation and conflict resolution
           </p>
         </div>
@@ -293,14 +293,14 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
 
       <div className="mt-8 space-y-6">
         {/* Instructions Card */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="bg-primary border border-blue-200 rounded-lg p-6">
           <div className="flex">
             <div className="flex-shrink-0">
-              <FiFileText className="h-5 w-5 text-blue-400" />
+              <FiFileText className="h-5 w-5 text-primary" />
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800">Upload Instructions</h3>
-              <div className="mt-2 text-sm text-blue-700">
+              <h3 className="text-sm font-medium text-primary">Upload Instructions</h3>
+              <div className="mt-2 text-sm text-primary">
                 <ul className="list-disc pl-5 space-y-1">
                   <li>Use CSV format with columns: Email, Name, StaffId, Role, Department</li>
                   <li>Email addresses must be unique and valid</li>
@@ -315,9 +315,9 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
         </div>
 
         {/* Upload Section */}
-        <div className="bg-white shadow rounded-lg">
+        <div className="bg-card shadow rounded-lg">
           <div className="px-4 py-5 sm:p-6">
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+            <h3 className="text-lg leading-6 font-medium text-foreground mb-4">
               Upload Staff Data
             </h3>
 
@@ -325,7 +325,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
             <div className="mb-6">
               <button
                 onClick={downloadTemplate}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="inline-flex items-center px-4 py-2 border border-border shadow-sm text-sm font-medium rounded-md text-foreground bg-card hover:bg-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
               >
                 <FiDownload className="mr-2 h-4 w-4" />
                 Download CSV Template
@@ -334,7 +334,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
 
             {/* File Upload */}
             <div className="mb-6">
-              <label htmlFor="file-upload" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="file-upload" className="block text-sm font-medium text-foreground mb-2">
                 Select CSV File
               </label>
               <input
@@ -342,10 +342,10 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
                 type="file"
                 accept=".csv"
                 onChange={handleFileChange}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                className="block w-full text-sm text-muted-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary hover:file:bg-primary"
               />
               {file && (
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="mt-2 text-sm text-muted-foreground">
                   Selected: {file.name} ({(file.size / 1024).toFixed(1)} KB)
                 </p>
               )}
@@ -356,10 +356,10 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
               <button
                 onClick={handlePreview}
                 disabled={!file || isLoading}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-foreground bg-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-border mr-2"></div>
                 ) : (
                   <FiEye className="mr-2 h-4 w-4" />
                 )}
@@ -369,10 +369,10 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
               <button
                 onClick={handleUpload}
                 disabled={!showPreview || selectedRecords.size === 0 || isLoading}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-foreground bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-border mr-2"></div>
                 ) : (
                   <FiSave className="mr-2 h-4 w-4" />
                 )}
@@ -382,14 +382,14 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
 
             {/* Status Messages */}
             {error && (
-              <div className="mt-4 bg-red-50 border border-red-200 rounded-md p-4">
+              <div className="mt-4 bg-destructive/10 border border-destructive rounded-md p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <FiAlertCircle className="h-5 w-5 text-red-400" />
+                    <FiAlertCircle className="h-5 w-5 text-destructive" />
                   </div>
                   <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">Error</h3>
-                    <div className="mt-2 text-sm text-red-700">{error}</div>
+                    <h3 className="text-sm font-medium text-destructive">Error</h3>
+                    <div className="mt-2 text-sm text-destructive">{error}</div>
                   </div>
                 </div>
               </div>
@@ -434,17 +434,17 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
 
         {/* Preview Summary */}
         {showPreview && previewSummary && (
-          <div className="bg-white shadow rounded-lg">
+          <div className="bg-card shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+              <h3 className="text-lg leading-6 font-medium text-foreground mb-4">
                 <FiUsers className="inline mr-2 h-5 w-5" />
                 Upload Summary
               </h3>
               
               <div className="grid grid-cols-4 gap-4 mb-6">
-                <div className="bg-gray-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-gray-900">{previewSummary.total}</div>
-                  <div className="text-sm text-gray-500">Total Records</div>
+                <div className="bg-muted p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-foreground">{previewSummary.total}</div>
+                  <div className="text-sm text-muted-foreground">Total Records</div>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg text-center">
                   <div className="text-2xl font-bold text-green-600">{previewSummary.valid}</div>
@@ -454,9 +454,9 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
                   <div className="text-2xl font-bold text-yellow-600">{previewSummary.conflicts}</div>
                   <div className="text-sm text-yellow-600">With Conflicts</div>
                 </div>
-                <div className="bg-red-50 p-4 rounded-lg text-center">
-                  <div className="text-2xl font-bold text-red-600">{previewSummary.errors}</div>
-                  <div className="text-sm text-red-600">Errors</div>
+                <div className="bg-destructive/10 p-4 rounded-lg text-center">
+                  <div className="text-2xl font-bold text-destructive">{previewSummary.errors}</div>
+                  <div className="text-sm text-destructive">Errors</div>
                 </div>
               </div>
 
@@ -464,13 +464,13 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
               <div className="flex space-x-4 mb-4">
                 <button
                   onClick={selectAllValid}
-                  className="text-sm text-blue-600 hover:text-blue-800"
+                  className="text-sm text-primary hover:text-primary"
                 >
                   Select All Valid ({previewSummary.valid})
                 </button>
                 <button
                   onClick={selectNone}
-                  className="text-sm text-gray-600 hover:text-gray-800"
+                  className="text-sm text-muted-foreground hover:text-foreground"
                 >
                   Select None
                 </button>
@@ -481,41 +481,41 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
 
         {/* Detailed Preview */}
         {showPreview && previewData.length > 0 && (
-          <div className="bg-white shadow rounded-lg">
+          <div className="bg-card shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+              <h3 className="text-lg leading-6 font-medium text-foreground mb-4">
                 Detailed Analysis ({previewData.length} records)
               </h3>
 
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-muted">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         <input
                           type="checkbox"
                           checked={selectedRecords.size === previewData.filter(r => r.canUpload).length && previewData.filter(r => r.canUpload).length > 0}
                           onChange={() => selectedRecords.size === previewData.filter(r => r.canUpload).length ? selectNone() : selectAllValid()}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          className="h-4 w-4 text-primary focus:ring-ring border-border rounded"
                         />
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Row</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Staff ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issues/Changes</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Row</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Name</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Staff ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Role</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Department</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Issues/Changes</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-card divide-y divide-gray-200">
                     {previewData.map((record) => (
                       <tr key={record.rowNumber} className={`${
-                        record.errors.length > 0 ? 'bg-red-50' : 
+                        record.errors.length > 0 ? 'bg-destructive/10' : 
                         record.status === 'create' ? 'bg-green-50' : 
-                        record.conflicts.length > 0 ? 'bg-yellow-50' : 'bg-white'
+                        record.conflicts.length > 0 ? 'bg-yellow-50' : 'bg-card'
                       }`}>
                         <td className="px-4 py-4 whitespace-nowrap">
                           <input
@@ -523,20 +523,20 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
                             checked={selectedRecords.has(record.rowNumber)}
                             onChange={() => toggleRecordSelection(record.rowNumber)}
                             disabled={!record.canUpload}
-                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded disabled:opacity-50"
+                            className="h-4 w-4 text-primary focus:ring-ring border-border rounded disabled:opacity-50"
                           />
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.rowNumber}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{record.rowNumber}</td>
                         <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(record)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.email}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.staffId}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.role}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{record.department}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{record.email}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{record.name}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{record.staffId}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{record.role}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{record.department}</td>
                         <td className="px-6 py-4 text-sm">
                           {/* Errors */}
                           {record.errors.length > 0 && (
-                            <div className="text-red-600 space-y-1">
+                            <div className="text-destructive space-y-1">
                               {record.errors.map((error, index) => (
                                 <div key={index} className="flex items-center">
                                   <FiAlertCircle className="h-3 w-3 mr-1" />
@@ -560,7 +560,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
                           
                           {/* Warnings */}
                           {record.warnings.length > 0 && (
-                            <div className="text-blue-600 space-y-1">
+                            <div className="text-primary space-y-1">
                               {record.warnings.map((warning, index) => (
                                 <div key={index}>{warning}</div>
                               ))}
@@ -584,7 +584,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
                                     setRecordAction(record.rowNumber, action);
                                   }
                                 }}
-                                className="text-xs border border-gray-300 rounded px-2 py-1 w-full"
+                                className="text-xs border border-border rounded px-2 py-1 w-full"
                                 disabled={!record.canUpload}
                               >
                                 {record.actions.map((action) => (
@@ -596,17 +596,17 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
                               
                               {/* Show change selection when partial is selected */}
                               {recordActions.get(record.rowNumber) === 'partial' && record.conflicts.length > 0 && (
-                                <div className="bg-gray-50 p-2 rounded text-xs space-y-1">
-                                  <div className="font-medium text-gray-700">Select changes to apply:</div>
+                                <div className="bg-muted p-2 rounded text-xs space-y-1">
+                                  <div className="font-medium text-foreground">Select changes to apply:</div>
                                   {record.conflicts.map((conflict) => (
                                     <label key={conflict.field} className="flex items-center space-x-2">
                                       <input
                                         type="checkbox"
                                         checked={selectedChanges.get(record.rowNumber)?.has(conflict.field) || false}
                                         onChange={() => toggleChangeSelection(record.rowNumber, conflict.field)}
-                                        className="h-3 w-3 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        className="h-3 w-3 text-primary focus:ring-ring border-border rounded"
                                       />
-                                      <span className="text-gray-600">
+                                      <span className="text-muted-foreground">
                                         {conflict.field}: {conflict.existing} → {conflict.new}
                                       </span>
                                     </label>

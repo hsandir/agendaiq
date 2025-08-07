@@ -190,10 +190,10 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'High': return 'bg-red-100 text-red-700';
+      case 'High': return 'bg-destructive/10 text-destructive';
       case 'Medium': return 'bg-yellow-100 text-yellow-700';
       case 'Low': return 'bg-green-100 text-green-700';
-      default: return 'bg-gray-100 text-gray-700';
+      default: return 'bg-muted text-foreground';
     }
   };
 
@@ -201,27 +201,27 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
     switch (status) {
       case 'Resolved': return <CheckCircle className="h-5 w-5 text-green-600" />;
       case 'Ongoing': return <Clock className="h-5 w-5 text-yellow-600" />;
-      case 'Deferred': return <XCircle className="h-5 w-5 text-red-600" />;
-      default: return <AlertCircle className="h-5 w-5 text-gray-600" />;
+      case 'Deferred': return <XCircle className="h-5 w-5 text-destructive" />;
+      default: return <AlertCircle className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
-      <div className="bg-white border-b shadow-sm">
+      <div className="bg-card border-b shadow-sm">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Link 
                 href={`/dashboard/meetings/${meeting.id}/live`}
-                className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Meeting
               </Link>
-              <div className="h-6 w-px bg-gray-300" />
-              <span className="text-sm text-gray-600">{meeting.title}</span>
+              <div className="h-6 w-px bg-muted" />
+              <span className="text-sm text-muted-foreground">{meeting.title}</span>
             </div>
             
             {canEdit && !isEditing && (
@@ -243,11 +243,11 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
           {/* Main Content Area */}
           <div className="lg:col-span-2 space-y-6">
             {/* Topic Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-card rounded-xl shadow-sm border border-border p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   {getStatusIcon(item.status)}
-                  <h1 className="text-2xl font-bold text-gray-900">
+                  <h1 className="text-2xl font-bold text-foreground">
                     {isEditing ? (
                       <Input
                         value={editData.topic}
@@ -269,7 +269,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
               {/* Problem Statement */}
               {(item.problem_statement || isEditing) && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-2">Problem/Need Statement</h3>
+                  <h3 className="text-sm font-semibold text-foreground mb-2">Problem/Need Statement</h3>
                   {isEditing ? (
                     <Textarea
                       value={editData.problem_statement}
@@ -278,7 +278,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                       className="w-full"
                     />
                   ) : (
-                    <p className="text-gray-600 whitespace-pre-wrap">{item.problem_statement}</p>
+                    <p className="text-muted-foreground whitespace-pre-wrap">{item.problem_statement}</p>
                   )}
                 </div>
               )}
@@ -286,7 +286,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
               {/* Proposed Solution */}
               {(item.proposed_solution || isEditing) && (
                 <div className="mb-6">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-2">Proposed Solution</h3>
+                  <h3 className="text-sm font-semibold text-foreground mb-2">Proposed Solution</h3>
                   {isEditing ? (
                     <Textarea
                       value={editData.proposed_solution}
@@ -295,14 +295,14 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                       className="w-full"
                     />
                   ) : (
-                    <p className="text-gray-600 whitespace-pre-wrap">{item.proposed_solution}</p>
+                    <p className="text-muted-foreground whitespace-pre-wrap">{item.proposed_solution}</p>
                   )}
                 </div>
               )}
 
               {/* Decisions & Actions */}
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">Decision(s) & Action(s)</h3>
+                <h3 className="text-sm font-semibold text-foreground mb-2">Decision(s) & Action(s)</h3>
                 {isEditing ? (
                   <Textarea
                     value={editData.decisions_actions}
@@ -311,7 +311,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                     className="w-full"
                   />
                 ) : (
-                  <p className="text-gray-600 whitespace-pre-wrap">
+                  <p className="text-muted-foreground whitespace-pre-wrap">
                     {item.decisions_actions || 'No decisions recorded yet'}
                   </p>
                 )}
@@ -331,7 +331,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                   <Button 
                     onClick={handleSave}
                     disabled={isSaving}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="bg-primary hover:bg-primary"
                   >
                     <Save className="h-4 w-4 mr-2" />
                     {isSaving ? 'Saving...' : 'Save Changes'}
@@ -341,7 +341,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
             </div>
 
             {/* Comments Section */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="bg-card rounded-xl shadow-sm border border-border p-6">
               <AgendaItemComments
                 itemId={item.id}
                 comments={item.Comments || []}
@@ -354,13 +354,13 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             {/* Details Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">Details</h3>
+            <div className="bg-card rounded-xl shadow-sm border border-border p-5">
+              <h3 className="font-semibold text-foreground mb-4">Details</h3>
               
               <div className="space-y-4">
                 {/* Status */}
                 <div>
-                  <label className="text-sm text-gray-600">Status</label>
+                  <label className="text-sm text-muted-foreground">Status</label>
                   {isEditing ? (
                     <Select
                       value={editData.status}
@@ -376,7 +376,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                       </SelectContent>
                     </Select>
                   ) : (
-                    <p className="font-medium text-gray-900 mt-1">
+                    <p className="font-medium text-foreground mt-1">
                       {item.status.replace('_', ' ')}
                     </p>
                   )}
@@ -384,7 +384,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
 
                 {/* Purpose */}
                 <div>
-                  <label className="text-sm text-gray-600">Purpose</label>
+                  <label className="text-sm text-muted-foreground">Purpose</label>
                   {isEditing ? (
                     <Select
                       value={editData.purpose}
@@ -401,7 +401,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                       </SelectContent>
                     </Select>
                   ) : (
-                    <p className="font-medium text-gray-900 mt-1">
+                    <p className="font-medium text-foreground mt-1">
                       {item.purpose.replace('_', ' ')}
                     </p>
                   )}
@@ -410,7 +410,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                 {/* Type of Solution */}
                 {(item.solution_type || isEditing) && (
                   <div>
-                    <label className="text-sm text-gray-600">Type of Solution</label>
+                    <label className="text-sm text-muted-foreground">Type of Solution</label>
                     {isEditing ? (
                       <Select
                         value={editData.solution_type || ''}
@@ -426,7 +426,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                         </SelectContent>
                       </Select>
                     ) : (
-                      <p className="font-medium text-gray-900 mt-1">
+                      <p className="font-medium text-foreground mt-1">
                         {item.solution_type || 'Not specified'}
                       </p>
                     )}
@@ -436,7 +436,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                 {/* Type of Decision */}
                 {(item.decision_type || isEditing) && (
                   <div>
-                    <label className="text-sm text-gray-600">Type of Decision</label>
+                    <label className="text-sm text-muted-foreground">Type of Decision</label>
                     {isEditing ? (
                       <Select
                         value={editData.decision_type || ''}
@@ -452,7 +452,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                         </SelectContent>
                       </Select>
                     ) : (
-                      <p className="font-medium text-gray-900 mt-1">
+                      <p className="font-medium text-foreground mt-1">
                         {item.decision_type || 'Not specified'}
                       </p>
                     )}
@@ -461,7 +461,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
 
                 {/* Responsible Staff */}
                 <div>
-                  <label className="text-sm text-gray-600">Responsible Staff</label>
+                  <label className="text-sm text-muted-foreground">Responsible Staff</label>
                   {isEditing ? (
                     <Select
                       value={editData.responsible_staff_id?.toString() || 'none'}
@@ -486,16 +486,16 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                     <div className="mt-1">
                       {item.ResponsibleStaff ? (
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                            <User className="h-4 w-4 text-blue-600" />
+                          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                            <User className="h-4 w-4 text-primary" />
                           </div>
                           <div>
-                            <p className="font-medium text-gray-900">{item.ResponsibleStaff.User.name}</p>
-                            <p className="text-xs text-gray-500">{item.ResponsibleStaff.Role.title}</p>
+                            <p className="font-medium text-foreground">{item.ResponsibleStaff.User.name}</p>
+                            <p className="text-xs text-muted-foreground">{item.ResponsibleStaff.Role.title}</p>
                           </div>
                         </div>
                       ) : (
-                        <p className="text-gray-500">Unassigned</p>
+                        <p className="text-muted-foreground">Unassigned</p>
                       )}
                     </div>
                   )}
@@ -503,8 +503,8 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
 
                 {/* Created Date */}
                 <div>
-                  <label className="text-sm text-gray-600">Created</label>
-                  <p className="font-medium text-gray-900 mt-1">
+                  <label className="text-sm text-muted-foreground">Created</label>
+                  <p className="font-medium text-foreground mt-1">
                     {(() => {
                       const date = getSafeDate(item.created_at);
                       return date ? format(date, "MMM d, yyyy") : 'Unknown date';
@@ -525,10 +525,10 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
             </div>
 
             {/* Attachments Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+            <div className="bg-card rounded-xl shadow-sm border border-border p-5">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900 flex items-center">
-                  <Paperclip className="h-5 w-5 mr-2 text-gray-600" />
+                <h3 className="font-semibold text-foreground flex items-center">
+                  <Paperclip className="h-5 w-5 mr-2 text-muted-foreground" />
                   Attachments
                 </h3>
                 {canEdit && (
@@ -554,14 +554,14 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
               {item.Attachments?.length > 0 ? (
                 <div className="space-y-2">
                   {item.Attachments.map((attachment: any) => (
-                    <div key={attachment.id} className="flex items-center gap-2 p-2 rounded-lg bg-gray-50">
-                      <FileText className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm text-gray-700">{attachment.file_name}</span>
+                    <div key={attachment.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted">
+                      <FileText className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm text-foreground">{attachment.file_name}</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500 text-center py-4">
+                <p className="text-sm text-muted-foreground text-center py-4">
                   No attachments yet
                 </p>
               )}
@@ -584,12 +584,12 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
               onClick={() => setOngoingChoice('new_meeting')}
               className={`w-full p-4 text-left rounded-lg border transition-colors ${
                 ongoingChoice === 'new_meeting' 
-                  ? 'border-blue-500 bg-blue-50' 
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-blue-500 bg-primary' 
+                  : 'border-border hover:border-border'
               }`}
             >
               <div className="font-medium mb-1">Create a new meeting</div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-muted-foreground">
                 Start a new meeting to continue working on this item
               </div>
             </button>
@@ -597,12 +597,12 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
               onClick={() => setOngoingChoice('next_meeting')}
               className={`w-full p-4 text-left rounded-lg border transition-colors ${
                 ongoingChoice === 'next_meeting' 
-                  ? 'border-blue-500 bg-blue-50' 
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-blue-500 bg-primary' 
+                  : 'border-border hover:border-border'
               }`}
             >
               <div className="font-medium mb-1">Add to next recurring meeting</div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-muted-foreground">
                 This item will be added to the next scheduled meeting in this series
               </div>
             </button>
@@ -614,7 +614,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
             <Button 
               onClick={saveChanges}
               disabled={!ongoingChoice || isSaving}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-primary hover:bg-primary"
             >
               {isSaving ? 'Saving...' : 'Continue'}
             </Button>

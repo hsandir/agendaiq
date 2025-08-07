@@ -62,16 +62,16 @@ export function RoleSwitch({ staff }: RoleSwitchProps) {
         value={staff?.Role?.id?.toString() || ''}
         onChange={handleRoleChange}
         disabled={isLoading}
-        className="ml-2 text-sm border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+        className="ml-2 text-sm border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
       >
         <option value="">Select role</option>
         <option value={staff?.Role?.id?.toString() || ''}>{staff?.Role?.title || 'Current Role'}</option>
       </select>
       {isLoading && (
-        <span className="text-xs text-gray-500">Switching...</span>
+        <span className="text-xs text-muted-foreground">Switching...</span>
       )}
       {error && (
-        <span className="text-xs text-red-500" title={error}>❌</span>
+        <span className="text-xs text-destructive" title={error}>❌</span>
       )}
     </div>
   );

@@ -286,18 +286,18 @@ export default function CICDMonitor() {
   };
 
   const getStatusIcon = (status: string, conclusion: string | null) => {
-    if (status === 'in_progress') return <RefreshCw className="h-4 w-4 animate-spin text-blue-500" />;
-    if (status === 'queued') return <Clock className="h-4 w-4 text-gray-500" />;
+    if (status === 'in_progress') return <RefreshCw className="h-4 w-4 animate-spin text-primary" />;
+    if (status === 'queued') return <Clock className="h-4 w-4 text-muted-foreground" />;
     if (conclusion === 'success') return <CheckCircle className="h-4 w-4 text-green-500" />;
-    if (conclusion === 'failure') return <XCircle className="h-4 w-4 text-red-500" />;
+    if (conclusion === 'failure') return <XCircle className="h-4 w-4 text-destructive" />;
     return <AlertCircle className="h-4 w-4 text-yellow-500" />;
   };
 
   const getStatusBadge = (status: string, conclusion: string | null) => {
-    if (status === 'in_progress') return <Badge className="bg-blue-100 text-blue-800">Running</Badge>;
-    if (status === 'queued') return <Badge className="bg-gray-100 text-gray-800">Queued</Badge>;
+    if (status === 'in_progress') return <Badge className="bg-primary text-primary">Running</Badge>;
+    if (status === 'queued') return <Badge className="bg-muted text-foreground">Queued</Badge>;
     if (conclusion === 'success') return <Badge className="bg-green-100 text-green-800">Success</Badge>;
-    if (conclusion === 'failure') return <Badge className="bg-red-100 text-red-800">Failed</Badge>;
+    if (conclusion === 'failure') return <Badge className="bg-destructive/10 text-destructive">Failed</Badge>;
     return <Badge className="bg-yellow-100 text-yellow-800">Unknown</Badge>;
   };
 
@@ -314,7 +314,7 @@ export default function CICDMonitor() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <RefreshCw className="h-8 w-8 animate-spin text-blue-600" />
+        <RefreshCw className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -325,7 +325,7 @@ export default function CICDMonitor() {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold">CI/CD Monitor</h2>
-          <p className="text-sm text-gray-600">Monitor and fix GitHub Actions workflows</p>
+          <p className="text-sm text-muted-foreground">Monitor and fix GitHub Actions workflows</p>
         </div>
         <div className="flex gap-2">
           {runs.some(r => r.conclusion === 'failure') && (
@@ -385,7 +385,7 @@ export default function CICDMonitor() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Success Rate</p>
+                <p className="text-sm text-muted-foreground">Success Rate</p>
                 <p className="text-2xl font-bold">{stats.successRate}%</p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-600" />
@@ -395,40 +395,40 @@ export default function CICDMonitor() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Failed Runs</p>
+                <p className="text-sm text-muted-foreground">Failed Runs</p>
                 <p className="text-2xl font-bold">{stats.failed}</p>
               </div>
-              <XCircle className="h-8 w-8 text-red-600" />
+              <XCircle className="h-8 w-8 text-destructive" />
             </div>
           </Card>
 
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">In Progress</p>
+                <p className="text-sm text-muted-foreground">In Progress</p>
                 <p className="text-2xl font-bold">{stats.inProgress}</p>
               </div>
-              <RefreshCw className="h-8 w-8 text-blue-600" />
+              <RefreshCw className="h-8 w-8 text-primary" />
             </div>
           </Card>
 
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Avg Duration</p>
+                <p className="text-sm text-muted-foreground">Avg Duration</p>
                 <p className="text-xl font-bold">{stats.averageDuration}</p>
               </div>
-              <Clock className="h-8 w-8 text-purple-600" />
+              <Clock className="h-8 w-8 text-secondary" />
             </div>
           </Card>
 
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Runs</p>
+                <p className="text-sm text-muted-foreground">Total Runs</p>
                 <p className="text-2xl font-bold">{stats.total}</p>
               </div>
-              <PlayCircle className="h-8 w-8 text-gray-600" />
+              <PlayCircle className="h-8 w-8 text-muted-foreground" />
             </div>
           </Card>
         </div>
@@ -493,7 +493,7 @@ export default function CICDMonitor() {
                       <div className="flex items-center gap-2 mb-2">
                         <button
                           onClick={() => toggleRunExpansion(run.id)}
-                          className="p-1 hover:bg-gray-100 rounded"
+                          className="p-1 hover:bg-muted rounded"
                         >
                           {expandedRuns.has(run.id) ? 
                             <ChevronDown className="h-4 w-4" /> : 
@@ -505,7 +505,7 @@ export default function CICDMonitor() {
                         {getStatusBadge(run.status, run.conclusion)}
                       </div>
                       
-                      <div className="flex items-center gap-4 text-sm text-gray-600 ml-7">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground ml-7">
                         <span className="flex items-center gap-1">
                           <GitBranch className="h-3 w-3" />
                           {run.head_branch}
@@ -523,20 +523,20 @@ export default function CICDMonitor() {
                       {/* Expanded content */}
                       {expandedRuns.has(run.id) && run.failedJobs && run.failedJobs.length > 0 && (
                         <div className="mt-4 ml-7 space-y-2">
-                          <div className="bg-red-50 border border-red-200 rounded p-3">
-                            <h4 className="font-semibold text-red-800 mb-2">Failed Jobs:</h4>
+                          <div className="bg-destructive/10 border border-destructive rounded p-3">
+                            <h4 className="font-semibold text-destructive mb-2">Failed Jobs:</h4>
                             {run.failedJobs.map((job) => (
                               <div key={job.id} className="mb-2">
-                                <p className="text-sm font-medium text-red-700">{job.name}</p>
+                                <p className="text-sm font-medium text-destructive">{job.name}</p>
                                 {job.failedSteps && job.failedSteps.length > 0 && (
-                                  <ul className="mt-1 ml-4 text-xs text-red-600">
+                                  <ul className="mt-1 ml-4 text-xs text-destructive">
                                     {job.failedSteps.map((step, idx) => (
                                       <li key={idx}>• {step.name}</li>
                                     ))}
                                   </ul>
                                 )}
                                 {job.logs && (
-                                  <pre className="mt-2 p-2 bg-gray-900 text-gray-100 text-xs rounded overflow-x-auto">
+                                  <pre className="mt-2 p-2 bg-background text-muted-foreground text-xs rounded overflow-x-auto">
                                     {job.logs.split('\n').slice(-10).join('\n')}
                                   </pre>
                                 )}
@@ -588,7 +588,7 @@ export default function CICDMonitor() {
             <div className="space-y-4">
               <Card className="p-4">
                 <h3 className="text-lg font-semibold mb-2">Selected Failed Run</h3>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-muted-foreground">
                   <p><strong>Workflow:</strong> {selectedRun.name}</p>
                   <p><strong>Branch:</strong> {selectedRun.head_branch}</p>
                   <p><strong>Error Type:</strong> {detectErrorType(selectedRun.failedJobs?.[0])}</p>
@@ -608,21 +608,21 @@ export default function CICDMonitor() {
                               className={
                                 suggestion.confidence === 'high' ? 'bg-green-100 text-green-800' :
                                 suggestion.confidence === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-gray-100 text-gray-800'
+                                'bg-muted text-foreground'
                               }
                             >
                               {suggestion.confidence} confidence
                             </Badge>
                             {suggestion.preventive && (
-                              <Badge className="bg-blue-100 text-blue-800">Preventive</Badge>
+                              <Badge className="bg-primary text-primary">Preventive</Badge>
                             )}
                           </div>
-                          <p className="text-sm text-gray-600 mb-2">{suggestion.description}</p>
+                          <p className="text-sm text-muted-foreground mb-2">{suggestion.description}</p>
                           
                           {suggestion.commands.length > 0 && (
                             <div className="mt-2">
-                              <p className="text-xs font-semibold text-gray-700">Commands:</p>
-                              <pre className="mt-1 p-2 bg-gray-100 text-xs rounded overflow-x-auto">
+                              <p className="text-xs font-semibold text-foreground">Commands:</p>
+                              <pre className="mt-1 p-2 bg-muted text-xs rounded overflow-x-auto">
                                 {suggestion.commands.join('\n')}
                               </pre>
                             </div>
@@ -630,8 +630,8 @@ export default function CICDMonitor() {
                           
                           {suggestion.files.length > 0 && (
                             <div className="mt-2">
-                              <p className="text-xs font-semibold text-gray-700">File changes:</p>
-                              <ul className="mt-1 text-xs text-gray-600">
+                              <p className="text-xs font-semibold text-foreground">File changes:</p>
+                              <ul className="mt-1 text-xs text-muted-foreground">
                                 {suggestion.files.map((file, idx) => (
                                   <li key={idx}>
                                     <FileCode className="h-3 w-3 inline mr-1" />
@@ -673,8 +673,8 @@ export default function CICDMonitor() {
             </div>
           ) : (
             <Card className="p-8 text-center">
-              <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">Select a failed workflow run to see auto-fix suggestions</p>
+              <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">Select a failed workflow run to see auto-fix suggestions</p>
             </Card>
           )}
         </TabsContent>
@@ -687,7 +687,7 @@ export default function CICDMonitor() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Email Notifications</p>
-                  <p className="text-sm text-gray-600">Receive email alerts for failed workflows</p>
+                  <p className="text-sm text-muted-foreground">Receive email alerts for failed workflows</p>
                 </div>
                 <Button
                   variant={emailNotifications ? 'default' : 'outline'}
@@ -701,7 +701,7 @@ export default function CICDMonitor() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Auto-fix on Failure</p>
-                  <p className="text-sm text-gray-600">Automatically attempt to fix common errors</p>
+                  <p className="text-sm text-muted-foreground">Automatically attempt to fix common errors</p>
                 </div>
                 <Button 
                   variant={autoFixOnFailure ? 'default' : 'outline'} 
@@ -715,7 +715,7 @@ export default function CICDMonitor() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Slack Integration</p>
-                  <p className="text-sm text-gray-600">Send notifications to Slack channel</p>
+                  <p className="text-sm text-muted-foreground">Send notifications to Slack channel</p>
                 </div>
                 <Button variant="outline" size="sm">
                   <Settings className="h-4 w-4 mr-2" />
@@ -726,7 +726,7 @@ export default function CICDMonitor() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">GitHub Token</p>
-                  <p className="text-sm text-gray-600">Configure GitHub access token for API calls</p>
+                  <p className="text-sm text-muted-foreground">Configure GitHub access token for API calls</p>
                 </div>
                 <Button variant="outline" size="sm">
                   <Settings className="h-4 w-4 mr-2" />

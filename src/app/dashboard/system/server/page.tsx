@@ -247,7 +247,7 @@ export default function ServerManagementPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Monitor className="h-5 w-5 mr-2 text-blue-600" />
+                  <Monitor className="h-5 w-5 mr-2 text-primary" />
                   System Information
                 </CardTitle>
                 <CardDescription>Server specifications and runtime details</CardDescription>
@@ -256,34 +256,34 @@ export default function ServerManagementPage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Platform</p>
-                      <p className="text-sm text-gray-900">{metrics.system.platform}</p>
+                      <p className="text-sm font-medium text-muted-foreground">Platform</p>
+                      <p className="text-sm text-foreground">{metrics.system.platform}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Architecture</p>
-                      <p className="text-sm text-gray-900">{metrics.system.architecture}</p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Node.js Version</p>
-                      <p className="text-sm text-gray-900">v{metrics.system.nodeVersion}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Next.js Version</p>
-                      <p className="text-sm text-gray-900">v{metrics.system.nextVersion}</p>
+                      <p className="text-sm font-medium text-muted-foreground">Architecture</p>
+                      <p className="text-sm text-foreground">{metrics.system.architecture}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Hostname</p>
-                      <p className="text-sm text-gray-900">{metrics.system.hostname}</p>
+                      <p className="text-sm font-medium text-muted-foreground">Node.js Version</p>
+                      <p className="text-sm text-foreground">v{metrics.system.nodeVersion}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Uptime</p>
+                      <p className="text-sm font-medium text-muted-foreground">Next.js Version</p>
+                      <p className="text-sm text-foreground">v{metrics.system.nextVersion}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Hostname</p>
+                      <p className="text-sm text-foreground">{metrics.system.hostname}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Uptime</p>
                       <div className="flex items-center">
                         <Clock className="w-4 h-4 mr-1 text-green-600" />
-                        <p className="text-sm text-gray-900">{metrics.system.uptime}</p>
+                        <p className="text-sm text-foreground">{metrics.system.uptime}</p>
                       </div>
                     </div>
                   </div>
@@ -304,11 +304,11 @@ export default function ServerManagementPage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Protocol</p>
-                      <p className="text-sm text-gray-900">{metrics.network.protocol}</p>
+                      <p className="text-sm font-medium text-muted-foreground">Protocol</p>
+                      <p className="text-sm text-foreground">{metrics.network.protocol}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Status</p>
+                      <p className="text-sm font-medium text-muted-foreground">Status</p>
                       <Badge variant="outline" className="text-green-600 border-green-600">
                         <CheckCircle className="w-3 h-3 mr-1" />
                         {metrics.network.status}
@@ -317,17 +317,17 @@ export default function ServerManagementPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Host</p>
-                      <p className="text-sm text-gray-900">{metrics.network.host}</p>
+                      <p className="text-sm font-medium text-muted-foreground">Host</p>
+                      <p className="text-sm text-foreground">{metrics.network.host}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Port</p>
-                      <p className="text-sm text-gray-900">{metrics.network.port}</p>
+                      <p className="text-sm font-medium text-muted-foreground">Port</p>
+                      <p className="text-sm text-foreground">{metrics.network.port}</p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Full URL</p>
-                    <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                    <p className="text-sm font-medium text-muted-foreground">Full URL</p>
+                    <code className="text-xs bg-muted px-2 py-1 rounded">
                       {metrics.network.protocol.toLowerCase()}://{metrics.network.host}:{metrics.network.port}
                     </code>
                   </div>
@@ -340,7 +340,7 @@ export default function ServerManagementPage() {
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Activity className="h-5 w-5 mr-2 text-purple-600" />
+                <Activity className="h-5 w-5 mr-2 text-secondary" />
                 Performance Details
               </CardTitle>
               <CardDescription>Detailed resource usage and performance metrics</CardDescription>
@@ -355,15 +355,15 @@ export default function ServerManagementPage() {
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Total</span>
+                      <span className="text-sm text-muted-foreground">Total</span>
                       <span className="text-sm font-medium">{formatBytes(metrics.performance.memory.total)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Used</span>
+                      <span className="text-sm text-muted-foreground">Used</span>
                       <span className="text-sm font-medium">{formatBytes(metrics.performance.memory.used)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Free</span>
+                      <span className="text-sm text-muted-foreground">Free</span>
                       <span className="text-sm font-medium">{formatBytes(metrics.performance.memory.free)}</span>
                     </div>
                     <div className="mt-3">
@@ -384,15 +384,15 @@ export default function ServerManagementPage() {
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Model</span>
+                      <span className="text-sm text-muted-foreground">Model</span>
                       <span className="text-sm font-medium">{metrics.performance.cpu.model}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Cores</span>
+                      <span className="text-sm text-muted-foreground">Cores</span>
                       <span className="text-sm font-medium">{metrics.performance.cpu.cores}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Current Load</span>
+                      <span className="text-sm text-muted-foreground">Current Load</span>
                       <span className="text-sm font-medium">{metrics.performance.cpu.usage}%</span>
                     </div>
                     <div className="mt-3">
@@ -413,15 +413,15 @@ export default function ServerManagementPage() {
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Total</span>
+                      <span className="text-sm text-muted-foreground">Total</span>
                       <span className="text-sm font-medium">{formatBytes(metrics.performance.disk.total)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Used</span>
+                      <span className="text-sm text-muted-foreground">Used</span>
                       <span className="text-sm font-medium">{formatBytes(metrics.performance.disk.used)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Free</span>
+                      <span className="text-sm text-muted-foreground">Free</span>
                       <span className="text-sm font-medium">{formatBytes(metrics.performance.disk.free)}</span>
                     </div>
                     <div className="mt-3">
@@ -455,7 +455,7 @@ export default function ServerManagementPage() {
                 
                 {metrics.health.alerts.length > 0 ? (
                   <div>
-                    <p className="text-sm font-medium text-gray-600 mb-2">Active Alerts</p>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">Active Alerts</p>
                     <div className="space-y-2">
                       {metrics.health.alerts.map((alert, index) => (
                         <Alert key={index} className="border-yellow-200 bg-yellow-50">

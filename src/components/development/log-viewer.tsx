@@ -99,15 +99,15 @@ export default function LogViewer() {
   }
 
   const getContextColor = (context?: string) => {
-    if (!context) return 'text-gray-500'
+    if (!context) return 'text-muted-foreground'
     const colors = {
-      auth: 'text-blue-600',
+      auth: 'text-primary',
       meetings: 'text-green-600',
-      database: 'text-purple-600',
+      database: 'text-secondary',
       api: 'text-orange-600',
-      security: 'text-red-600',
+      security: 'text-destructive',
     }
-    return colors[context] || 'text-gray-600'
+    return colors[context] || 'text-muted-foreground'
   }
 
   const contexts = ['all', ...new Set(logs.map(log => log.context).filter(Boolean))]
@@ -164,7 +164,7 @@ export default function LogViewer() {
           {/* Filters */}
           <div className="flex space-x-4 mb-4">
             <div className="flex-1 relative">
-              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 placeholder="Search logs..."
                 value={filter}
@@ -202,7 +202,7 @@ export default function LogViewer() {
           {/* Log stats */}
           <div className="flex space-x-4 mb-4 text-sm">
             <div>Total: <span className="font-medium">{filteredLogs.length}</span></div>
-            <div>Errors: <span className="font-medium text-red-600">
+            <div>Errors: <span className="font-medium text-destructive">
               {filteredLogs.filter(l => l.level === 'error').length}
             </span></div>
             <div>Warnings: <span className="font-medium text-yellow-600">
@@ -222,14 +222,14 @@ export default function LogViewer() {
                   <div
                     key={log.id}
                     className={`p-3 border rounded-lg font-mono text-xs ${
-                      log.level === 'error' ? 'border-red-200 bg-red-50' :
+                      log.level === 'error' ? 'border-destructive bg-destructive/10' :
                       log.level === 'warn' ? 'border-yellow-200 bg-yellow-50' :
                       ''
                     }`}
                   >
                     <div className="flex items-start justify-between mb-1">
                       <div className="flex items-center space-x-2">
-                        <span className="text-gray-500">
+                        <span className="text-muted-foreground">
                           {new Date(log.timestamp).toLocaleTimeString()}
                         </span>
                         <Badge variant={getLevelBadgeVariant(log.level)} className="text-xs">
@@ -241,14 +241,14 @@ export default function LogViewer() {
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center space-x-2 text-gray-500">
+                      <div className="flex items-center space-x-2 text-muted-foreground">
                         {log.userId && <span>User: {log.userId}</span>}
                         {log.requestId && <span>Req: {log.requestId}</span>}
                       </div>
                     </div>
-                    <div className="text-gray-800">{log.message}</div>
+                    <div className="text-foreground">{log.message}</div>
                     {log.data && Object.keys(log.data).length > 0 && (
-                      <div className="mt-2 p-2 bg-gray-100 rounded text-gray-600">
+                      <div className="mt-2 p-2 bg-muted rounded text-muted-foreground">
                         {JSON.stringify(log.data, null, 2)}
                       </div>
                     )}

@@ -344,7 +344,7 @@ export default function LintErrorManagementPage() {
                 <Bug className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-red-600">{lintStatus.summary.totalErrors}</div>
+                <div className="text-2xl font-bold text-destructive">{lintStatus.summary.totalErrors}</div>
                 <p className="text-xs text-muted-foreground">
                   in {lintStatus.summary.errorFiles} files
                 </p>
@@ -385,7 +385,7 @@ export default function LintErrorManagementPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Bug className="h-5 w-5 mr-2 text-red-600" />
+                  <Bug className="h-5 w-5 mr-2 text-destructive" />
                   Error Summary
                 </CardTitle>
                 <CardDescription>Most problematic files requiring attention</CardDescription>
@@ -429,7 +429,7 @@ export default function LintErrorManagementPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Settings className="h-5 w-5 mr-2 text-blue-600" />
+                  <Settings className="h-5 w-5 mr-2 text-primary" />
                   Recent Fixes
                 </CardTitle>
                 <CardDescription>Latest automatic and manual fixes applied</CardDescription>
@@ -500,14 +500,14 @@ export default function LintErrorManagementPage() {
                           <div key={issueIndex} className="flex items-start space-x-3 text-sm">
                             <div className="flex-shrink-0">
                               {issue.severity === 'error' ? (
-                                <AlertCircle className="w-4 h-4 text-red-600 mt-0.5" />
+                                <AlertCircle className="w-4 h-4 text-destructive mt-0.5" />
                               ) : (
                                 <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5" />
                               )}
                             </div>
                             <div className="flex-1">
-                              <p className="text-gray-900">{issue.message}</p>
-                              <p className="text-gray-500 text-xs">
+                              <p className="text-foreground">{issue.message}</p>
+                              <p className="text-muted-foreground text-xs">
                                 Line {issue.line}:{issue.column} • {issue.rule}
                               </p>
                             </div>

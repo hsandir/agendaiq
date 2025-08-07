@@ -123,7 +123,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
                 placeholder="Enter meeting agenda items..."
                 className="mt-2"
               />
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 List the topics and items to be discussed in this meeting
               </p>
             </div>
@@ -145,7 +145,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
                 placeholder="Add any preparation notes or additional information..."
                 className="mt-2"
               />
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Add any preparation notes, background information, or additional details
               </p>
             </div>

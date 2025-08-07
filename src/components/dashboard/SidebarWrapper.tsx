@@ -29,7 +29,7 @@ export function SidebarWrapper({ isAdmin }: SidebarWrapperProps) {
       />
       
       {/* Main Sidebar */}
-      <aside className="w-64 bg-white border-r h-full">
+      <aside className="w-64 bg-card border-r h-full">
         <Sidebar onSettingsClick={handleSettingsClick} />
       </aside>
     </>

@@ -18,11 +18,11 @@ function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-6">
-        <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
+    <div className="min-h-screen flex items-center justify-center bg-muted">
+      <div className="max-w-md w-full bg-card shadow-lg rounded-lg p-6">
+        <div className="flex items-center justify-center w-12 h-12 mx-auto bg-destructive/10 rounded-full">
           <svg
-            className="w-6 h-6 text-red-600"
+            className="w-6 h-6 text-destructive"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -36,16 +36,16 @@ function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
           </svg>
         </div>
         
-        <h2 className="mt-4 text-xl font-semibold text-center text-gray-900">
+        <h2 className="mt-4 text-xl font-semibold text-center text-foreground">
           Something went wrong
         </h2>
         
-        <p className="mt-2 text-sm text-center text-gray-600">
+        <p className="mt-2 text-sm text-center text-muted-foreground">
           An unexpected error occurred. We have been notified and are working to fix it.
         </p>
         
         {process.env.NODE_ENV === 'development' && (
-          <details className="mt-4 p-4 bg-gray-100 rounded text-xs">
+          <details className="mt-4 p-4 bg-muted rounded text-xs">
             <summary className="cursor-pointer font-medium">Error details</summary>
             <pre className="mt-2 whitespace-pre-wrap break-words">
               {error.message}
@@ -57,14 +57,14 @@ function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
         <div className="mt-6 flex gap-3">
           <button
             onClick={resetErrorBoundary}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            className="flex-1 px-4 py-2 bg-primary text-foreground rounded-md hover:bg-primary transition-colors"
           >
             Try again
           </button>
           
           <button
             onClick={() => window.location.href = '/dashboard'}
-            className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+            className="flex-1 px-4 py-2 bg-muted text-foreground rounded-md hover:bg-muted transition-colors"
           >
             Go to Dashboard
           </button>

@@ -79,21 +79,21 @@ export function TwoFactorSetup() {
       <div className="space-y-6">
         <div>
           <h3 className="text-lg font-medium">Enable Two-Factor Authentication</h3>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-muted-foreground">
             Add an extra layer of security to your account by enabling two-factor authentication.
           </p>
         </div>
 
         {error && (
-          <div className="rounded-md bg-red-50 p-4">
-            <p className="text-sm text-red-800">{error}</p>
+          <div className="rounded-md bg-destructive/10 p-4">
+            <p className="text-sm text-destructive">{error}</p>
           </div>
         )}
 
         <button
           onClick={startSetup}
           disabled={isLoading}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+          className="bg-primary text-foreground px-4 py-2 rounded-md hover:bg-primary disabled:opacity-50"
         >
           {isLoading ? "Setting up..." : "Enable 2FA"}
         </button>
@@ -106,7 +106,7 @@ export function TwoFactorSetup() {
       <div className="space-y-6">
         <div>
           <h3 className="text-lg font-medium">Scan QR Code</h3>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-muted-foreground">
             Use your authenticator app to scan this QR code.
           </p>
         </div>
@@ -118,14 +118,14 @@ export function TwoFactorSetup() {
         )}
 
         <div>
-          <p className="text-sm font-medium text-gray-700">Manual entry key:</p>
-          <code className="mt-1 block bg-gray-100 p-2 rounded text-xs break-all">
+          <p className="text-sm font-medium text-foreground">Manual entry key:</p>
+          <code className="mt-1 block bg-muted p-2 rounded text-xs break-all">
             {manualKey}
           </code>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-foreground">
             Enter verification code
           </label>
           <input
@@ -134,13 +134,13 @@ export function TwoFactorSetup() {
             onChange={(e) => setVerificationCode(e.target.value)}
             placeholder="000000"
             maxLength={6}
-            className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="mt-1 w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
 
         {error && (
-          <div className="rounded-md bg-red-50 p-4">
-            <p className="text-sm text-red-800">{error}</p>
+          <div className="rounded-md bg-destructive/10 p-4">
+            <p className="text-sm text-destructive">{error}</p>
           </div>
         )}
 
@@ -148,7 +148,7 @@ export function TwoFactorSetup() {
           <button
             onClick={verifyCode}
             disabled={isLoading || verificationCode.length !== 6}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+            className="bg-primary text-foreground px-4 py-2 rounded-md hover:bg-primary disabled:opacity-50"
           >
             {isLoading ? "Verifying..." : "Verify and Enable"}
           </button>
@@ -157,7 +157,7 @@ export function TwoFactorSetup() {
               setStep('setup');
               setError("");
             }}
-            className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300"
+            className="bg-muted text-foreground px-4 py-2 rounded-md hover:bg-muted"
           >
             Cancel
           </button>
@@ -175,12 +175,12 @@ export function TwoFactorSetup() {
       </div>
 
       <div>
-        <h4 className="text-sm font-medium text-gray-900">Backup Codes</h4>
-        <p className="mt-1 text-sm text-gray-600">
+        <h4 className="text-sm font-medium text-foreground">Backup Codes</h4>
+        <p className="mt-1 text-sm text-muted-foreground">
           Save these backup codes in a secure place. You can use them to access your account if you lose your authenticator device.
         </p>
         
-        <div className="mt-3 bg-gray-50 p-4 rounded-md">
+        <div className="mt-3 bg-muted p-4 rounded-md">
           <div className="grid grid-cols-2 gap-2 font-mono text-sm">
             {backupCodes.map((code, index) => (
               <div key={index}>{code}</div>
@@ -191,13 +191,13 @@ export function TwoFactorSetup() {
         <div className="mt-4 flex space-x-3">
           <button
             onClick={downloadBackupCodes}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            className="bg-primary text-foreground px-4 py-2 rounded-md hover:bg-primary"
           >
             Download Codes
           </button>
           <button
             onClick={() => router.push("/dashboard/settings")}
-            className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300"
+            className="bg-muted text-foreground px-4 py-2 rounded-md hover:bg-muted"
           >
             Done
           </button>

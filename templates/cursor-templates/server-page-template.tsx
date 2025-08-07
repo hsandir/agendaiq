@@ -35,7 +35,7 @@ export default async function PAGE_NAME() {
 
   // REQUIRED: Your page JSX here
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 bg-background text-foreground">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">PAGE_TITLE</h1>
         <p className="text-muted-foreground">PAGE_DESCRIPTION</p>
