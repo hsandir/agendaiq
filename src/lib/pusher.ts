@@ -1,26 +1,26 @@
-import Pusher from 'pusher';
-import PusherClient from 'pusher-js';
+// Pusher functionality temporarily disabled for performance optimization
+// Will be replaced with WebSocket or Server-Sent Events
 
-// Server-side Pusher instance
-export const pusherServer = new Pusher({
-  appId: process.env.PUSHER_APP_ID!,
-  key: process.env.NEXT_PUBLIC_PUSHER_KEY!,
-  secret: process.env.PUSHER_SECRET!,
-  cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-  useTLS: true,
-});
+// Mock Pusher server (does nothing)
+export const pusherServer = {
+  trigger: async (channel: string, event: string, data: any) => {
+    // No-op - real-time features temporarily disabled
+    console.log('Real-time event skipped:', { channel, event });
+    return Promise.resolve();
+  }
+};
 
-// Client-side Pusher instance factory
+// Mock Pusher client factory
 export const getPusherClient = () => {
-  return new PusherClient(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-    cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
-    authEndpoint: '/api/pusher/auth',
-    auth: {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  });
+  return {
+    subscribe: (channel: string) => ({
+      bind: (event: string, callback: Function) => {},
+      unbind: (event: string) => {},
+      unsubscribe: () => {}
+    }),
+    unsubscribe: (channel: string) => {},
+    disconnect: () => {}
+  };
 };
 
 // Channel names

@@ -5,6 +5,7 @@ import { Logger } from "@/lib/utils/logger";
 import { MeetingWithRelations, MeetingResponse, CreateMeetingRequest } from "@/types/meeting";
 import { sanitizeMeetingData } from "@/lib/utils/sanitization";
 import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
+import { memoryCache, cacheKeys, CACHE_DURATIONS } from "@/lib/utils/cache";
 import { z } from "zod";
 
 // Validation schema for creating meetings
@@ -25,6 +26,12 @@ export async function GET(request: NextRequest) {
   }
 
   const user = authResult.user!;
+  
+  // Add pagination parameters
+  const searchParams = request.nextUrl.searchParams;
+  const page = parseInt(searchParams.get('page') || '1');
+  const limit = parseInt(searchParams.get('limit') || '20');
+  const skip = (page - 1) * limit;
 
   try {
     if (!user.staff) {
@@ -33,6 +40,15 @@ export async function GET(request: NextRequest) {
 
     const staffRecord = user.staff;
     const isAdmin = staffRecord.role?.title === 'Administrator';
+    
+    // Check cache first
+    const cacheKey = cacheKeys.staffMeetings(staffRecord.id, page);
+    const cached = memoryCache.get(cacheKey);
+    if (cached) {
+      const response = NextResponse.json(cached);
+      response.headers.set('X-Cache', 'HIT');
+      return response;
+    }
 
     let meetingWhereClause;
 
@@ -78,12 +94,32 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    // Fetch meetings based on permission level
+    // Get total count for pagination
+    const totalCount = await prisma.meeting.count({
+      where: meetingWhereClause
+    });
+
+    // Fetch meetings based on permission level with optimized query and pagination
     const meetings = await prisma.meeting.findMany({
       where: meetingWhereClause,
-      include: {
+      skip,
+      take: limit,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        start_time: true,
+        end_time: true,
+        zoom_join_url: true,
+        zoom_meeting_id: true,
+        status: true,
+        repeat_pattern: true,
+        is_continuation: true,
+        created_at: true,
+        organizer_id: true,
         Staff: {
-          include: {
+          select: {
+            id: true,
             User: {
               select: {
                 id: true,
@@ -91,13 +127,22 @@ export async function GET(request: NextRequest) {
                 email: true,
               },
             },
-            Role: true
+            Role: {
+              select: {
+                id: true,
+                title: true,
+                is_leadership: true
+              }
+            }
           },
         },
         MeetingAttendee: {
-          include: {
+          select: {
+            id: true,
+            status: true,
             Staff: {
-              include: {
+              select: {
+                id: true,
                 User: {
                   select: {
                     id: true,
@@ -105,7 +150,12 @@ export async function GET(request: NextRequest) {
                     email: true,
                   },
                 },
-                Role: true
+                Role: {
+                  select: {
+                    id: true,
+                    title: true
+                  }
+                }
               },
             },
           },
@@ -140,7 +190,23 @@ export async function GET(request: NextRequest) {
       })),
     }));
 
-    return NextResponse.json({ meetings: formattedMeetings });
+    const responseData = { 
+      meetings: formattedMeetings,
+      pagination: {
+        page,
+        limit,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / limit)
+      }
+    };
+    
+    // Cache the response
+    memoryCache.set(cacheKey, responseData, CACHE_DURATIONS.short);
+    
+    const response = NextResponse.json(responseData);
+    response.headers.set('X-Cache', 'MISS');
+    response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+    return response;
   } catch (error) {
     await Logger.error("Failed to fetch meetings", { error: String(error), userId: user.id, staffId: user.staff?.id }, "meetings");
     return NextResponse.json({ error: "Failed to fetch meetings" }, { status: 500 });
@@ -279,6 +345,9 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+    
+    // Clear cache after creating a new meeting
+    memoryCache.clear('meetings');
 
     // Format the response
     const formattedMeeting = {

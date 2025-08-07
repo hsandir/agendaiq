@@ -17,9 +17,6 @@ Sentry.init({
   // Release tracking
   release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
   
-  // Server specific settings
-  autoSessionTracking: true,
-  
   // Integrations
   integrations: [
     // Database monitoring will be added when needed
@@ -30,7 +27,8 @@ Sentry.init({
     // Filter out specific errors in development
     if (process.env.NODE_ENV === 'development') {
       // Ignore hot reload errors
-      if (hint.originalException?.message?.includes('ECONNREFUSED')) {
+      const error = hint.originalException as Error;
+      if (error && error.message && error.message.includes('ECONNREFUSED')) {
         return null;
       }
     }
@@ -47,9 +45,10 @@ Sentry.init({
       // Remove sensitive data from body
       if (event.request.data) {
         const sensitiveFields = ['password', 'token', 'secret', 'apiKey'];
+        const requestData = event.request.data as any;
         sensitiveFields.forEach(field => {
-          if (event.request.data[field]) {
-            event.request.data[field] = '[REDACTED]';
+          if (requestData[field]) {
+            requestData[field] = '[REDACTED]';
           }
         });
       }

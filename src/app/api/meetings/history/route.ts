@@ -36,20 +36,20 @@ export async function GET(request: NextRequest) {
         whereClause.organizer_id = user.staff?.id;
         break;
       case 'department':
-        if (user.staff?.department_id) {
+        if (user.staff?.department?.id) {
           if (includeSubDepartments) {
             // Get all departments in hierarchy
             const departments = await prisma.department.findMany({
               where: {
                 OR: [
-                  { id: user.staff.department_id },
-                  { parent_id: user.staff.department_id }
+                  { id: user.staff.department.id },
+                  { parent_id: user.staff.department.id }
                 ]
               }
             });
             whereClause.department_id = { in: departments.map(d => d.id) };
           } else {
-            whereClause.department_id = user.staff.department_id;
+            whereClause.department_id = user.staff.department.id;
           }
         }
         break;

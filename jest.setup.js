@@ -41,6 +41,17 @@ jest.mock('next-auth/react', () => ({
   SessionProvider: ({ children }) => children,
 }))
 
+// Mock lucide-react
+jest.mock('lucide-react', () => ({
+  ...jest.requireActual('lucide-react'),
+  Palette: () => null,
+  Sun: () => null,
+  Moon: () => null,
+  Eye: () => null,
+  Leaf: () => null,
+  Check: () => null,
+}))
+
 // Mock Pusher
 jest.mock('pusher-js', () => {
   return jest.fn().mockImplementation(() => ({

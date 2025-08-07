@@ -58,6 +58,11 @@ interface Meeting {
   parentMeetingId?: number;
 }
 
+interface ImportOptions {
+  importAgendaItems: boolean;
+  importAttendees: boolean;
+}
+
 interface MeetingHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -65,6 +70,8 @@ interface MeetingHistoryModalProps {
   currentUserId?: string;
   currentDepartment?: string;
   currentRole?: string;
+  multiSelect?: boolean;
+  onSelectMultipleMeetings?: (meetings: Meeting[], options: ImportOptions) => void;
 }
 
 export function MeetingHistoryModal({
@@ -73,7 +80,9 @@ export function MeetingHistoryModal({
   onSelectMeeting,
   currentUserId,
   currentDepartment,
-  currentRole
+  currentRole,
+  multiSelect = false,
+  onSelectMultipleMeetings
 }: MeetingHistoryModalProps) {
   const [activeTab, setActiveTab] = useState("recent");
   const [searchQuery, setSearchQuery] = useState("");
@@ -85,6 +94,9 @@ export function MeetingHistoryModal({
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
   const [includeSubDepartments, setIncludeSubDepartments] = useState(true);
   const [onlyWithActionItems, setOnlyWithActionItems] = useState(false);
+  const [selectedMeetingIds, setSelectedMeetingIds] = useState<Set<number>>(new Set());
+  const [importAgendaItems, setImportAgendaItems] = useState(true);
+  const [importAttendees, setImportAttendees] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
@@ -147,11 +159,30 @@ export function MeetingHistoryModal({
   };
 
   const handleSelectMeeting = (meeting: Meeting) => {
-    setSelectedMeeting(meeting);
+    if (multiSelect) {
+      const newSelected = new Set(selectedMeetingIds);
+      if (newSelected.has(meeting.id)) {
+        newSelected.delete(meeting.id);
+      } else {
+        newSelected.add(meeting.id);
+      }
+      setSelectedMeetingIds(newSelected);
+    } else {
+      setSelectedMeeting(meeting);
+    }
   };
 
   const confirmSelection = () => {
-    if (selectedMeeting) {
+    if (multiSelect && onSelectMultipleMeetings) {
+      const selected = meetings.filter(m => selectedMeetingIds.has(m.id));
+      if (selected.length > 0) {
+        onSelectMultipleMeetings(selected, {
+          importAgendaItems,
+          importAttendees
+        });
+        onClose();
+      }
+    } else if (selectedMeeting) {
       onSelectMeeting(selectedMeeting);
       onClose();
     }
@@ -300,7 +331,9 @@ export function MeetingHistoryModal({
                       <Card
                         key={meeting.id}
                         className={`cursor-pointer transition-all hover:shadow-md ${
-                          selectedMeeting?.id === meeting.id ? "ring-2 ring-blue-500" : ""
+                          multiSelect 
+                            ? selectedMeetingIds.has(meeting.id) ? "ring-2 ring-blue-500" : ""
+                            : selectedMeeting?.id === meeting.id ? "ring-2 ring-blue-500" : ""
                         }`}
                         onClick={() => handleSelectMeeting(meeting)}
                       >
@@ -308,6 +341,13 @@ export function MeetingHistoryModal({
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
                               <CardTitle className="text-base flex items-center gap-2">
+                                {multiSelect && (
+                                  <Checkbox 
+                                    checked={selectedMeetingIds.has(meeting.id)}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onCheckedChange={() => handleSelectMeeting(meeting)}
+                                  />
+                                )}
                                 {getMeetingStatusIcon(meeting.status)}
                                 {meeting.title}
                                 {meeting.isRecurring && (
@@ -395,15 +435,35 @@ export function MeetingHistoryModal({
               <span>No meeting selected</span>
             )}
           </div>
+          {multiSelect && selectedMeetingIds.size > 0 && (
+            <div className="flex items-center gap-3 mr-4">
+              <label className="flex items-center gap-2 text-sm">
+                <Checkbox
+                  checked={importAgendaItems}
+                  onCheckedChange={(checked) => setImportAgendaItems(checked as boolean)}
+                />
+                Import Agenda Items
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <Checkbox
+                  checked={importAttendees}
+                  onCheckedChange={(checked) => setImportAttendees(checked as boolean)}
+                />
+                Import Attendees
+              </label>
+            </div>
+          )}
           <div className="flex gap-2">
             <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
             <Button 
               onClick={confirmSelection} 
-              disabled={!selectedMeeting}
+              disabled={multiSelect ? selectedMeetingIds.size === 0 : !selectedMeeting}
             >
-              Use This Meeting
+              {multiSelect 
+                ? `Use ${selectedMeetingIds.size} Meeting${selectedMeetingIds.size > 1 ? 's' : ''}`
+                : 'Use This Meeting'}
             </Button>
           </div>
         </div>

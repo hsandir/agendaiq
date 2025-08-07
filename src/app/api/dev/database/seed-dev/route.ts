@@ -27,8 +27,8 @@ export async function POST(request: NextRequest) {
         record_id: `${i + 1}`,
         operation,
         source: 'SYSTEM',
-        user_id: authResult.user.id,
-        staff_id: authResult.user.staff?.id,
+        user_id: authResult.user!.id,
+        staff_id: authResult.user!.staff?.id,
         field_changes: {
           before: { field: 'old_value' },
           after: { field: 'new_value' }
@@ -58,8 +58,8 @@ export async function POST(request: NextRequest) {
         record_id: `test-${Date.now()}-${i}`,
         operation: 'CREATE',
         source: 'SYSTEM',
-        user_id: authResult.user.id,
-        staff_id: authResult.user.staff?.id,
+        user_id: authResult.user!.id,
+        staff_id: authResult.user!.staff?.id,
         field_changes: {
           passed,
           failed,
@@ -79,11 +79,12 @@ export async function POST(request: NextRequest) {
     
     // Log this operation
     await AuditLogger.logFromRequest(request, {
-      table_name: 'system',
-      record_id: 'seed-dev',
+      tableName: 'system',
+      recordId: 'seed-dev',
       operation: 'CREATE',
-      user_id: authResult.user.id,
-      staff_id: authResult.user.staff?.id,
+      userId: authResult.user!.id,
+      staffId: authResult.user!.staff?.id,
+      source: 'SYSTEM',
       description: 'Development data seeded'
     });
     

@@ -3,7 +3,7 @@ import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireStaffRole: true });
+  const authResult = await withAuth(request, { requireStaff: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -16,7 +16,10 @@ export async function GET(request: NextRequest) {
         operation: 'CREATE'
       },
       orderBy: { created_at: 'desc' },
-      select: { field_changes: true }
+      select: { 
+        field_changes: true,
+        created_at: true
+      }
     });
     
     const testCoverage = (latestTestRun?.field_changes as any)?.coverage || 0;
@@ -31,7 +34,10 @@ export async function GET(request: NextRequest) {
         }
       },
       orderBy: { created_at: 'desc' },
-      select: { field_changes: true }
+      select: { 
+        field_changes: true,
+        created_at: true
+      }
     });
     
     const previousCoverage = (previousTestRun?.field_changes as any)?.coverage || 0;

@@ -1,0 +1,17 @@
+module.exports = {
+  Palette: () => null,
+  Sun: () => null,
+  Moon: () => null,
+  Eye: () => null,
+  Leaf: () => null,
+  Check: () => null,
+  ChevronDown: () => null,
+  ChevronUp: () => null,
+  LayoutDashboard: () => null,
+  Calendar: () => null,
+  Users: () => null,
+  FileText: () => null,
+  Settings: () => null,
+  Wrench: () => null,
+  FlaskConical: () => null,
+};

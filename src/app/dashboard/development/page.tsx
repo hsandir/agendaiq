@@ -20,13 +20,43 @@ import {
   RefreshCwIcon,
   DownloadIcon
 } from 'lucide-react'
-import TestDashboard from '@/components/development/test-dashboard'
-import DatabaseManager from '@/components/development/database-manager'
-import PerformanceMonitor from '@/components/development/performance-monitor'
-import ApiTester from '@/components/development/api-tester'
-import LogViewer from '@/components/development/log-viewer'
-import CICDMonitor from '@/components/development/ci-cd-monitor'
-import GitOperations from '@/components/development/git-operations'
+import dynamic from 'next/dynamic'
+
+// Lazy load heavy development components for better performance
+const TestDashboard = dynamic(() => import('@/components/development/test-dashboard'), {
+  loading: () => <div className="p-4">Loading Test Dashboard...</div>,
+  ssr: false
+})
+
+const DatabaseManager = dynamic(() => import('@/components/development/database-manager'), {
+  loading: () => <div className="p-4">Loading Database Manager...</div>,
+  ssr: false
+})
+
+const PerformanceMonitor = dynamic(() => import('@/components/development/performance-monitor'), {
+  loading: () => <div className="p-4">Loading Performance Monitor...</div>,
+  ssr: false
+})
+
+const ApiTester = dynamic(() => import('@/components/development/api-tester'), {
+  loading: () => <div className="p-4">Loading API Tester...</div>,
+  ssr: false
+})
+
+const LogViewer = dynamic(() => import('@/components/development/log-viewer'), {
+  loading: () => <div className="p-4">Loading Log Viewer...</div>,
+  ssr: false
+})
+
+const CICDMonitor = dynamic(() => import('@/components/development/ci-cd-monitor'), {
+  loading: () => <div className="p-4">Loading CI/CD Monitor...</div>,
+  ssr: false
+})
+
+const GitOperations = dynamic(() => import('@/components/development/git-operations'), {
+  loading: () => <div className="p-4">Loading Git Operations...</div>,
+  ssr: false
+})
 
 export default function DevelopmentTools() {
   const [activeTab, setActiveTab] = useState('tests')

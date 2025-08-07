@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
-import { Shield as FiShield, Check as FiCheck, X as FiX } from 'lucide-react';
+import { Shield as FiShield, Check as FiCheck, X as FiX, Copy } from 'lucide-react';
 
 export default function TwoFactorSetupPage() {
   const [step, setStep] = useState<'intro' | 'qr' | 'verify'>('intro');
@@ -80,7 +79,22 @@ export default function TwoFactorSetupPage() {
                 Scan this QR code with your authenticator app (like Google Authenticator or Authy).
               </p>
               <div className="mt-4 flex justify-center">
-                <QRCodeSVG value={qrCode} size={200} />
+                <div className="bg-gray-100 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 mb-2">Setup URL:</p>
+                  <div className="flex items-center gap-2">
+                    <code className="text-xs break-all bg-white p-2 rounded">{qrCode}</code>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(qrCode)}
+                      className="p-2 hover:bg-gray-200 rounded"
+                      title="Copy to clipboard"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Copy this URL and add it to your authenticator app manually
+                  </p>
+                </div>
               </div>
               <div className="mt-6">
                 <input

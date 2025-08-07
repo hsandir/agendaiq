@@ -12,8 +12,25 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { MultiSelectV2 as MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select-v2";
-import { RepeatMeetingModal, type RepeatConfig } from "@/components/meetings/RepeatMeetingModal";
-import { MeetingHistoryModal } from "@/components/meetings/MeetingHistoryModal";
+import dynamic from 'next/dynamic';
+import type { RepeatConfig } from "@/components/meetings/RepeatMeetingModal";
+
+// Lazy load heavy modals for better performance
+const RepeatMeetingModal = dynamic(
+  () => import('@/components/meetings/RepeatMeetingModal').then(mod => mod.RepeatMeetingModal),
+  {
+    loading: () => <div className="text-sm text-gray-500">Loading...</div>,
+    ssr: false
+  }
+);
+
+const MeetingHistoryModal = dynamic(
+  () => import('@/components/meetings/MeetingHistoryModal').then(mod => mod.MeetingHistoryModal),
+  {
+    loading: () => <div className="text-sm text-gray-500">Loading...</div>,
+    ssr: false
+  }
+);
 import { Search, Users, Calendar, Video, Repeat, Link, CalendarDays, FolderOpen } from "lucide-react";
 import { addMinutes, format } from "date-fns";
 import { safeFormatDate, isValidDate, getSafeDate } from '@/lib/utils/safe-date';
@@ -152,6 +169,47 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     }
     
     // Auto-set continuation flag
+    setIsContinuation(true);
+  };
+
+  const handleSelectMultipleMeetings = (meetings: any[], options: { importAgendaItems: boolean; importAttendees: boolean }) => {
+    // Use the first meeting as the base
+    const baseMeeting = meetings[0];
+    setSelectedPreviousMeeting(baseMeeting);
+    setParentMeetingId(baseMeeting.id);
+    
+    // Create title from all selected meetings
+    const titles = meetings.map(m => m.title).join(', ');
+    setTitle(`Continuation of: ${titles}`);
+    
+    // Combine descriptions
+    const descriptions = meetings.map(m => m.description).filter(Boolean);
+    if (descriptions.length > 0) {
+      setDescription(`Combined from previous meetings:\n${descriptions.join('\n\n')}`);
+    }
+    
+    // Import attendees if requested
+    if (options.importAttendees) {
+      const allAttendees = new Set<string>();
+      meetings.forEach(meeting => {
+        if (meeting.attendees && Array.isArray(meeting.attendees)) {
+          meeting.attendees.forEach((a: any) => {
+            const id = a.id || a.staff_id;
+            if (id) allAttendees.add(id);
+          });
+        }
+      });
+      setSelectedAttendees(Array.from(allAttendees));
+    }
+    
+    // Store selected meetings and import options for later use
+    setFormData((prev: any) => ({
+      ...prev,
+      sourceMeetings: meetings.map(m => m.id),
+      importAgendaItems: options.importAgendaItems,
+      importAttendees: options.importAttendees
+    }));
+    
     setIsContinuation(true);
   };
 
@@ -531,6 +589,8 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
         isOpen={showHistoryModal}
         onClose={() => setShowHistoryModal(false)}
         onSelectMeeting={handleSelectPreviousMeeting}
+        multiSelect={isContinuation}
+        onSelectMultipleMeetings={handleSelectMultipleMeetings}
       />
     </form>
   );

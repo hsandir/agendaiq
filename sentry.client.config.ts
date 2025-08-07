@@ -36,7 +36,8 @@ Sentry.init({
     // Filter out specific errors in development
     if (process.env.NODE_ENV === 'development') {
       // Ignore ResizeObserver errors
-      if (hint.originalException?.message?.includes('ResizeObserver')) {
+      const error = hint.originalException as Error;
+      if (error && error.message && error.message.includes('ResizeObserver')) {
         return null;
       }
     }

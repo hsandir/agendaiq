@@ -14,8 +14,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  let body: any = {};
   try {
-    const body = await request.json();
+    body = await request.json();
     const { command, cwd = process.cwd(), timeout = 30000 } = body;
 
     if (!command) {

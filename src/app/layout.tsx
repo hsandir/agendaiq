@@ -2,6 +2,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ThemeProvider } from "@/lib/theme/theme-provider";
+import { ThemeInitializer } from "@/components/theme/theme-initializer";
+import { SimpleThemeSwitcher } from "@/components/theme/simple-theme-switcher";
 import { ErrorBoundary } from "@/components/error-boundary";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -48,12 +50,13 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ErrorBoundary>
-          <ThemeProvider
-            defaultTheme="light"
-            storageKey="agendaiq-ui-theme"
-          >
-            <AuthProvider>{children}</AuthProvider>
-          </ThemeProvider>
+          <ThemeInitializer />
+          <SimpleThemeSwitcher />
+          <AuthProvider>
+            <ThemeProvider initialTheme="classic-light">
+              {children}
+            </ThemeProvider>
+          </AuthProvider>
         </ErrorBoundary>
       </body>
     </html>

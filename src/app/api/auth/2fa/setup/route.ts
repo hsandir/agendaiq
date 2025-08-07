@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 import speakeasy from "speakeasy";
-import QRCode from "qrcode";
 
 export async function GET(request: NextRequest) {
   try {
@@ -44,12 +43,10 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Generate QR code
-    const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url!);
-
+    // Return the OTP URL directly instead of generating QR code
     return NextResponse.json({
       secret: secret.base32,
-      qrCode: qrCodeUrl,
+      qrCode: secret.otpauth_url || '',
       manualEntryKey: secret.base32
     });
 

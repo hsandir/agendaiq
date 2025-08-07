@@ -25,7 +25,7 @@ export default async function SettingsPage() {
           </p>
         </div>
         
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
               <span className="text-green-600 font-bold">👤</span>
@@ -54,6 +54,22 @@ export default async function SettingsPage() {
             <p className="text-gray-600 text-sm">
               Monitor system health, database status, server metrics, and backups.
             </p>
+          </div>
+          
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <span className="text-indigo-600 font-bold">🎨</span>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Theme Settings</h3>
+            <p className="text-gray-600 text-sm">
+              Customize your experience with beautiful themes optimized for all devices.
+            </p>
+            <a 
+              href="/dashboard/settings/theme"
+              className="inline-flex items-center mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm font-medium"
+            >
+              Choose Theme →
+            </a>
           </div>
         </div>
       </div>

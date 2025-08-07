@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 import os from 'os';
 
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireStaffRole: true });
+  const authResult = await withAuth(request, { requireStaff: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -95,9 +95,6 @@ export async function GET(request: NextRequest) {
       where: {
         created_at: {
           gte: new Date(Date.now() - 300000) // Last 5 minutes
-        },
-        table_name: {
-          not: null
         }
       },
       _count: {

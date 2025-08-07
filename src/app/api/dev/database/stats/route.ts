@@ -3,7 +3,7 @@ import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireStaffRole: true });
+  const authResult = await withAuth(request, { requireStaff: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
