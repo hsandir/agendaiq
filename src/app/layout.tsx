@@ -7,26 +7,26 @@ import { ErrorBoundary } from "@/components/error-boundary";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Meeting Intelligence Platform",
+  title: "AgendaIQ - Meeting Intelligence Platform",
   description: "Advanced meeting tracking, action item management, and intelligent follow-up system",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Meeting Intelligence Platform",
+    title: "AgendaIQ - Meeting Intelligence Platform",
   },
   formatDetection: {
     telephone: false,
   },
   openGraph: {
     type: "website",
-    siteName: "Meeting Intelligence Platform",
-    title: "Meeting Intelligence Platform - AgendaIQ",
+    siteName: "AgendaIQ",
+    title: "AgendaIQ - Meeting Intelligence Platform",
     description: "Transform your meetings with intelligent tracking, action management, and automated follow-ups",
   },
   twitter: {
     card: "summary",
-    title: "Meeting Intelligence Platform",
+    title: "AgendaIQ - Meeting Intelligence Platform",
     description: "Transform your meetings with intelligent tracking and action management",
   },
 };
