@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { themes } from '@/lib/theme/themes';
-import { generateCSSVariables } from '@/lib/theme/theme-utils';
+import { getContrastColor } from '@/lib/theme/theme-utils';
 
 export function ThemeInitializer() {
   useEffect(() => {
@@ -12,37 +12,58 @@ export function ThemeInitializer() {
     // Find theme
     const theme = themes.find(t => t.id === savedTheme) || themes[1];
     
-    // Generate and apply CSS variables
-    const cssVars = generateCSSVariables(theme);
-    
-    Object.entries(cssVars).forEach(([key, value]) => {
-      document.documentElement.style.setProperty(key, value);
-    });
-    
-    // Also set Tailwind-compatible HSL variables
-    // Convert hex to HSL for Tailwind compatibility
-    const hexToHSL = (hex: string) => {
-      // Simple conversion - in production use a proper library
-      // For now, just use the hex values directly
-      return hex;
+    // Tailwind-compatible HSL variable setter
+    const hexToHslVar = (hex: string): string => {
+      const h = hex.replace('#', '');
+      const r = parseInt(h.substring(0, 2), 16) / 255;
+      const g = parseInt(h.substring(2, 4), 16) / 255;
+      const b = parseInt(h.substring(4, 6), 16) / 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let hDeg = 0; let s = 0; const l = (max + min) / 2;
+      if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: hDeg = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: hDeg = (b - r) / d + 2; break;
+          case b: hDeg = (r - g) / d + 4; break;
+        }
+        hDeg /= 6;
+      }
+      const hNum = Math.round(hDeg * 360);
+      const sNum = Math.round(s * 100);
+      const lNum = Math.round(l * 100);
+      return `${hNum} ${sNum}% ${lNum}%`;
     };
-    
-    // Set Tailwind variables (these expect HSL but we'll use hex for now)
-    document.documentElement.style.setProperty('--primary', theme.colors.primary);
-    document.documentElement.style.setProperty('--primary-foreground', theme.colors.primaryForeground);
-    document.documentElement.style.setProperty('--secondary', theme.colors.secondary);
-    document.documentElement.style.setProperty('--secondary-foreground', theme.colors.secondaryForeground);
-    document.documentElement.style.setProperty('--background', theme.colors.background);
-    document.documentElement.style.setProperty('--foreground', theme.colors.text);
-    document.documentElement.style.setProperty('--card', theme.colors.card);
-    document.documentElement.style.setProperty('--card-foreground', theme.colors.text);
-    document.documentElement.style.setProperty('--border', theme.colors.border);
-    document.documentElement.style.setProperty('--input', theme.colors.inputBorder);
-    document.documentElement.style.setProperty('--ring', theme.colors.primary);
+
+    const setVar = (name: string, valueHex: string) => {
+      document.documentElement.style.setProperty(`--${name}`, hexToHslVar(valueHex));
+    };
+
+    setVar('background', theme.colors.background);
+    setVar('foreground', theme.colors.text);
+    setVar('card', theme.colors.card);
+    setVar('card-foreground', theme.colors.text);
+    setVar('popover', theme.colors.card);
+    setVar('popover-foreground', theme.colors.text);
+    setVar('primary', theme.colors.primary);
+    setVar('primary-foreground', theme.colors.primaryForeground || getContrastColor(theme.colors.primary));
+    setVar('secondary', theme.colors.secondary);
+    setVar('secondary-foreground', theme.colors.secondaryForeground || getContrastColor(theme.colors.secondary));
+    setVar('muted', theme.colors.backgroundSecondary);
+    setVar('muted-foreground', theme.colors.textMuted);
+    setVar('accent', theme.colors.secondaryLight || theme.colors.secondary);
+    setVar('accent-foreground', theme.colors.secondaryForeground || getContrastColor(theme.colors.secondary));
+    setVar('destructive', theme.colors.error);
+    setVar('destructive-foreground', getContrastColor(theme.colors.error));
+    setVar('border', theme.colors.border);
+    setVar('input', theme.colors.inputBorder);
+    setVar('ring', theme.colors.primary);
+    document.documentElement.style.setProperty('--radius', theme.borderRadius.md);
     
     // Apply dark/light class
     document.documentElement.classList.remove('light', 'dark');
-    if (theme.id === 'dark-mode' || theme.id === 'modern-purple') {
+    if (theme.id === 'dark-mode' || theme.id === 'modern-purple' || theme.id === 'high-contrast') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.add('light');
