@@ -34,24 +34,24 @@ export default async function DashboardLayout({
   const isAdmin = isUserAdmin(userWithStaff);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow">
+    <div className="min-h-screen bg-background text-foreground">
+      <nav className="bg-card text-card-foreground shadow border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
               <Link
                 href="/dashboard"
-                className="flex items-center px-2 py-2 text-gray-900 hover:text-gray-600"
+                className="flex items-center px-2 py-2 hover:text-foreground/80"
               >
                 Dashboard
               </Link>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-muted-foreground">
                   {user.email}
                 </span>
-                <span className="text-xs px-2 py-1 bg-gray-100 rounded-full">
+                <span className="text-xs px-2 py-1 bg-muted text-foreground rounded-full">
                   {currentRole?.title || 'No Role'}
                 </span>
                 <RoleSwitch staff={userWithStaff?.Staff?.[0] || null} />
@@ -68,7 +68,7 @@ export default async function DashboardLayout({
         {/* Main content */}
         <div className="flex-1 flex flex-col">
           <Header />
-          <main className="flex-1 bg-gray-50">
+          <main className="flex-1 bg-background">
             <div className="container mx-auto px-4 py-8">
               {children}
             </div>
