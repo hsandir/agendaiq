@@ -52,32 +52,17 @@ export function ThemeProvider({ children, initialTheme = 'classic-light' }: Them
   // Apply theme CSS variables
   useEffect(() => {
     if (!mounted) {
-      console.log('ThemeProvider: Not mounted yet, skipping theme application');
       return;
     }
 
-    console.log('ThemeProvider: Applying theme with ID:', currentThemeId);
     const theme = themes.find(t => t.id === currentThemeId) || themes[1]; // Default to classic-light
-    console.log('ThemeProvider: Found theme:', theme.id, theme.name);
     
     const cssVariables = generateCSSVariables(theme);
-    console.log('ThemeProvider: Generated CSS variables count:', Object.keys(cssVariables).length);
-    console.log('ThemeProvider: First 5 variables:', Object.entries(cssVariables).slice(0, 5));
 
-    // Clear existing inline styles first
-    console.log('ThemeProvider: Clearing existing styles...');
-    
     // Apply CSS variables to document root
-    let appliedCount = 0;
     Object.entries(cssVariables).forEach(([key, value]) => {
       document.documentElement.style.setProperty(key, value);
-      appliedCount++;
     });
-    console.log(`ThemeProvider: Applied ${appliedCount} CSS variables`);
-
-    // Verify a sample variable was applied
-    const testVar = getComputedStyle(document.documentElement).getPropertyValue('--color-primary');
-    console.log('ThemeProvider: Verification - --color-primary is now:', testVar);
 
     // Apply theme class to body for Tailwind dark mode support
     document.documentElement.classList.remove('light', 'dark');
@@ -89,7 +74,6 @@ export function ThemeProvider({ children, initialTheme = 'classic-light' }: Them
 
     // Save to localStorage
     localStorage.setItem('agendaiq-theme', currentThemeId);
-    console.log('ThemeProvider: Theme saved to localStorage:', currentThemeId);
   }, [currentThemeId, mounted]);
 
   const setTheme = async (themeId: string) => {
