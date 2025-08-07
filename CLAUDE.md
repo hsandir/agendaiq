@@ -298,7 +298,12 @@ Claude must include testing considerations:
 #### Port Management
 - **MANDATORY**: Always use port 3000
 - **NEVER** change the port number
-- If port 3000 is occupied, kill the existing process first
+- **AUTOMATIC PORT CLEANUP**: If port 3000 is occupied, immediately kill the existing process and restart on port 3000
+- **RULE**: When you see "Port 3000 is in use, using available port 3001" or similar:
+  1. Immediately run: `lsof -ti:3000 | xargs kill -9 2>/dev/null`
+  2. Also kill any other dev server ports: `lsof -ti:3001 | xargs kill -9 2>/dev/null`
+  3. Restart the server with `npm run dev` on port 3000
+  4. Do NOT accept running on alternative ports
 - Before starting the app, check for all kinds of errors
 
 #### Version Control Requirements
@@ -341,6 +346,53 @@ Claude must include testing considerations:
 - **NEVER** create file-specific designs
 - Use Tailwind CSS through centralized theme system
 - Follow established design patterns
+
+## ⚠️ CRITICAL DATABASE SAFETY RULES - MANDATORY
+
+### STRICT DATABASE MODIFICATION PROTOCOL
+**NEVER DELETE DATABASE DATA - THIS IS AN ABSOLUTE RULE**
+
+1. **Before ANY Database Schema Changes**:
+   - **ALWAYS** backup existing data first
+   - **NEVER** use destructive migrations
+   - **NEVER** delete tables or columns with data
+   - **ALWAYS** preserve all existing records
+
+2. **Database Modification Steps**:
+   ```bash
+   # MANDATORY STEPS FOR DATABASE CHANGES:
+   # 1. Backup current data
+   npx prisma db pull  # Get current schema
+   npx prisma db seed  # Backup data if seed exists
+   pg_dump database_name > backup_$(date +%Y%m%d_%H%M%S).sql
+   
+   # 2. Make schema changes
+   # Edit schema.prisma
+   
+   # 3. Generate migration WITHOUT applying
+   npx prisma migrate dev --create-only
+   
+   # 4. Review migration file
+   # 5. Apply migration
+   npx prisma migrate dev
+   ```
+
+3. **Adding New Fields**:
+   - **ALWAYS** make new fields nullable or provide defaults
+   - **NEVER** make existing nullable fields required
+   - **ALWAYS** use additive changes only
+
+4. **Modifying Existing Tables**:
+   - **PRESERVE** all existing data
+   - **ADD** new columns as nullable
+   - **RENAME** instead of delete when changing
+   - **MIGRATE** data to new structure if needed
+
+5. **Data Integrity**:
+   - **NEVER** truncate tables
+   - **NEVER** drop tables
+   - **NEVER** delete records without archiving
+   - **ALWAYS** use soft deletes (is_deleted flags)
 
 ## 🚫 FORBIDDEN PATTERNS FOR CLAUDE
 

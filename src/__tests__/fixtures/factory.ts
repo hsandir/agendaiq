@@ -141,7 +141,7 @@ export class TestFactory {
   async createAgendaItem(meeting: any, overrides: Partial<any> = {}) {
     const presenter = overrides.presenter || await this.createStaff()
 
-    return this.prisma.meetingAgendaItems.create({
+    return this.prisma.meetingAgendaItem.create({
       data: {
         meeting_id: meeting.id,
         title: faker.lorem.sentence(),
@@ -280,13 +280,13 @@ export class TestFactory {
       this.prisma.meetingAuditLog.deleteMany(),
       this.prisma.meetingAttendee.deleteMany(),
       this.prisma.meetingNote.deleteMany(),
-      this.prisma.meetingActionItems.deleteMany(),
+      this.prisma.meetingActionItem.deleteMany(),
       this.prisma.agendaItemComment.deleteMany(),
       this.prisma.agendaItemAttachment.deleteMany(),
-      this.prisma.meetingAgendaItems.deleteMany(),
+      this.prisma.meetingAgendaItem.deleteMany(),
       this.prisma.meeting.deleteMany(),
-      this.prisma.notification.deleteMany(),
-      this.prisma.activityLog.deleteMany(),
+      // this.prisma.notification.deleteMany(), // Model doesn't exist
+      // this.prisma.activityLog.deleteMany(), // Model doesn't exist
       this.prisma.staff.deleteMany(),
       this.prisma.user.deleteMany(),
     ])

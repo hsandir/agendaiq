@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { prisma } from "@/lib/prisma";
 import { Video, Settings, Bell, Calendar, Link, ExternalLink, CheckCircle, AlertCircle } from "lucide-react";
+import { safeFormatDate, safeFormatTime, safeFormatDateTime } from '@/lib/utils/safe-date';
 
 export const metadata: Metadata = {
   title: "Zoom User Preferences | AgendaIQ",
@@ -169,7 +170,7 @@ export default async function ZoomUserPreferences() {
               
               {zoomIntegration.lastSync && (
                 <div className="text-sm text-gray-600">
-                  Last synchronized: {new Date(zoomIntegration.lastSync).toLocaleString()}
+                  Last synchronized: {safeFormatDateTime(zoomIntegration.lastSync)}
                 </div>
               )}
             </div>
@@ -344,7 +345,7 @@ export default async function ZoomUserPreferences() {
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {meeting.start_time && new Date(meeting.start_time).toLocaleDateString()} at {meeting.start_time && new Date(meeting.start_time).toLocaleTimeString()}
+                      {safeFormatDate(meeting.start_time)} at {safeFormatTime(meeting.start_time)}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">

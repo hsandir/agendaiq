@@ -34,6 +34,7 @@ import {
   Plus
 } from "lucide-react";
 import { format } from "date-fns";
+import { getSafeDate, safeFormatDate } from '@/lib/utils/safe-date';
 
 interface Props {
   item: any;
@@ -504,7 +505,10 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                 <div>
                   <label className="text-sm text-gray-600">Created</label>
                   <p className="font-medium text-gray-900 mt-1">
-                    {format(new Date(item.created_at), "MMM d, yyyy")}
+                    {(() => {
+                      const date = getSafeDate(item.created_at);
+                      return date ? format(date, "MMM d, yyyy") : 'Unknown date';
+                    })()}
                   </p>
                 </div>
 

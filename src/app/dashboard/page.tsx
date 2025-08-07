@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 import { Calendar, Users, FileText } from "lucide-react";
 import { isUserAdmin } from "@/lib/auth/admin-check";
+import { safeFormatDateTime } from '@/lib/utils/safe-date';
 
 export default async function DashboardPage() {
   const user = await requireAuth(AuthPresets.requireAuth);
@@ -199,7 +200,7 @@ export default async function DashboardPage() {
                       <div>
                         <h3 className="font-medium">{meeting.title}</h3>
                         <p className="text-sm text-gray-500 mt-1">
-                          {meeting.start_time ? new Date(meeting.start_time).toLocaleString() : 'No date set'}
+                          {safeFormatDateTime(meeting.start_time, undefined, 'No date set')}
                         </p>
                       </div>
                     </div>

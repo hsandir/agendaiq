@@ -20,6 +20,7 @@ import {
   Save,
   MessageSquare 
 } from 'lucide-react';
+import { safeFormatDateTime } from '@/lib/utils/safe-date';
 
 interface User {
   id: number;
@@ -239,13 +240,13 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
                   <div>
                     <label className="text-sm font-medium text-gray-500">Start Time</label>
                     <p className="text-sm text-gray-900">
-                      {new Date(meeting.startTime).toLocaleString()}
+                      {safeFormatDateTime(meeting.startTime, undefined, 'No start time')}
                     </p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-500">End Time</label>
                     <p className="text-sm text-gray-900">
-                      {new Date(meeting.endTime).toLocaleString()}
+                      {safeFormatDateTime(meeting.endTime, undefined, 'No end time')}
                     </p>
                   </div>
                   <div>
@@ -381,7 +382,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
                         </div>
                       </div>
                       <div className="mt-2 text-xs text-gray-500">
-                        By {note.author} • {new Date(note.timestamp).toLocaleString()}
+                        By {note.author} • {safeFormatDateTime(note.timestamp, undefined, 'Unknown time')}
                       </div>
                     </div>
                   ))}

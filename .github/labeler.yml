@@ -1,67 +1,104 @@
-# Configuration for GitHub labeler action
+# Configuration for GitHub Labeler Action
+# https://github.com/actions/labeler
 
-# Frontend labels
+# Frontend changes
 frontend:
   - src/components/**/*
-  - src/app/**/*.tsx
+  - src/app/**/*
   - src/styles/**/*
   - '*.css'
   - '*.scss'
 
-# Backend labels
+# Backend changes  
 backend:
   - src/app/api/**/*
-  - src/lib/auth/**/*
-  - src/lib/db/**/*
+  - src/lib/**/*
   - prisma/**/*
+  - src/server/**/*
 
-# Documentation
-documentation:
-  - '**/*.md'
-  - docs/**/*
+# Database changes
+database:
+  - prisma/**/*
+  - '**/migrations/**/*'
 
-# Configuration
-configuration:
-  - .github/**/*
-  - .env.example
-  - next.config.*
-  - tsconfig.json
-  - package.json
-  - .eslintrc.*
-  - .prettierrc.*
-
-# Testing
+# Testing changes
 testing:
-  - src/__tests__/**/*
   - '**/*.test.ts'
   - '**/*.test.tsx'
+  - '**/*.spec.ts'
+  - '**/*.spec.tsx'
+  - src/__tests__/**/*
   - jest.config.*
   - playwright.config.*
 
-# Database
-database:
-  - prisma/**/*
-  - src/lib/prisma.ts
+# Documentation changes
+documentation:
+  - '**/*.md'
+  - docs/**/*
+  - README.md
+  - CONTRIBUTING.md
+  - LICENSE
 
-# Security
-security:
-  - src/lib/auth/**/*
-  - src/lib/utils/rate-limit.ts
-  - src/middleware.ts
+# Configuration changes
+configuration:
+  - '*.json'
+  - '*.yml'
+  - '*.yaml'
+  - '.env*'
+  - tsconfig.json
+  - next.config.js
+  - tailwind.config.js
+  - postcss.config.js
+
+# CI/CD changes
+ci/cd:
+  - .github/**/*
+  - .gitlab-ci.yml
+  - Dockerfile
+  - docker-compose.yml
 
 # Dependencies
 dependencies:
   - package.json
   - package-lock.json
   - yarn.lock
+  - pnpm-lock.yaml
 
-# CI/CD
-ci-cd:
-  - .github/workflows/**/*
-  - .github/actions/**/*
+# Security changes
+security:
+  - src/lib/auth/**/*
+  - src/middleware.ts
+  - '**/auth/**/*'
+  - '**/security/**/*'
+
+# UI/UX changes
+ui/ux:
+  - src/components/ui/**/*
+  - src/app/globals.css
+  - '**/styles/**/*'
+
+# API changes
+api:
+  - src/app/api/**/*
+  - '**/route.ts'
+  - '**/route.js'
 
 # Performance
 performance:
-  - src/lib/utils/cache.ts
-  - src/lib/utils/performance.ts
-  - '**/*optimization*'
+  - '**/*.performance.ts'
+  - '**/*.perf.ts'
+  - src/lib/utils/performance/**/*
+
+# Feature additions
+feature:
+  - src/features/**/*
+  - src/app/**/page.tsx
+  - src/app/**/layout.tsx
+
+# Bug fixes - manual label needed
+
+# Development tools
+dev-tools:
+  - src/components/development/**/*
+  - src/app/dashboard/development/**/*
+  - scripts/**/*

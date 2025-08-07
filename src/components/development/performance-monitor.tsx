@@ -173,12 +173,16 @@ export default function PerformanceMonitor() {
                 {/* Alerts */}
                 <div className="space-y-2">
                   <h3 className="font-medium">Active Alerts</h3>
-                  <Alert variant="destructive">
-                    <AlertTriangleIcon className="h-4 w-4" />
-                    <AlertDescription>
-                      High memory usage detected (62% of available memory)
-                    </AlertDescription>
-                  </Alert>
+                  {metrics.some(m => getMetricStatus(m) === 'critical') ? (
+                    <Alert variant="destructive">
+                      <AlertTriangleIcon className="h-4 w-4" />
+                      <AlertDescription>
+                        Critical performance threshold exceeded
+                      </AlertDescription>
+                    </Alert>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No active alerts</p>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -246,14 +250,14 @@ export default function PerformanceMonitor() {
                   <div className="space-y-1">
                     <div className="flex justify-between text-sm">
                       <span>Active Connections</span>
-                      <span className="font-medium">15 / 50</span>
+                      <span className="font-medium">- / -</span>
                     </div>
-                    <Progress value={30} />
+                    <Progress value={0} />
                   </div>
                   <div className="space-y-1">
                     <div className="flex justify-between text-sm">
                       <span>Idle Connections</span>
-                      <span className="font-medium">10</span>
+                      <span className="font-medium">-</span>
                     </div>
                   </div>
                 </div>
@@ -263,15 +267,15 @@ export default function PerformanceMonitor() {
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
                       <span>Avg Query Time</span>
-                      <span className="font-medium">12ms</span>
+                      <span className="font-medium">-</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Slow Queries (>100ms)</span>
-                      <span className="font-medium text-yellow-600">3</span>
+                      <span>Slow Queries (&gt;100ms)</span>
+                      <span className="font-medium">-</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Failed Queries</span>
-                      <span className="font-medium text-red-600">0</span>
+                      <span className="font-medium">-</span>
                     </div>
                   </div>
                 </div>
@@ -281,14 +285,7 @@ export default function PerformanceMonitor() {
                 <h3 className="font-medium mb-2">Slow Query Log</h3>
                 <ScrollArea className="h-[200px] border rounded-lg p-3">
                   <div className="space-y-2 text-xs font-mono">
-                    <div className="p-2 bg-yellow-50 rounded">
-                      <p className="text-yellow-800">SELECT * FROM meetings WHERE... (125ms)</p>
-                      <p className="text-muted-foreground">2024-01-22 10:45:23</p>
-                    </div>
-                    <div className="p-2 bg-yellow-50 rounded">
-                      <p className="text-yellow-800">UPDATE users SET... (108ms)</p>
-                      <p className="text-muted-foreground">2024-01-22 10:42:15</p>
-                    </div>
+                    <p className="text-muted-foreground text-center">No slow queries</p>
                   </div>
                 </ScrollArea>
               </div>
@@ -309,8 +306,8 @@ export default function PerformanceMonitor() {
                     <CardTitle className="text-sm">Hit Rate</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold text-green-600">94.5%</div>
-                    <Progress value={94.5} className="mt-2" />
+                    <div className="text-2xl font-bold text-gray-400">-</div>
+                    <Progress value={0} className="mt-2" />
                   </CardContent>
                 </Card>
                 <Card>
@@ -318,8 +315,8 @@ export default function PerformanceMonitor() {
                     <CardTitle className="text-sm">Memory Used</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">248MB</div>
-                    <p className="text-xs text-muted-foreground">of 512MB</p>
+                    <div className="text-2xl font-bold">-</div>
+                    <p className="text-xs text-muted-foreground">No data</p>
                   </CardContent>
                 </Card>
                 <Card>
@@ -327,8 +324,8 @@ export default function PerformanceMonitor() {
                     <CardTitle className="text-sm">Keys</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">1,847</div>
-                    <p className="text-xs text-muted-foreground">Active keys</p>
+                    <div className="text-2xl font-bold">-</div>
+                    <p className="text-xs text-muted-foreground">No data</p>
                   </CardContent>
                 </Card>
               </div>
@@ -338,15 +335,15 @@ export default function PerformanceMonitor() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>GET operations/sec</span>
-                    <span className="font-medium">450</span>
+                    <span className="font-medium">-</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>SET operations/sec</span>
-                    <span className="font-medium">125</span>
+                    <span className="font-medium">-</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Evictions/hour</span>
-                    <span className="font-medium">32</span>
+                    <span className="font-medium">-</span>
                   </div>
                 </div>
               </div>

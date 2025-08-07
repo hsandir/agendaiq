@@ -31,6 +31,7 @@ import { AgendaItemLive } from "./AgendaItemLive";
 import { usePusherChannel, usePresenceChannel } from "@/hooks/usePusher";
 import { CHANNELS, EVENTS } from "@/lib/pusher";
 import Link from "next/link";
+import { safeFormatDate, safeFormatTime, getSafeDate } from '@/lib/utils/safe-date';
 import type { 
   Meeting, 
   MeetingAgendaItem, 
@@ -225,9 +226,10 @@ export function MeetingLiveView({
   // Meeting status
   const getMeetingStatus = () => {
     const now = new Date();
-    const start = new Date(meeting.start_time!);
-    const end = new Date(meeting.end_time!);
+    const start = getSafeDate(meeting.start_time);
+    const end = getSafeDate(meeting.end_time);
 
+    if (!start || !end) return { status: "unknown", label: "Unknown", color: "bg-gray-100 text-gray-700" };
     if (now < start) return { status: "upcoming", label: "Upcoming", color: "bg-blue-100 text-blue-700" };
     if (now > end) return { status: "completed", label: "Completed", color: "bg-gray-100 text-gray-700" };
     return { status: "in-progress", label: "In Progress", color: "bg-green-100 text-green-700" };
@@ -269,13 +271,13 @@ export function MeetingLiveView({
                 <div className="flex flex-wrap gap-3 mt-4">
                   <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full text-sm">
                     <Calendar className="h-4 w-4 text-gray-600" />
-                    <span className="text-gray-700">{new Date(meeting.start_time!).toLocaleDateString()}</span>
+                    <span className="text-gray-700">{safeFormatDate(meeting.start_time, undefined, 'No date')}</span>
                   </div>
                   <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full text-sm">
                     <Clock className="h-4 w-4 text-gray-600" />
                     <span className="text-gray-700">
-                      {new Date(meeting.start_time!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
-                      {new Date(meeting.end_time!).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {safeFormatTime(meeting.start_time, { hour: '2-digit', minute: '2-digit' }, 'No time')} - 
+                      {safeFormatTime(meeting.end_time, { hour: '2-digit', minute: '2-digit' }, 'No time')}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full text-sm">

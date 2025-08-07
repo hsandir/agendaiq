@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 import { Bell, Mail, Clock, Settings, Users, Calendar, AlertTriangle } from "lucide-react";
+import { safeFormatDate, safeFormatTime } from '@/lib/utils/safe-date';
 
 export const metadata: Metadata = {
   title: "Notification Settings | AgendaIQ",
@@ -277,7 +278,7 @@ export default async function NotificationsPage() {
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {meeting.start_time && new Date(meeting.start_time).toLocaleDateString()} at {meeting.start_time && new Date(meeting.start_time).toLocaleTimeString()}
+                      {safeFormatDate(meeting.start_time)} at {safeFormatTime(meeting.start_time)}
                     </p>
                     <p className="text-xs text-gray-500">
                       Organized by: {userWithSettings?.name || 'Unknown'}

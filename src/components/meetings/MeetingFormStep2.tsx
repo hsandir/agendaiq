@@ -6,94 +6,77 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Save, ArrowLeft, ArrowRight, Calendar, Users, Clock } from "lucide-react";
-import { AgendaItemForm, AgendaItemFormData } from "./AgendaItemForm";
-import type { Priority, Purpose, AgendaItemStatus } from "@prisma/client";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Trash2, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
+import { safeFormatDate, safeFormatTime } from '@/lib/utils/safe-date';
 
-interface MeetingData {
-  id: number;
+interface Attendee {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  department: string;
+}
+
+interface AgendaItem {
+  id?: number;
   title: string;
-  start_time: string;
-  end_time: string;
-  meeting_type: string;
-  MeetingAttendee: Array<{
-    Staff: {
-      id: number;
-      User: {
-        name: string | null;
-        email: string;
-      }
-    }
-  }>;
+  description: string;
+  duration: number;
+  presenter_id?: number;
+  order: number;
 }
 
 interface Props {
   meetingId: number;
-  onComplete?: () => void;
+  meetingTitle: string;
+  meetingDate: string;
+  attendees: Attendee[];
+  existingItems?: AgendaItem[];
+  onSubmit: (items: AgendaItem[]) => Promise<{ success: boolean; message?: string }>;
+  onFinalize: () => Promise<{ success: boolean; redirect?: string; message?: string }>;
 }
 
-export function MeetingFormStep2({ meetingId, onComplete }: Props) {
+export function MeetingFormStep2({ 
+  meetingId, 
+  meetingTitle, 
+  meetingDate, 
+  attendees, 
+  existingItems = [],
+  onSubmit,
+  onFinalize 
+}: Props) {
   const router = useRouter();
-  const [meeting, setMeeting] = useState<MeetingData | null>(null);
-  const [agendaItems, setAgendaItems] = useState<AgendaItemFormData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [agendaItems, setAgendaItems] = useState<AgendaItem[]>(
+    existingItems.length > 0 ? existingItems : [{
+      title: '',
+      description: '',
+      duration: 15,
+      order: 0
+    }]
+  );
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch meeting data
-  useEffect(() => {
-    async function fetchMeeting() {
-      try {
-        const response = await fetch(`/api/meetings/${meetingId}`);
-        const data = await response.json();
-        
-        if (data.meeting) {
-          setMeeting(data.meeting);
-          
-          // If meeting already has agenda items, load them
-          if (data.meeting.MeetingAgendaItems?.length > 0) {
-            setAgendaItems(data.meeting.MeetingAgendaItems.map((item: any) => ({
-              topic: item.topic,
-              problem_statement: item.problem_statement,
-              staff_initials: item.staff_initials,
-              responsible_staff_id: item.responsible_staff_id,
-              priority: item.priority,
-              purpose: item.purpose,
-              proposed_solution: item.proposed_solution,
-              solution_type: item.solution_type,
-              decisions_actions: item.decisions_actions,
-              decision_type: item.decision_type,
-              status: item.status,
-              future_implications: item.future_implications,
-              duration_minutes: item.duration_minutes,
-              order_index: item.order_index
-            })));
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching meeting:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchMeeting();
-  }, [meetingId]);
 
   // Add new agenda item
   const addAgendaItem = () => {
-    const newItem: AgendaItemFormData = {
-      topic: '',
-      priority: 'Medium' as Priority,
-      purpose: 'Discussion' as Purpose,
-      status: 'Pending' as AgendaItemStatus,
-      order_index: agendaItems.length
+    const newItem: AgendaItem = {
+      title: '',
+      description: '',
+      duration: 15,
+      order: agendaItems.length
     };
     setAgendaItems([...agendaItems, newItem]);
   };
 
   // Update agenda item
-  const updateAgendaItem = (index: number, item: AgendaItemFormData) => {
+  const updateAgendaItem = (index: number, updates: Partial<AgendaItem>) => {
     const updated = [...agendaItems];
-    updated[index] = item;
+    updated[index] = { ...updated[index], ...updates };
     setAgendaItems(updated);
   };
 
@@ -109,7 +92,7 @@ export function MeetingFormStep2({ meetingId, onComplete }: Props) {
     [items[index - 1], items[index]] = [items[index], items[index - 1]];
     // Update order indices
     items.forEach((item, i) => {
-      item.order_index = i;
+      item.order = i;
     });
     setAgendaItems(items);
   };
@@ -121,7 +104,7 @@ export function MeetingFormStep2({ meetingId, onComplete }: Props) {
     [items[index], items[index + 1]] = [items[index + 1], items[index]];
     // Update order indices
     items.forEach((item, i) => {
-      item.order_index = i;
+      item.order = i;
     });
     setAgendaItems(items);
   };
@@ -133,45 +116,25 @@ export function MeetingFormStep2({ meetingId, onComplete }: Props) {
       return;
     }
 
-    // Validate all agenda items have topics
-    const invalidItems = agendaItems.filter(item => !item.topic.trim());
+    // Validate all agenda items have titles
+    const invalidItems = agendaItems.filter(item => !item.title.trim());
     if (invalidItems.length > 0) {
-      alert("All agenda items must have a topic.");
+      alert("All agenda items must have a title.");
       return;
     }
 
     setIsSaving(true);
 
     try {
-      const response = await fetch(`/api/meetings/${meetingId}/agenda-items`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ items: agendaItems }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save agenda items');
-      }
-
-      const result = await response.json();
+      const result = await onSubmit(agendaItems);
       
       if (result.success) {
-        // Update meeting status to scheduled
-        await fetch(`/api/meetings/${meetingId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ status: 'scheduled' }),
-        });
-
-        if (onComplete) {
-          onComplete();
-        } else {
-          router.push(`/dashboard/meetings/${meetingId}`);
+        const finalizeResult = await onFinalize();
+        if (finalizeResult.success && finalizeResult.redirect) {
+          router.push(finalizeResult.redirect);
         }
+      } else {
+        alert(result.message || "Failed to save agenda items.");
       }
     } catch (error) {
       console.error("Error saving agenda items:", error);
@@ -181,19 +144,11 @@ export function MeetingFormStep2({ meetingId, onComplete }: Props) {
     }
   };
 
-  if (isLoading) {
-    return <div className="flex justify-center items-center h-64">Loading...</div>;
-  }
-
-  if (!meeting) {
-    return <div className="text-center py-8">Meeting not found</div>;
-  }
-
-  // Extract staff list from attendees
-  const staff = meeting.MeetingAttendee.map(ma => ({
-    id: ma.Staff.id,
-    name: ma.Staff.User.name || ma.Staff.User.email,
-    initials: ma.Staff.User.name?.split(' ').map(n => n[0]).join('').toUpperCase() || ''
+  // Transform attendees for presenter selection
+  const presenters = (attendees || []).map(a => ({
+    id: parseInt(a.id),
+    name: a.name,
+    role: a.role
   }));
 
   return (
@@ -201,7 +156,7 @@ export function MeetingFormStep2({ meetingId, onComplete }: Props) {
       {/* Meeting Info Header */}
       <Card>
         <CardHeader>
-          <CardTitle>{meeting.title}</CardTitle>
+          <CardTitle>{meetingTitle}</CardTitle>
           <CardDescription>
             Add agenda items for this meeting
           </CardDescription>
@@ -210,20 +165,16 @@ export function MeetingFormStep2({ meetingId, onComplete }: Props) {
           <div className="flex flex-wrap gap-4 text-sm">
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-gray-500" />
-              <span>{new Date(meeting.start_time).toLocaleDateString()}</span>
+              <span>{safeFormatDate(meetingDate, undefined, 'No date')}</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-gray-500" />
-              <span>
-                {new Date(meeting.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
-                {new Date(meeting.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
+              <span>{safeFormatTime(meetingDate, { hour: '2-digit', minute: '2-digit' }, 'No time')}</span>
             </div>
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-gray-500" />
-              <span>{meeting.MeetingAttendee.length} attendees</span>
+              <span>{attendees.length} attendees</span>
             </div>
-            <Badge variant="outline">{meeting.meeting_type}</Badge>
           </div>
         </CardContent>
       </Card>
@@ -251,18 +202,101 @@ export function MeetingFormStep2({ meetingId, onComplete }: Props) {
         ) : (
           <div className="space-y-4">
             {agendaItems.map((item, index) => (
-              <AgendaItemForm
-                key={index}
-                item={item}
-                index={index}
-                staff={staff}
-                onUpdate={updateAgendaItem}
-                onRemove={removeAgendaItem}
-                onMoveUp={moveItemUp}
-                onMoveDown={moveItemDown}
-                isFirst={index === 0}
-                isLast={index === agendaItems.length - 1}
-              />
+              <Card key={index}>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <GripVertical className="h-4 w-4 text-gray-400" />
+                      <span className="font-medium">Item {index + 1}</span>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => moveItemUp(index)}
+                        disabled={index === 0}
+                      >
+                        <ChevronUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => moveItemDown(index)}
+                        disabled={index === agendaItems.length - 1}
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => removeAgendaItem(index)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor={`title-${index}`}>Title *</Label>
+                    <Input
+                      id={`title-${index}`}
+                      value={item.title}
+                      onChange={(e) => updateAgendaItem(index, { title: e.target.value })}
+                      placeholder="Enter agenda item title"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor={`description-${index}`}>Description</Label>
+                    <Textarea
+                      id={`description-${index}`}
+                      value={item.description}
+                      onChange={(e) => updateAgendaItem(index, { description: e.target.value })}
+                      placeholder="Enter detailed description"
+                      rows={3}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor={`duration-${index}`}>Duration (minutes)</Label>
+                      <Input
+                        id={`duration-${index}`}
+                        type="number"
+                        min="5"
+                        max="180"
+                        value={item.duration}
+                        onChange={(e) => updateAgendaItem(index, { duration: parseInt(e.target.value) || 15 })}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor={`presenter-${index}`}>Presenter</Label>
+                      <Select 
+                        value={item.presenter_id?.toString() || ""}
+                        onValueChange={(value) => updateAgendaItem(index, { 
+                          presenter_id: value ? parseInt(value) : undefined 
+                        })}
+                      >
+                        <SelectTrigger id={`presenter-${index}`}>
+                          <SelectValue placeholder="Select presenter" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">No presenter</SelectItem>
+                          {presenters.map((presenter) => (
+                            <SelectItem key={presenter.id} value={presenter.id.toString()}>
+                              {presenter.name} ({presenter.role})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         )}
@@ -272,7 +306,7 @@ export function MeetingFormStep2({ meetingId, onComplete }: Props) {
       <div className="flex justify-between">
         <Button
           variant="outline"
-          onClick={() => router.push(`/dashboard/meetings/${meetingId}/edit`)}
+          onClick={() => router.back()}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Step 1
@@ -282,9 +316,9 @@ export function MeetingFormStep2({ meetingId, onComplete }: Props) {
             variant="outline"
             onClick={() => router.push('/dashboard/meetings')}
           >
-            Save as Draft
+            Cancel
           </Button>
-          <Button onClick={handleSave} disabled={isSaving}>
+          <Button onClick={handleSave} disabled={isSaving || agendaItems.length === 0}>
             {isSaving ? (
               "Saving..."
             ) : (

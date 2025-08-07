@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { safeFormatDateTime } from '@/lib/utils/safe-date';
 
 interface MeetingEditFormProps {
   meeting: {
@@ -88,10 +89,10 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
               <span className="font-medium">Status:</span> {meeting.status}
             </div>
             <div>
-              <span className="font-medium">Start:</span> {new Date(meeting.startTime).toLocaleString()}
+              <span className="font-medium">Start:</span> {safeFormatDateTime(meeting.startTime, undefined, 'Not set')}
             </div>
             <div>
-              <span className="font-medium">End:</span> {new Date(meeting.endTime).toLocaleString()}
+              <span className="font-medium">End:</span> {safeFormatDateTime(meeting.endTime, undefined, 'Not set')}
             </div>
           </div>
           {meeting.description && (

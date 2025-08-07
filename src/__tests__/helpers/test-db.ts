@@ -34,13 +34,13 @@ export async function resetTestDatabase() {
     prisma.meetingAuditLog.deleteMany(),
     prisma.meetingAttendee.deleteMany(),
     prisma.meetingNote.deleteMany(),
-    prisma.meetingActionItems.deleteMany(),
+    prisma.meetingActionItem.deleteMany(),
     prisma.agendaItemComment.deleteMany(),
     prisma.agendaItemAttachment.deleteMany(),
-    prisma.meetingAgendaItems.deleteMany(),
+    prisma.meetingAgendaItem.deleteMany(),
     prisma.meeting.deleteMany(),
-    prisma.notification.deleteMany(),
-    prisma.activityLog.deleteMany(),
+    // prisma.notification.deleteMany(), // Model doesn't exist
+    // prisma.activityLog.deleteMany(), // Model doesn't exist
     prisma.staff.deleteMany(),
     prisma.user.deleteMany(),
     prisma.role.deleteMany(),

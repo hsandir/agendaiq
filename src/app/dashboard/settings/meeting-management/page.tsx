@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { safeFormatDateTime } from '@/lib/utils/safe-date';
 
 export default async function MeetingManagementDashboard() {
   const user = await requireAuth(AuthPresets.requireAuth);
@@ -105,7 +106,7 @@ export default async function MeetingManagementDashboard() {
                       )}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-900">
-                      {meeting.start_time ? new Date(meeting.start_time).toLocaleString() : 'TBD'}
+                      {safeFormatDateTime(meeting.start_time, undefined, 'TBD')}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-900">
                       {meeting.Staff.User.name || meeting.Staff.User.email}
@@ -163,7 +164,7 @@ export default async function MeetingManagementDashboard() {
                       )}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-900">
-                      {meeting.start_time ? new Date(meeting.start_time).toLocaleString() : 'TBD'}
+                      {safeFormatDateTime(meeting.start_time, undefined, 'TBD')}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-900">
                       {meeting.Staff.User.name || meeting.Staff.User.email}

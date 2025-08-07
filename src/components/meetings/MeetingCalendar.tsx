@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, List, Plus, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { safeFormatDateTime } from '@/lib/utils/safe-date';
 
 interface Meeting {
   id: string;
@@ -114,10 +115,10 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
             <CardContent>
               <div className="space-y-2">
                 <div className="text-sm text-gray-600">
-                  <strong>Start:</strong> {new Date(meeting.startTime).toLocaleString()}
+                  <strong>Start:</strong> {safeFormatDateTime(meeting.startTime, undefined, 'No start time')}
                 </div>
                 <div className="text-sm text-gray-600">
-                  <strong>End:</strong> {new Date(meeting.endTime).toLocaleString()}
+                  <strong>End:</strong> {safeFormatDateTime(meeting.endTime, undefined, 'No end time')}
                 </div>
                 {meeting.description && (
                   <div className="text-sm text-gray-600">

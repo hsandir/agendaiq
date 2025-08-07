@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageSquare, Send, User } from "lucide-react";
 import { format } from "date-fns";
+import { getSafeDate } from '@/lib/utils/safe-date';
 
 interface Comment {
   id: number;
@@ -93,7 +94,10 @@ export function AgendaItemComments({ itemId, comments, onAddComment, canComment 
                       {comment.Staff.User.name || comment.Staff.User.email}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {format(new Date(comment.created_at), "MMM d, h:mm a")}
+                      {(() => {
+                        const date = getSafeDate(comment.created_at);
+                        return date ? format(date, "MMM d, h:mm a") : 'Unknown time';
+                      })()}
                     </span>
                   </div>
                   <p className="text-sm text-gray-700 mt-1 whitespace-pre-wrap">
