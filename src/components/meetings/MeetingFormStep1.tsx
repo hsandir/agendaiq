@@ -13,7 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
 import { MultiSelectV2 as MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select-v2";
 import { RepeatMeetingModal, type RepeatConfig } from "@/components/meetings/RepeatMeetingModal";
-import { Search, Users, Calendar, Video, Repeat, Link, CalendarDays } from "lucide-react";
+import { MeetingHistoryModal } from "@/components/meetings/MeetingHistoryModal";
+import { Search, Users, Calendar, Video, Repeat, Link, CalendarDays, FolderOpen } from "lucide-react";
 import { addMinutes, format } from "date-fns";
 import { safeFormatDate, isValidDate, getSafeDate } from '@/lib/utils/safe-date';
 
@@ -79,6 +80,8 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showRepeatModal, setShowRepeatModal] = useState(false);
   const [repeatConfig, setRepeatConfig] = useState<RepeatConfig | null>(null);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [selectedPreviousMeeting, setSelectedPreviousMeeting] = useState<any>(null);
 
   // Transform users to MultiSelectOptions
   const attendeeOptions: MultiSelectOption[] = users.map(user => ({
@@ -133,6 +136,23 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSelectPreviousMeeting = (meeting: any) => {
+    setSelectedPreviousMeeting(meeting);
+    setParentMeetingId(meeting.id);
+    setTitle(`${meeting.title} (Continuation)`);
+    setDescription(meeting.description || "");
+    setMeetingType(meeting.meeting_type || "regular");
+    
+    // Set attendees if available
+    if (meeting.attendees && Array.isArray(meeting.attendees)) {
+      const attendeeIds = meeting.attendees.map((a: any) => a.id || a.staff_id).filter(Boolean);
+      setSelectedAttendees(attendeeIds);
+    }
+    
+    // Auto-set continuation flag
+    setIsContinuation(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -368,6 +388,50 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
           {isContinuation && (
             <div className="space-y-4">
               <div className="flex gap-2">
+                <Button 
+                  type="button" 
+                  onClick={() => setShowHistoryModal(true)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <FolderOpen className="h-4 w-4 mr-2" />
+                  Select from Previous Meetings
+                </Button>
+              </div>
+              
+              {selectedPreviousMeeting && (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium text-blue-900">Continuing from:</p>
+                      <p className="text-sm text-blue-700 mt-1">{selectedPreviousMeeting.title}</p>
+                      <p className="text-xs text-blue-600 mt-1">
+                        {safeFormatDate(selectedPreviousMeeting.start_time)} • 
+                        {selectedPreviousMeeting.attendees} attendees • 
+                        {selectedPreviousMeeting.agendaItems} agenda items
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedPreviousMeeting(null);
+                        setParentMeetingId(undefined);
+                        setTitle("");
+                        setDescription("");
+                      }}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              <div className="text-sm text-gray-500">
+                Or search manually:
+              </div>
+              <div className="flex gap-2">
                 <Input
                   placeholder="Search by date, meeting ID, title, attendee, or department"
                   value={searchQuery}
@@ -378,6 +442,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
                   type="button" 
                   onClick={handleSearchMeetings}
                   disabled={isLoading}
+                  variant="secondary"
                 >
                   <Search className="h-4 w-4 mr-2" />
                   Search
@@ -459,6 +524,13 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
             setRepeatEndDate(config.endDate);
           }
         }}
+      />
+      
+      {/* Meeting History Modal */}
+      <MeetingHistoryModal
+        isOpen={showHistoryModal}
+        onClose={() => setShowHistoryModal(false)}
+        onSelectMeeting={handleSelectPreviousMeeting}
       />
     </form>
   );

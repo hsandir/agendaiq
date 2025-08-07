@@ -10,8 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trash2, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
+import { Trash2, ChevronUp, ChevronDown, GripVertical, Target } from "lucide-react";
 import { safeFormatDate, safeFormatTime } from '@/lib/utils/safe-date';
+import { MeetingActionItems, type ActionItem } from "./MeetingActionItems";
 
 interface Attendee {
   id: string;
@@ -60,6 +61,8 @@ export function MeetingFormStep2({
   );
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [actionItems, setActionItems] = useState<ActionItem[]>([]);
+  const [activeTab, setActiveTab] = useState<"agenda" | "actions">("agenda");
 
 
   // Add new agenda item
