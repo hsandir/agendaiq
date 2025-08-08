@@ -326,15 +326,17 @@ export default function RoleTasksPage() {
                             )}
                           </div>
                           
-                          <div className="mt-2 text-xs text-muted-foreground">
-                            <Link 
-                              href={`/dashboard/meetings/${task.meeting.id}`}
-                              className="hover:text-primary transition-colors flex items-center gap-1"
-                            >
-                              From: {task.meeting.title}
-                              <ChevronRight className="h-3 w-3" />
-                            </Link>
-                          </div>
+                          {task.meeting && (
+                            <div className="mt-2 text-xs text-muted-foreground">
+                              <Link 
+                                href={`/dashboard/meetings/${task.meeting.id}`}
+                                className="hover:text-primary transition-colors flex items-center gap-1"
+                              >
+                                From: {task.meeting.title}
+                                <ChevronRight className="h-3 w-3" />
+                              </Link>
+                            </div>
+                          )}
                           
                           {task.previousHolder && (
                             <div className="mt-2 text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded inline-block">

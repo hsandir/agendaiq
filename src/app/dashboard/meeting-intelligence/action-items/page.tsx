@@ -337,13 +337,15 @@ export default function ActionItemsTrackingPage() {
                         </div>
                       )}
                       
-                      <Link 
-                        href={`/dashboard/meetings/${item.meeting.id}`}
-                        className="flex items-center gap-1 hover:text-primary transition-colors"
-                      >
-                        <span>From: {item.meeting.title}</span>
-                        <ChevronRight className="h-3 w-3" />
-                      </Link>
+                      {item.meeting && (
+                        <Link 
+                          href={`/dashboard/meetings/${item.meeting.id}`}
+                          className="flex items-center gap-1 hover:text-primary transition-colors"
+                        >
+                          <span>From: {item.meeting.title}</span>
+                          <ChevronRight className="h-3 w-3" />
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>

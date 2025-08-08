@@ -240,7 +240,7 @@ export default function MeetingSearchPage() {
               {agendaItems.map((item) => (
                 <Link
                   key={item.id}
-                  href={`/dashboard/meetings/${item.meeting.id}`}
+                  href={item.meeting ? `/dashboard/meetings/${item.meeting.id}` : '#'}
                   className="block p-4 border border-border rounded-lg hover:bg-muted transition-colors"
                 >
                   <div className="flex justify-between items-start">
@@ -254,7 +254,7 @@ export default function MeetingSearchPage() {
                         </p>
                       )}
                       <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
-                        <span>Meeting: {item.meeting.title}</span>
+                        <span>Meeting: {item.meeting?.title || 'Unknown'}</span>
                         <span className={`px-2 py-1 rounded ${
                           item.status === 'Resolved' ? 'bg-green-100 text-green-700' :
                           item.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
@@ -283,7 +283,7 @@ export default function MeetingSearchPage() {
               {actionItems.map((item) => (
                 <Link
                   key={item.id}
-                  href={`/dashboard/meetings/${item.meeting.id}`}
+                  href={item.meeting ? `/dashboard/meetings/${item.meeting.id}` : '#'}
                   className="block p-4 border border-border rounded-lg hover:bg-muted transition-colors"
                 >
                   <div className="flex justify-between items-start">
