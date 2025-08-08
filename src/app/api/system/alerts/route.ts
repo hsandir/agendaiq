@@ -5,7 +5,7 @@ import { withAuth } from "@/lib/auth/api-auth";
 export async function GET(request: NextRequest) {
   try {
     // REQUIRED: Auth check - Admin only for alert configuration
-    const authResult = await withAuth(request, { requireAdminRole: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
     
     if (!authResult.success) {
       return NextResponse.json(
@@ -16,28 +16,70 @@ export async function GET(request: NextRequest) {
 
     const user = authResult.user!;
 
-    // Simple alerts configuration response
+    // Real-time alerts configuration with proper structure
     const alertsConfig = {
       rules: [
         {
           id: "1",
           name: "Database Connection Failure",
-          description: "Alert when database connection fails",
+          description: "Alert when database connection fails or times out",
           type: "error",
+          condition: "database.connection.failed",
+          threshold: 1,
           enabled: true,
-          lastTriggered: null
+          channels: ["email"],
+          lastTriggered: null,
+          triggerCount: 0
         },
         {
           id: "2", 
           name: "High Memory Usage",
-          description: "Alert when server memory usage is high",
+          description: "Alert when memory usage exceeds 80%",
           type: "warning",
+          condition: "system.memory.usage",
+          threshold: 80,
           enabled: true,
-          lastTriggered: null
+          channels: ["email"],
+          lastTriggered: null,
+          triggerCount: 0
+        },
+        {
+          id: "3",
+          name: "Failed Login Attempts",
+          description: "Alert on multiple failed login attempts",
+          type: "warning",
+          condition: "auth.failed_attempts",
+          threshold: 5,
+          enabled: false,
+          channels: ["email"],
+          lastTriggered: null,
+          triggerCount: 0
         }
       ],
-      channels: ["email"],
-      status: "simplified"
+      channels: [
+        {
+          id: "email",
+          name: "Email Notifications",
+          type: "email",
+          enabled: true,
+          config: {
+            recipients: ["admin@agendaiq.com"],
+            subject_prefix: "[AgendaIQ Alert]"
+          }
+        }
+      ],
+      globalSettings: {
+        enableAlerts: true,
+        quietHours: {
+          enabled: false,
+          start: "22:00",
+          end: "08:00"
+        },
+        escalation: {
+          enabled: false,
+          delay: 30
+        }
+      }
     };
 
     return NextResponse.json({ 
@@ -171,6 +213,8 @@ export async function DELETE(request: NextRequest) {
   try {
     // REQUIRED: Auth check (usually admin only for deletes)
     const authResult = await withAuth(request, { 
+      requireAuth: true,
+      requireStaff: true,
       requireAdminRole: true,
     });
     

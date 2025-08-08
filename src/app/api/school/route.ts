@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/school - Create a new school (admin only)
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if school code already exists
-    const existingSchool = await prisma.school.findUnique({
+    const existingSchool = await prisma.school.findFirst({
       where: { code },
     });
 
@@ -102,8 +102,9 @@ export async function POST(request: NextRequest) {
         name,
         code,
         address,
-        phone,
-        email,
+        // TODO: Add phone and email fields to School model in schema
+        // phone,
+        // email,
         district_id,
       },
       include: {
@@ -123,7 +124,7 @@ export async function POST(request: NextRequest) {
 
 // PUT /api/school - Update a school (admin only)
 export async function PUT(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -153,7 +154,7 @@ export async function PUT(request: NextRequest) {
 
     // If code is being changed, check for conflicts
     if (code && code !== existingSchool.code) {
-      const codeConflict = await prisma.school.findUnique({
+      const codeConflict = await prisma.school.findFirst({
         where: { code },
       });
 

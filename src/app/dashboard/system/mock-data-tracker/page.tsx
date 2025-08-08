@@ -97,7 +97,7 @@ export default function MockDataTrackerPage() {
       case 'api_fallback':
         return <Badge variant="outline" className="text-yellow-600 border-yellow-600"><AlertTriangle className="w-3 h-3 mr-1" />API Fallback</Badge>;
       case 'mixed':
-        return <Badge variant="outline" className="text-blue-600 border-blue-600"><Code className="w-3 h-3 mr-1" />Mixed</Badge>;
+        return <Badge variant="outline" className="text-primary border-blue-600"><Code className="w-3 h-3 mr-1" />Mixed</Badge>;
       default:
         return <Badge variant="secondary">Unknown</Badge>;
     }
@@ -135,7 +135,7 @@ export default function MockDataTrackerPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold flex items-center">
-              <Search className="w-8 h-8 mr-3 text-purple-600" />
+              <Search className="w-8 h-8 mr-3 text-secondary" />
               Mock Data Tracker
             </h1>
             <p className="text-muted-foreground">Real-time codebase scanning in progress...</p>
@@ -155,7 +155,7 @@ export default function MockDataTrackerPage() {
           <div className="text-center">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
             <p className="text-lg font-medium">Scanning codebase for mock data usage...</p>
-            <p className="text-sm text-gray-500 mt-2">This may take a few seconds</p>
+            <p className="text-sm text-muted-foreground mt-2">This may take a few seconds</p>
           </div>
         </div>
       </div>
@@ -168,7 +168,7 @@ export default function MockDataTrackerPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold flex items-center">
-              <Search className="w-8 h-8 mr-3 text-purple-600" />
+              <Search className="w-8 h-8 mr-3 text-secondary" />
               Mock Data Tracker
             </h1>
             <p className="text-muted-foreground">Monitor and track mock data usage across the application</p>
@@ -193,9 +193,9 @@ export default function MockDataTrackerPage() {
           </div>
         </div>
 
-        <Alert className="mb-6 border-red-200 bg-red-50">
-          <AlertCircle className="h-4 w-4 text-red-600" />
-          <AlertDescription className="text-red-800">
+        <Alert className="mb-6 border-destructive bg-destructive/10">
+          <AlertCircle className="h-4 w-4 text-destructive" />
+          <AlertDescription className="text-destructive">
             <strong>Scan Failed:</strong> {error}
           </AlertDescription>
         </Alert>
@@ -208,7 +208,7 @@ export default function MockDataTrackerPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold flex items-center">
-            <Search className="w-8 h-8 mr-3 text-purple-600" />
+            <Search className="w-8 h-8 mr-3 text-secondary" />
             Mock Data Tracker
           </h1>
           <p className="text-muted-foreground">Real-time monitoring of mock data usage across the application</p>
@@ -263,10 +263,10 @@ export default function MockDataTrackerPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Mock Only</CardTitle>
-                <AlertCircle className="h-4 w-4 text-red-500" />
+                <AlertCircle className="h-4 w-4 text-destructive" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-red-600">{report.mockOnlyFiles}</div>
+                <div className="text-2xl font-bold text-destructive">{report.mockOnlyFiles}</div>
                 <p className="text-xs text-muted-foreground">
                   High priority fixes needed
                 </p>
@@ -289,10 +289,10 @@ export default function MockDataTrackerPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Mixed Usage</CardTitle>
-                <Code className="h-4 w-4 text-blue-500" />
+                <Code className="h-4 w-4 text-primary" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-blue-600">{report.mixedFiles}</div>
+                <div className="text-2xl font-bold text-primary">{report.mixedFiles}</div>
                 <p className="text-xs text-muted-foreground">
                   Partially using real data
                 </p>
@@ -326,7 +326,7 @@ export default function MockDataTrackerPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Database className="h-5 w-5 mr-2 text-purple-600" />
+                  <Database className="h-5 w-5 mr-2 text-secondary" />
                   Mock Data Usage Details
                 </CardTitle>
                 <CardDescription>Complete list of files using mock data with details and recommendations</CardDescription>
@@ -339,9 +339,9 @@ export default function MockDataTrackerPage() {
                         <div className="flex items-center space-x-3">
                           {getTypeIcon(item.type)}
                           <div>
-                            <h4 className="font-medium text-gray-900">{item.file}</h4>
-                            <p className="text-sm text-gray-600">{item.description}</p>
-                            <p className="text-xs text-gray-500 mt-1">Path: {item.path}</p>
+                            <h4 className="font-medium text-foreground">{item.file}</h4>
+                            <p className="text-sm text-muted-foreground">{item.description}</p>
+                            <p className="text-xs text-muted-foreground mt-1">Path: {item.path}</p>
                           </div>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -357,23 +357,23 @@ export default function MockDataTrackerPage() {
                         </div>
                       )}
 
-                      <div className="bg-gray-50 rounded p-3">
-                        <p className="text-xs font-medium text-gray-600 mb-2">Mock Data References:</p>
+                      <div className="bg-muted rounded p-3">
+                        <p className="text-xs font-medium text-muted-foreground mb-2">Mock Data References:</p>
                         {item.mockDataLines.map((line, lineIndex) => (
-                          <code key={lineIndex} className="block text-xs text-gray-700 mb-1">
+                          <code key={lineIndex} className="block text-xs text-foreground mb-1">
                             {line}
                           </code>
                         ))}
                       </div>
 
                       <div className="flex items-center justify-between mt-3 pt-3 border-t">
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-muted-foreground">
                           Last checked: {new Date(item.lastChecked).toLocaleString()}
                         </span>
                         <div className="flex space-x-2">
                           {item.type === 'page' && (
                             <Button variant="outline" size="sm" asChild>
-                              <Link href={item.path}>
+                              <Link href={item.path as any}>
                                 <ExternalLink className="w-3 h-3 mr-1" />
                                 View Page
                               </Link>

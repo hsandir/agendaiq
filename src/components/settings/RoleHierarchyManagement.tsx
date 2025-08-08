@@ -134,13 +134,13 @@ export function RoleHierarchyManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded-lg shadow">
+      <div className="bg-card p-6 rounded-lg shadow">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-medium">Role Management</h3>
           <button
             onClick={handleInitializeRoles}
             disabled={isLoading}
-            className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-foreground bg-green-600 hover:bg-green-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
           >
             {isLoading ? 'Initializing...' : 'Initialize Default Roles'}
           </button>
@@ -148,7 +148,7 @@ export function RoleHierarchyManagement() {
 
         <form onSubmit={handleAddRole} className="space-y-4">
           <div>
-            <label htmlFor="roleName" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="roleName" className="block text-sm font-medium text-foreground">
               Role Name
             </label>
             <input
@@ -156,47 +156,47 @@ export function RoleHierarchyManagement() {
               id="roleName"
               value={newRoleName}
               onChange={(e) => setNewRoleName(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-border py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
               placeholder="Enter role name"
               required
             />
           </div>
 
-          {error && <div className="text-sm text-red-600">{error}</div>}
+          {error && <div className="text-sm text-destructive">{error}</div>}
           {success && <div className="text-sm text-green-600">{success}</div>}
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-foreground bg-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50"
           >
             {isLoading ? 'Adding Role...' : 'Add Role'}
           </button>
         </form>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow">
+      <div className="bg-card p-6 rounded-lg shadow">
         <h3 className="text-lg font-medium mb-4">Existing Roles</h3>
         <div className="space-y-4">
           {roles.map((role, index) => (
             <div key={`role-${role.id}-${index}`} className="flex items-center justify-between p-4 border rounded">
               <div>
                 <h4 className="font-medium">{role.title}</h4>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   Department: {role.Department?.name || 'None'}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   Priority: {role.priority || 'Not set'}
                 </p>
                 {role.Staff && role.Staff.length > 0 && (
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     Staff: {role.Staff.length} member{role.Staff.length !== 1 ? 's' : ''}
                   </p>
                 )}
               </div>
               <button
                 onClick={() => handleDeleteRole(role.title)}
-                className="px-3 py-1 text-sm text-red-600 hover:text-red-800 focus:outline-none"
+                className="px-3 py-1 text-sm text-destructive hover:text-destructive focus:outline-none"
                 disabled={isLoading}
               >
                 Delete
@@ -204,7 +204,7 @@ export function RoleHierarchyManagement() {
             </div>
           ))}
           {roles.length === 0 && (
-            <p className="text-gray-500 text-center py-4">No roles found. Click "Initialize Default Roles" to get started.</p>
+            <p className="text-muted-foreground text-center py-4">No roles found. Click "Initialize Default Roles" to get started.</p>
           )}
         </div>
       </div>

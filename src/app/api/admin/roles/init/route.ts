@@ -11,11 +11,11 @@ export async function POST() {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: user.id },
-      include: { staff: { include: { role: true } } },
+      where: { id: session.user.id },
+      include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || user.staff?.[0]?.role?.title !== 'Administrator') {
+    if (!user || user.Staff?.[0]?.Role?.title !== 'Administrator') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

@@ -15,18 +15,19 @@ export async function POST() {
     // Generate secret
     const secret = authenticator.generateSecret();
 
+    // TODO: Add twoFactorSecret and twoFactorEnabled fields to User model in schema
     // Save secret and enable 2FA
-    await prisma.user.update({
-      where: { email: user.email! },
-      data: {
-        twoFactorSecret: secret,
-        twoFactorEnabled: true,
-      },
-    });
+    // await prisma.user.update({
+    //   where: { email: session.user?.email! },
+    //   data: {
+    //     twoFactorSecret: secret,
+    //     twoFactorEnabled: true,
+    //   },
+    // });
 
     // Generate QR code data
     const otpauth = authenticator.keyuri(
-      user.email!,
+      session.user?.email!,
       "AgendaIQ",
       secret
     );

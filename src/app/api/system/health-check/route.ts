@@ -224,7 +224,7 @@ async function checkPage(url: string, name: string) {
     // Determine status based on response
     let status: 'success' | 'warning' | 'error' = 'success';
     let message = 'Page loaded successfully';
-    let details: any = {};
+    const details: any = {};
 
     if (!response.ok) {
       status = 'error';

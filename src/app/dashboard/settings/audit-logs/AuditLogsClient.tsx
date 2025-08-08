@@ -1,16 +1,127 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { FiSearch, FiFilter, FiDownload, FiEye, FiTrash2, FiEdit, FiRefreshCw, FiCalendar, FiUser, FiDatabase, FiActivity } from 'react-icons/fi';
+import { useState, useEffect, useCallback } from 'react';
+import { Download as FiDownload, Eye as FiEye, Trash2 as FiTrash2, Edit as FiEdit, RefreshCw as FiRefreshCw, User as FiUser, Database as FiDatabase, Activity as FiActivity, Shield as FiShield, AlertTriangle as FiAlertTriangle } from 'lucide-react';
 
-interface AuditLog {
+// User interface for authentication context
+interface AuthUser {
+  id: number;
+  email: string;
+  name?: string;
+  staff?: {
+    id: number;
+    role: {
+      title: string;
+      priority: number;
+      is_leadership: boolean;
+    };
+    department: {
+      name: string;
+    };
+  };
+}
+
+// Component props interface
+interface AuditLogsClientProps {
+  user: AuthUser;
+}
+
+// Enhanced error handling types
+enum ErrorCategory {
+  NETWORK = 'NETWORK',
+  AUTHENTICATION = 'AUTHENTICATION', 
+  AUTHORIZATION = 'AUTHORIZATION',
+  VALIDATION = 'VALIDATION',
+  SERVER = 'SERVER',
+  CLIENT = 'CLIENT'
+}
+
+interface AuditError {
+  category: ErrorCategory;
+  message: string;
+  code?: string;
+  details?: string;
+}
+
+// Error categorization helper
+const categorizeError = (error: unknown, context: string): AuditError => {
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    
+    // Network errors
+    if (message.includes('fetch') || message.includes('network') || message.includes('connection')) {
+      return {
+        category: ErrorCategory.NETWORK,
+        message: `Network error while ${context}`,
+        details: error.message
+      };
+    }
+    
+    // Authentication errors
+    if (message.includes('unauthorized') || message.includes('token')) {
+      return {
+        category: ErrorCategory.AUTHENTICATION,
+        message: `Authentication required for ${context}`,
+        details: error.message
+      };
+    }
+    
+    // Authorization errors
+    if (message.includes('forbidden') || message.includes('access denied')) {
+      return {
+        category: ErrorCategory.AUTHORIZATION,
+        message: `Access denied for ${context}`,
+        details: error.message
+      };
+    }
+    
+    // Server errors
+    if (message.includes('500') || message.includes('internal server')) {
+      return {
+        category: ErrorCategory.SERVER,
+        message: `Server error while ${context}`,
+        details: error.message
+      };
+    }
+    
+    // Validation errors
+    if (message.includes('validation') || message.includes('invalid')) {
+      return {
+        category: ErrorCategory.VALIDATION,
+        message: `Invalid data for ${context}`,
+        details: error.message
+      };
+    }
+    
+    // Default to client error
+    return {
+      category: ErrorCategory.CLIENT,
+      message: `Error ${context}`,
+      details: error.message
+    };
+  }
+  
+  return {
+    category: ErrorCategory.CLIENT,
+    message: `Unknown error ${context}`,
+    details: String(error)
+  };
+};
+
+// Define safe types for audit data
+type AuditFieldValue = string | number | boolean | null | undefined;
+type AuditRecord = Record<string, AuditFieldValue>;
+type FieldChange = { old: AuditFieldValue; new: AuditFieldValue };
+
+// Legacy audit log interface
+interface LegacyAuditLog {
   id: number;
   table_name: string;
   record_id: string;
   operation: string;
-  field_changes: Record<string, { old: any; new: any }> | null;
-  old_values: Record<string, any> | null;
-  new_values: Record<string, any> | null;
+  field_changes: Record<string, FieldChange> | null;
+  old_values: AuditRecord | null;
+  new_values: AuditRecord | null;
   description: string | null;
   source: string;
   ip_address: string | null;
@@ -24,6 +135,40 @@ interface AuditLog {
   } | null;
 }
 
+// Critical audit log interface
+interface CriticalAuditLog {
+  id: number;
+  category: string;
+  action: string;
+  user_id: number | null;
+  staff_id: number | null;
+  ip_address: string | null;
+  user_agent: string | null;
+  metadata: AuditRecord | null;
+  risk_score: number;
+  success: boolean;
+  error_message: string | null;
+  description: string | null;
+  timestamp: string;
+  User: { id: number; email: string; name: string | null } | null;
+  Staff: { 
+    id: number; 
+    Role: { title: string }; 
+    Department: { name: string } 
+  } | null;
+}
+
+type AuditLog = LegacyAuditLog | CriticalAuditLog;
+
+// Type guards
+function isCriticalLog(log: AuditLog): log is CriticalAuditLog {
+  return 'category' in log && 'risk_score' in log;
+}
+
+function isLegacyLog(log: AuditLog): log is LegacyAuditLog {
+  return 'table_name' in log && 'operation' in log;
+}
+
 interface AuditSummary {
   totalLogs: number;
   operationStats: { operation: string; count: number }[];
@@ -31,16 +176,34 @@ interface AuditSummary {
   topUsers: { userId: number; count: number }[];
 }
 
+interface HighRiskStats {
+  total: number;
+  riskScoreDistribution: Record<string, number>;
+  categoryDistribution: Record<string, number>;
+  userDistribution: Record<string, number>;
+  ipDistribution: Record<string, number>;
+  timeRange: {
+    from: string;
+    to: string;
+  };
+}
+
 interface Filters {
+  logType: 'critical' | 'legacy' | 'both';
   table: string;
   operation: string;
+  category: string;
+  action: string;
   userId: string;
+  staffId: string;
   startDate: string;
   endDate: string;
+  minRiskScore: string;
+  success: string;
   search: string;
 }
 
-export default function AuditLogsClient() {
+export default function AuditLogsClient({ user }: AuditLogsClientProps) {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [summary, setSummary] = useState<AuditSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -48,13 +211,20 @@ export default function AuditLogsClient() {
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [filters, setFilters] = useState<Filters>({
+    logType: 'both',
     table: '',
     operation: '',
+    category: '',
+    action: '',
     userId: '',
+    staffId: '',
     startDate: '',
     endDate: '',
+    minRiskScore: '',
+    success: '',
     search: ''
   });
+  const [highRiskStats, setHighRiskStats] = useState<HighRiskStats | null>(null);
   const [pagination, setPagination] = useState({
     limit: 50,
     offset: 0,
@@ -62,30 +232,49 @@ export default function AuditLogsClient() {
   });
 
   // Load audit logs
-  const loadAuditLogs = async (reset: boolean = false) => {
+  const loadAuditLogs = useCallback(async (reset: boolean = false) => {
     try {
       setLoading(true);
       
       const queryParams = new URLSearchParams();
+      queryParams.set('type', filters.logType);
       if (filters.table) queryParams.set('table', filters.table);
       if (filters.operation) queryParams.set('operation', filters.operation);
+      if (filters.category) queryParams.set('category', filters.category);
+      if (filters.action) queryParams.set('action', filters.action);
       if (filters.userId) queryParams.set('userId', filters.userId);
+      if (filters.staffId) queryParams.set('staffId', filters.staffId);
       if (filters.startDate) queryParams.set('startDate', filters.startDate);
       if (filters.endDate) queryParams.set('endDate', filters.endDate);
+      if (filters.minRiskScore) queryParams.set('minRiskScore', filters.minRiskScore);
+      if (filters.success) queryParams.set('success', filters.success);
       
       queryParams.set('limit', pagination.limit.toString());
-      queryParams.set('offset', reset ? '0' : pagination.offset.toString());
+      queryParams.set('page', reset ? '1' : Math.floor(pagination.offset / pagination.limit + 1).toString());
 
       const response = await fetch(`/api/admin/audit-logs?${queryParams}`);
       if (!response.ok) throw new Error('Failed to fetch audit logs');
       
       const data = await response.json();
       
+      let logs: AuditLog[] = [];
+      if (data.type === 'both') {
+        logs = [...data.data.critical, ...data.data.legacy];
+        // Sort by timestamp/created_at
+        logs.sort((a, b) => {
+          const timeA = new Date(isCriticalLog(a) ? a.timestamp : a.created_at).getTime();
+          const timeB = new Date(isCriticalLog(b) ? b.timestamp : b.created_at).getTime();
+          return timeB - timeA;
+        });
+      } else {
+        logs = data.data;
+      }
+      
       if (reset) {
-        setAuditLogs(data.data);
+        setAuditLogs(logs);
         setPagination({ ...pagination, offset: 0, hasMore: data.pagination.hasMore });
       } else {
-        setAuditLogs(prev => [...prev, ...data.data]);
+        setAuditLogs(prev => [...prev, ...logs]);
         setPagination(prev => ({ 
           ...prev, 
           offset: prev.offset + prev.limit, 
@@ -94,14 +283,30 @@ export default function AuditLogsClient() {
       }
       
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error loading audit logs');
+      const auditError = categorizeError(err, 'loading audit logs');
+      console.error(`[${auditError.category}] ${auditError.message}:`, auditError.details);
+      setError(`${auditError.message}. Please try again.`);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, pagination.limit, pagination.offset]);
+
+  // Load high-risk stats
+  const loadHighRiskStats = useCallback(async () => {
+    try {
+      const response = await fetch('/api/admin/audit-logs/high-risk?limit=10');
+      if (response.ok) {
+        const data = await response.json();
+        setHighRiskStats(data.stats);
+      }
+    } catch (err) {
+      const auditError = categorizeError(err, 'loading high-risk statistics');
+      console.error(`[${auditError.category}] ${auditError.message}:`, auditError.details);
+    }
+  }, []);
 
   // Load summary
-  const loadSummary = async () => {
+  const loadSummary = useCallback(async () => {
     try {
       const response = await fetch('/api/admin/audit-logs/summary');
       if (!response.ok) throw new Error('Failed to fetch summary');
@@ -109,14 +314,16 @@ export default function AuditLogsClient() {
       const data = await response.json();
       setSummary(data.data);
     } catch (err) {
-      console.error('Error loading summary:', err);
+      const auditError = categorizeError(err, 'loading audit summary');
+      console.error(`[${auditError.category}] ${auditError.message}:`, auditError.details);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadAuditLogs(true);
     loadSummary();
-  }, [filters]);
+    loadHighRiskStats();
+  }, [filters, loadAuditLogs, loadSummary, loadHighRiskStats]);
 
   const handleFilterChange = (key: keyof Filters, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -125,11 +332,17 @@ export default function AuditLogsClient() {
 
   const resetFilters = () => {
     setFilters({
+      logType: 'both',
       table: '',
       operation: '',
+      category: '',
+      action: '',
       userId: '',
+      staffId: '',
       startDate: '',
       endDate: '',
+      minRiskScore: '',
+      success: '',
       search: ''
     });
   };
@@ -137,149 +350,257 @@ export default function AuditLogsClient() {
   const getOperationBadge = (operation: string) => {
     const colors = {
       CREATE: 'bg-green-100 text-green-800',
-      UPDATE: 'bg-blue-100 text-blue-800',
-      DELETE: 'bg-red-100 text-red-800',
-      BULK_CREATE: 'bg-purple-100 text-purple-800',
-      BULK_UPDATE: 'bg-indigo-100 text-indigo-800',
+      UPDATE: 'bg-primary text-primary',
+      DELETE: 'bg-destructive/10 text-destructive',
+      BULK_CREATE: 'bg-secondary text-secondary',
+      BULK_UPDATE: 'bg-primary text-primary',
       BULK_DELETE: 'bg-pink-100 text-pink-800'
     };
-    return colors[operation as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[operation as keyof typeof colors] || 'bg-muted text-foreground';
+  };
+
+  const getCategoryBadge = (category: string) => {
+    const colors = {
+      AUTH: 'bg-primary text-primary',
+      SECURITY: 'bg-destructive/10 text-destructive',
+      DATA_CRITICAL: 'bg-secondary text-secondary',
+      PERMISSION: 'bg-yellow-100 text-yellow-800',
+      SYSTEM: 'bg-muted text-foreground'
+    };
+    return colors[category as keyof typeof colors] || 'bg-muted text-foreground';
+  };
+
+  const getRiskBadge = (riskScore: number) => {
+    if (riskScore >= 80) return 'bg-destructive/10 text-destructive';
+    if (riskScore >= 60) return 'bg-orange-100 text-orange-800';
+    if (riskScore >= 40) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-green-100 text-green-800';
   };
 
   const getSourceBadge = (source: string) => {
     const colors = {
-      WEB_UI: 'bg-blue-100 text-blue-800',
+      WEB_UI: 'bg-primary text-primary',
       API: 'bg-green-100 text-green-800',
-      BULK_UPLOAD: 'bg-purple-100 text-purple-800',
-      SYSTEM: 'bg-gray-100 text-gray-800'
+      BULK_UPLOAD: 'bg-secondary text-secondary',
+      SYSTEM: 'bg-muted text-foreground'
     };
-    return colors[source as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[source as keyof typeof colors] || 'bg-muted text-foreground';
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('tr-TR');
+    return new Date(dateString).toLocaleString('en-US');
   };
+
+  // Permission validation helper
+  const canViewAuditDetails = useCallback((log: AuditLog): boolean => {
+    // Administrator can view all logs
+    if (user.staff?.role.title === 'Administrator') {
+      return true;
+    }
+
+    // Leadership can view logs from their own organization
+    if (user.staff?.role.is_leadership) {
+      // Can view logs from same user or their own staff actions
+      if (isCriticalLog(log)) {
+        return log.user_id === user.id || log.staff_id === user.staff.id;
+      } else {
+        // For legacy logs, check the User/Staff relations
+        return log.User?.id === user.id || log.Staff?.id === user.staff.id;
+      }
+    }
+
+    // Regular staff can only view their own audit logs
+    if (isCriticalLog(log)) {
+      return log.user_id === user.id || log.staff_id === user.staff?.id;
+    } else {
+      // For legacy logs, check the User/Staff relations
+      return log.User?.id === user.id || log.Staff?.id === user.staff?.id;
+    }
+  }, [user]);
 
   const handleViewDetails = (log: AuditLog) => {
+    // Security validation: Check permissions before viewing details
+    if (!canViewAuditDetails(log)) {
+      setError('Access denied: You do not have permission to view this audit log.');
+      return;
+    }
+
     setSelectedLog(log);
     setShowDetails(true);
+    setError(''); // Clear any previous errors
   };
 
-  const exportLogs = async () => {
+  const exportLogs = async (format: 'csv' | 'json' = 'csv') => {
     try {
       const queryParams = new URLSearchParams();
+      queryParams.set('format', format);
+      queryParams.set('type', filters.logType);
       if (filters.table) queryParams.set('table', filters.table);
       if (filters.operation) queryParams.set('operation', filters.operation);
+      if (filters.category) queryParams.set('category', filters.category);
+      if (filters.userId) queryParams.set('userId', filters.userId);
+      if (filters.staffId) queryParams.set('staffId', filters.staffId);
       if (filters.startDate) queryParams.set('startDate', filters.startDate);
       if (filters.endDate) queryParams.set('endDate', filters.endDate);
-      queryParams.set('limit', '10000'); // Export all
+      queryParams.set('maxRecords', '10000');
 
-      const response = await fetch(`/api/admin/audit-logs?${queryParams}`);
-      const data = await response.json();
+      const response = await fetch(`/api/admin/audit-logs/export?${queryParams}`);
+      if (!response.ok) throw new Error('Export failed');
       
-      // Convert to CSV
-      const csv = [
-        ['Date', 'Table', 'Operation', 'User', 'Description', 'IP Address'].join(','),
-        ...data.data.map((log: AuditLog) => [
-          formatDate(log.created_at),
-          log.table_name,
-          log.operation,
-          log.User?.email || 'System',
-          log.description || '',
-          log.ip_address || ''
-        ].map(field => `"${field}"`).join(','))
-      ].join('\n');
-
-      const blob = new Blob([csv], { type: 'text/csv' });
+      const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `audit-logs-${new Date().toISOString().split('T')[0]}.csv`;
+      
+      // Get filename from response headers or create default
+      const contentDisposition = response.headers.get('content-disposition');
+      const filename = contentDisposition?.match(/filename="(.+)"/)?.[1] || 
+                      `audit-logs-${new Date().toISOString().split('T')[0]}.${format}`;
+      
+      a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
-      setError('Export failed');
+      const auditError = categorizeError(err, 'exporting audit logs');
+      console.error(`[${auditError.category}] ${auditError.message}:`, auditError.details);
+      setError(`Export failed: ${auditError.message}`);
     }
   };
 
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      {summary && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center">
-              <FiActivity className="h-8 w-8 text-blue-600" />
-              <div className="ml-4">
-                <p className="text-2xl font-bold text-gray-900">{summary.totalLogs}</p>
-                <p className="text-gray-600">Total Logs</p>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+        {summary && (
+          <>
+            <div className="bg-card p-6 rounded-lg shadow-sm border">
+              <div className="flex items-center">
+                <FiActivity className="h-8 w-8 text-primary" />
+                <div className="ml-4">
+                  <p className="text-2xl font-bold text-foreground">{summary.totalLogs}</p>
+                  <p className="text-muted-foreground">Total Logs</p>
+                </div>
               </div>
             </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center">
-              <FiDatabase className="h-8 w-8 text-green-600" />
-              <div className="ml-4">
-                <p className="text-2xl font-bold text-gray-900">{summary.tableStats.length}</p>
-                <p className="text-gray-600">Affected Tables</p>
+            
+            <div className="bg-card p-6 rounded-lg shadow-sm border">
+              <div className="flex items-center">
+                <FiDatabase className="h-8 w-8 text-green-600" />
+                <div className="ml-4">
+                  <p className="text-2xl font-bold text-foreground">{summary.tableStats.length}</p>
+                  <p className="text-muted-foreground">Affected Tables</p>
+                </div>
               </div>
             </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center">
-              <FiUser className="h-8 w-8 text-purple-600" />
-              <div className="ml-4">
-                <p className="text-2xl font-bold text-gray-900">{summary.topUsers.length}</p>
-                <p className="text-gray-600">Active Users</p>
+            
+            <div className="bg-card p-6 rounded-lg shadow-sm border">
+              <div className="flex items-center">
+                <FiUser className="h-8 w-8 text-secondary" />
+                <div className="ml-4">
+                  <p className="text-2xl font-bold text-foreground">{summary.topUsers.length}</p>
+                  <p className="text-muted-foreground">Active Users</p>
+                </div>
               </div>
             </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <div className="flex items-center">
-              <FiCalendar className="h-8 w-8 text-orange-600" />
-              <div className="ml-4">
-                <p className="text-2xl font-bold text-gray-900">30</p>
-                <p className="text-gray-600">Day Report</p>
+          </>
+        )}
+        
+        {highRiskStats && (
+          <>
+            <div className="bg-card p-6 rounded-lg shadow-sm border">
+              <div className="flex items-center">
+                <FiShield className="h-8 w-8 text-destructive" />
+                <div className="ml-4">
+                  <p className="text-2xl font-bold text-foreground">{highRiskStats.total}</p>
+                  <p className="text-muted-foreground">High Risk Events</p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+            
+            <div className="bg-card p-6 rounded-lg shadow-sm border">
+              <div className="flex items-center">
+                <FiAlertTriangle className="h-8 w-8 text-orange-600" />
+                <div className="ml-4">
+                  <p className="text-2xl font-bold text-foreground">24h</p>
+                  <p className="text-muted-foreground">Time Range</p>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
 
       {/* Filters */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
+      <div className="bg-card p-6 rounded-lg shadow-sm border">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-gray-900">Filters</h3>
+          <h3 className="text-lg font-medium text-foreground">Filters</h3>
           <div className="flex space-x-2">
             <button
               onClick={resetFilters}
-              className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+              className="px-3 py-2 text-sm font-medium text-foreground bg-card border border-border rounded-md hover:bg-muted"
             >
               <FiRefreshCw className="h-4 w-4 mr-1 inline" />
               Reset
             </button>
-            <button
-              onClick={exportLogs}
-              className="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700"
-            >
-              <FiDownload className="h-4 w-4 mr-1 inline" />
-              Export
-            </button>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => exportLogs('csv')}
+                className="px-3 py-2 text-sm font-medium text-foreground bg-primary border border-transparent rounded-md hover:bg-primary"
+              >
+                <FiDownload className="h-4 w-4 mr-1 inline" />
+                Export CSV
+              </button>
+              <button
+                onClick={() => exportLogs('json')}
+                className="px-3 py-2 text-sm font-medium text-foreground bg-green-600 border border-transparent rounded-md hover:bg-green-700"
+              >
+                <FiDownload className="h-4 w-4 mr-1 inline" />
+                Export JSON
+              </button>
+            </div>
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Table</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Log Type</label>
+            <select
+              value={filters.logType}
+              onChange={(e) => handleFilterChange('logType', e.target.value as 'critical' | 'legacy' | 'both')}
+              className="w-full border border-border rounded-md px-3 py-2"
+            >
+              <option value="both">Both Types</option>
+              <option value="critical">Critical Events</option>
+              <option value="legacy">Legacy Audit</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Category</label>
+            <select
+              value={filters.category}
+              onChange={(e) => handleFilterChange('category', e.target.value)}
+              className="w-full border border-border rounded-md px-3 py-2"
+              disabled={filters.logType === 'legacy'}
+            >
+              <option value="">All Categories</option>
+              <option value="AUTH">Authentication</option>
+              <option value="SECURITY">Security</option>
+              <option value="DATA_CRITICAL">Data Critical</option>
+              <option value="PERMISSION">Permission</option>
+              <option value="SYSTEM">System</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Table</label>
             <select
               value={filters.table}
               onChange={(e) => handleFilterChange('table', e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
+              disabled={filters.logType === 'critical'}
             >
-              <option value="">All</option>
+              <option value="">All Tables</option>
               <option value="users">Users</option>
               <option value="staff">Staff</option>
               <option value="roles">Roles</option>
@@ -289,13 +610,31 @@ export default function AuditLogsClient() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Operation</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Risk Score</label>
+            <select
+              value={filters.minRiskScore}
+              onChange={(e) => handleFilterChange('minRiskScore', e.target.value)}
+              className="w-full border border-border rounded-md px-3 py-2"
+              disabled={filters.logType === 'legacy'}
+            >
+              <option value="">Any Risk</option>
+              <option value="80">High Risk (80+)</option>
+              <option value="60">Medium Risk (60+)</option>
+              <option value="40">Low Risk (40+)</option>
+            </select>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Operation</label>
             <select
               value={filters.operation}
               onChange={(e) => handleFilterChange('operation', e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
+              disabled={filters.logType === 'critical'}
             >
-              <option value="">All</option>
+              <option value="">All Operations</option>
               <option value="CREATE">Create</option>
               <option value="UPDATE">Update</option>
               <option value="DELETE">Delete</option>
@@ -306,148 +645,215 @@ export default function AuditLogsClient() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Action</label>
+            <input
+              type="text"
+              value={filters.action}
+              onChange={(e) => handleFilterChange('action', e.target.value)}
+              placeholder="Action name..."
+              className="w-full border border-border rounded-md px-3 py-2"
+              disabled={filters.logType === 'legacy'}
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-1">Start Date</label>
             <input
               type="date"
               value={filters.startDate}
               onChange={(e) => handleFilterChange('startDate', e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+            <label className="block text-sm font-medium text-foreground mb-1">End Date</label>
             <input
               type="date"
               value={filters.endDate}
               onChange={(e) => handleFilterChange('endDate', e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">User ID</label>
+            <label className="block text-sm font-medium text-foreground mb-1">User ID</label>
             <input
               type="number"
               value={filters.userId}
               onChange={(e) => handleFilterChange('userId', e.target.value)}
               placeholder="User ID"
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className="w-full border border-border rounded-md px-3 py-2"
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <label className="block text-sm font-medium text-foreground mb-1">Staff ID</label>
             <input
-              type="text"
-              value={filters.search}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
-              placeholder="Search description..."
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              type="number"
+              value={filters.staffId}
+              onChange={(e) => handleFilterChange('staffId', e.target.value)}
+              placeholder="Staff ID"
+              className="w-full border border-border rounded-md px-3 py-2"
             />
           </div>
         </div>
       </div>
 
       {/* Audit Logs Table */}
-      <div className="bg-white shadow-sm border rounded-lg overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Database Audit Logs</h3>
+      <div className="bg-card shadow-sm border rounded-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-border">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-medium text-foreground">
+              {filters.logType === 'critical' ? 'Critical Security Events' : 
+               filters.logType === 'legacy' ? 'Legacy Database Audit Logs' : 
+               'Hybrid Audit System - All Events'}
+            </h3>
+            <div className="text-sm text-muted-foreground">
+              Showing {auditLogs.length} events
+            </div>
+          </div>
         </div>
         
         {error && (
-          <div className="p-4 bg-red-50 border-l-4 border-red-400">
-            <p className="text-red-700">{error}</p>
+          <div className="p-4 bg-destructive/10 border-l-4 border-destructive">
+            <p className="text-destructive">{error}</p>
           </div>
         )}
         
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-muted">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Date/Time
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Table
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Type
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Operation
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Category/Table
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Action/Operation
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   User
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Risk/Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Description
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Source
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {auditLogs.map((log) => (
-                <tr key={log.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatDate(log.created_at)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                      {log.table_name}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getOperationBadge(log.operation)}`}>
-                      {log.operation}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {log.User ? (
-                      <div>
-                        <div className="font-medium">{log.User.name || log.User.email}</div>
-                        {log.Staff && (
-                          <div className="text-gray-500 text-xs">
-                            {log.Staff.Role.title} - {log.Staff.Department.name}
-                          </div>
+            <tbody className="bg-card divide-y divide-gray-200">
+              {auditLogs.map((log) => {
+                const isCritical = isCriticalLog(log);
+                const timestamp = isCritical ? log.timestamp : log.created_at;
+                return (
+                  <tr key={`${isCritical ? 'critical' : 'legacy'}-${log.id}`} className="hover:bg-muted">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                      {formatDate(timestamp)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        isCritical ? 'bg-destructive/10 text-destructive' : 'bg-primary text-primary'
+                      }`}>
+                        {isCritical ? 'CRITICAL' : 'LEGACY'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        isCritical ? getCategoryBadge(log.category) : 'bg-muted text-foreground'
+                      }`}>
+                        {isCritical ? log.category : log.table_name}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        isCritical ? 'bg-muted text-foreground' : getOperationBadge(log.operation)
+                      }`}>
+                        {isCritical ? log.action : log.operation}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                      {log.User ? (
+                        <div>
+                          <div className="font-medium">{log.User.name || log.User.email}</div>
+                          {log.Staff && (
+                            <div className="text-muted-foreground text-xs">
+                              {log.Staff.Role.title} - {log.Staff.Department.name}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">System</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {isCritical ? (
+                        <div className="flex items-center space-x-2">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getRiskBadge(log.risk_score)}`}>
+                            Risk: {log.risk_score}
+                          </span>
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            log.success ? 'bg-green-100 text-green-800' : 'bg-destructive/10 text-destructive'
+                          }`}>
+                            {log.success ? 'SUCCESS' : 'FAILED'}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getSourceBadge(log.source)}`}>
+                          {log.source}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-foreground">
+                      <div className="max-w-xs truncate">
+                        {isCritical ? (
+                          log.error_message || log.description || 'No description'
+                        ) : (
+                          log.description || 'No description'
                         )}
                       </div>
-                    ) : (
-                      <span className="text-gray-500">System</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">
-                    <div className="max-w-xs truncate">
-                      {log.description || 'No description'}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getSourceBadge(log.source)}`}>
-                      {log.source}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => handleViewDetails(log)}
-                      className="text-blue-600 hover:text-blue-900 mr-3"
-                    >
-                      <FiEye className="h-4 w-4" />
-                    </button>
-                    {log.operation !== 'DELETE' && (
-                      <>
-                        <button className="text-green-600 hover:text-green-900 mr-3">
-                          <FiEdit className="h-4 w-4" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      {canViewAuditDetails(log) ? (
+                        <button
+                          onClick={() => handleViewDetails(log)}
+                          className="text-primary hover:text-primary mr-3"
+                          title="View Details"
+                        >
+                          <FiEye className="h-4 w-4" />
                         </button>
-                        <button className="text-red-600 hover:text-red-900">
-                          <FiTrash2 className="h-4 w-4" />
+                      ) : (
+                        <button
+                          disabled
+                          className="text-muted-foreground mr-3 cursor-not-allowed"
+                          title="Access Denied: Insufficient permissions"
+                        >
+                          <FiEye className="h-4 w-4" />
                         </button>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              ))}
+                      )}
+                      {!isCritical && log.operation !== 'DELETE' && (
+                        <>
+                          <button className="text-green-600 hover:text-green-900 mr-3" title="Edit">
+                            <FiEdit className="h-4 w-4" />
+                          </button>
+                          <button className="text-destructive hover:text-destructive" title="Delete">
+                            <FiTrash2 className="h-4 w-4" />
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -465,7 +871,7 @@ export default function AuditLogsClient() {
           <div className="p-4 text-center border-t">
             <button
               onClick={() => loadAuditLogs(false)}
-              className="px-4 py-2 text-sm font-medium text-blue-600 bg-white border border-blue-600 rounded-md hover:bg-blue-50"
+              className="px-4 py-2 text-sm font-medium text-primary bg-card border border-blue-600 rounded-md hover:bg-primary"
             >
               Load More
             </button>
@@ -475,13 +881,15 @@ export default function AuditLogsClient() {
 
       {/* Detail Modal */}
       {showDetails && selectedLog && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div className="fixed inset-0 bg-background bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-card">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">Audit Log Details</h3>
+              <h3 className="text-lg font-medium text-foreground">
+                {isCriticalLog(selectedLog) ? 'Critical Event Details' : 'Legacy Audit Log Details'}
+              </h3>
               <button
                 onClick={() => setShowDetails(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-muted-foreground hover:text-muted-foreground"
               >
                 ✕
               </button>
@@ -489,65 +897,137 @@ export default function AuditLogsClient() {
             
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Table</label>
-                  <p className="text-sm text-gray-900">{selectedLog.table_name}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Operation</label>
-                  <p className="text-sm text-gray-900">{selectedLog.operation}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Record ID</label>
-                  <p className="text-sm text-gray-900">{selectedLog.record_id}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Date</label>
-                  <p className="text-sm text-gray-900">{formatDate(selectedLog.created_at)}</p>
-                </div>
+                {isCriticalLog(selectedLog) ? (
+                  <>
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Category</label>
+                      <p className="text-sm text-foreground">{selectedLog.category}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Action</label>
+                      <p className="text-sm text-foreground">{selectedLog.action}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Risk Score</label>
+                      <p className="text-sm text-foreground">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRiskBadge(selectedLog.risk_score)}`}>
+                          {selectedLog.risk_score}/100
+                        </span>
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Success</label>
+                      <p className="text-sm text-foreground">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          selectedLog.success ? 'bg-green-100 text-green-800' : 'bg-destructive/10 text-destructive'
+                        }`}>
+                          {selectedLog.success ? 'SUCCESS' : 'FAILED'}
+                        </span>
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Date</label>
+                      <p className="text-sm text-foreground">{formatDate(selectedLog.timestamp)}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground">User/Staff ID</label>
+                      <p className="text-sm text-foreground">
+                        User: {selectedLog.user_id || 'N/A'}, Staff: {selectedLog.staff_id || 'N/A'}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Table</label>
+                      <p className="text-sm text-foreground">{selectedLog.table_name}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Operation</label>
+                      <p className="text-sm text-foreground">{selectedLog.operation}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Record ID</label>
+                      <p className="text-sm text-foreground">{selectedLog.record_id}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Date</label>
+                      <p className="text-sm text-foreground">{formatDate(selectedLog.created_at)}</p>
+                    </div>
+                  </>
+                )}
               </div>
               
-              {selectedLog.field_changes && (
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Field Changes</label>
-                  <pre className="text-xs bg-gray-100 p-3 rounded mt-1 overflow-auto">
-                    {JSON.stringify(selectedLog.field_changes, null, 2)}
-                  </pre>
-                </div>
-              )}
-              
-              {selectedLog.old_values && (
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Old Values</label>
-                  <pre className="text-xs bg-gray-100 p-3 rounded mt-1 overflow-auto">
-                    {JSON.stringify(selectedLog.old_values, null, 2)}
-                  </pre>
-                </div>
-              )}
-              
-              {selectedLog.new_values && (
-                <div>
-                  <label className="text-sm font-medium text-gray-700">New Values</label>
-                  <pre className="text-xs bg-gray-100 p-3 rounded mt-1 overflow-auto">
-                    {JSON.stringify(selectedLog.new_values, null, 2)}
-                  </pre>
-                </div>
+              {isCriticalLog(selectedLog) ? (
+                <>
+                  {selectedLog.error_message && (
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Error Message</label>
+                      <p className="text-sm text-destructive bg-destructive/10 p-3 rounded">{selectedLog.error_message}</p>
+                    </div>
+                  )}
+                  
+                  {selectedLog.metadata && (
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Metadata</label>
+                      <pre className="text-xs bg-muted p-3 rounded mt-1 overflow-auto">
+                        {JSON.stringify(selectedLog.metadata, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  {selectedLog.field_changes && (
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Field Changes</label>
+                      <pre className="text-xs bg-muted p-3 rounded mt-1 overflow-auto">
+                        {JSON.stringify(selectedLog.field_changes, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                  
+                  {selectedLog.old_values && (
+                    <div>
+                      <label className="text-sm font-medium text-foreground">Old Values</label>
+                      <pre className="text-xs bg-muted p-3 rounded mt-1 overflow-auto">
+                        {JSON.stringify(selectedLog.old_values, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                  
+                  {selectedLog.new_values && (
+                    <div>
+                      <label className="text-sm font-medium text-foreground">New Values</label>
+                      <pre className="text-xs bg-muted p-3 rounded mt-1 overflow-auto">
+                        {JSON.stringify(selectedLog.new_values, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+                </>
               )}
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">IP Address</label>
-                  <p className="text-sm text-gray-900">{selectedLog.ip_address || 'N/A'}</p>
+                  <label className="text-sm font-medium text-foreground">IP Address</label>
+                  <p className="text-sm text-foreground">{selectedLog.ip_address || 'N/A'}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">User Agent</label>
-                  <p className="text-sm text-gray-900 truncate">{selectedLog.user_agent || 'N/A'}</p>
+                  <label className="text-sm font-medium text-foreground">User Agent</label>
+                  <p className="text-sm text-foreground truncate">{selectedLog.user_agent || 'N/A'}</p>
                 </div>
               </div>
+              
+              {selectedLog.description && (
+                <div>
+                  <label className="text-sm font-medium text-foreground">Description</label>
+                  <p className="text-sm text-foreground bg-muted p-3 rounded">{selectedLog.description}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
     </div>
   );
-} 
+}

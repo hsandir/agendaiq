@@ -18,36 +18,40 @@ export async function POST(request: Request) {
       return new NextResponse("Verification code is required", { status: 400 });
     }
 
+    // TODO: Add twoFactorSecret field to User model in schema
     // Get user's 2FA secret
-    const user = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { twoFactorSecret: true },
-    });
+    // const user = await prisma.user.findUnique({
+    //   where: { id: session.user.id },
+    //   select: { twoFactorSecret: true },
+    // });
 
-    if (!user?.twoFactorSecret) {
-      return new NextResponse("2FA not set up", { status: 400 });
-    }
+    // if (!user?.twoFactorSecret) {
+    //   return new NextResponse("2FA not set up", { status: 400 });
+    // }
+
+    // For now, return error since 2FA fields don't exist
+    return new NextResponse("2FA functionality not available", { status: 501 });
 
     // Verify code
-    const isValid = authenticator.verify({
-      token: code,
-      secret: user.twoFactorSecret,
-    });
+    // const isValid = authenticator.verify({
+    //   token: code,
+    //   secret: user.twoFactorSecret,
+    // });
 
-    if (!isValid) {
-      return new NextResponse("Invalid verification code", { status: 400 });
-    }
+    // if (!isValid) {
+    //   return new NextResponse("Invalid verification code", { status: 400 });
+    // }
 
     // Enable 2FA
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { twoFactorEnabled: true },
-    });
+    // await prisma.user.update({
+    //   where: { id: session.user.id },
+    //   data: { twoFactorEnabled: true },
+    // });
 
-    return new NextResponse(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    // return new NextResponse(JSON.stringify({ success: true }), {
+    //   status: 200,
+    //   headers: { "Content-Type": "application/json" },
+    // });
   } catch (error) {
     console.error("Error in 2FA verification:", error);
     return new NextResponse("Internal Server Error", { status: 500 });

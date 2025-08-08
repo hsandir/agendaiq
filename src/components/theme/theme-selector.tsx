@@ -1,0 +1,136 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useTheme } from '@/lib/theme/theme-provider';
+import { themes } from '@/lib/theme/themes';
+import { Check, Palette, Monitor, Moon, Sun, Eye, Leaf } from 'lucide-react';
+
+interface ThemeSelectorProps {
+  className?: string;
+  showDescription?: boolean;
+  variant?: 'grid' | 'list' | 'compact';
+}
+
+const ThemeIcons = {
+  'modern-purple': Palette,
+  'classic-light': Sun,
+  'dark-mode': Moon,
+  'high-contrast': Eye,
+  'nature-green': Leaf,
+} as const;
+
+export function ThemeSelector({ 
+  className = '', 
+  showDescription = true, 
+  variant = 'grid' 
+}: ThemeSelectorProps) {
+  const { theme: currentTheme, setTheme } = useTheme();
+  const [isChanging, setIsChanging] = useState(false);
+
+  const handleThemeChange = async (themeId: string) => {
+    setIsChanging(true);
+    
+    // Add smooth transition
+    document.documentElement.style.transition = 'all 0.3s ease-in-out';
+    
+    await new Promise(resolve => setTimeout(resolve, 50));
+    setTheme(themeId);
+    
+    // Remove transition after change
+    setTimeout(() => {
+      document.documentElement.style.transition = '';
+      setIsChanging(false);
+    }, 300);
+  };
+
+  const ThemeCard = ({ theme }: { theme: typeof themes[0] }) => {
+    const Icon = ThemeIcons[theme.id as keyof typeof ThemeIcons] || Palette;
+    const isSelected = currentTheme.id === theme.id;
+    
+    // Rely on theme tokens instead of hardcoded palettes
+    const cardColors = 'bg-card border border-border hover:border-primary';
+    const iconColorClass = 'text-primary';
+
+    return (
+      <button
+        onClick={() => handleThemeChange(theme.id)}
+        disabled={isChanging}
+        className={`
+          relative overflow-hidden rounded-lg border-2 p-4 text-left transition-all
+          ${cardColors[theme.id as keyof typeof cardColors] || 'bg-muted border-border'}
+          ${isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
+          ${isChanging ? 'opacity-50 cursor-wait' : 'hover:scale-105 cursor-pointer'}
+          ${variant === 'compact' ? 'flex items-center gap-3' : 'block'}
+        `}
+      >
+        <div className={variant === 'compact' ? 'flex items-center gap-3' : ''}>
+          <Icon className={`h-6 w-6 ${iconColorClass}`} />
+          <div className={variant === 'compact' ? '' : 'mt-3'}>
+            <h3 className="font-semibold text-foreground flex items-center gap-2">
+              {theme.name}
+              {isSelected && (
+                <Check className="h-4 w-4 text-green-600" />
+              )}
+            </h3>
+            {showDescription && variant !== 'compact' && (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {theme.description}
+              </p>
+            )}
+          </div>
+        </div>
+        
+        {variant === 'grid' && (
+          <div className="mt-4 space-y-2">
+            {/* Preview elements using CSS vars so they reflect current theme */}
+            <div className="flex gap-2">
+              <div className="h-2 w-16 rounded" style={{ background: 'hsl(var(--muted))' }} />
+              <div className="h-2 w-12 rounded" style={{ background: 'hsl(var(--muted-foreground))' }} />
+            </div>
+            <div className="flex gap-2">
+              <div className="h-2 w-20 rounded" style={{ background: 'hsl(var(--primary))' }} />
+              <div className="h-2 w-8 rounded" style={{ background: 'hsl(var(--secondary))' }} />
+            </div>
+          </div>
+        )}
+      </button>
+    );
+  };
+
+  const containerStyles = {
+    grid: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4',
+    list: 'flex flex-col gap-4',
+    compact: 'flex flex-wrap gap-3',
+  };
+
+  return (
+    <div className={`w-full ${className}`}>
+      {showDescription && variant === 'grid' && (
+        <p className="text-muted-foreground mb-6">
+          Choose a theme that suits your preference. Changes are applied immediately and saved automatically.
+        </p>
+      )}
+      
+      <div 
+        className={`${containerStyles[variant]} ${isChanging ? 'pointer-events-none' : ''}`}
+        role="group"
+        aria-label="Theme selection"
+      >
+        {themes.map((theme) => (
+          <ThemeCard key={theme.id} theme={theme} />
+        ))}
+      </div>
+      
+      {currentTheme && (
+        <div className="mt-8 p-4 bg-primary border border-blue-200 rounded-lg">
+          <h4 className="font-semibold text-foreground mb-1">
+            Current Theme: {currentTheme.name}
+          </h4>
+          <p className="text-sm text-muted-foreground">
+            {currentTheme.description}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}

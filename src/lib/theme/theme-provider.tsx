@@ -1,92 +1,174 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { themes, Theme } from './themes';
+import { getContrastColor } from './theme-utils';
+import { useSession } from 'next-auth/react';
 
-type Theme = "light" | "dark" | "system";
-
-type ThemeProviderProps = {
-  children: React.ReactNode;
-  defaultTheme?: Theme;
-  storageKey?: string;
-};
-
-type ThemeProviderState = {
+interface ThemeContextValue {
   theme: Theme;
-  setTheme: (theme: Theme) => void;
-};
+  setTheme: (themeId: string) => void;
+  availableThemes: Theme[];
+  isLoading: boolean;
+}
 
-const initialState: ThemeProviderState = {
-  theme: "system",
-  setTheme: () => null,
-};
+const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+interface ThemeProviderProps {
+  children: React.ReactNode;
+  initialTheme?: string;
+}
 
-export function ThemeProvider({
-  children,
-  defaultTheme = "system",
-  storageKey = "agendaiq-ui-theme",
-  ...props
-}: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme);
+export function ThemeProvider({ children, initialTheme = 'classic-light' }: ThemeProviderProps) {
+  const [currentThemeId, setCurrentThemeId] = useState(initialTheme);
   const [mounted, setMounted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { data: session } = useSession();
 
-  // Only access localStorage after component mounts (client-side)
+  // Load theme from localStorage or database on mount
   useEffect(() => {
     setMounted(true);
-    const storedTheme = localStorage?.getItem(storageKey) as Theme;
-    if (storedTheme) {
-      setTheme(storedTheme);
+    
+    // First check localStorage
+    const savedTheme = localStorage.getItem('agendaiq-theme');
+    if (savedTheme && themes.find(t => t.id === savedTheme)) {
+      setCurrentThemeId(savedTheme);
     }
-  }, [storageKey]);
+    
+    // If user is logged in, fetch theme from database
+    if (session?.user) {
+      fetch('/api/user/theme')
+        .then(res => res.json())
+        .then(data => {
+          if (data.theme && themes.find(t => t.id === data.theme)) {
+            setCurrentThemeId(data.theme);
+            localStorage.setItem('agendaiq-theme', data.theme);
+          }
+        })
+        .catch(err => console.error('Failed to fetch user theme:', err));
+    }
+  }, [session]);
 
+  // Apply theme CSS variables
   useEffect(() => {
-    if (!mounted) return;
-
-    const root = window.document.documentElement;
-
-    root.classList.remove("light", "dark");
-
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-
-      root.classList.add(systemTheme);
+    if (!mounted) {
       return;
     }
 
-    root.classList.add(theme);
-  }, [theme, mounted]);
+    const theme = themes.find(t => t.id === currentThemeId) || themes[1]; // Default to classic-light
 
-  const value = {
-    theme,
-    setTheme: (theme: Theme) => {
-      if (mounted) {
-        localStorage?.setItem(storageKey, theme);
+    // Helper to convert hex (#rrggbb) to H S L numbers string that Tailwind expects
+    const hexToHslVar = (hex: string): string => {
+      const h = hex.replace('#', '');
+      const r = parseInt(h.substring(0, 2), 16) / 255;
+      const g = parseInt(h.substring(2, 4), 16) / 255;
+      const b = parseInt(h.substring(4, 6), 16) / 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let hDeg = 0; let s = 0; const l = (max + min) / 2;
+      if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: hDeg = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: hDeg = (b - r) / d + 2; break;
+          case b: hDeg = (r - g) / d + 4; break;
+        }
+        hDeg /= 6;
       }
-      setTheme(theme);
-    },
+      const hNum = Math.round(hDeg * 360);
+      const sNum = Math.round(s * 100);
+      const lNum = Math.round(l * 100);
+      return `${hNum} ${sNum}% ${lNum}%`;
+    };
+
+    // Map our theme tokens to Tailwind CSS variables (expects HSL components, not hex)
+    const setVar = (name: string, valueHex: string) => {
+      document.documentElement.style.setProperty(`--${name}`, hexToHslVar(valueHex));
+    };
+
+    setVar('background', theme.colors.background);
+    setVar('foreground', theme.colors.text);
+    setVar('card', theme.colors.card);
+    setVar('card-foreground', theme.colors.text);
+    setVar('popover', theme.colors.card);
+    setVar('popover-foreground', theme.colors.text);
+    setVar('primary', theme.colors.primary);
+    setVar('primary-foreground', theme.colors.primaryForeground || getContrastColor(theme.colors.primary));
+    setVar('secondary', theme.colors.secondary);
+    setVar('secondary-foreground', theme.colors.secondaryForeground || getContrastColor(theme.colors.secondary));
+    setVar('muted', theme.colors.backgroundSecondary);
+    setVar('muted-foreground', theme.colors.textMuted);
+    setVar('accent', theme.colors.secondaryLight || theme.colors.secondary);
+    setVar('accent-foreground', theme.colors.secondaryForeground || getContrastColor(theme.colors.secondary));
+    setVar('destructive', theme.colors.error);
+    setVar('destructive-foreground', getContrastColor(theme.colors.error));
+    setVar('border', theme.colors.border);
+    setVar('input', theme.colors.inputBorder);
+    setVar('ring', theme.colors.primary);
+
+    // Border radius token used by Tailwind extensions
+    document.documentElement.style.setProperty('--radius', theme.borderRadius.md);
+
+    // Apply theme class for Tailwind dark mode support
+    document.documentElement.classList.remove('light', 'dark');
+    if (theme.id === 'dark-mode' || theme.id === 'modern-purple' || theme.id === 'high-contrast') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.add('light');
+    }
+
+    // Save to localStorage
+    localStorage.setItem('agendaiq-theme', currentThemeId);
+  }, [currentThemeId, mounted]);
+
+  const setTheme = async (themeId: string) => {
+    const theme = themes.find(t => t.id === themeId);
+    if (!theme) return;
+
+    setIsLoading(true);
+    setCurrentThemeId(themeId);
+
+    // Save to database if user is logged in
+    if (session?.user) {
+      try {
+        await fetch('/api/user/theme', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ theme: themeId }),
+        });
+      } catch (err) {
+        console.error('Failed to save theme to database:', err);
+      }
+    }
+
+    setIsLoading(false);
   };
 
-  // Prevent hydration mismatch by not rendering until mounted
+  const currentTheme = themes.find(t => t.id === currentThemeId) || themes[1];
+
+  const value = {
+    theme: currentTheme,
+    setTheme,
+    availableThemes: themes,
+    isLoading,
+  };
+
+  // Prevent hydration mismatch
   if (!mounted) {
     return <>{children}</>;
   }
 
   return (
-    <ThemeProviderContext.Provider {...props} value={value}>
+    <ThemeContext.Provider value={value}>
       {children}
-    </ThemeProviderContext.Provider>
+    </ThemeContext.Provider>
   );
 }
 
-export const useTheme = () => {
-  const context = useContext(ThemeProviderContext);
-
-  if (context === undefined)
-    throw new Error("useTheme must be used within a ThemeProvider");
-
+export function useTheme() {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
   return context;
-}; 
+}

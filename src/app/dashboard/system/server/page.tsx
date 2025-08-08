@@ -79,74 +79,24 @@ export default function ServerManagementPage() {
       setLoading(true);
       
       // Try to fetch from real server metrics API
-      const response = await fetch('/api/system/server-metrics');
+      const response = await fetch('/api/system/server', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (response.ok) {
-        const serverData = await response.json();
-        setMetrics(serverData);
-        showNotification('Server metrics updated from real-time data');
-        return;
-      }
-      
-      // Fallback to simulated metrics with real-time variations
-      const mockMetrics: ServerMetrics = {
-        system: {
-          platform: "darwin",
-          architecture: "arm64",
-          nodeVersion: "18.19.1",
-          nextVersion: "14.2.5",
-          uptime: "2 days 14 hours",
-          hostname: "AgendaIQ-Server"
-        },
-        performance: {
-          memory: {
-            total: 16,
-            used: 8.5,
-            free: 7.5,
-            usage: 53
-          },
-          cpu: {
-            usage: 35,
-            cores: 8,
-            model: "Apple M2"
-          },
-          disk: {
-            total: 500,
-            used: 285,
-            free: 215,
-            usage: 57
-          }
-        },
-        network: {
-          protocol: "HTTP",
-          host: "localhost",
-          port: 3000,
-          status: "Active"
-        },
-        health: {
-          overall: 'healthy',
-          alerts: []
+        const result = await response.json();
+        if (result.data) {
+          setMetrics(result.data);
+          showNotification('Server metrics updated from real-time data');
+          return;
         }
-      };
-      
-      // Generate health alerts based on performance
-      if (mockMetrics.performance.memory.usage > 80) {
-        mockMetrics.health.overall = 'warning';
-        mockMetrics.health.alerts.push('High memory usage detected');
       }
       
-      if (mockMetrics.performance.cpu.usage > 90) {
-        mockMetrics.health.overall = 'critical';
-        mockMetrics.health.alerts.push('Critical CPU usage');
-      }
-      
-      if (mockMetrics.performance.disk.usage > 85) {
-        if (mockMetrics.health.overall === 'healthy') {
-          mockMetrics.health.overall = 'warning';
-        }
-        mockMetrics.health.alerts.push('Low disk space available');
-      }
-      
-      setMetrics(mockMetrics);
+      // Show error state instead of mock data
+      throw new Error('Failed to fetch server metrics');
+      // No mock data - error will be handled in catch block
     } catch (error) {
       console.error('Failed to fetch server metrics:', error);
       showNotification('Failed to fetch server metrics');
@@ -297,7 +247,7 @@ export default function ServerManagementPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Monitor className="h-5 w-5 mr-2 text-blue-600" />
+                  <Monitor className="h-5 w-5 mr-2 text-primary" />
                   System Information
                 </CardTitle>
                 <CardDescription>Server specifications and runtime details</CardDescription>
@@ -306,34 +256,34 @@ export default function ServerManagementPage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Platform</p>
-                      <p className="text-sm text-gray-900">{metrics.system.platform}</p>
+                      <p className="text-sm font-medium text-muted-foreground">Platform</p>
+                      <p className="text-sm text-foreground">{metrics.system.platform}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Architecture</p>
-                      <p className="text-sm text-gray-900">{metrics.system.architecture}</p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Node.js Version</p>
-                      <p className="text-sm text-gray-900">v{metrics.system.nodeVersion}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-600">Next.js Version</p>
-                      <p className="text-sm text-gray-900">v{metrics.system.nextVersion}</p>
+                      <p className="text-sm font-medium text-muted-foreground">Architecture</p>
+                      <p className="text-sm text-foreground">{metrics.system.architecture}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Hostname</p>
-                      <p className="text-sm text-gray-900">{metrics.system.hostname}</p>
+                      <p className="text-sm font-medium text-muted-foreground">Node.js Version</p>
+                      <p className="text-sm text-foreground">v{metrics.system.nodeVersion}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Uptime</p>
+                      <p className="text-sm font-medium text-muted-foreground">Next.js Version</p>
+                      <p className="text-sm text-foreground">v{metrics.system.nextVersion}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Hostname</p>
+                      <p className="text-sm text-foreground">{metrics.system.hostname}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Uptime</p>
                       <div className="flex items-center">
                         <Clock className="w-4 h-4 mr-1 text-green-600" />
-                        <p className="text-sm text-gray-900">{metrics.system.uptime}</p>
+                        <p className="text-sm text-foreground">{metrics.system.uptime}</p>
                       </div>
                     </div>
                   </div>
@@ -354,11 +304,11 @@ export default function ServerManagementPage() {
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Protocol</p>
-                      <p className="text-sm text-gray-900">{metrics.network.protocol}</p>
+                      <p className="text-sm font-medium text-muted-foreground">Protocol</p>
+                      <p className="text-sm text-foreground">{metrics.network.protocol}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Status</p>
+                      <p className="text-sm font-medium text-muted-foreground">Status</p>
                       <Badge variant="outline" className="text-green-600 border-green-600">
                         <CheckCircle className="w-3 h-3 mr-1" />
                         {metrics.network.status}
@@ -367,17 +317,17 @@ export default function ServerManagementPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Host</p>
-                      <p className="text-sm text-gray-900">{metrics.network.host}</p>
+                      <p className="text-sm font-medium text-muted-foreground">Host</p>
+                      <p className="text-sm text-foreground">{metrics.network.host}</p>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-600">Port</p>
-                      <p className="text-sm text-gray-900">{metrics.network.port}</p>
+                      <p className="text-sm font-medium text-muted-foreground">Port</p>
+                      <p className="text-sm text-foreground">{metrics.network.port}</p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Full URL</p>
-                    <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                    <p className="text-sm font-medium text-muted-foreground">Full URL</p>
+                    <code className="text-xs bg-muted px-2 py-1 rounded">
                       {metrics.network.protocol.toLowerCase()}://{metrics.network.host}:{metrics.network.port}
                     </code>
                   </div>
@@ -390,7 +340,7 @@ export default function ServerManagementPage() {
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Activity className="h-5 w-5 mr-2 text-purple-600" />
+                <Activity className="h-5 w-5 mr-2 text-secondary" />
                 Performance Details
               </CardTitle>
               <CardDescription>Detailed resource usage and performance metrics</CardDescription>
@@ -405,15 +355,15 @@ export default function ServerManagementPage() {
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Total</span>
+                      <span className="text-sm text-muted-foreground">Total</span>
                       <span className="text-sm font-medium">{formatBytes(metrics.performance.memory.total)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Used</span>
+                      <span className="text-sm text-muted-foreground">Used</span>
                       <span className="text-sm font-medium">{formatBytes(metrics.performance.memory.used)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Free</span>
+                      <span className="text-sm text-muted-foreground">Free</span>
                       <span className="text-sm font-medium">{formatBytes(metrics.performance.memory.free)}</span>
                     </div>
                     <div className="mt-3">
@@ -434,15 +384,15 @@ export default function ServerManagementPage() {
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Model</span>
+                      <span className="text-sm text-muted-foreground">Model</span>
                       <span className="text-sm font-medium">{metrics.performance.cpu.model}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Cores</span>
+                      <span className="text-sm text-muted-foreground">Cores</span>
                       <span className="text-sm font-medium">{metrics.performance.cpu.cores}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Current Load</span>
+                      <span className="text-sm text-muted-foreground">Current Load</span>
                       <span className="text-sm font-medium">{metrics.performance.cpu.usage}%</span>
                     </div>
                     <div className="mt-3">
@@ -463,15 +413,15 @@ export default function ServerManagementPage() {
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Total</span>
+                      <span className="text-sm text-muted-foreground">Total</span>
                       <span className="text-sm font-medium">{formatBytes(metrics.performance.disk.total)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Used</span>
+                      <span className="text-sm text-muted-foreground">Used</span>
                       <span className="text-sm font-medium">{formatBytes(metrics.performance.disk.used)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Free</span>
+                      <span className="text-sm text-muted-foreground">Free</span>
                       <span className="text-sm font-medium">{formatBytes(metrics.performance.disk.free)}</span>
                     </div>
                     <div className="mt-3">
@@ -505,7 +455,7 @@ export default function ServerManagementPage() {
                 
                 {metrics.health.alerts.length > 0 ? (
                   <div>
-                    <p className="text-sm font-medium text-gray-600 mb-2">Active Alerts</p>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">Active Alerts</p>
                     <div className="space-y-2">
                       {metrics.health.alerts.map((alert, index) => (
                         <Alert key={index} className="border-yellow-200 bg-yellow-50">

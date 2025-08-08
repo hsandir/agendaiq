@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FiUsers, FiUser, FiShield, FiHome, FiArrowLeft } from 'react-icons/fi';
+import { Users as FiUsers, User as FiUser, Shield as FiShield, Home as FiHome, ArrowLeft as FiArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface User {
@@ -76,18 +76,18 @@ export default function UserRoleAssignmentContent() {
       ]);
 
       if (usersRes.ok) {
-        const usersData = await usersRes.json();
-        setUsers(usersData);
+        const usersResponse = await usersRes.json();
+        setUsers(usersResponse.data || []);
       }
 
       if (rolesRes.ok) {
-        const rolesData = await rolesRes.json();
-        setRoles(rolesData);
+        const rolesResponse = await rolesRes.json();
+        setRoles(rolesResponse.data || []);
       }
 
       if (departmentsRes.ok) {
-        const departmentsData = await departmentsRes.json();
-        setDepartments(departmentsData);
+        const departmentsResponse = await departmentsRes.json();
+        setDepartments(departmentsResponse.data || []);
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -176,7 +176,7 @@ export default function UserRoleAssignmentContent() {
       <div className="flex items-center space-x-4">
         <Link 
           href="/dashboard/settings/role-hierarchy"
-          className="flex items-center text-gray-500 hover:text-gray-700"
+          className="flex items-center text-muted-foreground hover:text-foreground"
         >
           <FiArrowLeft className="w-5 h-5 mr-2" />
           Back to Role Hierarchy
@@ -185,10 +185,10 @@ export default function UserRoleAssignmentContent() {
 
       <div className="md:flex md:items-center md:justify-between">
         <div className="min-w-0 flex-1">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+          <h2 className="text-2xl font-bold leading-7 text-foreground sm:truncate sm:text-3xl sm:tracking-tight">
             User Role Assignment
           </h2>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Assign users to roles and departments
           </p>
         </div>
@@ -198,26 +198,26 @@ export default function UserRoleAssignmentContent() {
       {message && (
         <div className={`p-4 rounded-md ${
           message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 
-          'bg-red-50 text-red-800 border border-red-200'
+          'bg-destructive/10 text-destructive border border-destructive'
         }`}>
           {message.text}
         </div>
       )}
 
       {/* Assignment Form */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Assign Role to User</h3>
+      <div className="bg-card shadow rounded-lg p-6">
+        <h3 className="text-lg font-medium text-foreground mb-4">Assign Role to User</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* User Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Select User
             </label>
             <select
               value={selectedUser}
               onChange={(e) => setSelectedUser(e.target.value)}
-              className="block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="block w-full rounded-md border border-border py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring"
             >
               <option value="">Choose a user...</option>
               {users.map(user => (
@@ -230,13 +230,13 @@ export default function UserRoleAssignmentContent() {
 
           {/* Role Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Select Role
             </label>
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
-              className="block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="block w-full rounded-md border border-border py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring"
             >
               <option value="">Choose a role...</option>
               {roles.map(role => (
@@ -249,13 +249,13 @@ export default function UserRoleAssignmentContent() {
 
           {/* Department Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Select Department (Optional)
             </label>
             <select
               value={selectedDepartment}
               onChange={(e) => setSelectedDepartment(e.target.value)}
-              className="block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="block w-full rounded-md border border-border py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring"
             >
               <option value="">Choose a department...</option>
               {departments.map(dept => (
@@ -271,7 +271,7 @@ export default function UserRoleAssignmentContent() {
           <Button
             onClick={handleAssignment}
             disabled={submitting || !selectedUser || !selectedRole}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+            className="bg-primary text-foreground px-4 py-2 rounded-md hover:bg-primary disabled:opacity-50"
           >
             {submitting ? 'Assigning...' : 'Assign Role'}
           </Button>
@@ -279,13 +279,13 @@ export default function UserRoleAssignmentContent() {
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Search & Filter Users</h3>
+      <div className="bg-card shadow rounded-lg p-6">
+        <h3 className="text-lg font-medium text-foreground mb-4">Search & Filter Users</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Search */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Search Users
             </label>
             <input
@@ -293,19 +293,19 @@ export default function UserRoleAssignmentContent() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by name or email..."
-              className="block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="block w-full rounded-md border border-border py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring"
             />
           </div>
 
           {/* Role Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Filter by Role
             </label>
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="block w-full rounded-md border border-border py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring"
             >
               <option value="">All roles</option>
               {roles.map(role => (
@@ -318,13 +318,13 @@ export default function UserRoleAssignmentContent() {
 
           {/* Department Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Filter by Department
             </label>
             <select
               value={departmentFilter}
               onChange={(e) => setDepartmentFilter(e.target.value)}
-              className="block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="block w-full rounded-md border border-border py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring"
             >
               <option value="">All departments</option>
               {departments.map(dept => (
@@ -338,38 +338,38 @@ export default function UserRoleAssignmentContent() {
       </div>
 
       {/* Users List */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">
+      <div className="bg-card shadow rounded-lg">
+        <div className="px-6 py-4 border-b border-border">
+          <h3 className="text-lg font-medium text-foreground">
             Users ({filteredUsers.length})
           </h3>
         </div>
         
         <div className="divide-y divide-gray-200">
           {filteredUsers.map(user => (
-            <div key={user.id} className="p-6 hover:bg-gray-50">
+            <div key={user.id} className="p-6 hover:bg-muted">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                      <FiUser className="w-5 h-5 text-gray-600" />
+                    <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
+                      <FiUser className="w-5 h-5 text-muted-foreground" />
                     </div>
                   </div>
                   <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-foreground">
                       {user.name || 'No Name'}
                     </div>
-                    <div className="text-sm text-gray-500">{user.email}</div>
+                    <div className="text-sm text-muted-foreground">{user.email}</div>
                   </div>
                 </div>
                 
                 <div className="flex items-center space-x-4">
                   {user.Staff && user.Staff.length > 0 && (
                     <div className="text-right">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-foreground">
                         {user.Staff[0].Role?.title || 'No Role'}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-muted-foreground">
                         {user.Staff[0].Department?.name || 'No Department'}
                       </div>
                     </div>
@@ -377,7 +377,7 @@ export default function UserRoleAssignmentContent() {
                   
                   <Button
                     onClick={() => setSelectedUser(user.id)}
-                    className="text-blue-600 hover:text-blue-800 text-sm"
+                    className="text-primary hover:text-primary text-sm"
                   >
                     Select
                   </Button>
@@ -387,7 +387,7 @@ export default function UserRoleAssignmentContent() {
           ))}
           
           {filteredUsers.length === 0 && (
-            <div className="p-6 text-center text-gray-500">
+            <div className="p-6 text-center text-muted-foreground">
               No users found matching your criteria
             </div>
           )}

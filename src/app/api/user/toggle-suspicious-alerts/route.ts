@@ -11,25 +11,27 @@ export async function POST() {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    // TODO: Add suspiciousAlerts field to User model in schema
     const user = await prisma.user.findUnique({
-      where: { email: user.email! },
-      select: { suspiciousAlerts: true },
+      where: { email: session.user?.email! },
+      select: { 
+        email: true,
+        // suspiciousAlerts: true 
+      },
     });
 
     if (!user) {
       return new NextResponse("User not found", { status: 404 });
     }
 
-    // Toggle the setting
-    await prisma.user.update({
-      where: { email: user.email! },
-      data: { suspiciousAlerts: !user.suspiciousAlerts },
-    });
+    // TODO: Toggle the setting once suspiciousAlerts field is added
+    // await prisma.user.update({
+    //   where: { email: session.user?.email! },
+    //   data: { suspiciousAlerts: !user.suspiciousAlerts },
+    // });
 
-    return new NextResponse(
-      `Suspicious activity alerts ${!user.suspiciousAlerts ? "enabled" : "disabled"}`,
-      { status: 200 }
-    );
+    // For now, return error since suspiciousAlerts field doesn't exist
+    return new NextResponse("Suspicious alerts feature not available", { status: 501 });
   } catch (error) {
     console.error("Error toggling suspicious activity alerts:", error);
     return new NextResponse("Internal server error", { status: 500 });

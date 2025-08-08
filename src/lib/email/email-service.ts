@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { Logger } from '@/lib/utils/logger';
 
 let resend: Resend | null = null;
 
@@ -7,10 +8,10 @@ try {
   if (process.env.RESEND_API_KEY) {
     resend = new Resend(process.env.RESEND_API_KEY);
   } else {
-    console.warn('RESEND_API_KEY not found in environment variables. Email functionality will be disabled.');
+    Logger.warn('RESEND_API_KEY not found in environment variables. Email functionality will be disabled.', {}, 'email-service');
   }
 } catch (error) {
-  console.error('Failed to initialize Resend:', error);
+  Logger.error('Failed to initialize Resend', { error: String(error) }, 'email-service');
 }
 
 export interface EmailOptions {
@@ -22,7 +23,7 @@ export interface EmailOptions {
 export async function sendEmail({ to, subject, html }: EmailOptions) {
   try {
     if (!resend) {
-      console.warn('Email service not configured or disabled');
+      Logger.warn('Email service not configured or disabled', { to }, 'email-service');
       return { success: false, error: 'Email service not configured' };
     }
 
@@ -35,7 +36,7 @@ export async function sendEmail({ to, subject, html }: EmailOptions) {
 
     return { success: true, data };
   } catch (error) {
-    console.error('Error sending email:', error);
+    Logger.error('Error sending email', { error: String(error), to, subject }, 'email-service');
     return { success: false, error };
   }
 }
@@ -78,6 +79,25 @@ export function getTwoFactorCodeHtml(code: string) {
       </div>
       <p>This code will expire in 10 minutes.</p>
       <p>If you didn't request this code, please ignore this email.</p>
+    </div>
+  `;
+}
+
+export function getPasswordResetHtml(resetLink: string) {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2>Password Reset Request</h2>
+      <p>You requested to reset your password for your AgendaIQ account.</p>
+      <p>Click the button below to reset your password:</p>
+      <a href="${resetLink}" style="display: inline-block; padding: 12px 24px; background-color: #DC2626; color: white; text-decoration: none; border-radius: 6px; margin: 16px 0;">
+        Reset Password
+      </a>
+      <p>This link will expire in 1 hour for security reasons.</p>
+      <p>If you didn't request a password reset, please ignore this email.</p>
+      <p style="color: #6B7280; font-size: 12px;">
+        If the button above doesn't work, copy and paste this link into your browser:<br>
+        ${resetLink}
+      </p>
     </div>
   `;
 } 

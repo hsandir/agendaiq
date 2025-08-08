@@ -1,0 +1,275 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  NODE_VERSION: '20.x'
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  pre-deploy-checks:
+    name: Pre-deployment Checks
+    runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for breaking changes
+        id: check
+        run: |
+          # Check commit messages for breaking changes
+          if git log --format=%B -n 10 | grep -q "BREAKING CHANGE"; then
+            echo "⚠️ Breaking changes detected!"
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
+          else
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate environment variables
+        run: |
+          required_vars=(
+            "VERCEL_TOKEN"
+            "DATABASE_URL"
+            "NEXTAUTH_SECRET"
+            "JWT_SECRET"
+            "SENTRY_DSN"
+            "PUSHER_APP_ID"
+            "PUSHER_KEY"
+            "PUSHER_SECRET"
+          )
+          
+          missing_vars=()
+          for var in "${required_vars[@]}"; do
+            if [ -z "${!var}" ]; then
+              missing_vars+=($var)
+            fi
+          done
+          
+          if [ ${#missing_vars[@]} -gt 0 ]; then
+            echo "❌ Missing required environment variables: ${missing_vars[*]}"
+            exit 1
+          fi
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.PRODUCTION_NEXTAUTH_SECRET }}
+          JWT_SECRET: ${{ secrets.PRODUCTION_JWT_SECRET }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+          PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+          PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+
+  backup-database:
+    name: Backup Production Database
+    runs-on: ubuntu-latest
+    needs: pre-deploy-checks
+    if: needs.pre-deploy-checks.outputs.should_deploy == 'true'
+    steps:
+      - name: Create database backup
+        run: |
+          timestamp=$(date +%Y%m%d_%H%M%S)
+          echo "Creating backup: agendaiq_prod_${timestamp}.sql"
+          # Add actual backup command here
+          # pg_dump ${{ secrets.PRODUCTION_DATABASE_URL }} > agendaiq_prod_${timestamp}.sql
+        continue-on-error: true
+
+      - name: Upload backup to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --exclude '*' --include '*.sql'
+        env:
+          AWS_S3_BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-east-1'
+        continue-on-error: true
+
+  test-production:
+    name: Production Tests
+    runs-on: ubuntu-latest
+    needs: pre-deploy-checks
+    if: needs.pre-deploy-checks.outputs.should_deploy == 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run production build
+        run: npm run build
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_APP_URL: ${{ secrets.PRODUCTION_URL }}
+
+      - name: Run smoke tests
+        run: npm run test:smoke
+        continue-on-error: true
+
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [pre-deploy-checks, backup-database, test-production]
+    if: needs.pre-deploy-checks.outputs.should_deploy == 'true'
+    environment:
+      name: production
+      url: https://agendaiq.vercel.app
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel environment information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build project artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to Vercel
+        id: deploy
+        run: |
+          deployment_url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "deployment_url=$deployment_url" >> $GITHUB_OUTPUT
+
+      - name: Run database migrations
+        run: |
+          npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+
+      - name: Verify deployment
+        run: |
+          deployment_url="${{ steps.deploy.outputs.deployment_url }}"
+          max_attempts=10
+          attempt=0
+          
+          while [ $attempt -lt $max_attempts ]; do
+            response=$(curl -s -o /dev/null -w "%{http_code}" "$deployment_url")
+            if [ "$response" = "200" ]; then
+              echo "✅ Deployment verified successfully!"
+              exit 0
+            fi
+            
+            echo "Attempt $((attempt + 1))/$max_attempts: HTTP $response"
+            sleep 10
+            attempt=$((attempt + 1))
+          done
+          
+          echo "❌ Deployment verification failed!"
+          exit 1
+
+      - name: Clear CDN cache
+        run: |
+          # Add CDN cache clearing command if using CDN
+          echo "Clearing CDN cache..."
+        continue-on-error: true
+
+  post-deploy:
+    name: Post-deployment Tasks
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: success()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create release tag
+        run: |
+          version=$(node -p "require('./package.json').version")
+          git tag -a "v${version}" -m "Production deployment v${version}"
+          git push origin "v${version}"
+        continue-on-error: true
+
+      - name: Update Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: production
+          version: ${{ github.sha }}
+
+      - name: Send deployment notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              text: "🚀 Production Deployment Successful!",
+              attachments: [{
+                color: "good",
+                fields: [
+                  { title: "Environment", value: "Production", short: true },
+                  { title: "Version", value: "${{ github.sha }}", short: true },
+                  { title: "Deployed by", value: "${{ github.actor }}", short: true },
+                  { title: "Branch", value: "${{ github.ref_name }}", short: true }
+                ]
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+        if: always()
+
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: [deploy, post-deploy]
+    if: failure()
+    steps:
+      - name: Rollback Vercel deployment
+        run: |
+          echo "⚠️ Initiating rollback..."
+          # vercel rollback --token=${{ secrets.VERCEL_TOKEN }}
+        
+      - name: Restore database backup
+        run: |
+          echo "⚠️ Restoring database from backup..."
+          # Add database restore command here
+        continue-on-error: true
+
+      - name: Send rollback notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              text: "❌ Production Deployment Failed - Rollback Initiated",
+              attachments: [{
+                color: "danger",
+                fields: [
+                  { title: "Environment", value: "Production", short: true },
+                  { title: "Failed deployment", value: "${{ github.sha }}", short: true },
+                  { title: "Initiated by", value: "${{ github.actor }}", short: true }
+                ]
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

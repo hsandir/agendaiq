@@ -1,19 +1,37 @@
----
-description: 
+description: Project Development & Deployment Guidelines
 globs: 
 alwaysApply: true
 ---
-Please don't change the port number. If you can't start it, kill the old one first. The port number should be 3000.
 
-Whenever you make any changes, use version control, save the old version of the file via git, explaining the changes made.
+- Do not change the port number. If the app doesn't start, kill the existing process using port 3000 instead of modifying it.
 
-Use issue tracking system.
+- If you reset the database, proceed with caution and ensure consistency across environments.
 
-When you need to add something to a file or something doesn't work there, don't recreate the entire file. Change only the necessary parts.
+- Every time you make a change, use version control. Save the previous version of the file via Git and clearly document the modifications.
 
-Always monitor the server logs for any potantial issues.
+- Always use the issue tracking system to log tasks, bugs, or feature requests.
 
-Before giving result of changing, check the app for all kind of errors.
-Before starting the app, check the app for all kind of errors.
+- Do not recreate entire files when adding a new feature or fixing an issue. Modify only the necessary parts.
 
-All feedbacks should be in english.
+- Always monitor server logs for potential issues.
+
+- Before sharing the results of your changes, thoroughly test the app for any kind of errors.
+
+- Before starting the app, run a complete error check.
+
+- All feedback, documentation, and commit messages must be written in English.
+
+- After each significant operation, verify that all pages are authenticated through the central auth system.
+
+- Always use centralized CSS. Do not create file-specific custom styles.
+
+- For GitHub synchronization:
+  - Do not use emojis or icons in commit messages.
+  - Provide detailed and clear commit descriptions.
+  - All changes must be committed and pushed to feature branches regularly.
+  - No direct commits to the `main` branch.
+  - Every Monday, create a timestamped backup from the `main` or `release` branch to ensure version control.
+
+- Never use mock data or `api_fallback` mocks. Always implement code that generates real-time data.
+
+- Never use static data. Always fetch data from its original source on each run.

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FiUpload, FiPlus, FiUsers, FiBook, FiEdit2, FiTrash2 } from "react-icons/fi";
+import { Upload as FiUpload, Plus as FiPlus, Users as FiUsers, Book as FiBook, Edit2 as FiEdit2, Trash2 as FiTrash2 } from "lucide-react";
 
 interface School {
   id: string;
@@ -115,36 +115,36 @@ export default function SetupPage() {
           <CardContent>
             <form className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">District Name</label>
+                <label className="block text-sm font-medium text-foreground">District Name</label>
                 <input
                   type="text"
                   defaultValue="Central Jersey College Prep Charter School"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Address</label>
+                <label className="block text-sm font-medium text-foreground">Address</label>
                 <input
                   type="text"
                   placeholder="District address"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">City</label>
+                  <label className="block text-sm font-medium text-foreground">City</label>
                   <input
                     type="text"
                     defaultValue="Somerset"
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">State</label>
+                  <label className="block text-sm font-medium text-foreground">State</label>
                   <input
                     type="text"
                     defaultValue="NJ"
-                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
               </div>
@@ -170,14 +170,14 @@ export default function SetupPage() {
               {loading ? (
                 <div>Loading...</div>
               ) : error ? (
-                <div className="text-red-600">{error}</div>
+                <div className="text-destructive">{error}</div>
               ) : (
                 <div className="border rounded-lg divide-y">
                   {schools.map((school) => (
                     <div className="p-4 flex justify-between items-center" key={school.id}>
                       <div>
                         <h4 className="font-medium">{school.name}</h4>
-                        <p className="text-sm text-gray-500">{school.address || "No address"}</p>
+                        <p className="text-sm text-muted-foreground">{school.address || "No address"}</p>
                       </div>
                       <div className="flex gap-2">
                         <Button variant="outline" onClick={() => openEditModal(school)}><FiEdit2 className="mr-1" />Edit</Button>
@@ -185,7 +185,7 @@ export default function SetupPage() {
                       </div>
                     </div>
                   ))}
-                  {schools.length === 0 && <div className="p-4 text-gray-500">No schools found.</div>}
+                  {schools.length === 0 && <div className="p-4 text-muted-foreground">No schools found.</div>}
                 </div>
               )}
             </div>
@@ -201,18 +201,18 @@ export default function SetupPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="border rounded-lg p-4 text-center">
-                  <FiUsers className="mx-auto h-8 w-8 text-gray-400" />
+                  <FiUsers className="mx-auto h-8 w-8 text-muted-foreground" />
                   <h3 className="mt-2 font-medium">Import Staff</h3>
-                  <p className="text-sm text-gray-500 mt-1">Upload staff data from Excel</p>
+                  <p className="text-sm text-muted-foreground mt-1">Upload staff data from Excel</p>
                   <Button variant="outline" className="mt-4" onClick={() => window.location.href = '/dashboard/settings/staff-upload'}>
                     <FiUpload className="mr-2 h-4 w-4" />
                     Upload Staff Data
                   </Button>
                 </div>
                 <div className="border rounded-lg p-4 text-center">
-                  <FiBook className="mx-auto h-8 w-8 text-gray-400" />
+                  <FiBook className="mx-auto h-8 w-8 text-muted-foreground" />
                   <h3 className="mt-2 font-medium">Import Students</h3>
-                  <p className="text-sm text-gray-500 mt-1">Upload student data from Excel</p>
+                  <p className="text-sm text-muted-foreground mt-1">Upload student data from Excel</p>
                   <Button variant="outline" className="mt-4">
                     <FiUpload className="mr-2 h-4 w-4" />
                     Upload Student Data
@@ -226,40 +226,40 @@ export default function SetupPage() {
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+          <div className="bg-card rounded-lg shadow-lg p-6 w-full max-w-lg">
             <h3 className="text-lg font-medium mb-4">{editSchool ? "Edit School" : "Add School"}</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium">School Name</label>
-                <input type="text" required className="mt-1 block w-full rounded-md border-gray-300" value={form.name || ""} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+                <input type="text" required className="mt-1 block w-full rounded-md border-border" value={form.name || ""} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
               </div>
               <div>
                 <label className="block text-sm font-medium">Address</label>
-                <input type="text" className="mt-1 block w-full rounded-md border-gray-300" value={form.address || ""} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} />
+                <input type="text" className="mt-1 block w-full rounded-md border-border" value={form.address || ""} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium">City</label>
-                  <input type="text" className="mt-1 block w-full rounded-md border-gray-300" value={form.city || ""} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} />
+                  <input type="text" className="mt-1 block w-full rounded-md border-border" value={form.city || ""} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium">State</label>
-                  <input type="text" className="mt-1 block w-full rounded-md border-gray-300" value={form.state || ""} onChange={e => setForm(f => ({ ...f, state: e.target.value }))} />
+                  <input type="text" className="mt-1 block w-full rounded-md border-border" value={form.state || ""} onChange={e => setForm(f => ({ ...f, state: e.target.value }))} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium">ZIP Code</label>
-                  <input type="text" className="mt-1 block w-full rounded-md border-gray-300" value={form.zipCode || ""} onChange={e => setForm(f => ({ ...f, zipCode: e.target.value }))} />
+                  <input type="text" className="mt-1 block w-full rounded-md border-border" value={form.zipCode || ""} onChange={e => setForm(f => ({ ...f, zipCode: e.target.value }))} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium">Phone</label>
-                  <input type="tel" className="mt-1 block w-full rounded-md border-gray-300" value={form.phone || ""} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
+                  <input type="tel" className="mt-1 block w-full rounded-md border-border" value={form.phone || ""} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium">Website</label>
-                <input type="url" className="mt-1 block w-full rounded-md border-gray-300" value={form.website || ""} onChange={e => setForm(f => ({ ...f, website: e.target.value }))} />
+                <input type="url" className="mt-1 block w-full rounded-md border-border" value={form.website || ""} onChange={e => setForm(f => ({ ...f, website: e.target.value }))} />
               </div>
               <div className="flex justify-end gap-2 mt-4">
                 <Button type="button" variant="outline" onClick={closeModal}>Cancel</Button>

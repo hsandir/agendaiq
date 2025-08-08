@@ -1,32 +1,37 @@
----
-description: 
+description: Project Development & Deployment Guidelines
 globs: 
 alwaysApply: true
 ---
-Don't change the port number. If you can't start it, kill the old one first. The port number should be 3000.
 
-If you reset database, 
+- Do not change the port number. If the app doesn't start, kill the existing process using port 3000 instead of modifying it.
 
-Whenever you make any changes, use version control, save the old version of the file via git, explaining the changes made.
+- If you reset the database, proceed with caution and ensure consistency across environments.
 
-Use issue tracking system.
+- Every time you make a change, use version control. Save the previous version of the file via Git and clearly document the modifications.
 
-When you need to add something to a file or something doesn't work there, don't recreate the entire file. Change only the necessary parts.
+- Always use the issue tracking system to log tasks, bugs, or feature requests.
 
-Always monitor the server logs for any potantial issues.
+- Do not recreate entire files when adding a new feature or fixing an issue. Modify only the necessary parts.
 
-Before giving result of changing, check the app for all kind of errors.
+- Always monitor server logs for potential issues.
 
-Before starting the app, check the app for all kind of errors.
+- Before sharing the results of your changes, thoroughly test the app for any kind of errors.
 
-All feedbacks should be in English.
+- Before starting the app, run a complete error check.
 
-Her islem yaptiginda sayfalarin tek bir merkezden auth olup oladigini kontrol et.
+- All feedback, documentation, and commit messages must be written in English.
 
-Daima css'i merkezi sistemden kullan. Dosyaya ozel tasarim yapma.
+- After each significant operation, verify that all pages are authenticated through the central auth system.
 
-GitHub senkronizasyonunda emoji/ikon kullanilmamali ama detaylı açıklamalar yapilmalidir. Tüm değişiklikler, main brancha doğrudan yazılmadan önce düzenli olarak feature branch’ler üzerinden commit edilip GitHub’a push edilmelidir; her pazartesi günü ise main veya release branch’inden zaman damgalı bir yedekleme oluşturularak versiyon kontrolü sağlanmalıdır. 
+- Always use centralized CSS. Do not create file-specific custom styles.
 
-Hicbir zaman mock data ya da api_fallback mock kullanma. Daima realtime veri uretecek code yaz.
+- For GitHub synchronization:
+  - Do not use emojis or icons in commit messages.
+  - Provide detailed and clear commit descriptions.
+  - All changes must be committed and pushed to feature branches regularly.
+  - No direct commits to the `main` branch.
+  - Every Monday, create a timestamped backup from the `main` or `release` branch to ensure version control.
 
-Hicbir zaman static veri kullanma. Daima her seferinde orjinal pozisyonundan veri cekilmeli.
+- Never use mock data or `api_fallback` mocks. Always implement code that generates real-time data.
+
+- Never use static data. Always fetch data from its original source on each run.

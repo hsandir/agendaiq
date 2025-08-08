@@ -1,7 +1,7 @@
-# AgendaIQ Project Rules - Turkish Education Management System
+# AgendaIQ Project Rules - Education Management System
 
 ## PROJECT OVERVIEW
-AgendaIQ is a comprehensive meeting and agenda management system for Turkish educational institutions with hierarchical role-based access control.
+AgendaIQ is a comprehensive meeting and agenda management system for educational institutions with hierarchical role-based access control.
 
 ## 🎯 CURSOR TEMPLATE SYSTEM
 
@@ -213,10 +213,22 @@ if (!response.ok) {
 ```
 
 ### 8. LANGUAGE & LOCALIZATION
-- Turkish comments in code when explaining business logic
-- English for technical documentation
-- All user-facing text in Turkish
-- Error messages in Turkish for end users
+- 
+All code, user interface, documentation, 
+          + comments, and error messages must be in **ENGLISH ONLY**.
+       15 +  
+       16 +  - **User Interface**: English (corrected from mixed policy)
+       17 +  - **Code Comments**: English for all types
+       18 +  - **Console Logs**: English 
+       19 +  - **Documentation**: English
+       20 +  - **Error Messages**: English for all users
+       21 +  - **Commit Messages**: English with detailed descriptions (no 
+          + emojis)
+       22 +  - **Variable Names**: English
+       23 +  - **Function Names**: English
+       24 +  - **Database Schema**: English field names
+       25 +  
+
 
 ### 9. SECURITY REQUIREMENTS
 
@@ -375,7 +387,6 @@ GOOGLE_CLIENT_SECRET=
 4. ✅ Consistent styling with Tailwind
 5. ✅ Database relationships respected
 6. ✅ Role-based access control applied
-7. ✅ Turkish language for user interfaces
 8. ✅ No security vulnerabilities
 9. ✅ Performance considerations addressed
 10. ✅ Testing verifies functionality

@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/auth-options';
 import * as os from 'os';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { Logger } from '@/lib/utils/logger';
+
+const execAsync = promisify(exec);
 
 interface ServerMetrics {
   system: {
@@ -51,7 +56,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('Fetching real-time server metrics...');
+    Logger.info('Fetching real-time server metrics', { userId: session.user.id }, 'system-metrics');
 
     // Get real system information
     const memoryUsage = process.memoryUsage();
@@ -62,8 +67,25 @@ export async function GET() {
     const cpus = os.cpus();
     const uptime = process.uptime();
     
-    // Calculate CPU usage (simplified)
-    const avgCpuUsage = Math.floor(Math.random() * 50) + 10; // Simulated but realistic
+    // Calculate real CPU usage
+    let avgCpuUsage = 0;
+    try {
+      if (os.platform() === 'darwin' || os.platform() === 'linux') {
+        const { stdout } = await execAsync('ps -A -o %cpu | awk \'{s+=$1} END {print s}\'');
+        avgCpuUsage = Math.min(Math.max(parseFloat(stdout.trim()) || 0, 0), 100);
+      } else {
+        // Fallback for other platforms - calculate from load average
+        const loadAvg = os.loadavg()[0];
+        const numCPUs = os.cpus().length;
+        avgCpuUsage = Math.min((loadAvg / numCPUs) * 100, 100);
+      }
+    } catch (error) {
+      // Fallback to load average calculation
+      const loadAvg = os.loadavg()[0];
+      const numCPUs = os.cpus().length;
+      avgCpuUsage = Math.min((loadAvg / numCPUs) * 100, 100);
+    }
+    avgCpuUsage = Math.round(avgCpuUsage * 10) / 10; // Round to 1 decimal
     
     // Convert uptime to human readable
     const hours = Math.floor(uptime / 3600);
@@ -76,11 +98,36 @@ export async function GET() {
     const freeMemoryGB = Math.round((freeMemory / 1024 / 1024 / 1024) * 10) / 10;
     const memoryUsagePercent = Math.round((usedMemory / totalMemory) * 100);
     
-    // Disk usage (simulated - would need real disk API)
-    const diskTotal = 500; // GB
-    const diskUsed = 285 + Math.floor(Math.random() * 10); // Slight variation
-    const diskFree = diskTotal - diskUsed;
-    const diskUsagePercent = Math.round((diskUsed / diskTotal) * 100);
+    // Get real disk usage
+    let diskTotal = 500; // GB fallback
+    let diskUsed = 285; // GB fallback
+    let diskFree = diskTotal - diskUsed;
+    let diskUsagePercent = Math.round((diskUsed / diskTotal) * 100);
+    
+    try {
+      if (os.platform() === 'darwin') {
+        const { stdout } = await execAsync('df -H / | tail -1 | awk \'{print $2 " " $3 " " $4}\'');
+        const parts = stdout.trim().split(' ');
+        if (parts.length >= 3) {
+          diskTotal = Math.round(parseInt(parts[0]) / 1000000000); // Convert to GB
+          diskUsed = Math.round(parseInt(parts[1]) / 1000000000);
+          diskFree = Math.round(parseInt(parts[2]) / 1000000000);
+          diskUsagePercent = Math.round((diskUsed / diskTotal) * 100);
+        }
+      } else if (os.platform() === 'linux') {
+        const { stdout } = await execAsync('df -BG / | tail -1 | awk \'{print $2 " " $3 " " $4}\'');
+        const parts = stdout.trim().split(' ');
+        if (parts.length >= 3) {
+          diskTotal = parseInt(parts[0].replace('G', ''));
+          diskUsed = parseInt(parts[1].replace('G', ''));
+          diskFree = parseInt(parts[2].replace('G', ''));
+          diskUsagePercent = Math.round((diskUsed / diskTotal) * 100);
+        }
+      }
+    } catch (error) {
+      // Keep fallback values - already set above
+      Logger.warn('Could not get real disk usage, using fallback values', { error: String(error) }, 'system-metrics');
+    }
     
     const serverMetrics: ServerMetrics = {
       system: {
@@ -140,11 +187,15 @@ export async function GET() {
       serverMetrics.health.alerts.push('Low disk space available');
     }
 
-    console.log(`Server metrics fetched: ${serverMetrics.health.overall} health status`);
+    Logger.info('Server metrics fetched successfully', { 
+      healthStatus: serverMetrics.health.overall,
+      metricsCount: Object.keys(serverMetrics).length,
+      userId: session.user.id
+    }, 'system-metrics');
     
     return NextResponse.json(serverMetrics);
   } catch (error) {
-    console.error('Error fetching server metrics:', error);
+    Logger.error('Error fetching server metrics', { error: String(error) }, 'system-metrics');
     return NextResponse.json(
       { error: 'Failed to fetch server metrics', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { prisma } from "@/lib/db/prisma";
+import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth/auth-options";
 import { createHash } from "crypto";
 import { sendVerificationEmail } from "@/lib/email/send-verification";
@@ -14,12 +14,16 @@ export async function POST() {
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: user.email! },
+      where: { email: session.user?.email! },
       select: { emailVerified: true, email: true },
     });
 
     if (user?.emailVerified) {
       return new NextResponse("Email already verified", { status: 400 });
+    }
+
+    if (!user?.email) {
+      return new NextResponse("User email not found", { status: 404 });
     }
 
     // Generate verification token
@@ -30,7 +34,7 @@ export async function POST() {
     // Store token with expiry
     await prisma.verificationToken.create({
       data: {
-        identifier: user.email!,
+        identifier: user.email,
         token,
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       },
@@ -38,7 +42,7 @@ export async function POST() {
 
     // Send verification email
     await sendVerificationEmail(
-      user.email!,
+      user.email,
       `${process.env.NEXTAUTH_URL}/verify-email?token=${token}`
     );
 

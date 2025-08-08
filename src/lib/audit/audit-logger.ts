@@ -1,20 +1,27 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest } from 'next/server';
+import { Logger } from '@/lib/utils/logger';
+
+// Safe audit data types
+export type AuditFieldValue = string | number | boolean | null | undefined;
+export type AuditRecord = Record<string, AuditFieldValue>;
+export type AuditFieldChange = { old: AuditFieldValue; new: AuditFieldValue };
+export type AuditMetadata = Record<string, string | number | boolean | null | undefined>;
 
 export interface AuditLogData {
   tableName: string;
   recordId: string;
   operation: 'CREATE' | 'UPDATE' | 'DELETE' | 'BULK_CREATE' | 'BULK_UPDATE' | 'BULK_DELETE';
-  fieldChanges?: Record<string, { old: any; new: any }>;
-  oldValues?: Record<string, any>;
-  newValues?: Record<string, any>;
+  fieldChanges?: Record<string, AuditFieldChange>;
+  oldValues?: AuditRecord;
+  newValues?: AuditRecord;
   userId?: number;
   staffId?: number;
   source: 'WEB_UI' | 'API' | 'BULK_UPLOAD' | 'SYSTEM';
   description?: string;
   ipAddress?: string;
   userAgent?: string;
-  metadata?: Record<string, any>;
+  metadata?: AuditMetadata;
 }
 
 export class AuditLogger {
@@ -25,20 +32,24 @@ export class AuditLogger {
           table_name: data.tableName,
           record_id: data.recordId,
           operation: data.operation,
-          field_changes: data.fieldChanges || null,
-          old_values: data.oldValues || null,
-          new_values: data.newValues || null,
+          field_changes: data.fieldChanges || undefined,
+          old_values: data.oldValues || undefined,
+          new_values: data.newValues || undefined,
           user_id: data.userId || null,
           staff_id: data.staffId || null,
           source: data.source,
           description: data.description || null,
           ip_address: data.ipAddress || null,
           user_agent: data.userAgent || null,
-          metadata: data.metadata || null,
+          metadata: data.metadata || undefined,
         }
       });
     } catch (error) {
-      console.error('Failed to create audit log:', error);
+      Logger.error('Failed to create audit log', { 
+        error: String(error), 
+        tableName: data.tableName, 
+        operation: data.operation 
+      }, 'audit');
       // Don't throw - audit logging should not break the main operation
     }
   }
@@ -58,7 +69,7 @@ export class AuditLogger {
   }
 
   // Helper methods for common operations
-  static async logUserCreate(userId: number, userData: any, source: AuditLogData['source'], metadata?: any) {
+  static async logUserCreate(userId: number, userData: AuditRecord, source: AuditLogData['source'], metadata?: AuditMetadata) {
     return this.log({
       tableName: 'users',
       recordId: userId.toString(),
@@ -71,7 +82,7 @@ export class AuditLogger {
     });
   }
 
-  static async logUserUpdate(userId: number, oldData: any, newData: any, changes: Record<string, any>, source: AuditLogData['source']) {
+  static async logUserUpdate(userId: number, oldData: AuditRecord, newData: AuditRecord, changes: Record<string, AuditFieldChange>, source: AuditLogData['source']) {
     return this.log({
       tableName: 'users',
       recordId: userId.toString(),
@@ -85,7 +96,7 @@ export class AuditLogger {
     });
   }
 
-  static async logStaffCreate(staffId: number, staffData: any, userId?: number, source: AuditLogData['source'] = 'WEB_UI', metadata?: any) {
+  static async logStaffCreate(staffId: number, staffData: AuditRecord, userId?: number, source: AuditLogData['source'] = 'WEB_UI', metadata?: AuditMetadata) {
     return this.log({
       tableName: 'staff',
       recordId: staffId.toString(),
@@ -99,7 +110,7 @@ export class AuditLogger {
     });
   }
 
-  static async logStaffUpdate(staffId: number, oldData: any, newData: any, changes: Record<string, any>, userId?: number, source: AuditLogData['source'] = 'WEB_UI') {
+  static async logStaffUpdate(staffId: number, oldData: AuditRecord, newData: AuditRecord, changes: Record<string, AuditFieldChange>, userId?: number, source: AuditLogData['source'] = 'WEB_UI') {
     return this.log({
       tableName: 'staff',
       recordId: staffId.toString(),
@@ -119,7 +130,7 @@ export class AuditLogger {
     recordCount: number, 
     userId?: number, 
     staffId?: number, 
-    metadata?: any
+    metadata?: AuditMetadata
   ) {
     return this.log({
       tableName,

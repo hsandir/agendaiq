@@ -155,20 +155,16 @@ export class DynamicRBAC {
       const staff = await prisma.staff.findFirst({
         where: { user_id: user.id },
         include: {
-          role: {
-            include: {
-              RoleHierarchy: true
-            }
-          }
+          Role: true
         }
       });
 
-      if (!staff?.role) {
+      if (!staff?.Role) {
         return [];
       }
 
       // Get all role IDs in hierarchy
-      const roleIds = await this.getRoleHierarchy(staff.role.id.toString());
+      const roleIds = await this.getRoleHierarchy(staff.Role.id.toString());
       
       // Get permissions for all roles
       const permissions: RolePermission[] = [];
@@ -221,16 +217,16 @@ export class DynamicRBAC {
     try {
       // Get user's role hierarchy
       const staff = await prisma.staff.findFirst({
-        where: { user_id: parseInt(user.id) },
-        include: { role: true }
+        where: { user_id: user.id },
+        include: { Role: true }
       });
 
-      if (!staff?.role) {
+      if (!staff?.Role) {
         return { granted: false, reason: 'No role found' };
       }
 
       // Get parent roles
-      const parentRoles = await this.getParentRoles(staff.role.id.toString());
+      const parentRoles = await this.getParentRoles(staff.Role.id.toString());
       
       for (const parentRoleId of parentRoles) {
         const parentPermissions = await this.getRolePermissions(parentRoleId);
@@ -252,7 +248,7 @@ export class DynamicRBAC {
   // Check contextual permissions (e.g., own data access)
   private async checkContextualPermissions(context: AccessContext): Promise<{ granted: boolean; reason?: string }> {
     // Example: Users can always access their own data
-    if (context.resource === 'user' && context.action === 'read' && context.targetId === context.user.id) {
+    if (context.resource === 'user' && context.action === 'read' && context.targetId === context.user.id.toString()) {
       return { granted: true, reason: 'Self-access granted' };
     }
 
@@ -288,13 +284,13 @@ export class DynamicRBAC {
     
     try {
       const hierarchy = await prisma.roleHierarchy.findMany({
-        where: { parentRoleId: roleId }
+        where: { parent_role_id: parseInt(roleId) }
       });
 
       for (const child of hierarchy) {
-        childRoles.push(child.childRoleId);
+        childRoles.push(child.child_role_id.toString());
         // Recursively get children of children
-        const grandChildren = await this.getChildRoles(child.childRoleId);
+        const grandChildren = await this.getChildRoles(child.child_role_id.toString());
         childRoles.push(...grandChildren);
       }
     } catch (error) {
@@ -310,13 +306,13 @@ export class DynamicRBAC {
     
     try {
       const hierarchy = await prisma.roleHierarchy.findMany({
-        where: { childRoleId: roleId }
+        where: { child_role_id: parseInt(roleId) }
       });
 
       for (const parent of hierarchy) {
-        parentRoles.push(parent.parentRoleId);
+        parentRoles.push(parent.parent_role_id.toString());
         // Recursively get parents of parents
-        const grandParents = await this.getParentRoles(parent.parentRoleId);
+        const grandParents = await this.getParentRoles(parent.parent_role_id.toString());
         parentRoles.push(...grandParents);
       }
     } catch (error) {
@@ -429,7 +425,7 @@ export class DynamicRBAC {
   async isStaff(user: AuthenticatedUser): Promise<boolean> {
     try {
       const staff = await prisma.staff.findFirst({
-        where: { userId: user.id }
+        where: { user_id: user.id }
       });
       return !!staff;
     } catch (error) {

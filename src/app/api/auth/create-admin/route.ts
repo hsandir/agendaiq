@@ -3,6 +3,7 @@ import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
 import { z } from "zod";
+import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
 
 const createAdminSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -10,7 +11,15 @@ const createAdminSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  // Rate limiting for admin creation attempts
+  const clientId = getClientIdentifier(request);
+  const rateLimitResult = await RateLimiters.api.check(request, 10, clientId); // 10 admin creations per minute
+  
+  if (!rateLimitResult.success) {
+    return RateLimiters.api.createErrorResponse(rateLimitResult);
+  }
+
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

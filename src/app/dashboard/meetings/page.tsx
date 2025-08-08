@@ -72,7 +72,7 @@ export default function MeetingsPage() {
         <Card>
           <CardContent className="p-6">
             <div className="text-center">
-              <p className="text-red-600">Error: {error}</p>
+              <p className="text-destructive">Error: {error}</p>
             </div>
           </CardContent>
         </Card>
@@ -85,7 +85,7 @@ export default function MeetingsPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">Meetings</h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-muted-foreground mt-1">
             Manage your meetings with calendar and list views
           </p>
         </div>

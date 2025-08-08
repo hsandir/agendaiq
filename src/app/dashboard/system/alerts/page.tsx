@@ -77,10 +77,20 @@ export default function AlertsConfigurationPage() {
       setLoading(true);
       
       // Fetch real alerts configuration from API
-      const response = await fetch('/api/system/alerts');
+      const response = await fetch('/api/system/alerts', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (response.ok) {
-        const data = await response.json();
-        setAlertsConfig(data);
+        const result = await response.json();
+        // API returns { data: alertsConfig, message: "..." }
+        if (result.data) {
+          setAlertsConfig(result.data);
+        } else {
+          throw new Error('Invalid response format');
+        }
       } else {
         throw new Error('Failed to fetch alerts configuration');
       }
@@ -88,126 +98,23 @@ export default function AlertsConfigurationPage() {
       console.error('Failed to fetch alerts configuration:', error);
       showNotification('Failed to fetch alerts configuration');
       
-      // Fallback to mock data if API fails
-      const mockAlertsConfig: AlertsConfig = {
-        rules: [
-          {
-            id: "1",
-            name: "Database Connection Failure",
-            description: "Alert when database connection fails or times out",
-            type: "error",
-            condition: "database.connection.failed",
-            threshold: 1,
-            enabled: true,
-            channels: ["email", "slack"],
-            lastTriggered: "2024-06-01T10:45:23Z",
-            triggerCount: 3
-          },
-          {
-            id: "2",
-            name: "High Memory Usage",
-            description: "Alert when memory usage exceeds 80%",
-            type: "warning",
-            condition: "system.memory.usage",
-            threshold: 80,
-            enabled: true,
-            channels: ["email"],
-            triggerCount: 0
-          },
-          {
-            id: "3",
-            name: "API Rate Limit Exceeded",
-            description: "Alert when API rate limits are exceeded",
-            type: "warning",
-            condition: "api.ratelimit.exceeded",
-            threshold: 5,
-            enabled: true,
-            channels: ["slack"],
-            lastTriggered: "2024-06-01T09:30:12Z",
-            triggerCount: 12
-          },
-          {
-            id: "4",
-            name: "Failed Login Attempts",
-            description: "Alert on multiple failed login attempts",
-            type: "warning",
-            condition: "auth.failed_attempts",
-            threshold: 5,
-            enabled: false,
-            channels: ["email", "slack"],
-            triggerCount: 0
-          },
-          {
-            id: "5",
-            name: "Backup Completion",
-            description: "Notify when daily backup is completed",
-            type: "info",
-            condition: "backup.completed",
-            threshold: 1,
-            enabled: true,
-            channels: ["email"],
-            lastTriggered: "2024-06-01T02:00:00Z",
-            triggerCount: 1
-          }
-        ],
-        channels: [
-          {
-            id: "email",
-            name: "Email Notifications",
-            type: "email",
-            enabled: true,
-            config: {
-              recipients: ["admin@agendaiq.com", "alerts@agendaiq.com"],
-              subject_prefix: "[AgendaIQ Alert]"
-            }
-          },
-          {
-            id: "slack",
-            name: "Slack Alerts",
-            type: "slack",
-            enabled: true,
-            config: {
-              webhook_url: "https://hooks.slack.com/services/***",
-              channel: "#system-alerts",
-              username: "AgendaIQ Bot"
-            }
-          },
-          {
-            id: "webhook",
-            name: "Custom Webhook",
-            type: "webhook",
-            enabled: false,
-            config: {
-              url: "https://your-webhook-url.com/alerts",
-              method: "POST"
-            }
-          },
-          {
-            id: "sms",
-            name: "SMS Alerts",
-            type: "sms",
-            enabled: false,
-            config: {
-              numbers: ["+1234567890"],
-              provider: "twilio"
-            }
-          }
-        ],
+      // Show empty state on error instead of mock data
+      setAlertsConfig({
+        rules: [],
+        channels: [],
         globalSettings: {
-          enableAlerts: true,
+          enableAlerts: false,
           quietHours: {
-            enabled: true,
+            enabled: false,
             start: "22:00",
             end: "08:00"
           },
           escalation: {
-            enabled: true,
+            enabled: false,
             delay: 30
           }
         }
-      };
-      
-      setAlertsConfig(mockAlertsConfig);
+      });
     } finally {
       setLoading(false);
     }
@@ -222,6 +129,7 @@ export default function AlertsConfigurationPage() {
       // Save configuration to API
       const response = await fetch('/api/system/alerts', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -287,13 +195,13 @@ export default function AlertsConfigurationPage() {
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'error':
-        return <AlertCircle className="w-4 h-4 text-red-600" />;
+        return <AlertCircle className="w-4 h-4 text-destructive" />;
       case 'warning':
         return <AlertTriangle className="w-4 h-4 text-yellow-600" />;
       case 'info':
-        return <CheckCircle className="w-4 h-4 text-blue-600" />;
+        return <CheckCircle className="w-4 h-4 text-primary" />;
       default:
-        return <Bell className="w-4 h-4 text-gray-600" />;
+        return <Bell className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
@@ -326,7 +234,7 @@ export default function AlertsConfigurationPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold flex items-center">
-            <Bell className="w-8 h-8 mr-3 text-purple-600" />
+            <Bell className="w-8 h-8 mr-3 text-secondary" />
             Alert Configuration
           </h1>
           <p className="text-muted-foreground">Configure system alerts and notifications</p>
@@ -384,7 +292,7 @@ export default function AlertsConfigurationPage() {
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Settings className="h-5 w-5 mr-2 text-gray-600" />
+                <Settings className="h-5 w-5 mr-2 text-muted-foreground" />
                 Global Settings
               </CardTitle>
               <CardDescription>Configure global alert settings and behavior</CardDescription>
@@ -518,7 +426,7 @@ export default function AlertsConfigurationPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Bell className="h-5 w-5 mr-2 text-blue-600" />
+                  <Bell className="h-5 w-5 mr-2 text-primary" />
                   Notification Channels
                 </CardTitle>
                 <CardDescription>Configure how alerts are delivered</CardDescription>
@@ -574,7 +482,7 @@ export default function AlertsConfigurationPage() {
             <CardContent>
               <div className="grid gap-4 md:grid-cols-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-primary">
                     {alertsConfig.rules.filter(r => r.enabled).length}
                   </div>
                   <div className="text-sm text-muted-foreground">Active Rules</div>
@@ -592,7 +500,7 @@ export default function AlertsConfigurationPage() {
                   <div className="text-sm text-muted-foreground">Total Triggers</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">
+                  <div className="text-2xl font-bold text-secondary">
                     {alertsConfig.rules.filter(r => r.lastTriggered).length}
                   </div>
                   <div className="text-sm text-muted-foreground">Recently Active</div>

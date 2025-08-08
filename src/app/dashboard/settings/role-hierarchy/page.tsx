@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { FiEye, FiEdit3, FiUsers, FiTrendingUp } from 'react-icons/fi';
+import { Eye as FiEye, Edit3 as FiEdit3, Users as FiUsers, TrendingUp as FiTrendingUp } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: "Role Hierarchy | AgendaIQ",

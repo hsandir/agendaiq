@@ -68,8 +68,42 @@ export default function LintErrorManagementPage() {
     try {
       setLoading(true);
       
-      // Fetch real system status for linting data
-      const response = await fetch('/api/system/status');
+      // First try the dedicated lint API
+      const lintResponse = await fetch('/api/system/lint', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (lintResponse.ok) {
+        const lintResult = await lintResponse.json();
+        if (lintResult.data) {
+          const lintData = lintResult.data;
+          setLintStatus({
+            summary: {
+              totalFiles: lintData.totalFiles,
+              errorFiles: lintData.errors,
+              warningFiles: lintData.warnings,
+              cleanFiles: lintData.totalFiles - lintData.errors - lintData.warnings,
+              totalErrors: lintData.errors,
+              totalWarnings: lintData.warnings
+            },
+            files: [],
+            recentFixes: []
+          });
+          showNotification('Lint status updated from API');
+          return;
+        }
+      }
+      
+      // Fallback to system status API
+      const response = await fetch('/api/system/status', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         
@@ -147,11 +181,24 @@ export default function LintErrorManagementPage() {
         });
       }, 500);
 
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Call real API to run auto-fix
+      const response = await fetch('/api/system/lint', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Auto-fix failed');
+      }
+      
+      const result = await response.json();
+      const fixedCount = result.data?.fixed || 0;
       
       setFixProgress(100);
-      showNotification('Auto-fix completed! Fixed 12 issues automatically.');
+      showNotification(`Auto-fix completed! Fixed ${fixedCount} issues automatically.`);
       
       // Refresh lint status
       await fetchLintStatus();
@@ -297,7 +344,7 @@ export default function LintErrorManagementPage() {
                 <Bug className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-red-600">{lintStatus.summary.totalErrors}</div>
+                <div className="text-2xl font-bold text-destructive">{lintStatus.summary.totalErrors}</div>
                 <p className="text-xs text-muted-foreground">
                   in {lintStatus.summary.errorFiles} files
                 </p>
@@ -338,7 +385,7 @@ export default function LintErrorManagementPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Bug className="h-5 w-5 mr-2 text-red-600" />
+                  <Bug className="h-5 w-5 mr-2 text-destructive" />
                   Error Summary
                 </CardTitle>
                 <CardDescription>Most problematic files requiring attention</CardDescription>
@@ -382,7 +429,7 @@ export default function LintErrorManagementPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Settings className="h-5 w-5 mr-2 text-blue-600" />
+                  <Settings className="h-5 w-5 mr-2 text-primary" />
                   Recent Fixes
                 </CardTitle>
                 <CardDescription>Latest automatic and manual fixes applied</CardDescription>
@@ -453,14 +500,14 @@ export default function LintErrorManagementPage() {
                           <div key={issueIndex} className="flex items-start space-x-3 text-sm">
                             <div className="flex-shrink-0">
                               {issue.severity === 'error' ? (
-                                <AlertCircle className="w-4 h-4 text-red-600 mt-0.5" />
+                                <AlertCircle className="w-4 h-4 text-destructive mt-0.5" />
                               ) : (
                                 <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5" />
                               )}
                             </div>
                             <div className="flex-1">
-                              <p className="text-gray-900">{issue.message}</p>
-                              <p className="text-gray-500 text-xs">
+                              <p className="text-foreground">{issue.message}</p>
+                              <p className="text-muted-foreground text-xs">
                                 Line {issue.line}:{issue.column} • {issue.rule}
                               </p>
                             </div>

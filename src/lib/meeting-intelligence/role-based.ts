@@ -1,0 +1,324 @@
+// Role-Based Assignment Module
+// Handles role transitions and automatic task reassignment
+
+import { prisma } from '@/lib/prisma';
+import { RoleTransitionData } from './types';
+
+export class RoleBasedAssignmentService {
+  /**
+   * Transfer all pending tasks when role changes hands
+   */
+  static async handleRoleTransition(data: RoleTransitionData) {
+    return await prisma.$transaction(async (tx) => {
+      // Create transition record
+      const transition = await tx.roleTransition.create({
+        data: {
+          role_id: data.roleId,
+          from_staff_id: data.fromStaffId,
+          to_staff_id: data.toStaffId,
+          pending_tasks: data.pendingTasks,
+          transferred_items: data.transferredItems,
+          notes: data.notes,
+          created_by: data.toStaffId // For now, use the new staff as creator
+        }
+      });
+
+      // Transfer agenda items assigned to role
+      await tx.meetingAgendaItem.updateMany({
+        where: {
+          responsible_role_id: data.roleId,
+          responsible_staff_id: data.fromStaffId,
+          status: {
+            in: ['Pending', 'Ongoing', 'Deferred']
+          }
+        },
+        data: {
+          responsible_staff_id: data.toStaffId
+        }
+      });
+
+      // Transfer action items assigned to role
+      await tx.meetingActionItem.updateMany({
+        where: {
+          assigned_to_role: data.roleId,
+          assigned_to: data.fromStaffId,
+          status: {
+            in: ['Pending', 'InProgress', 'Deferred', 'Overdue']
+          }
+        },
+        data: {
+          assigned_to: data.toStaffId
+        }
+      });
+
+      // Get summary of transferred items
+      const [transferredAgendaItems, transferredActionItems] = await Promise.all([
+        tx.meetingAgendaItem.count({
+          where: {
+            responsible_role_id: data.roleId,
+            responsible_staff_id: data.toStaffId
+          }
+        }),
+        tx.meetingActionItem.count({
+          where: {
+            assigned_to_role: data.roleId,
+            assigned_to: data.toStaffId
+          }
+        })
+      ]);
+
+      return {
+        transition,
+        summary: {
+          transferredAgendaItems,
+          transferredActionItems,
+          totalTransferred: transferredAgendaItems + transferredActionItems
+        }
+      };
+    });
+  }
+
+  /**
+   * Get all tasks assigned to a role
+   */
+  static async getRoleTasks(roleId: number, includeCompleted = false) {
+    const statusFilter = includeCompleted 
+      ? {} 
+      : {
+          status: {
+            notIn: ['Completed', 'Cancelled', 'Resolved']
+          }
+        };
+
+    const [agendaItems, actionItems] = await Promise.all([
+      prisma.meetingAgendaItem.findMany({
+        where: {
+          responsible_role_id: roleId,
+          ...statusFilter
+        },
+        include: {
+          Meeting: {
+            select: {
+              id: true,
+              title: true,
+              start_time: true
+            }
+          },
+          ResponsibleStaff: {
+            select: {
+              id: true,
+              User: {
+                select: {
+                  name: true,
+                  email: true
+                }
+              }
+            }
+          }
+        },
+        orderBy: [
+          { priority: 'desc' },
+          { created_at: 'desc' }
+        ]
+      }),
+      
+      prisma.meetingActionItem.findMany({
+        where: {
+          assigned_to_role: roleId,
+          ...statusFilter
+        },
+        include: {
+          Meeting: {
+            select: {
+              id: true,
+              title: true,
+              start_time: true
+            }
+          },
+          AssignedTo: {
+            select: {
+              id: true,
+              User: {
+                select: {
+                  name: true,
+                  email: true
+                }
+              }
+            }
+          }
+        },
+        orderBy: [
+          { due_date: 'asc' },
+          { priority: 'desc' }
+        ]
+      })
+    ]);
+
+    return {
+      agendaItems,
+      actionItems,
+      total: agendaItems.length + actionItems.length
+    };
+  }
+
+  /**
+   * Assign task to role (automatically assigns to current role holder)
+   */
+  static async assignTaskToRole(
+    taskId: number,
+    roleId: number,
+    taskType: 'agenda' | 'action'
+  ) {
+    // Get current role holder
+    const currentRoleHolder = await prisma.staff.findFirst({
+      where: {
+        role_id: roleId,
+        is_active: true
+      },
+      orderBy: {
+        created_at: 'desc'
+      }
+    });
+
+    if (!currentRoleHolder) {
+      throw new Error('No active staff member found for this role');
+    }
+
+    if (taskType === 'agenda') {
+      return await prisma.meetingAgendaItem.update({
+        where: { id: taskId },
+        data: {
+          responsible_role_id: roleId,
+          responsible_staff_id: currentRoleHolder.id
+        }
+      });
+    } else {
+      return await prisma.meetingActionItem.update({
+        where: { id: taskId },
+        data: {
+          assigned_to_role: roleId,
+          assigned_to: currentRoleHolder.id
+        }
+      });
+    }
+  }
+
+  /**
+   * Get role transition history
+   */
+  static async getRoleTransitionHistory(roleId: number) {
+    return await prisma.roleTransition.findMany({
+      where: { role_id: roleId },
+      include: {
+        FromStaff: {
+          include: {
+            User: {
+              select: {
+                name: true,
+                email: true
+              }
+            }
+          }
+        },
+        ToStaff: {
+          include: {
+            User: {
+              select: {
+                name: true,
+                email: true
+              }
+            }
+          }
+        },
+        Role: true
+      },
+      orderBy: {
+        transition_date: 'desc'
+      }
+    });
+  }
+
+  /**
+   * Get upcoming tasks for a role
+   */
+  static async getUpcomingRoleTasks(roleId: number, days = 7) {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + days);
+
+    return await prisma.meetingActionItem.findMany({
+      where: {
+        assigned_to_role: roleId,
+        status: {
+          in: ['Pending', 'InProgress']
+        },
+        due_date: {
+          lte: futureDate,
+          gte: new Date()
+        }
+      },
+      include: {
+        Meeting: {
+          select: {
+            title: true
+          }
+        },
+        AssignedTo: {
+          include: {
+            User: {
+              select: {
+                name: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: {
+        due_date: 'asc'
+      }
+    });
+  }
+
+  /**
+   * Bulk reassign tasks from one staff to another (same role)
+   */
+  static async bulkReassignTasks(
+    fromStaffId: number,
+    toStaffId: number,
+    taskIds: { agendaItems?: number[], actionItems?: number[] }
+  ) {
+    return await prisma.$transaction(async (tx) => {
+      const results = {
+        agendaItemsUpdated: 0,
+        actionItemsUpdated: 0
+      };
+
+      if (taskIds.agendaItems && taskIds.agendaItems.length > 0) {
+        const agendaUpdate = await tx.meetingAgendaItem.updateMany({
+          where: {
+            id: { in: taskIds.agendaItems },
+            responsible_staff_id: fromStaffId
+          },
+          data: {
+            responsible_staff_id: toStaffId
+          }
+        });
+        results.agendaItemsUpdated = agendaUpdate.count;
+      }
+
+      if (taskIds.actionItems && taskIds.actionItems.length > 0) {
+        const actionUpdate = await tx.meetingActionItem.updateMany({
+          where: {
+            id: { in: taskIds.actionItems },
+            assigned_to: fromStaffId
+          },
+          data: {
+            assigned_to: toStaffId
+          }
+        });
+        results.actionItemsUpdated = actionUpdate.count;
+      }
+
+      return results;
+    });
+  }
+}

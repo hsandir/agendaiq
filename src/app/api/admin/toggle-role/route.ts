@@ -15,11 +15,11 @@ export async function POST(request: Request) {
     }
 
     const currentUser = await prisma.user.findUnique({
-      where: { id: user.id },
-      include: { staff: { include: { role: true } } },
+      where: { id: session.user.id },
+      include: { Staff: { include: { Role: true } } },
     });
 
-    if (!currentUser || currentUser.staff?.[0]?.role?.title !== 'Administrator') {
+    if (!currentUser || currentUser.Staff?.[0]?.Role?.title !== 'Administrator') {
       return NextResponse.json(
         { error: "Not authorized" },
         { status: 403 }
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     // Find the user
     const user = await prisma.user.findUnique({
       where: { email },
-      include: { staff: true },
+      include: { Staff: true },
     });
 
     if (!user) {
@@ -50,9 +50,9 @@ export async function POST(request: Request) {
     }
 
     // Update or create staff record
-    if (user.staff?.[0]) {
+    if (user.Staff?.[0]) {
       await prisma.staff.update({
-        where: { id: user.staff[0].id },
+        where: { id: user.Staff[0].id },
         data: { role_id: roleId },
       });
     } else {
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     // Get updated user with staff
     const updatedUser = await prisma.user.findUnique({
       where: { id: user.id },
-      include: { staff: { include: { role: true, department: true } } },
+      include: { Staff: { include: { Role: true, Department: true } } },
     });
 
     return NextResponse.json(updatedUser);

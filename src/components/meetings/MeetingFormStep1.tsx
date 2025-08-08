@@ -10,7 +10,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Search, Users, Calendar, Video, Repeat, Link } from "lucide-react";
+import { DateTimePicker } from "@/components/ui/date-time-picker";
+import { MultiSelectV2 as MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select-v2";
+import dynamic from 'next/dynamic';
+import type { RepeatConfig } from "@/components/meetings/RepeatMeetingModal";
+
+// Lazy load heavy modals for better performance
+const RepeatMeetingModal = dynamic(
+  () => import('@/components/meetings/RepeatMeetingModal').then(mod => mod.RepeatMeetingModal),
+  {
+    loading: () => <div className="text-sm text-muted-foreground">Loading...</div>,
+    ssr: false
+  }
+);
+
+const MeetingHistoryModal = dynamic(
+  () => import('@/components/meetings/MeetingHistoryModal').then(mod => mod.MeetingHistoryModal),
+  {
+    loading: () => <div className="text-sm text-muted-foreground">Loading...</div>,
+    ssr: false
+  }
+);
+import { Search, Users, Calendar, Video, Repeat, Link, CalendarDays, FolderOpen } from "lucide-react";
+import { addMinutes, format } from "date-fns";
+import { safeFormatDate, isValidDate, getSafeDate } from '@/lib/utils/safe-date';
 
 interface User {
   id: string;
@@ -43,6 +66,7 @@ interface MeetingFormStep1Props {
     endTime: string;
     repeatType: string;
     repeatEndDate: string;
+    repeatConfig?: any;
     calendarIntegration: string;
     meetingType: string;
     zoomMeetingId: string;
@@ -71,28 +95,50 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showRepeatModal, setShowRepeatModal] = useState(false);
+  const [repeatConfig, setRepeatConfig] = useState<RepeatConfig | null>(null);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [selectedPreviousMeeting, setSelectedPreviousMeeting] = useState<any>(null);
 
-  // Filter states
-  const [departmentFilter, setDepartmentFilter] = useState("all");
-  const [roleFilter, setRoleFilter] = useState("all");
-  const [searchFilter, setSearchFilter] = useState("");
+  // Transform users to MultiSelectOptions
+  const attendeeOptions: MultiSelectOption[] = users.map(user => ({
+    value: user.id,
+    label: user.name,
+    email: user.email,
+    department: user.department,
+    role: user.role
+  }));
 
-  const filteredUsers = users.filter(user => {
-    const matchesDepartment = !departmentFilter || departmentFilter === "all" || user.department === departmentFilter;
-    const matchesRole = !roleFilter || roleFilter === "all" || user.role === roleFilter;
-    const matchesSearch = !searchFilter || 
-      user.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchFilter.toLowerCase());
+  // Get unique departments and roles for filters
+  const uniqueDepartments = Array.from(new Set(users.map(u => u.department)));
+  const uniqueRoles = Array.from(new Set(users.map(u => u.role)));
+
+  // Auto-set end time when start time changes
+  const handleStartTimeChange = (newStartTime: string) => {
+    // Validate the new start time
+    if (!newStartTime) {
+      setStartTime("");
+      return;
+    }
     
-    return matchesDepartment && matchesRole && matchesSearch;
-  });
-
-  const handleAttendeeToggle = (userId: string) => {
-    setSelectedAttendees(prev => 
-      prev.includes(userId) 
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId]
-    );
+    try {
+      const startDate = getSafeDate(newStartTime);
+      if (!startDate) {
+        console.error("Invalid start time:", newStartTime);
+        return;
+      }
+      
+      setStartTime(newStartTime);
+      
+      // Auto-set end time to 1 hour after start time if not set
+      if (!endTime) {
+        const endDate = addMinutes(startDate, 60);
+        const formattedEndTime = endDate.toISOString().slice(0, 16);
+        setEndTime(formattedEndTime);
+      }
+    } catch (error) {
+      console.error("Error handling start time change:", error);
+    }
   };
 
   const handleSearchMeetings = async () => {
@@ -109,11 +155,94 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     }
   };
 
+  const handleSelectPreviousMeeting = (meeting: any) => {
+    setSelectedPreviousMeeting(meeting);
+    setParentMeetingId(meeting.id);
+    setTitle(`${meeting.title} (Continuation)`);
+    setDescription(meeting.description || "");
+    setMeetingType(meeting.meeting_type || "regular");
+    
+    // Set attendees if available
+    if (meeting.attendees && Array.isArray(meeting.attendees)) {
+      const attendeeIds = meeting.attendees.map((a: any) => a.id || a.staff_id).filter(Boolean);
+      setSelectedAttendees(attendeeIds);
+    }
+    
+    // Auto-set continuation flag
+    setIsContinuation(true);
+  };
+
+  const handleSelectMultipleMeetings = (meetings: any[], options: { importAgendaItems: boolean; importAttendees: boolean }) => {
+    // Use the first meeting as the base
+    const baseMeeting = meetings[0];
+    setSelectedPreviousMeeting(baseMeeting);
+    setParentMeetingId(baseMeeting.id);
+    
+    // Create title from all selected meetings
+    const titles = meetings.map(m => m.title).join(', ');
+    setTitle(`Continuation of: ${titles}`);
+    
+    // Combine descriptions
+    const descriptions = meetings.map(m => m.description).filter(Boolean);
+    if (descriptions.length > 0) {
+      setDescription(`Combined from previous meetings:\n${descriptions.join('\n\n')}`);
+    }
+    
+    // Import attendees if requested
+    if (options.importAttendees) {
+      const allAttendees = new Set<string>();
+      meetings.forEach(meeting => {
+        if (meeting.attendees && Array.isArray(meeting.attendees)) {
+          meeting.attendees.forEach((a: any) => {
+            const id = a.id || a.staff_id;
+            if (id) allAttendees.add(id);
+          });
+        }
+      });
+      setSelectedAttendees(Array.from(allAttendees));
+    }
+    
+    // Store selected meetings and import options for later use
+    setFormData((prev: any) => ({
+      ...prev,
+      sourceMeetings: meetings.map(m => m.id),
+      importAgendaItems: options.importAgendaItems,
+      importAttendees: options.importAttendees
+    }));
+    
+    setIsContinuation(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate required fields
     if (!title || !startTime || !endTime || selectedAttendees.length === 0) {
       alert("Please fill in all required fields and select at least one attendee.");
+      return;
+    }
+
+    // Validate date values
+    try {
+      const startDate = getSafeDate(startTime);
+      const endDate = getSafeDate(endTime);
+      
+      if (!startDate) {
+        alert("Invalid start date/time. Please select a valid date and time.");
+        return;
+      }
+      
+      if (!endDate) {
+        alert("Invalid end date/time. Please select a valid date and time.");
+        return;
+      }
+      
+      if (endDate <= startDate) {
+        alert("End time must be after start time.");
+        return;
+      }
+    } catch (error) {
+      alert("Invalid date/time values. Please check your selections.");
       return;
     }
 
@@ -132,6 +261,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
         endTime,
         repeatType,
         repeatEndDate,
+        repeatConfig,
         calendarIntegration,
         meetingType,
         zoomMeetingId,
@@ -141,8 +271,8 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       });
       
       if (result?.success && result?.meetingId) {
-        // Client-side redirect to Step 2
-        router.push(`/dashboard/meetings/${result.meetingId}/edit`);
+        // Client-side redirect to Step 2 (agenda items)
+        router.push(`/dashboard/meetings/${result.meetingId}/agenda`);
       } else if (result?.message) {
         alert(result.message);
       }
@@ -206,26 +336,21 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="startTime">Start Date & Time *</Label>
-              <Input
-                id="startTime"
-                type="datetime-local"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="endTime">End Date & Time *</Label>
-              <Input
-                id="endTime"
-                type="datetime-local"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                required
-              />
-            </div>
+            <DateTimePicker
+              id="startTime"
+              label="Start Date & Time"
+              value={startTime}
+              onChange={handleStartTimeChange}
+              required
+            />
+            <DateTimePicker
+              id="endTime"
+              label="End Date & Time"
+              value={endTime}
+              onChange={setEndTime}
+              minDate={startTime ? new Date(startTime) : undefined}
+              required
+            />
           </div>
         </CardContent>
       </Card>
@@ -241,33 +366,37 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="repeatType">Repeat Type</Label>
-              <Select value={repeatType} onValueChange={setRepeatType}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">No Repeat</SelectItem>
-                  <SelectItem value="daily">Daily</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                  <SelectItem value="yearly">Yearly</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            {repeatType !== "none" && (
-              <div>
-                <Label htmlFor="repeatEndDate">Repeat Until</Label>
-                <Input
-                  id="repeatEndDate"
-                  type="date"
-                  value={repeatEndDate}
-                  onChange={(e) => setRepeatEndDate(e.target.value)}
-                  min={startTime.split('T')[0]}
-                  required={repeatType !== "none"}
-                />
+              <Label>Repeat Settings</Label>
+              <div className="space-y-2">
+                <Button
+                  type="button"
+                  variant={repeatConfig ? "default" : "outline"}
+                  className="w-full justify-start"
+                  onClick={() => setShowRepeatModal(true)}
+                >
+                  <CalendarDays className="h-4 w-4 mr-2" />
+                  {repeatConfig ? (
+                    <span>
+                      Repeats {repeatConfig.pattern} 
+                      {repeatConfig.endType === 'after' && ` (${repeatConfig.occurrences} times)`}
+                      {repeatConfig.endType === 'by' && ` until ${format(new Date(repeatConfig.endDate!), 'MMM dd, yyyy')}`}
+                    </span>
+                  ) : (
+                    "Configure Repeat Settings"
+                  )}
+                </Button>
+                {repeatConfig && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setRepeatConfig(null)}
+                  >
+                    Clear repeat settings
+                  </Button>
+                )}
               </div>
-            )}
+            </div>
             <div>
               <Label htmlFor="calendarIntegration">Calendar Integration</Label>
               <Select value={calendarIntegration} onValueChange={setCalendarIntegration}>
@@ -317,6 +446,50 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
           {isContinuation && (
             <div className="space-y-4">
               <div className="flex gap-2">
+                <Button 
+                  type="button" 
+                  onClick={() => setShowHistoryModal(true)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <FolderOpen className="h-4 w-4 mr-2" />
+                  Select from Previous Meetings
+                </Button>
+              </div>
+              
+              {selectedPreviousMeeting && (
+                <div className="p-4 bg-primary border border-blue-200 rounded-lg">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium text-primary">Continuing from:</p>
+                      <p className="text-sm text-primary mt-1">{selectedPreviousMeeting.title}</p>
+                      <p className="text-xs text-primary mt-1">
+                        {safeFormatDate(selectedPreviousMeeting.start_time)} • 
+                        {selectedPreviousMeeting.attendees} attendees • 
+                        {selectedPreviousMeeting.agendaItems} agenda items
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedPreviousMeeting(null);
+                        setParentMeetingId(undefined);
+                        setTitle("");
+                        setDescription("");
+                      }}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              <div className="text-sm text-muted-foreground">
+                Or search manually:
+              </div>
+              <div className="flex gap-2">
                 <Input
                   placeholder="Search by date, meeting ID, title, attendee, or department"
                   value={searchQuery}
@@ -327,6 +500,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
                   type="button" 
                   onClick={handleSearchMeetings}
                   disabled={isLoading}
+                  variant="secondary"
                 >
                   <Search className="h-4 w-4 mr-2" />
                   Search
@@ -340,12 +514,12 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
                     {searchResults.map((meeting) => (
                       <div
                         key={meeting.id}
-                        className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50"
+                        className="p-3 border rounded-lg cursor-pointer hover:bg-muted"
                         onClick={() => setParentMeetingId(meeting.id)}
                       >
                         <div className="font-medium">{meeting.title}</div>
-                        <div className="text-sm text-gray-600">
-                          {new Date(meeting.start_time).toLocaleDateString()} - {meeting.description}
+                        <div className="text-sm text-muted-foreground">
+                          {safeFormatDate(meeting.start_time)} - {meeting.description}
                         </div>
                       </div>
                     ))}
@@ -362,91 +536,27 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Select Attendees *
+            Select Attendees
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="departmentFilter">Filter by Department</Label>
-              <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Departments" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Departments</SelectItem>
-                  {departments.map((dept) => (
-                    <SelectItem key={dept.id} value={dept.name}>
-                      {dept.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="roleFilter">Filter by Role</Label>
-              <Select value={roleFilter} onValueChange={setRoleFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Roles" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Roles</SelectItem>
-                  {roles.map((role) => (
-                    <SelectItem key={role.id} value={role.title}>
-                      {role.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="searchFilter">Search by Name/Email</Label>
-              <Input
-                id="searchFilter"
-                value={searchFilter}
-                onChange={(e) => setSearchFilter(e.target.value)}
-                placeholder="Search attendees..."
-              />
-            </div>
-          </div>
-
-          {/* Attendee List */}
-          <div className="max-h-60 overflow-y-auto border rounded-lg p-4">
-            <div className="space-y-2">
-              {filteredUsers.map((user) => (
-                <div
-                  key={user.id}
-                  className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
-                    selectedAttendees.includes(user.id)
-                      ? "bg-blue-50 border-blue-200"
-                      : "bg-gray-50 border-gray-200"
-                  }`}
-                  onClick={() => handleAttendeeToggle(user.id)}
-                >
-                  <div className="flex-1">
-                    <div className="font-medium">{user.name}</div>
-                    <div className="text-sm text-gray-600">{user.email}</div>
-                    <div className="flex gap-2 mt-1">
-                      <Badge variant="outline">{user.department}</Badge>
-                      <Badge variant="outline">{user.role}</Badge>
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    {selectedAttendees.includes(user.id) && (
-                      <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
+        <CardContent>
+          <MultiSelect
+            options={attendeeOptions}
+            selected={selectedAttendees}
+            onChange={setSelectedAttendees}
+            placeholder="Click to select attendees..."
+            label="Meeting Attendees"
+            required
+            showSearch
+            showDepartmentFilter
+            showRoleFilter
+            departments={uniqueDepartments}
+            roles={uniqueRoles}
+            maxHeight="400px"
+          />
           {selectedAttendees.length > 0 && (
-            <div className="text-sm text-gray-600">
-              Selected: {selectedAttendees.length} attendee(s)
+            <div className="mt-2 text-sm text-muted-foreground">
+              {selectedAttendees.length} attendee(s) selected
             </div>
           )}
         </CardContent>
@@ -458,6 +568,30 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
           {isSubmitting ? "Creating..." : "Continue to Step 2"}
         </Button>
       </div>
+
+      {/* Repeat Meeting Modal */}
+      <RepeatMeetingModal
+        isOpen={showRepeatModal}
+        onClose={() => setShowRepeatModal(false)}
+        startDate={startTime}
+        endDate={endTime}
+        onConfirm={(config) => {
+          setRepeatConfig(config);
+          setRepeatType(config.pattern);
+          if (config.endType === 'by' && config.endDate) {
+            setRepeatEndDate(config.endDate);
+          }
+        }}
+      />
+      
+      {/* Meeting History Modal */}
+      <MeetingHistoryModal
+        isOpen={showHistoryModal}
+        onClose={() => setShowHistoryModal(false)}
+        onSelectMeeting={handleSelectPreviousMeeting}
+        multiSelect={isContinuation}
+        onSelectMultipleMeetings={handleSelectMultipleMeetings}
+      />
     </form>
   );
 } 

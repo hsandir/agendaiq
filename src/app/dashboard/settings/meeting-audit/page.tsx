@@ -22,7 +22,7 @@ export default async function MeetingAuditPage() {
 
       {/* Your page content here */}
       <div className="space-y-6">
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
+        <div className="bg-card p-6 rounded-lg shadow-sm border">
           <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
           <p className="text-muted-foreground">Meeting audit functionality will be implemented here.</p>
         </div>

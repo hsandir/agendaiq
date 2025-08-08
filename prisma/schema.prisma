@@ -1,0 +1,589 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Account {
+  id                String  @id
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  userId            Int
+  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model District {
+  name       String
+  address    String?
+  code       String?
+  created_at DateTime  @default(now())
+  id         Int       @id @default(autoincrement())
+  Meeting    Meeting[]
+  School     School[]
+  Staff      Staff[]
+}
+
+model School {
+  name        String
+  address     String?
+  code        String?
+  created_at  DateTime     @default(now())
+  district_id Int
+  id          Int          @id @default(autoincrement())
+  Department  Department[]
+  Meeting     Meeting[]
+  District    District     @relation(fields: [district_id], references: [id])
+  Staff       Staff[]
+}
+
+model Department {
+  id         Int          @id @default(autoincrement())
+  code       String       @unique
+  name       String
+  category   String?
+  school_id  Int
+  created_at DateTime     @default(now())
+  level      Int          @default(0)
+  parent_id  Int?
+  Parent     Department?  @relation("DepartmentHierarchy", fields: [parent_id], references: [id])
+  Children   Department[] @relation("DepartmentHierarchy")
+  School     School       @relation(fields: [school_id], references: [id])
+  Meeting    Meeting[]
+  Role       Role[]
+  Staff      Staff[]
+}
+
+model Role {
+  id              Int                 @id @default(autoincrement())
+  title           String              @unique
+  priority        Int                 @default(0)
+  category        String?
+  department_id   Int?
+  created_at      DateTime            @default(now())
+  is_leadership   Boolean             @default(false)
+  level           Int                 @default(0)
+  parent_id       Int?
+  extension       String?
+  is_coordinator  Boolean             @default(false)
+  is_supervisor   Boolean             @default(false)
+  room            String?
+  Department      Department?         @relation(fields: [department_id], references: [id])
+  Parent          Role?               @relation("RoleHierarchy", fields: [parent_id], references: [id])
+  Children        Role[]              @relation("RoleHierarchy")
+  ChildHierarchy  RoleHierarchy[]     @relation("ChildRole")
+  RoleHierarchy   RoleHierarchy[]     @relation("ParentRole")
+  Staff           Staff[]
+  ActionItems     MeetingActionItem[]
+  AgendaItems     MeetingAgendaItem[]
+  RoleTransitions RoleTransition[]
+}
+
+model RoleHierarchy {
+  id              Int      @id @default(autoincrement())
+  parent_role_id  Int
+  child_role_id   Int
+  hierarchy_level Int      @default(1)
+  created_at      DateTime @default(now())
+  ChildRole       Role     @relation("ChildRole", fields: [child_role_id], references: [id])
+  ParentRole      Role     @relation("ParentRole", fields: [parent_role_id], references: [id])
+
+  @@unique([parent_role_id, child_role_id])
+}
+
+model User {
+  id                          Int                @id @default(autoincrement())
+  email                       String             @unique
+  name                        String?
+  staff_id                    String?            @unique
+  hashedPassword              String?
+  emailVerified               DateTime?
+  image                       String?
+  is_admin                    Boolean            @default(false)
+  two_factor_enabled          Boolean            @default(false)
+  two_factor_secret           String?
+  backup_codes                String[]
+  login_notifications_enabled Boolean            @default(true)
+  suspicious_alerts_enabled   Boolean            @default(true)
+  remember_devices_enabled    Boolean            @default(true)
+  created_at                  DateTime           @default(now())
+  updated_at                  DateTime           @updatedAt
+  theme_preference            String?            @default("classic-light")
+  Account                     Account[]
+  Session                     Session[]
+  Staff                       Staff[]
+  AuditLog                    AuditLog[]
+  TargetCriticalAuditLog      CriticalAuditLog[] @relation("TargetUser")
+  CriticalAuditLog            CriticalAuditLog[]
+  Device                      Device[]
+  MeetingAuditLog             MeetingAuditLog[]
+
+  @@map("users")
+}
+
+model Staff {
+  id                        Int                    @id @default(autoincrement())
+  user_id                   Int
+  department_id             Int
+  role_id                   Int
+  manager_id                Int?
+  flags                     String[]
+  endorsements              String[]
+  school_id                 Int
+  district_id               Int
+  created_at                DateTime               @default(now())
+  extension                 String?
+  hire_date                 DateTime?
+  is_active                 Boolean                @default(true)
+  room                      String?
+  Meeting                   Meeting[]
+  MeetingAttendee           MeetingAttendee[]
+  Department                Department             @relation(fields: [department_id], references: [id])
+  District                  District               @relation(fields: [district_id], references: [id])
+  Staff                     Staff?                 @relation("StaffToStaff", fields: [manager_id], references: [id])
+  other_Staff               Staff[]                @relation("StaffToStaff")
+  Role                      Role                   @relation(fields: [role_id], references: [id])
+  School                    School                 @relation(fields: [school_id], references: [id])
+  User                      User                   @relation(fields: [user_id], references: [id])
+  UploadedAttachments       AgendaItemAttachment[] @relation("UploadedAttachments")
+  AgendaItemComments        AgendaItemComment[]
+  AuditLog                  AuditLog[]
+  CriticalAuditLog          CriticalAuditLog[]
+  TargetCriticalAuditLog    CriticalAuditLog[]     @relation("TargetStaff")
+  AssignedActionItems       MeetingActionItem[]
+  CompletedActionItems      MeetingActionItem[]    @relation("CompletedByStaff")
+  ResponsibleForAgendaItems MeetingAgendaItem[]    @relation("ResponsibleStaff")
+  MeetingAuditLogs          MeetingAuditLog[]
+  MeetingNote               MeetingNote[]
+  MeetingTemplate           MeetingTemplate[]
+  CreatedRoleTransitions    RoleTransition[]       @relation("CreatedByTransition")
+  FromRoleTransitions       RoleTransition[]       @relation("FromStaffTransition")
+  ToRoleTransitions         RoleTransition[]       @relation("ToStaffTransition")
+}
+
+model Meeting {
+  title                String
+  description          String?
+  created_at           DateTime            @default(now())
+  department_id        Int
+  district_id          Int
+  end_time             DateTime?
+  organizer_id         Int
+  school_id            Int
+  start_time           DateTime?
+  zoom_join_url        String?
+  zoom_meeting_id      String?
+  id                   Int                 @id @default(autoincrement())
+  action_items         String?
+  agenda               String?
+  calendar_integration String?
+  decisions            String?
+  is_continuation      Boolean             @default(false)
+  meeting_type         String?
+  notes                String?
+  parent_meeting_id    Int?
+  repeat_type          String?
+  status               String              @default("draft")
+  template_id          Int?
+  is_series_master     Boolean             @default(false)
+  repeat_end_date      DateTime?
+  repeat_end_type      String?
+  repeat_exceptions    DateTime[]          @default([])
+  repeat_interval      Int?
+  repeat_month_day     Int?
+  repeat_month_week    Int?
+  repeat_month_weekday Int?
+  repeat_occurrences   Int?
+  repeat_pattern       String?
+  repeat_weekdays      Int[]               @default([])
+  series_id            String?
+  series_position      Int?
+  Department           Department          @relation(fields: [department_id], references: [id])
+  District             District            @relation(fields: [district_id], references: [id])
+  Staff                Staff               @relation(fields: [organizer_id], references: [id])
+  ParentMeeting        Meeting?            @relation("MeetingContinuation", fields: [parent_meeting_id], references: [id])
+  ContinuationMeetings Meeting[]           @relation("MeetingContinuation")
+  School               School              @relation(fields: [school_id], references: [id])
+  MeetingTemplate      MeetingTemplate?    @relation(fields: [template_id], references: [id])
+  MeetingAttendee      MeetingAttendee[]
+  MeetingActionItems   MeetingActionItem[]
+  MeetingAgendaItems   MeetingAgendaItem[]
+  MeetingAuditLogs     MeetingAuditLog[]
+  MeetingNote          MeetingNote[]
+  MeetingSearches      MeetingSearch[]
+  MeetingTranscript    MeetingTranscript?
+}
+
+model MeetingAttendee {
+  status     String?
+  created_at DateTime @default(now())
+  meeting_id Int
+  staff_id   Int
+  id         Int      @id @default(autoincrement())
+  Meeting    Meeting  @relation(fields: [meeting_id], references: [id])
+  Staff      Staff    @relation(fields: [staff_id], references: [id])
+}
+
+model MeetingNote {
+  id         Int      @id @default(autoincrement())
+  meeting_id Int
+  staff_id   Int
+  content    String
+  created_at DateTime @default(now())
+  Meeting    Meeting  @relation(fields: [meeting_id], references: [id], onDelete: Cascade)
+  Staff      Staff    @relation(fields: [staff_id], references: [id], onDelete: Cascade)
+
+  @@map("meeting_notes")
+}
+
+model CriticalAuditLog {
+  id              Int           @id @default(autoincrement())
+  timestamp       DateTime      @default(now())
+  category        AuditCategory
+  action          String
+  user_id         Int?
+  staff_id        Int?
+  target_user_id  Int?
+  target_staff_id Int?
+  ip_address      String?
+  session_id      String?
+  risk_score      Int           @default(0)
+  success         Boolean       @default(true)
+  error_message   String?
+  metadata        Json?
+  Staff           Staff?        @relation(fields: [staff_id], references: [id])
+  TargetStaff     Staff?        @relation("TargetStaff", fields: [target_staff_id], references: [id])
+  TargetUser      User?         @relation("TargetUser", fields: [target_user_id], references: [id])
+  User            User?         @relation(fields: [user_id], references: [id])
+
+  @@index([category, timestamp])
+  @@index([user_id, timestamp])
+  @@index([risk_score, timestamp])
+  @@index([ip_address, timestamp])
+  @@index([category, risk_score, timestamp])
+  @@index([user_id, staff_id, timestamp])
+  @@index([category, user_id, timestamp])
+  @@index([success, risk_score, timestamp])
+  @@map("critical_audit_logs")
+}
+
+model AuditLog {
+  id            Int      @id @default(autoincrement())
+  table_name    String
+  record_id     String
+  operation     String
+  field_changes Json?
+  old_values    Json?
+  new_values    Json?
+  user_id       Int?
+  staff_id      Int?
+  source        String
+  description   String?
+  ip_address    String?
+  user_agent    String?
+  metadata      Json?
+  created_at    DateTime @default(now())
+  Staff         Staff?   @relation(fields: [staff_id], references: [id])
+  User          User?    @relation(fields: [user_id], references: [id])
+
+  @@index([table_name, created_at])
+  @@index([user_id, created_at])
+  @@index([operation, created_at])
+  @@map("audit_logs")
+}
+
+model Session {
+  id           String   @id
+  sessionToken String   @unique
+  expires      DateTime
+  userId       Int
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SystemSetting {
+  key   String @id
+  value Json
+}
+
+model MeetingTemplate {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  duration    Int       @default(60)
+  agenda      String?
+  attendees   String[]
+  is_active   Boolean   @default(true)
+  created_by  Int
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  Meeting     Meeting[]
+  Staff       Staff     @relation(fields: [created_by], references: [id])
+
+  @@map("meeting_templates")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Device {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  device_id   String   @unique
+  device_name String
+  device_type String
+  device_os   String?
+  browser     String?
+  ip_address  String?
+  last_active DateTime @default(now())
+  is_trusted  Boolean  @default(false)
+  created_at  DateTime @default(now())
+  User        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("devices")
+}
+
+model MeetingAgendaItem {
+  id                   Int                    @id @default(autoincrement())
+  meeting_id           Int
+  topic                String
+  problem_statement    String?
+  staff_initials       String?
+  responsible_staff_id Int?
+  priority             Priority               @default(Medium)
+  purpose              Purpose
+  proposed_solution    String?
+  solution_type        SolutionType?
+  decisions_actions    String?
+  decision_type        DecisionType?
+  status               AgendaItemStatus       @default(Pending)
+  future_implications  Boolean?               @default(false)
+  order_index          Int                    @default(0)
+  duration_minutes     Int?
+  created_at           DateTime               @default(now())
+  updated_at           DateTime               @updatedAt
+  carried_forward      Boolean                @default(false)
+  carry_forward_count  Int                    @default(0)
+  parent_item_id       Int?
+  responsible_role_id  Int?
+  Attachments          AgendaItemAttachment[]
+  Comments             AgendaItemComment[]
+  ActionItems          MeetingActionItem[]
+  Meeting              Meeting                @relation(fields: [meeting_id], references: [id], onDelete: Cascade)
+  ParentItem           MeetingAgendaItem?     @relation("ItemContinuation", fields: [parent_item_id], references: [id])
+  ChildItems           MeetingAgendaItem[]    @relation("ItemContinuation")
+  ResponsibleRole      Role?                  @relation(fields: [responsible_role_id], references: [id])
+  ResponsibleStaff     Staff?                 @relation("ResponsibleStaff", fields: [responsible_staff_id], references: [id])
+
+  @@index([meeting_id])
+  @@index([responsible_staff_id])
+  @@index([responsible_role_id])
+  @@index([parent_item_id])
+  @@map("meeting_agenda_items")
+}
+
+model AgendaItemAttachment {
+  id             Int               @id @default(autoincrement())
+  agenda_item_id Int
+  file_name      String
+  file_url       String
+  file_size      Int
+  content_type   String
+  created_at     DateTime          @default(now())
+  updated_at     DateTime          @updatedAt
+  uploaded_by_id Int
+  AgendaItem     MeetingAgendaItem @relation(fields: [agenda_item_id], references: [id], onDelete: Cascade)
+  UploadedBy     Staff             @relation("UploadedAttachments", fields: [uploaded_by_id], references: [id])
+
+  @@index([agenda_item_id])
+  @@index([uploaded_by_id])
+  @@map("agenda_item_attachments")
+}
+
+model AgendaItemComment {
+  id             Int               @id @default(autoincrement())
+  agenda_item_id Int
+  staff_id       Int
+  comment        String
+  created_at     DateTime          @default(now())
+  AgendaItem     MeetingAgendaItem @relation(fields: [agenda_item_id], references: [id], onDelete: Cascade)
+  Staff          Staff             @relation(fields: [staff_id], references: [id])
+
+  @@index([agenda_item_id])
+  @@map("agenda_item_comments")
+}
+
+model MeetingAuditLog {
+  id         Int      @id @default(autoincrement())
+  meeting_id Int
+  user_id    Int
+  staff_id   Int?
+  action     String
+  details    String?
+  changes    Json?
+  ip_address String?
+  user_agent String?
+  created_at DateTime @default(now())
+  Meeting    Meeting  @relation(fields: [meeting_id], references: [id], onDelete: Cascade)
+  Staff      Staff?   @relation(fields: [staff_id], references: [id])
+  User       User     @relation(fields: [user_id], references: [id])
+
+  @@index([meeting_id])
+  @@index([user_id])
+  @@index([created_at])
+  @@map("meeting_audit_logs")
+}
+
+model MeetingActionItem {
+  id                  Int                 @id @default(autoincrement())
+  meeting_id          Int
+  agenda_item_id      Int?
+  title               String
+  description         String?
+  assigned_to         Int
+  due_date            DateTime?
+  completed_at        DateTime?
+  created_at          DateTime            @default(now())
+  updated_at          DateTime            @updatedAt
+  assigned_to_role    Int?
+  carry_forward_count Int                 @default(0)
+  completed_by        Int?
+  notes               String?
+  parent_action_id    Int?
+  priority            Priority            @default(Medium)
+  status              ActionItemStatus    @default(Pending)
+  AgendaItem          MeetingAgendaItem?  @relation(fields: [agenda_item_id], references: [id])
+  AssignedTo          Staff               @relation(fields: [assigned_to], references: [id])
+  AssignedToRole      Role?               @relation(fields: [assigned_to_role], references: [id])
+  CompletedBy         Staff?              @relation("CompletedByStaff", fields: [completed_by], references: [id])
+  Meeting             Meeting             @relation(fields: [meeting_id], references: [id], onDelete: Cascade)
+  ParentAction        MeetingActionItem?  @relation("ActionItemContinuation", fields: [parent_action_id], references: [id])
+  ChildActions        MeetingActionItem[] @relation("ActionItemContinuation")
+
+  @@index([meeting_id])
+  @@index([assigned_to])
+  @@index([assigned_to_role])
+  @@index([status])
+  @@index([due_date])
+  @@map("meeting_action_items")
+}
+
+model MeetingTranscript {
+  id         Int      @id @default(autoincrement())
+  meeting_id Int      @unique
+  full_text  String?
+  summary    String?
+  key_points String[]
+  ai_summary String?
+  speakers   Json?
+  timestamps Json?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  Meeting    Meeting  @relation(fields: [meeting_id], references: [id], onDelete: Cascade)
+
+  @@index([meeting_id])
+  @@map("meeting_transcripts")
+}
+
+model MeetingSearch {
+  id          Int      @id @default(autoincrement())
+  meeting_id  Int
+  content     String
+  search_text String
+  metadata    Json?
+  created_at  DateTime @default(now())
+  Meeting     Meeting  @relation(fields: [meeting_id], references: [id], onDelete: Cascade)
+
+  @@index([meeting_id])
+  @@map("meeting_search")
+}
+
+model RoleTransition {
+  id                Int      @id @default(autoincrement())
+  role_id           Int
+  from_staff_id     Int
+  to_staff_id       Int
+  transition_date   DateTime @default(now())
+  pending_tasks     Json?
+  transferred_items Json?
+  notes             String?
+  created_by        Int
+  CreatedBy         Staff    @relation("CreatedByTransition", fields: [created_by], references: [id])
+  FromStaff         Staff    @relation("FromStaffTransition", fields: [from_staff_id], references: [id])
+  Role              Role     @relation(fields: [role_id], references: [id])
+  ToStaff           Staff    @relation("ToStaffTransition", fields: [to_staff_id], references: [id])
+
+  @@index([role_id])
+  @@index([from_staff_id])
+  @@index([to_staff_id])
+  @@map("role_transitions")
+}
+
+enum AuditCategory {
+  AUTH
+  SECURITY
+  DATA_CRITICAL
+  PERMISSION
+  SYSTEM
+}
+
+enum Priority {
+  Low
+  Medium
+  High
+}
+
+enum Purpose {
+  Information_Sharing
+  Discussion
+  Decision
+  Reminder
+}
+
+enum SolutionType {
+  Technical
+  Adaptive
+  Both
+}
+
+enum DecisionType {
+  Technical
+  Adaptive
+  Both
+}
+
+enum AgendaItemStatus {
+  Ongoing
+  Resolved
+  Assigned_to_local
+  Pending
+  Deferred
+  CarriedForward
+}
+
+enum ActionItemStatus {
+  Pending
+  InProgress
+  Completed
+  Cancelled
+  Deferred
+  Overdue
+}

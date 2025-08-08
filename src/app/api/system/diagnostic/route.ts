@@ -5,7 +5,7 @@ import { withAuth } from "@/lib/auth/api-auth";
 export async function GET(request: NextRequest) {
   try {
     // REQUIRED: Auth check - Admin only for diagnostics
-    const authResult = await withAuth(request, { requireAdminRole: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
     
     if (!authResult.success) {
       return NextResponse.json(
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // REQUIRED: Auth check - Admin only
-    const authResult = await withAuth(request, { requireAdminRole: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
     
     if (!authResult.success) {
       return NextResponse.json(

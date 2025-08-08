@@ -12,8 +12,9 @@ export async function GET() {
     }
 
     const schools = await prisma.school.findMany({
-      include: { District: true,
-        departments: true,
+      include: { 
+        District: true,
+        Department: true,
       },
     });
 
@@ -36,11 +37,11 @@ export async function POST(request: Request) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: user.id },
+      where: { id: session.user.id },
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || user.staff?.Role?.title !== 'Administrator') {
+    if (!user || user.Staff?.[0]?.Role?.title !== 'Administrator') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -72,6 +73,7 @@ export async function POST(request: Request) {
       data: {
         name: schoolName?.trim(),
         address: address?.trim(),
+        code: `SCH${Date.now().toString().slice(-6)}`, // Generate unique code
         district_id: district.id,
       },
     });
@@ -95,11 +97,11 @@ export async function PUT(request: Request) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: user.id },
+      where: { id: session.user.id },
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || user.staff?.Role?.title !== 'Administrator') {
+    if (!user || user.Staff?.[0]?.Role?.title !== 'Administrator') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

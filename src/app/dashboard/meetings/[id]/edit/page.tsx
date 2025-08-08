@@ -94,17 +94,17 @@ export default async function EditMeetingPage({ params }: PageProps) {
       id: attendee.Staff.id.toString(),
       name: attendee.Staff.User.name || attendee.Staff.User.email || '',
       email: attendee.Staff.User.email || '',
-      status: attendee.status
+      status: attendee.status || 'pending'
     }))
   };
 
   return (
     <div className="max-w-4xl mx-auto py-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-foreground">
           {isStep2 ? "Create New Meeting - Step 2" : "Edit Meeting"}
         </h1>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           {isStep2 
             ? "Set up agenda, notes, and finalize your meeting"
             : "Update meeting details, agenda, and content"
@@ -112,7 +112,7 @@ export default async function EditMeetingPage({ params }: PageProps) {
         </p>
       </div>
       
-      <div className="bg-white shadow-sm rounded-lg">
+      <div className="bg-card shadow-sm rounded-lg">
         <div className="px-6 py-6">
           <MeetingEditForm 
             meeting={transformedMeeting}

@@ -16,11 +16,11 @@ export async function POST(request: Request) {
 
     // Get user with staff to check admin role
     const user = await prisma.user.findUnique({
-      where: { id: user.id },
-              include: { Staff: { include: { Role: true } } },
+      where: { id: session.user.id },
+      include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || !user.staff?.Role?.title || user.Staff[0].Role.title !== "Administrator") {
+    if (!user || !user.Staff?.[0]?.Role?.title || user.Staff[0].Role.title !== "Administrator") {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }

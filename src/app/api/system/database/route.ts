@@ -1,6 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // CRITICAL SECURITY FIX: Add authentication for sensitive database info
+  const authResult = await withAuth(request, { 
+    requireAuth: true, 
+    requireStaff: true, 
+    requireAdminRole: true 
+  });
+  
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
   try {
     const databaseUrl = process.env.DATABASE_URL;
     

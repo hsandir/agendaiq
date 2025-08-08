@@ -204,11 +204,11 @@ export default function BackupManagementPage() {
   const getBackupTypeBadge = (type: string) => {
     switch (type) {
       case 'manual':
-        return <Badge variant="outline" className="text-blue-600 border-blue-600"><Save className="w-3 h-3 mr-1" />Manual</Badge>;
+        return <Badge variant="outline" className="text-primary border-blue-600"><Save className="w-3 h-3 mr-1" />Manual</Badge>;
       case 'auto':
         return <Badge variant="outline" className="text-green-600 border-green-600"><Clock className="w-3 h-3 mr-1" />Auto</Badge>;
       case 'github':
-        return <Badge variant="outline" className="text-purple-600 border-purple-600"><GitBranch className="w-3 h-3 mr-1" />GitHub</Badge>;
+        return <Badge variant="outline" className="text-secondary border-purple-600"><GitBranch className="w-3 h-3 mr-1" />GitHub</Badge>;
       case 'github-failed':
         return <Badge variant="destructive"><Cloud className="w-3 h-3 mr-1" />GitHub Failed</Badge>;
       case 'restore':

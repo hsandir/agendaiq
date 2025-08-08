@@ -390,7 +390,7 @@ export default function SystemManagementPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Bug className="h-5 w-5 mr-2 text-red-600" />
+                <Bug className="h-5 w-5 mr-2 text-destructive" />
                 Error Management
               </CardTitle>
               <CardDescription>
@@ -400,20 +400,20 @@ export default function SystemManagementPage() {
             <CardContent>
               <div className="space-y-3">
                 <div className="flex gap-2 text-sm">
-                  <Link href="/dashboard/system/logs" className="text-blue-600 hover:underline flex items-center">
+                  <Link href="/dashboard/system/logs" className="text-primary hover:underline flex items-center">
                     <FileText className="w-4 h-4 mr-1" />
                     View Error Logs ({status.linting?.errors || 0})
                   </Link>
                 </div>
                 <div className="flex gap-2 text-sm">
-                  <Link href="/dashboard/system/alerts" className="text-blue-600 hover:underline flex items-center">
+                  <Link href="/dashboard/system/alerts" className="text-primary hover:underline flex items-center">
                     <Bell className="w-4 h-4 mr-1" />
                     Configure Alerts
                   </Link>
                 </div>
                 {status.health.issues.length > 0 && (
                   <div className="flex gap-2 text-sm">
-                    <span className="text-red-600 flex items-center">
+                    <span className="text-destructive flex items-center">
                       <AlertCircle className="w-4 h-4 mr-1" />
                       {status.health.issues.length} critical issues
                     </span>
@@ -437,7 +437,7 @@ export default function SystemManagementPage() {
 
       {/* Critical Issues Alert */}
       {status && status.health.overall === 'critical' && (
-        <Alert className="border-red-200 bg-red-50">
+        <Alert className="border-destructive bg-destructive/10">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             <strong>Critical Issues Detected:</strong>

@@ -69,22 +69,40 @@ export default function UserManagement() {
   const fetchData = async () => {
     try {
       // Fetch users with staff relationships
-      const usersResponse = await fetch('/api/users');
+      const usersResponse = await fetch('/api/users', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (!usersResponse.ok) throw new Error('Failed to fetch users');
       const usersData = await usersResponse.json();
-      setUsers(usersData);
+      // Handle APIResponse format
+      setUsers(Array.isArray(usersData) ? usersData : (usersData.data || usersData.users || []));
 
       // Fetch roles with department info
-      const rolesResponse = await fetch('/api/roles');
+      const rolesResponse = await fetch('/api/roles', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (!rolesResponse.ok) throw new Error('Failed to fetch roles');
       const rolesData = await rolesResponse.json();
-      setRoles(rolesData.roles || []);
+      // Handle APIResponse format and direct array
+      setRoles(Array.isArray(rolesData) ? rolesData : (rolesData.data || rolesData.roles || []));
 
       // Fetch departments
-      const departmentsResponse = await fetch('/api/departments');
+      const departmentsResponse = await fetch('/api/departments', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       if (!departmentsResponse.ok) throw new Error('Failed to fetch departments');
       const departmentsData = await departmentsResponse.json();
-      setDepartments(departmentsData);
+      // Handle APIResponse format
+      setDepartments(Array.isArray(departmentsData) ? departmentsData : (departmentsData.data || departmentsData.departments || []));
 
     } catch (error) {
       toast({
@@ -206,12 +224,12 @@ export default function UserManagement() {
                         <SelectTrigger className="w-[200px]">
                           <SelectValue placeholder="Select department" />
                         </SelectTrigger>
-                        <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                        <SelectContent className="bg-card border border-border shadow-lg z-50">
                           {departments.map((department) => (
                             <SelectItem 
                               key={department.id} 
                               value={department.id}
-                              className="cursor-pointer hover:bg-gray-100 px-3 py-2"
+                              className="cursor-pointer hover:bg-muted px-3 py-2"
                             >
                               {department.name}
                             </SelectItem>
@@ -231,19 +249,19 @@ export default function UserManagement() {
                         <SelectTrigger className="w-[200px]">
                           <SelectValue placeholder="Select role" />
                         </SelectTrigger>
-                        <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                        <SelectContent className="bg-card border border-border shadow-lg z-50">
                           {departmentRoles.length > 0 ? (
                             departmentRoles.map((role) => (
                               <SelectItem 
                                 key={role.id} 
                                 value={role.id}
-                                className="cursor-pointer hover:bg-gray-100 px-3 py-2"
+                                className="cursor-pointer hover:bg-muted px-3 py-2"
                               >
                                 {role.title}
                               </SelectItem>
                             ))
                           ) : (
-                            <SelectItem value="no-roles" disabled className="px-3 py-2 text-gray-500">
+                            <SelectItem value="no-roles" disabled className="px-3 py-2 text-muted-foreground">
                               No roles available for this department
                             </SelectItem>
                           )}

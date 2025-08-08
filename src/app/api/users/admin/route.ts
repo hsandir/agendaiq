@@ -15,10 +15,10 @@ export async function GET() {
 
     // Check if user is admin via staff relation
     const user = await prisma.user.findUnique({
-      where: { id: user.id },
-      include: { staff: { include: { role: true } } },
+      where: { id: session.user.id },
+      include: { Staff: { include: { Role: true } } },
     });
-    const isAdmin = user?.staff?.[0]?.role?.title === 'Administrator';
+    const isAdmin = user?.Staff?.[0]?.Role?.title === 'Administrator';
     if (!isAdmin) {
       return NextResponse.json(
         { error: 'Unauthorized' },
@@ -28,7 +28,7 @@ export async function GET() {
 
     const users = await prisma.user.findMany({
       include: {
-        staff: { include: { role: true, department: true, school: true } },
+        Staff: { include: { Role: true, Department: true, School: true } },
       },
       orderBy: {
         name: 'asc',

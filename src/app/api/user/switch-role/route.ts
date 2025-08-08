@@ -25,27 +25,27 @@ export async function POST(request: Request) {
 
     // Find the user and their staff record
     const user = await prisma.user.findUnique({
-      where: { email: user.email },
+      where: { email: session.user.email },
       include: {
-        staff: {
+        Staff: {
           include: {
-            role: true,
-            department: true,
-            school: true,
-            district: true
+            Role: true,
+            Department: true,
+            School: true,
+            District: true
           }
         }
       }
     });
 
-    if (!user || !user.staff || user.staff.length === 0) {
+    if (!user || !user.Staff || user.Staff.length === 0) {
       return NextResponse.json(
         { error: "User staff record not found" },
         { status: 404 }
       );
     }
 
-    const staffRecord = user.staff[0];
+    const staffRecord = user.Staff[0];
     let targetRole;
 
     if (role === 'admin') {
@@ -80,8 +80,7 @@ export async function POST(request: Request) {
     await prisma.staff.update({
       where: { id: staffRecord.id },
       data: { 
-        role_id: targetRole.id,
-        department_id: targetRole.department_id
+        role_id: targetRole.id
       }
     });
 

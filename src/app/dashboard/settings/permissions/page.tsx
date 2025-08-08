@@ -162,7 +162,7 @@ export default async function PermissionsPage() {
           <Card key={category.name}>
             <CardHeader>
               <div className="flex items-center space-x-2">
-                <category.icon className="h-5 w-5 text-blue-600" />
+                <category.icon className="h-5 w-5 text-primary" />
                 <CardTitle>{category.name}</CardTitle>
               </div>
               <CardDescription>{category.description}</CardDescription>
@@ -170,7 +170,7 @@ export default async function PermissionsPage() {
             <CardContent className="space-y-4">
               {/* Permissions List */}
               <div className="space-y-3">
-                <h4 className="text-sm font-medium text-gray-700">Available Permissions:</h4>
+                <h4 className="text-sm font-medium text-foreground">Available Permissions:</h4>
                 <div className="grid gap-2">
                   {category.permissions.map((permission, index) => (
                     <div key={index} className="flex items-center space-x-2 text-sm">
@@ -183,19 +183,19 @@ export default async function PermissionsPage() {
 
               {/* Roles with Access */}
               <div className="space-y-3">
-                <h4 className="text-sm font-medium text-gray-700">Roles with Access:</h4>
+                <h4 className="text-sm font-medium text-foreground">Roles with Access:</h4>
                 <div className="flex flex-wrap gap-2">
                   {category.roles.length > 0 ? (
                     category.roles.map((role) => (
                       <Badge key={role.id} variant="outline" className="text-xs">
                         {role.title}
                         {role.is_leadership && (
-                          <span className="ml-1 text-blue-600">(Leadership)</span>
+                          <span className="ml-1 text-primary">(Leadership)</span>
                         )}
                       </Badge>
                     ))
                   ) : (
-                    <span className="text-sm text-gray-500">No roles have access to this category</span>
+                    <span className="text-sm text-muted-foreground">No roles have access to this category</span>
                   )}
                 </div>
               </div>
@@ -203,7 +203,7 @@ export default async function PermissionsPage() {
               {/* Department Information */}
               {category.roles.some(role => role.Department) && (
                 <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-gray-700">Department Access:</h4>
+                  <h4 className="text-sm font-medium text-foreground">Department Access:</h4>
                   <div className="flex flex-wrap gap-2">
                     {category.roles
                       .filter(role => role.Department)
@@ -224,7 +224,7 @@ export default async function PermissionsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Shield className="h-5 w-5 text-blue-600" />
+            <Shield className="h-5 w-5 text-primary" />
             Role Hierarchy Information
           </CardTitle>
           <CardDescription>
@@ -241,7 +241,7 @@ export default async function PermissionsPage() {
                     .filter(role => role.is_leadership)
                     .sort((a, b) => a.priority - b.priority)
                     .map((role) => (
-                      <div key={role.id} className="flex items-center justify-between p-2 bg-blue-50 rounded">
+                      <div key={role.id} className="flex items-center justify-between p-2 bg-primary rounded">
                         <span className="text-sm font-medium">{role.title}</span>
                         <Badge variant="outline" className="text-xs">
                           Priority {role.priority}
@@ -258,7 +258,7 @@ export default async function PermissionsPage() {
                     .filter(role => !role.is_leadership)
                     .sort((a, b) => a.priority - b.priority)
                     .map((role) => (
-                      <div key={role.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <div key={role.id} className="flex items-center justify-between p-2 bg-muted rounded">
                         <span className="text-sm font-medium">{role.title}</span>
                         <Badge variant="outline" className="text-xs">
                           Priority {role.priority}

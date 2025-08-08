@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { FiEye, FiEdit3, FiTrendingUp, FiUserCheck } from 'react-icons/fi';
+import { Eye as FiEye, Edit3 as FiEdit3, TrendingUp as FiTrendingUp, UserCheck as FiUserCheck } from 'lucide-react';
 
 const submenuItems = [
   {
@@ -45,12 +45,12 @@ export default function RoleHierarchyLayout({
             return (
               <Link
                 key={item.href}
-                href={item.href}
+                href={item.href as any}
                 className={cn(
                   'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
                   isActive
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    ? 'bg-primary text-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                 )}
               >
                 <item.icon className="mr-2 h-4 w-4" />

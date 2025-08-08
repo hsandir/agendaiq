@@ -1,9 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
-import { parse } from "csv-parse/sync";
 import { z } from "zod";
+
+// Simple CSV parser replacement
+function parseCSV(content: string): any[] {
+  const lines = content.split('\n').filter(line => line.trim());
+  if (lines.length === 0) return [];
+  
+  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+  const records = [];
+  
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+    const record: any = {};
+    headers.forEach((header, index) => {
+      record[header] = values[index] || '';
+    });
+    records.push(record);
+  }
+  
+  return records;
+}
 import { AuditLogger } from '@/lib/audit/audit-logger';
+import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
 
 // Enhanced interfaces for preview system
 interface ConflictItem {
@@ -88,6 +108,14 @@ function validateCsvHeaders(headers: string[]): { isValid: boolean; errors: stri
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting for staff upload operations
+    const clientId = getClientIdentifier(request);
+    const rateLimitResult = await RateLimiters.api.check(request, 20, clientId); // 20 uploads per minute
+    
+    if (!rateLimitResult.success) {
+      return RateLimiters.api.createErrorResponse(rateLimitResult);
+    }
+
     // REQUIRED: Auth check - Leadership required for staff upload
     const authResult = await withAuth(request, { requireLeadership: true });
     if (!authResult.success) {
@@ -112,14 +140,7 @@ export async function POST(request: NextRequest) {
       console.log('📄 CSV file size:', text.length, 'bytes');
       console.log('📄 First 200 chars:', text.substring(0, 200));
       
-      records = parse(text, {
-        columns: true,
-        skip_empty_lines: true,
-        trim: true,
-        delimiter: ',',
-        quote: '"',
-        escape: '"'
-      });
+      records = parseCSV(text);
       
       console.log('✅ CSV parsed successfully. Records found:', records.length);
       console.log('📝 First record:', records[0]);
@@ -269,7 +290,7 @@ export async function POST(request: NextRequest) {
           
           if (existingStaff) {
             processedRecord.existingData = {
-              name: existingUser.name,
+              name: existingUser.name || '',
               staffId: existingUser.staff_id || '',
               role: existingStaff.Role.title,
               department: existingStaff.Department.name
@@ -280,7 +301,7 @@ export async function POST(request: NextRequest) {
             if (record.Name !== existingUser.name) {
               conflicts.push({
                 field: 'name',
-                existing: existingUser.name,
+                existing: existingUser.name || '',
                 new: record.Name,
                 action: 'update_name'
               });

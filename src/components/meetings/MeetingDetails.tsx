@@ -20,6 +20,7 @@ import {
   Save,
   MessageSquare 
 } from 'lucide-react';
+import { safeFormatDateTime } from '@/lib/utils/safe-date';
 
 interface User {
   id: number;
@@ -169,7 +170,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
       case 'accepted':
         return <Badge className="bg-green-100 text-green-800">Accepted</Badge>;
       case 'declined':
-        return <Badge className="bg-red-100 text-red-800">Declined</Badge>;
+        return <Badge className="bg-destructive/10 text-destructive">Declined</Badge>;
       default:
         return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>;
     }
@@ -237,26 +238,26 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Start Time</label>
-                    <p className="text-sm text-gray-900">
-                      {new Date(meeting.startTime).toLocaleString()}
+                    <label className="text-sm font-medium text-muted-foreground">Start Time</label>
+                    <p className="text-sm text-foreground">
+                      {safeFormatDateTime(meeting.startTime, undefined, 'No start time')}
                     </p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">End Time</label>
-                    <p className="text-sm text-gray-900">
-                      {new Date(meeting.endTime).toLocaleString()}
+                    <label className="text-sm font-medium text-muted-foreground">End Time</label>
+                    <p className="text-sm text-foreground">
+                      {safeFormatDateTime(meeting.endTime, undefined, 'No end time')}
                     </p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Status</label>
-                    <p className="text-sm text-gray-900 capitalize">{meeting.status}</p>
+                    <label className="text-sm font-medium text-muted-foreground">Status</label>
+                    <p className="text-sm text-foreground capitalize">{meeting.status}</p>
                   </div>
                 </div>
                 {meeting.description && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Description</label>
-                    <p className="text-sm text-gray-900 whitespace-pre-wrap mt-1">
+                    <label className="text-sm font-medium text-muted-foreground">Description</label>
+                    <p className="text-sm text-foreground whitespace-pre-wrap mt-1">
                       {meeting.description}
                     </p>
                   </div>
@@ -278,7 +279,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
               <div className="space-y-4">
                 {/* Add New Agenda Item */}
                 {isOrganizer && (
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                  <div className="border-2 border-dashed border-border rounded-lg p-4">
                     <div className="space-y-3">
                                              <Input
                          placeholder="Agenda item title"
@@ -304,23 +305,23 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
                     <div
                       key={item.id}
                       className={`flex items-start space-x-3 p-3 rounded-lg border ${
-                        item.completed ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200'
+                        item.completed ? 'bg-green-50 border-green-200' : 'bg-card border-border'
                       }`}
                     >
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => toggleAgendaItem(item.id)}
-                        className={`mt-0.5 ${item.completed ? 'text-green-600' : 'text-gray-400'}`}
+                        className={`mt-0.5 ${item.completed ? 'text-green-600' : 'text-muted-foreground'}`}
                       >
                         <Check className="h-4 w-4" />
                       </Button>
                       <div className="flex-1">
-                        <h4 className={`font-medium ${item.completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+                        <h4 className={`font-medium ${item.completed ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
                           {index + 1}. {item.title}
                         </h4>
                         {item.description && (
-                          <p className={`text-sm mt-1 ${item.completed ? 'text-gray-400' : 'text-gray-600'}`}>
+                          <p className={`text-sm mt-1 ${item.completed ? 'text-muted-foreground' : 'text-muted-foreground'}`}>
                             {item.description}
                           </p>
                         )}
@@ -330,7 +331,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
                           variant="ghost"
                           size="sm"
                           onClick={() => deleteAgendaItem(item.id)}
-                          className="text-red-600 hover:text-red-800"
+                          className="text-destructive hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -354,7 +355,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
             <CardContent>
               <div className="space-y-4">
                 {/* Add New Note */}
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                <div className="border-2 border-dashed border-border rounded-lg p-4">
                   <div className="space-y-3">
                     <Textarea
                       placeholder="Add a note..."
@@ -372,16 +373,16 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
                 {/* Notes List */}
                 <div className="space-y-3">
                   {notes.map((note) => (
-                    <div key={note.id} className="bg-gray-50 rounded-lg p-4">
+                    <div key={note.id} className="bg-muted rounded-lg p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <p className="text-sm text-gray-900 whitespace-pre-wrap">
+                          <p className="text-sm text-foreground whitespace-pre-wrap">
                             {note.content}
                           </p>
                         </div>
                       </div>
-                      <div className="mt-2 text-xs text-gray-500">
-                        By {note.author} • {new Date(note.timestamp).toLocaleString()}
+                      <div className="mt-2 text-xs text-muted-foreground">
+                        By {note.author} • {safeFormatDateTime(note.timestamp, undefined, 'Unknown time')}
                       </div>
                     </div>
                   ))}
@@ -404,17 +405,17 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
                 {meeting.attendees.map((attendee) => (
                   <div
                     key={attendee.id}
-                    className="flex items-center justify-between p-3 rounded-lg border border-gray-200"
+                    className="flex items-center justify-between p-3 rounded-lg border border-border"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                        <Users className="h-4 w-4 text-gray-600" />
+                      <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
+                        <Users className="h-4 w-4 text-muted-foreground" />
                       </div>
                       <div>
-                        <h4 className="font-medium text-gray-900">
+                        <h4 className="font-medium text-foreground">
                           {attendee.staff.user.name || 'Unknown User'}
                         </h4>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                           {attendee.staff.user.email}
                         </p>
                       </div>

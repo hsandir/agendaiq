@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 import { Bell, Mail, Clock, Settings, Users, Calendar, AlertTriangle } from "lucide-react";
+import { safeFormatDate, safeFormatTime } from '@/lib/utils/safe-date';
 
 export const metadata: Metadata = {
   title: "Notification Settings | AgendaIQ",
@@ -168,7 +169,7 @@ export default async function NotificationsPage() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{upcomingMeetings}</div>
+            <div className="text-2xl font-bold text-primary">{upcomingMeetings}</div>
             <p className="text-xs text-muted-foreground">
               Scheduled meetings
             </p>
@@ -210,7 +211,7 @@ export default async function NotificationsPage() {
           <Card key={category.name}>
             <CardHeader>
               <div className="flex items-center space-x-2">
-                <category.icon className="h-5 w-5 text-blue-600" />
+                <category.icon className="h-5 w-5 text-primary" />
                 <CardTitle>{category.name}</CardTitle>
               </div>
               <CardDescription>{category.description}</CardDescription>
@@ -228,7 +229,7 @@ export default async function NotificationsPage() {
                     <p className="text-sm text-muted-foreground">
                       {setting.description}
                     </p>
-                    <div className="flex items-center space-x-2 text-xs text-gray-500">
+                    <div className="flex items-center space-x-2 text-xs text-muted-foreground">
                       <span>Delivery:</span>
                       <Badge variant="outline" className="text-xs">
                         {setting.type === 'email' && <Mail className="h-3 w-3 mr-1" />}
@@ -257,7 +258,7 @@ export default async function NotificationsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Bell className="h-5 w-5 text-blue-600" />
+            <Bell className="h-5 w-5 text-primary" />
             Recent Activities
           </CardTitle>
           <CardDescription>
@@ -277,21 +278,21 @@ export default async function NotificationsPage() {
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {meeting.start_time && new Date(meeting.start_time).toLocaleDateString()} at {meeting.start_time && new Date(meeting.start_time).toLocaleTimeString()}
+                      {safeFormatDate(meeting.start_time)} at {safeFormatTime(meeting.start_time)}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       Organized by: {userWithSettings?.name || 'Unknown'}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-muted-foreground">
                       Meeting ID: {meeting.id}
                     </p>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-muted-foreground">
                 <Bell className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>No recent activities found.</p>
                 <p className="text-sm mt-2">Your meeting activities will appear here.</p>
@@ -305,7 +306,7 @@ export default async function NotificationsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Settings className="h-5 w-5 text-blue-600" />
+            <Settings className="h-5 w-5 text-primary" />
             Notification Preferences
           </CardTitle>
           <CardDescription>

@@ -100,7 +100,7 @@ export default function DatabaseManagementPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold flex items-center">
-              <Database className="w-8 h-8 mr-3 text-blue-600" />
+              <Database className="w-8 h-8 mr-3 text-primary" />
               Database Management
             </h1>
             <p className="text-muted-foreground">Loading real-time database metrics...</p>
@@ -132,7 +132,7 @@ export default function DatabaseManagementPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold flex items-center">
-              <Database className="w-8 h-8 mr-3 text-blue-600" />
+              <Database className="w-8 h-8 mr-3 text-primary" />
               Database Management
             </h1>
             <p className="text-muted-foreground">Real-time database monitoring and management</p>
@@ -156,9 +156,9 @@ export default function DatabaseManagementPage() {
           </div>
         </div>
 
-        <Alert className="mb-6 border-red-200 bg-red-50">
-          <AlertCircle className="h-4 w-4 text-red-600" />
-          <AlertDescription className="text-red-800">
+        <Alert className="mb-6 border-destructive bg-destructive/10">
+          <AlertCircle className="h-4 w-4 text-destructive" />
+          <AlertDescription className="text-destructive">
             <strong>Failed to load database metrics:</strong> {error}
           </AlertDescription>
         </Alert>
@@ -171,7 +171,7 @@ export default function DatabaseManagementPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold flex items-center">
-            <Database className="w-8 h-8 mr-3 text-blue-600" />
+            <Database className="w-8 h-8 mr-3 text-primary" />
             Database Management
           </h1>
           <p className="text-muted-foreground">Real-time database monitoring with live Prisma data</p>
@@ -211,7 +211,7 @@ export default function DatabaseManagementPage() {
           <Card className="mb-6">
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Database className="h-5 w-5 mr-2 text-blue-600" />
+                <Database className="h-5 w-5 mr-2 text-primary" />
                 Live Database Connection
               </CardTitle>
               <CardDescription>Real-time database connection and configuration details</CardDescription>
@@ -310,19 +310,19 @@ export default function DatabaseManagementPage() {
             <CardContent>
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{metrics.performance.queriesPerSecond}</div>
+                  <div className="text-2xl font-bold text-primary">{metrics.performance.queriesPerSecond}</div>
                   <div className="text-sm text-muted-foreground">Queries/Second</div>
-                  <div className="text-xs text-gray-500 mt-1">Estimated throughput</div>
+                  <div className="text-xs text-muted-foreground mt-1">Estimated throughput</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">{metrics.performance.cacheHitRatio}%</div>
                   <div className="text-sm text-muted-foreground">Cache Hit Ratio</div>
-                  <div className="text-xs text-gray-500 mt-1">Query efficiency</div>
+                  <div className="text-xs text-muted-foreground mt-1">Query efficiency</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-orange-600">{metrics.performance.slowQueries}</div>
                   <div className="text-sm text-muted-foreground">Slow Queries</div>
-                  <div className="text-xs text-gray-500 mt-1">Performance alerts</div>
+                  <div className="text-xs text-muted-foreground mt-1">Performance alerts</div>
                 </div>
               </div>
             </CardContent>
@@ -332,7 +332,7 @@ export default function DatabaseManagementPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
-                <Database className="h-5 w-5 mr-2 text-purple-600" />
+                <Database className="h-5 w-5 mr-2 text-secondary" />
                 Live Table Statistics
               </CardTitle>
               <CardDescription>Real-time table data from active Prisma queries</CardDescription>
@@ -340,18 +340,18 @@ export default function DatabaseManagementPage() {
             <CardContent>
               <div className="space-y-4">
                 {metrics.tables.map((table, index) => (
-                  <div key={table.name} className="border rounded-lg p-4 hover:bg-gray-50">
+                  <div key={table.name} className="border rounded-lg p-4 hover:bg-muted">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <Database className="w-5 h-5 text-gray-600" />
+                        <Database className="w-5 h-5 text-muted-foreground" />
                         <div>
                           <div className="flex items-center space-x-2 mb-1">
                             <h4 className="font-medium">{table.name}</h4>
-                            <Badge variant="outline" className="text-blue-600 border-blue-600">
+                            <Badge variant="outline" className="text-primary border-blue-600">
                               Live Data
                             </Badge>
                           </div>
-                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                             <span><strong>Records:</strong> {table.rows.toLocaleString()}</span>
                             <span><strong>Size:</strong> {table.size}</span>
                             <span><strong>Last Access:</strong> {new Date(table.lastAccess).toLocaleTimeString()}</span>
@@ -359,8 +359,8 @@ export default function DatabaseManagementPage() {
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Clock className="w-4 h-4 text-gray-400" />
-                        <span className="text-xs text-gray-500">
+                        <Clock className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-xs text-muted-foreground">
                           {new Date(table.lastAccess).toLocaleDateString()}
                         </span>
                       </div>

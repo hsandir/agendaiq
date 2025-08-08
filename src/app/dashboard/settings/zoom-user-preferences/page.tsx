@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { prisma } from "@/lib/prisma";
 import { Video, Settings, Bell, Calendar, Link, ExternalLink, CheckCircle, AlertCircle } from "lucide-react";
+import { safeFormatDate, safeFormatTime, safeFormatDateTime } from '@/lib/utils/safe-date';
 
 export const metadata: Metadata = {
   title: "Zoom User Preferences | AgendaIQ",
@@ -117,7 +118,7 @@ export default async function ZoomUserPreferences() {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{upcomingMeetings}</div>
+            <div className="text-2xl font-bold text-primary">{upcomingMeetings}</div>
             <p className="text-xs text-muted-foreground">
               Scheduled meetings
             </p>
@@ -142,7 +143,7 @@ export default async function ZoomUserPreferences() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Link className="h-5 w-5 text-blue-600" />
+            <Link className="h-5 w-5 text-primary" />
             Zoom Account Integration
           </CardTitle>
           <CardDescription>
@@ -168,8 +169,8 @@ export default async function ZoomUserPreferences() {
               </div>
               
               {zoomIntegration.lastSync && (
-                <div className="text-sm text-gray-600">
-                  Last synchronized: {new Date(zoomIntegration.lastSync).toLocaleString()}
+                <div className="text-sm text-muted-foreground">
+                  Last synchronized: {safeFormatDateTime(zoomIntegration.lastSync)}
                 </div>
               )}
             </div>
@@ -185,13 +186,13 @@ export default async function ZoomUserPreferences() {
                     </p>
                   </div>
                 </div>
-                <Button className="bg-blue-600 hover:bg-blue-700">
+                <Button className="bg-primary hover:bg-primary">
                   <Link className="h-4 w-4 mr-2" />
                   Connect Zoom Account
                 </Button>
               </div>
               
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-muted-foreground">
                 Connecting your Zoom account will enable:
                 <ul className="list-disc list-inside mt-2 space-y-1">
                   <li>Automatic Zoom meeting creation</li>
@@ -209,7 +210,7 @@ export default async function ZoomUserPreferences() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Bell className="h-5 w-5 text-blue-600" />
+            <Bell className="h-5 w-5 text-primary" />
             Notification Preferences
           </CardTitle>
           <CardDescription>
@@ -255,7 +256,7 @@ export default async function ZoomUserPreferences() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Settings className="h-5 w-5 text-blue-600" />
+            <Settings className="h-5 w-5 text-primary" />
             Default Meeting Settings
           </CardTitle>
           <CardDescription>
@@ -324,7 +325,7 @@ export default async function ZoomUserPreferences() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <Video className="h-5 w-5 text-blue-600" />
+            <Video className="h-5 w-5 text-primary" />
             Recent Zoom Meetings
           </CardTitle>
           <CardDescription>
@@ -344,7 +345,7 @@ export default async function ZoomUserPreferences() {
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      {meeting.start_time && new Date(meeting.start_time).toLocaleDateString()} at {meeting.start_time && new Date(meeting.start_time).toLocaleTimeString()}
+                      {safeFormatDate(meeting.start_time)} at {safeFormatTime(meeting.start_time)}
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -356,7 +357,7 @@ export default async function ZoomUserPreferences() {
                 </div>
               ))
             ) : (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-muted-foreground">
                 <Video className="w-12 h-12 mx-auto mb-4 opacity-50" />
                 <p>No meetings found.</p>
                 <p className="text-sm mt-2">Create meetings to enable Zoom integration.</p>

@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from './auth-options';
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
+import { Logger } from '@/lib/utils/logger';
 
 // Types for better type safety
 export interface AuthenticatedUser {
@@ -116,7 +117,7 @@ export async function checkAuthRequirements(requirements: AuthRequirements = {})
 
     return { authorized: true, user };
   } catch (error) {
-    console.error('Error checking auth requirements:', error);
+    Logger.error('Error checking auth requirements', { error: String(error) }, 'auth');
     return { 
       authorized: false, 
       error: 'Authentication error', 

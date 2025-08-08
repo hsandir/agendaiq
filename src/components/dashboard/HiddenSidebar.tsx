@@ -4,31 +4,31 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  FiUser, 
-  FiLock, 
-  FiBell, 
-  FiSettings, 
-  FiHome, 
-  FiUpload, 
-  FiTrendingUp, 
-  FiKey, 
-  FiActivity, 
-  FiHardDrive,
-  FiDatabase,
-  FiServer,
-  FiMenu,
-  FiX,
-  FiHelpCircle,
-  FiFileText,
-  FiUsers,
-  FiShield,
-  FiMonitor,
-  FiPackage,
-  FiDownload,
-  FiArchive,
-  FiAlertTriangle,
-  FiSearch
-} from 'react-icons/fi';
+  User as FiUser, 
+  Lock as FiLock, 
+  Bell as FiBell, 
+  Settings as FiSettings, 
+  Home as FiHome, 
+  Upload as FiUpload, 
+  TrendingUp as FiTrendingUp, 
+  Key as FiKey, 
+  Activity as FiActivity, 
+  HardDrive as FiHardDrive,
+  Database as FiDatabase,
+  Server as FiServer,
+  Menu as FiMenu,
+  X as FiX,
+  HelpCircle as FiHelpCircle,
+  FileText as FiFileText,
+  Users as FiUsers,
+  Shield as FiShield,
+  Monitor as FiMonitor,
+  Package as FiPackage,
+  Download as FiDownload,
+  Archive as FiArchive,
+  AlertTriangle as FiAlertTriangle,
+  Search as FiSearch
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -43,6 +43,9 @@ interface NavSection {
   items: NavItem[];
   adminOnly?: boolean;
 }
+
+// Environment check
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 const navigation: NavSection[] = [
   {
@@ -69,22 +72,29 @@ const navigation: NavSection[] = [
     ],
   },
   {
-    title: "System Management",
+    title: "Production Monitoring",
     adminOnly: true,
     items: [
       { href: "/dashboard/system", label: "System Overview", icon: FiMonitor },
       { href: "/dashboard/system/health", label: "System Health", icon: FiActivity },
+      { href: "/dashboard/system/server", label: "Server Metrics", icon: FiServer },
+      { href: "/dashboard/system/alerts", label: "Alert Configuration", icon: FiAlertTriangle },
+      { href: "/dashboard/system/logs", label: "System Logs", icon: FiFileText },
+      { href: "/dashboard/system/backup", label: "Backup Management", icon: FiArchive },
+    ],
+  },
+  ...(isDevelopment ? [{
+    title: "Development Tools",
+    adminOnly: true,
+    items: [
       { href: "/dashboard/system/dependencies", label: "Dependencies Management", icon: FiPackage },
       { href: "/dashboard/system/updates", label: "Package Updates", icon: FiDownload },
       { href: "/dashboard/system/database", label: "Database Management", icon: FiDatabase },
-      { href: "/dashboard/system/backup", label: "Backup Management", icon: FiArchive },
-      { href: "/dashboard/system/server", label: "Server Management", icon: FiServer },
-      { href: "/dashboard/system/alerts", label: "Alert Configuration", icon: FiAlertTriangle },
-      { href: "/dashboard/system/logs", label: "System Logs", icon: FiFileText },
       { href: "/dashboard/system/migration", label: "Auth Migration & Diagnostics", icon: FiTrendingUp },
       { href: "/dashboard/system/mock-data-tracker", label: "Mock Data Tracker", icon: FiSearch },
+      { href: "/dashboard/system/lint", label: "Code Quality Tools", icon: FiSearch },
     ],
-  },
+  }] : []),
   {
     title: "Meetings & Zoom",
     items: [
@@ -149,12 +159,12 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
         <button
           onClick={toggleSidebar}
           onMouseEnter={() => setIsOpen(true)}
-          className="flex items-center justify-center w-12 h-12 bg-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border border-gray-200 hover:border-blue-300"
+          className="flex items-center justify-center w-12 h-12 bg-card rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border border-border hover:border-blue-300"
         >
           {isOpen ? (
-            <FiX className="w-6 h-6 text-gray-600" />
+            <FiX className="w-6 h-6 text-muted-foreground" />
           ) : (
-            <FiMenu className="w-6 h-6 text-gray-600" />
+            <FiMenu className="w-6 h-6 text-muted-foreground" />
           )}
         </button>
       </div>
@@ -170,26 +180,26 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
       {/* Hidden Sidebar */}
       <div 
         className={cn(
-          "fixed top-0 left-0 h-screen w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col",
+          "fixed top-0 left-0 h-screen w-80 bg-card shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
+        <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-              <span className="text-white font-bold text-sm">AQ</span>
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-3">
+              <span className="text-foreground font-bold text-sm">AQ</span>
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">AgendaIQ</h2>
-              <p className="text-xs text-gray-500">Settings & System</p>
+              <h2 className="text-lg font-semibold text-foreground">AgendaIQ</h2>
+              <p className="text-xs text-muted-foreground">Settings & System</p>
             </div>
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-muted rounded-lg transition-colors"
           >
-            <FiX className="w-5 h-5 text-gray-500" />
+            <FiX className="w-5 h-5 text-muted-foreground" />
           </button>
         </div>
 
@@ -205,7 +215,7 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
 
               return (
                 <div key={section.title}>
-                  <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                  <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                     {section.title}
                   </h3>
                   <div className="space-y-1">
@@ -215,19 +225,19 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
                       return (
                         <Link
                           key={item.href}
-                          href={item.href}
+                          href={item.href as any}
                           onClick={() => setIsOpen(false)}
                           className={cn(
                             "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors group",
                             isActive(item.href)
-                              ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
-                              : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                              ? "bg-primary text-primary border-r-2 border-blue-700"
+                              : "text-muted-foreground hover:bg-muted hover:text-foreground"
                           )}
                         >
                           <item.icon
                             className={cn("mr-3 h-5 w-5 transition-colors", {
-                              "text-blue-600": isActive(item.href),
-                              "text-gray-400 group-hover:text-gray-600": !isActive(item.href),
+                              "text-primary": isActive(item.href),
+                              "text-muted-foreground group-hover:text-muted-foreground": !isActive(item.href),
                             })}
                           />
                           {item.label}
@@ -242,8 +252,8 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 p-4 flex-shrink-0">
-          <div className="text-xs text-gray-500 text-center">
+        <div className="border-t border-border p-4 flex-shrink-0">
+          <div className="text-xs text-muted-foreground text-center">
             <p>Press ESC to close</p>
           </div>
         </div>

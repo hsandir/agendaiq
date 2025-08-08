@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FiChevronDown, FiChevronRight, FiUsers, FiUser, FiUserCheck } from 'react-icons/fi';
+import { ChevronDown as FiChevronDown, ChevronRight as FiChevronRight, Users as FiUsers, User as FiUser, UserCheck as FiUserCheck } from 'lucide-react';
 
 interface Role {
   id: string;
@@ -75,8 +75,8 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
     return (
       <div key={role.id} className="role-item">
         <div 
-          className={`flex items-center py-3 px-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors ${
-            role.is_leadership ? 'bg-blue-50 border-l-4 border-blue-400' : 'bg-white border-l-4 border-gray-200'
+          className={`flex items-center py-3 px-4 rounded-lg hover:bg-muted cursor-pointer transition-colors ${
+            role.is_leadership ? 'bg-primary border-l-4 border-blue-400' : 'bg-card border-l-4 border-border'
           }`}
           style={{ marginLeft: `${depth * 20}px` }}
           onClick={() => onRoleSelect?.(role)}
@@ -88,7 +88,7 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
                   e.stopPropagation();
                   toggleExpanded(role.id);
                 }}
-                className="mr-2 p-1 hover:bg-gray-200 rounded"
+                className="mr-2 p-1 hover:bg-muted rounded"
               >
                 {isExpanded ? (
                   <FiChevronDown className="h-4 w-4" />
@@ -102,14 +102,14 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
             
             <div className="flex items-center flex-1">
               {role.is_leadership ? (
-                <FiUsers className="h-4 w-4 mr-2 text-blue-600" />
+                <FiUsers className="h-4 w-4 mr-2 text-primary" />
               ) : (
-                <FiUser className="h-4 w-4 mr-2 text-gray-600" />
+                <FiUser className="h-4 w-4 mr-2 text-muted-foreground" />
               )}
               
               <div className="flex-1">
                 <div className="flex items-center">
-                  <span className="font-medium text-gray-900">{role.title}</span>
+                  <span className="font-medium text-foreground">{role.title}</span>
                   {/* Show staff count as badge */}
                   {staffCount > 0 && (
                     <span className="ml-2 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
@@ -124,7 +124,7 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
                     {role.Staff!.map((staffMember) => (
                       <span 
                         key={staffMember.id}
-                        className="inline-flex items-center px-2 py-1 rounded bg-blue-100 text-blue-800 text-xs font-medium"
+                        className="inline-flex items-center px-2 py-1 rounded bg-primary text-primary text-xs font-medium"
                       >
                         <FiUser className="h-3 w-3 mr-1" />
                         {staffMember.User.name || 'No Name'}
@@ -133,13 +133,13 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
                   </div>
                 )}
                 
-                <div className="text-sm text-gray-500 flex items-center gap-2 mt-1">
+                <div className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
                   <span>{role.Department?.name || 'No Department'}</span>
                   <span>•</span>
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     role.is_leadership 
-                      ? 'bg-blue-100 text-blue-800' 
-                      : 'bg-gray-100 text-gray-800'
+                      ? 'bg-primary text-primary' 
+                      : 'bg-muted text-foreground'
                   }`}>
                     {role.category}
                   </span>
@@ -161,14 +161,14 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
         {/* Show staff list when expanded and no children (bottom level) and NOT leadership */}
         {hasStaff && isExpanded && !hasChildren && !role.is_leadership && (
           <div className="mt-2 ml-8 space-y-1" style={{ marginLeft: `${(depth + 1) * 20 + 40}px` }}>
-            <div className="text-xs font-medium text-gray-700 uppercase tracking-wider mb-2">
+            <div className="text-xs font-medium text-foreground uppercase tracking-wider mb-2">
               Staff Members ({staffCount})
             </div>
             {role.Staff!.map((staffMember) => (
-              <div key={staffMember.id} className="flex items-center text-sm text-gray-600 py-1 px-3 bg-gray-50 rounded">
+              <div key={staffMember.id} className="flex items-center text-sm text-muted-foreground py-1 px-3 bg-muted rounded">
                 <FiUserCheck className="h-3 w-3 mr-2 text-green-500" />
                 <span className="font-medium">{staffMember.User.name || 'No Name'}</span>
-                <span className="text-gray-400 ml-2">({staffMember.User.email})</span>
+                <span className="text-muted-foreground ml-2">({staffMember.User.email})</span>
               </div>
             ))}
           </div>
@@ -187,11 +187,11 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
 
   if (error) {
     return (
-      <div className="bg-red-50 p-4 rounded-lg">
-        <div className="text-red-800">{error}</div>
+      <div className="bg-destructive/10 p-4 rounded-lg">
+        <div className="text-destructive">{error}</div>
         <button 
           onClick={fetchRoleHierarchy}
-          className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+          className="mt-2 text-sm text-destructive hover:text-destructive underline"
         >
           Try again
         </button>
@@ -200,8 +200,8 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">
+    <div className="bg-card rounded-lg shadow p-6">
+      <h3 className="text-lg font-medium text-foreground mb-4">
         Organization Hierarchy
       </h3>
       
@@ -210,20 +210,20 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
       </div>
       
       {roles.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-muted-foreground">
           No roles found. Please set up the organization hierarchy first.
         </div>
       )}
       
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-        <h4 className="text-sm font-medium text-gray-700 mb-2">Legend:</h4>
-        <div className="flex flex-wrap gap-4 text-xs text-gray-600">
+      <div className="mt-6 p-4 bg-muted rounded-lg">
+        <h4 className="text-sm font-medium text-foreground mb-2">Legend:</h4>
+        <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
           <div className="flex items-center">
-            <div className="w-3 h-3 bg-blue-100 border-l-2 border-blue-400 mr-2"></div>
+            <div className="w-3 h-3 bg-primary border-l-2 border-blue-400 mr-2"></div>
             Leadership Roles
           </div>
           <div className="flex items-center">
-            <div className="w-3 h-3 bg-white border-l-2 border-gray-200 mr-2"></div>
+            <div className="w-3 h-3 bg-card border-l-2 border-border mr-2"></div>
             Staff Roles
           </div>
           <div className="flex items-center">

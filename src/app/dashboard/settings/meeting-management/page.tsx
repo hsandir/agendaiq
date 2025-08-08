@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { safeFormatDateTime } from '@/lib/utils/safe-date';
 
 export default async function MeetingManagementDashboard() {
   const user = await requireAuth(AuthPresets.requireAuth);
@@ -12,24 +13,24 @@ export default async function MeetingManagementDashboard() {
   const userDetails = await prisma.user.findUnique({
     where: { email: user.email },
     include: { 
-      staff: {
+      Staff: {
         include: {
-          role: true
+          Role: true
         }
       }
     }
   });
 
-  if (!userDetails || userDetails.staff?.[0]?.role?.title !== "Administrator") {
+  if (!userDetails || userDetails.Staff?.[0]?.Role?.title !== "Administrator") {
     redirect("/dashboard");
   }
 
   // Fetch all meetings for admin view
   const meetings = await prisma.meeting.findMany({
     include: {
-      organizer: {
+      Staff: {
         include: {
-          user: {
+          User: {
             select: {
               id: true,
               name: true,
@@ -38,11 +39,11 @@ export default async function MeetingManagementDashboard() {
           },
         },
       },
-      attendees: {
+      MeetingAttendee: {
         include: {
-          staff: {
+          Staff: {
             include: {
-              user: {
+              User: {
                 select: {
                   id: true,
                   name: true,
@@ -66,8 +67,8 @@ export default async function MeetingManagementDashboard() {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-4">Staff Meeting Management</h1>
-      <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-700">
+      <div className="mb-4 p-4 bg-primary border border-blue-200 rounded-lg">
+        <p className="text-sm text-primary">
           <strong>Admin Only:</strong> This page allows administrators to view and manage all staff meetings across the organization.
         </p>
       </div>
@@ -75,7 +76,7 @@ export default async function MeetingManagementDashboard() {
       <section className="mb-6">
         <Link 
           href="/dashboard/meetings/new"
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-4 py-2 bg-primary text-foreground rounded hover:bg-primary"
         >
           Create New Meeting
         </Link>
@@ -84,39 +85,40 @@ export default async function MeetingManagementDashboard() {
       <section className="mb-6">
         <h2 className="text-lg font-semibold mb-2">Upcoming Meetings ({upcomingMeetings.length})</h2>
         {upcomingMeetings.length > 0 ? (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="bg-card rounded-lg shadow overflow-hidden">
             <table className="min-w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-muted">
                 <tr>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date/Time</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organizer</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendees</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Title</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Date/Time</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Organizer</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Attendees</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-gray-200">
                 {upcomingMeetings.map((meeting) => (
                   <tr key={meeting.id}>
                     <td className="py-4 px-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{meeting.title}</div>
+                      <div className="text-sm font-medium text-foreground">{meeting.title}</div>
                       {meeting.description && (
-                        <div className="text-sm text-gray-500 truncate max-w-xs">{meeting.description}</div>
+                        <div className="text-sm text-muted-foreground truncate max-w-xs">{meeting.description}</div>
                       )}
                     </td>
-                    <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-900">
-                      {meeting.start_time ? new Date(meeting.start_time).toLocaleString() : 'TBD'}
+                    <td className="py-4 px-4 whitespace-nowrap text-sm text-foreground">
+                      {safeFormatDateTime(meeting.start_time, undefined, 'TBD')}
                     </td>
-                    <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-900">
-                      {meeting.organizer.user.name || meeting.organizer.user.email}
+                    <td className="py-4 px-4 whitespace-nowrap text-sm text-foreground">
+                      {meeting.Staff.User.name || meeting.Staff.User.email}
                     </td>
-                    <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-900">
-                      {meeting.attendees.length} attendees
+                    <td className="py-4 px-4 whitespace-nowrap text-sm text-foreground">
+                      {meeting.MeetingAttendee.length} attendees
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm font-medium">
-                      <Link href={`/dashboard/meetings/${meeting.id}`} className="text-blue-600 hover:text-blue-900 mr-3">
+                      <Link href={`/dashboard/meetings/${meeting.id}`} className="text-primary hover:text-primary mr-3">
                         View
                       </Link>
+                      {/* TODO: Add zoom_join_url field to Meeting model
                       {meeting.zoom_join_url && (
                         <a 
                           href={meeting.zoom_join_url} 
@@ -126,7 +128,7 @@ export default async function MeetingManagementDashboard() {
                         >
                           Join
                         </a>
-                      )}
+                      )} */}
                     </td>
                   </tr>
                 ))}
@@ -134,44 +136,44 @@ export default async function MeetingManagementDashboard() {
             </table>
           </div>
         ) : (
-          <div className="border p-4 rounded bg-gray-50">No upcoming meetings scheduled.</div>
+          <div className="border p-4 rounded bg-muted">No upcoming meetings scheduled.</div>
         )}
       </section>
       
       <section>
         <h2 className="text-lg font-semibold mb-2">Meeting History ({pastMeetings.length})</h2>
         {pastMeetings.length > 0 ? (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="bg-card rounded-lg shadow overflow-hidden">
             <table className="min-w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-muted">
                 <tr>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date/Time</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Organizer</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendees</th>
-                  <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Title</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Date/Time</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Organizer</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Attendees</th>
+                  <th className="py-3 px-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-gray-200">
                 {pastMeetings.slice(0, 10).map((meeting) => (
                   <tr key={meeting.id}>
                     <td className="py-4 px-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{meeting.title}</div>
+                      <div className="text-sm font-medium text-foreground">{meeting.title}</div>
                       {meeting.description && (
-                        <div className="text-sm text-gray-500 truncate max-w-xs">{meeting.description}</div>
+                        <div className="text-sm text-muted-foreground truncate max-w-xs">{meeting.description}</div>
                       )}
                     </td>
-                    <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-900">
-                      {meeting.start_time ? new Date(meeting.start_time).toLocaleString() : 'TBD'}
+                    <td className="py-4 px-4 whitespace-nowrap text-sm text-foreground">
+                      {safeFormatDateTime(meeting.start_time, undefined, 'TBD')}
                     </td>
-                    <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-900">
-                      {meeting.organizer.user.name || meeting.organizer.user.email}
+                    <td className="py-4 px-4 whitespace-nowrap text-sm text-foreground">
+                      {meeting.Staff.User.name || meeting.Staff.User.email}
                     </td>
-                    <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-900">
-                      {meeting.attendees.length} attendees
+                    <td className="py-4 px-4 whitespace-nowrap text-sm text-foreground">
+                      {meeting.MeetingAttendee.length} attendees
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm font-medium">
-                      <Link href={`/dashboard/meetings/${meeting.id}`} className="text-blue-600 hover:text-blue-900">
+                      <Link href={`/dashboard/meetings/${meeting.id}`} className="text-primary hover:text-primary">
                         View
                       </Link>
                     </td>
@@ -181,7 +183,7 @@ export default async function MeetingManagementDashboard() {
             </table>
           </div>
         ) : (
-          <div className="border p-4 rounded bg-gray-50">No past meetings yet.</div>
+          <div className="border p-4 rounded bg-muted">No past meetings yet.</div>
         )}
       </section>
     </div>

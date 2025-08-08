@@ -1,0 +1,78 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
+
+export async function GET(request: NextRequest) {
+  // Only allow in development
+  if (process.env.NODE_ENV !== 'development') {
+    return NextResponse.json(
+      { error: 'This endpoint is only available in development' },
+      { status: 403 }
+    );
+  }
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const limit = searchParams.get('limit') || '50';
+    
+    // Get commit history with stats
+    const { stdout } = await execAsync(
+      `git log --pretty=format:'%H|%h|%an|%ar|%s' --stat -n ${limit}`
+    );
+    
+    const commits: any[] = [];
+    const lines = stdout.split('\n');
+    
+    let currentCommit: any = null;
+    
+    for (const line of lines) {
+      if (line.includes('|') && line.split('|').length >= 5) {
+        // This is a commit line
+        if (currentCommit) {
+          commits.push(currentCommit);
+        }
+        
+        const [hash, shortHash, author, date, ...messageParts] = line.split('|');
+        currentCommit = {
+          hash,
+          shortHash,
+          author,
+          date,
+          message: messageParts.join('|'),
+          files: 0,
+          insertions: 0,
+          deletions: 0
+        };
+      } else if (line.includes('changed') && currentCommit) {
+        // This is a stat line
+        const match = line.match(/(\d+) files? changed(?:, (\d+) insertions?\(\+\))?(?:, (\d+) deletions?\(-\))?/);
+        if (match) {
+          currentCommit.files = parseInt(match[1]) || 0;
+          currentCommit.insertions = parseInt(match[2]) || 0;
+          currentCommit.deletions = parseInt(match[3]) || 0;
+        }
+      }
+    }
+    
+    if (currentCommit) {
+      commits.push(currentCommit);
+    }
+    
+    return NextResponse.json({
+      commits,
+      total: commits.length,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error: any) {
+    console.error('Git commits error:', error);
+    return NextResponse.json(
+      { 
+        error: 'Failed to get commit history',
+        details: error.message 
+      },
+      { status: 500 }
+    );
+  }
+}

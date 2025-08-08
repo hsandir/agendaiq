@@ -1,48 +1,138 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
 import { AuditLogger } from '@/lib/audit/audit-logger';
+import { auditSystem } from '@/lib/audit/hybrid-audit-system';
+import { AuditCategory } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await withAuth(request, { requireAdminRole: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
     if (!authResult.success) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
     const { searchParams } = new URL(request.url);
     
-    // Parse query parameters
-    const tableName = searchParams.get('table');
-    const operation = searchParams.get('operation');
-    const userId = searchParams.get('userId') ? parseInt(searchParams.get('userId')!) : undefined;
-    const staffId = searchParams.get('staffId') ? parseInt(searchParams.get('staffId')!) : undefined;
-    const startDate = searchParams.get('startDate') ? new Date(searchParams.get('startDate')!) : undefined;
-    const endDate = searchParams.get('endDate') ? new Date(searchParams.get('endDate')!) : undefined;
-    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 50;
-    const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : 0;
+    // Parse query parameters for hybrid system
+    const logType = searchParams.get('type') || 'critical'; // 'critical' | 'legacy' | 'both'
+    const category = searchParams.get('category') as AuditCategory | null;
+    // Additional parameters for future filtering capability
+    // const action = searchParams.get('action');
+    // const search = searchParams.get('search');
+    // const ipAddress = searchParams.get('ipAddress');
+    // const minRiskScore = searchParams.get('minRiskScore');
+    // const successOnly = searchParams.get('success');
+    
+    // Parse pagination
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '50')));
+    
+    // Parse and validate user/staff IDs
+    const userIdParam = searchParams.get('userId');
+    const userId = userIdParam ? Number(userIdParam) : undefined;
+    if (userIdParam && Number.isNaN(userId)) {
+      return NextResponse.json({ error: 'Invalid userId' }, { status: 400 });
+    }
 
-    const filters = {
-      tableName: tableName || undefined,
-      operation: operation || undefined,
-      userId,
-      staffId,
-      startDate,
-      endDate,
-      limit,
-      offset
-    };
+    const staffIdParam = searchParams.get('staffId');
+    const staffId = staffIdParam ? Number(staffIdParam) : undefined;
+    if (staffIdParam && Number.isNaN(staffId)) {
+      return NextResponse.json({ error: 'Invalid staffId' }, { status: 400 });
+    }
 
-    const auditLogs = await AuditLogger.getAuditLogs(filters);
+    // Parse and validate dates
+    const startDateParam = searchParams.get('startDate');
+    const startDate = startDateParam ? new Date(startDateParam) : undefined;
+    if (startDate && Number.isNaN(startDate.getTime())) {
+      return NextResponse.json({ error: 'Invalid startDate' }, { status: 400 });
+    }
 
-    return NextResponse.json({
-      success: true,
-      data: auditLogs,
-      pagination: {
+    const endDateParam = searchParams.get('endDate');
+    const endDate = endDateParam ? new Date(endDateParam) : undefined;
+    if (endDate && Number.isNaN(endDate.getTime())) {
+      return NextResponse.json({ error: 'Invalid endDate' }, { status: 400 });
+    }
+
+    let response;
+
+    if (logType === 'critical') {
+      // Get critical audit logs from hybrid system
+      const criticalLogs = await auditSystem.getRecentCriticalEvents(limit, category || undefined, userId);
+      
+      response = {
+        success: true,
+        data: criticalLogs,
+        type: 'critical',
+        pagination: {
+          page,
+          limit,
+          total: criticalLogs.length,
+          hasMore: criticalLogs.length === limit
+        }
+      };
+
+    } else if (logType === 'legacy') {
+      // Get legacy audit logs (backward compatibility)
+      const tableName = searchParams.get('table');
+      const operation = searchParams.get('operation');
+      const offset = (page - 1) * limit;
+
+      const filters = {
+        tableName: tableName || undefined,
+        operation: operation || undefined,
+        userId,
+        staffId,
+        startDate,
+        endDate,
         limit,
-        offset,
-        hasMore: auditLogs.length === limit
-      }
-    });
+        offset
+      };
+
+      const legacyLogs = await AuditLogger.getAuditLogs(filters);
+      
+      response = {
+        success: true,
+        data: legacyLogs,
+        type: 'legacy',
+        pagination: {
+          page,
+          limit,
+          offset,
+          hasMore: legacyLogs.length === limit
+        }
+      };
+
+    } else {
+      // Get both types (default for admin dashboard)
+      const [criticalLogs, legacyLogs] = await Promise.all([
+        auditSystem.getRecentCriticalEvents(Math.floor(limit / 2), category || undefined, userId),
+        AuditLogger.getAuditLogs({
+          userId,
+          staffId,
+          startDate,
+          endDate,
+          limit: Math.floor(limit / 2),
+          offset: 0
+        })
+      ]);
+
+      response = {
+        success: true,
+        data: {
+          critical: criticalLogs,
+          legacy: legacyLogs
+        },
+        type: 'both',
+        pagination: {
+          page,
+          limit,
+          total: criticalLogs.length + legacyLogs.length,
+          hasMore: criticalLogs.length + legacyLogs.length === limit
+        }
+      };
+    }
+
+    return NextResponse.json(response);
 
   } catch (error) {
     console.error('Error fetching audit logs:', error);

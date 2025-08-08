@@ -1,0 +1,104 @@
+# Configuration for GitHub Labeler Action
+# https://github.com/actions/labeler
+
+# Frontend changes
+frontend:
+  - src/components/**/*
+  - src/app/**/*
+  - src/styles/**/*
+  - '*.css'
+  - '*.scss'
+
+# Backend changes  
+backend:
+  - src/app/api/**/*
+  - src/lib/**/*
+  - prisma/**/*
+  - src/server/**/*
+
+# Database changes
+database:
+  - prisma/**/*
+  - '**/migrations/**/*'
+
+# Testing changes
+testing:
+  - '**/*.test.ts'
+  - '**/*.test.tsx'
+  - '**/*.spec.ts'
+  - '**/*.spec.tsx'
+  - src/__tests__/**/*
+  - jest.config.*
+  - playwright.config.*
+
+# Documentation changes
+documentation:
+  - '**/*.md'
+  - docs/**/*
+  - README.md
+  - CONTRIBUTING.md
+  - LICENSE
+
+# Configuration changes
+configuration:
+  - '*.json'
+  - '*.yml'
+  - '*.yaml'
+  - '.env*'
+  - tsconfig.json
+  - next.config.js
+  - tailwind.config.js
+  - postcss.config.js
+
+# CI/CD changes
+ci/cd:
+  - .github/**/*
+  - .gitlab-ci.yml
+  - Dockerfile
+  - docker-compose.yml
+
+# Dependencies
+dependencies:
+  - package.json
+  - package-lock.json
+  - yarn.lock
+  - pnpm-lock.yaml
+
+# Security changes
+security:
+  - src/lib/auth/**/*
+  - src/middleware.ts
+  - '**/auth/**/*'
+  - '**/security/**/*'
+
+# UI/UX changes
+ui/ux:
+  - src/components/ui/**/*
+  - src/app/globals.css
+  - '**/styles/**/*'
+
+# API changes
+api:
+  - src/app/api/**/*
+  - '**/route.ts'
+  - '**/route.js'
+
+# Performance
+performance:
+  - '**/*.performance.ts'
+  - '**/*.perf.ts'
+  - src/lib/utils/performance/**/*
+
+# Feature additions
+feature:
+  - src/features/**/*
+  - src/app/**/page.tsx
+  - src/app/**/layout.tsx
+
+# Bug fixes - manual label needed
+
+# Development tools
+dev-tools:
+  - src/components/development/**/*
+  - src/app/dashboard/development/**/*
+  - scripts/**/*

@@ -59,3 +59,5 @@ staff*.csv
 staff*.xlsx
 tailwind.config*.js
 next.config*.js
+.env.local
+dev.log

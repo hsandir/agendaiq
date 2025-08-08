@@ -6,14 +6,14 @@ export default function ZoomIntegrationSettings() {
       <h1 className="text-2xl font-bold mb-4">Zoom Integration Settings</h1>
       <section className="mb-6">
         <h2 className="text-lg font-semibold mb-2">Zoom Account Connection</h2>
-        <button className="px-4 py-2 bg-blue-600 text-white rounded">Connect Zoom Account</button>
-        <div className="mt-2 text-sm text-gray-600">Status: Not Connected</div>
+        <button className="px-4 py-2 bg-primary text-foreground rounded">Connect Zoom Account</button>
+        <div className="mt-2 text-sm text-muted-foreground">Status: Not Connected</div>
       </section>
       <section className="mb-6">
         <h2 className="text-lg font-semibold mb-2">API Credentials</h2>
         <input type="text" placeholder="API Key" className="input input-bordered w-full mb-2" />
         <input type="password" placeholder="API Secret" className="input input-bordered w-full mb-2" />
-        <button className="px-4 py-2 bg-gray-700 text-white rounded">Save Credentials</button>
+        <button className="px-4 py-2 bg-background text-foreground rounded">Save Credentials</button>
       </section>
       <section>
         <h2 className="text-lg font-semibold mb-2">Organization Preferences</h2>
@@ -27,7 +27,7 @@ export default function ZoomIntegrationSettings() {
           <input type="checkbox" className="mr-2" />
           Automatic Meeting Recording
         </label>
-        <button className="px-4 py-2 bg-green-600 text-white rounded mt-2">Save Preferences</button>
+        <button className="px-4 py-2 bg-green-600 text-foreground rounded mt-2">Save Preferences</button>
       </section>
     </div>
   );
