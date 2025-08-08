@@ -112,11 +112,11 @@ export async function GET(request: NextRequest) {
           name: item.Staff.User.name || 'Unknown',
           email: item.Staff.User.email
         } : undefined,
-        meeting: {
+        meeting: item.Meeting ? {
           id: item.Meeting.id,
           title: item.Meeting.title,
           date: item.Meeting.start_time?.toISOString() || new Date().toISOString()
-        },
+        } : undefined,
         carriedForwardCount: item.carry_forward_count || 0,
         parentItemId: item.parent_item_id
       };

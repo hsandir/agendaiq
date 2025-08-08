@@ -113,11 +113,11 @@ export async function GET(request: NextRequest) {
           priority: item.priority || 'medium',
           dueDate: item.due_date?.toISOString(),
           assignedAt: item.created_at.toISOString(),
-          meeting: {
+          meeting: item.Meeting ? {
             id: item.Meeting.id,
             title: item.Meeting.title,
             date: item.Meeting.start_time?.toISOString() || new Date().toISOString()
-          },
+          } : undefined,
           previousHolder: undefined // Would need transition history tracking
         };
       });

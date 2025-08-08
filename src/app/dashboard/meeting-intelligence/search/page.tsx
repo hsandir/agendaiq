@@ -88,7 +88,7 @@ export default function MeetingSearchPage() {
         type: searchType
       });
       
-      const response = await fetch(`/api/meetings/search?${params}`);
+      const response = await fetch(`/api/meeting-intelligence/search?${params}`);
       const data = await response.json();
       
       if (searchType === 'all' || searchType === 'meetings') {
