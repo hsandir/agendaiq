@@ -11,7 +11,7 @@ const customJestConfig = {
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^lucide-react$': '<rootDir>/__mocks__/lucide-react.js',
+    'lucide-react': '<rootDir>/__mocks__/lucide-react.js',
   },
   testMatch: [
     '<rootDir>/src/__tests__/**/*.test.{js,jsx,ts,tsx}',
@@ -24,7 +24,7 @@ const customJestConfig = {
     '<rootDir>/src/__tests__/performance/',
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!(.*\\.mjs$|lucide-react))',
+    '/node_modules/(?!lucide-react)/',
   ],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',

@@ -228,7 +228,7 @@ export function AgendaItemForm({
                   <SelectValue placeholder="Select staff member" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {staff.map((s) => (
                     <SelectItem key={s.id} value={s.id.toString()}>
                       {s.name} {s.initials ? `(${s.initials})` : ''}
@@ -288,7 +288,7 @@ export function AgendaItemForm({
                   <SelectValue placeholder="Select solution type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   <SelectItem value="Technical">Technical</SelectItem>
                   <SelectItem value="Adaptive">Adaptive</SelectItem>
                   <SelectItem value="Both">Both</SelectItem>
@@ -321,7 +321,7 @@ export function AgendaItemForm({
                   <SelectValue placeholder="Select decision type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   <SelectItem value="Technical">Technical</SelectItem>
                   <SelectItem value="Adaptive">Adaptive</SelectItem>
                   <SelectItem value="Both">Both</SelectItem>

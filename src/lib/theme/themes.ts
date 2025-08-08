@@ -127,9 +127,9 @@ export const modernPurpleTheme: Theme = {
   name: 'Modern Purple',
   description: 'Modern dark theme with purple accents based on the new design',
   colors: {
-    primary: '#7C3AED',
-    primaryLight: '#8B5CF6',
-    primaryDark: '#6D28D9',
+    primary: '#A855F7',
+    primaryLight: '#C084FC',
+    primaryDark: '#9333EA',
     primaryForeground: '#FFFFFF',
     
     secondary: '#EC4899',
@@ -146,7 +146,7 @@ export const modernPurpleTheme: Theme = {
     cardBorder: '#3A3C5E',
     
     text: '#FFFFFF',
-    textSecondary: '#E2E8F0',
+    textSecondary: '#CBD5E1',
     textMuted: '#94A3B8',
     textInverse: '#0F172A',
     
@@ -173,19 +173,19 @@ export const modernPurpleTheme: Theme = {
     sidebar: '#1A1B3A',
     sidebarText: '#E2E8F0',
     sidebarHover: '#2D2F56',
-    sidebarActive: '#7C3AED',
+    sidebarActive: '#A855F7',
     
     header: '#1A1B3A',
     headerText: '#FFFFFF',
     
     input: '#2D2F56',
     inputBorder: '#3A3C5E',
-    inputFocus: '#7C3AED',
+    inputFocus: '#A855F7',
     inputText: '#FFFFFF',
     inputPlaceholder: '#64748B',
     
-    buttonPrimary: '#7C3AED',
-    buttonPrimaryHover: '#8B5CF6',
+    buttonPrimary: '#A855F7',
+    buttonPrimaryHover: '#C084FC',
     buttonPrimaryText: '#FFFFFF',
     
     buttonSecondary: '#3A3C5E',
@@ -194,7 +194,7 @@ export const modernPurpleTheme: Theme = {
     
     buttonGhost: 'transparent',
     buttonGhostHover: 'rgba(124, 58, 237, 0.1)',
-    buttonGhostText: '#7C3AED',
+    buttonGhostText: '#A855F7',
     
     overlay: 'rgba(0, 0, 0, 0.7)',
     shadow: 'rgba(0, 0, 0, 0.3)',

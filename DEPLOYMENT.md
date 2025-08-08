@@ -1,376 +1,339 @@
-# AgendaIQ Production Deployment Guide
+# AgendaIQ Deployment Guide
 
-## 🚀 Quick Start
+## Production Deployment Setup
 
-AgendaIQ is production-ready! This guide will help you deploy the system to production environments.
+This guide covers the complete deployment process for AgendaIQ, including CI/CD pipelines, monitoring, and automated deployment.
 
-## 📋 Pre-Deployment Checklist
+## Table of Contents
 
-### ✅ System Requirements
-- **Node.js**: 18.x or higher
-- **Database**: PostgreSQL 12+ (recommended) or MySQL 8+
-- **Memory**: Minimum 2GB RAM, 4GB+ recommended
-- **Storage**: 10GB+ available disk space
-- **SSL Certificate**: Required for HTTPS
+1. [Prerequisites](#prerequisites)
+2. [CI/CD Pipeline](#cicd-pipeline)
+3. [Deployment Options](#deployment-options)
+4. [Monitoring Setup](#monitoring-setup)
+5. [Security Checklist](#security-checklist)
+6. [Troubleshooting](#troubleshooting)
 
-### ✅ Environment Variables
-Create a `.env.production` file with the following variables:
+## Prerequisites
+
+### Required Tools
+- Node.js 20.x
+- npm 10.x
+- PostgreSQL 15+
+- Git
+- Docker (for monitoring stack)
+
+### Environment Variables
+Create a `.env.production` file with:
 
 ```env
-# Database
-DATABASE_URL="postgresql://username:password@localhost:5432/agendaiq_prod"
-
-# Authentication
-NEXTAUTH_URL="https://yourdomain.com"
-NEXTAUTH_SECRET="your-super-secret-key-here-minimum-32-characters"
-
-# Google OAuth (for authentication)
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
-
-# Email Service (for notifications)
-RESEND_API_KEY="your-resend-api-key"
-
-# Optional: Additional services
-SENTRY_DSN="your-sentry-dsn-for-error-tracking"
+DATABASE_URL=postgresql://user:password@host:5432/agendaiq
+NEXTAUTH_URL=https://yourdomain.com
+NEXTAUTH_SECRET=your-secret-key
+NEXT_PUBLIC_APP_URL=https://yourdomain.com
 ```
 
-## 🔧 Environment Setup
+## CI/CD Pipeline
 
-### 1. Database Setup
+### GitHub Actions Workflows
 
-**PostgreSQL (Recommended)**
-```sql
--- Create database
-CREATE DATABASE agendaiq_prod;
-CREATE USER agendaiq_user WITH PASSWORD 'secure_password';
-GRANT ALL PRIVILEGES ON DATABASE agendaiq_prod TO agendaiq_user;
-```
+#### 1. Continuous Integration (`ci.yml`)
+Automatically runs on every push and pull request:
 
-**MySQL Alternative**
-```sql
-CREATE DATABASE agendaiq_prod;
-CREATE USER 'agendaiq_user'@'%' IDENTIFIED BY 'secure_password';
-GRANT ALL PRIVILEGES ON agendaiq_prod.* TO 'agendaiq_user'@'%';
-FLUSH PRIVILEGES;
-```
+- **Code Quality**: Linting, type checking, formatting
+- **Tests**: Unit tests with coverage reporting
+- **Build**: Production build verification
+- **Security**: Vulnerability scanning with Trivy
+- **Performance**: Lighthouse CI checks
 
-### 2. Google OAuth Setup
+#### 2. Deployment (`deploy.yml`)
+Triggered on main branch pushes:
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing
-3. Enable Google+ API
-4. Create OAuth 2.0 credentials
-5. Add your domain to authorized origins
-6. Add `https://yourdomain.com/api/auth/callback/google` to authorized redirect URIs
+- **Pre-deployment checks**: Validates secrets and configuration
+- **Build**: Creates optimized production build
+- **Database migrations**: Runs Prisma migrations
+- **Deploy**: Transfers files to production server
+- **Verification**: Health checks and smoke tests
+- **Rollback**: Automatic rollback on failure
 
-### 3. Email Service Setup
+### Running CI/CD Locally
 
-1. Sign up for [Resend](https://resend.com/)
-2. Get your API key
-3. Verify your domain for email sending
-
-## 🚀 Deployment Options
-
-### Option 1: Vercel (Recommended)
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/agendaiq)
-
-1. **Connect Repository**
-   ```bash
-   git clone https://github.com/yourusername/agendaiq.git
-   cd agendaiq
-   npm install -g vercel
-   vercel
-   ```
-
-2. **Configure Environment Variables**
-   - Go to your Vercel dashboard
-   - Add all required environment variables
-   - Deploy
-
-3. **Database Setup**
-   ```bash
-   # Run database migrations
-   npx prisma db push
-   npx prisma generate
-   ```
-
-### Option 2: Docker Deployment
-
-1. **Build Docker Image**
-   ```bash
-   docker build -t agendaiq .
-   ```
-
-2. **Run with Docker Compose**
-   ```yaml
-   # docker-compose.prod.yml
-   version: '3.8'
-   services:
-     app:
-       build: .
-       ports:
-         - "3000:3000"
-       environment:
-         - NODE_ENV=production
-         - DATABASE_URL=${DATABASE_URL}
-         - NEXTAUTH_URL=${NEXTAUTH_URL}
-         - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-       depends_on:
-         - db
-     
-     db:
-       image: postgres:15
-       environment:
-         POSTGRES_DB: agendaiq_prod
-         POSTGRES_USER: agendaiq_user
-         POSTGRES_PASSWORD: ${DB_PASSWORD}
-       volumes:
-         - postgres_data:/var/lib/postgresql/data
-   
-   volumes:
-     postgres_data:
-   ```
-
-3. **Deploy**
-   ```bash
-   docker-compose -f docker-compose.prod.yml up -d
-   ```
-
-### Option 3: Traditional Server
-
-1. **Server Setup** (Ubuntu/Debian)
-   ```bash
-   # Install Node.js
-   curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-   sudo apt-get install -y nodejs
-   
-   # Install PM2 for process management
-   npm install -g pm2
-   
-   # Install PostgreSQL
-   sudo apt-get install postgresql postgresql-contrib
-   ```
-
-2. **Application Setup**
-   ```bash
-   # Clone and build
-   git clone https://github.com/yourusername/agendaiq.git
-   cd agendaiq
-   npm ci
-   npm run build
-   
-   # Setup database
-   npx prisma db push
-   npx prisma generate
-   
-   # Start with PM2
-   pm2 start npm --name "agendaiq" -- start
-   pm2 save
-   pm2 startup
-   ```
-
-3. **Nginx Configuration**
-   ```nginx
-   # /etc/nginx/sites-available/agendaiq
-   server {
-       listen 80;
-       server_name yourdomain.com;
-       return 301 https://$server_name$request_uri;
-   }
-   
-   server {
-       listen 443 ssl http2;
-       server_name yourdomain.com;
-       
-       ssl_certificate /path/to/your/certificate.pem;
-       ssl_certificate_key /path/to/your/private.key;
-       
-       location / {
-           proxy_pass http://localhost:3000;
-           proxy_http_version 1.1;
-           proxy_set_header Upgrade $http_upgrade;
-           proxy_set_header Connection 'upgrade';
-           proxy_set_header Host $host;
-           proxy_set_header X-Real-IP $remote_addr;
-           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-           proxy_set_header X-Forwarded-Proto $scheme;
-           proxy_cache_bypass $http_upgrade;
-       }
-   }
-   ```
-
-## 🔒 Security Configuration
-
-### 1. SSL/TLS Certificate
-- Use Let's Encrypt for free SSL certificates
-- Configure automatic renewal
-
-### 2. Firewall Rules
 ```bash
-# Allow only necessary ports
-sudo ufw allow 22    # SSH
-sudo ufw allow 80    # HTTP (for redirects)
-sudo ufw allow 443   # HTTPS
-sudo ufw enable
-```
+# Run all quality checks
+npm run lint
+npm run type-check
+npm run format:check
 
-### 3. Environment Security
-- Never commit `.env` files to version control
-- Use strong, unique passwords
-- Regularly rotate API keys and secrets
-- Enable two-factor authentication for all accounts
+# Run tests with coverage
+npm run test:coverage
 
-## 📊 Monitoring & Maintenance
-
-### 1. Health Checks
-The system includes built-in health monitoring:
-- **System Health**: `/dashboard/system/health`
-- **Server Metrics**: `/dashboard/system/server`
-- **API Health**: `/api/system/health-check`
-
-### 2. Log Monitoring
-```bash
-# PM2 logs
-pm2 logs agendaiq
-
-# System logs
-tail -f /var/log/nginx/access.log
-tail -f /var/log/nginx/error.log
-```
-
-### 3. Database Backups
-```bash
-# Automated backup script
-#!/bin/bash
-BACKUP_DIR="/backups/agendaiq"
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-pg_dump agendaiq_prod > "$BACKUP_DIR/backup_$TIMESTAMP.sql"
-
-# Keep only last 7 days of backups
-find $BACKUP_DIR -name "backup_*.sql" -mtime +7 -delete
-```
-
-### 4. Performance Monitoring
-The system includes:
-- **Structured logging** with performance metrics
-- **Memory usage monitoring**
-- **Slow query detection**
-- **API response time tracking**
-
-## 🚨 Emergency Procedures
-
-### 1. Quick Rollback
-```bash
-# Revert to previous version
-git checkout [previous-commit-hash]
+# Build for production
 npm run build
-pm2 restart agendaiq
 ```
 
-### 2. Database Issues
+## Deployment Options
+
+### Option 1: Vercel (Recommended for Quick Setup)
+
+1. **Install Vercel CLI**:
 ```bash
-# Check database connections
-npx prisma db pull
-npx prisma studio
-
-# Reset database (CAUTION!)
-npx prisma db reset
+npm i -g vercel
 ```
 
-### 3. Service Recovery
+2. **Deploy**:
 ```bash
-# Restart services
-pm2 restart agendaiq
-sudo systemctl restart nginx
-sudo systemctl restart postgresql
+# Production deployment
+npm run deploy:vercel
+
+# Preview deployment
+npm run deploy:preview
 ```
 
-## 📈 Performance Optimization
+3. **Configure Environment Variables**:
+- Go to Vercel Dashboard → Settings → Environment Variables
+- Add all required variables from `.env.production`
 
-### 1. Next.js Optimizations
-The system includes:
-- ✅ Image optimization with WebP/AVIF support
-- ✅ Bundle optimization for icons and packages
-- ✅ Compression enabled
-- ✅ Security headers configured
+### Option 2: Traditional Server (VPS/Dedicated)
 
-### 2. Database Optimization
+1. **Setup Server**:
+```bash
+# Install Node.js
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Install PM2
+npm install -g pm2
+
+# Install PostgreSQL
+sudo apt-get install postgresql postgresql-contrib
+```
+
+2. **Configure GitHub Secrets**:
+```
+DEPLOY_HOST=your-server-ip
+DEPLOY_USER=deploy-user
+DEPLOY_KEY=ssh-private-key
+DEPLOY_PATH=/var/www/agendaiq
+DATABASE_URL=production-database-url
+```
+
+3. **Deploy**:
+Push to main branch to trigger automatic deployment.
+
+### Option 3: Docker Container
+
+1. **Build Docker Image**:
+```bash
+docker build -t agendaiq:latest .
+```
+
+2. **Run Container**:
+```bash
+docker run -d \
+  -p 3000:3000 \
+  --env-file .env.production \
+  --name agendaiq \
+  agendaiq:latest
+```
+
+## Monitoring Setup
+
+### 1. Deploy Monitoring Stack
+
+```bash
+cd monitoring
+docker-compose up -d
+```
+
+### 2. Access Dashboards
+
+- **Prometheus**: http://localhost:9090
+- **Grafana**: http://localhost:3001 (admin/admin)
+- **AlertManager**: http://localhost:9093
+
+### 3. Configure Alerts
+
+Edit `monitoring/alertmanager.yml`:
+
+```yaml
+route:
+  receiver: 'email-notifications'
+
+receivers:
+  - name: 'email-notifications'
+    email_configs:
+      - to: 'admin@yourdomain.com'
+        from: 'alerts@yourdomain.com'
+```
+
+### 4. Health Check Endpoint
+
+Monitor application health:
+
+```bash
+curl https://yourdomain.com/api/health
+```
+
+Expected response:
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "uptime": 3600,
+  "checks": {
+    "database": "healthy (5ms)",
+    "memory": "healthy (45MB used)"
+  }
+}
+```
+
+## Security Checklist
+
+### Pre-Deployment
+
+- [ ] All secrets in environment variables
+- [ ] Database backups configured
+- [ ] SSL/TLS certificates installed
+- [ ] Rate limiting enabled
+- [ ] CORS properly configured
+- [ ] Security headers set
+- [ ] Input validation on all endpoints
+- [ ] SQL injection prevention (Prisma)
+- [ ] XSS protection enabled
+
+### Post-Deployment
+
+- [ ] Remove debug logs
+- [ ] Disable source maps in production
+- [ ] Configure firewall rules
+- [ ] Setup intrusion detection
+- [ ] Enable audit logging
+- [ ] Configure backup rotation
+- [ ] Test disaster recovery
+
+## Performance Optimization
+
+### Build Optimizations
+
+```javascript
+// next.config.js additions
+module.exports = {
+  swcMinify: true,
+  compress: true,
+  poweredByHeader: false,
+  generateEtags: true,
+  reactStrictMode: true,
+}
+```
+
+### Database Optimizations
+
 ```sql
--- Create indexes for better performance
-CREATE INDEX idx_meetings_created_at ON meetings(created_at);
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_staff_role_id ON staff(role_id);
+-- Add indexes for common queries
+CREATE INDEX idx_meetings_start_time ON meetings(start_time);
+CREATE INDEX idx_action_items_status ON meeting_action_items(status);
+CREATE INDEX idx_staff_user_id ON staff(user_id);
 ```
 
-### 3. Caching Strategy
-- **Static assets**: CDN caching
-- **Database queries**: Connection pooling
-- **API responses**: HTTP caching headers
+### Caching Strategy
 
-## 🧪 Testing Production
+- Static assets: 1 year cache
+- API responses: No cache (real-time data)
+- Images: 30 days cache
+- CSS/JS: Versioned URLs with long cache
 
-### 1. Smoke Tests
-After deployment, verify:
-- [ ] Homepage loads correctly
-- [ ] Authentication works (Google OAuth)
-- [ ] Meeting creation functions
-- [ ] Admin panels accessible
-- [ ] System monitoring pages work
+## Troubleshooting
 
-### 2. Load Testing
+### Common Issues
+
+#### 1. Database Connection Failed
 ```bash
-# Install artillery for load testing
-npm install -g artillery
+# Check PostgreSQL status
+sudo systemctl status postgresql
 
-# Run load test
-artillery quick --count 10 --num 25 https://yourdomain.com
+# Test connection
+psql -U username -d database_name -h localhost
 ```
 
-## 📚 Additional Resources
+#### 2. Build Failures
+```bash
+# Clear cache and rebuild
+npm run clean
+npm install
+npm run build
+```
 
-### Feature Overview
-- **Production Monitoring**: Essential metrics and alerts for production
-- **Development Tools**: Hidden in production, visible only in development
-- **Authentication**: Role-based access with Turkish education hierarchy
-- **Meeting Management**: Complete CRUD operations for meetings
-- **System Health**: Real-time monitoring and diagnostics
+#### 3. Memory Issues
+```bash
+# Increase Node.js memory limit
+NODE_OPTIONS="--max-old-space-size=2048" npm run build
+```
 
-### Architecture
-- **Frontend**: Next.js 14 with App Router
-- **Backend**: API routes with NextAuth
-- **Database**: Prisma ORM with PostgreSQL/MySQL
-- **Authentication**: NextAuth with Google OAuth
-- **Styling**: Tailwind CSS with responsive design
+#### 4. Port Already in Use
+```bash
+# Find and kill process
+lsof -ti:3000 | xargs kill -9
+```
 
-### Support
-- **Documentation**: Check `/docs` folder
-- **Issues**: Report on GitHub
-- **Monitoring**: Built-in system health dashboard
+### Rollback Procedure
 
-## 🎯 Production Checklist
+1. **Automatic Rollback** (via GitHub Actions):
+   - Triggered on health check failure
+   - Restores previous backup
 
-Before going live:
-- [ ] All environment variables configured
-- [ ] Database migrated and seeded
-- [ ] SSL certificate installed
-- [ ] DNS configured
-- [ ] Monitoring enabled
-- [ ] Backup strategy implemented
-- [ ] Security headers configured
-- [ ] Performance testing completed
-- [ ] Emergency procedures tested
+2. **Manual Rollback**:
+```bash
+# SSH to server
+ssh user@server
 
-## 🚀 Go Live!
+# Navigate to app directory
+cd /var/www/agendaiq
 
-Once everything is configured:
-1. Test all functionality thoroughly
-2. Monitor system performance
-3. Set up alerts for critical issues
-4. Document any custom configurations
-5. Train users on the system
+# Restore backup
+tar -xzf backup-YYYYMMDD-HHMMSS.tar.gz
 
-**Your AgendaIQ system is now production-ready!** 🎉
+# Restart application
+pm2 restart agendaiq
+```
 
-For support and updates, visit the [GitHub repository](https://github.com/yourusername/agendaiq).
+## Maintenance
+
+### Regular Tasks
+
+- **Daily**: Check health endpoint, review error logs
+- **Weekly**: Review performance metrics, update dependencies
+- **Monthly**: Security patches, database optimization
+- **Quarterly**: Disaster recovery test, security audit
+
+### Backup Strategy
+
+```bash
+# Database backup (daily)
+pg_dump agendaiq > backup-$(date +%Y%m%d).sql
+
+# Application backup (before deployment)
+tar -czf backup-$(date +%Y%m%d-%H%M%S).tar.gz .next public
+
+# Keep last 30 days of backups
+find ./backups -name "*.sql" -mtime +30 -delete
+```
+
+## Support
+
+For deployment issues:
+1. Check logs: `pm2 logs agendaiq`
+2. Review monitoring dashboards
+3. Check GitHub Actions logs
+4. Contact DevOps team
+
+## Conclusion
+
+This deployment setup provides:
+- ✅ Automated CI/CD pipeline
+- ✅ Multiple deployment options
+- ✅ Comprehensive monitoring
+- ✅ Automatic rollback on failure
+- ✅ Security best practices
+- ✅ Performance optimization
+- ✅ Disaster recovery
+
+The system is now production-ready with professional-grade deployment automation.

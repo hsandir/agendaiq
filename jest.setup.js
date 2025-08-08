@@ -3,6 +3,9 @@ import { TextEncoder, TextDecoder } from 'util'
 import 'whatwg-fetch'
 import { ReadableStream, WritableStream, TransformStream } from 'web-streams-polyfill'
 
+// Mock next/dynamic
+jest.mock('next/dynamic', () => require('./__mocks__/next/dynamic'))
+
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   useRouter() {
@@ -41,16 +44,22 @@ jest.mock('next-auth/react', () => ({
   SessionProvider: ({ children }) => children,
 }))
 
-// Mock lucide-react
-jest.mock('lucide-react', () => ({
-  ...jest.requireActual('lucide-react'),
-  Palette: () => null,
-  Sun: () => null,
-  Moon: () => null,
-  Eye: () => null,
-  Leaf: () => null,
-  Check: () => null,
-}))
+// Mock lucide-react - return mock components for all icons
+jest.mock('lucide-react', () => {
+  const React = require('react');
+  const mockIcon = React.forwardRef((props, ref) => {
+    return React.createElement('svg', { ...props, ref });
+  });
+  
+  return new Proxy({}, {
+    get: (target, prop) => {
+      if (prop === '__esModule') {
+        return true;
+      }
+      return mockIcon;
+    }
+  });
+})
 
 // Mock Pusher
 jest.mock('pusher-js', () => {

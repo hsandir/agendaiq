@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       const teamMembers = await prisma.staff.findMany({
         where: {
           OR: [
-            { department_id: user.staff.department_id },
+            { department_id: user.staff.department.id },
             { manager_id: user.staff.id }
           ]
         },

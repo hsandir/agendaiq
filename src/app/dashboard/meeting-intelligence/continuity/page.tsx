@@ -17,6 +17,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
+import { BackLink } from '@/components/ui/back-link';
 
 interface MeetingChain {
   id: number;
@@ -295,6 +296,7 @@ export default function MeetingContinuityPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <BackLink href="/dashboard/meeting-intelligence" label="Return to Meeting Intelligence" />
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">
           Meeting Continuity

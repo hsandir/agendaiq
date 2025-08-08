@@ -288,7 +288,7 @@ export function MeetingFormStep2({
                           <SelectValue placeholder="Select presenter" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">No presenter</SelectItem>
+                          <SelectItem value="none">No presenter</SelectItem>
                           {presenters.map((presenter) => (
                             <SelectItem key={presenter.id} value={presenter.id.toString()}>
                               {presenter.name} ({presenter.role})

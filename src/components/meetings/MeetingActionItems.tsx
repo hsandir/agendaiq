@@ -327,7 +327,7 @@ export function MeetingActionItems({
                     <SelectValue placeholder="None" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {agendaItems.map((item, index) => (
                       <SelectItem key={index} value={index.toString()}>
                         #{index + 1}: {item.title}

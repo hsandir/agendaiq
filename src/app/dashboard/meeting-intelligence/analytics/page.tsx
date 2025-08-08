@@ -15,6 +15,7 @@ import {
   XCircle,
   Filter
 } from 'lucide-react';
+import { BackLink } from '@/components/ui/back-link';
 
 interface MeetingMetrics {
   totalMeetings: number;
@@ -105,6 +106,8 @@ export default function MeetingAnalyticsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <BackLink href="/dashboard/meeting-intelligence" label="Return to Meeting Intelligence" />
+      
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">
           Meeting Analytics

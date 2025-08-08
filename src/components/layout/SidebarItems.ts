@@ -16,7 +16,8 @@ import {
   BarChart,
   CheckSquare,
   GitBranch,
-  UserCog
+  UserCog,
+  Palette
 } from "lucide-react";
 
 export interface NavigationItem {
@@ -126,6 +127,11 @@ export const sidebarItems: NavigationSection[] = [
             href: "/dashboard/settings/users",
             label: "User Management",
             icon: UserCheck,
+          },
+          {
+            href: "/dashboard/settings/theme",
+            label: "Theme",
+            icon: Palette,
           },
           {
             href: "/dashboard/settings/security",

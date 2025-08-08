@@ -5,6 +5,7 @@ import { Search, Calendar, Filter, FileText, CheckSquare, Users, ChevronRight } 
 import { useRouter } from 'next/navigation';
 import { useDebounce } from '@/hooks/useDebounce';
 import Link from 'next/link';
+import { BackLink } from '@/components/ui/back-link';
 
 interface SearchResult {
   meetingId: number;
@@ -137,6 +138,7 @@ export default function MeetingSearchPage() {
   
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <BackLink href="/dashboard/meeting-intelligence" label="Return to Meeting Intelligence" />
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">
           Meeting Search
