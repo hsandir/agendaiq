@@ -134,7 +134,7 @@ export function MeetingFormStep2({
       if (result.success) {
         const finalizeResult = await onFinalize();
         if (finalizeResult.success && finalizeResult.redirect) {
-          router.push(finalizeResult.redirect);
+          router.push(finalizeResult.redirect as any);
         }
       } else {
         alert(result.message || "Failed to save agenda items.");
@@ -317,7 +317,7 @@ export function MeetingFormStep2({
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => router.push('/dashboard/meetings')}
+            onClick={() => router.push('/dashboard/meetings' as any)}
           >
             Cancel
           </Button>

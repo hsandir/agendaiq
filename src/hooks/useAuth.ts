@@ -83,19 +83,19 @@ export function useAuth(options: UseAuthOptions = {}): UseAuthReturn {
     
     if (requireStaff && !isStaff) {
       setError(new Error('Staff access required'));
-      router.push('/dashboard');
+      router.push('/dashboard' as any);
       return;
     }
     
     if (requireAdmin && !isAdmin) {
       setError(new Error('Admin access required'));
-      router.push('/dashboard');
+      router.push('/dashboard' as any);
       return;
     }
     
     if (allowedRoles.length > 0 && !allowedRoles.includes(user?.staff?.role?.title || '')) {
       setError(new Error(`Required role: ${allowedRoles.join(' or ')}`));
-      router.push('/dashboard');
+      router.push('/dashboard' as any);
       return;
     }
     

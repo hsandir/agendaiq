@@ -38,7 +38,7 @@ export default function SignUpPage() {
         throw new Error(data.message || "Failed to sign up");
       }
 
-      router.push("/auth/signin?registered=true");
+      router.push("/auth/signin?registered=true" as any);
     } catch (error) {
       setError(error instanceof Error ? error.message : "An error occurred during sign up");
     } finally {

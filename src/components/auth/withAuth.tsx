@@ -28,19 +28,19 @@ export function withAuth<P extends object>(
       
       // Not authenticated at all
       if (!session) {
-        router.push('/auth/signin');
+        router.push('/auth/signin' as any);
         return;
       }
       
       // Check staff requirement
       if (requirements.requireStaff && !session.user?.staff) {
-        router.push('/dashboard');
+        router.push('/dashboard' as any);
         return;
       }
       
       // Check admin requirement
       if (requirements.requireAdmin && session.user?.staff?.role?.title !== 'Administrator') {
-        router.push('/dashboard');
+        router.push('/dashboard' as any);
         return;
       }
       
@@ -48,7 +48,7 @@ export function withAuth<P extends object>(
       if (requirements.allowedRoles && requirements.allowedRoles.length > 0) {
         const userRole = session.user?.staff?.role?.title;
         if (!userRole || !requirements.allowedRoles.includes(userRole)) {
-          router.push('/dashboard');
+          router.push('/dashboard' as any);
           return;
         }
       }

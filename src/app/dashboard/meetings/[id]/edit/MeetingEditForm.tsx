@@ -61,7 +61,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
       });
 
       if (response.ok) {
-        router.push('/dashboard/meetings');
+        router.push('/dashboard/meetings' as any);
       } else {
         throw new Error('Failed to update meeting');
       }

@@ -102,7 +102,7 @@ export default function SystemManagementPage() {
   // Auth check - only admins can access system management
   useEffect(() => {
     if (session && session.user?.staff?.role?.title !== 'Administrator') {
-      router.push('/dashboard');
+      router.push('/dashboard' as any);
       return;
     }
   }, [session, router]);

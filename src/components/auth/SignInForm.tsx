@@ -76,7 +76,7 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
       if (result?.error) {
         setError('Invalid email or password');
       } else {
-        router.push('/dashboard');
+        router.push('/dashboard' as any);
       }
     } catch (error) {
       setError('An error occurred during sign in');

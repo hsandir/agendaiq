@@ -272,7 +272,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       
       if (result?.success && result?.meetingId) {
         // Client-side redirect to Step 2 (agenda items)
-        router.push(`/dashboard/meetings/${result.meetingId}/agenda`);
+        router.push(`/dashboard/meetings/${result.meetingId}/agenda` as any);
       } else if (result?.message) {
         alert(result.message);
       }

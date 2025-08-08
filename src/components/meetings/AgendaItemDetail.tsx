@@ -93,7 +93,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
         if (editData.status === 'Ongoing' && ongoingChoice) {
           if (ongoingChoice === 'new_meeting') {
             // Create new meeting with this item
-            router.push(`/dashboard/meetings/new?fromItem=${item.id}`);
+            router.push(`/dashboard/meetings/new?fromItem=${item.id}` as any);
           } else if (ongoingChoice === 'next_meeting') {
             // Add to next recurring meeting
             await addToNextMeeting();

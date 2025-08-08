@@ -34,7 +34,7 @@ export function RegisterForm() {
       }
 
       // Redirect to sign in page after successful registration
-      router.push('/auth/signin');
+      router.push('/auth/signin' as any);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred');
     } finally {
