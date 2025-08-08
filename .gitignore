@@ -24,6 +24,18 @@
 .DS_Store
 *.pem
 
+# SECURITY: Never commit sensitive files
+SUPABASE_CREDENTIALS_BACKUP.md
+SUPABASE_VERIFIED_URLS.md
+*_CREDENTIALS.md
+*_PASSWORDS.md
+*_SECRETS.md
+*_PRIVATE.md
+*_SENSITIVE.md
+credentials/
+secrets/
+private/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

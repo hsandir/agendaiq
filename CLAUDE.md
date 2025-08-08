@@ -754,6 +754,32 @@ Before completing any task, Claude must verify:
 5. ✅ **Security Tested**: Auth and permissions verified
 6. ✅ **Accessibility**: ARIA attributes tested
 
+## 🔒 CRITICAL SECURITY RULES - MANDATORY
+
+### ABSOLUTE PROHIBITION - SENSITIVE FILES
+
+**NEVER commit or deploy files containing:**
+- Passwords, API keys, secrets, tokens
+- Database URLs with actual credentials  
+- OAuth secrets or JWT tokens
+- Any file with: CREDENTIALS, PASSWORDS, SECRETS, PRIVATE, SENSITIVE in the name
+- Supabase or any service credentials
+
+**ALWAYS use these patterns for sensitive files (auto-ignored by git):**
+- `*_CREDENTIALS.md`, `*_PASSWORDS.md`, `*_SECRETS.md`, `*_PRIVATE.md`, `*_SENSITIVE.md`
+
+**BEFORE ANY git operation:**
+1. Check `git status` for sensitive files
+2. Verify `.gitignore` includes all sensitive patterns
+3. Use placeholders like `[PASSWORD]`, `[API_KEY]` in documentation
+4. Store real values ONLY in `.env.local` or Vercel dashboard
+
+**IF SENSITIVE DATA IS EXPOSED:**
+1. Remove immediately from repository
+2. Rotate ALL credentials
+3. Clean git history with BFG Repo-Cleaner
+4. Audit access logs
+
 ## 🎯 SUCCESS METRICS
 
 Claude's success is measured by:
@@ -765,6 +791,7 @@ Claude's success is measured by:
 - **Performance**: Optimized for production use
 - **Test Coverage**: Minimum 80% coverage for all new code
 - **Test Quality**: Comprehensive test scenarios
+- **Data Protection**: Never expose sensitive information
 
 ---
 
