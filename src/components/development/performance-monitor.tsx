@@ -174,7 +174,7 @@ export default function PerformanceMonitor() {
                 <div className="space-y-2">
                   <h3 className="font-medium">Active Alerts</h3>
                   {metrics.some(m => getMetricStatus(m) === 'critical') ? (
-                    <Alert variant="destructive">
+                    <Alert className="border-destructive bg-destructive/10">
                       <AlertTriangleIcon className="h-4 w-4" />
                       <AlertDescription>
                         Critical performance threshold exceeded

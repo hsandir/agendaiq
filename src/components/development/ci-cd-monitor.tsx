@@ -276,7 +276,7 @@ export default function CICDMonitor() {
     if (!job || !job.logs) return '';
     
     const lines = job.logs.split('\n');
-    const errorLines = lines.filter(line => 
+    const errorLines = lines.filter((line: string) => 
       line.includes('Error:') || 
       line.includes('ERROR') || 
       line.includes('Failed')

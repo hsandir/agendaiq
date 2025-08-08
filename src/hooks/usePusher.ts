@@ -11,7 +11,7 @@ export function usePusher() {
 
   useEffect(() => {
     if (!pusherRef.current) {
-      pusherRef.current = getPusherClient();
+      pusherRef.current = getPusherClient() as any;
       setPusher(pusherRef.current);
     }
 

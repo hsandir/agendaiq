@@ -378,7 +378,7 @@ export default function TestDashboard() {
                         />
                         <div className="flex justify-between text-xs mt-1">
                           <span className="text-green-600">{suite.passed} passed</span>
-                          {suite.failed > 0 && <span className="text-destructive">{suite.failed} failed</span>}
+                          {suite.failed && suite.failed > 0 && <span className="text-destructive">{suite.failed} failed</span>}
                         </div>
                       </div>
                     )}
@@ -465,7 +465,7 @@ export default function TestDashboard() {
                             </div>
                           </div>
                           {result.error && (
-                            <Alert variant="destructive" className="mt-2">
+                            <Alert className="mt-2 border-destructive bg-destructive/10">
                               <AlertCircleIcon className="h-4 w-4" />
                               <AlertDescription className="text-xs font-mono">
                                 {result.error}

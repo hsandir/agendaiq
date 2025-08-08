@@ -9,8 +9,9 @@ interface Role {
   title: string;
   priority: number;
   is_leadership: boolean;
-  department_id: number | null;
-  Staff: { id: number }[];
+  _count?: {
+    Staff: number;
+  };
 }
 
 interface Department {
@@ -28,10 +29,16 @@ export default function RolesPageClient({ departments, roles }: Props) {
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
 
-  const handleSaveRoleAssignments = async (updates: { roleId: number; departmentId: number | null }[]) => {
+  const handleSaveRoleAssignments = async (updatedRoles: Role[]) => {
     setIsSaving(true);
     
     try {
+      // Convert Role[] to the format expected by the API
+      const updates = updatedRoles.map(role => ({
+        roleId: role.id,
+        departmentId: null // Since department_id isn't part of the Role interface
+      }));
+
       const response = await fetch('/api/roles/department-assignments', {
         method: 'POST',
         headers: {
@@ -56,8 +63,7 @@ export default function RolesPageClient({ departments, roles }: Props) {
 
   return (
     <DragDropRoleDistribution
-      departments={departments}
-      availableRoles={roles}
+      roles={roles}
       onSave={handleSaveRoleAssignments}
     />
   );

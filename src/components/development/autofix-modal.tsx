@@ -542,7 +542,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
                       </span>
                     )}
                     {step.error && (
-                      <Alert variant="destructive" className="mt-2">
+                      <Alert className="mt-2 border-destructive bg-destructive/10">
                         <AlertDescription className="text-xs">{step.error}</AlertDescription>
                       </Alert>
                     )}
@@ -584,7 +584,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
 
           {/* Result Summary */}
           {result && (
-            <Alert variant={result.success ? 'default' : 'destructive'}>
+            <Alert className={result.success ? '' : 'border-destructive bg-destructive/10'}>
               <div className="flex items-start gap-3">
                 {result.success ? (
                   <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" />

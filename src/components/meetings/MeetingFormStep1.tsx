@@ -202,13 +202,10 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       setSelectedAttendees(Array.from(allAttendees));
     }
     
-    // Store selected meetings and import options for later use
-    setFormData((prev: any) => ({
-      ...prev,
-      sourceMeetings: meetings.map(m => m.id),
-      importAgendaItems: options.importAgendaItems,
-      importAttendees: options.importAttendees
-    }));
+    // Store the parent meeting ID (use the first selected meeting as parent)
+    if (meetings.length > 0) {
+      setParentMeetingId(meetings[0].id);
+    }
     
     setIsContinuation(true);
   };

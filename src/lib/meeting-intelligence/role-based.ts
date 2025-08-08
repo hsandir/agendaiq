@@ -82,11 +82,19 @@ export class RoleBasedAssignmentService {
    * Get all tasks assigned to a role
    */
   static async getRoleTasks(roleId: number, includeCompleted = false) {
-    const statusFilter = includeCompleted 
+    const agendaStatusFilter = includeCompleted 
       ? {} 
       : {
           status: {
-            notIn: ['Completed', 'Cancelled', 'Resolved']
+            notIn: ['Resolved' as const]
+          }
+        };
+
+    const actionStatusFilter = includeCompleted 
+      ? {} 
+      : {
+          status: {
+            notIn: ['Completed' as const, 'Cancelled' as const]
           }
         };
 
@@ -94,7 +102,7 @@ export class RoleBasedAssignmentService {
       prisma.meetingAgendaItem.findMany({
         where: {
           responsible_role_id: roleId,
-          ...statusFilter
+          ...agendaStatusFilter
         },
         include: {
           Meeting: {
@@ -125,7 +133,7 @@ export class RoleBasedAssignmentService {
       prisma.meetingActionItem.findMany({
         where: {
           assigned_to_role: roleId,
-          ...statusFilter
+          ...actionStatusFilter
         },
         include: {
           Meeting: {

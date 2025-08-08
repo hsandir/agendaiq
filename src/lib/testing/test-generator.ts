@@ -39,8 +39,9 @@ export class TestGenerator {
     ).join('')
 
     // Extract props from interface or type definition
-    const propsMatch = content.match(/interface\s+\w*Props\s*{([^}]+)}/s) ||
-                      content.match(/type\s+\w*Props\s*=\s*{([^}]+)}/s)
+    // Using [\s\S] instead of . with /s flag for ES2017 compatibility
+    const propsMatch = content.match(/interface\s+\w*Props\s*{([\s\S]*?)}\s/) ||
+                      content.match(/type\s+\w*Props\s*=\s*{([\s\S]*?)}\s/)
     
     const props = []
     if (propsMatch) {

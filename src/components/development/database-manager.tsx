@@ -141,7 +141,7 @@ export default function DatabaseManager() {
       setQueryResults(data)
     } catch (error) {
       console.error('Query failed:', error)
-      setQueryResults({ error: error.message })
+      setQueryResults({ error: error instanceof Error ? error.message : 'An error occurred' })
     } finally {
       setIsLoading(false)
     }

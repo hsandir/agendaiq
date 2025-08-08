@@ -159,12 +159,15 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
         <button
           onClick={toggleSidebar}
           onMouseEnter={() => setIsOpen(true)}
-          className="flex items-center justify-center w-12 h-12 bg-card rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border border-border hover:border-blue-300"
+          className="flex items-center justify-center w-12 h-12 bg-card rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 border border-border hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          aria-label={isOpen ? "Close settings menu" : "Open settings menu"}
+          aria-expanded={isOpen}
+          aria-controls="settings-sidebar"
         >
           {isOpen ? (
-            <FiX className="w-6 h-6 text-muted-foreground" />
+            <FiX className="w-6 h-6 text-muted-foreground" aria-hidden="true" />
           ) : (
-            <FiMenu className="w-6 h-6 text-muted-foreground" />
+            <FiMenu className="w-6 h-6 text-muted-foreground" aria-hidden="true" />
           )}
         </button>
       </div>
@@ -174,15 +177,20 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-200"
           onClick={() => setIsOpen(false)}
+          aria-hidden="true"
         />
       )}
 
       {/* Hidden Sidebar */}
-      <div 
+      <aside 
+        id="settings-sidebar"
         className={cn(
           "fixed top-0 left-0 h-screen w-80 bg-card shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
+        aria-label="Settings and system navigation"
+        aria-hidden={!isOpen}
+        role="navigation"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border flex-shrink-0">
@@ -197,9 +205,10 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-muted rounded-lg transition-colors"
+            className="p-2 hover:bg-muted rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            aria-label="Close settings menu"
           >
-            <FiX className="w-5 h-5 text-muted-foreground" />
+            <FiX className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
           </button>
         </div>
 
@@ -209,42 +218,53 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
           onMouseLeave={() => setIsOpen(false)}
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          <nav className="px-6 space-y-8">
+          <nav className="px-6 space-y-8" aria-label="Settings navigation">
             {validNavigation.map((section) => {
               if (!section || section.adminOnly && !isAdmin) return null;
 
               return (
                 <div key={section.title}>
-                  <h3 className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                  <h3 
+                    className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3"
+                    id={`settings-section-${section.title.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
                     {section.title}
                   </h3>
-                  <div className="space-y-1">
+                  <ul 
+                    className="space-y-1"
+                    role="list"
+                    aria-labelledby={`settings-section-${section.title.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
                     {section.items.map((item) => {
                       if (!item || (item.adminOnly && !isAdmin)) return null;
 
                       return (
-                        <Link
-                          key={item.href}
-                          href={item.href as any}
-                          onClick={() => setIsOpen(false)}
-                          className={cn(
-                            "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors group",
-                            isActive(item.href)
-                              ? "bg-primary text-primary border-r-2 border-blue-700"
-                              : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                          )}
-                        >
-                          <item.icon
-                            className={cn("mr-3 h-5 w-5 transition-colors", {
-                              "text-primary": isActive(item.href),
-                              "text-muted-foreground group-hover:text-muted-foreground": !isActive(item.href),
-                            })}
-                          />
-                          {item.label}
-                        </Link>
+                        <li key={item.href} role="none">
+                          <Link
+                            href={item.href as any}
+                            onClick={() => setIsOpen(false)}
+                            className={cn(
+                              "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+                              isActive(item.href)
+                                ? "bg-primary text-primary border-r-2 border-blue-700"
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                            )}
+                            aria-current={isActive(item.href) ? "page" : undefined}
+                            aria-label={item.label}
+                          >
+                            <item.icon
+                              className={cn("mr-3 h-5 w-5 transition-colors", {
+                                "text-primary": isActive(item.href),
+                                "text-muted-foreground group-hover:text-muted-foreground": !isActive(item.href),
+                              })}
+                              aria-hidden="true"
+                            />
+                            {item.label}
+                          </Link>
+                        </li>
                       );
                     })}
-                  </div>
+                  </ul>
                 </div>
               );
             })}
@@ -257,7 +277,7 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
             <p>Press ESC to close</p>
           </div>
         </div>
-      </div>
+      </aside>
     </>
   );
 } 

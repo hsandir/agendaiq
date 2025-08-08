@@ -150,7 +150,12 @@ export class MeetingContinuityService {
     while (rootMeeting.ParentMeeting) {
       const parent = await prisma.meeting.findUnique({
         where: { id: rootMeeting.parent_meeting_id! },
-        include: { ParentMeeting: true }
+        include: { 
+          ParentMeeting: true,
+          ContinuationMeetings: {
+            orderBy: { created_at: 'asc' }
+          }
+        }
       });
       if (!parent) break;
       rootMeeting = parent;

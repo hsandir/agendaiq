@@ -92,7 +92,7 @@ export default function LogViewer() {
     switch (level) {
       case 'debug': return 'secondary'
       case 'info': return 'default'
-      case 'warn': return 'warning'
+      case 'warn': return 'secondary'
       case 'error': return 'destructive'
       default: return 'secondary'
     }
@@ -100,7 +100,7 @@ export default function LogViewer() {
 
   const getContextColor = (context?: string) => {
     if (!context) return 'text-muted-foreground'
-    const colors = {
+    const colors: Record<string, string> = {
       auth: 'text-primary',
       meetings: 'text-green-600',
       database: 'text-secondary',
@@ -110,7 +110,7 @@ export default function LogViewer() {
     return colors[context] || 'text-muted-foreground'
   }
 
-  const contexts = ['all', ...new Set(logs.map(log => log.context).filter(Boolean))]
+  const contexts = ['all', ...new Set(logs.map(log => log.context).filter(Boolean) as string[])]
 
   const filteredLogs = logs.filter(log => {
     const matchesFilter = log.message.toLowerCase().includes(filter.toLowerCase()) ||

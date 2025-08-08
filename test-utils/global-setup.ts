@@ -20,7 +20,8 @@ export default async function globalSetup() {
   }
 
   process.env.DATABASE_URL = testDbUrl
-  process.env.NODE_ENV = 'test'
+  // NODE_ENV is read-only in TypeScript, use type assertion
+  (process.env as any).NODE_ENV = 'test'
   process.env.NEXTAUTH_URL = 'http://localhost:3000'
   process.env.NEXTAUTH_SECRET = 'test-secret'
 

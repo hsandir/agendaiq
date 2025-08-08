@@ -49,6 +49,7 @@ export default function ApiTester() {
   const [history, setHistory] = useState<RequestHistory[]>([])
   const [savedRequests, setSavedRequests] = useState<SavedRequest[]>([])
   const [activeTab, setActiveTab] = useState('headers')
+  const [responseTab, setResponseTab] = useState('body')
 
   const sendRequest = async () => {
     setIsLoading(true)
@@ -140,8 +141,8 @@ export default function ApiTester() {
   }
 
   const getStatusBadgeVariant = (status: number) => {
-    if (status >= 200 && status < 300) return 'success'
-    if (status >= 300 && status < 400) return 'warning'
+    if (status >= 200 && status < 300) return 'default'
+    if (status >= 300 && status < 400) return 'secondary'
     if (status >= 400 && status < 500) return 'destructive'
     if (status >= 500) return 'destructive'
     return 'secondary'
@@ -256,7 +257,7 @@ export default function ApiTester() {
                   </Badge>
                 </div>
               </div>
-              <Tabs defaultValue="body">
+              <Tabs value={responseTab} onValueChange={setResponseTab}>
                 <TabsList>
                   <TabsTrigger value="body">Body</TabsTrigger>
                   <TabsTrigger value="headers">Headers</TabsTrigger>

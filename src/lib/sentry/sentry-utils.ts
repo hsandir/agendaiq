@@ -183,10 +183,12 @@ export const Performance = {
     
     try {
       const result = await queryFn();
-      transaction?.setStatus('ok');
+      // SpanStatus type changed in newer Sentry versions
+      // Using setHttpStatus instead for compatibility
+      (transaction as any)?.setHttpStatus?.(200);
       return result;
     } catch (error) {
-      transaction?.setStatus('internal_error');
+      (transaction as any)?.setHttpStatus?.(500);
       throw error;
     } finally {
       transaction?.end();
@@ -204,10 +206,12 @@ export const Performance = {
     
     try {
       const result = await routeFn();
-      transaction?.setStatus('ok');
+      // SpanStatus type changed in newer Sentry versions
+      // Using setHttpStatus instead for compatibility
+      (transaction as any)?.setHttpStatus?.(200);
       return result;
     } catch (error) {
-      transaction?.setStatus('internal_error');
+      (transaction as any)?.setHttpStatus?.(500);
       throw error;
     } finally {
       transaction?.end();
