@@ -19,14 +19,27 @@ async function createAdmin() {
 
     // Create or find the Administrator role
     let role = await prisma.role.findFirst({
-      where: { name: 'Administrator' }
+      where: { title: 'Administrator' }
     });
 
     if (!role) {
       role = await prisma.role.create({
-        data: { name: 'Administrator' }
+        data: { 
+          title: 'Administrator',
+          priority: 1,
+          is_leadership: true
+        }
       });
       console.log('Created Administrator role');
+    }
+
+    // Get the first school and district
+    const district = await prisma.district.findFirst();
+    const school = await prisma.school.findFirst();
+    
+    if (!district || !school) {
+      console.error('No district or school found. Please run seed script first.');
+      return;
     }
 
     // Create or find the Administration department
@@ -38,7 +51,8 @@ async function createAdmin() {
       department = await prisma.department.create({
         data: {
           name: 'Administration',
-          code: 'ADMIN'
+          code: 'ADMIN',
+          school_id: school.id
         }
       });
       console.log('Created Administration department');
@@ -52,17 +66,30 @@ async function createAdmin() {
       data: {
         email: 'admin@school.edu',
         name: 'System Administrator',
-        staffId: `ADMIN-${Date.now()}`,
+        staff_id: `ADMIN-${Date.now()}`,
         hashedPassword,
-        roleId: role.id,
-        departmentId: department.id
+        is_admin: true,
+        emailVerified: new Date()
+      }
+    });
+    
+    // Create staff record
+    const staff = await prisma.staff.create({
+      data: {
+        user_id: user.id,
+        role_id: role.id,
+        department_id: department.id,
+        school_id: school.id,
+        district_id: district.id
       }
     });
 
     console.log('Admin user created successfully!');
     console.log('Email: admin@school.edu');
     console.log('Password: 1234');
-    console.log('Staff ID:', user.staffId);
+    console.log('Staff ID:', user.staff_id);
+    console.log('User ID:', user.id);
+    console.log('Staff Record ID:', staff.id);
 
   } catch (error) {
     console.error('Error creating admin:', error);

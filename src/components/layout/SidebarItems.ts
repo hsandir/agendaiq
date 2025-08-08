@@ -10,7 +10,13 @@ import {
   Shield,
   Lock,
   Activity,
-  FlaskConical
+  FlaskConical,
+  Brain,
+  Search,
+  BarChart,
+  CheckSquare,
+  GitBranch,
+  UserCog
 } from "lucide-react";
 
 export interface NavigationItem {
@@ -38,6 +44,43 @@ export const sidebarItems: NavigationSection[] = [
         href: "/dashboard/meetings",
         label: "Meetings",
         icon: Calendar,
+      },
+      {
+        href: "/dashboard/meeting-intelligence",
+        label: "Meeting Intelligence",
+        icon: Brain,
+        children: [
+          {
+            href: "/dashboard/meeting-intelligence",
+            label: "Overview",
+            icon: Brain,
+          },
+          {
+            href: "/dashboard/meeting-intelligence/search",
+            label: "Search",
+            icon: Search,
+          },
+          {
+            href: "/dashboard/meeting-intelligence/analytics",
+            label: "Analytics",
+            icon: BarChart,
+          },
+          {
+            href: "/dashboard/meeting-intelligence/action-items",
+            label: "Action Items",
+            icon: CheckSquare,
+          },
+          {
+            href: "/dashboard/meeting-intelligence/continuity",
+            label: "Meeting Chains",
+            icon: GitBranch,
+          },
+          {
+            href: "/dashboard/meeting-intelligence/role-tasks",
+            label: "Role Tasks",
+            icon: UserCog,
+          },
+        ],
       },
       {
         href: "/dashboard/team",
