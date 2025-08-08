@@ -59,7 +59,7 @@ export async function PUT(request: NextRequest) {
       operation: 'UPDATE',
       userId: user.id,
       staffId: user.staff?.id,
-      source: 'theme_settings',
+      source: 'WEB_UI',
       description: `Theme changed to ${validatedData.theme}`,
     });
 

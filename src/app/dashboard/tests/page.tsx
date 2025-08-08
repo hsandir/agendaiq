@@ -50,6 +50,7 @@ export default function TestDashboard() {
   const [testResults, setTestResults] = useState<TestResult[]>([])
   const [coverage, setCoverage] = useState<CoverageReport | null>(null)
   const [isRunning, setIsRunning] = useState(false)
+  const [activeTab, setActiveTab] = useState("results")
   const [output, setOutput] = useState<string[]>([])
 
   // Load available test suites
@@ -198,7 +199,7 @@ export default function TestDashboard() {
                         {getStatusIcon(suite.status)}
                         <span className="font-medium">{suite.name}</span>
                       </div>
-                      <Badge variant={suite.status === 'passed' ? 'success' : suite.status === 'failed' ? 'destructive' : 'secondary'}>
+                      <Badge variant={suite.status === 'passed' ? 'default' : suite.status === 'failed' ? 'destructive' : 'secondary'}>
                         {suite.tests} tests
                       </Badge>
                     </div>
@@ -232,7 +233,7 @@ export default function TestDashboard() {
             <CardTitle>Test Results</CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="results">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="w-full">
                 <TabsTrigger value="results" className="flex-1">
                   <FileTextIcon className="mr-2 h-4 w-4" />
@@ -274,7 +275,7 @@ export default function TestDashboard() {
                             </span>
                           </div>
                           {result.error && (
-                            <Alert variant="destructive" className="mt-2">
+                            <Alert className="mt-2 border-destructive">
                               <AlertDescription className="text-xs font-mono">
                                 {result.error}
                               </AlertDescription>

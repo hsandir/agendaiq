@@ -112,7 +112,7 @@ export default function DevelopmentTools() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center space-x-2">
-              <Badge variant={stats.buildStatus.status === 'passing' ? 'success' : 'destructive'}>
+              <Badge variant={stats.buildStatus.status === 'passing' ? 'default' : 'destructive'}>
                 {stats.buildStatus.status === 'passing' ? 'Passing' : 'Failed'}
               </Badge>
               <span className="text-sm text-muted-foreground">{stats.buildStatus.timeFormatted}</span>

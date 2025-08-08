@@ -419,6 +419,7 @@ const designSystems = [
 export default function DesignSystemDemoPage() {
   const [selectedDesign, setSelectedDesign] = useState(designSystems[0]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState("meetings");
 
   // Örnek veriler
   const meetings = [
@@ -474,7 +475,7 @@ export default function DesignSystemDemoPage() {
   return (
     <div className={`min-h-screen ${design.colors.secondary}`}>
       {/* Header */}
-      <header className={`${design.header} ${design.colors.surface} ${design.border} border-b`}>
+      <header className={`${design.header} ${design.colors.surface} ${design.colors.border} border-b`}>
         <div className={`${design.layout} ${design.spacing.container}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -492,7 +493,7 @@ export default function DesignSystemDemoPage() {
                     if (design) setSelectedDesign(design);
                   }}
                 >
-                  <SelectTrigger className={`w-48 ${design.border}`}>
+                  <SelectTrigger className={`w-48 ${design.colors.border}`}>
                     <SelectValue placeholder="Select Design" />
                   </SelectTrigger>
                   <SelectContent>
@@ -510,11 +511,11 @@ export default function DesignSystemDemoPage() {
                 New Meeting
               </Button>
               
-              <Button variant="outline" className={design.border}>
+              <Button variant="outline" className={design.colors.border}>
                 <Settings className="w-4 h-4" />
               </Button>
               
-              <Button variant="outline" className={design.border}>
+              <Button variant="outline" className={design.colors.border}>
                 <Bell className="w-4 h-4" />
               </Button>
               
@@ -582,7 +583,7 @@ export default function DesignSystemDemoPage() {
         <main className={`flex-1 ${design.spacing.container}`}>
           {/* Stats Cards */}
           <div className={`grid grid-cols-1 md:grid-cols-4 gap-6 ${design.spacing.section}`}>
-            <Card className={`${design.shadows} ${design.borderRadius} ${design.border} border`}>
+            <Card className={`${design.shadows} ${design.borderRadius} ${design.colors.border} border`}>
               <CardContent className={design.spacing.card}>
                 <div className="flex items-center justify-between">
                   <div>
@@ -590,13 +591,13 @@ export default function DesignSystemDemoPage() {
                     <p className={`text-2xl font-bold ${design.typography.heading}`}>24</p>
                   </div>
                   <div className={`p-3 ${design.colors.accent} ${design.borderRadius}`}>
-                    <Calendar className={`w-6 h-6 ${design.typography.muted}`} />
+                    <Calendar className={`w-6 h-6 ${design.colors.muted}`} />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className={`${design.shadows} ${design.borderRadius} ${design.border} border`}>
+            <Card className={`${design.shadows} ${design.borderRadius} ${design.colors.border} border`}>
               <CardContent className={design.spacing.card}>
                 <div className="flex items-center justify-between">
                   <div>
@@ -604,13 +605,13 @@ export default function DesignSystemDemoPage() {
                     <p className={`text-2xl font-bold ${design.typography.heading}`}>8</p>
                   </div>
                   <div className={`p-3 ${design.colors.accent} ${design.borderRadius}`}>
-                    <Clock className={`w-6 h-6 ${design.typography.muted}`} />
+                    <Clock className={`w-6 h-6 ${design.colors.muted}`} />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className={`${design.shadows} ${design.borderRadius} ${design.border} border`}>
+            <Card className={`${design.shadows} ${design.borderRadius} ${design.colors.border} border`}>
               <CardContent className={design.spacing.card}>
                 <div className="flex items-center justify-between">
                   <div>
@@ -618,13 +619,13 @@ export default function DesignSystemDemoPage() {
                     <p className={`text-2xl font-bold ${design.typography.heading}`}>156</p>
                   </div>
                   <div className={`p-3 ${design.colors.accent} ${design.borderRadius}`}>
-                    <Users className={`w-6 h-6 ${design.typography.muted}`} />
+                    <Users className={`w-6 h-6 ${design.colors.muted}`} />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className={`${design.shadows} ${design.borderRadius} ${design.border} border`}>
+            <Card className={`${design.shadows} ${design.borderRadius} ${design.colors.border} border`}>
               <CardContent className={design.spacing.card}>
                 <div className="flex items-center justify-between">
                   <div>
@@ -632,7 +633,7 @@ export default function DesignSystemDemoPage() {
                     <p className={`text-2xl font-bold ${design.typography.heading}`}>12</p>
                   </div>
                   <div className={`p-3 ${design.colors.accent} ${design.borderRadius}`}>
-                    <Video className={`w-6 h-6 ${design.typography.muted}`} />
+                    <Video className={`w-6 h-6 ${design.colors.muted}`} />
                   </div>
                 </div>
               </CardContent>
@@ -647,28 +648,28 @@ export default function DesignSystemDemoPage() {
                 <Input
                   type="text"
                   placeholder="Search meetings..."
-                  className={`pl-10 pr-4 ${design.border} ${design.borderRadius}`}
+                  className={`pl-10 pr-4 ${design.colors.border} ${design.borderRadius}`}
                 />
               </div>
-              <Button variant="outline" className={`flex items-center space-x-2 ${design.border}`}>
+              <Button variant="outline" className={`flex items-center space-x-2 ${design.colors.border}`}>
                 <Filter className="w-4 h-4" />
                 <span>Filter</span>
               </Button>
             </div>
             
             <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" className={design.border}>
+              <Button variant="outline" size="sm" className={design.colors.border}>
                 <Eye className="w-4 h-4" />
               </Button>
-              <Button variant="outline" size="sm" className={design.border}>
+              <Button variant="outline" size="sm" className={design.colors.border}>
                 <Download className="w-4 h-4" />
               </Button>
             </div>
           </div>
 
           {/* Tabs */}
-          <Tabs defaultValue="meetings" className={design.spacing.section}>
-            <TabsList className={`${design.border} ${design.borderRadius}`}>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className={design.spacing.section}>
+            <TabsList className={`${design.colors.border} ${design.borderRadius}`}>
               <TabsTrigger value="meetings">Meetings</TabsTrigger>
               <TabsTrigger value="calendar">Calendar</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -678,7 +679,7 @@ export default function DesignSystemDemoPage() {
               {/* Meetings Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {meetings.map((meeting) => (
-                  <Card key={meeting.id} className={`${design.shadows} ${design.borderRadius} ${design.border} border hover:shadow-lg transition-all duration-200`}>
+                  <Card key={meeting.id} className={`${design.shadows} ${design.borderRadius} ${design.colors.border} border hover:shadow-lg transition-all duration-200`}>
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -698,7 +699,7 @@ export default function DesignSystemDemoPage() {
                     <CardContent className="space-y-4">
                       {/* Time Info */}
                       <div className="flex items-center space-x-2">
-                        <Clock className={`w-4 h-4 ${design.typography.muted}`} />
+                        <Clock className={`w-4 h-4 ${design.colors.muted}`} />
                         <span className={`text-sm ${design.typography.body}`}>
                           {new Date(meeting.startTime).toLocaleDateString('tr-TR', {
                             weekday: 'short',
@@ -712,7 +713,7 @@ export default function DesignSystemDemoPage() {
 
                       {/* Attendees */}
                       <div className="flex items-center space-x-2">
-                        <Users className={`w-4 h-4 ${design.typography.muted}`} />
+                        <Users className={`w-4 h-4 ${design.colors.muted}`} />
                         <span className={`text-sm ${design.typography.body}`}>
                           {meeting.attendees} participants
                         </span>
@@ -774,10 +775,10 @@ export default function DesignSystemDemoPage() {
             </TabsContent>
             
             <TabsContent value="calendar" className="mt-6">
-              <Card className={`${design.shadows} ${design.borderRadius} ${design.border} border`}>
+              <Card className={`${design.shadows} ${design.borderRadius} ${design.colors.border} border`}>
                 <CardContent className={design.spacing.card}>
                   <div className="text-center py-12">
-                    <Calendar className={`w-16 h-16 mx-auto mb-4 ${design.typography.muted}`} />
+                    <Calendar className={`w-16 h-16 mx-auto mb-4 ${design.colors.muted}`} />
                     <h3 className={`text-lg ${design.typography.heading} mb-2`}>Calendar View</h3>
                     <p className={`text-sm ${design.typography.caption}`}>
                       Calendar integration coming soon...
@@ -788,7 +789,7 @@ export default function DesignSystemDemoPage() {
             </TabsContent>
             
             <TabsContent value="analytics" className="mt-6">
-              <Card className={`${design.shadows} ${design.borderRadius} ${design.border} border`}>
+              <Card className={`${design.shadows} ${design.borderRadius} ${design.colors.border} border`}>
                 <CardContent className={design.spacing.card}>
                   <div className="space-y-6">
                     <div>
@@ -824,7 +825,7 @@ export default function DesignSystemDemoPage() {
           </Tabs>
 
           {/* Quick Actions */}
-          <div className={`mt-8 p-6 ${design.colors.surface} ${design.borderRadius} ${design.shadows} ${design.border} border`}>
+          <div className={`mt-8 p-6 ${design.colors.surface} ${design.borderRadius} ${design.shadows} ${design.colors.border} border`}>
             <h3 className={`text-lg font-semibold mb-4 ${design.typography.heading}`}>
               Quick Actions
             </h3>
@@ -833,15 +834,15 @@ export default function DesignSystemDemoPage() {
                 <Plus className="w-4 h-4 mr-2" />
                 New Meeting
               </Button>
-              <Button variant="outline" className={design.border}>
+              <Button variant="outline" className={design.colors.border}>
                 <Calendar className="w-4 h-4 mr-2" />
                 Schedule
               </Button>
-              <Button variant="outline" className={design.border}>
+              <Button variant="outline" className={design.colors.border}>
                 <Users className="w-4 h-4 mr-2" />
                 Invite
               </Button>
-              <Button variant="outline" className={design.border}>
+              <Button variant="outline" className={design.colors.border}>
                 <FileText className="w-4 h-4 mr-2" />
                 Templates
               </Button>
@@ -849,7 +850,7 @@ export default function DesignSystemDemoPage() {
           </div>
 
           {/* Form Example */}
-          <div className={`mt-8 p-6 ${design.colors.surface} ${design.borderRadius} ${design.shadows} ${design.border} border`}>
+          <div className={`mt-8 p-6 ${design.colors.surface} ${design.borderRadius} ${design.shadows} ${design.colors.border} border`}>
             <h3 className={`text-lg font-semibold mb-4 ${design.typography.heading}`}>
               Form Components
             </h3>
@@ -860,7 +861,7 @@ export default function DesignSystemDemoPage() {
                   <Input 
                     id="title" 
                     placeholder="Enter meeting title"
-                    className={`mt-1 ${design.border} ${design.borderRadius}`}
+                    className={`mt-1 ${design.colors.border} ${design.borderRadius}`}
                   />
                 </div>
                 <div>
@@ -868,13 +869,13 @@ export default function DesignSystemDemoPage() {
                   <Textarea 
                     id="description" 
                     placeholder="Enter meeting description"
-                    className={`mt-1 ${design.border} ${design.borderRadius}`}
+                    className={`mt-1 ${design.colors.border} ${design.borderRadius}`}
                   />
                 </div>
                 <div>
                   <Label htmlFor="type" className={design.typography.body}>Meeting Type</Label>
                   <Select>
-                    <SelectTrigger className={`mt-1 ${design.border} ${design.borderRadius}`}>
+                    <SelectTrigger className={`mt-1 ${design.colors.border} ${design.borderRadius}`}>
                       <SelectValue placeholder="Select meeting type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -892,7 +893,7 @@ export default function DesignSystemDemoPage() {
                   <Input 
                     id="date" 
                     type="datetime-local"
-                    className={`mt-1 ${design.border} ${design.borderRadius}`}
+                    className={`mt-1 ${design.colors.border} ${design.borderRadius}`}
                   />
                 </div>
                 <div>
@@ -901,7 +902,7 @@ export default function DesignSystemDemoPage() {
                     id="duration" 
                     type="number"
                     placeholder="60"
-                    className={`mt-1 ${design.border} ${design.borderRadius}`}
+                    className={`mt-1 ${design.colors.border} ${design.borderRadius}`}
                   />
                 </div>
                 <div className="flex items-center space-x-2">

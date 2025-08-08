@@ -52,7 +52,13 @@ export async function GET(request: NextRequest) {
     
     // Filter by priority
     if (priority !== 'all') {
-      whereConditions.priority = priority;
+      // Convert lowercase filter value to enum format
+      const priorityMap: Record<string, string> = {
+        'low': 'Low',
+        'medium': 'Medium',
+        'high': 'High'
+      };
+      whereConditions.priority = priorityMap[priority.toLowerCase()] || priority;
     }
     
     // Fetch action items
@@ -66,7 +72,7 @@ export async function GET(request: NextRequest) {
             start_time: true
           }
         },
-        Staff: {
+        AssignedTo: {
           include: {
             User: {
               select: {
@@ -78,7 +84,7 @@ export async function GET(request: NextRequest) {
             Role: true
           }
         },
-        ResponsibleRole: true
+        AssignedToRole: true
       },
       orderBy: [
         { priority: 'desc' },
@@ -89,28 +95,28 @@ export async function GET(request: NextRequest) {
     // Transform action items
     const items = actionItems.map(item => {
       const now = new Date();
-      const isOverdue = item.due_date && item.due_date < now && item.status !== 'completed';
+      const isOverdue = item.due_date && item.due_date < now && item.status !== 'Completed';
       
       return {
         id: item.id,
         title: item.title,
         description: item.description,
         status: isOverdue ? 'overdue' : item.status,
-        priority: item.priority || 'medium',
+        priority: item.priority || 'Medium',
         dueDate: item.due_date?.toISOString(),
         createdAt: item.created_at.toISOString(),
         completedAt: item.completed_at?.toISOString(),
-        assignedRole: item.ResponsibleRole ? {
-          id: item.ResponsibleRole.id,
-          title: item.ResponsibleRole.title
+        assignedRole: item.AssignedToRole ? {
+          id: item.AssignedToRole.id,
+          title: item.AssignedToRole.title
         } : {
           id: 0,
           title: 'Unassigned'
         },
-        assignedStaff: item.Staff ? {
-          id: item.Staff.id,
-          name: item.Staff.User.name || 'Unknown',
-          email: item.Staff.User.email
+        assignedStaff: item.AssignedTo ? {
+          id: item.AssignedTo.id,
+          name: item.AssignedTo.User.name || 'Unknown',
+          email: item.AssignedTo.User.email
         } : undefined,
         meeting: item.Meeting ? {
           id: item.Meeting.id,
@@ -118,7 +124,7 @@ export async function GET(request: NextRequest) {
           date: item.Meeting.start_time?.toISOString() || new Date().toISOString()
         } : undefined,
         carriedForwardCount: item.carry_forward_count || 0,
-        parentItemId: item.parent_item_id
+        parentItemId: item.parent_action_id
       };
     });
     
@@ -134,10 +140,10 @@ export async function GET(request: NextRequest) {
         : 0,
       avgCompletionTime: 0, // Would need more complex calculation
       byPriority: {
-        urgent: items.filter(i => i.priority === 'urgent').length,
-        high: items.filter(i => i.priority === 'high').length,
-        medium: items.filter(i => i.priority === 'medium').length,
-        low: items.filter(i => i.priority === 'low').length
+        urgent: items.filter(i => i.priority === 'High').length, // Using High for urgent
+        high: items.filter(i => i.priority === 'High').length,
+        medium: items.filter(i => i.priority === 'Medium').length,
+        low: items.filter(i => i.priority === 'Low').length
       }
     };
     

@@ -6,6 +6,13 @@ export const pusherServer = {
   trigger: async (channel: string, event: string, data: any) => {
     // No-op - real-time features temporarily disabled
     return Promise.resolve();
+  },
+  authorizeChannel: (socketId: string, channel: string, presenceData?: any) => {
+    // Mock authorization - return a mock auth response
+    return {
+      auth: `${socketId}:mock-auth-signature`,
+      channel_data: presenceData ? JSON.stringify(presenceData) : undefined
+    };
   }
 };
 

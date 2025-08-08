@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
         const content = await fs.readFile(path.join(process.cwd(), file), 'utf-8')
         const testCount = (content.match(/\bit\s*\(/g) || []).length
         const describeMatches = content.match(/describe\s*\(\s*['"`]([^'"`]+)['"`]/g) || []
-        const suiteName = describeMatches.length > 0 
+        const suiteName = describeMatches.length > 0 && describeMatches[0]
           ? describeMatches[0].replace(/describe\s*\(\s*['"`]([^'"`]+)['"`]/, '$1')
           : path.basename(file, path.extname(file))
 

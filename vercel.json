@@ -7,14 +7,7 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "build": {
-    "env": {
-      "DATABASE_URL": "@database_url",
-      "NEXTAUTH_URL": "@nextauth_url",
-      "NEXTAUTH_SECRET": "@nextauth_secret",
-      "NEXT_PUBLIC_APP_URL": "@next_public_app_url"
-    }
-  },
+  
   "functions": {
     "src/app/api/**/*.ts": {
       "maxDuration": 30,

@@ -113,7 +113,7 @@ export default async function MeetingIntelligenceDashboard() {
           return (
             <Link
               key={index}
-              href={stat.href}
+              href={stat.href as any}
               className="bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <div className="flex items-center justify-between">
@@ -139,7 +139,7 @@ export default async function MeetingIntelligenceDashboard() {
           return (
             <Link
               key={index}
-              href={feature.href}
+              href={feature.href as any}
               className="bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-all hover:scale-105"
             >
               <div className="flex items-start space-x-4">

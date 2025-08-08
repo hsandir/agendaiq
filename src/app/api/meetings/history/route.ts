@@ -158,9 +158,9 @@ export async function GET(request: NextRequest) {
       attendees: meeting.MeetingAttendee.length,
       agendaItems: meeting.MeetingAgendaItems.length,
       actionItems: meeting.MeetingActionItems.length,
-      completedActions: meeting.MeetingActionItems.filter(item => item.status === 'completed').length,
+      completedActions: meeting.MeetingActionItems.filter((item: any) => item.status === 'Completed').length,
       department: meeting.Department?.name,
-      isRecurring: meeting.is_recurring,
+      isRecurring: !!meeting.repeat_type,
       parentMeetingId: meeting.parent_meeting_id
     }));
 

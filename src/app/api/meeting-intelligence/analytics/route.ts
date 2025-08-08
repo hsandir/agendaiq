@@ -52,8 +52,8 @@ export async function GET(request: NextRequest) {
     const meetings = await prisma.meeting.findMany({
       where: whereConditions,
       include: {
-        MeetingAgendaItem: true,
-        MeetingActionItem: true,
+        MeetingAgendaItems: true,
+        MeetingActionItems: true,
         MeetingAttendee: true,
         Department: true,
         Staff: {
@@ -85,23 +85,13 @@ export async function GET(request: NextRequest) {
       ? Math.round((completedMeetings / totalMeetings) * 100)
       : 0;
     
-    // Calculate on-time start rate
-    const onTimeMeetings = meetings.filter(m => {
-      if (m.start_time && m.actual_start_time) {
-        const diff = Math.abs(m.actual_start_time.getTime() - m.start_time.getTime());
-        return diff <= 5 * 60000; // Within 5 minutes
-      }
-      return false;
-    }).length;
-    
-    const onTimeStartRate = totalMeetings > 0
-      ? Math.round((onTimeMeetings / totalMeetings) * 100)
-      : 0;
+    // Calculate on-time start rate (would need actual_start_time field)
+    const onTimeStartRate = 0; // Placeholder until we add actual_start_time to schema
     
     // Calculate action item completion rate
-    const totalActionItems = meetings.reduce((sum, m) => sum + m.MeetingActionItem.length, 0);
+    const totalActionItems = meetings.reduce((sum, m) => sum + m.MeetingActionItems.length, 0);
     const completedActionItems = meetings.reduce((sum, m) => 
-      sum + m.MeetingActionItem.filter(a => a.status === 'completed').length, 0
+      sum + m.MeetingActionItems.filter((a: any) => a.status === 'Completed').length, 0
     );
     const actionItemCompletionRate = totalActionItems > 0
       ? Math.round((completedActionItems / totalActionItems) * 100)
@@ -137,8 +127,8 @@ export async function GET(request: NextRequest) {
         if (m.start_time && m.end_time) {
           dept.totalDuration += (m.end_time.getTime() - m.start_time.getTime()) / 60000;
         }
-        dept.actionItems += m.MeetingActionItem.length;
-        dept.completedItems += m.MeetingActionItem.filter(a => a.status === 'completed').length;
+        dept.actionItems += m.MeetingActionItems.length;
+        dept.completedItems += m.MeetingActionItems.filter((a: any) => a.status === 'Completed').length;
       }
     });
     

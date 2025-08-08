@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
         OR: [
           { parent_meeting_id: { not: null } },
           { 
-            ChildMeetings: {
+            ContinuationMeetings: {
               some: {}
             }
           }
@@ -25,21 +25,21 @@ export async function GET(request: NextRequest) {
       },
       include: {
         ParentMeeting: true,
-        ChildMeetings: {
+        ContinuationMeetings: {
           include: {
-            MeetingAgendaItem: true,
-            MeetingActionItem: true,
+            MeetingAgendaItems: true,
+            MeetingActionItems: true,
             MeetingAttendee: true
           }
         },
-        MeetingAgendaItem: {
+        MeetingAgendaItems: {
           include: {
             ResponsibleRole: true
           }
         },
-        MeetingActionItem: {
+        MeetingActionItems: {
           include: {
-            ResponsibleRole: true
+            AssignedToRole: true
           }
         },
         MeetingAttendee: true,
@@ -55,14 +55,21 @@ export async function GET(request: NextRequest) {
     
     meetings.forEach(meeting => {
       // Find root meeting
-      let rootMeeting = meeting;
-      while (rootMeeting.ParentMeeting) {
-        rootMeeting = rootMeeting.ParentMeeting;
+      let rootId = meeting.id;
+      let parentId = meeting.parent_meeting_id;
+      
+      // Traverse up to find root (without ParentMeeting object)
+      while (parentId) {
+        const parent = meetings.find(m => m.id === parentId);
+        if (!parent) break;
+        rootId = parent.id;
+        parentId = parent.parent_meeting_id;
       }
       
-      const chainId = rootMeeting.id;
+      const chainId = rootId;
       
       if (!chainsMap.has(chainId)) {
+        const rootMeeting = meetings.find(m => m.id === rootId) || meeting;
         chainsMap.set(chainId, {
           id: chainId,
           rootMeeting: {
@@ -115,7 +122,7 @@ export async function GET(request: NextRequest) {
         : 0,
       longestChain: Math.max(...chains.map(c => c.totalMeetings), 0),
       totalCarriedItems: meetings.reduce((sum, m) => 
-        sum + m.MeetingAgendaItem.filter(i => i.carried_forward).length, 0
+        sum + m.MeetingAgendaItems.filter((i: any) => i.carried_forward).length, 0
       ),
       resolutionRate: chains.reduce((sum, c) => sum + c.efficiency, 0) / (chains.length || 1),
       averageResolutionTime: 7 // Simplified - would need more complex calculation
@@ -146,16 +153,16 @@ function buildMeetingNode(meeting: any, allMeetings: any[]): any {
     parentId: meeting.parent_meeting_id,
     children: children.map(child => buildMeetingNode(child, allMeetings)),
     agendaItems: {
-      total: meeting.MeetingAgendaItem.length,
-      resolved: meeting.MeetingAgendaItem.filter((i: any) => i.status === 'Resolved').length,
-      carriedForward: meeting.MeetingAgendaItem.filter((i: any) => i.carried_forward).length
+      total: meeting.MeetingAgendaItems.length,
+      resolved: meeting.MeetingAgendaItems.filter((i: any) => i.status === 'Resolved').length,
+      carriedForward: meeting.MeetingAgendaItems.filter((i: any) => i.carried_forward).length
     },
     actionItems: {
-      total: meeting.MeetingActionItem.length,
-      completed: meeting.MeetingActionItem.filter((i: any) => i.status === 'completed').length,
-      pending: meeting.MeetingActionItem.filter((i: any) => i.status === 'pending').length,
-      overdue: meeting.MeetingActionItem.filter((i: any) => {
-        return i.due_date && i.due_date < new Date() && i.status !== 'completed';
+      total: meeting.MeetingActionItems.length,
+      completed: meeting.MeetingActionItems.filter((i: any) => i.status === 'Completed').length,
+      pending: meeting.MeetingActionItems.filter((i: any) => i.status === 'Pending').length,
+      overdue: meeting.MeetingActionItems.filter((i: any) => {
+        return i.due_date && i.due_date < new Date() && i.status !== 'Completed';
       }).length
     },
     attendeeCount: meeting.MeetingAttendee.length,

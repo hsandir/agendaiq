@@ -21,22 +21,22 @@ export async function GET(request: NextRequest) {
       roleWhereConditions.is_leadership = true;
     } else if (filter === 'active') {
       // Roles with active tasks
-      roleWhereConditions.MeetingActionItems = {
+      roleWhereConditions.ActionItems = {
         some: {
           status: {
-            not: 'completed'
+            not: 'Completed'
           }
         }
       };
     } else if (filter === 'overdue') {
       // Roles with overdue tasks
-      roleWhereConditions.MeetingActionItems = {
+      roleWhereConditions.ActionItems = {
         some: {
           due_date: {
             lt: new Date()
           },
           status: {
-            not: 'completed'
+            not: 'Completed'
           }
         }
       };
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
             }
           }
         },
-        MeetingAgendaItems: {
+        AgendaItems: {
           include: {
             Meeting: {
               select: {
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
             }
           }
         },
-        MeetingActionItems: {
+        ActionItems: {
           include: {
             Meeting: {
               select: {
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
                 start_time: true
               }
             },
-            Staff: {
+            AssignedTo: {
               include: {
                 User: {
                   select: {
@@ -101,16 +101,16 @@ export async function GET(request: NextRequest) {
     
     // Transform roles with tasks
     const rolesWithTasks = roles.map(role => {
-      const tasks = role.MeetingActionItems.map(item => {
+      const tasks = role.ActionItems.map((item: any) => {
         const now = new Date();
-        const isOverdue = item.due_date && item.due_date < now && item.status !== 'completed';
+        const isOverdue = item.due_date && item.due_date < now && item.status !== 'Completed';
         
         return {
           id: item.id,
           title: item.title,
           description: item.description,
           status: isOverdue ? 'overdue' : (item.status || 'pending'),
-          priority: item.priority || 'medium',
+          priority: item.priority || 'Medium',
           dueDate: item.due_date?.toISOString(),
           assignedAt: item.created_at.toISOString(),
           meeting: item.Meeting ? {
@@ -125,18 +125,18 @@ export async function GET(request: NextRequest) {
       // Calculate stats for this role
       const stats = {
         totalTasks: tasks.length,
-        completedTasks: tasks.filter(t => t.status === 'completed').length,
+        completedTasks: tasks.filter(t => t.status === 'Completed').length,
         pendingTasks: tasks.filter(t => t.status === 'pending').length,
         overdueTasks: tasks.filter(t => t.status === 'overdue').length,
         completionRate: tasks.length > 0
-          ? Math.round((tasks.filter(t => t.status === 'completed').length / tasks.length) * 100)
+          ? Math.round((tasks.filter(t => t.status === 'Completed').length / tasks.length) * 100)
           : 0,
         averageCompletionTime: 0, // Would need more complex calculation
         tasksByPriority: {
-          urgent: tasks.filter(t => t.priority === 'urgent').length,
-          high: tasks.filter(t => t.priority === 'high').length,
-          medium: tasks.filter(t => t.priority === 'medium').length,
-          low: tasks.filter(t => t.priority === 'low').length
+          urgent: tasks.filter(t => t.priority === 'High').length, // Using High for urgent
+          high: tasks.filter(t => t.priority === 'High').length,
+          medium: tasks.filter(t => t.priority === 'Medium').length,
+          low: tasks.filter(t => t.priority === 'Low').length
         }
       };
       

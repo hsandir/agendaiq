@@ -76,6 +76,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
 
+  const user = authResult.user!;
+
   try {
     const body = await request.json();
     const { passed, failed, coverage, duration } = body;
@@ -87,8 +89,8 @@ export async function POST(request: NextRequest) {
         record_id: Date.now().toString(),
         operation: 'CREATE',
         source: 'SYSTEM',
-        user_id: authResult.user.id,
-        staff_id: authResult.user.staff?.id,
+        user_id: user.id,
+        staff_id: user.staff?.id,
         field_changes: {
           passed,
           failed,

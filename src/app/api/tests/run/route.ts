@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
           
           // Parse test results from output
           const lines = output.split('\n')
-          lines.forEach(line => {
+          lines.forEach((line: string) => {
             // Match test pass/fail patterns
             if (line.includes('✓') || line.includes('✔')) {
               const match = line.match(/✓\s+(.+?)\s*\((\d+)\s*ms\)/)

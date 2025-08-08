@@ -271,7 +271,7 @@ export default async function MeetingAgendaPage(props: Props) {
           <MeetingFormStep2
             meetingId={meetingId}
             meetingTitle={meeting.title}
-            meetingDate={meeting.start_time.toISOString()}
+            meetingDate={meeting.start_time?.toISOString() || new Date().toISOString()}
             attendees={attendees}
             existingItems={existingItems}
             onSubmit={existingItems.length > 0 ? updateAgendaItems : addAgendaItems}

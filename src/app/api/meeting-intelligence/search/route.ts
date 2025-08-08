@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
               title: true
             }
           },
-          Staff: {
+          AssignedTo: {
             include: {
               User: {
                 select: {
@@ -128,8 +128,8 @@ export async function GET(request: NextRequest) {
           id: item.Meeting.id,
           title: item.Meeting.title
         } : undefined,
-        assignedTo: item.Staff ? {
-          name: item.Staff.User.name || 'Unknown'
+        assignedTo: item.AssignedTo ? {
+          name: item.AssignedTo.User.name || 'Unknown'
         } : {
           name: 'Unassigned'
         }
