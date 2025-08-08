@@ -1,7 +1,7 @@
 // Meeting Continuity Module
 // Handles parent-child meeting relationships and carry-forward logic
 
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { CarriedAgendaItem, PendingActionItem, MeetingContinuityData } from './types';
 
 export class MeetingContinuityService {

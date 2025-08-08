@@ -1,7 +1,7 @@
 // Action Items Tracking Module
 // Enhanced action item management with tracking and analytics
 
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { ActionItemStatus } from './types';
 
 export class ActionItemsService {

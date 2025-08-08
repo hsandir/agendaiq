@@ -1,7 +1,7 @@
 // Advanced Search Module
 // Full-text search and filtering capabilities for meetings
 
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { MeetingSearchQuery, MeetingSearchResult } from './types';
 
 export class MeetingSearchService {

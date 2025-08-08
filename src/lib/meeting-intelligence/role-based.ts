@@ -1,7 +1,7 @@
 // Role-Based Assignment Module
 // Handles role transitions and automatic task reassignment
 
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { RoleTransitionData } from './types';
 
 export class RoleBasedAssignmentService {

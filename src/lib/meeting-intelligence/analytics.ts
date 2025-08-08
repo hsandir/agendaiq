@@ -1,7 +1,7 @@
 // Meeting Analytics Module
 // Analytics and reporting capabilities for meetings
 
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { MeetingAnalytics, DepartmentStats } from './types';
 
 export class MeetingAnalyticsService {
