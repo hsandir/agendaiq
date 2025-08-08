@@ -95,10 +95,19 @@ export default function MeetingSearchPage() {
         setMeetings(data.meetings || []);
       }
       if (searchType === 'all' || searchType === 'agenda') {
-        setAgendaItems(data.agendaItems || []);
+        const safeAgendaItems = (data.agendaItems || []).map((item: any) => ({
+          ...item,
+          meeting: item.meeting || { id: 0, title: 'Unknown', startTime: new Date().toISOString() }
+        }));
+        setAgendaItems(safeAgendaItems);
       }
       if (searchType === 'all' || searchType === 'actions') {
-        setActionItems(data.actionItems || []);
+        const safeActionItems = (data.actionItems || []).map((item: any) => ({
+          ...item,
+          meeting: item.meeting || { id: 0, title: 'Unknown' },
+          assignedTo: item.assignedTo || { name: 'Unassigned' }
+        }));
+        setActionItems(safeActionItems);
       }
     } catch (error) {
       console.error('Search error:', error);

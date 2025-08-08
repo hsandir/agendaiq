@@ -91,7 +91,15 @@ export default function RoleTasksPage() {
       const response = await fetch(`/api/meeting-intelligence/role-tasks?${params}`);
       const data = await response.json();
       
-      setRolesWithTasks(data.roles || []);
+      // Ensure all tasks have proper structure
+      const safeRoles = (data.roles || []).map((roleData: any) => ({
+        ...roleData,
+        tasks: (roleData.tasks || []).map((task: any) => ({
+          ...task,
+          meeting: task.meeting || { id: 0, title: 'Unknown', date: new Date().toISOString() }
+        }))
+      }));
+      setRolesWithTasks(safeRoles);
       setTransitionHistory(data.transitions || []);
       
       // Auto-expand roles with overdue tasks

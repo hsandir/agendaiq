@@ -37,7 +37,7 @@ interface ActionItem {
     name: string;
     email: string;
   };
-  meeting: {
+  meeting?: {
     id: number;
     title: string;
     date: string;
@@ -88,7 +88,14 @@ export default function ActionItemsTrackingPage() {
       const response = await fetch(`/api/meeting-intelligence/action-items?${params}`);
       const data = await response.json();
       
-      setActionItems(data.items || []);
+      // Ensure all items have proper structure
+      const safeItems = (data.items || []).map((item: any) => ({
+        ...item,
+        meeting: item.meeting || undefined,
+        assignedRole: item.assignedRole || { id: 0, title: 'Unassigned' },
+        assignedStaff: item.assignedStaff || undefined
+      }));
+      setActionItems(safeItems);
       setStats(data.stats || null);
     } catch (error) {
       console.error('Failed to fetch action items:', error);
