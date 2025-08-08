@@ -48,6 +48,7 @@ export default function ApiTester() {
   const [isLoading, setIsLoading] = useState(false)
   const [history, setHistory] = useState<RequestHistory[]>([])
   const [savedRequests, setSavedRequests] = useState<SavedRequest[]>([])
+  const [activeTab, setActiveTab] = useState('headers')
 
   const sendRequest = async () => {
     setIsLoading(true)
@@ -93,7 +94,7 @@ export default function ApiTester() {
       setHistory([historyItem, ...history.slice(0, 19)])
     } catch (error) {
       setResponse({
-        error: error.message,
+        error: error instanceof Error ? error.message : 'An error occurred',
         duration: Date.now() - startTime,
       })
     } finally {
@@ -183,7 +184,7 @@ export default function ApiTester() {
             </Button>
           </div>
 
-          <Tabs defaultValue="headers">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList>
               <TabsTrigger value="headers">Headers</TabsTrigger>
               <TabsTrigger value="body">Body</TabsTrigger>

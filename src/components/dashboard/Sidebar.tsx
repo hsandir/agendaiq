@@ -16,7 +16,7 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
   const isActive = (path: string) => {
-    return pathname === path || pathname.startsWith(path + "/");
+    return pathname === path || pathname?.startsWith(path + "/");
   };
 
   const toggleExpanded = (href: string) => {
