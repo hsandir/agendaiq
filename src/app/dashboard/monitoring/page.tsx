@@ -5,5 +5,5 @@ export default async function MonitoringPage() {
   // Operations monitoring capability required
   const user = await requireAuth(AuthPresets.requireMonitoring);
 
-  return <MonitoringClient />;
+  return <MonitoringClient user={user} />;
 }

@@ -2,21 +2,34 @@
 
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import LocalMonitor from '@/components/monitoring/local-monitor';
 import ProductionMonitor from '@/components/monitoring/production-monitor';
 import EnhancedLiveMonitor from '@/components/monitoring/enhanced-live-monitor';
+import { AuthenticatedUser } from '@/lib/auth/auth-utils';
 
-export default function MonitoringClient() {
+interface MonitoringClientProps {
+  user: AuthenticatedUser
+}
+
+export default function MonitoringClient({ user }: MonitoringClientProps) {
   const [activeTab, setActiveTab] = useState("enhanced");
 
   return (
     <div className="container mx-auto py-6 space-y-6">
       {/* Page Header */}
       <div className="border-b pb-4">
-        <h1 className="text-3xl font-bold">Professional Error Monitoring System</h1>
-        <p className="text-muted-foreground mt-2">
-          Advanced error analysis with automated solution recommendations - Detailed view of error types per page
-        </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold">Professional Error Monitoring System</h1>
+            <p className="text-muted-foreground mt-2">
+              Advanced error analysis with automated solution recommendations - Detailed view of error types per page
+            </p>
+          </div>
+          <Badge variant="secondary" className="text-sm">
+            {user.name} - OPS
+          </Badge>
+        </div>
         <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg">
           <div className="flex items-start gap-3">
             <div className="bg-gradient-to-r from-blue-500 to-green-500 rounded-full w-3 h-3 mt-2 flex-shrink-0 animate-pulse"></div>
