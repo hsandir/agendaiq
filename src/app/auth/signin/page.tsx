@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { SignInButton } from "@/components/auth/SignInButton";
 import { SignInForm } from "@/components/auth/SignInForm";
 import Link from "next/link";
+import "./signin.css";
 
 function SignInContent() {
   const router = useRouter();

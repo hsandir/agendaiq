@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-08-09T19:59:31.190Z",
+  "tables": {
+    "roleHierarchy": 0,
+    "department": 27,
+    "meeting": 3,
+    "meetingAgendaItem": 0,
+    "meetingActionItem": 0,
+    "meetingAttendee": 0,
+    "meetingTemplate": 0,
+    "auditLog": 0,
+    "device": 0,
+    "session": 0,
+    "account": 0
+  }
+}

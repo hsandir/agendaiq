@@ -55,8 +55,8 @@ interface WorkflowJob {
   html_url: string;
 }
 
-// Mock data for development when GitHub token is not available
-function getMockData() {
+// Removed mock data - require real GitHub token
+/* function getMockData() {
   const mockRuns: WorkflowRun[] = [
     {
       id: 1,
@@ -159,7 +159,7 @@ function getMockData() {
       },
     },
   };
-}
+} */
 
 // GET /api/dev/ci-cd/runs - Get workflow runs and their status
 export async function GET(request: NextRequest) {
@@ -177,31 +177,19 @@ export async function GET(request: NextRequest) {
       branch: searchParams.get('branch') || undefined,
     };
 
-    // If no GitHub token, return mock data for development
+    // Check if GitHub token is configured
     if (!GITHUB_TOKEN) {
-      console.warn('GitHub token not configured, returning mock data');
-      const mockData = getMockData();
-      
-      // Filter mock data based on status if needed
-      if (params.status && params.status !== 'all') {
-        const filteredRuns = mockData.runs.filter(run => {
-          if (params.status === 'failure') return run.conclusion === 'failure';
-          if (params.status === 'success') return run.conclusion === 'success';
-          return run.status === params.status;
-        });
-        
-        return NextResponse.json({
-          ...mockData,
-          runs: filteredRuns,
-          timestamp: new Date().toISOString(),
-        });
-      }
-      
-      return NextResponse.json({
-        ...mockData,
-        timestamp: new Date().toISOString(),
-      });
+      return NextResponse.json(
+        { 
+          error: 'GitHub token not configured',
+          message: 'Please configure GITHUB_TOKEN in your environment variables to use CI/CD monitoring',
+          code: 'MISSING_GITHUB_TOKEN'
+        },
+        { status: 503 }
+      );
     }
+    
+    /* Removed mock data logic */
 
     // Fetch workflow runs from GitHub
     const runsResponse = await fetch(

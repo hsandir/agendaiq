@@ -75,8 +75,12 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
 
       if (result?.error) {
         setError('Invalid email or password');
+      } else if (result?.ok) {
+        // Successful login
+        router.push('/dashboard');
+        router.refresh(); // Force refresh to update session
       } else {
-        router.push('/dashboard' as any);
+        setError('Authentication failed. Please try again.');
       }
     } catch (error) {
       setError('An error occurred during sign in');

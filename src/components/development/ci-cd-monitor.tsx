@@ -87,6 +87,7 @@ export default function CICDMonitor() {
   const [runs, setRuns] = useState<WorkflowRun[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [selectedRun, setSelectedRun] = useState<WorkflowRun | null>(null);
   const [autofixSuggestions, setAutofixSuggestions] = useState<AutofixSuggestion[]>([]);
@@ -101,6 +102,7 @@ export default function CICDMonitor() {
 
   const fetchRuns = async () => {
     try {
+      setError(null); // Clear any previous errors
       const response = await fetch(`/api/dev/ci-cd/runs?status=${filterStatus}&limit=50`);
       
       // Always read the response body once
@@ -108,22 +110,22 @@ export default function CICDMonitor() {
       
       if (!response.ok) {
         // Handle specific error cases
-        if (response.status === 500 && data.code === 'MISSING_GITHUB_TOKEN') {
-          console.info('GitHub token not configured, using mock data');
-          setUsingMockData(true);
-          // Don't throw error, the API returns mock data
+        if (response.status === 503 && data.code === 'MISSING_GITHUB_TOKEN') {
+          console.error('GitHub token not configured');
+          setUsingMockData(false);
+          // Show error message to user
+          setRuns([]);
+          setStats(null);
+          setError(data.message || 'GitHub token not configured. Please add GITHUB_TOKEN to your environment variables.');
           return;
         } else {
           throw new Error(data.error || `HTTP error! status: ${response.status}`);
         }
       }
       
-      // Check if we're using mock data based on the run URLs
-      if (data.runs && data.runs.length > 0 && data.runs[0].url === '#') {
-        setUsingMockData(true);
-      } else {
-        setUsingMockData(false);
-      }
+      // We're using real data if we get here
+      setUsingMockData(false);
+      setError(null);
       
       setRuns(data.runs || []);
       setStats(data.stats || null);
@@ -135,11 +137,12 @@ export default function CICDMonitor() {
           .map((r: WorkflowRun) => r.id);
         setExpandedRuns(new Set(failedRunIds.slice(0, 3)));
       }
-    } catch (error) {
-      console.error('Error fetching CI/CD runs:', error);
+    } catch (err: any) {
+      console.error('Error fetching CI/CD runs:', err);
       // Set empty data on error
       setRuns([]);
       setStats(null);
+      setError(err.message || 'Failed to fetch CI/CD runs');
     } finally {
       setLoading(false);
     }
@@ -315,6 +318,37 @@ export default function CICDMonitor() {
     return (
       <div className="flex justify-center items-center h-64">
         <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Show error state if there's an error
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <Card className="p-6">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-destructive mt-0.5" />
+            <div className="flex-1">
+              <h3 className="font-semibold text-destructive">Configuration Error</h3>
+              <p className="text-sm text-muted-foreground mt-1">{error}</p>
+              {error.includes('GITHUB_TOKEN') && (
+                <div className="mt-4 p-3 bg-muted rounded-md">
+                  <p className="text-sm font-medium mb-2">To enable CI/CD monitoring:</p>
+                  <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+                    <li>Add GITHUB_TOKEN to your .env.local file</li>
+                    <li>Ensure GITHUB_OWNER and GITHUB_REPO are set correctly</li>
+                    <li>Restart your development server</li>
+                  </ol>
+                </div>
+              )}
+              <Button onClick={fetchRuns} className="mt-4">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Retry
+              </Button>
+            </div>
+          </div>
+        </Card>
       </div>
     );
   }

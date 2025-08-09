@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo "${YELLOW}🔍 Running pre-commit checks...${NC}"
+
+# 1. Check for sensitive data
+echo "Checking for sensitive data..."
+if grep -r "password\|secret\|token\|api_key" --include="*.env*" . 2>/dev/null; then
+  echo "${RED}❌ Found sensitive data in env files! Use .env.example instead${NC}"
+  exit 1
+fi
+
+# 2. Lint check
+echo "Running ESLint..."
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "${RED}❌ Linting errors found${NC}"
+  exit 1
+fi
+
+# 3. Type check
+echo "Running type check..."
+npm run type-check
+if [ $? -ne 0 ]; then
+  echo "${RED}❌ TypeScript errors found${NC}"
+  exit 1
+fi
+
+echo "${GREEN}✅ All pre-commit checks passed!${NC}"
