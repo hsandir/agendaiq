@@ -194,7 +194,7 @@ export function SecuritySettings({ user }: { user: any }) {
                     ) : (
                       <button
                         onClick={() => trustDevice(device.id, true)}
-                        className="px-2 py-1 bg-primary text-primary text-xs rounded hover:bg-primary"
+                        className="px-2 py-1 bg-primary text-primary-foreground text-xs rounded hover:bg-primary/90"
                       >
                         Trust
                       </button>

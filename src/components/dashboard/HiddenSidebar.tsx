@@ -246,7 +246,7 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
                             className={cn(
                               "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
                               isActive(item.href)
-                                ? "bg-primary text-primary border-r-2 border-blue-700"
+                                ? "bg-primary text-primary-foreground border-r-2 border-primary-dark"
                                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
                             )}
                             aria-current={isActive(item.href) ? "page" : undefined}

@@ -13,14 +13,14 @@ export default async function SettingsPage() {
         <p className="text-lg text-muted-foreground mb-8">
           Access settings and system management tools through the sidebar menu.
         </p>
-        <div className="bg-primary border border-blue-200 rounded-lg p-6 max-w-md mx-auto">
+        <div className="bg-primary border border-primary-dark rounded-lg p-6 max-w-md mx-auto">
           <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-foreground font-bold">AQ</span>
+            <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
+              <span className="text-primary-foreground font-bold">AQ</span>
             </div>
           </div>
-          <p className="text-primary font-medium mb-2">How to access settings:</p>
-          <p className="text-primary text-sm">
+          <p className="text-primary-foreground font-medium mb-2">How to access settings:</p>
+          <p className="text-primary-foreground text-sm">
             Click or hover over the menu icon (☰) in the top-left corner to open the settings sidebar.
           </p>
         </div>
@@ -38,7 +38,7 @@ export default async function SettingsPage() {
           
           <div className="bg-card rounded-lg shadow p-6">
             <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center mx-auto mb-4">
-              <span className="text-secondary font-bold">⚙️</span>
+              <span className="text-secondary-foreground font-bold">⚙️</span>
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">Administration</h3>
             <p className="text-muted-foreground text-sm">
@@ -58,7 +58,7 @@ export default async function SettingsPage() {
           
           <div className="bg-card rounded-lg shadow p-6">
             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4">
-              <span className="text-primary font-bold">🎨</span>
+              <span className="text-primary-foreground font-bold">🎨</span>
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">Theme Settings</h3>
             <p className="text-muted-foreground text-sm">
@@ -66,7 +66,7 @@ export default async function SettingsPage() {
             </p>
             <a 
               href="/dashboard/settings/theme"
-              className="inline-flex items-center mt-4 px-4 py-2 bg-primary text-foreground rounded-md hover:bg-primary transition-colors text-sm font-medium"
+              className="inline-flex items-center mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium"
             >
               Choose Theme →
             </a>

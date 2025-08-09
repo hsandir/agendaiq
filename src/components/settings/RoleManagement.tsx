@@ -103,7 +103,7 @@ export default function RoleManagement() {
                 <TableCell>
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     role.is_leadership 
-                      ? 'bg-primary text-primary' 
+                      ? 'bg-primary text-primary-foreground' 
                       : 'bg-muted text-foreground'
                   }`}>
                     {role.is_leadership ? 'Yes' : 'No'}

@@ -146,7 +146,7 @@ export function MeetingHistoryModal({
   const getMeetingTypeColor = (type: string) => {
     switch (type) {
       case "department":
-        return "bg-primary text-primary";
+        return "bg-primary text-primary-foreground";
       case "project":
         return "bg-secondary text-secondary";
       case "one_on_one":

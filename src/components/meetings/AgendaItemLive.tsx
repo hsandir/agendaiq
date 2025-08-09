@@ -158,7 +158,7 @@ export function AgendaItemLive({
       case 'Resolved': return 'bg-green-100 text-green-700';
       case 'Ongoing': return 'bg-yellow-100 text-yellow-700';
       case 'Pending': return 'bg-muted text-foreground';
-      case 'Assigned_to_local': return 'bg-primary text-primary';
+      case 'Assigned_to_local': return 'bg-primary text-primary-foreground';
       case 'Deferred': return 'bg-orange-100 text-orange-700';
       default: return 'bg-muted text-foreground';
     }
@@ -204,7 +204,7 @@ export function AgendaItemLive({
               {/* Assigned User Pill */}
               {item.ResponsibleStaff && !isEditing && (
                 <div className="flex items-center gap-2 mt-2">
-                  <div className="flex items-center gap-1.5 bg-primary text-primary px-2.5 py-1 rounded-full text-xs font-medium">
+                  <div className="flex items-center gap-1.5 bg-primary text-primary-foreground px-2.5 py-1 rounded-full text-xs font-medium">
                     <User className="h-3 w-3" />
                     <span>{item.ResponsibleStaff.User.name}</span>
                   </div>

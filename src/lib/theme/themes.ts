@@ -231,6 +231,120 @@ export const modernPurpleTheme: Theme = {
   },
 };
 
+// Theme X: Tasarim (from tasarim.png)
+export const tasarimTheme: Theme = {
+  id: 'tasarim',
+  name: 'Tasarım',
+  description: 'Design from tasarim.png with crisp corners and purple accents',
+  colors: {
+    // Map provided Tailwind hints to our tokens without breaking structure
+    // Provided hints: primary #6366F1, secondary #8B5CF6, background #0F172A, surface #1E293B, muted #64748B, white #FFFFFF
+    primary: '#6366F1',
+    primaryLight: '#818CF8',
+    primaryDark: '#4F46E5',
+    primaryForeground: '#FFFFFF',
+
+    secondary: '#8B5CF6',
+    secondaryLight: '#A78BFA',
+    secondaryDark: '#7C3AED',
+    secondaryForeground: '#FFFFFF',
+
+    // Background layers: background = page bg, card = surface, secondary/tertiary = subtle elevations
+    background: '#0F172A',
+    backgroundSecondary: '#1E293B',
+    backgroundTertiary: '#273449',
+
+    card: '#1E293B',
+    cardHover: '#273449',
+    cardBorder: '#334155',
+
+    text: '#FFFFFF',
+    textSecondary: '#E2E8F0',
+    textMuted: '#94A3B8',
+    textInverse: '#0F172A',
+
+    border: '#334155',
+    borderLight: '#475569',
+    borderDark: '#1F2937',
+
+    success: '#10B981',
+    successLight: '#34D399',
+    successDark: '#059669',
+
+    warning: '#F59E0B',
+    warningLight: '#FCD34D',
+    warningDark: '#D97706',
+
+    error: '#EF4444',
+    errorLight: '#F87171',
+    errorDark: '#DC2626',
+
+    info: '#3B82F6',
+    infoLight: '#60A5FA',
+    infoDark: '#2563EB',
+
+    sidebar: '#0F172A',
+    sidebarText: '#E2E8F0',
+    sidebarHover: '#1E293B',
+    sidebarActive: '#6366F1',
+
+    header: '#0F172A',
+    headerText: '#FFFFFF',
+
+    input: '#1E293B',
+    inputBorder: '#334155',
+    inputFocus: '#6366F1',
+    inputText: '#FFFFFF',
+    inputPlaceholder: '#64748B',
+
+    buttonPrimary: '#6366F1',
+    buttonPrimaryHover: '#4F46E5',
+    buttonPrimaryText: '#FFFFFF',
+
+    buttonSecondary: '#334155',
+    buttonSecondaryHover: '#475569',
+    buttonSecondaryText: '#FFFFFF',
+
+    buttonGhost: 'transparent',
+    buttonGhostHover: 'rgba(99, 102, 241, 0.12)',
+    buttonGhostText: '#6366F1',
+
+    overlay: 'rgba(0, 0, 0, 0.75)',
+    shadow: 'rgba(0, 0, 0, 0.35)',
+    scrollbar: '#1E293B',
+    scrollbarThumb: '#475569',
+  },
+  fonts: {
+    primary: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    secondary: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    mono: '"SF Mono", Monaco, Inconsolata, "Fira Code", monospace',
+  },
+  spacing: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.25rem',
+    xl: '1.75rem',
+    xxl: '2.5rem',
+  },
+  borderRadius: {
+    // Balanced: keep existing structure, allow rounded-xl=1rem per hint
+    none: '0',
+    sm: '0.25rem',    // 4px
+    md: '0.5rem',     // 8px used for --radius mapping
+    lg: '0.75rem',
+    xl: '1rem',       // 16px
+    full: '9999px',
+  },
+  shadows: {
+    none: 'none',
+    sm: '0 1px 2px rgba(0, 0, 0, 0.08)',
+    md: '0 4px 12px rgba(0, 0, 0, 0.08)', // soft per hint
+    lg: '0 10px 20px rgba(0, 0, 0, 0.12)',
+    xl: '0 16px 28px rgba(0, 0, 0, 0.16)',
+  },
+};
+
 // Theme 2: Classic Light (Current design)
 export const classicLightTheme: Theme = {
   id: 'classic-light',
@@ -350,12 +464,12 @@ export const darkModeTheme: Theme = {
     primary: '#60A5FA',
     primaryLight: '#93C5FD',
     primaryDark: '#3B82F6',
-    primaryForeground: '#0F172A',
+    primaryForeground: '#FFFFFF',
     
     secondary: '#A78BFA',
     secondaryLight: '#C4B5FD',
     secondaryDark: '#8B5CF6',
-    secondaryForeground: '#0F172A',
+    secondaryForeground: '#FFFFFF',
     
     background: '#0F172A',
     backgroundSecondary: '#1E293B',
@@ -406,7 +520,7 @@ export const darkModeTheme: Theme = {
     
     buttonPrimary: '#60A5FA',
     buttonPrimaryHover: '#3B82F6',
-    buttonPrimaryText: '#0F172A',
+    buttonPrimaryText: '#FFFFFF',
     
     buttonSecondary: '#475569',
     buttonSecondaryHover: '#64748B',
@@ -457,9 +571,9 @@ export const highContrastTheme: Theme = {
   name: 'High Contrast',
   description: 'Maximum contrast for accessibility',
   colors: {
-    primary: '#000000',
-    primaryLight: '#1F1F1F',
-    primaryDark: '#000000',
+    primary: '#0066CC',
+    primaryLight: '#3385D6',
+    primaryDark: '#004C99',
     primaryForeground: '#FFFFFF',
     
     secondary: '#FFFFFF',
@@ -500,10 +614,10 @@ export const highContrastTheme: Theme = {
     infoLight: '#3333FF',
     infoDark: '#0000CC',
     
-    sidebar: '#000000',
+    sidebar: '#002855',
     sidebarText: '#FFFFFF',
-    sidebarHover: '#1F1F1F',
-    sidebarActive: '#FFFFFF',
+    sidebarHover: '#003366',
+    sidebarActive: '#0066CC',
     
     header: '#000000',
     headerText: '#FFFFFF',
@@ -514,8 +628,8 @@ export const highContrastTheme: Theme = {
     inputText: '#000000',
     inputPlaceholder: '#666666',
     
-    buttonPrimary: '#000000',
-    buttonPrimaryHover: '#333333',
+    buttonPrimary: '#0066CC',
+    buttonPrimaryHover: '#004C99',
     buttonPrimaryText: '#FFFFFF',
     
     buttonSecondary: '#FFFFFF',
@@ -673,6 +787,7 @@ export const natureGreenTheme: Theme = {
 
 // Export all themes
 export const themes: Theme[] = [
+  tasarimTheme,
   modernPurpleTheme,
   classicLightTheme,
   darkModeTheme,

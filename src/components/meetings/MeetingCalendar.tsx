@@ -179,7 +179,7 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
                 {dayMeetings.slice(0, 2).map(meeting => (
                   <div
                     key={meeting.id}
-                    className="text-xs bg-primary text-primary rounded px-1 py-0.5 mb-1 truncate"
+                    className="text-xs bg-primary text-primary-foreground rounded px-1 py-0.5 mb-1 truncate"
                     title={meeting.title}
                   >
                     {safeFormatTime(meeting.startTime)} {meeting.title}

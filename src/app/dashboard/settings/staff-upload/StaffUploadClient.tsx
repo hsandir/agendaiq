@@ -266,7 +266,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
     }
     if (record.status === 'update') {
       return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary text-primary">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary text-primary-foreground">
           Update
         </span>
       );

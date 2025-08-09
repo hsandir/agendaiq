@@ -350,10 +350,10 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
   const getOperationBadge = (operation: string) => {
     const colors = {
       CREATE: 'bg-green-100 text-green-800',
-      UPDATE: 'bg-primary text-primary',
+      UPDATE: 'bg-primary text-primary-foreground',
       DELETE: 'bg-destructive/10 text-destructive',
       BULK_CREATE: 'bg-secondary text-secondary',
-      BULK_UPDATE: 'bg-primary text-primary',
+      BULK_UPDATE: 'bg-primary text-primary-foreground',
       BULK_DELETE: 'bg-pink-100 text-pink-800'
     };
     return colors[operation as keyof typeof colors] || 'bg-muted text-foreground';
@@ -361,7 +361,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
 
   const getCategoryBadge = (category: string) => {
     const colors = {
-      AUTH: 'bg-primary text-primary',
+      AUTH: 'bg-primary text-primary-foreground',
       SECURITY: 'bg-destructive/10 text-destructive',
       DATA_CRITICAL: 'bg-secondary text-secondary',
       PERMISSION: 'bg-yellow-100 text-yellow-800',
@@ -379,7 +379,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
 
   const getSourceBadge = (source: string) => {
     const colors = {
-      WEB_UI: 'bg-primary text-primary',
+      WEB_UI: 'bg-primary text-primary-foreground',
       API: 'bg-green-100 text-green-800',
       BULK_UPLOAD: 'bg-secondary text-secondary',
       SYSTEM: 'bg-muted text-foreground'
@@ -762,7 +762,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        isCritical ? 'bg-destructive/10 text-destructive' : 'bg-primary text-primary'
+                        isCritical ? 'bg-destructive/10 text-destructive' : 'bg-primary text-primary-foreground'
                       }`}>
                         {isCritical ? 'CRITICAL' : 'LEGACY'}
                       </span>

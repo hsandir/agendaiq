@@ -230,7 +230,7 @@ export function MeetingLiveView({
     const end = getSafeDate(meeting.end_time);
 
     if (!start || !end) return { status: "unknown", label: "Unknown", color: "bg-muted text-foreground" };
-    if (now < start) return { status: "upcoming", label: "Upcoming", color: "bg-primary text-primary" };
+    if (now < start) return { status: "upcoming", label: "Upcoming", color: "bg-primary text-primary-foreground" };
     if (now > end) return { status: "completed", label: "Completed", color: "bg-muted text-foreground" };
     return { status: "in-progress", label: "In Progress", color: "bg-green-100 text-green-700" };
   };
@@ -409,7 +409,7 @@ export function MeetingLiveView({
                         meetingId={meeting.id}
                       />
                       {typingUser && typingUser.userId !== currentUser.id && (
-                        <div className="absolute -bottom-2 left-4 bg-primary text-primary text-xs px-3 py-1 rounded-full shadow-sm">
+                        <div className="absolute -bottom-2 left-4 bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full shadow-sm">
                           {typingUser.userName} is typing...
                         </div>
                       )}

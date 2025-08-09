@@ -57,8 +57,8 @@ export function ThemeSelector({
         disabled={isChanging}
         className={`
           relative overflow-hidden rounded-lg border-2 p-4 text-left transition-all
-          ${cardColors[theme.id as keyof typeof cardColors] || 'bg-muted border-border'}
-          ${isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
+          ${cardColors}
+          ${isSelected ? 'ring-2 ring-primary ring-offset-2' : ''}
           ${isChanging ? 'opacity-50 cursor-wait' : 'hover:scale-105 cursor-pointer'}
           ${variant === 'compact' ? 'flex items-center gap-3' : 'block'}
         `}
@@ -122,11 +122,11 @@ export function ThemeSelector({
       </div>
       
       {currentTheme && (
-        <div className="mt-8 p-4 bg-primary border border-blue-200 rounded-lg">
-          <h4 className="font-semibold text-foreground mb-1">
+        <div className="mt-8 p-4 bg-primary border border-primary-dark rounded-lg">
+          <h4 className="font-semibold text-primary-foreground mb-1">
             Current Theme: {currentTheme.name}
           </h4>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-primary-foreground/80">
             {currentTheme.description}
           </p>
         </div>

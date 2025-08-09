@@ -14,6 +14,24 @@ export default function Error({
   useEffect(() => {
     // Log error to Sentry
     Sentry.captureException(error);
+    
+    // Also capture to our local error API for debugging
+    try {
+      fetch('/api/error-capture', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: error.message,
+          stack: error.stack,
+          digest: error.digest,
+          url: window.location.href,
+        }),
+      }).catch(e => console.error('Failed to capture error:', e));
+    } catch (e) {
+      console.error('Error capturing error:', e);
+    }
   }, [error]);
 
   return (

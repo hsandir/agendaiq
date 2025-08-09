@@ -63,7 +63,7 @@ export function ThemeInitializer() {
     
     // Apply dark/light class
     document.documentElement.classList.remove('light', 'dark');
-    if (theme.id === 'dark-mode' || theme.id === 'modern-purple' || theme.id === 'high-contrast') {
+    if (theme.id === 'dark-mode' || theme.id === 'modern-purple' || theme.id === 'high-contrast' || theme.id === 'tasarim') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.add('light');

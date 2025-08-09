@@ -84,7 +84,7 @@ export function MobileSidebar() {
                             <summary
                               className={`flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-md cursor-pointer transition-colors ${
                                 isActive
-                                  ? 'bg-primary text-primary'
+                                  ? 'bg-primary text-primary-foreground'
                                   : 'text-foreground hover:bg-muted'
                               }`}
                             >
@@ -101,7 +101,7 @@ export function MobileSidebar() {
                                     href={child.href as any}
                                     className={`block px-3 py-2 text-sm rounded-md transition-colors ${
                                       pathname === child.href
-                                        ? 'bg-primary text-primary font-medium'
+                                        ? 'bg-primary text-primary-foreground font-medium'
                                         : 'text-muted-foreground hover:bg-muted'
                                     }`}
                                   >

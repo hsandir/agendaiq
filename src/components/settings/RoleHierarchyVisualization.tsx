@@ -124,7 +124,7 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
                     {role.Staff!.map((staffMember) => (
                       <span 
                         key={staffMember.id}
-                        className="inline-flex items-center px-2 py-1 rounded bg-primary text-primary text-xs font-medium"
+                        className="inline-flex items-center px-2 py-1 rounded bg-primary text-primary-foreground text-xs font-medium"
                       >
                         <FiUser className="h-3 w-3 mr-1" />
                         {staffMember.User.name || 'No Name'}
@@ -138,7 +138,7 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
                   <span>•</span>
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     role.is_leadership 
-                      ? 'bg-primary text-primary' 
+                      ? 'bg-primary text-primary-foreground' 
                       : 'bg-muted text-foreground'
                   }`}>
                     {role.category}

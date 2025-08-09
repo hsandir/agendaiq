@@ -294,7 +294,7 @@ export default function CICDMonitor() {
   };
 
   const getStatusBadge = (status: string, conclusion: string | null) => {
-    if (status === 'in_progress') return <Badge className="bg-primary text-primary">Running</Badge>;
+    if (status === 'in_progress') return <Badge className="bg-primary text-primary-foreground">Running</Badge>;
     if (status === 'queued') return <Badge className="bg-muted text-foreground">Queued</Badge>;
     if (conclusion === 'success') return <Badge className="bg-green-100 text-green-800">Success</Badge>;
     if (conclusion === 'failure') return <Badge className="bg-destructive/10 text-destructive">Failed</Badge>;
@@ -614,7 +614,7 @@ export default function CICDMonitor() {
                               {suggestion.confidence} confidence
                             </Badge>
                             {suggestion.preventive && (
-                              <Badge className="bg-primary text-primary">Preventive</Badge>
+                              <Badge className="bg-primary text-primary-foreground">Preventive</Badge>
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground mb-2">{suggestion.description}</p>
