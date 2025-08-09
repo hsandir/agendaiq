@@ -3,7 +3,6 @@ import "./globals.css";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ThemeProvider } from "@/lib/theme/theme-provider";
 import { LayoutProvider } from "@/lib/layout/layout-provider";
-import { ThemeInitializer } from "@/components/theme/theme-initializer";
 import { ErrorBoundary } from "@/components/error-boundary";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -50,9 +49,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-background text-foreground`}>
         <ErrorBoundary>
-          <ThemeInitializer />
           <AuthProvider>
-            <ThemeProvider initialTheme="classic-light">
+            <ThemeProvider>
               <LayoutProvider>
                 {children}
               </LayoutProvider>

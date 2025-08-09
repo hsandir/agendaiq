@@ -32,6 +32,7 @@ import type { MeetingAgendaItem, Staff, User as PrismaUser } from "@prisma/clien
 import { usePusherChannel } from "@/hooks/usePusher";
 import { CHANNELS, EVENTS } from "@/lib/pusher";
 import { AgendaItemComments } from "./AgendaItemComments";
+import { CreateMeetingModal } from "./CreateMeetingModal";
 import Link from "next/link";
 
 interface ExtendedAgendaItem extends MeetingAgendaItem {
@@ -66,6 +67,7 @@ export function AgendaItemLive({
   const [isEditing, setIsEditing] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [showCreateMeetingModal, setShowCreateMeetingModal] = useState(false);
   const [editData, setEditData] = useState({
     topic: item.topic,
     problem_statement: item.problem_statement || '',
@@ -101,15 +103,8 @@ export function AgendaItemLive({
       setIsEditing(false);
       setShowAssignDialog(false);
       
-      // Navigate to create new meeting with this agenda item
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams({
-          agendaItemId: item.id.toString(),
-          topic: item.topic,
-          problemStatement: item.problem_statement || ''
-        });
-        window.location.href = `/dashboard/meetings/new?${params.toString()}`;
-      }
+      // Open create meeting modal
+      setShowCreateMeetingModal(true);
     } else if (action === 'email') {
       // TODO: Implement email functionality
       alert('Email functionality will be implemented soon');
@@ -121,6 +116,12 @@ export function AgendaItemLive({
       setIsEditing(false);
       setShowAssignDialog(false);
     }
+  };
+  
+  const handleMeetingCreated = (meetingId: number) => {
+    setShowCreateMeetingModal(false);
+    // Optionally refresh the page or show success message
+    console.log('Meeting created with ID:', meetingId);
   };
 
   const handleCancel = () => {
@@ -656,11 +657,7 @@ export function AgendaItemLive({
               Send Email
             </Button>
             <Button
-              onClick={() => {
-                if (window.confirm('Save changes and create a new meeting for this item?')) {
-                  handleAssignToLocal('meeting');
-                }
-              }}
+              onClick={() => handleAssignToLocal('meeting')}
               className="w-full sm:w-auto"
             >
               Create Meeting
@@ -668,6 +665,21 @@ export function AgendaItemLive({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+      {/* Create Meeting Modal */}
+      <CreateMeetingModal
+        open={showCreateMeetingModal}
+        onOpenChange={setShowCreateMeetingModal}
+        agendaItem={{
+          id: item.id,
+          topic: item.topic,
+          problem_statement: item.problem_statement,
+          responsible_staff_id: item.responsible_staff_id,
+          priority: item.priority,
+          purpose: item.purpose
+        }}
+        onSuccess={handleMeetingCreated}
+      />
     </div>
   );
 }

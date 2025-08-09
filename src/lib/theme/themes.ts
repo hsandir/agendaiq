@@ -341,11 +341,11 @@ export const midnightBlueTheme: Theme = {
   },
 };
 
-// Theme X: Tasarim (from tasarim.png)
+// Theme X: AgendaIQ Theme
 export const tasarimTheme: Theme = {
   id: 'tasarim',
-  name: 'Tasarım',
-  description: 'Design from tasarim.png with crisp corners and purple accents',
+  name: 'AgendaIQ',
+  description: 'Official AgendaIQ dark theme with purple accents',
   colors: {
     // Map provided Tailwind hints to our tokens without breaking structure
     // Provided hints: primary #6366F1, secondary #8B5CF6, background #0F172A, surface #1E293B, muted #64748B, white #FFFFFF

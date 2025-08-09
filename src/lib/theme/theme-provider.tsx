@@ -19,21 +19,26 @@ interface ThemeProviderProps {
   initialTheme?: string;
 }
 
-export function ThemeProvider({ children, initialTheme = 'standard' }: ThemeProviderProps) {
-  const [currentThemeId, setCurrentThemeId] = useState(initialTheme);
+export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
+  // Get initial theme from localStorage before first render to prevent flash
+  const getInitialTheme = () => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('agendaiq-theme');
+      if (savedTheme && themes.find(t => t.id === savedTheme)) {
+        return savedTheme;
+      }
+    }
+    return initialTheme || 'standard';
+  };
+  
+  const [currentThemeId, setCurrentThemeId] = useState(getInitialTheme);
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { data: session } = useSession();
 
-  // Load theme from localStorage or database on mount
+  // Load theme from database on mount if user is logged in
   useEffect(() => {
     setMounted(true);
-    
-    // First check localStorage
-    const savedTheme = localStorage.getItem('agendaiq-theme');
-    if (savedTheme && themes.find(t => t.id === savedTheme)) {
-      setCurrentThemeId(savedTheme);
-    }
     
     // If user is logged in, fetch theme from database
     if (session?.user) {

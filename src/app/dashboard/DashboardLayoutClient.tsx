@@ -23,20 +23,25 @@ export function DashboardLayoutClient({
   currentRole, 
   userWithStaff 
 }: DashboardLayoutClientProps) {
-  const [layoutId, setLayoutId] = useState('modern');
+  // Get initial layout from localStorage before first render to prevent flash
+  const getInitialLayout = () => {
+    if (typeof window !== 'undefined') {
+      const savedLayout = localStorage.getItem('agendaiq-layout');
+      if (savedLayout) {
+        return savedLayout;
+      }
+    }
+    return 'modern';
+  };
+  
+  const [layoutId, setLayoutId] = useState(getInitialLayout);
   const [mounted, setMounted] = useState(false);
 
-  // Load layout preference from database and localStorage
+  // Load layout preference from database
   useEffect(() => {
     setMounted(true);
     
-    // First check localStorage
-    const savedLayout = localStorage.getItem('agendaiq-layout');
-    if (savedLayout) {
-      setLayoutId(savedLayout);
-    }
-    
-    // Then fetch from database
+    // Fetch from database
     fetch('/api/user/layout')
       .then(res => res.json())
       .then(data => {
