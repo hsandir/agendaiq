@@ -2,6 +2,7 @@ import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { AgendaItemDetail } from '@/components/meetings/AgendaItemDetail';
+import { isAnyAdmin } from '@/lib/auth/policy';
 
 interface Props {
   params: Promise<{ id: string; itemId: string }>;
@@ -77,10 +78,10 @@ export default async function AgendaItemPage(props: Props) {
   // Check permissions
   const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
   const isAttendee = agendaItem.Meeting.MeetingAttendee.length > 0;
-  const isAdmin = user.staff?.role?.title === 'Administrator';
+  const hasAdminAccess = isAnyAdmin(user);
   const isResponsible = agendaItem.responsible_staff_id === user.staff?.id;
 
-  if (!isOrganizer && !isAttendee && !isAdmin) {
+  if (!isOrganizer && !isAttendee && !hasAdminAccess) {
     notFound();
   }
 
@@ -99,7 +100,7 @@ export default async function AgendaItemPage(props: Props) {
       meeting={agendaItem.Meeting}
       currentUser={user}
       allStaff={allStaff}
-      canEdit={isOrganizer || isAdmin || isResponsible}
+      canEdit={isOrganizer || hasAdminAccess || isResponsible}
     />
   );
 }

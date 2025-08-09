@@ -110,9 +110,9 @@ export const RoutePolicy: Record<string, Capability | Capability[]> = {
   '/setup/district': Capability.DEV_UPDATE
 };
 
-// API Route Policy
+// API Route Policy - CRITICAL SECURITY ENFORCEMENT
 export const ApiRoutePolicy: Record<string, Capability | Capability[]> = {
-  // Dev APIs
+  // Dev APIs - CRITICAL SECURITY - DEV_ADMIN ONLY
   '/api/dev': Capability.DEV_DEBUG,
   '/api/debug': Capability.DEV_DEBUG,
   '/api/tests': Capability.DEV_DEBUG,
@@ -123,37 +123,49 @@ export const ApiRoutePolicy: Record<string, Capability | Capability[]> = {
   '/api/system/error-fix': Capability.DEV_FIX,
   '/api/system/update': Capability.DEV_UPDATE,
   '/api/system/mock-data-scan': Capability.DEV_MOCKDATA,
+  '/api/system/diagnostic': Capability.DEV_DEBUG,
   '/api/monitoring/logs/dev': Capability.DEV_DEBUG,
   '/api/internal': Capability.DEV_DEBUG,
   
-  // Ops APIs
+  // Ops APIs - SYSTEM ADMINISTRATION - OPS_ADMIN + DEV_ADMIN
   '/api/monitoring': Capability.OPS_MONITORING,
-  '/api/monitoring/production-errors': Capability.OPS_MONITORING,
-  '/api/monitoring/live-logs': Capability.OPS_LOGS,
-  '/api/monitoring/real-time-errors': Capability.OPS_MONITORING,
-  '/api/monitoring/logs/audit': Capability.OPS_LOGS,
   '/api/system/alerts': Capability.OPS_ALERTS,
   '/api/system/backup': Capability.OPS_BACKUP,
   '/api/system/database': Capability.OPS_DB_READ,
-  '/api/system/database-metrics': Capability.OPS_DB_READ,
   '/api/system/server': Capability.OPS_HEALTH,
-  '/api/system/server-metrics': Capability.OPS_HEALTH,
   '/api/system/status': Capability.OPS_HEALTH,
   '/api/system/settings': Capability.OPS_HEALTH,
-  '/api/system/health-check': Capability.OPS_HEALTH,
+  '/api/system/health': Capability.OPS_HEALTH,
   '/api/system/logs': Capability.OPS_LOGS,
   
-  // Admin APIs
-  '/api/admin/assign-role': Capability.ROLE_MANAGE,
-  '/api/admin/toggle-role': Capability.ROLE_MANAGE,
-  '/api/admin/roles/init': Capability.ROLE_MANAGE,
-  '/api/admin/rate-limits': Capability.USER_MANAGE,
+  // Admin APIs - USER AND ROLE MANAGEMENT - OPS_ADMIN + DEV_ADMIN
+  '/api/admin': Capability.OPS_HEALTH,
   '/api/users': Capability.USER_MANAGE,
-  '/api/user': Capability.USER_VIEW,
+  '/api/user/admin-update': Capability.USER_MANAGE,
+  '/api/user/switch-role': Capability.ROLE_MANAGE,
+  '/api/user/revoke': Capability.USER_MANAGE,
+  
+  // Setup APIs - CRITICAL SECURITY - DEV_ADMIN ONLY
+  '/api/setup/init': Capability.DEV_UPDATE,
+  '/api/district/setup': Capability.DEV_UPDATE,
+  '/api/auth/create-admin': Capability.DEV_UPDATE,
+  '/api/auth/admin-users': Capability.USER_MANAGE,
+  
+  // School Management APIs - OPS_ADMIN + DEV_ADMIN
+  '/api/schools': Capability.SCHOOL_MANAGE,
+  '/api/school': Capability.SCHOOL_MANAGE,
+  '/api/departments': Capability.SCHOOL_MANAGE,
   '/api/staff/upload': Capability.STAFF_IMPORT,
-  '/api/roles': Capability.ROLE_VIEW,
-  '/api/school': Capability.SCHOOL_VIEW,
-  '/api/schools': Capability.SCHOOL_VIEW
+  '/api/roles': Capability.ROLE_MANAGE,
+  
+  // Error Tracking APIs - OPS_ADMIN + DEV_ADMIN
+  '/api/errors': Capability.OPS_MONITORING,
+  '/api/error-capture': Capability.OPS_MONITORING,
+  
+  // Meeting APIs - AUTHENTICATED USERS
+  '/api/meetings': Capability.MEETING_VIEW,
+  '/api/meeting-templates': Capability.MEETING_VIEW,
+  '/api/meeting-intelligence': Capability.MEETING_VIEW
 };
 
 // User interface with capabilities
@@ -307,6 +319,20 @@ export function canAccessRoute(user: UserWithCapabilities | null | undefined, pa
 
 // Check API access
 export function canAccessApi(user: UserWithCapabilities | null | undefined, path: string): boolean {
+  // Public APIs that don't require authentication
+  const publicApis = [
+    '/api/auth',
+    '/api/health',
+    '/api/setup/check'
+  ];
+  
+  // Check if it's a public API
+  for (const publicApi of publicApis) {
+    if (path.startsWith(publicApi)) {
+      return true;
+    }
+  }
+  
   // Find matching API policy
   for (const [pattern, capability] of Object.entries(ApiRoutePolicy)) {
     if (path.startsWith(pattern)) {
@@ -314,8 +340,9 @@ export function canAccessApi(user: UserWithCapabilities | null | undefined, path
     }
   }
   
-  // Default allow for unspecified APIs (may need adjustment)
-  return true;
+  // Default DENY for unspecified APIs - SECURITY BY DEFAULT
+  // If an API is not explicitly listed, it requires authentication
+  return user !== null && user !== undefined;
 }
 
 // Get user with capabilities (for auth)

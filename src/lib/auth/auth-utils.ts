@@ -228,10 +228,8 @@ export async function checkAuthRequirements(requirements: AuthRequirements = {})
 
     // Legacy checks (deprecated but kept for backward compatibility)
     if (requirements.requireAdminRole) {
-      // Check both old and new admin system
-      const isAdmin = isOpsAdmin(user) || isDevAdmin(user) || 
-                     user.staff?.role?.title === 'Administrator' ||
-                     user.staff?.role?.key === 'OPS_ADMIN';
+      // Use capability-based admin check
+      const isAdmin = isOpsAdmin(user) || isDevAdmin(user);
       if (!isAdmin) {
         console.log('❌ Administrator access required but user is not admin');
         return { 

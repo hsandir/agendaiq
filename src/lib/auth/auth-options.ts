@@ -7,6 +7,7 @@ import bcrypt from "bcrypt";
 import speakeasy from "speakeasy";
 import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
 import { AuditClient } from '@/lib/audit/audit-client';
+import { getUserCapabilities } from '@/lib/auth/policy';
 
 // Type guard for staff property
 function hasStaff(user: unknown): user is User & { staff: unknown } {
@@ -221,15 +222,19 @@ export const authOptions: NextAuthOptions = {
         }
       }
       
-      // For Google OAuth, fetch staff info if not present
-      if (token.email && !token.staff && (trigger === 'signIn' || trigger === 'update')) {
+      // Fetch complete user info including capabilities
+      if (token.email && (trigger === 'signIn' || trigger === 'update' || !token.capabilities)) {
         try {
           const dbUser = await prisma.user.findUnique({
             where: { email: token.email },
             include: {
               Staff: {
                 include: {
-                  Role: true,
+                  Role: {
+                    include: {
+                      Permissions: true
+                    }
+                  },
                   Department: true,
                   School: true,
                   District: true
@@ -238,36 +243,47 @@ export const authOptions: NextAuthOptions = {
             }
           });
           
-          if (dbUser?.Staff && dbUser.Staff.length > 0) {
-            const staff = dbUser.Staff[0];
-            token.staff = {
-              id: staff.id,
-              role: {
-                key: staff.Role.key,
-                title: staff.Role.title,
-                priority: staff.Role.priority,
-                category: staff.Role.category,
-                is_leadership: staff.Role.is_leadership
-              },
-              department: {
-                id: staff.Department.id,
-                name: staff.Department.name,
-                code: staff.Department.code
-              },
-              school: {
-                id: staff.School.id,
-                name: staff.School.name,
-                code: staff.School.code
-              },
-              district: {
-                id: staff.District.id,
-                name: staff.District.name,
-                code: staff.District.code
-              }
-            } as any;
+          if (dbUser) {
+            // Add admin flags
+            token.is_system_admin = dbUser.is_system_admin;
+            token.is_school_admin = dbUser.is_school_admin;
+            
+            // Get and add capabilities
+            const capabilities = await getUserCapabilities(dbUser.id);
+            token.capabilities = capabilities;
+            
+            // Add staff info if available
+            if (dbUser.Staff && dbUser.Staff.length > 0) {
+              const staff = dbUser.Staff[0];
+              token.staff = {
+                id: staff.id,
+                role: {
+                  key: staff.Role.key,
+                  title: staff.Role.title,
+                  priority: staff.Role.priority,
+                  category: staff.Role.category,
+                  is_leadership: staff.Role.is_leadership
+                },
+                department: {
+                  id: staff.Department.id,
+                  name: staff.Department.name,
+                  code: staff.Department.code
+                },
+                school: {
+                  id: staff.School.id,
+                  name: staff.School.name,
+                  code: staff.School.code
+                },
+                district: {
+                  id: staff.District.id,
+                  name: staff.District.name,
+                  code: staff.District.code
+                }
+              } as any;
+            }
           }
         } catch (error) {
-          console.error('Error fetching staff info for JWT:', error);
+          console.error('Error fetching user info for JWT:', error);
         }
       }
       
@@ -280,6 +296,10 @@ export const authOptions: NextAuthOptions = {
       if (hasStaffToken(token)) {
         session.user.staff = token.staff;
       }
+      // Add admin flags and capabilities to session
+      session.user.is_system_admin = token.is_system_admin as boolean;
+      session.user.is_school_admin = token.is_school_admin as boolean;
+      session.user.capabilities = token.capabilities as string[];
       return session;
     },
   },

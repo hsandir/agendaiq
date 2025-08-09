@@ -2,6 +2,7 @@ import { requireAuth, AuthPresets } from "@/lib/auth/auth-utils";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { MeetingLiveView } from "@/components/meetings/MeetingLiveView";
+import { isAnyAdmin } from '@/lib/auth/policy';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -90,9 +91,9 @@ export default async function MeetingLivePage(props: Props) {
   // Check if user is authorized
   const isOrganizer = meeting.organizer_id === user.staff?.id;
   const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
-  const isAdmin = user.staff?.role?.title === 'Administrator';
+  const hasAdminAccess = isAnyAdmin(user);
 
-  if (!isOrganizer && !isAttendee && !isAdmin) {
+  if (!isOrganizer && !isAttendee && !hasAdminAccess) {
     notFound();
   }
 

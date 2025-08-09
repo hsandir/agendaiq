@@ -13,8 +13,8 @@ function tokenToUser(token: any): UserWithCapabilities | null {
     id: parseInt(token.id),
     email: token.email,
     name: token.name,
-    is_system_admin: token.staff?.role?.key === 'DEV_ADMIN' || false,
-    is_school_admin: token.staff?.role?.key === 'OPS_ADMIN' || false,
+    is_system_admin: token.is_system_admin || token.staff?.role?.key === 'DEV_ADMIN' || false,
+    is_school_admin: token.is_school_admin || token.staff?.role?.key === 'OPS_ADMIN' || false,
     roleKey: token.staff?.role?.key,
     capabilities: token.capabilities || [],
     staff: token.staff
@@ -53,15 +53,14 @@ export async function middleware(request: NextRequest) {
   
   // Protect API routes
   if (path.startsWith("/api/")) {
-    // Skip auth for public endpoints and development tools
+    // Skip auth for public endpoints ONLY
+    // SECURITY: Dev/test/debug endpoints require authentication and proper capabilities
     const publicEndpoints = [
       '/api/auth', 
       '/api/health', 
       '/api/setup/check', 
       '/api/test-sentry',
-      '/api/dev',  // Development tools - accessible without auth in dev mode
-      '/api/tests', // Test endpoints for development
-      '/api/debug', // Debug endpoints for production troubleshooting
+      // REMOVED: /api/dev, /api/tests, /api/debug - These require DEV_ADMIN capability
     ];
     const isPublic = publicEndpoints.some(endpoint => path.startsWith(endpoint));
     

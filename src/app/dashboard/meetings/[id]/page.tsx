@@ -1,6 +1,7 @@
 import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { isAnyAdmin } from '@/lib/auth/policy';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -34,9 +35,9 @@ export default async function MeetingPage({ params }: PageProps) {
   // Check permissions
   const isOrganizer = meeting.organizer_id === user.staff?.id;
   const isAttendee = meeting.MeetingAttendee.length > 0;
-  const isAdmin = user.staff?.role?.title === 'Administrator';
+  const hasAdminAccess = isAnyAdmin(user);
 
-  if (!isOrganizer && !isAttendee && !isAdmin) {
+  if (!isOrganizer && !isAttendee && !hasAdminAccess) {
     redirect("/dashboard/meetings");
   }
 

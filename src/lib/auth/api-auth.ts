@@ -109,8 +109,8 @@ export function hasResourcePermission(
   action: 'read' | 'write' | 'delete' | 'admin'
 ): boolean {
   
-  // Admin can do everything
-  if (user.staff?.role?.title === 'Administrator') {
+  // Admin can do everything - use capability-based check
+  if (user.is_system_admin || user.is_school_admin) {
     return true;
   }
 

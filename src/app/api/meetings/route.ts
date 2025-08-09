@@ -7,6 +7,7 @@ import { sanitizeMeetingData } from "@/lib/utils/sanitization";
 import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
 import { memoryCache, cacheKeys, CACHE_DURATIONS } from "@/lib/utils/cache";
 import { z } from "zod";
+import { isAnyAdmin } from '@/lib/auth/policy';
 
 // Validation schema for creating meetings
 const createMeetingSchema = z.object({
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest) {
     }
 
     const staffRecord = user.staff;
-    const isAdmin = staffRecord.role?.title === 'Administrator';
+    const hasAdminAccess = isAnyAdmin(user);
     
     // Check cache first
     const cacheKey = cacheKeys.staffMeetings(staffRecord.id, page);
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
 
     let meetingWhereClause;
 
-    if (isAdmin) {
+    if (hasAdminAccess) {
       // Admins can see all meetings in their district
       meetingWhereClause = {
         Staff: {
