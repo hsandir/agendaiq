@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import { MeetingFormStep2 } from "@/components/meetings/MeetingFormStep2";
 import { revalidatePath } from "next/cache";
+import { isAnyAdmin } from '@/lib/auth/policy';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -67,9 +68,9 @@ export default async function MeetingAgendaPage(props: Props) {
 
   // Check if user is the organizer or has admin rights
   const isOrganizer = meeting.organizer_id === currentStaff.id;
-  const isAdmin = currentStaff.Role.title === "Administrator";
+  const hasAdminAccess = isAnyAdmin(user);
   
-  if (!isOrganizer && !isAdmin) {
+  if (!isOrganizer && !hasAdminAccess) {
     redirect("/dashboard/meetings");
   }
 

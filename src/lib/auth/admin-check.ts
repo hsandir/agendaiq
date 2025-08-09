@@ -8,9 +8,12 @@
 
 interface UserWithStaff {
   is_admin?: boolean;
+  is_system_admin?: boolean;
+  is_school_admin?: boolean;
   Staff?: Array<{
     Role?: {
       title: string;
+      key?: string;
       priority?: number;
       level?: number;
       is_leadership?: boolean;
@@ -21,15 +24,18 @@ interface UserWithStaff {
 export function isUserAdmin(user: UserWithStaff | null | undefined): boolean {
   if (!user) return false;
   
-  // Check is_admin flag first - this is the primary admin indicator
+  // Check new admin flags first - these are the primary indicators
+  if (user.is_system_admin || user.is_school_admin) return true;
+  
+  // Legacy check for backward compatibility
   if (user.is_admin) return true;
   
   // Check role properties
   const role = user.Staff?.[0]?.Role;
   if (!role) return false;
   
-  // Check for Administrator or System Administrator roles
-  if (role.title === 'Administrator' || role.title === 'System Administrator') {
+  // Check for admin role keys
+  if (role.key === 'DEV_ADMIN' || role.key === 'OPS_ADMIN') {
     return true;
   }
   

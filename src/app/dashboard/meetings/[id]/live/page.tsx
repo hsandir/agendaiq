@@ -113,7 +113,7 @@ export default async function MeetingLivePage(props: Props) {
         currentUser={user}
         allStaff={allStaff}
         isOrganizer={isOrganizer}
-        isAdmin={isAdmin}
+        isAdmin={hasAdminAccess}
       />
     </div>
   );
