@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from "next/link";
+import type { Route } from 'next';
 import { Header } from "@/components/dashboard/Header";
 import { SidebarWrapper } from "@/components/dashboard/SidebarWrapper";
 import { getLayoutPreference } from '@/lib/layout/layout-types';
@@ -424,7 +425,7 @@ export function DashboardLayoutClient({
                                   <Link href="/dashboard/system/alerts" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
                                     Alert Configuration
                                   </Link>
-                                  <Link href="/dashboard/system/logs" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                  <Link href={"/dashboard/system/logs" as Route} className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
                                     System Logs
                                   </Link>
                                   <Link href="/dashboard/system/backup" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">

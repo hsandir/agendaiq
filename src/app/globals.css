@@ -10,7 +10,7 @@
   /* Theme variables will be applied dynamically via JavaScript */
 
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
 
   body {
