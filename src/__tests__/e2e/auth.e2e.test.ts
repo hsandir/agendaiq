@@ -29,8 +29,8 @@ test.describe('Authentication Flow', () => {
   })
 
   test('should successfully login with valid credentials', async ({ page }) => {
-    await page.fill('input[name="email"]', 'admin@test.com')
-    await page.fill('input[name="password"]', 'password123')
+    await page.fill('input[name="email"]', 'admin@school.edu')
+    await page.fill('input[name="password"]', '1234')
     await page.locator('button[type="submit"]').click()
     
     // Should redirect to dashboard
@@ -41,7 +41,7 @@ test.describe('Authentication Flow', () => {
   test('should handle two-factor authentication', async ({ page }) => {
     // Enable 2FA for test user first
     await page.fill('input[name="email"]', 'user-with-2fa@test.com')
-    await page.fill('input[name="password"]', 'password123')
+    await page.fill('input[name="password"]', 'Admin123!@#')
     await page.locator('button[type="submit"]').click()
     
     // Should redirect to 2FA page
@@ -58,8 +58,8 @@ test.describe('Authentication Flow', () => {
 
   test('should logout successfully', async ({ page }) => {
     // First login
-    await page.fill('input[name="email"]', 'admin@test.com')
-    await page.fill('input[name="password"]', 'password123')
+    await page.fill('input[name="email"]', 'admin@school.edu')
+    await page.fill('input[name="password"]', '1234')
     await page.locator('button[type="submit"]').click()
     
     await expect(page).toHaveURL('/dashboard')
@@ -73,8 +73,8 @@ test.describe('Authentication Flow', () => {
   })
 
   test('should handle remember me functionality', async ({ page, context }) => {
-    await page.fill('input[name="email"]', 'admin@test.com')
-    await page.fill('input[name="password"]', 'password123')
+    await page.fill('input[name="email"]', 'admin@school.edu')
+    await page.fill('input[name="password"]', '1234')
     await page.check('input[name="rememberMe"]')
     await page.locator('button[type="submit"]').click()
     
@@ -142,7 +142,7 @@ test.describe('Password Reset Flow', () => {
     await expect(page).toHaveURL('/auth/forgot-password')
     await expect(page.locator('h1')).toContainText('Reset your password')
     
-    await page.fill('input[name="email"]', 'admin@test.com')
+    await page.fill('input[name="email"]', 'admin@school.edu')
     await page.locator('button[type="submit"]').click()
     
     await expect(page.locator('text=Check your email')).toBeVisible()

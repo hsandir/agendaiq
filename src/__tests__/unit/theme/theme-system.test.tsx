@@ -6,6 +6,11 @@ import { themes } from '@/lib/theme/themes';
 import { generateCSSVariables, isDarkTheme, getSystemThemePreference } from '@/lib/theme/theme-utils';
 import '@testing-library/jest-dom';
 
+// Mock next-auth
+jest.mock('next-auth/react', () => ({
+  useSession: jest.fn(() => ({ data: null, status: 'unauthenticated' })),
+}));
+
 // Mock localStorage
 const localStorageMock = {
   getItem: jest.fn(),

@@ -147,9 +147,10 @@ export function AgendaItemLive({
     
     // Use whisper for client events (works with presence channels)
     try {
-      // @ts-ignore - Pusher types might not include whisper
-      if (channel.whisper) {
-        channel.whisper(EVENTS.USER_TYPING, {
+      // Type assertion for whisper method
+      const presenceChannel = channel as any;
+      if (presenceChannel.whisper) {
+        presenceChannel.whisper(EVENTS.USER_TYPING, {
           itemId: item.id,
           userId: currentUserId,
           userName: currentUserName
@@ -175,9 +176,10 @@ export function AgendaItemLive({
     
     // Use whisper for client events (works with presence channels)
     try {
-      // @ts-ignore - Pusher types might not include whisper
-      if (channel.whisper) {
-        channel.whisper(EVENTS.USER_STOPPED_TYPING, {
+      // Type assertion for whisper method
+      const presenceChannel = channel as any;
+      if (presenceChannel.whisper) {
+        presenceChannel.whisper(EVENTS.USER_STOPPED_TYPING, {
           itemId: item.id,
           userId: currentUserId
         });

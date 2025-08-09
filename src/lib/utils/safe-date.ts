@@ -8,6 +8,26 @@ export interface SafeDateResult {
   formatted: string;
 }
 
+// Default formatting options
+export const DEFAULT_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric'
+};
+
+export const DEFAULT_DATETIME_OPTIONS: Intl.DateTimeFormatOptions = {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+};
+
+export const DEFAULT_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
+  hour: '2-digit',
+  minute: '2-digit'
+};
+
 /**
  * Safely create a Date object from various input types
  */
@@ -115,24 +135,3 @@ export function getSafeDate(input: string | Date | number | null | undefined): D
   return safeDate(input).date;
 }
 
-/**
- * Default date format options for consistent display
- */
-export const DEFAULT_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric'
-};
-
-export const DEFAULT_DATETIME_OPTIONS: Intl.DateTimeFormatOptions = {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit'
-};
-
-export const DEFAULT_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
-  hour: '2-digit',
-  minute: '2-digit'
-};

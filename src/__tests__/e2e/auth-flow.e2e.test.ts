@@ -44,7 +44,7 @@ test.describe('AUTH-E2E-01: Login Flow', () => {
     
     // Fill in test credentials
     await page.fill('input[name="email"]', 'admin@school.edu');
-    await page.fill('input[name="password"]', 'Admin123!@#');
+    await page.fill('input[name="password"]', '1234');
     
     // Submit form
     await page.click('button[type="submit"]');
