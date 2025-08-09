@@ -6,81 +6,76 @@ import { useRouter } from 'next/navigation';
 import { Lock as FiLock, Shield as FiShield } from 'lucide-react';
 import Link from 'next/link';
 
-interface SignInFormProps {
-  isFirstTimeSetup?: boolean;
-}
-
-interface AdminUser {
-  email: string;
-  name: string;
-}
-
-export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
+export function SignInForm() {
   const router = useRouter();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [trustDevice, setTrustDevice] = useState(false);
-  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
-  const [selectedAdminEmail, setSelectedAdminEmail] = useState('');
-
-  // Fetch admin users from database
-  useEffect(() => {
-    const fetchAdminUsers = async () => {
-      try {
-        const response = await fetch('/api/auth/admin-users');
-        if (response.ok) {
-          const data = await response.json();
-          setAdminUsers(data.adminUsers);
-          if (data.adminUsers.length > 0) {
-            setSelectedAdminEmail(data.adminUsers[0].email);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching admin users:', error);
-      }
-    };
-
-    if (isFirstTimeSetup) {
-      fetchAdminUsers();
-    }
-  }, [isFirstTimeSetup]);
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [tempCredentials, setTempCredentials] = useState<{email: string, password: string} | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-
     try {
-      // If first user, create admin account
-      if (isFirstTimeSetup && selectedAdminEmail && email === selectedAdminEmail) {
-        await fetch("/api/auth/create-admin", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+      let email: string;
+      let password: string;
+
+      if (requires2FA && tempCredentials) {
+        // Handle 2FA verification
+        email = tempCredentials.email;
+        password = tempCredentials.password;
+        
+        const result = await signIn('credentials', {
+          email,
+          password,
+          twoFactorCode,
+          rememberMe: rememberMe.toString(),
+          trustDevice: trustDevice.toString(),
+          redirect: false,
         });
-      }
 
-      const result = await signIn('credentials', {
-        email,
-        password,
-        rememberMe: rememberMe.toString(),
-        trustDevice: trustDevice.toString(),
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError('Invalid email or password');
-      } else if (result?.ok) {
-        // Successful login
-        router.push('/dashboard');
-        router.refresh(); // Force refresh to update session
+        if (result?.error === 'INVALID_2FA_CODE') {
+          setError('Invalid verification code. Please try again.');
+        } else if (result?.ok) {
+          // Successful login with 2FA
+          router.push('/dashboard');
+          router.refresh();
+        } else {
+          setError(result?.error || 'Authentication failed. Please try again.');
+        }
       } else {
-        setError('Authentication failed. Please try again.');
+        // Regular login attempt
+        const formData = new FormData(e.currentTarget);
+        email = formData.get('email') as string;
+        password = formData.get('password') as string;
+
+        const result = await signIn('credentials', {
+          email,
+          password,
+          rememberMe: rememberMe.toString(),
+          trustDevice: trustDevice.toString(),
+          redirect: false,
+        });
+
+        if (result?.error === '2FA_REQUIRED') {
+          // User has 2FA enabled, show 2FA input
+          setRequires2FA(true);
+          setTempCredentials({ email, password });
+          setError('');
+        } else if (result?.error) {
+          setError('Invalid email or password');
+        } else if (result?.ok) {
+          // Successful login without 2FA
+          router.push('/dashboard');
+          router.refresh();
+        } else {
+          setError('Authentication failed. Please try again.');
+        }
       }
     } catch (error) {
       setError('An error occurred during sign in');
@@ -94,72 +89,91 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
     <div className="w-full max-w-md space-y-8 rounded-lg bg-card p-6 shadow-lg" role="form" aria-label="Sign in form">
       <div>
         <h2 className="text-center text-3xl font-bold tracking-tight text-foreground" role="heading" aria-level="2">
-          {isFirstTimeSetup ? 'Create Admin Account' : 'Sign in to your account'}
+          Sign in to your account
         </h2>
-        {isFirstTimeSetup && (
-          <p className="mt-2 text-center text-sm text-muted-foreground">
-            Select an admin user to create account
-          </p>
-        )}
       </div>
       <form className="mt-8 space-y-6" onSubmit={handleSubmit} role="form" aria-label="Authentication form">
-        {isFirstTimeSetup && adminUsers.length > 0 && (
-          <div>
-            <label htmlFor="admin-select" className="block text-sm font-medium text-foreground mb-2">
-              Select Admin User
-            </label>
-            <select
-              id="admin-select"
-              value={selectedAdminEmail}
-              onChange={(e) => setSelectedAdminEmail(e.target.value)}
-              className="relative block w-full rounded-md border-0 py-1.5 text-foreground ring-1 ring-inset ring-gray-300 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
+        
+        {!requires2FA ? (
+          <div className="-space-y-px rounded-md shadow-sm">
+            <div>
+              <label htmlFor="email" className="sr-only">
+                Email address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                aria-label="Email address"
+                aria-required="true"
+                className="relative block w-full rounded-t-md border-0 py-1.5 text-foreground ring-1 ring-inset ring-gray-300 placeholder:text-muted-foreground focus:z-10 focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
+                placeholder="Email address"
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                aria-label="Password"
+                aria-required="true"
+                className="relative block w-full rounded-b-md border-0 py-1.5 text-foreground ring-1 ring-inset ring-gray-300 placeholder:text-muted-foreground focus:z-10 focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
+                placeholder="Password"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="text-center">
+              <FiShield className="mx-auto h-12 w-12 text-primary" />
+              <h3 className="mt-2 text-lg font-medium text-foreground">Two-Factor Authentication</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Enter the 6-digit code from your authenticator app
+              </p>
+            </div>
+            <div>
+              <label htmlFor="2fa-code" className="sr-only">
+                Verification Code
+              </label>
+              <input
+                id="2fa-code"
+                name="2fa-code"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                required
+                value={twoFactorCode}
+                onChange={(e) => setTwoFactorCode(e.target.value.replace(/\D/g, ''))}
+                aria-label="2FA Code"
+                aria-required="true"
+                className="relative block w-full rounded-md border-0 py-1.5 text-center text-foreground ring-1 ring-inset ring-gray-300 placeholder:text-muted-foreground focus:z-10 focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
+                placeholder="000000"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setRequires2FA(false);
+                setTwoFactorCode('');
+                setTempCredentials(null);
+                setError('');
+              }}
+              className="text-sm text-primary hover:text-primary-dark"
             >
-              {adminUsers.map((admin) => (
-                <option key={admin.email} value={admin.email}>
-                  {admin.name} ({admin.email})
-                </option>
-              ))}
-            </select>
+              ← Back to login
+            </button>
           </div>
         )}
-        
-        <div className="-space-y-px rounded-md shadow-sm">
-          <div>
-            <label htmlFor="email" className="sr-only">
-              Email address
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              aria-label="Email address"
-              aria-required="true"
-              defaultValue={isFirstTimeSetup && selectedAdminEmail ? selectedAdminEmail : ''}
-              className="relative block w-full rounded-t-md border-0 py-1.5 text-foreground ring-1 ring-inset ring-gray-300 placeholder:text-muted-foreground focus:z-10 focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
-              placeholder="Email address"
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="sr-only">
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete={isFirstTimeSetup ? 'new-password' : 'current-password'}
-              required
-              aria-label="Password"
-              aria-required="true"
-              className="relative block w-full rounded-b-md border-0 py-1.5 text-foreground ring-1 ring-inset ring-gray-300 placeholder:text-muted-foreground focus:z-10 focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
-              placeholder={isFirstTimeSetup ? 'Create password' : 'Password'}
-            />
-          </div>
-        </div>
 
-        {!isFirstTimeSetup && (
+        {!requires2FA && (
           <div className="space-y-4">
             <div className="flex items-center">
               <input
@@ -213,20 +227,19 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
             <span className="absolute inset-y-0 left-0 flex items-center pl-3">
               <FiLock className="h-5 w-5 text-primary group-hover:text-primary" aria-hidden="true" />
             </span>
-            {isLoading ? 'Signing in...' : (isFirstTimeSetup ? 'Create Account' : 'Sign in')}
+            {isLoading ? (requires2FA ? 'Verifying...' : 'Signing in...') : 
+             (requires2FA ? 'Verify Code' : 'Sign in')}
           </button>
         </div>
 
-        {!isFirstTimeSetup && (
-          <div className="text-center">
-            <Link
-              href="/auth/forgot-password"
-              className="text-sm font-medium text-primary hover:text-primary"
-            >
-              Forgot your password?
-            </Link>
-          </div>
-        )}
+        <div className="text-center">
+          <Link
+            href="/auth/forgot-password"
+            className="text-sm font-medium text-primary hover:text-primary"
+          >
+            Forgot your password?
+          </Link>
+        </div>
       </form>
     </div>
   );

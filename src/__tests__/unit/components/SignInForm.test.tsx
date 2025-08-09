@@ -24,28 +24,28 @@ describe('SignInForm Component', () => {
   });
 
   it('renders email and password input fields', () => {
-    render(<SignInForm isFirstTimeSetup={false} />);
+    render(<SignInForm />);
     
     expect(screen.getByPlaceholderText('Email address')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
   });
 
   it('renders submit button', () => {
-    render(<SignInForm isFirstTimeSetup={false} />);
+    render(<SignInForm />);
     
     const submitButton = screen.getByRole('button', { name: /sign in/i });
     expect(submitButton).toBeInTheDocument();
   });
 
   it('shows remember me and trust device checkboxes', () => {
-    render(<SignInForm isFirstTimeSetup={false} />);
+    render(<SignInForm />);
     
     expect(screen.getByLabelText(/remember me/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/trust this device/i)).toBeInTheDocument();
   });
 
   it('validates email format', async () => {
-    render(<SignInForm isFirstTimeSetup={false} />);
+    render(<SignInForm />);
     
     const emailInput = screen.getByPlaceholderText('Email address');
     const submitButton = screen.getByRole('button', { name: /sign in/i });
@@ -60,7 +60,7 @@ describe('SignInForm Component', () => {
   it('disables submit button while loading', async () => {
     (signIn as jest.Mock).mockReturnValue(new Promise(() => {})); // Never resolves
     
-    render(<SignInForm isFirstTimeSetup={false} />);
+    render(<SignInForm />);
     
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
@@ -79,7 +79,7 @@ describe('SignInForm Component', () => {
   it('calls signIn with correct credentials', async () => {
     (signIn as jest.Mock).mockResolvedValue({ ok: true });
     
-    render(<SignInForm isFirstTimeSetup={false} />);
+    render(<SignInForm />);
     
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
@@ -101,7 +101,7 @@ describe('SignInForm Component', () => {
   it('redirects to dashboard on successful login', async () => {
     (signIn as jest.Mock).mockResolvedValue({ ok: true });
     
-    render(<SignInForm isFirstTimeSetup={false} />);
+    render(<SignInForm />);
     
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
@@ -122,7 +122,7 @@ describe('SignInForm Component', () => {
       error: 'Invalid credentials' 
     });
     
-    render(<SignInForm isFirstTimeSetup={false} />);
+    render(<SignInForm />);
     
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
@@ -137,13 +137,13 @@ describe('SignInForm Component', () => {
     });
   });
 
-  it('shows error message for 2FA required', async () => {
+  it('shows 2FA input when required', async () => {
     (signIn as jest.Mock).mockResolvedValue({ 
       ok: false, 
       error: '2FA_REQUIRED' 
     });
     
-    render(<SignInForm isFirstTimeSetup={false} />);
+    render(<SignInForm />);
     
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
@@ -154,15 +154,16 @@ describe('SignInForm Component', () => {
     fireEvent.click(submitButton);
     
     await waitFor(() => {
-      // Currently shows generic error for any auth failure including 2FA
-      expect(screen.getByText(/invalid email or password/i)).toBeInTheDocument();
+      // Now shows 2FA input field
+      expect(screen.getByPlaceholderText('000000')).toBeInTheDocument();
+      expect(screen.getByText(/Two-Factor Authentication/i)).toBeInTheDocument();
     });
   });
 
   it('handles network errors gracefully', async () => {
     (signIn as jest.Mock).mockRejectedValue(new Error('Network error'));
     
-    render(<SignInForm isFirstTimeSetup={false} />);
+    render(<SignInForm />);
     
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
@@ -177,16 +178,11 @@ describe('SignInForm Component', () => {
     });
   });
 
-  it('shows different title for first time setup', () => {
-    render(<SignInForm isFirstTimeSetup={true} />);
-    
-    expect(screen.getByText(/create admin account/i)).toBeInTheDocument();
-  });
 
   it('remembers user preference when remember me is checked', async () => {
     (signIn as jest.Mock).mockResolvedValue({ ok: true });
     
-    render(<SignInForm isFirstTimeSetup={false} />);
+    render(<SignInForm />);
     
     const rememberCheckbox = screen.getByLabelText(/remember me/i);
     const emailInput = screen.getByPlaceholderText('Email address');
