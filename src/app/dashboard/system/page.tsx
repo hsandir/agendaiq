@@ -29,6 +29,7 @@ import {
   Bell
 } from "lucide-react";
 import Link from "next/link";
+import type { Route } from 'next';
 
 interface SystemStatus {
   health: {
@@ -400,7 +401,7 @@ export default function SystemManagementPage() {
             <CardContent>
               <div className="space-y-3">
                 <div className="flex gap-2 text-sm">
-                  <Link href="/dashboard/system/logs" className="text-primary hover:underline flex items-center">
+                  <Link href={"/dashboard/system/logs" as Route} className="text-primary hover:underline flex items-center">
                     <FileText className="w-4 h-4 mr-1" />
                     View Error Logs ({status.linting?.errors || 0})
                   </Link>
