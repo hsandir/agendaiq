@@ -35,13 +35,9 @@ export async function rateLimitMiddleware(request: NextRequest): Promise<NextRes
         return config.limiter.createErrorResponse(result);
       }
       
-      // Add rate limit headers to successful responses
-      const response = NextResponse.next();
-      response.headers.set('X-RateLimit-Limit', config.limit.toString());
-      response.headers.set('X-RateLimit-Remaining', result.remaining.toString());
-      response.headers.set('X-RateLimit-Reset', result.reset.toString());
-      
-      return response;
+      // Rate limit check passed - return null to continue middleware chain
+      // Headers will be added at the end of middleware chain
+      return null;
     }
   }
   

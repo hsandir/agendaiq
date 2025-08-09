@@ -1,7 +1,7 @@
 import type { NextAuthOptions, User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
+// import GoogleProvider from "next-auth/providers/google"; // TODO: Add PrismaAdapter before enabling
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import speakeasy from "speakeasy";
@@ -37,10 +37,11 @@ export const authOptions: NextAuthOptions = {
     error: "/auth/error",
   },
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-    }),
+    // TODO: Add PrismaAdapter before enabling Google OAuth
+    // GoogleProvider({
+    //   clientId: process.env.GOOGLE_CLIENT_ID || "",
+    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    // }),
     Credentials({
       name: "credentials",
       credentials: {

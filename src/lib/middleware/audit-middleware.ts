@@ -24,14 +24,11 @@ export async function auditMiddleware(request: NextRequest): Promise<NextRespons
     // Continue without user context
   }
 
-  // Proceed with request
-  const response = NextResponse.next();
-  
   // Log request immediately (edge-compatible)
   const duration = Date.now() - startTime;
-  EdgeAuditLogger.logRequest(request, duration, response.status);
+  EdgeAuditLogger.logRequest(request, duration, 200); // Assume success for now
 
-  // For critical events, queue them for API processing
+  // For critical events, prepare audit event for later processing
   if (isCriticalPath(pathname, request.method)) {
     const auditEvent = EdgeAuditLogger.createAuditEvent(
       `${request.method}_${pathname.replace(/\//g, '_')}`,
@@ -41,11 +38,13 @@ export async function auditMiddleware(request: NextRequest): Promise<NextRespons
       { userId, staffId, type: 'middleware_critical' }
     );
 
-    // Add header to trigger API-side audit processing
-    response.headers.set('x-audit-event', JSON.stringify(auditEvent));
+    // Store audit event in request for later processing
+    // This will be handled by the final response in main middleware
+    (request as any)._auditEvent = auditEvent;
   }
 
-  return response;
+  // Return null to continue middleware chain
+  return null;
 }
 
 /**

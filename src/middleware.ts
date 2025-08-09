@@ -58,9 +58,8 @@ export async function middleware(request: NextRequest) {
     const publicEndpoints = [
       '/api/auth', 
       '/api/health', 
-      '/api/setup/check', 
-      '/api/test-sentry',
-      // REMOVED: /api/dev, /api/tests, /api/debug - These require DEV_ADMIN capability
+      '/api/setup/check',
+      // REMOVED: /api/test-sentry, /api/dev, /api/tests, /api/debug - These require authentication
     ];
     const isPublic = publicEndpoints.some(endpoint => path.startsWith(endpoint));
     
