@@ -12,6 +12,8 @@ interface ThemeSelectorProps {
 }
 
 const ThemeIcons = {
+  'midnight-blue': Monitor,
+  'tasarim': Palette,
   'modern-purple': Palette,
   'classic-light': Sun,
   'dark-mode': Moon,

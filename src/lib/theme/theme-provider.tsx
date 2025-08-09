@@ -114,7 +114,7 @@ export function ThemeProvider({ children, initialTheme = 'classic-light' }: Them
 
     // Apply theme class for Tailwind dark mode support
     document.documentElement.classList.remove('light', 'dark');
-    if (theme.id === 'dark-mode' || theme.id === 'modern-purple' || theme.id === 'high-contrast' || theme.id === 'tasarim') {
+    if (theme.id === 'dark-mode' || theme.id === 'modern-purple' || theme.id === 'high-contrast' || theme.id === 'tasarim' || theme.id === 'midnight-blue') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.add('light');

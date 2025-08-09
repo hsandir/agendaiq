@@ -17,7 +17,8 @@ import {
   CheckSquare,
   GitBranch,
   UserCog,
-  Palette
+  Palette,
+  Monitor
 } from "lucide-react";
 
 export interface NavigationItem {
@@ -97,6 +98,11 @@ export const sidebarItems: NavigationSection[] = [
         href: "/dashboard/development",
         label: "Development Tools",
         icon: FlaskConical,
+      },
+      {
+        href: "/dashboard/monitoring",
+        label: "Live Monitoring",
+        icon: Monitor,
       },
     ],
   },

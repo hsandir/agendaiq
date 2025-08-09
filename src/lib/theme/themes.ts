@@ -231,6 +231,116 @@ export const modernPurpleTheme: Theme = {
   },
 };
 
+// Theme X: Midnight Blue (Modern Dark Theme)
+export const midnightBlueTheme: Theme = {
+  id: 'midnight-blue',
+  name: 'Midnight Blue',
+  description: 'Professional dark theme with blue accents and soft shadows',
+  colors: {
+    primary: '#4A64F0',
+    primaryLight: '#6B7DF2',
+    primaryDark: '#3B52ED',
+    primaryForeground: '#FFFFFF',
+    
+    secondary: '#7B4AF0',
+    secondaryLight: '#9563F2',
+    secondaryDark: '#6B3BED',
+    secondaryForeground: '#FFFFFF',
+    
+    background: '#0E1321',
+    backgroundSecondary: '#1D2536',
+    backgroundTertiary: '#2A3441',
+    
+    card: '#1D2536',
+    cardHover: '#2A3441',
+    cardBorder: '#3A4753',
+    
+    text: '#FFFFFF',
+    textSecondary: '#E1E5E9',
+    textMuted: '#5B6A85',
+    textInverse: '#0E1321',
+    
+    border: '#3A4753',
+    borderLight: '#4A5764',
+    borderDark: '#2A3441',
+    
+    success: '#10B981',
+    successLight: '#34D399',
+    successDark: '#059669',
+    
+    warning: '#F0A44A',
+    warningLight: '#F2B866',
+    warningDark: '#ED9433',
+    
+    error: '#EF4444',
+    errorLight: '#F87171',
+    errorDark: '#DC2626',
+    
+    info: '#4A64F0',
+    infoLight: '#6B7DF2',
+    infoDark: '#3B52ED',
+    
+    sidebar: '#0E1321',
+    sidebarText: '#E1E5E9',
+    sidebarHover: '#1D2536',
+    sidebarActive: '#4A64F0',
+    
+    header: '#0E1321',
+    headerText: '#FFFFFF',
+    
+    input: '#1D2536',
+    inputBorder: '#3A4753',
+    inputFocus: '#4A64F0',
+    inputText: '#FFFFFF',
+    inputPlaceholder: '#5B6A85',
+    
+    buttonPrimary: '#4A64F0',
+    buttonPrimaryHover: '#3B52ED',
+    buttonPrimaryText: '#FFFFFF',
+    
+    buttonSecondary: '#3A4753',
+    buttonSecondaryHover: '#4A5764',
+    buttonSecondaryText: '#FFFFFF',
+    
+    buttonGhost: 'transparent',
+    buttonGhostHover: 'rgba(74, 100, 240, 0.12)',
+    buttonGhostText: '#4A64F0',
+    
+    overlay: 'rgba(14, 19, 33, 0.8)',
+    shadow: 'rgba(0, 0, 0, 0.25)',
+    scrollbar: '#1D2536',
+    scrollbarThumb: '#4A5764',
+  },
+  fonts: {
+    primary: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    secondary: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    mono: '"SF Mono", Monaco, Inconsolata, "Fira Code", monospace',
+  },
+  spacing: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.25rem',
+    xl: '1.75rem',
+    xxl: '2.5rem',
+  },
+  borderRadius: {
+    none: '0',
+    sm: '0.25rem',
+    md: '0.5rem',
+    lg: '0.75rem',
+    xl: '1rem',
+    full: '9999px',
+  },
+  shadows: {
+    none: 'none',
+    sm: '0 1px 2px rgba(0, 0, 0, 0.08)',
+    md: '0 4px 12px rgba(0, 0, 0, 0.08)', // shadow-soft
+    lg: '0 10px 20px rgba(0, 0, 0, 0.12)',
+    xl: '0 16px 28px rgba(0, 0, 0, 0.16)',
+  },
+};
+
 // Theme X: Tasarim (from tasarim.png)
 export const tasarimTheme: Theme = {
   id: 'tasarim',
@@ -787,6 +897,7 @@ export const natureGreenTheme: Theme = {
 
 // Export all themes
 export const themes: Theme[] = [
+  midnightBlueTheme,
   tasarimTheme,
   modernPurpleTheme,
   classicLightTheme,
