@@ -91,11 +91,19 @@ export function AgendaItemLive({
   const emitTyping = () => {
     if (!channel || !currentUserId || !currentUserName) return;
     
-    channel.trigger(`client-${EVENTS.USER_TYPING}`, {
-      itemId: item.id,
-      userId: currentUserId,
-      userName: currentUserName
-    });
+    // Use whisper for client events (works with presence channels)
+    try {
+      // @ts-ignore - Pusher types might not include whisper
+      if (channel.whisper) {
+        channel.whisper(EVENTS.USER_TYPING, {
+          itemId: item.id,
+          userId: currentUserId,
+          userName: currentUserName
+        });
+      }
+    } catch (error) {
+      console.debug('Whisper not available, typing indicator disabled');
+    }
 
     // Clear existing timeout
     if (typingTimeoutRef.current) {
@@ -111,10 +119,18 @@ export function AgendaItemLive({
   const emitStoppedTyping = () => {
     if (!channel || !currentUserId) return;
     
-    channel.trigger(`client-${EVENTS.USER_STOPPED_TYPING}`, {
-      itemId: item.id,
-      userId: currentUserId
-    });
+    // Use whisper for client events (works with presence channels)
+    try {
+      // @ts-ignore - Pusher types might not include whisper
+      if (channel.whisper) {
+        channel.whisper(EVENTS.USER_STOPPED_TYPING, {
+          itemId: item.id,
+          userId: currentUserId
+        });
+      }
+    } catch (error) {
+      console.debug('Whisper not available, typing indicator disabled');
+    }
 
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
