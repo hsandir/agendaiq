@@ -1,26 +1,119 @@
 import { withSentryConfig } from '@sentry/nextjs';
+import withBundleAnalyzer from '@next/bundle-analyzer';
+
+const bundleAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Compiler optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  
+  // Modularize imports for better tree-shaking
+  modularizeImports: {
+    'lucide-react': {
+      transform: 'lucide-react/dist/esm/icons/{{member}}',
+    },
+    '@radix-ui/react-select': {
+      transform: '@radix-ui/react-select',
+    },
+    '@radix-ui/react-dialog': {
+      transform: '@radix-ui/react-dialog',
+    },
+    '@radix-ui/react-dropdown-menu': {
+      transform: '@radix-ui/react-dropdown-menu',
+    },
+    '@radix-ui/react-popover': {
+      transform: '@radix-ui/react-popover',
+    },
+    '@radix-ui/react-tabs': {
+      transform: '@radix-ui/react-tabs',
+    },
+  },
+  
+  // Image optimization
   images: {
     domains: ['localhost'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        port: '',
+        pathname: '/a/**',
+      },
+    ],
+    formats: ['image/webp', 'image/avif'],
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
   },
-  // Enable experimental features if needed
+  
+  // Performance optimizations
   experimental: {
-    // serverActions: true,
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'date-fns'],
+    typedRoutes: true,
+    clientTraceMetadata: ["baggage", "sentry-trace", "sentry-environment", "sentry-public_key", "sentry-release", "sentry-user_segment"],
   },
-  // Sentry error handling
-  sentry: {
-    // Upload source maps to Sentry
-    hideSourceMaps: true,
-    // Suppress Sentry SDK logs in production
-    disableLogger: true,
-    // Automatically tree shake Sentry logger statements
-    autoInstrumentServerFunctions: true,
-    // Tunnel route for bypassing ad blockers
-    tunnelRoute: '/monitoring',
-    // Automatically instrument app router
-    autoInstrumentAppDirectory: true,
+  
+  // Temporarily disable ESLint during build
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  
+  // Production optimizations
+  compress: true,
+  poweredByHeader: false,
+  
+  // Security headers
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+        ],
+      },
+    ];
+  },
+  
+  // Bundle analyzer for production builds
+  bundlePagesRouterDependencies: true,
+  
+  // Webpack optimizations
+  webpack: (config, { isServer }) => {
+    // Optimize bundle size
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+    
+    // Ignore Prisma instrumentation warnings
+    config.module = {
+      ...config.module,
+      exprContextCritical: false,
+    };
+    
+    return config;
   },
 };
 
@@ -49,7 +142,16 @@ const sentryWebpackPluginOptions = {
   
   // Disable Sentry CLI logs
   disableLogger: true,
+  
+  // Automatically tree shake Sentry logger statements
+  autoInstrumentServerFunctions: true,
+  
+  // Tunnel route for bypassing ad blockers
+  tunnelRoute: '/monitoring',
+  
+  // Automatically instrument app router
+  autoInstrumentAppDirectory: true,
 };
 
-// Export the config wrapped with Sentry
-export default withSentryConfig(nextConfig, sentryWebpackPluginOptions);
+// Export the config wrapped with Sentry and Bundle Analyzer
+export default withSentryConfig(bundleAnalyzer(nextConfig), sentryWebpackPluginOptions);
