@@ -7,6 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { 
   ChevronDown, 
   ChevronRight, 
@@ -56,6 +65,7 @@ export function AgendaItemLive({
 }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
   const [editData, setEditData] = useState({
     topic: item.topic,
     problem_statement: item.problem_statement || '',
@@ -63,15 +73,54 @@ export function AgendaItemLive({
     decisions_actions: item.decisions_actions || '',
     status: item.status,
     priority: item.priority,
-    responsible_staff_id: item.responsible_staff_id
+    responsible_staff_id: item.responsible_staff_id,
+    purpose: item.purpose || 'Discussion',
+    solution_type: item.solution_type || null,
+    decision_type: item.decision_type || null,
+    future_implications: item.future_implications || false
   });
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
   const channel = usePusherChannel(meetingId ? CHANNELS.meeting(meetingId) : null);
 
   const handleSave = () => {
+    // Check if status changed to "Assigned_to_local"
+    if (editData.status === 'Assigned_to_local' && item.status !== 'Assigned_to_local') {
+      setShowAssignDialog(true);
+      return;
+    }
+    
     onUpdate(editData);
     setIsEditing(false);
     emitStoppedTyping();
+  };
+  
+  const handleAssignToLocal = (action: 'email' | 'meeting' | 'skip') => {
+    if (action === 'meeting') {
+      // Save changes first
+      onUpdate(editData);
+      setIsEditing(false);
+      setShowAssignDialog(false);
+      
+      // Navigate to create new meeting with this agenda item
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams({
+          agendaItemId: item.id.toString(),
+          topic: item.topic,
+          problemStatement: item.problem_statement || ''
+        });
+        window.location.href = `/dashboard/meetings/new?${params.toString()}`;
+      }
+    } else if (action === 'email') {
+      // TODO: Implement email functionality
+      alert('Email functionality will be implemented soon');
+      onUpdate(editData);
+      setIsEditing(false);
+      setShowAssignDialog(false);
+    } else {
+      onUpdate(editData);
+      setIsEditing(false);
+      setShowAssignDialog(false);
+    }
   };
 
   const handleCancel = () => {
@@ -82,7 +131,11 @@ export function AgendaItemLive({
       decisions_actions: item.decisions_actions || '',
       status: item.status,
       priority: item.priority,
-      responsible_staff_id: item.responsible_staff_id
+      responsible_staff_id: item.responsible_staff_id,
+      purpose: item.purpose || 'Discussion',
+      solution_type: item.solution_type || null,
+      decision_type: item.decision_type || null,
+      future_implications: item.future_implications || false
     });
     setIsEditing(false);
     emitStoppedTyping();
@@ -366,6 +419,90 @@ export function AgendaItemLive({
             )}
           </div>
 
+          {/* Purpose, Solution Type, Decision Type */}
+          {isEditing && (
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm font-medium text-foreground">Purpose</label>
+                <Select
+                  value={editData.purpose}
+                  onValueChange={(value: any) => setEditData({ ...editData, purpose: value })}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Decision">Decision</SelectItem>
+                    <SelectItem value="Information_Sharing">Information</SelectItem>
+                    <SelectItem value="Discussion">Discussion</SelectItem>
+                    <SelectItem value="Reminder">Reminder</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium text-foreground">Solution Type</label>
+                <Select
+                  value={editData.solution_type || 'none'}
+                  onValueChange={(value) => setEditData({ 
+                    ...editData, 
+                    solution_type: value === 'none' ? null : value as any
+                  })}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="Technical">Technical</SelectItem>
+                    <SelectItem value="Adaptive">Adaptive</SelectItem>
+                    <SelectItem value="Both">Both</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium text-foreground">Decision Type</label>
+                <Select
+                  value={editData.decision_type || 'none'}
+                  onValueChange={(value) => setEditData({ 
+                    ...editData, 
+                    decision_type: value === 'none' ? null : value as any
+                  })}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="Technical">Technical</SelectItem>
+                    <SelectItem value="Adaptive">Adaptive</SelectItem>
+                    <SelectItem value="Both">Both</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+
+          {/* Future Implications Checkbox */}
+          {isEditing && (
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="future-implications"
+                checked={editData.future_implications}
+                onCheckedChange={(checked) => 
+                  setEditData({ ...editData, future_implications: checked as boolean })
+                }
+              />
+              <label 
+                htmlFor="future-implications" 
+                className="text-sm font-medium text-foreground cursor-pointer"
+              >
+                Decision has Future Implications
+              </label>
+            </div>
+          )}
+
           {/* Status and Priority */}
           {isEditing && (
             <div className="grid grid-cols-2 gap-4">
@@ -404,6 +541,30 @@ export function AgendaItemLive({
             </div>
           )}
 
+          {/* Show Purpose and Types when not editing */}
+          {!isEditing && (
+            <div className="flex flex-wrap gap-2 mb-2">
+              <Badge variant="outline" className="text-xs">
+                Purpose: {item.purpose?.replace('_', ' ')}
+              </Badge>
+              {item.solution_type && (
+                <Badge variant="outline" className="text-xs">
+                  Solution: {item.solution_type}
+                </Badge>
+              )}
+              {item.decision_type && (
+                <Badge variant="outline" className="text-xs">
+                  Decision: {item.decision_type}
+                </Badge>
+              )}
+              {item.future_implications && (
+                <Badge variant="outline" className="text-xs text-yellow-600 border-yellow-600">
+                  Has Future Implications
+                </Badge>
+              )}
+            </div>
+          )}
+
           {/* Meta Info */}
           <div className="pt-2 border-t">
             <div className="flex items-center justify-between">
@@ -419,7 +580,7 @@ export function AgendaItemLive({
                   <Paperclip className="h-4 w-4" />
                   <span>{item.ActionItems?.length || 0}</span>
                 </div>
-                {item.future_implications && (
+                {item.future_implications && !isEditing && (
                   <div className="flex items-center space-x-1 text-yellow-600">
                     <AlertCircle className="h-4 w-4" />
                     <span>Future implications</span>
@@ -455,6 +616,58 @@ export function AgendaItemLive({
           </div>
         </div>
       )}
+      
+      {/* Assign to Local Dialog */}
+      <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Assign to Local Team</DialogTitle>
+            <DialogDescription>
+              This item is being assigned to a local team. What would you like to do?
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="bg-muted p-3 rounded-lg">
+              <p className="text-sm font-medium mb-1">{item.topic}</p>
+              {item.problem_statement && (
+                <p className="text-xs text-muted-foreground">{item.problem_statement}</p>
+              )}
+            </div>
+            
+            <div className="text-sm text-muted-foreground">
+              You can create a new meeting for this agenda item or send an email notification to the responsible team.
+            </div>
+          </div>
+          
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => handleAssignToLocal('skip')}
+              className="w-full sm:w-auto"
+            >
+              Just Save
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => handleAssignToLocal('email')}
+              className="w-full sm:w-auto"
+            >
+              Send Email
+            </Button>
+            <Button
+              onClick={() => {
+                if (window.confirm('Save changes and create a new meeting for this item?')) {
+                  handleAssignToLocal('meeting');
+                }
+              }}
+              className="w-full sm:w-auto"
+            >
+              Create Meeting
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
