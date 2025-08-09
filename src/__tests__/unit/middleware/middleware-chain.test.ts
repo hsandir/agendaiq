@@ -31,7 +31,11 @@ describe('Middleware Chain Tests', () => {
 
   describe('AUTH-MWINT-01: Rate-limit does not bypass auth', () => {
     it('should return null when under quota to continue chain', async () => {
-      const request = new NextRequest('http://localhost:3000/api/users');
+      const request = {
+        url: 'http://localhost:3000/api/users',
+        headers: new Headers(),
+        method: 'GET'
+      } as unknown as NextRequest;
       
       const { RateLimiters } = require('@/lib/utils/rate-limit');
       RateLimiters.api.check.mockResolvedValue({ success: true });
@@ -43,7 +47,11 @@ describe('Middleware Chain Tests', () => {
     });
 
     it('should return 429 response when over quota', async () => {
-      const request = new NextRequest('http://localhost:3000/api/users');
+      const request = {
+        url: 'http://localhost:3000/api/users',
+        headers: new Headers(),
+        method: 'GET'
+      } as unknown as NextRequest;
       
       const { RateLimiters } = require('@/lib/utils/rate-limit');
       RateLimiters.api.check.mockResolvedValue({ 
@@ -66,7 +74,11 @@ describe('Middleware Chain Tests', () => {
 
   describe('AUTH-MWINT-03: Audit does not suppress security headers', () => {
     it('should return null to allow security headers to be added', async () => {
-      const request = new NextRequest('http://localhost:3000/api/admin/users');
+      const request = {
+        url: 'http://localhost:3000/api/admin/users',
+        headers: new Headers(),
+        method: 'GET'
+      } as unknown as NextRequest;
       
       const result = await auditMiddleware(request);
       
@@ -77,7 +89,12 @@ describe('Middleware Chain Tests', () => {
 
   describe('Security Headers Application', () => {
     it('should add security headers to final response', async () => {
-      const request = new NextRequest('http://localhost:3000/dashboard');
+      const request = {
+        url: 'http://localhost:3000/dashboard',
+        headers: new Headers(),
+        method: 'GET',
+        nextUrl: new URL('http://localhost:3000/dashboard')
+      } as unknown as NextRequest;
       
       const { getToken } = require('next-auth/jwt');
       getToken.mockResolvedValue({
@@ -110,7 +127,12 @@ describe('Middleware Chain Tests', () => {
       getToken.mockResolvedValue(null);
       
       for (const path of publicPaths) {
-        const request = new NextRequest(`http://localhost:3000${path}`);
+        const request = {
+          url: `http://localhost:3000${path}`,
+          headers: new Headers(),
+          method: 'GET',
+          nextUrl: new URL(`http://localhost:3000${path}`)
+        } as unknown as NextRequest;
         const response = await middleware(request);
         
         // Should not return 401 for public paths
@@ -132,7 +154,12 @@ describe('Middleware Chain Tests', () => {
       getToken.mockResolvedValue(null);
       
       for (const path of protectedPaths) {
-        const request = new NextRequest(`http://localhost:3000${path}`);
+        const request = {
+          url: `http://localhost:3000${path}`,
+          headers: new Headers(),
+          method: 'GET',
+          nextUrl: new URL(`http://localhost:3000${path}`)
+        } as unknown as NextRequest;
         const response = await middleware(request);
         
         // Should return 401 for protected paths without auth

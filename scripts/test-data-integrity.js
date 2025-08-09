@@ -65,9 +65,9 @@ async function testDatabaseIntegrity() {
     const orphanedStaff = await prisma.staff.findMany({
       where: {
         OR: [
-          { userId: null },
-          { roleId: null },
-          { districtId: null }
+          { user_id: null },
+          { role_id: null },
+          { district_id: null }
         ]
       }
     });

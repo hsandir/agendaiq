@@ -32,7 +32,8 @@ import {
   Edit,
   Trash2,
   Eye,
-  EyeOff
+  EyeOff,
+  Wand2
 } from 'lucide-react';
 
 interface CustomTheme {
@@ -109,6 +110,7 @@ const presetPalettes = [
 export function CustomThemeEditor() {
   const [themeName, setThemeName] = useState('My Custom Theme');
   const [isDark, setIsDark] = useState(true);
+  const [activeColorKey, setActiveColorKey] = useState<string | null>(null);
   const [colors, setColors] = useState<Record<string, string>>({
     // Base colors
     background: '222 47 11',
@@ -165,6 +167,16 @@ export function CustomThemeEditor() {
       }
     }
   }, []);
+
+  // Clear highlight after 3 seconds
+  useEffect(() => {
+    if (activeColorKey) {
+      const timer = setTimeout(() => {
+        setActiveColorKey(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [activeColorKey]);
 
   const hslToHex = (hsl: string) => {
     const [h, s, l] = hsl.split(' ').map(Number);
@@ -228,6 +240,7 @@ export function CustomThemeEditor() {
       ...prev,
       [key]: hslValue
     }));
+    setActiveColorKey(key);
   };
 
   const applyPreset = (preset: typeof presetPalettes[0]) => {
@@ -262,6 +275,11 @@ export function CustomThemeEditor() {
       const [h, s, l] = preset.colors.background.split(' ').map(Number);
       newColors.card = preset.isDark ? `${h} ${s} ${l + 5}` : `${h} ${s} ${l - 2}`;
       newColors['card-foreground'] = preset.colors.foreground;
+    }
+    
+    if (!preset.colors.border) {
+      newColors.border = preset.isDark ? '240 6 20' : '240 6 80';
+      newColors.input = newColors.border;
     }
     
     setColors(newColors);
@@ -339,6 +357,14 @@ export function CustomThemeEditor() {
     navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Helper function to get highlight class
+  const getHighlightClass = (keys: string[]) => {
+    if (keys.some(key => activeColorKey === key)) {
+      return 'ring-4 ring-purple-500 ring-opacity-50 animate-pulse';
+    }
+    return '';
   };
 
   return (
@@ -439,11 +465,13 @@ export function CustomThemeEditor() {
                           type="color"
                           value={hslToHex(colors[key])}
                           onChange={(e) => updateColor(key, e.target.value)}
+                          onFocus={() => setActiveColorKey(key)}
                           className="w-12 h-9 p-1 cursor-pointer"
                         />
                         <Input
                           value={colors[key]}
                           onChange={(e) => updateColor(key, e.target.value)}
+                          onFocus={() => setActiveColorKey(key)}
                           placeholder="H S L"
                           className="flex-1 text-xs"
                         />
@@ -471,11 +499,13 @@ export function CustomThemeEditor() {
                           type="color"
                           value={hslToHex(colors[key])}
                           onChange={(e) => updateColor(key, e.target.value)}
+                          onFocus={() => setActiveColorKey(key)}
                           className="w-12 h-9 p-1 cursor-pointer"
                         />
                         <Input
                           value={colors[key]}
                           onChange={(e) => updateColor(key, e.target.value)}
+                          onFocus={() => setActiveColorKey(key)}
                           placeholder="H S L"
                           className="flex-1 text-xs"
                         />
@@ -503,11 +533,13 @@ export function CustomThemeEditor() {
                           type="color"
                           value={hslToHex(colors[key])}
                           onChange={(e) => updateColor(key, e.target.value)}
+                          onFocus={() => setActiveColorKey(key)}
                           className="w-12 h-9 p-1 cursor-pointer"
                         />
                         <Input
                           value={colors[key]}
                           onChange={(e) => updateColor(key, e.target.value)}
+                          onFocus={() => setActiveColorKey(key)}
                           placeholder="H S L"
                           className="flex-1 text-xs"
                         />
@@ -618,8 +650,8 @@ export function CustomThemeEditor() {
         </Tabs>
       </div>
 
-      {/* Right Panel - Live Preview */}
-      <div className="bg-muted/30 rounded-lg p-4 overflow-hidden">
+      {/* Right Panel - Live Preview (Sticky) */}
+      <div className="lg:sticky lg:top-0 lg:h-screen bg-muted/30 rounded-lg p-4 overflow-hidden">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="font-semibold">Live Preview</h3>
           <div className="flex gap-2">
@@ -641,7 +673,7 @@ export function CustomThemeEditor() {
         <div
           className={`${
             previewDevice === 'mobile' ? 'max-w-sm mx-auto' : 'w-full'
-          } rounded-lg overflow-hidden shadow-2xl`}
+          } rounded-lg overflow-y-auto shadow-2xl`}
           style={{
             '--background': colors.background,
             '--foreground': colors.foreground,
@@ -658,24 +690,25 @@ export function CustomThemeEditor() {
             '--card': colors.card,
             '--card-foreground': colors['card-foreground'],
             '--border': colors.border,
+            maxHeight: 'calc(100vh - 120px)'
           } as React.CSSProperties}
         >
           {/* Preview App */}
-          <div className="bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
+          <div className={`bg-[hsl(var(--background))] text-[hsl(var(--foreground))] transition-all ${getHighlightClass(['background', 'foreground'])}`}>
             {/* Header */}
-            <header className="bg-[hsl(var(--card))] border-b border-[hsl(var(--border))] p-4">
+            <header className={`bg-[hsl(var(--card))] border-b border-[hsl(var(--border))] p-4 transition-all ${getHighlightClass(['card', 'card-foreground', 'border'])}`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-[hsl(var(--primary))] rounded-lg flex items-center justify-center">
-                    <span className="text-[hsl(var(--primary-foreground))] font-bold text-sm">AQ</span>
+                  <div className={`w-8 h-8 bg-[hsl(var(--primary))] rounded-lg flex items-center justify-center transition-all ${getHighlightClass(['primary'])}`}>
+                    <span className={`text-[hsl(var(--primary-foreground))] font-bold text-sm ${getHighlightClass(['primary-foreground'])}`}>AQ</span>
                   </div>
                   <h1 className="font-bold text-lg">AgendaIQ</h1>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button className="p-2 hover:bg-[hsl(var(--muted))] rounded-lg transition-colors">
+                  <button className={`p-2 hover:bg-[hsl(var(--muted))] rounded-lg transition-all ${getHighlightClass(['muted'])}`}>
                     <Search className="h-4 w-4" />
                   </button>
-                  <button className="p-2 hover:bg-[hsl(var(--muted))] rounded-lg transition-colors">
+                  <button className={`p-2 hover:bg-[hsl(var(--muted))] rounded-lg transition-all ${getHighlightClass(['muted'])}`}>
                     <Bell className="h-4 w-4" />
                   </button>
                 </div>
@@ -685,25 +718,25 @@ export function CustomThemeEditor() {
             {/* Navigation */}
             <div className="flex">
               {previewDevice === 'desktop' && (
-                <aside className="w-64 bg-[hsl(var(--card))] border-r border-[hsl(var(--border))] p-4 min-h-[500px]">
+                <aside className={`w-64 bg-[hsl(var(--card))] border-r border-[hsl(var(--border))] p-4 min-h-[500px] transition-all ${getHighlightClass(['card', 'border'])}`}>
                   <nav className="space-y-1">
-                    <a className="flex items-center gap-3 px-3 py-2 bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] rounded-lg">
+                    <a className={`flex items-center gap-3 px-3 py-2 bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] rounded-lg transition-all ${getHighlightClass(['primary'])}`}>
                       <Home className="h-4 w-4" />
                       <span className="text-sm font-medium">Dashboard</span>
                     </a>
-                    <a className="flex items-center gap-3 px-3 py-2 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))] rounded-lg transition-colors">
+                    <a className={`flex items-center gap-3 px-3 py-2 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))] rounded-lg transition-all ${getHighlightClass(['muted-foreground', 'muted'])}`}>
                       <Calendar className="h-4 w-4" />
                       <span className="text-sm">Meetings</span>
                     </a>
-                    <a className="flex items-center gap-3 px-3 py-2 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))] rounded-lg transition-colors">
+                    <a className={`flex items-center gap-3 px-3 py-2 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))] rounded-lg transition-all ${getHighlightClass(['muted-foreground', 'muted'])}`}>
                       <Users className="h-4 w-4" />
                       <span className="text-sm">Team</span>
                     </a>
-                    <a className="flex items-center gap-3 px-3 py-2 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))] rounded-lg transition-colors">
+                    <a className={`flex items-center gap-3 px-3 py-2 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))] rounded-lg transition-all ${getHighlightClass(['muted-foreground', 'muted'])}`}>
                       <FileText className="h-4 w-4" />
                       <span className="text-sm">Documents</span>
                     </a>
-                    <a className="flex items-center gap-3 px-3 py-2 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))] rounded-lg transition-colors">
+                    <a className={`flex items-center gap-3 px-3 py-2 text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))] rounded-lg transition-all ${getHighlightClass(['muted-foreground', 'muted'])}`}>
                       <Settings className="h-4 w-4" />
                       <span className="text-sm">Settings</span>
                     </a>
@@ -716,67 +749,67 @@ export function CustomThemeEditor() {
                 <div className="space-y-6">
                   {/* Stats Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-[hsl(var(--card))] p-4 rounded-lg border border-[hsl(var(--border))]">
+                    <div className={`bg-[hsl(var(--card))] p-4 rounded-lg border border-[hsl(var(--border))] transition-all ${getHighlightClass(['card', 'border'])}`}>
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-sm text-[hsl(var(--muted-foreground))]">Total Meetings</p>
-                        <Calendar className="h-4 w-4 text-[hsl(var(--primary))]" />
+                        <p className={`text-sm text-[hsl(var(--muted-foreground))] ${getHighlightClass(['muted-foreground'])}`}>Total Meetings</p>
+                        <Calendar className={`h-4 w-4 text-[hsl(var(--primary))] ${getHighlightClass(['primary'])}`} />
                       </div>
                       <p className="text-2xl font-bold">24</p>
-                      <p className="text-xs text-[hsl(var(--muted-foreground))]">+12% from last month</p>
+                      <p className={`text-xs text-[hsl(var(--muted-foreground))] ${getHighlightClass(['muted-foreground'])}`}>+12% from last month</p>
                     </div>
-                    <div className="bg-[hsl(var(--card))] p-4 rounded-lg border border-[hsl(var(--border))]">
+                    <div className={`bg-[hsl(var(--card))] p-4 rounded-lg border border-[hsl(var(--border))] transition-all ${getHighlightClass(['card', 'border'])}`}>
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-sm text-[hsl(var(--muted-foreground))]">Team Members</p>
-                        <Users className="h-4 w-4 text-[hsl(var(--secondary))]" />
+                        <p className={`text-sm text-[hsl(var(--muted-foreground))] ${getHighlightClass(['muted-foreground'])}`}>Team Members</p>
+                        <Users className={`h-4 w-4 text-[hsl(var(--secondary))] ${getHighlightClass(['secondary'])}`} />
                       </div>
                       <p className="text-2xl font-bold">142</p>
-                      <p className="text-xs text-[hsl(var(--muted-foreground))]">+5 new this week</p>
+                      <p className={`text-xs text-[hsl(var(--muted-foreground))] ${getHighlightClass(['muted-foreground'])}`}>+5 new this week</p>
                     </div>
-                    <div className="bg-[hsl(var(--card))] p-4 rounded-lg border border-[hsl(var(--border))]">
+                    <div className={`bg-[hsl(var(--card))] p-4 rounded-lg border border-[hsl(var(--border))] transition-all ${getHighlightClass(['card', 'border'])}`}>
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-sm text-[hsl(var(--muted-foreground))]">Productivity</p>
-                        <BarChart3 className="h-4 w-4 text-[hsl(var(--accent))]" />
+                        <p className={`text-sm text-[hsl(var(--muted-foreground))] ${getHighlightClass(['muted-foreground'])}`}>Productivity</p>
+                        <BarChart3 className={`h-4 w-4 text-[hsl(var(--accent))] ${getHighlightClass(['accent'])}`} />
                       </div>
                       <p className="text-2xl font-bold">89%</p>
-                      <p className="text-xs text-[hsl(var(--muted-foreground))]">Above average</p>
+                      <p className={`text-xs text-[hsl(var(--muted-foreground))] ${getHighlightClass(['muted-foreground'])}`}>Above average</p>
                     </div>
                   </div>
 
                   {/* Meeting List */}
-                  <div className="bg-[hsl(var(--card))] rounded-lg border border-[hsl(var(--border))]">
-                    <div className="p-4 border-b border-[hsl(var(--border))]">
+                  <div className={`bg-[hsl(var(--card))] rounded-lg border border-[hsl(var(--border))] transition-all ${getHighlightClass(['card', 'border'])}`}>
+                    <div className={`p-4 border-b border-[hsl(var(--border))] ${getHighlightClass(['border'])}`}>
                       <h2 className="font-semibold">Upcoming Meetings</h2>
                     </div>
-                    <div className="divide-y divide-[hsl(var(--border))]">
-                      <div className="p-4 hover:bg-[hsl(var(--muted))]/50 transition-colors">
+                    <div className={`divide-y divide-[hsl(var(--border))] ${getHighlightClass(['border'])}`}>
+                      <div className={`p-4 hover:bg-[hsl(var(--muted))]/50 transition-all ${getHighlightClass(['muted'])}`}>
                         <div className="flex items-center justify-between">
                           <div>
                             <h3 className="font-medium">Team Standup</h3>
-                            <p className="text-sm text-[hsl(var(--muted-foreground))]">Today at 10:00 AM</p>
+                            <p className={`text-sm text-[hsl(var(--muted-foreground))] ${getHighlightClass(['muted-foreground'])}`}>Today at 10:00 AM</p>
                           </div>
-                          <span className="px-2 py-1 bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] text-xs rounded-full">
+                          <span className={`px-2 py-1 bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))] text-xs rounded-full transition-all ${getHighlightClass(['primary'])}`}>
                             In 2 hours
                           </span>
                         </div>
                       </div>
-                      <div className="p-4 hover:bg-[hsl(var(--muted))]/50 transition-colors">
+                      <div className={`p-4 hover:bg-[hsl(var(--muted))]/50 transition-all ${getHighlightClass(['muted'])}`}>
                         <div className="flex items-center justify-between">
                           <div>
                             <h3 className="font-medium">Project Review</h3>
-                            <p className="text-sm text-[hsl(var(--muted-foreground))]">Today at 2:00 PM</p>
+                            <p className={`text-sm text-[hsl(var(--muted-foreground))] ${getHighlightClass(['muted-foreground'])}`}>Today at 2:00 PM</p>
                           </div>
-                          <span className="px-2 py-1 bg-[hsl(var(--secondary))]/10 text-[hsl(var(--secondary))] text-xs rounded-full">
+                          <span className={`px-2 py-1 bg-[hsl(var(--secondary))]/10 text-[hsl(var(--secondary))] text-xs rounded-full transition-all ${getHighlightClass(['secondary'])}`}>
                             Scheduled
                           </span>
                         </div>
                       </div>
-                      <div className="p-4 hover:bg-[hsl(var(--muted))]/50 transition-colors">
+                      <div className={`p-4 hover:bg-[hsl(var(--muted))]/50 transition-all ${getHighlightClass(['muted'])}`}>
                         <div className="flex items-center justify-between">
                           <div>
                             <h3 className="font-medium">Client Meeting</h3>
-                            <p className="text-sm text-[hsl(var(--muted-foreground))]">Tomorrow at 11:00 AM</p>
+                            <p className={`text-sm text-[hsl(var(--muted-foreground))] ${getHighlightClass(['muted-foreground'])}`}>Tomorrow at 11:00 AM</p>
                           </div>
-                          <span className="px-2 py-1 bg-[hsl(var(--accent))]/10 text-[hsl(var(--accent))] text-xs rounded-full">
+                          <span className={`px-2 py-1 bg-[hsl(var(--accent))]/10 text-[hsl(var(--accent))] text-xs rounded-full transition-all ${getHighlightClass(['accent'])}`}>
                             Important
                           </span>
                         </div>
@@ -786,13 +819,13 @@ export function CustomThemeEditor() {
 
                   {/* Action Buttons */}
                   <div className="flex gap-3">
-                    <button className="px-4 py-2 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] rounded-lg hover:opacity-90 transition-opacity">
+                    <button className={`px-4 py-2 bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] rounded-lg hover:opacity-90 transition-all ${getHighlightClass(['primary', 'primary-foreground'])}`}>
                       Create Meeting
                     </button>
-                    <button className="px-4 py-2 bg-[hsl(var(--secondary))] text-[hsl(var(--secondary-foreground))] rounded-lg hover:opacity-90 transition-opacity">
+                    <button className={`px-4 py-2 bg-[hsl(var(--secondary))] text-[hsl(var(--secondary-foreground))] rounded-lg hover:opacity-90 transition-all ${getHighlightClass(['secondary', 'secondary-foreground'])}`}>
                       View Calendar
                     </button>
-                    <button className="px-4 py-2 border border-[hsl(var(--border))] rounded-lg hover:bg-[hsl(var(--muted))] transition-colors">
+                    <button className={`px-4 py-2 border border-[hsl(var(--border))] rounded-lg hover:bg-[hsl(var(--muted))] transition-all ${getHighlightClass(['border', 'muted'])}`}>
                       Export Report
                     </button>
                   </div>

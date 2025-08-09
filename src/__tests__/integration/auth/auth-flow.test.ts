@@ -64,15 +64,18 @@ describe('Authentication Integration Tests', () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
-      // Create test request
+      // Create test request (mock NextRequest)
       const formData = new FormData();
       formData.append('email', 'test@school.edu');
       formData.append('password', 'password123');
       
-      const request = new NextRequest('http://localhost:3000/api/auth/signin', {
+      const request = {
+        url: 'http://localhost:3000/api/auth/signin',
+        headers: new Headers(),
         method: 'POST',
         body: formData,
-      });
+        formData: () => Promise.resolve(formData)
+      } as unknown as NextRequest;
 
       // Mock successful session creation
       (getServerSession as jest.Mock).mockResolvedValue({

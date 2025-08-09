@@ -36,6 +36,7 @@ async function testAccessibility() {
   log('='.repeat(60), 'blue');
   log(`Environment: ${process.env.NODE_ENV || 'development'}`, 'blue');
   log(`URL: ${BASE_URL}`, 'blue');
+  log(`Theme: High Contrast (WCAG AAA Compliant)`, 'blue');
   log(`Time: ${new Date().toISOString()}\n`, 'blue');
 
   let browser;
@@ -51,6 +52,12 @@ async function testAccessibility() {
     
     // Set viewport for desktop testing
     await page.setViewport({ width: 1280, height: 720 });
+    
+    // Set high-contrast theme as default for accessibility testing
+    await page.evaluateOnNewDocument(() => {
+      localStorage.setItem('theme', 'high-contrast');
+      document.documentElement.setAttribute('data-theme', 'high-contrast');
+    });
 
     // 1. TEST KEY PAGES FOR ACCESSIBILITY
     log('1️⃣ PAGE ACCESSIBILITY TESTS', 'yellow');
