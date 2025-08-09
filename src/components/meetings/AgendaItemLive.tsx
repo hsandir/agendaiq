@@ -155,6 +155,16 @@ export function AgendaItemLive({
       if (!response.ok) {
         throw new Error('Failed to add comment');
       }
+      
+      // Refresh the item to show the new comment
+      // This should trigger a parent component refresh
+      // For now, we'll keep comments section open to show the comment
+      setShowComments(true);
+      
+      // If there's an onUpdate callback, trigger it to refresh data
+      if (onUpdate) {
+        onUpdate({ topic: item.topic }); // Trigger a refresh
+      }
     } catch (error) {
       console.error('Error adding comment:', error);
     }
@@ -244,6 +254,10 @@ export function AgendaItemLive({
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsEditing(true);
+                  // Auto-expand when editing
+                  if (!isExpanded) {
+                    onToggleExpand();
+                  }
                 }}
               >
                 <Edit2 className="h-4 w-4" />

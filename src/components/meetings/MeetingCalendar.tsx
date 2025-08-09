@@ -195,8 +195,12 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
                 {dayMeetings.slice(0, 2).map(meeting => (
                   <div
                     key={meeting.id}
-                    className="text-xs bg-primary text-primary-foreground rounded px-1 py-0.5 mb-1 truncate"
+                    className="text-xs bg-primary text-primary-foreground rounded px-1 py-0.5 mb-1 truncate cursor-pointer hover:bg-primary/80"
                     title={meeting.title}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/dashboard/meetings/${meeting.id}/edit`);
+                    }}
                   >
                     {safeFormatTime(meeting.startTime)} {meeting.title}
                   </div>
@@ -221,7 +225,11 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
                 <p className="text-sm text-muted-foreground">No meetings scheduled</p>
               ) : (
                 getMeetingsForDay(selectedDate).map(meeting => (
-                  <div key={meeting.id} className="bg-card p-2 rounded border">
+                  <div 
+                    key={meeting.id} 
+                    className="bg-card p-2 rounded border cursor-pointer hover:bg-muted transition-colors"
+                    onClick={() => router.push(`/dashboard/meetings/${meeting.id}/edit`)}
+                  >
                     <div className="font-medium text-sm">{meeting.title}</div>
                     <div className="text-xs text-muted-foreground">
                       {safeFormatTime(meeting.startTime)} - {safeFormatTime(meeting.endTime)}
