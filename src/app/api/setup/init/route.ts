@@ -1,23 +1,15 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/auth-options";
+import { NextResponse, NextRequest } from "next/server";
+import { withAuth } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Setup initialization requires DEV_ADMIN capabilities
+    const authResult = await withAuth(request, { requireDevAdmin: true });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
-
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      include: { Staff: { include: { Role: true } } },
-    });
-
-    if (!user || user.Staff?.[0]?.Role?.title !== 'Administrator') {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+    const user = authResult.user!;
 
     // Initialize system data
     // This would typically initialize default districts, schools, departments, etc.
