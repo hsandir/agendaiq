@@ -8,7 +8,12 @@ import path from 'path';
 const execAsync = promisify(exec);
 
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
+  // Backup requires OPS_ADMIN (school admin) capabilities
+  const authResult = await withAuth(request, { 
+    requireAuth: true, 
+    requireStaff: true, 
+    requireOpsAdmin: true 
+  });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -35,7 +40,12 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
+  // Backup creation requires OPS_ADMIN (school admin) capabilities
+  const authResult = await withAuth(request, { 
+    requireAuth: true, 
+    requireStaff: true, 
+    requireOpsAdmin: true 
+  });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

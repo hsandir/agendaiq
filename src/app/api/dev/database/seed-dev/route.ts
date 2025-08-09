@@ -4,7 +4,8 @@ import { prisma } from '@/lib/prisma';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  // Seed operation requires DEV_ADMIN (system admin) capabilities
+  const authResult = await withAuth(request, { requireDevAdmin: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
