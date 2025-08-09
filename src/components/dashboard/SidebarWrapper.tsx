@@ -40,13 +40,8 @@ export function SidebarWrapper({ isAdmin, className }: SidebarWrapperProps) {
         role="navigation"
         style={{ scrollbarWidth: 'thin', scrollbarColor: 'hsl(var(--muted)) transparent' }}
       >
-        {/* Brand Header */}
-        <div className="px-6 py-7 border-b border-border/50">
-          <h1 className="text-xl font-bold text-primary tracking-wide">AgendaIQ</h1>
-        </div>
-        
         {/* Navigation */}
-        <div className="px-2 pb-6">
+        <div className="px-2 py-6">
           <Sidebar onSettingsClick={handleSettingsClick} />
         </div>
       </aside>

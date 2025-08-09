@@ -24,11 +24,17 @@ export function isUserAdmin(user: UserWithStaff | null | undefined): boolean {
   // Check is_admin flag first - this is the primary admin indicator
   if (user.is_admin) return true;
   
-  // Check role properties - admin roles have priority 1 and level 0
+  // Check role properties
   const role = user.Staff?.[0]?.Role;
   if (!role) return false;
   
-  return role.priority === 1 && role.level === 0;
+  // Check for Administrator or System Administrator roles
+  if (role.title === 'Administrator' || role.title === 'System Administrator') {
+    return true;
+  }
+  
+  // Admin roles have priority 0 or 1 and level 0
+  return (role.priority === 0 || role.priority === 1) && role.level === 0;
 }
 
 export function isUserLeadership(user: UserWithStaff | null | undefined): boolean {

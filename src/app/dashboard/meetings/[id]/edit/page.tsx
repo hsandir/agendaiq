@@ -48,8 +48,8 @@ export default async function EditMeetingPage({ params }: PageProps) {
   }
 
   // Check if user has permission to edit this meeting
-  const isAdmin = user.staff.role.title === 'Administrator';
-  const isOrganizer = meeting.organizer_id === user.staff.id;
+  const isAdmin = user.staff?.role?.title === 'Administrator';
+  const isOrganizer = meeting.organizer_id === user.staff?.id;
 
   if (!isAdmin && !isOrganizer) {
     redirect("/dashboard/meetings");

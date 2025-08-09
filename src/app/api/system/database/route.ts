@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { can, Capability } from '@/lib/auth/policy';
 
 export async function GET(request: NextRequest) {
   // CRITICAL SECURITY FIX: Add authentication for sensitive database info
-  const authResult = await withAuth(request, { 
-    requireAuth: true, 
-    requireStaff: true, 
-    requireAdminRole: true 
-  });
-  
+  const authResult = await withAuth(request);
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
+
+  const user = authResult.user!;
+
+  // Check database read capability
+  if (!can(user, Capability.OPS_DB_READ)) {
+    return NextResponse.json({ error: 'Database read access required' }, { status: 403 });
   }
   try {
     const databaseUrl = process.env.DATABASE_URL;

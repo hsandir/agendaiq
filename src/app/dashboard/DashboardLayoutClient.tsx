@@ -109,7 +109,7 @@ export function DashboardLayoutClient({
                   className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>Sign Out</span>
+                  <span className="hidden sm:inline">Sign Out</span>
                 </button>
               </div>
             </div>
@@ -139,7 +139,12 @@ export function DashboardLayoutClient({
               <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded font-medium">
                 {currentRole?.title || 'No Role'}
               </span>
-              <RoleSwitch staff={userWithStaff?.Staff?.[0] || null} />
+              <button
+                onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+              </button>
             </div>
           </header>
           
@@ -230,7 +235,16 @@ export function DashboardLayoutClient({
           
           <div className="flex items-center gap-3">
             <span className="text-sm text-muted-foreground">{user.email}</span>
-            <RoleSwitch staff={userWithStaff?.Staff?.[0] || null} />
+            <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">
+              {currentRole?.title || 'No Role'}
+            </span>
+            <button
+              onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+              className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+            >
+              <LogOut className="h-4 w-4" />
+              <span>Sign Out</span>
+            </button>
           </div>
         </header>
         

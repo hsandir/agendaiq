@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function RolePage() {
-  const user = await requireAuth(AuthPresets.requireAuth);
+  const user = await requireAuth(AuthPresets.requireRoleManagement);
 
   // Fetch real role and organizational data
   const roles = await prisma.role.findMany({

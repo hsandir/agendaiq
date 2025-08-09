@@ -3,31 +3,23 @@ import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 import { rateLimitMiddleware } from "@/lib/middleware/rate-limit-middleware";
 import { auditMiddleware } from "@/lib/middleware/audit-middleware";
+import { canAccessRoute, canAccessApi, UserWithCapabilities } from "@/lib/auth/policy";
 
-// Admin-only routes
-const adminOnlyRoutes = [
-  '/dashboard/system',
-  '/dashboard/settings/admin',
-  '/dashboard/settings/setup',
-  '/dashboard/settings/audit',
-  '/dashboard/settings/backup',
-  '/dashboard/monitoring',
-  '/api/admin',
-  '/api/system',
-  '/api/monitoring'
-];
-
-// Staff-only routes (requires staff record)
-const staffOnlyRoutes = [
-  '/dashboard/meetings',
-  '/dashboard/settings/roles',
-  '/dashboard/settings/permissions',
-  '/dashboard/settings/users',
-  '/api/meetings',
-  '/api/roles',
-  '/api/departments',
-  '/api/staff'
-];
+// Helper function to convert token to UserWithCapabilities
+function tokenToUser(token: any): UserWithCapabilities | null {
+  if (!token) return null;
+  
+  return {
+    id: parseInt(token.id),
+    email: token.email,
+    name: token.name,
+    is_system_admin: token.staff?.role?.key === 'DEV_ADMIN' || false,
+    is_school_admin: token.staff?.role?.key === 'OPS_ADMIN' || false,
+    roleKey: token.staff?.role?.key,
+    capabilities: token.capabilities || [],
+    staff: token.staff
+  };
+}
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
@@ -51,26 +43,11 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(signInUrl);
     }
     
-    // Check admin-only routes
-    const isAdminRoute = adminOnlyRoutes.some(route => path.startsWith(route));
-    if (isAdminRoute) {
-      const isAdmin = token.staff?.role?.title === 'Administrator';
-      
-      if (!isAdmin) {
-        // Redirect non-admins to dashboard home
-        return NextResponse.redirect(new URL('/dashboard', request.url));
-      }
-    }
-    
-    // Check staff-only routes
-    const isStaffRoute = staffOnlyRoutes.some(route => path.startsWith(route));
-    if (isStaffRoute) {
-      const hasStaff = token.staff && token.staff.id;
-      
-      if (!hasStaff) {
-        // Redirect non-staff to dashboard home
-        return NextResponse.redirect(new URL('/dashboard', request.url));
-      }
+    // Use capability-based access control for dashboard routes
+    const user = tokenToUser(token);
+    if (!canAccessRoute(user, path)) {
+      // Redirect to dashboard home for unauthorized access
+      return NextResponse.redirect(new URL('/dashboard', request.url));
     }
   }
   
@@ -95,27 +72,12 @@ export async function middleware(request: NextRequest) {
       );
     }
     
-    // Check admin-only API routes
-    const isAdminRoute = adminOnlyRoutes.some(route => path.startsWith(route));
-    if (isAdminRoute && token) {
-      const isAdmin = token.staff?.role?.title === 'Administrator';
-      
-      if (!isAdmin) {
+    // Use capability-based access control for API routes
+    if (token) {
+      const user = tokenToUser(token);
+      if (!canAccessApi(user, path)) {
         return NextResponse.json(
-          { error: 'Administrator access required' },
-          { status: 403 }
-        );
-      }
-    }
-    
-    // Check staff-only API routes
-    const isStaffRoute = staffOnlyRoutes.some(route => path.startsWith(route));
-    if (isStaffRoute && token) {
-      const hasStaff = token.staff && token.staff.id;
-      
-      if (!hasStaff) {
-        return NextResponse.json(
-          { error: 'Staff access required' },
+          { error: 'Insufficient permissions' },
           { status: 403 }
         );
       }

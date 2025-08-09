@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     // Filter by ownership
     if (filter === 'my' && user.staff) {
       whereConditions.assigned_to_id = user.staff.id;
-    } else if (filter === 'team' && user.staff) {
+    } else if (filter === 'team' && user.staff && user.staff.department) {
       // Get team members
       const teamMembers = await prisma.staff.findMany({
         where: {

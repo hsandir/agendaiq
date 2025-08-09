@@ -70,6 +70,7 @@ model Department {
 model Role {
   id              Int                 @id @default(autoincrement())
   title           String              @unique
+  key             String?             @unique // New: DEV_ADMIN, OPS_ADMIN, TEACHER, etc.
   priority        Int                 @default(0)
   category        String?
   department_id   Int?
@@ -90,6 +91,7 @@ model Role {
   ActionItems     MeetingActionItem[]
   AgendaItems     MeetingAgendaItem[]
   RoleTransitions RoleTransition[]
+  Permissions     Permission[]        // New: Capabilities for this role
 }
 
 model RoleHierarchy {
@@ -104,6 +106,22 @@ model RoleHierarchy {
   @@unique([parent_role_id, child_role_id])
 }
 
+model Permission {
+  id           Int      @id @default(autoincrement())
+  role_id      Int
+  capability   String   // e.g., "dev:ci", "ops:monitoring", "meeting:create"
+  resource     String?  // e.g., "dashboard", "api", "meeting"
+  action       String?  // e.g., "read", "write", "delete"
+  conditions   Json?    // Additional conditions for the permission
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  Role         Role     @relation(fields: [role_id], references: [id], onDelete: Cascade)
+
+  @@unique([role_id, capability])
+  @@index([capability])
+  @@index([resource, action])
+}
+
 model User {
   id                          Int                @id @default(autoincrement())
   email                       String             @unique
@@ -112,7 +130,9 @@ model User {
   hashedPassword              String?
   emailVerified               DateTime?
   image                       String?
-  is_admin                    Boolean            @default(false)
+  is_admin                    Boolean            @default(false) // Deprecated - kept for migration
+  is_system_admin             Boolean            @default(false) // New: System/Dev admin flag
+  is_school_admin             Boolean            @default(false) // New: School/Ops admin flag
   two_factor_enabled          Boolean            @default(false)
   two_factor_secret           String?
   backup_codes                String[]

@@ -3,44 +3,54 @@ import { authOptions } from './auth-options';
 import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { Logger } from '@/lib/utils/logger';
+import { 
+  Capability, 
+  UserWithCapabilities, 
+  getUserCapabilities, 
+  can,
+  isDevAdmin,
+  isOpsAdmin,
+  enrichUserWithCapabilities 
+} from './policy';
 
-// Types for better type safety
-export interface AuthenticatedUser {
-  id: number;
-  email: string;
-  name: string | null;
+// Types for better type safety - extend UserWithCapabilities
+export interface AuthenticatedUser extends UserWithCapabilities {
   staff?: {
     id: number;
-    role: {
+    role?: {
       id: number;
+      key?: string | null;
       title: string;
-      priority: number;
-      category: string | null;
-      is_leadership: boolean;
+      priority?: number;
+      category?: string | null;
+      is_leadership?: boolean;
     };
-    department: {
+    department?: {
       id: number;
       name: string;
       code: string;
     };
-    school: {
+    school?: {
       id: number;
       name: string;
       code: string | null;
     };
-    district: {
+    district?: {
       id: number;
       name: string;
       code: string | null;
     };
-  } | null;
+  };
 }
 
 export interface AuthRequirements {
   requireAuth?: boolean;
   requireStaff?: boolean;
-  requireAdminRole?: boolean;
-  requireLeadership?: boolean;
+  requireAdminRole?: boolean; // Deprecated - use requireCapability
+  requireLeadership?: boolean; // Deprecated - use requireCapability
+  requireCapability?: Capability | Capability[];
+  requireDevAdmin?: boolean;
+  requireOpsAdmin?: boolean;
 }
 
 export interface AuthResult {
@@ -73,21 +83,77 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
       return null;
     }
 
-    const user = {
-      id: session.user.id,
-      email: session.user.email,
-      name: session.user.name,
-      staff: session.user.staff || null
-    };
-
-    console.log('✅ Current user retrieved:', {
-      id: user.id,
-      email: user.email,
-      hasStaff: !!user.staff,
-      staffRole: user.staff?.role?.title
+    // Get user from database to get latest admin flags and capabilities
+    const dbUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      include: {
+        Staff: {
+          include: {
+            Role: {
+              include: {
+                Permissions: true
+              }
+            },
+            Department: true,
+            School: true,
+            District: true
+          }
+        }
+      }
     });
 
-    return user;
+    if (!dbUser) {
+      console.log('❌ User not found in database');
+      return null;
+    }
+
+    // Enrich user with capabilities
+    const userWithCapabilities = await enrichUserWithCapabilities({
+      id: dbUser.id,
+      email: dbUser.email,
+      name: dbUser.name,
+      is_system_admin: dbUser.is_system_admin,
+      is_school_admin: dbUser.is_school_admin,
+      staff: dbUser.Staff && dbUser.Staff.length > 0 ? {
+        id: dbUser.Staff[0].id,
+        role: {
+          id: dbUser.Staff[0].Role.id,
+          key: dbUser.Staff[0].Role.key,
+          title: dbUser.Staff[0].Role.title,
+          priority: dbUser.Staff[0].Role.priority,
+          category: dbUser.Staff[0].Role.category,
+          is_leadership: dbUser.Staff[0].Role.is_leadership
+        },
+        department: {
+          id: dbUser.Staff[0].Department.id,
+          name: dbUser.Staff[0].Department.name,
+          code: dbUser.Staff[0].Department.code
+        },
+        school: {
+          id: dbUser.Staff[0].School.id,
+          name: dbUser.Staff[0].School.name,
+          code: dbUser.Staff[0].School.code
+        },
+        district: {
+          id: dbUser.Staff[0].District.id,
+          name: dbUser.Staff[0].District.name,
+          code: dbUser.Staff[0].District.code
+        }
+      } : null
+    });
+
+    console.log('✅ Current user retrieved:', {
+      id: userWithCapabilities.id,
+      email: userWithCapabilities.email,
+      hasStaff: !!userWithCapabilities.staff,
+      staffRole: userWithCapabilities.staff?.role?.title,
+      roleKey: userWithCapabilities.roleKey,
+      isSystemAdmin: userWithCapabilities.is_system_admin,
+      isSchoolAdmin: userWithCapabilities.is_school_admin,
+      capabilityCount: userWithCapabilities.capabilities?.length || 0
+    });
+
+    return userWithCapabilities;
   } catch (error) {
     console.error('❌ Error getting current user:', error);
     return null;
@@ -128,17 +194,55 @@ export async function checkAuthRequirements(requirements: AuthRequirements = {})
       };
     }
 
-    // Check admin role requirement
-    if (requirements.requireAdminRole && user.staff?.role?.title !== 'Administrator') {
-      console.log('❌ Administrator access required but user role is:', user.staff?.role?.title);
+    // Check capability requirement (new system)
+    if (requirements.requireCapability) {
+      if (!can(user, requirements.requireCapability)) {
+        console.log('❌ Capability required but user lacks permission:', requirements.requireCapability);
+        return { 
+          authorized: false, 
+          error: 'Insufficient permissions', 
+          statusCode: 403 
+        };
+      }
+    }
+    
+    // Check dev admin requirement
+    if (requirements.requireDevAdmin && !isDevAdmin(user)) {
+      console.log('❌ Developer admin access required');
       return { 
         authorized: false, 
-        error: 'Administrator access required', 
+        error: 'Developer admin access required', 
+        statusCode: 403 
+      };
+    }
+    
+    // Check ops admin requirement
+    if (requirements.requireOpsAdmin && !isOpsAdmin(user)) {
+      console.log('❌ Operations admin access required');
+      return { 
+        authorized: false, 
+        error: 'Operations admin access required', 
         statusCode: 403 
       };
     }
 
-    // Check leadership requirement
+    // Legacy checks (deprecated but kept for backward compatibility)
+    if (requirements.requireAdminRole) {
+      // Check both old and new admin system
+      const isAdmin = isOpsAdmin(user) || isDevAdmin(user) || 
+                     user.staff?.role?.title === 'Administrator' ||
+                     user.staff?.role?.key === 'OPS_ADMIN';
+      if (!isAdmin) {
+        console.log('❌ Administrator access required but user is not admin');
+        return { 
+          authorized: false, 
+          error: 'Administrator access required', 
+          statusCode: 403 
+        };
+      }
+    }
+
+    // Check leadership requirement (legacy)
     if (requirements.requireLeadership && !user.staff?.role?.is_leadership) {
       console.log('❌ Leadership access required but user is not leadership');
       return { 
@@ -180,6 +284,26 @@ export async function requireAuth(requirements: AuthRequirements = {}): Promise<
 export const AuthPresets = {
   requireAuth: { requireAuth: true },
   requireStaff: { requireAuth: true, requireStaff: true },
-  requireAdmin: { requireAuth: true, requireStaff: true, requireAdminRole: true },
-  requireLeadership: { requireAuth: true, requireStaff: true, requireLeadership: true }
+  requireAdmin: { requireAuth: true, requireStaff: true, requireAdminRole: true }, // Legacy
+  requireLeadership: { requireAuth: true, requireStaff: true, requireLeadership: true }, // Legacy
+  
+  // New capability-based presets
+  requireDevAdmin: { requireAuth: true, requireDevAdmin: true },
+  requireOpsAdmin: { requireAuth: true, requireOpsAdmin: true },
+  requireAnyAdmin: { requireAuth: true, requireCapability: [Capability.USER_MANAGE, Capability.DEV_DEBUG] },
+  
+  // Development access
+  requireDevelopment: { requireAuth: true, requireCapability: Capability.DEV_DEBUG },
+  
+  // Operations access  
+  requireMonitoring: { requireAuth: true, requireCapability: Capability.OPS_MONITORING },
+  requireLogs: { requireAuth: true, requireCapability: Capability.OPS_LOGS },
+  
+  // Management access
+  requireUserManagement: { requireAuth: true, requireCapability: Capability.USER_MANAGE },
+  requireRoleManagement: { requireAuth: true, requireCapability: Capability.ROLE_MANAGE },
+  
+  // Meeting access
+  requireMeetingCreate: { requireAuth: true, requireCapability: Capability.MEETING_CREATE },
+  requireMeetingView: { requireAuth: true, requireCapability: Capability.MEETING_VIEW }
 }; 

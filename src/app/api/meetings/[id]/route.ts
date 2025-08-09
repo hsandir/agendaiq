@@ -131,10 +131,10 @@ export async function GET(request: NextRequest, props: Props) {
     }
 
     // Check if user is authorized to view this meeting
-    const isAdmin = user.staff?.role.title === 'Administrator';
+    const isAdmin = user.staff?.role?.title === 'Administrator';
     const isOrganizer = meeting.organizer_id === user.staff?.id;
     const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
-    const isSameDepartment = meeting.department_id === user.staff?.department.id;
+    const isSameDepartment = meeting.department_id === user.staff?.department?.id;
 
     if (!isAdmin && !isOrganizer && !isAttendee && !isSameDepartment) {
       return NextResponse.json({ error: "Not authorized to view this meeting" }, { status: 403 });
@@ -217,8 +217,8 @@ export async function PATCH(
       return NextResponse.json({ error: "Meeting not found" }, { status: 404 });
     }
 
-    const isAdmin = user.staff.role.title === 'Administrator';
-    const isOrganizer = existingMeeting.organizer_id === user.staff.id;
+    const isAdmin = user.staff?.role?.title === 'Administrator';
+    const isOrganizer = existingMeeting.organizer_id === user.staff?.id;
 
     if (!isAdmin && !isOrganizer) {
       return NextResponse.json({ error: "Not authorized to edit this meeting" }, { status: 403 });

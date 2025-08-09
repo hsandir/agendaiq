@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     // Check if user is authorized
     const isOrganizer = meeting.organizer_id === user.staff?.id;
     const isAttendee = meeting.MeetingAttendee.length > 0;
-    const isAdmin = user.staff?.role.title === 'Administrator';
+    const isAdmin = user.staff?.role?.title === 'Administrator';
 
     if (!isOrganizer && !isAttendee && !isAdmin) {
       return NextResponse.json(
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
           name: user.name,
           email: user.email,
           staff_id: user.staff?.id,
-          role: user.staff?.role.title,
+          role: user.staff?.role?.title,
         }
       };
       authResponse = pusherServer.authorizeChannel(socketId, channel, presenceData);

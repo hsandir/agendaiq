@@ -77,7 +77,7 @@ export default async function AgendaItemPage(props: Props) {
   // Check permissions
   const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
   const isAttendee = agendaItem.Meeting.MeetingAttendee.length > 0;
-  const isAdmin = user.staff?.role.title === 'Administrator';
+  const isAdmin = user.staff?.role?.title === 'Administrator';
   const isResponsible = agendaItem.responsible_staff_id === user.staff?.id;
 
   if (!isOrganizer && !isAttendee && !isAdmin) {

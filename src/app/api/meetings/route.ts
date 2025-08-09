@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
       // Admins can see all meetings in their district
       meetingWhereClause = {
         Staff: {
-          school_id: staffRecord.school.id
+          school_id: staffRecord.school?.id
         }
       };
     } else if (staffRecord.role?.is_leadership) {
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
           { organizer_id: staffRecord.id },
           {
             Staff: {
-              school_id: staffRecord.school.id
+              school_id: staffRecord.school?.id
             }
           },
           {
@@ -266,6 +266,14 @@ export async function POST(request: NextRequest) {
     if (start >= end) {
       return NextResponse.json(
         { error: "End time must be after start time" },
+        { status: 400 }
+      );
+    }
+
+    // Validate required staff data
+    if (!staffRecord.department?.id || !staffRecord.district?.id || !staffRecord.school?.id) {
+      return NextResponse.json(
+        { error: "Staff member must have complete organizational data" },
         { status: 400 }
       );
     }

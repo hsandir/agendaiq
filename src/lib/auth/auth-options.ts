@@ -212,13 +212,66 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
+      // When user signs in (initial JWT creation)
       if (user) {
         token.id = user.id.toString(); // Convert to string for JWT
         if (hasStaff(user)) {
           token.staff = user.staff;
         }
       }
+      
+      // For Google OAuth, fetch staff info if not present
+      if (token.email && !token.staff && (trigger === 'signIn' || trigger === 'update')) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { email: token.email },
+            include: {
+              Staff: {
+                include: {
+                  Role: true,
+                  Department: true,
+                  School: true,
+                  District: true
+                }
+              }
+            }
+          });
+          
+          if (dbUser?.Staff && dbUser.Staff.length > 0) {
+            const staff = dbUser.Staff[0];
+            token.staff = {
+              id: staff.id,
+              role: {
+                id: staff.Role.id,
+                key: staff.Role.key,
+                title: staff.Role.title,
+                priority: staff.Role.priority,
+                category: staff.Role.category,
+                is_leadership: staff.Role.is_leadership
+              },
+              department: {
+                id: staff.Department.id,
+                name: staff.Department.name,
+                code: staff.Department.code
+              },
+              school: {
+                id: staff.School.id,
+                name: staff.School.name,
+                code: staff.School.code
+              },
+              district: {
+                id: staff.District.id,
+                name: staff.District.name,
+                code: staff.District.code
+              }
+            };
+          }
+        } catch (error) {
+          console.error('Error fetching staff info for JWT:', error);
+        }
+      }
+      
       return token;
     },
     async session({ session, token }) {

@@ -3,38 +3,22 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth/auth-options";
 import { withAuth } from "@/lib/auth/api-auth";
+import { can, Capability } from '@/lib/auth/policy';
 import { createSuccessNextResponse, createErrorNextResponse } from '@/lib/api/response-types';
 import { Logger } from '@/lib/utils/logger';
 
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await withAuth(request, { requireStaff: true });
+    const authResult = await withAuth(request);
     if (!authResult.success) {
       return createErrorNextResponse(authResult.error || 'Authentication failed', authResult.statusCode || 401);
     }
 
     const user = authResult.user!;
 
-    const userWithStaff = await prisma.user.findUnique({
-      where: { email: user.email },
-      include: { 
-        Staff: {
-          include: {
-            Role: true
-          }
-        }
-      }
-    });
-
-    if (!userWithStaff) {
-      return createErrorNextResponse("User not found", 404);
-    }
-
-    // Check if user has admin privileges
-    const isAdmin = userWithStaff.Staff?.[0]?.Role?.title === 'Administrator';
-
-    if (!isAdmin) {
-      return createErrorNextResponse("Only administrators can view all users", 403);
+    // Check user management capability
+    if (!can(user, Capability.USER_MANAGE)) {
+      return createErrorNextResponse("User management access required", 403);
     }
 
     const users = await prisma.user.findMany({

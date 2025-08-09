@@ -470,6 +470,11 @@ export async function POST(request: NextRequest) {
                 }
               });
             } else {
+              // Validate admin staff has complete organizational data
+              if (!adminStaff.school?.id || !adminStaff.district?.id) {
+                throw new Error('Admin staff member must have complete organizational data');
+              }
+
               await prisma.staff.create({
                 data: {
                   user_id: existingUser.id,
@@ -482,6 +487,11 @@ export async function POST(request: NextRequest) {
             }
             updated++;
           } else {
+            // Validate admin staff has complete organizational data
+            if (!adminStaff.school?.id || !adminStaff.district?.id) {
+              throw new Error('Admin staff member must have complete organizational data');
+            }
+
             // Create new user
             const newUser = await prisma.user.create({
               data: {

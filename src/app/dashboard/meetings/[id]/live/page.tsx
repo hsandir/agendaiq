@@ -90,7 +90,7 @@ export default async function MeetingLivePage(props: Props) {
   // Check if user is authorized
   const isOrganizer = meeting.organizer_id === user.staff?.id;
   const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
-  const isAdmin = user.staff?.role.title === 'Administrator';
+  const isAdmin = user.staff?.role?.title === 'Administrator';
 
   if (!isOrganizer && !isAttendee && !isAdmin) {
     notFound();

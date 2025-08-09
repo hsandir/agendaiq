@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function UsersPage() {
-  const user = await requireAuth(AuthPresets.requireAuth);
+  const user = await requireAuth(AuthPresets.requireUserManagement);
 
   return (
     <div className="flex-1 space-y-4 p-8 pt-6">

@@ -24,7 +24,8 @@ import {
   Server,
   Code,
   Video,
-  Briefcase
+  Briefcase,
+  LogOut
 } from "lucide-react";
 
 export interface NavigationItem {

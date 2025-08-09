@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { can, Capability } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireStaff: true });
+  const authResult = await withAuth(request);
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
+
+  const user = authResult.user!;
+
+  // Check development capability
+  if (!can(user, Capability.DEV_DEBUG)) {
+    return NextResponse.json({ error: 'Development access required' }, { status: 403 });
   }
 
   try {

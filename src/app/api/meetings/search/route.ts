@@ -18,7 +18,7 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
     }
 
     const staffRecord = user.staff;
-    const isAdmin = staffRecord.role.title === 'Administrator';
+    const isAdmin = staffRecord?.role?.title === 'Administrator';
 
     // Build search where clause
     let searchWhereClause;
@@ -27,8 +27,8 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
       // Admins can search all meetings in their organization
       searchWhereClause = {
         OR: [
-          { school_id: staffRecord.school.id },
-          { district_id: staffRecord.district.id }
+          { school_id: staffRecord?.school?.id },
+          { district_id: staffRecord?.district?.id }
         ]
       };
     } else {

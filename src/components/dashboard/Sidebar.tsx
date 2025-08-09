@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import clsx from "clsx";
 import { sidebarItems } from "@/components/layout/SidebarItems";
+import { signOut } from "next-auth/react";
 
 interface SidebarProps {
   onSettingsClick?: () => void;
@@ -33,6 +34,22 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.has(item.href);
     const isItemActive = isActive(item.href);
+    const isSignOut = item.label === "Sign Out";
+
+    if (isSignOut) {
+      return (
+        <div key={item.href}>
+          <button
+            onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+            className="w-full flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-muted-foreground hover:bg-muted hover:text-foreground"
+            aria-label={item.label}
+          >
+            <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
+            {item.label}
+          </button>
+        </div>
+      );
+    }
 
     return (
       <div key={item.href}>
@@ -87,7 +104,7 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-4 py-6">
+      <div className="px-4 py-6 ml-12">
         <h2 className="text-2xl font-bold text-foreground">AgendaIQ</h2>
       </div>
       <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto" aria-label="Main navigation">

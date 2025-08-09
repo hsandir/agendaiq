@@ -34,7 +34,7 @@ export default async function MeetingPage({ params }: PageProps) {
   // Check permissions
   const isOrganizer = meeting.organizer_id === user.staff?.id;
   const isAttendee = meeting.MeetingAttendee.length > 0;
-  const isAdmin = user.staff?.role.title === 'Administrator';
+  const isAdmin = user.staff?.role?.title === 'Administrator';
 
   if (!isOrganizer && !isAttendee && !isAdmin) {
     redirect("/dashboard/meetings");

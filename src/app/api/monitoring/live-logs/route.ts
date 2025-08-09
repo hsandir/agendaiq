@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { can, Capability } from '@/lib/auth/policy';
 import { LogLevel } from '@/lib/logging/types';
 
 // Get live logs from the realtime transport buffer
 export async function GET(request: NextRequest) {
-  // Require admin authentication for live monitoring
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  // Require operations logs capability for live monitoring
+  const authResult = await withAuth(request);
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
+
+  const user = authResult.user!;
+
+  // Check operations logs capability
+  if (!can(user, Capability.OPS_LOGS)) {
+    return NextResponse.json({ error: 'Operations logs access required' }, { status: 403 });
   }
 
   try {

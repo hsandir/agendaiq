@@ -1,114 +1,121 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-async function fixAdmin() {
+async function fixAdminComplete() {
   try {
-    // First check what school exists
-    const school = await prisma.school.findFirst();
-    if (!school) {
-      console.log('No school found!');
-      return;
-    }
-    console.log('Using school:', school.name);
+    console.log('=== FIXING ADMIN USER ===\n');
     
-    // Check what district exists
-    const district = await prisma.district.findFirst();
-    if (!district) {
-      console.log('No district found!');
-      return;
-    }
-    console.log('Using district:', district.name);
-    
-    // Check or create Administrator role
+    // 1. Find or create Administrator role
     let adminRole = await prisma.role.findFirst({
       where: { title: 'Administrator' }
     });
     
     if (!adminRole) {
+      console.log('Administrator role not found, creating...');
       adminRole = await prisma.role.create({
         data: {
           title: 'Administrator',
-          priority: 1,
+          description: 'System administrator with full access',
+          priority: 0,
+          level: 0,
           is_leadership: true,
-          category: 'executive',
-          level: 1
+          category: 'Administrative'
         }
       });
-      console.log('Administrator role created');
-    } else {
-      console.log('Administrator role exists');
     }
+    console.log('✓ Administrator role:', adminRole.id);
     
-    // Use existing department or create District Office
-    let department = await prisma.department.findFirst({
-      where: { name: 'Executive Leadership' }
-    });
-    
-    if (!department) {
-      department = await prisma.department.findFirst();
-      console.log('Using first available department:', department.name);
-    } else {
-      console.log('Using Executive Leadership department');
-    }
-    
-    // Find admin user
+    // 2. Find admin user
     const adminUser = await prisma.user.findUnique({
       where: { email: 'admin@school.edu' }
     });
     
     if (!adminUser) {
-      console.log('Admin user not found!');
+      console.error('admin@school.edu not found!');
       return;
     }
+    console.log('✓ Admin user found:', adminUser.id);
     
-    // Check if staff record exists
+    // 3. Find or create District Office department
+    let districtOffice = await prisma.department.findFirst({
+      where: { name: 'District Office' }
+    });
+    
+    if (!districtOffice) {
+      console.log('Creating District Office department...');
+      districtOffice = await prisma.department.create({
+        data: {
+          name: 'District Office',
+          code: 'DO',
+          school_id: 2 // CJCP Somerset Campus
+        }
+      });
+    }
+    console.log('✓ District Office department:', districtOffice.id);
+    
+    // 4. Check for existing staff record
     const existingStaff = await prisma.staff.findFirst({
       where: { user_id: adminUser.id }
     });
     
+    let staff;
+    
     if (existingStaff) {
-      // Update existing staff record with Administrator role
-      await prisma.staff.update({
+      console.log('Updating existing staff record...');
+      // Update existing staff record
+      staff = await prisma.staff.update({
         where: { id: existingStaff.id },
         data: {
-          role_id: adminRole.id
+          department_id: districtOffice.id,
+          role_id: adminRole.id,
+          school_id: 2,
+          district_id: 2,
+          extension: '1000',
+          room: '500',
+          hire_date: new Date('2020-01-01'),
+          is_active: true,
+          flags: ['active', 'admin', 'leadership']
+        },
+        include: {
+          User: true,
+          Role: true,
+          Department: true
         }
       });
-      console.log('Updated existing staff record with Administrator role');
     } else {
+      console.log('Creating new staff record...');
       // Create new staff record
-      await prisma.staff.create({
+      staff = await prisma.staff.create({
         data: {
           user_id: adminUser.id,
+          department_id: districtOffice.id,
           role_id: adminRole.id,
-          department_id: department.id,
-          school_id: school.id,
-          district_id: district.id
+          school_id: 2,
+          district_id: 2,
+          extension: '1000',
+          room: '500',
+          hire_date: new Date('2020-01-01'),
+          is_active: true,
+          flags: ['active', 'admin', 'leadership']
+        },
+        include: {
+          User: true,
+          Role: true,
+          Department: true
         }
       });
-      console.log('Created new staff record with Administrator role');
     }
     
-    // Verify the fix
-    const verifyUser = await prisma.user.findUnique({
-      where: { email: 'admin@school.edu' },
-      include: {
-        Staff: {
-          include: {
-            Role: true,
-            Department: true
-          }
-        }
-      }
-    });
-    
-    if (verifyUser && verifyUser.Staff[0]) {
-      console.log('\nVerification successful!');
-      console.log('User:', verifyUser.email);
-      console.log('Role:', verifyUser.Staff[0].Role.title);
-      console.log('Department:', verifyUser.Staff[0].Department.name);
-      console.log('Is Leadership:', verifyUser.Staff[0].Role.is_leadership);
-    }
+    console.log('\n✅ Successfully fixed admin@school.edu:');
+    console.log('- User:', staff.User.email);
+    console.log('- Role:', staff.Role?.title);
+    console.log('- Role Priority:', staff.Role?.priority);
+    console.log('- Role Level:', staff.Role?.level);
+    console.log('- Department:', staff.Department?.name);
+    console.log('- Extension:', staff.extension);
+    console.log('- Room:', staff.room);
+    console.log('- Flags:', staff.flags);
+    console.log('- is_admin flag:', adminUser.is_admin);
     
   } catch (error) {
     console.error('Error:', error);
@@ -117,4 +124,4 @@ async function fixAdmin() {
   }
 }
 
-fixAdmin();
+fixAdminComplete();
