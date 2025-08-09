@@ -42,5 +42,17 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-  return NextResponse.json({ errors });
+  // Only show errors in development or for debugging purposes
+  if (process.env.NODE_ENV === 'development') {
+    return NextResponse.json({ errors });
+  } else {
+    return NextResponse.json({ 
+      totalErrors: errors.length, 
+      recentErrors: errors.slice(-5).map(e => ({
+        message: e.message,
+        timestamp: e.timestamp,
+        url: e.url
+      }))
+    });
+  }
 }

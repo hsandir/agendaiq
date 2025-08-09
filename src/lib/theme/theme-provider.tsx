@@ -109,9 +109,12 @@ export function ThemeProvider({ children, initialTheme = 'classic-light' }: Them
     // Border radius token used by Tailwind extensions
     document.documentElement.style.setProperty('--radius', theme.borderRadius.md);
 
+    // Mark current theme on the root for scoped overrides
+    document.documentElement.setAttribute('data-theme', currentThemeId);
+
     // Apply theme class for Tailwind dark mode support
     document.documentElement.classList.remove('light', 'dark');
-    if (theme.id === 'dark-mode' || theme.id === 'modern-purple' || theme.id === 'high-contrast') {
+    if (theme.id === 'dark-mode' || theme.id === 'modern-purple' || theme.id === 'high-contrast' || theme.id === 'tasarim') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.add('light');
