@@ -128,7 +128,7 @@ export function hasResourcePermission(
         return true; // For now, allow all staff to read meetings
       }
       // Leadership can write/delete in their scope
-      return staff.role.is_leadership;
+      return staff.role?.is_leadership || false;
       
     case 'user':
       // Users can read their own profile
@@ -136,31 +136,31 @@ export function hasResourcePermission(
         return true;
       }
       // Leadership can manage users in their scope
-      return staff.role.is_leadership;
+      return staff.role?.is_leadership || false;
       
     case 'department':
       // Users can read their own department
-      if (action === 'read' && resourceId === staff.department.id) {
+      if (action === 'read' && resourceId === staff.department?.id) {
         return true;
       }
       // High priority roles can manage departments
-      return staff.role.priority >= 80;
+      return (staff.role?.priority || 0) >= 80;
       
     case 'school':
       // Users can read their own school
-      if (action === 'read' && resourceId === staff.school.id) {
+      if (action === 'read' && resourceId === staff.school?.id) {
         return true;
       }
       // Principals and above can manage schools
-      return ['Principal', 'Superintendent', 'Administrator'].includes(staff.role.title);
+      return ['Principal', 'Superintendent', 'Administrator'].includes(staff.role?.title || '');
       
     case 'district':
       // Users can read their own district
-      if (action === 'read' && resourceId === staff.district.id) {
+      if (action === 'read' && resourceId === staff.district?.id) {
         return true;
       }
       // Superintendents and admins can manage districts
-      return ['Superintendent', 'Administrator'].includes(staff.role.title);
+      return ['Superintendent', 'Administrator'].includes(staff.role?.title || '');
       
     default:
       return false;

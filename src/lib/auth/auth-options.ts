@@ -144,7 +144,7 @@ export const authOptions: NextAuthOptions = {
 
           const staff = user.Staff[0];
           const userData = {
-            id: user.id, // Keep as number
+            id: user.id.toString(), // Convert to string for NextAuth
             email: user.email,
             name: user.name,
             ...(staff && { 
@@ -243,7 +243,6 @@ export const authOptions: NextAuthOptions = {
             token.staff = {
               id: staff.id,
               role: {
-                id: staff.Role.id,
                 key: staff.Role.key,
                 title: staff.Role.title,
                 priority: staff.Role.priority,
@@ -265,7 +264,7 @@ export const authOptions: NextAuthOptions = {
                 name: staff.District.name,
                 code: staff.District.code
               }
-            };
+            } as any;
           }
         } catch (error) {
           console.error('Error fetching staff info for JWT:', error);

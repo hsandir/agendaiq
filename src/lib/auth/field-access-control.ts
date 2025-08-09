@@ -175,12 +175,12 @@ function checkAccess(
     return true;
   }
 
-  if (allowedRoles.includes('leadership') && user.staff?.role.is_leadership) {
+  if (allowedRoles.includes('leadership') && user.staff?.role?.is_leadership) {
     return true;
   }
 
   // Check specific role titles
-  const userRoleTitle = user.staff?.role.title;
+  const userRoleTitle = user.staff?.role?.title;
   if (userRoleTitle && allowedRoles.includes(userRoleTitle)) {
     return true;
   }
