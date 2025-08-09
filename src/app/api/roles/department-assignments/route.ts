@@ -13,8 +13,8 @@ const assignmentSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    // Authenticate user and check admin permissions
-    const authResult = await withAuth(request, { requireAdminRole: true });
+    // Authenticate user and check operations admin permissions
+    const authResult = await withAuth(request, { requireOpsAdmin: true });
     if (!authResult.success) {
       return NextResponse.json(
         { error: authResult.error },

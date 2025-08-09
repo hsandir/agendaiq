@@ -4,8 +4,8 @@ import { withAuth } from "@/lib/auth/api-auth";
 // GET Method - System alerts configuration
 export async function GET(request: NextRequest) {
   try {
-    // REQUIRED: Auth check - Admin only for alert configuration
-    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
+    // REQUIRED: Auth check - Operations admin for alert configuration
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
     
     if (!authResult.success) {
       return NextResponse.json(
@@ -211,11 +211,11 @@ export async function PUT(request: NextRequest) {
 // DELETE Method
 export async function DELETE(request: NextRequest) {
   try {
-    // REQUIRED: Auth check (usually admin only for deletes)
+    // REQUIRED: Auth check (usually operations admin only for deletes)
     const authResult = await withAuth(request, { 
       requireAuth: true,
       requireStaff: true,
-      requireAdminRole: true,
+      requireOpsAdmin: true,
     });
     
     if (!authResult.success) {

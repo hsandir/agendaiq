@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from '@/lib/prisma';
 import { pusherServer, CHANNELS, EVENTS } from '@/lib/pusher';
+import { isAnyAdmin } from '@/lib/auth/policy';
 import { z } from 'zod';
 
 const createCommentSchema = z.object({
@@ -116,9 +117,9 @@ export async function POST(
     // Check permissions
     const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
     const isAttendee = agendaItem.Meeting.MeetingAttendee.length > 0;
-    const isAdmin = user.staff?.role?.title === 'Administrator';
+    const hasAdminAccess = isAnyAdmin(user);
 
-    if (!isOrganizer && !isAttendee && !isAdmin) {
+    if (!isOrganizer && !isAttendee && !hasAdminAccess) {
       return NextResponse.json(
         { error: 'Insufficient permissions to comment on this agenda item' },
         { status: 403 }

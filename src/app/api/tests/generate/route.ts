@@ -5,7 +5,7 @@ import fs from 'fs/promises'
 import path from 'path'
 
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true })
+  const authResult = await withAuth(request, { requireDevAdmin: true })
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode })
   }
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 
 // List files without tests
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true })
+  const authResult = await withAuth(request, { requireDevAdmin: true })
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode })
   }

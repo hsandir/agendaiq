@@ -12,8 +12,8 @@ const updateSchema = z.object({
 // GET /api/admin/rate-limits - Get rate limiting metrics
 export async function GET(request: NextRequest) {
   try {
-    // Check authentication - admin only
-    const authResult = await withAuth(request, { requireAdminRole: true });
+    // Check authentication - operations admin only
+    const authResult = await withAuth(request, { requireOpsAdmin: true });
     if (!authResult.success) {
       return NextResponse.json(
         { error: authResult.error },
@@ -39,8 +39,8 @@ export async function GET(request: NextRequest) {
 // POST /api/admin/rate-limits - Update rate limiting configuration
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication - admin only
-    const authResult = await withAuth(request, { requireAdminRole: true });
+    // Check authentication - operations admin only
+    const authResult = await withAuth(request, { requireOpsAdmin: true });
     if (!authResult.success) {
       return NextResponse.json(
         { error: authResult.error },
@@ -188,8 +188,8 @@ export async function POST(request: NextRequest) {
 // DELETE /api/admin/rate-limits - Clear all rate limit data
 export async function DELETE(request: NextRequest) {
   try {
-    // Check authentication - admin only
-    const authResult = await withAuth(request, { requireAdminRole: true });
+    // Check authentication - operations admin only
+    const authResult = await withAuth(request, { requireOpsAdmin: true });
     if (!authResult.success) {
       return NextResponse.json(
         { error: authResult.error },

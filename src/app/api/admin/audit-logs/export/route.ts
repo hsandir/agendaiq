@@ -30,8 +30,8 @@ interface SortableAuditRecord {
 
 export async function GET(request: NextRequest) {
   try {
-    // Require admin access
-    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
+    // Require operations admin access
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
     if (!authResult.success) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }

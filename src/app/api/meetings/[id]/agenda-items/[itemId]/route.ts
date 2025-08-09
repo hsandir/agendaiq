@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from '@/lib/prisma';
 import { pusherServer, CHANNELS, EVENTS } from '@/lib/pusher';
+import { isAnyAdmin } from '@/lib/auth/policy';
 import { z } from 'zod';
 
 const updateSchema = z.object({
@@ -74,10 +75,10 @@ export async function PATCH(
     // Check permissions
     const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
     const isAttendee = agendaItem.Meeting.MeetingAttendee.length > 0;
-    const isAdmin = user.staff?.role?.title === 'Administrator';
+    const hasAdminAccess = isAnyAdmin(user);
     const isResponsible = agendaItem.responsible_staff_id === user.staff?.id;
 
-    if (!isOrganizer && !isAdmin && !isResponsible) {
+    if (!isOrganizer && !hasAdminAccess && !isResponsible) {
       return NextResponse.json(
         { error: 'Insufficient permissions to update this agenda item' },
         { status: 403 }
@@ -135,7 +136,7 @@ export async function DELETE(
 ) {
   try {
     const params = await props.params;
-    const authResult = await withAuth(request, { requireAdminRole: true });
+    const authResult = await withAuth(request, { requireOpsAdmin: true });
     if (!authResult.success) {
       return NextResponse.json(
         { error: authResult.error },

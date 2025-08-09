@@ -647,7 +647,7 @@ async function createFullSystemBackup(components: string[] = ['database', 'setti
 
 // PUT method for uploading and restoring backups
 export async function PUT(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

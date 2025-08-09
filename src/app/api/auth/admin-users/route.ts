@@ -9,8 +9,8 @@ export async function GET(request: NextRequest) {
     const isFirstTimeSetup = userCount === 0;
     
     if (!isFirstTimeSetup) {
-      // Normal auth required if users already exist
-      const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
+      // Normal auth required if users already exist - operations admin for user management
+      const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
       if (!authResult.success) {
         return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
       }

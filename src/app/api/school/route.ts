@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/school - Create a new school (admin only)
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
 
 // PUT /api/school - Update a school (admin only)
 export async function PUT(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

@@ -5,11 +5,11 @@ import * as os from 'os';
 // GET Method - Server metrics
 export async function GET(request: NextRequest) {
   try {
-    // REQUIRED: Auth check - Admin only for server metrics
+    // REQUIRED: Auth check - Operations admin for server metrics
     const authResult = await withAuth(request, { 
       requireAuth: true, 
       requireStaff: true, 
-      requireAdminRole: true 
+      requireOpsAdmin: true 
     });
     
     if (!authResult.success) {

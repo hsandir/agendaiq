@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { isAnyAdmin } from '@/lib/auth/policy';
 
 export async function POST(
   request: NextRequest,
@@ -54,9 +55,9 @@ export async function POST(
     // Check permissions
     const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
     const isAttendee = agendaItem.Meeting.MeetingAttendee.length > 0;
-    const isAdmin = user.staff?.role?.title === 'Administrator';
+    const hasAdminAccess = isAnyAdmin(user);
 
-    if (!isOrganizer && !isAttendee && !isAdmin) {
+    if (!isOrganizer && !isAttendee && !hasAdminAccess) {
       return NextResponse.json(
         { error: 'Insufficient permissions' },
         { status: 403 }

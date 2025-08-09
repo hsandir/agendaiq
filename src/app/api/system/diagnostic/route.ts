@@ -4,8 +4,8 @@ import { withAuth } from "@/lib/auth/api-auth";
 // GET Method - System diagnostic (simplified)
 export async function GET(request: NextRequest) {
   try {
-    // REQUIRED: Auth check - Admin only for diagnostics
-    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
+    // REQUIRED: Auth check - Developer admin for diagnostics
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireDevAdmin: true });
     
     if (!authResult.success) {
       return NextResponse.json(
@@ -51,8 +51,8 @@ export async function GET(request: NextRequest) {
 // POST Method - Simplified diagnostic actions
 export async function POST(request: NextRequest) {
   try {
-    // REQUIRED: Auth check - Admin only
-    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
+    // REQUIRED: Auth check - Developer admin only
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireDevAdmin: true });
     
     if (!authResult.success) {
       return NextResponse.json(

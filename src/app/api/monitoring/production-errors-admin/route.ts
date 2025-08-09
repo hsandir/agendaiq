@@ -13,8 +13,8 @@ interface ProductionError {
 
 // Admin-only production error monitoring with proper authentication
 export async function GET(request: NextRequest) {
-  // Require admin authentication
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  // Require operations admin authentication
+  const authResult = await withAuth(request, { requireOpsAdmin: true });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

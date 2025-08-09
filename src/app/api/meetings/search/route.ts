@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { APIAuthPatterns } from "@/lib/auth/api-auth";
 import { AuthenticatedUser } from "@/lib/auth/auth-utils";
 import { prisma } from "@/lib/prisma";
+import { isAnyAdmin } from '@/lib/auth/policy';
 
 // GET /api/meetings/search - Search meetings for continuation feature
 export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {
@@ -18,12 +19,12 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
     }
 
     const staffRecord = user.staff;
-    const isAdmin = staffRecord?.role?.title === 'Administrator';
+    const hasAdminAccess = isAnyAdmin(user);
 
     // Build search where clause
     let searchWhereClause;
 
-    if (isAdmin) {
+    if (hasAdminAccess) {
       // Admins can search all meetings in their organization
       searchWhereClause = {
         OR: [

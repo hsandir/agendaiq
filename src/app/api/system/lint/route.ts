@@ -4,11 +4,11 @@ import { withAuth } from "@/lib/auth/api-auth";
 // GET Method - Lint status
 export async function GET(request: NextRequest) {
   try {
-    // REQUIRED: Auth check - Admin only for system lint
+    // REQUIRED: Auth check - Developer admin for system lint
     const authResult = await withAuth(request, { 
       requireAuth: true, 
       requireStaff: true, 
-      requireAdminRole: true 
+      requireDevAdmin: true 
     });
     
     if (!authResult.success) {
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     const authResult = await withAuth(request, { 
       requireAuth: true,
       requireStaff: true,
-      requireAdminRole: true
+      requireDevAdmin: true
     });
     
     if (!authResult.success) {
