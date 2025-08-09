@@ -44,9 +44,14 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   // Only show errors in development or for debugging purposes
   if (process.env.NODE_ENV === 'development') {
-    return NextResponse.json({ errors });
+    return NextResponse.json({ 
+      success: true,
+      totalErrors: errors.length,
+      errors 
+    });
   } else {
     return NextResponse.json({ 
+      success: true,
       totalErrors: errors.length, 
       recentErrors: errors.slice(-5).map(e => ({
         message: e.message,

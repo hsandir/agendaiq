@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useLayout } from '@/lib/layout/layout-provider';
+import React, { useState, useEffect } from 'react';
+import { getLayoutPreference, layoutPreferences } from '@/lib/layout/layout-types';
 import { Check, Layout, Sidebar, Grid, Monitor, Minimize2 } from 'lucide-react';
 
 interface LayoutSelectorProps {
@@ -23,22 +23,46 @@ export function LayoutSelector({
   showDescription = true, 
   variant = 'grid' 
 }: LayoutSelectorProps) {
-  const { layout: currentLayout, setLayout, layoutOptions } = useLayout();
+  const [currentLayoutId, setCurrentLayoutId] = useState('modern');
   const [isChanging, setIsChanging] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Load layout preference from localStorage
+  useEffect(() => {
+    setMounted(true);
+    const savedLayout = localStorage.getItem('agendaiq-layout');
+    if (savedLayout) {
+      setCurrentLayoutId(savedLayout);
+    }
+  }, []);
+
+  const currentLayout = getLayoutPreference(currentLayoutId);
+  const layoutOptions = layoutPreferences;
 
   const handleLayoutChange = async (layoutId: string) => {
     setIsChanging(true);
     
+    // Update local state
+    setCurrentLayoutId(layoutId);
+    
+    // Save to localStorage
+    localStorage.setItem('agendaiq-layout', layoutId);
+    
     // Add smooth transition
     document.documentElement.style.transition = 'all 0.3s ease-in-out';
     
-    await new Promise(resolve => setTimeout(resolve, 50));
-    setLayout(layoutId);
+    // Apply layout data attributes
+    const layout = getLayoutPreference(layoutId);
+    document.documentElement.setAttribute('data-layout', layoutId);
+    document.documentElement.setAttribute('data-sidebar-position', layout.sidebarPosition);
+    document.documentElement.setAttribute('data-header-style', layout.headerStyle);
+    document.documentElement.setAttribute('data-navigation-style', layout.navigationStyle);
+    document.documentElement.setAttribute('data-content-layout', layout.contentLayout);
+    document.documentElement.setAttribute('data-spacing', layout.spacing);
     
-    // Remove transition after change
+    // Trigger a page reload to apply the layout changes
     setTimeout(() => {
-      document.documentElement.style.transition = '';
-      setIsChanging(false);
+      window.location.reload();
     }, 300);
   };
 

@@ -55,20 +55,41 @@ export interface AuthResult {
  */
 export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
   try {
+    console.log('🔍 Getting current user from session...');
     const session = await getServerSession(authOptions);
     
+    console.log('📋 Session data:', {
+      hasSession: !!session,
+      hasUser: !!session?.user,
+      hasEmail: !!session?.user?.email,
+      hasStaff: !!session?.user?.staff,
+      userId: session?.user?.id,
+      userEmail: session?.user?.email,
+      staffData: session?.user?.staff
+    });
+    
     if (!session?.user?.email) {
+      console.log('❌ No session or user email found');
       return null;
     }
 
-    return {
+    const user = {
       id: session.user.id,
       email: session.user.email,
       name: session.user.name,
       staff: session.user.staff || null
     };
+
+    console.log('✅ Current user retrieved:', {
+      id: user.id,
+      email: user.email,
+      hasStaff: !!user.staff,
+      staffRole: user.staff?.role?.title
+    });
+
+    return user;
   } catch (error) {
-    console.error('Error getting current user:', error);
+    console.error('❌ Error getting current user:', error);
     return null;
   }
 }
@@ -78,9 +99,18 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
  */
 export async function checkAuthRequirements(requirements: AuthRequirements = {}): Promise<AuthResult> {
   try {
+    console.log('🔍 Checking auth requirements:', requirements);
     const user = await getCurrentUser();
     
+    console.log('👤 User check result:', {
+      hasUser: !!user,
+      hasStaff: !!user?.staff,
+      staffRole: user?.staff?.role?.title,
+      isLeadership: user?.staff?.role?.is_leadership
+    });
+    
     if (!user) {
+      console.log('❌ No user found - authentication required');
       return { 
         authorized: false, 
         error: 'Authentication required', 
@@ -90,6 +120,7 @@ export async function checkAuthRequirements(requirements: AuthRequirements = {})
 
     // Check staff requirement
     if (requirements.requireStaff && !user.staff) {
+      console.log('❌ Staff access required but user has no staff record');
       return { 
         authorized: false, 
         error: 'Staff access required', 
@@ -99,6 +130,7 @@ export async function checkAuthRequirements(requirements: AuthRequirements = {})
 
     // Check admin role requirement
     if (requirements.requireAdminRole && user.staff?.role?.title !== 'Administrator') {
+      console.log('❌ Administrator access required but user role is:', user.staff?.role?.title);
       return { 
         authorized: false, 
         error: 'Administrator access required', 
@@ -108,6 +140,7 @@ export async function checkAuthRequirements(requirements: AuthRequirements = {})
 
     // Check leadership requirement
     if (requirements.requireLeadership && !user.staff?.role?.is_leadership) {
+      console.log('❌ Leadership access required but user is not leadership');
       return { 
         authorized: false, 
         error: 'Leadership access required', 
@@ -115,8 +148,10 @@ export async function checkAuthRequirements(requirements: AuthRequirements = {})
       };
     }
 
+    console.log('✅ Auth requirements satisfied');
     return { authorized: true, user };
   } catch (error) {
+    console.error('❌ Error checking auth requirements:', error);
     Logger.error('Error checking auth requirements', { error: String(error) }, 'auth');
     return { 
       authorized: false, 

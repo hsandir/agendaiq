@@ -19,7 +19,7 @@ interface ThemeProviderProps {
   initialTheme?: string;
 }
 
-export function ThemeProvider({ children, initialTheme = 'classic-light' }: ThemeProviderProps) {
+export function ThemeProvider({ children, initialTheme = 'standard' }: ThemeProviderProps) {
   const [currentThemeId, setCurrentThemeId] = useState(initialTheme);
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -114,7 +114,7 @@ export function ThemeProvider({ children, initialTheme = 'classic-light' }: Them
 
     // Apply theme class for Tailwind dark mode support
     document.documentElement.classList.remove('light', 'dark');
-    if (theme.id === 'dark-mode' || theme.id === 'modern-purple' || theme.id === 'high-contrast' || theme.id === 'tasarim' || theme.id === 'midnight-blue') {
+    if (theme.id === 'dark-mode' || theme.id === 'modern-purple' || theme.id === 'high-contrast' || theme.id === 'tasarim' || theme.id === 'midnight-blue' || theme.id === 'classic-dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.add('light');

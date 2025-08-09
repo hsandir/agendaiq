@@ -132,8 +132,19 @@ export function usePresenceChannel(
     // Cleanup
     return () => {
       if (channelRef.current) {
-        // Unbind all events
-        channelRef.current.unbind_all();
+        // Unbind all events - check if method exists
+        if (typeof channelRef.current.unbind_all === 'function') {
+          channelRef.current.unbind_all();
+        } else if (typeof channelRef.current.unbind === 'function') {
+          // Unbind specific events if unbind_all is not available
+          channelRef.current.unbind('pusher:subscription_succeeded');
+          channelRef.current.unbind('pusher:member_added');
+          channelRef.current.unbind('pusher:member_removed');
+          // Unbind stable handlers
+          Object.entries(stableHandlers).forEach(([event, handler]) => {
+            channelRef.current?.unbind(event, handler);
+          });
+        }
         pusher.unsubscribe(channelName);
         channelRef.current = null;
       }

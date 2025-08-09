@@ -122,7 +122,7 @@ export default function LiveMonitor() {
       return false;
     };
 
-    window.onunhandledrejection = (event) => {
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       const errorEvent: ErrorEvent = {
         id: Date.now().toString(),
         timestamp: new Date().toISOString(),
@@ -135,12 +135,16 @@ export default function LiveMonitor() {
       };
 
       setErrors(prev => [errorEvent, ...prev.slice(0, 99)]);
-      originalUnhandledRejection?.(event);
+      if (originalUnhandledRejection) {
+        originalUnhandledRejection.call(window, event);
+      }
     };
+    
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
 
     return () => {
       window.onerror = originalError;
-      window.onunhandledrejection = originalUnhandledRejection;
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
     };
   };
 

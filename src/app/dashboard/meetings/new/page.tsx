@@ -4,13 +4,10 @@ import { MeetingFormStep1 } from "@/components/meetings/MeetingFormStep1";
 import { revalidatePath } from "next/cache";
 
 export default async function NewMeetingPage() {
-  // Require staff membership to create meetings
-  const user = await requireAuth(AuthPresets.requireStaff);
+  // Require authentication to create meetings
+  const user = await requireAuth(AuthPresets.requireAuth);
 
-  if (!user.staff) {
-    throw new Error("Staff record not found");
-  }
-
+  // Try to get staff record if exists
   const currentStaff = user.staff;
 
   // Fetch all staff except the current user, with their user info and additional details
@@ -87,10 +84,13 @@ export default async function NewMeetingPage() {
     "use server";
 
     // Get current user again for the server action
-    const currentUser = await requireAuth(AuthPresets.requireStaff);
+    const currentUser = await requireAuth(AuthPresets.requireAuth);
     
+    // Check if user has staff record
     if (!currentUser.staff) {
-      throw new Error("Staff record not found");
+      // For non-staff users, create a temporary staff record or handle differently
+      // For now, we'll return an error message
+      throw new Error("You need to be assigned as staff to create meetings. Please contact your administrator.");
     }
 
     try {

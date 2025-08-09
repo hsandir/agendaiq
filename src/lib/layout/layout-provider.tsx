@@ -46,16 +46,22 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
     setCurrentLayoutId(layoutId);
   };
 
-  if (!mounted) {
-    // Return a minimal fallback during hydration
-    return <div className="min-h-screen bg-background">{children}</div>;
-  }
-
   const layout = getLayoutPreference(currentLayoutId);
+  
+  // Provide default context even during hydration to prevent errors
+  const contextValue = {
+    layout,
+    setLayout,
+    layoutOptions: layoutPreferences
+  };
 
   return (
-    <LayoutContext.Provider value={{ layout, setLayout, layoutOptions: layoutPreferences }}>
-      {children}
+    <LayoutContext.Provider value={contextValue}>
+      {!mounted ? (
+        <div className="min-h-screen bg-background">{children}</div>
+      ) : (
+        children
+      )}
     </LayoutContext.Provider>
   );
 }

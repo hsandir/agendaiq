@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { Calendar, Users, FileText } from "lucide-react";
 import { isUserAdmin } from "@/lib/auth/admin-check";
 import { safeFormatDateTime } from '@/lib/utils/safe-date';
+// Removed DashboardContent for simplicity
 
 export default async function DashboardPage() {
   const user = await requireAuth(AuthPresets.requireAuth);

@@ -121,15 +121,18 @@ model User {
   remember_devices_enabled    Boolean            @default(true)
   created_at                  DateTime           @default(now())
   updated_at                  DateTime           @updatedAt
-  theme_preference            String?            @default("classic-light")
+  theme_preference            String?            @default("standard")
+  layout_preference           String?            @default("modern")
   Account                     Account[]
   Session                     Session[]
   Staff                       Staff[]
   AuditLog                    AuditLog[]
   TargetCriticalAuditLog      CriticalAuditLog[] @relation("TargetUser")
   CriticalAuditLog            CriticalAuditLog[]
+  DevLogs                     DevLog[]
   Device                      Device[]
   MeetingAuditLog             MeetingAuditLog[]
+  SecurityLogs                SecurityLog[]
 
   @@map("users")
 }
@@ -163,6 +166,7 @@ model Staff {
   AuditLog                  AuditLog[]
   CriticalAuditLog          CriticalAuditLog[]
   TargetCriticalAuditLog    CriticalAuditLog[]     @relation("TargetStaff")
+  DevLogs                   DevLog[]
   AssignedActionItems       MeetingActionItem[]
   CompletedActionItems      MeetingActionItem[]    @relation("CompletedByStaff")
   ResponsibleForAgendaItems MeetingAgendaItem[]    @relation("ResponsibleStaff")
@@ -172,6 +176,7 @@ model Staff {
   CreatedRoleTransitions    RoleTransition[]       @relation("CreatedByTransition")
   FromRoleTransitions       RoleTransition[]       @relation("FromStaffTransition")
   ToRoleTransitions         RoleTransition[]       @relation("ToStaffTransition")
+  SecurityLogs              SecurityLog[]
 }
 
 model Meeting {
@@ -537,6 +542,81 @@ model RoleTransition {
   @@map("role_transitions")
 }
 
+model DevLog {
+  id          String         @id
+  timestamp   DateTime
+  level       LogLevel
+  message     String
+  category    DevLogCategory
+  component   String?
+  function    String?
+  file        String?
+  line        Int?
+  stack       String?
+  environment String         @default("development")
+  context     String?
+  metadata    String?
+  performance String?
+  userId      Int?           @map("user_id")
+  staffId     Int?           @map("staff_id")
+  sessionId   String?        @map("session_id")
+  userAgent   String?        @map("user_agent")
+  ip          String?
+  path        String?
+  method      String?
+  statusCode  Int?           @map("status_code")
+  duration    Int?
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+  staff       Staff?         @relation(fields: [staffId], references: [id])
+  user        User?          @relation(fields: [userId], references: [id])
+
+  @@index([timestamp])
+  @@index([level])
+  @@index([category])
+  @@index([userId])
+  @@index([component])
+  @@index([environment])
+  @@index([statusCode])
+  @@map("dev_logs")
+}
+
+model SecurityLog {
+  id         String           @id
+  timestamp  DateTime
+  level      LogLevel
+  message    String
+  category   AuditLogCategory
+  action     String
+  result     AuditLogResult
+  riskLevel  RiskLevel        @map("risk_level")
+  actor      String
+  target     String?
+  context    String?
+  metadata   String?
+  compliance String?
+  location   String?
+  userId     Int              @map("user_id")
+  staffId    Int?             @map("staff_id")
+  userAgent  String?          @map("user_agent")
+  ip         String?
+  path       String?
+  method     String?
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+  staff      Staff?           @relation(fields: [staffId], references: [id])
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([timestamp])
+  @@index([level])
+  @@index([category])
+  @@index([userId])
+  @@index([riskLevel])
+  @@index([result])
+  @@index([action])
+  @@map("security_logs")
+}
+
 enum AuditCategory {
   AUTH
   SECURITY
@@ -586,4 +666,52 @@ enum ActionItemStatus {
   Cancelled
   Deferred
   Overdue
+}
+
+enum LogLevel {
+  TRACE
+  DEBUG
+  INFO
+  WARN
+  ERROR
+  FATAL
+}
+
+enum DevLogCategory {
+  system
+  database
+  api
+  auth
+  performance
+  error
+  network
+  cache
+  external
+  build
+}
+
+enum AuditLogCategory {
+  user_action
+  login_attempt
+  permission_check
+  data_access
+  data_modification
+  admin_action
+  security_violation
+  compliance
+  export
+  import
+}
+
+enum AuditLogResult {
+  success
+  failure
+  blocked
+}
+
+enum RiskLevel {
+  low
+  medium
+  high
+  critical
 }

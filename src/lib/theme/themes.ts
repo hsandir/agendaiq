@@ -455,29 +455,139 @@ export const tasarimTheme: Theme = {
   },
 };
 
-// Theme 2: Classic Light (Current design)
+// Standard Theme (Original theme before theme system)
+export const standardTheme: Theme = {
+  id: 'standard',
+  name: 'Standard',
+  description: 'Original standard theme from before the theme system',
+  colors: {
+    primary: '#5A82F7',  // HSL: 221.2 83.2% 53.3%
+    primaryLight: '#7A9CF9',
+    primaryDark: '#4A72F5',
+    primaryForeground: '#FAFBFE',  // HSL: 210 40% 98%
+    
+    secondary: '#F5F6FA',  // HSL: 210 40% 96%
+    secondaryLight: '#FFFFFF',
+    secondaryDark: '#E5E7EB',
+    secondaryForeground: '#030712',  // HSL: 222.2 84% 4.9%
+    
+    background: '#FFFFFF',  // HSL: 0 0% 100%
+    backgroundSecondary: '#F5F6FA',
+    backgroundTertiary: '#E5E7EB',
+    
+    card: '#FFFFFF',  // HSL: 0 0% 100%
+    cardHover: '#FAFBFE',
+    cardBorder: '#E5E9F0',  // HSL: 214.3 31.8% 91.4%
+    
+    text: '#030712',  // HSL: 222.2 84% 4.9%
+    textSecondary: '#687788',  // HSL: 215.4 16.3% 46.9%
+    textMuted: '#687788',  // HSL: 215.4 16.3% 46.9%
+    textInverse: '#FAFBFE',
+    
+    border: '#E5E9F0',  // HSL: 214.3 31.8% 91.4%
+    borderLight: '#F5F6FA',
+    borderDark: '#D1D5DB',
+    
+    success: '#10B981',
+    successLight: '#34D399',
+    successDark: '#059669',
+    
+    warning: '#F59E0B',
+    warningLight: '#FCD34D',
+    warningDark: '#D97706',
+    
+    error: '#F56565',  // HSL: 0 84.2% 60.2%
+    errorLight: '#FC8181',
+    errorDark: '#E53E3E',
+    
+    info: '#5A82F7',  // HSL: 221.2 83.2% 53.3%
+    infoLight: '#7A9CF9',
+    infoDark: '#4A72F5',
+    
+    sidebar: '#FFFFFF',
+    sidebarText: '#030712',
+    sidebarHover: '#F5F6FA',
+    sidebarActive: '#5A82F7',
+    
+    header: '#FFFFFF',
+    headerText: '#030712',
+    
+    input: '#FFFFFF',
+    inputBorder: '#E5E9F0',  // HSL: 214.3 31.8% 91.4%
+    inputFocus: '#5A82F7',
+    inputText: '#030712',
+    inputPlaceholder: '#687788',
+    
+    buttonPrimary: '#5A82F7',
+    buttonPrimaryHover: '#4A72F5',
+    buttonPrimaryText: '#FFFFFF',
+    
+    buttonSecondary: '#F5F6FA',
+    buttonSecondaryHover: '#E5E7EB',
+    buttonSecondaryText: '#030712',
+    
+    buttonGhost: 'transparent',
+    buttonGhostHover: 'rgba(90, 130, 247, 0.1)',
+    buttonGhostText: '#5A82F7',
+    
+    overlay: 'rgba(0, 0, 0, 0.5)',
+    shadow: 'rgba(0, 0, 0, 0.1)',
+    scrollbar: '#E5E9F0',
+    scrollbarThumb: '#9CA3AF',
+  },
+  fonts: {
+    primary: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    secondary: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    mono: '"SF Mono", Monaco, Inconsolata, "Fira Code", monospace',
+  },
+  spacing: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem',
+    xxl: '3rem',
+  },
+  borderRadius: {
+    none: '0',
+    sm: '0.25rem',
+    md: '0.5rem',
+    lg: '0.75rem',
+    xl: '1rem',
+    full: '9999px',
+  },
+  shadows: {
+    none: 'none',
+    sm: '0 1px 2px rgba(0, 0, 0, 0.05)',
+    md: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    lg: '0 10px 15px rgba(0, 0, 0, 0.1)',
+    xl: '0 20px 25px rgba(0, 0, 0, 0.1)',
+  },
+};
+
+// Theme 2: Classic Light
 export const classicLightTheme: Theme = {
   id: 'classic-light',
   name: 'Classic Light',
   description: 'Clean and professional light theme',
   colors: {
-    primary: '#3B82F6',
-    primaryLight: '#60A5FA',
-    primaryDark: '#2563EB',
+    primary: '#2563EB',  // Deeper blue than standard
+    primaryLight: '#3B82F6',
+    primaryDark: '#1E40AF',
     primaryForeground: '#FFFFFF',
     
-    secondary: '#8B5CF6',
-    secondaryLight: '#A78BFA',
-    secondaryDark: '#7C3AED',
+    secondary: '#7C3AED',  // Deeper purple
+    secondaryLight: '#8B5CF6',
+    secondaryDark: '#6D28D9',
     secondaryForeground: '#FFFFFF',
     
-    background: '#FFFFFF',
-    backgroundSecondary: '#F9FAFB',
-    backgroundTertiary: '#F3F4F6',
+    background: '#FAFAFA',  // Slightly grayer than standard
+    backgroundSecondary: '#F4F4F5',
+    backgroundTertiary: '#E4E4E7',
     
     card: '#FFFFFF',
-    cardHover: '#F9FAFB',
-    cardBorder: '#E5E7EB',
+    cardHover: '#FAFAFA',
+    cardBorder: '#D4D4D8',
     
     text: '#111827',
     textSecondary: '#4B5563',
@@ -565,11 +675,11 @@ export const classicLightTheme: Theme = {
   },
 };
 
-// Theme 3: Dark Mode
-export const darkModeTheme: Theme = {
-  id: 'dark-mode',
-  name: 'Dark Mode',
-  description: 'Modern dark theme for reduced eye strain',
+// Classic Dark Theme
+export const classicDarkTheme: Theme = {
+  id: 'classic-dark',
+  name: 'Classic Dark',
+  description: 'Easy on the eyes dark theme',
   colors: {
     primary: '#60A5FA',
     primaryLight: '#93C5FD',
@@ -581,13 +691,123 @@ export const darkModeTheme: Theme = {
     secondaryDark: '#8B5CF6',
     secondaryForeground: '#FFFFFF',
     
-    background: '#0F172A',
-    backgroundSecondary: '#1E293B',
-    backgroundTertiary: '#334155',
+    background: '#1A1A1A',
+    backgroundSecondary: '#2A2A2A',
+    backgroundTertiary: '#3A3A3A',
     
-    card: '#1E293B',
-    cardHover: '#334155',
-    cardBorder: '#475569',
+    card: '#2A2A2A',
+    cardHover: '#3A3A3A',
+    cardBorder: '#4A4A4A',
+    
+    text: '#F1F5F9',
+    textSecondary: '#CBD5E1',
+    textMuted: '#94A3B8',
+    textInverse: '#1A1A1A',
+    
+    border: '#4A4A4A',
+    borderLight: '#5A5A5A',
+    borderDark: '#3A3A3A',
+    
+    success: '#34D399',
+    successLight: '#6EE7B7',
+    successDark: '#10B981',
+    
+    warning: '#FCD34D',
+    warningLight: '#FDE68A',
+    warningDark: '#F59E0B',
+    
+    error: '#F87171',
+    errorLight: '#FCA5A5',
+    errorDark: '#EF4444',
+    
+    info: '#60A5FA',
+    infoLight: '#93C5FD',
+    infoDark: '#3B82F6',
+    
+    sidebar: '#2A2A2A',
+    sidebarText: '#CBD5E1',
+    sidebarHover: '#3A3A3A',
+    sidebarActive: '#60A5FA',
+    
+    header: '#2A2A2A',
+    headerText: '#F1F5F9',
+    
+    input: '#3A3A3A',
+    inputBorder: '#4A4A4A',
+    inputFocus: '#60A5FA',
+    inputText: '#F1F5F9',
+    inputPlaceholder: '#6B7280',
+    
+    buttonPrimary: '#60A5FA',
+    buttonPrimaryHover: '#3B82F6',
+    buttonPrimaryText: '#FFFFFF',
+    
+    buttonSecondary: '#4A4A4A',
+    buttonSecondaryHover: '#5A5A5A',
+    buttonSecondaryText: '#F1F5F9',
+    
+    buttonGhost: 'transparent',
+    buttonGhostHover: 'rgba(96, 165, 250, 0.1)',
+    buttonGhostText: '#60A5FA',
+    
+    overlay: 'rgba(0, 0, 0, 0.8)',
+    shadow: 'rgba(0, 0, 0, 0.5)',
+    scrollbar: '#3A3A3A',
+    scrollbarThumb: '#6B7280',
+  },
+  fonts: {
+    primary: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    secondary: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    mono: '"SF Mono", Monaco, Inconsolata, "Fira Code", monospace',
+  },
+  spacing: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem',
+    xxl: '3rem',
+  },
+  borderRadius: {
+    none: '0',
+    sm: '0.25rem',
+    md: '0.375rem',
+    lg: '0.5rem',
+    xl: '0.75rem',
+    full: '9999px',
+  },
+  shadows: {
+    none: 'none',
+    sm: '0 1px 2px rgba(0, 0, 0, 0.25)',
+    md: '0 4px 6px rgba(0, 0, 0, 0.3)',
+    lg: '0 10px 15px rgba(0, 0, 0, 0.35)',
+    xl: '0 20px 25px rgba(0, 0, 0, 0.4)',
+  },
+};
+
+// Theme 3: Dark Mode
+export const darkModeTheme: Theme = {
+  id: 'dark-mode',
+  name: 'Dark Mode',
+  description: 'Modern dark theme for reduced eye strain',
+  colors: {
+    primary: '#818CF8',  // Lighter indigo than midnight blue
+    primaryLight: '#A5B4FC',
+    primaryDark: '#6366F1',
+    primaryForeground: '#FFFFFF',
+    
+    secondary: '#F472B6',  // Pink accent
+    secondaryLight: '#F9A8D4',
+    secondaryDark: '#EC4899',
+    secondaryForeground: '#FFFFFF',
+    
+    background: '#18181B',  // Neutral dark gray
+    backgroundSecondary: '#27272A',
+    backgroundTertiary: '#3F3F46',
+    
+    card: '#27272A',
+    cardHover: '#3F3F46',
+    cardBorder: '#52525B',
     
     text: '#F1F5F9',
     textSecondary: '#CBD5E1',
@@ -785,6 +1005,226 @@ export const highContrastTheme: Theme = {
   },
 };
 
+// Forest Green Theme
+export const forestGreenTheme: Theme = {
+  id: 'forest-green',
+  name: 'Forest Green',
+  description: 'Natural green theme',
+  colors: {
+    primary: '#10B981',
+    primaryLight: '#34D399',
+    primaryDark: '#059669',
+    primaryForeground: '#FFFFFF',
+    
+    secondary: '#059669',
+    secondaryLight: '#10B981',
+    secondaryDark: '#047857',
+    secondaryForeground: '#FFFFFF',
+    
+    background: '#F0FDF4',
+    backgroundSecondary: '#DCFCE7',
+    backgroundTertiary: '#BBF7D0',
+    
+    card: '#FFFFFF',
+    cardHover: '#F0FDF4',
+    cardBorder: '#86EFAC',
+    
+    text: '#064E3B',
+    textSecondary: '#065F46',
+    textMuted: '#047857',
+    textInverse: '#FFFFFF',
+    
+    border: '#86EFAC',
+    borderLight: '#BBF7D0',
+    borderDark: '#4ADE80',
+    
+    success: '#10B981',
+    successLight: '#34D399',
+    successDark: '#059669',
+    
+    warning: '#F59E0B',
+    warningLight: '#FCD34D',
+    warningDark: '#D97706',
+    
+    error: '#EF4444',
+    errorLight: '#F87171',
+    errorDark: '#DC2626',
+    
+    info: '#3B82F6',
+    infoLight: '#60A5FA',
+    infoDark: '#2563EB',
+    
+    sidebar: '#ECFDF5',
+    sidebarText: '#064E3B',
+    sidebarHover: '#D1FAE5',
+    sidebarActive: '#10B981',
+    
+    header: '#FFFFFF',
+    headerText: '#064E3B',
+    
+    input: '#FFFFFF',
+    inputBorder: '#86EFAC',
+    inputFocus: '#10B981',
+    inputText: '#064E3B',
+    inputPlaceholder: '#059669',
+    
+    buttonPrimary: '#10B981',
+    buttonPrimaryHover: '#059669',
+    buttonPrimaryText: '#FFFFFF',
+    
+    buttonSecondary: '#86EFAC',
+    buttonSecondaryHover: '#4ADE80',
+    buttonSecondaryText: '#064E3B',
+    
+    buttonGhost: 'transparent',
+    buttonGhostHover: 'rgba(16, 185, 129, 0.1)',
+    buttonGhostText: '#10B981',
+    
+    overlay: 'rgba(6, 78, 59, 0.5)',
+    shadow: 'rgba(6, 78, 59, 0.1)',
+    scrollbar: '#BBF7D0',
+    scrollbarThumb: '#10B981',
+  },
+  fonts: {
+    primary: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    secondary: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    mono: '"SF Mono", Monaco, Inconsolata, "Fira Code", monospace',
+  },
+  spacing: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem',
+    xxl: '3rem',
+  },
+  borderRadius: {
+    none: '0',
+    sm: '0.375rem',
+    md: '0.5rem',
+    lg: '0.75rem',
+    xl: '1rem',
+    full: '9999px',
+  },
+  shadows: {
+    none: 'none',
+    sm: '0 1px 2px rgba(6, 78, 59, 0.05)',
+    md: '0 4px 6px rgba(6, 78, 59, 0.1)',
+    lg: '0 10px 15px rgba(6, 78, 59, 0.1)',
+    xl: '0 20px 25px rgba(6, 78, 59, 0.1)',
+  },
+};
+
+// Warm Orange Theme
+export const warmOrangeTheme: Theme = {
+  id: 'warm-orange',
+  name: 'Warm Orange',
+  description: 'Energetic warm theme',
+  colors: {
+    primary: '#FB923C',
+    primaryLight: '#FDBA74',
+    primaryDark: '#F97316',
+    primaryForeground: '#FFFFFF',
+    
+    secondary: '#F97316',
+    secondaryLight: '#FB923C',
+    secondaryDark: '#EA580C',
+    secondaryForeground: '#FFFFFF',
+    
+    background: '#FFF7ED',
+    backgroundSecondary: '#FED7AA',
+    backgroundTertiary: '#FDBA74',
+    
+    card: '#FFFFFF',
+    cardHover: '#FFF7ED',
+    cardBorder: '#FED7AA',
+    
+    text: '#431407',
+    textSecondary: '#7C2D12',
+    textMuted: '#9A3412',
+    textInverse: '#FFFFFF',
+    
+    border: '#FED7AA',
+    borderLight: '#FDBA74',
+    borderDark: '#FB923C',
+    
+    success: '#10B981',
+    successLight: '#34D399',
+    successDark: '#059669',
+    
+    warning: '#FCD34D',
+    warningLight: '#FDE68A',
+    warningDark: '#F59E0B',
+    
+    error: '#EF4444',
+    errorLight: '#F87171',
+    errorDark: '#DC2626',
+    
+    info: '#3B82F6',
+    infoLight: '#60A5FA',
+    infoDark: '#2563EB',
+    
+    sidebar: '#FFF7ED',
+    sidebarText: '#431407',
+    sidebarHover: '#FED7AA',
+    sidebarActive: '#FB923C',
+    
+    header: '#FFFFFF',
+    headerText: '#431407',
+    
+    input: '#FFFFFF',
+    inputBorder: '#FED7AA',
+    inputFocus: '#FB923C',
+    inputText: '#431407',
+    inputPlaceholder: '#9A3412',
+    
+    buttonPrimary: '#FB923C',
+    buttonPrimaryHover: '#F97316',
+    buttonPrimaryText: '#FFFFFF',
+    
+    buttonSecondary: '#FED7AA',
+    buttonSecondaryHover: '#FDBA74',
+    buttonSecondaryText: '#431407',
+    
+    buttonGhost: 'transparent',
+    buttonGhostHover: 'rgba(251, 146, 60, 0.1)',
+    buttonGhostText: '#FB923C',
+    
+    overlay: 'rgba(67, 20, 7, 0.5)',
+    shadow: 'rgba(67, 20, 7, 0.1)',
+    scrollbar: '#FED7AA',
+    scrollbarThumb: '#FB923C',
+  },
+  fonts: {
+    primary: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    secondary: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    mono: '"SF Mono", Monaco, Inconsolata, "Fira Code", monospace',
+  },
+  spacing: {
+    xs: '0.25rem',
+    sm: '0.5rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem',
+    xxl: '3rem',
+  },
+  borderRadius: {
+    none: '0',
+    sm: '0.375rem',
+    md: '0.5rem',
+    lg: '0.75rem',
+    xl: '1rem',
+    full: '9999px',
+  },
+  shadows: {
+    none: 'none',
+    sm: '0 1px 2px rgba(67, 20, 7, 0.05)',
+    md: '0 4px 6px rgba(67, 20, 7, 0.1)',
+    lg: '0 10px 15px rgba(67, 20, 7, 0.1)',
+    xl: '0 20px 25px rgba(67, 20, 7, 0.1)',
+  },
+};
+
 // Theme 5: Nature Green
 export const natureGreenTheme: Theme = {
   id: 'nature-green',
@@ -897,10 +1337,14 @@ export const natureGreenTheme: Theme = {
 
 // Export all themes
 export const themes: Theme[] = [
+  standardTheme,
+  classicLightTheme,
+  classicDarkTheme,
   midnightBlueTheme,
+  forestGreenTheme,
+  warmOrangeTheme,
   tasarimTheme,
   modernPurpleTheme,
-  classicLightTheme,
   darkModeTheme,
   highContrastTheme,
   natureGreenTheme,

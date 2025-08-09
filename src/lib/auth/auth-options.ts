@@ -89,7 +89,8 @@ export const authOptions: NextAuthOptions = {
                 include: {
                   Role: true,
                   Department: true,
-                  School: true
+                  School: true,
+                  District: true
                 }
               }
             }
@@ -143,7 +144,7 @@ export const authOptions: NextAuthOptions = {
 
           const staff = user.Staff[0];
           const userData = {
-            id: user.id.toString(), // NextAuth expects string id
+            id: user.id, // Keep as number
             email: user.email,
             name: user.name,
             ...(staff && { 
@@ -165,6 +166,11 @@ export const authOptions: NextAuthOptions = {
                   id: staff.School.id,
                   name: staff.School.name,
                   code: staff.School.code
+                },
+                district: {
+                  id: staff.District.id,
+                  name: staff.District.name,
+                  code: staff.District.code
                 }
               }
             })
@@ -208,7 +214,7 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id; // Keep as string for NextAuth compatibility
+        token.id = user.id.toString(); // Convert to string for JWT
         if (hasStaff(user)) {
           token.staff = user.staff;
         }
@@ -217,7 +223,7 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token.id) {
-        session.user.id = parseInt(token.id); // Convert string back to number for app usage
+        session.user.id = parseInt(token.id); // Convert back to number
       }
       if (hasStaffToken(token)) {
         session.user.staff = token.staff;

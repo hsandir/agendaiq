@@ -1,0 +1,522 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Link from "next/link";
+import { Header } from "@/components/dashboard/Header";
+import { SidebarWrapper } from "@/components/dashboard/SidebarWrapper";
+import { getLayoutPreference } from '@/lib/layout/layout-types';
+import { Monitor, UserCheck, Shield, Settings, MoreHorizontal, ChevronRight, Search, BarChart, CheckSquare, GitBranch, Brain, UserCog, LogOut } from 'lucide-react';
+import { signOut } from 'next-auth/react';
+
+interface DashboardLayoutClientProps {
+  children: React.ReactNode;
+  isAdmin: boolean;
+  user: any;
+  currentRole: any;
+  userWithStaff: any;
+}
+
+export function DashboardLayoutClient({ 
+  children, 
+  isAdmin, 
+  user, 
+  currentRole, 
+  userWithStaff 
+}: DashboardLayoutClientProps) {
+  const [layoutId, setLayoutId] = useState('modern');
+  const [mounted, setMounted] = useState(false);
+
+  // Load layout preference from database and localStorage
+  useEffect(() => {
+    setMounted(true);
+    
+    // First check localStorage
+    const savedLayout = localStorage.getItem('agendaiq-layout');
+    if (savedLayout) {
+      setLayoutId(savedLayout);
+    }
+    
+    // Then fetch from database
+    fetch('/api/user/layout')
+      .then(res => res.json())
+      .then(data => {
+        if (data.layout) {
+          setLayoutId(data.layout);
+          localStorage.setItem('agendaiq-layout', data.layout);
+        }
+      })
+      .catch(err => console.error('Failed to fetch layout preference:', err));
+  }, []);
+
+  const layout = getLayoutPreference(layoutId);
+
+  // Modern layouts with grid system
+  if (layout.id === 'modern' || layout.id === 'executive') {
+    const colWidth = layout.id === 'executive' ? '280px' : '260px';
+    
+    return (
+      <div className="grid min-h-screen bg-background text-foreground" 
+           style={{ gridTemplateColumns: layout.sidebarPosition !== 'hidden' ? `${colWidth} 1fr` : '1fr' }}
+           data-layout={layout.id}>
+        
+        {layout.sidebarPosition !== 'hidden' && (
+          <SidebarWrapper 
+            isAdmin={isAdmin} 
+            className="sticky top-0 h-screen bg-card shadow-lg border-r border-border" 
+          />
+        )}
+
+        <main className="flex flex-col min-h-screen">
+          <header className="flex items-center justify-between px-6 lg:px-12 py-7 bg-background/95 backdrop-blur border-b border-border sticky top-0 z-10">
+            <div className="flex items-center gap-4">
+              <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
+              
+              {layout.sidebarPosition === 'hidden' && (
+                <button 
+                  className="p-2 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Open navigation menu"
+                >
+                  <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 12h18m-9 6H3m18-12H3"/>
+                  </svg>
+                </button>
+              )}
+            </div>
+            
+            <div className="flex items-center gap-4">
+              {/* Enhanced Search */}
+              <div className="hidden sm:flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2 min-w-[280px] focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all">
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-muted-foreground">
+                  <circle cx="11" cy="11" r="7"></circle>
+                  <path d="M21 21l-4.35-4.35"></path>
+                </svg>
+                <input 
+                  placeholder="Search meetings, notes, tasks..."
+                  className="w-full bg-transparent border-0 outline-0 text-sm text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+              
+              {/* User Info */}
+              <div className="flex items-center gap-3">
+                <div className="hidden md:flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground">{user.email}</span>
+                  <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded-full font-medium">
+                    {currentRole?.title || 'No Role'}
+                  </span>
+                </div>
+                <button
+                  onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <div className="flex-1 px-6 lg:px-12 py-8">
+            {children}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Compact Layout
+  if (layout.id === 'compact') {
+    return (
+      <div className="flex min-h-screen bg-background text-foreground" data-layout="compact">
+        <SidebarWrapper 
+          isAdmin={isAdmin} 
+          className="w-56 sticky top-0 h-screen bg-card border-r border-border" 
+        />
+        
+        <main className="flex-1 flex flex-col">
+          <header className="flex items-center justify-between px-4 py-3 bg-card border-b border-border">
+            <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
+            <div className="flex items-center gap-2">
+              <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded font-medium">
+                {currentRole?.title || 'No Role'}
+              </span>
+              <RoleSwitch staff={userWithStaff?.Staff?.[0] || null} />
+            </div>
+          </header>
+          
+          <div className="flex-1 px-4 py-4">
+            {children}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Minimal Layout
+  if (layout.id === 'minimal') {
+    return (
+      <div className="min-h-screen bg-background text-foreground" data-layout="minimal">
+        <header className="flex items-center justify-between px-6 py-4 border-b border-border/30">
+          <div className="flex items-center gap-6">
+            <h1 className="text-xl font-bold text-foreground">AgendaIQ</h1>
+            
+            {/* Minimal Navigation */}
+            <nav className="hidden md:flex items-center space-x-1">
+              <Link
+                href="/dashboard"
+                className="px-3 py-1 text-sm font-medium text-foreground hover:text-primary transition-colors rounded-md"
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/dashboard/meetings"
+                className="px-3 py-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md"
+              >
+                Meetings
+              </Link>
+              <Link
+                href="/dashboard/meeting-intelligence"
+                className="px-3 py-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md"
+              >
+                Intelligence
+              </Link>
+              
+              {/* Settings Dropdown for Admin */}
+              <div className="relative group">
+                <Link
+                  href="/dashboard/settings"
+                  className="px-3 py-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md"
+                >
+                  Settings
+                </Link>
+                
+                <div className="absolute left-0 top-full mt-2 w-56 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                  <div className="p-2">
+                    <div className="space-y-1">
+                      <Link href="/dashboard/settings/interface" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                        <Monitor className="h-4 w-4" />
+                        Interface
+                      </Link>
+                      {isAdmin && (
+                        <>
+                          <Link href="/dashboard/settings/users" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                            <UserCheck className="h-4 w-4" />
+                            Users
+                          </Link>
+                          <Link href="/dashboard/settings/roles" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                            <Shield className="h-4 w-4" />
+                            Roles
+                          </Link>
+                          <Link href="/dashboard/settings/system" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                            <Settings className="h-4 w-4" />
+                            System
+                          </Link>
+                          <div className="border-t border-border my-2"></div>
+                          <Link href="/dashboard/development" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                            <Settings className="h-4 w-4" />
+                            Development
+                          </Link>
+                          <Link href="/dashboard/monitoring" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                            <Monitor className="h-4 w-4" />
+                            Monitoring
+                          </Link>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </nav>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-muted-foreground">{user.email}</span>
+            <RoleSwitch staff={userWithStaff?.Staff?.[0] || null} />
+          </div>
+        </header>
+        
+        <main className="px-6 py-8">
+          {children}
+        </main>
+      </div>
+    );
+  }
+
+  // Classic Layout (Default fallback) - Top navigation only, no sidebar
+  return (
+    <div className="min-h-screen bg-background text-foreground" data-layout="classic">
+      {/* Classic Top Navigation */}
+      <nav className="bg-card text-card-foreground shadow border-b border-border sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center gap-6">
+              <Link
+                href="/dashboard"
+                className="flex items-center px-3 py-2 font-semibold text-primary hover:text-primary/80 transition-colors"
+              >
+                AgendaIQ
+              </Link>
+              
+              <div className="hidden md:flex items-center space-x-1">
+                <Link
+                  href="/dashboard"
+                  className="px-3 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors rounded-md"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/dashboard/meetings"
+                  className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md"
+                >
+                  Meetings
+                </Link>
+                <div className="relative group">
+                  <Link
+                    href="/dashboard/meeting-intelligence"
+                    className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md"
+                  >
+                    Meeting Intelligence
+                  </Link>
+                  
+                  <div className="absolute left-0 top-full mt-2 w-56 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                    <div className="p-2">
+                      <div className="space-y-1">
+                        <Link href="/dashboard/meeting-intelligence" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                          <Brain className="h-4 w-4" />
+                          Overview
+                        </Link>
+                        <Link href="/dashboard/meeting-intelligence/search" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                          <Search className="h-4 w-4" />
+                          Search
+                        </Link>
+                        <Link href="/dashboard/meeting-intelligence/analytics" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                          <BarChart className="h-4 w-4" />
+                          Analytics
+                        </Link>
+                        <Link href="/dashboard/meeting-intelligence/action-items" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                          <CheckSquare className="h-4 w-4" />
+                          Action Items
+                        </Link>
+                        <Link href="/dashboard/meeting-intelligence/continuity" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                          <GitBranch className="h-4 w-4" />
+                          Meeting Chains
+                        </Link>
+                        <Link href="/dashboard/meeting-intelligence/role-tasks" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                          <UserCog className="h-4 w-4" />
+                          Role Tasks
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="relative group">
+                  <Link
+                    href="/dashboard/settings"
+                    className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md"
+                  >
+                    Settings
+                  </Link>
+                  
+                  {/* Settings Dropdown with nested menus */}
+                  <div className="absolute left-0 top-full mt-2 w-64 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                    <div className="p-2">
+                      <div className="space-y-1">
+                        {/* Account Section */}
+                        <div className="relative group/account">
+                          <div className="flex items-center justify-between px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors cursor-pointer">
+                            <span className="font-medium">Account</span>
+                            <ChevronRight className="w-3 h-3 opacity-40" />
+                          </div>
+                          <div className="absolute left-full top-0 ml-2 w-56 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover/account:opacity-100 group-hover/account:visible transition-all">
+                            <div className="p-2 space-y-1">
+                              <Link href="/dashboard/settings/profile" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                Profile
+                              </Link>
+                              <Link href="/dashboard/settings/interface" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                Interface & Theme
+                              </Link>
+                              <Link href="/dashboard/settings/security" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                Security
+                              </Link>
+                              <Link href="/dashboard/settings/notifications" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                Notifications
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+
+                        {isAdmin && (
+                          <>
+                            {/* Administration Section */}
+                            <div className="relative group/admin">
+                              <div className="flex items-center justify-between px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors cursor-pointer">
+                                <span className="font-medium">Administration</span>
+                                <ChevronRight className="w-3 h-3 opacity-40" />
+                              </div>
+                              <div className="absolute left-full top-0 ml-2 w-56 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover/admin:opacity-100 group-hover/admin:visible transition-all">
+                                <div className="p-2 space-y-1">
+                                  <Link href="/dashboard/settings/users" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    User Management
+                                  </Link>
+                                  <Link href="/dashboard/settings/roles" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Role Management
+                                  </Link>
+                                  <Link href="/dashboard/settings/role-hierarchy" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Role Hierarchy
+                                  </Link>
+                                  <Link href="/dashboard/settings/staff-upload" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Staff Upload
+                                  </Link>
+                                  <Link href="/dashboard/settings/audit-logs" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Database Audit Logs
+                                  </Link>
+                                  <Link href="/dashboard/settings/admin" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Admin Settings
+                                  </Link>
+                                  <Link href="/dashboard/settings/school" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    School Management
+                                  </Link>
+                                  <Link href="/dashboard/settings/permissions" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Permissions
+                                  </Link>
+                                  <Link href="/dashboard/settings/backup" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Backup & Restore
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Production Monitoring Section */}
+                            <div className="relative group/prod">
+                              <div className="flex items-center justify-between px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors cursor-pointer">
+                                <span className="font-medium">Production Monitoring</span>
+                                <ChevronRight className="w-3 h-3 opacity-40" />
+                              </div>
+                              <div className="absolute left-full top-0 ml-2 w-56 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover/prod:opacity-100 group-hover/prod:visible transition-all">
+                                <div className="p-2 space-y-1">
+                                  <Link href="/dashboard/system" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    System Overview
+                                  </Link>
+                                  <Link href="/dashboard/system/health" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    System Health
+                                  </Link>
+                                  <Link href="/dashboard/system/server" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Server Metrics
+                                  </Link>
+                                  <Link href="/dashboard/system/alerts" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Alert Configuration
+                                  </Link>
+                                  <Link href="/dashboard/system/logs" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    System Logs
+                                  </Link>
+                                  <Link href="/dashboard/system/backup" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Backup Management
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Development Tools Section */}
+                            <div className="relative group/dev">
+                              <div className="flex items-center justify-between px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors cursor-pointer">
+                                <span className="font-medium">Development Tools</span>
+                                <ChevronRight className="w-3 h-3 opacity-40" />
+                              </div>
+                              <div className="absolute left-full top-0 ml-2 w-56 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover/dev:opacity-100 group-hover/dev:visible transition-all">
+                                <div className="p-2 space-y-1">
+                                  <Link href="/dashboard/development" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Development Tools
+                                  </Link>
+                                  <Link href="/dashboard/monitoring" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Live Monitoring
+                                  </Link>
+                                  <Link href="/dashboard/system/dependencies" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Dependencies Management
+                                  </Link>
+                                  <Link href="/dashboard/system/updates" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Package Updates
+                                  </Link>
+                                  <Link href="/dashboard/system/database" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Database Management
+                                  </Link>
+                                  <Link href="/dashboard/system/migration" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Auth Migration & Diagnostics
+                                  </Link>
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        )}
+
+                        {/* Meetings & Zoom Section */}
+                        <div className="relative group/meetings">
+                          <div className="flex items-center justify-between px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors cursor-pointer">
+                            <span className="font-medium">Meetings & Zoom</span>
+                            <ChevronRight className="w-3 h-3 opacity-40" />
+                          </div>
+                          <div className="absolute left-full top-0 ml-2 w-56 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover/meetings:opacity-100 group-hover/meetings:visible transition-all">
+                            <div className="p-2 space-y-1">
+                              <Link href="/dashboard/settings/zoom-integration" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                Zoom Integration
+                              </Link>
+                              {isAdmin && (
+                                <Link href="/dashboard/settings/meeting-templates" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                  Meeting Templates
+                                </Link>
+                              )}
+                              <Link href="/dashboard/settings/zoom-user-preferences" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                Zoom User Preferences
+                              </Link>
+                              {isAdmin && (
+                                <>
+                                  <Link href="/dashboard/settings/meeting-management" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Meeting Management
+                                  </Link>
+                                  <Link href="/dashboard/settings/meeting-permissions" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Meeting Permissions
+                                  </Link>
+                                </>
+                              )}
+                              <Link href="/dashboard/settings/meeting-audit" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                Meeting Audit & Logs
+                              </Link>
+                              <Link href="/dashboard/settings/meeting-help" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                Meeting Help
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
+                <span className="text-sm text-muted-foreground">
+                  {user.email}
+                </span>
+                <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">
+                  {currentRole?.title || 'No Role'}
+                </span>
+                <button
+                  onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <main className="flex-1">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {children}
+        </div>
+      </main>
+    </div>
+  );
+}

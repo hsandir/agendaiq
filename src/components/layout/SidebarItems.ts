@@ -18,7 +18,13 @@ import {
   GitBranch,
   UserCog,
   Palette,
-  Monitor
+  Monitor,
+  User,
+  ShieldCheck,
+  Server,
+  Code,
+  Video,
+  Briefcase
 } from "lucide-react";
 
 export interface NavigationItem {
@@ -84,26 +90,6 @@ export const sidebarItems: NavigationSection[] = [
           },
         ],
       },
-      {
-        href: "/dashboard/team",
-        label: "Team",
-        icon: Users,
-      },
-      {
-        href: "/dashboard/notes",
-        label: "Notes",
-        icon: FileText,
-      },
-      {
-        href: "/dashboard/development",
-        label: "Development Tools",
-        icon: FlaskConical,
-      },
-      {
-        href: "/dashboard/monitoring",
-        label: "Live Monitoring",
-        icon: Monitor,
-      },
     ],
   },
   {
@@ -115,39 +101,136 @@ export const sidebarItems: NavigationSection[] = [
         icon: Settings,
         children: [
           {
-            href: "/dashboard/settings/roles",
-            label: "Role Management",
-            icon: Shield,
+            href: "/dashboard/settings/account",
+            label: "Account",
+            icon: User,
+            children: [
+              {
+                href: "/dashboard/settings/profile",
+                label: "Profile",
+                icon: User,
+              },
+              {
+                href: "/dashboard/settings/interface",
+                label: "Interface & Theme",
+                icon: Monitor,
+              },
+              {
+                href: "/dashboard/settings/security",
+                label: "Security",
+                icon: Lock,
+              },
+            ],
           },
           {
-            href: "/dashboard/settings/role-hierarchy",
-            label: "Role Hierarchy",
-            icon: TrendingUp,
+            href: "/dashboard/settings/admin",
+            label: "Admin",
+            icon: ShieldCheck,
+            children: [
+              {
+                href: "/dashboard/settings/users",
+                label: "User Management",
+                icon: UserCheck,
+              },
+              {
+                href: "/dashboard/settings/roles",
+                label: "Role Management",
+                icon: Shield,
+              },
+              {
+                href: "/dashboard/settings/role-hierarchy",
+                label: "Role Hierarchy",
+                icon: TrendingUp,
+              },
+              {
+                href: "/dashboard/settings/permissions",
+                label: "Permissions",
+                icon: Lock,
+              },
+            ],
           },
           {
-            href: "/dashboard/settings/role-hierarchy/visualization",
-            label: "Hierarchy Visualization", 
-            icon: Eye,
+            href: "/dashboard/settings/production",
+            label: "Production",
+            icon: Server,
+            children: [
+              {
+                href: "/dashboard/settings/system",
+                label: "System Settings",
+                icon: Settings,
+              },
+              {
+                href: "/dashboard/settings/monitoring",
+                label: "System Monitoring",
+                icon: Activity,
+              },
+              {
+                href: "/dashboard/settings/audit",
+                label: "Audit Logs",
+                icon: Activity,
+              },
+              {
+                href: "/dashboard/settings/backup",
+                label: "Backup & Restore",
+                icon: Shield,
+              },
+            ],
           },
           {
-            href: "/dashboard/settings/users",
-            label: "User Management",
-            icon: UserCheck,
+            href: "/dashboard/settings/development",
+            label: "Development",
+            icon: Code,
+            children: [
+              {
+                href: "/dashboard/development",
+                label: "Development Tools",
+                icon: FlaskConical,
+              },
+              {
+                href: "/dashboard/monitoring",
+                label: "Live Monitoring",
+                icon: Monitor,
+              },
+            ],
           },
           {
-            href: "/dashboard/settings/theme",
-            label: "Theme",
-            icon: Palette,
+            href: "/dashboard/settings/meeting",
+            label: "Meeting",
+            icon: Briefcase,
+            children: [
+              {
+                href: "/dashboard/settings/meeting-templates",
+                label: "Meeting Templates",
+                icon: FileText,
+              },
+              {
+                href: "/dashboard/settings/meeting-management",
+                label: "Meeting Management",
+                icon: Calendar,
+              },
+              {
+                href: "/dashboard/settings/meeting-permissions",
+                label: "Meeting Permissions",
+                icon: Shield,
+              },
+            ],
           },
           {
-            href: "/dashboard/settings/security",
-            label: "Security",
-            icon: Lock,
-          },
-          {
-            href: "/dashboard/settings/audit",
-            label: "Audit Logs",
-            icon: Activity,
+            href: "/dashboard/settings/zoom",
+            label: "Zoom",
+            icon: Video,
+            children: [
+              {
+                href: "/dashboard/settings/zoom-integration",
+                label: "Zoom Integration",
+                icon: Video,
+              },
+              {
+                href: "/dashboard/settings/zoom-user-preferences",
+                label: "User Preferences",
+                icon: UserCog,
+              },
+            ],
           },
         ],
       },

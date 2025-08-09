@@ -11,8 +11,10 @@ const adminOnlyRoutes = [
   '/dashboard/settings/setup',
   '/dashboard/settings/audit',
   '/dashboard/settings/backup',
+  '/dashboard/monitoring',
   '/api/admin',
-  '/api/system'
+  '/api/system',
+  '/api/monitoring'
 ];
 
 // Staff-only routes (requires staff record)
@@ -29,6 +31,7 @@ const staffOnlyRoutes = [
 
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
+  
   
   // Apply rate limiting to API routes first
   if (path.startsWith("/api/")) {
@@ -82,7 +85,6 @@ export async function middleware(request: NextRequest) {
       '/api/dev',  // Development tools - accessible without auth in dev mode
       '/api/tests', // Test endpoints for development
       '/api/debug', // Debug endpoints for production troubleshooting
-      '/api/error-capture' // Error capture for monitoring
     ];
     const isPublic = publicEndpoints.some(endpoint => path.startsWith(endpoint));
     

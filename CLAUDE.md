@@ -347,24 +347,39 @@ Claude must include testing considerations:
 - Use Tailwind CSS through centralized theme system
 - Follow established design patterns
 
-## ⚠️ CRITICAL DATABASE SAFETY RULES - MANDATORY
+## 🚨🚨🚨 ULTRA CRITICAL DATABASE SAFETY RULES - ABSOLUTE PROHIBITION 🚨🚨🚨
 
-### STRICT DATABASE MODIFICATION PROTOCOL
-**NEVER DELETE DATABASE DATA - THIS IS AN ABSOLUTE RULE**
+### ⛔ DATABASE DELETION IS ABSOLUTELY FORBIDDEN ⛔
+**DATABASE SİLME KESİNLİKLE YASAKTIR - HİÇBİR KOŞULDA DATABASE'E ZARAR VERME**
 
-1. **Before ANY Database Schema Changes**:
+### 🔴 EXTREME DATABASE PROTECTION PROTOCOL 🔴
+
+1. **DATABASE RESET/DROP/DELETE ABSOLUTELY PROHIBITED**:
+   - **NEVER EVER** run `prisma migrate reset` - BU KOMUTU ASLA KULLANMA!
+   - **NEVER EVER** run `prisma db push --force-reset` - BU KOMUTU ASLA KULLANMA!
+   - **NEVER EVER** drop database or tables - TABLOLARI ASLA SİLME!
+   - **NEVER EVER** truncate any table - TABLOLARI ASLA BOŞALTMA!
+   - **NEVER EVER** delete any records - KAYITLARI ASLA SİLME!
+   - **IF DATABASE RESET IS ABSOLUTELY NECESSARY**:
+     1. ❓ ASK USER: "Database reset gerekli mi? Bu TÜM VERİYİ SİLECEK! (50 kullanıcı, 37 role vs.)"
+     2. ❓ ASK AGAIN: "Emin misiniz? Tüm kullanıcılar, roller, veriler SİLİNECEK!"
+     3. ❓ ASK THIRD TIME: "Son kez soruyorum - Database'deki TÜM VERİ GİDECEK. Emin misiniz?"
+     4. ❓ ASK FOURTH TIME: "ONAYLAYIN: Database'deki TÜM VERİ (50 kullanıcı, 37 role) SİLİNECEK. 'EVET DATABASE SİL' yazın!"
+     5. Only proceed if user explicitly writes exactly "EVET DATABASE SİL" 4 times
+
+2. **Before ANY Database Schema Changes**:
    - **ALWAYS** backup existing data first
    - **NEVER** use destructive migrations
    - **NEVER** delete tables or columns with data
    - **ALWAYS** preserve all existing records
+   - **ALWAYS** use `--create-only` flag first to review
+   - **REMEMBER**: Production database has 50+ users, 37+ roles - PROTECT THEM!
 
-2. **Database Modification Steps**:
+3. **Safe Database Modification Steps**:
    ```bash
    # MANDATORY STEPS FOR DATABASE CHANGES:
-   # 1. Backup current data
-   npx prisma db pull  # Get current schema
-   npx prisma db seed  # Backup data if seed exists
-   pg_dump database_name > backup_$(date +%Y%m%d_%H%M%S).sql
+   # 1. Backup current data FIRST
+   pg_dump agendaiq > backup_$(date +%Y%m%d_%H%M%S).sql
    
    # 2. Make schema changes
    # Edit schema.prisma
@@ -372,27 +387,109 @@ Claude must include testing considerations:
    # 3. Generate migration WITHOUT applying
    npx prisma migrate dev --create-only
    
-   # 4. Review migration file
-   # 5. Apply migration
+   # 4. Review migration file CAREFULLY
+   # 5. Apply migration ONLY if safe
    npx prisma migrate dev
+   
+   # ⛔ NEVER USE THESE COMMANDS ⛔
+   # NEVER: prisma migrate reset
+   # NEVER: prisma db push --force-reset
+   # NEVER: DROP DATABASE
+   # NEVER: TRUNCATE TABLE
    ```
 
-3. **Adding New Fields**:
+4. **Adding New Fields**:
    - **ALWAYS** make new fields nullable or provide defaults
    - **NEVER** make existing nullable fields required
    - **ALWAYS** use additive changes only
+   - **PROTECT** existing 50 users and 37 roles!
 
-4. **Modifying Existing Tables**:
+5. **Modifying Existing Tables**:
    - **PRESERVE** all existing data
    - **ADD** new columns as nullable
    - **RENAME** instead of delete when changing
    - **MIGRATE** data to new structure if needed
 
-5. **Data Integrity**:
+6. **Data Integrity**:
    - **NEVER** truncate tables
    - **NEVER** drop tables
    - **NEVER** delete records without archiving
    - **ALWAYS** use soft deletes (is_deleted flags)
+   - **ALWAYS** keep audit trail of changes
+   - **REMEMBER**: Real database has valuable production data!
+
+### ⚠️ VIOLATION CONSEQUENCES ⚠️
+Any attempt to reset, drop, or delete database without 4 explicit user confirmations with exact text "EVET DATABASE SİL" is a CRITICAL VIOLATION and must be immediately stopped.
+
+## 🛡️ SUPABASE PRODUCTION DATABASE PROTECTION RULES 🛡️
+
+### ⛔ SUPABASE IS READ-ONLY - ABSOLUTE RULE ⛔
+**SUPABASE'E KESİNLİKLE DOKUNMA - SADECE OKUMA İZNİ VAR**
+
+1. **SUPABASE CONNECTION RULES**:
+   - **ONLY** use READ operations (SELECT, COUNT, FIND)
+   - **NEVER** use WRITE operations (INSERT, UPDATE, DELETE, CREATE, DROP)
+   - **NEVER** run migrations on Supabase
+   - **NEVER** run seed scripts on Supabase
+   - **NEVER** modify schema on Supabase
+   - **ALWAYS** use separate PrismaClient instances for Supabase (read-only)
+
+2. **ADDING NEW TABLES/COLUMNS TO PRODUCTION**:
+   - **STEP 1**: Test thoroughly in local database first
+   - **STEP 2**: Create migration file locally with `--create-only`
+   - **STEP 3**: Review migration SQL carefully
+   - **STEP 4**: Ask user: "Bu migration Supabase'e uygulanacak. Schema değişikliği: [DETAILS]. Onaylıyor musunuz?"
+   - **STEP 5**: Only proceed with user's explicit approval
+   - **STEP 6**: Apply to Supabase using safe migration practices
+   - **STEP 7**: Verify no data loss occurred
+
+3. **DATA SYNC PROTOCOL**:
+   ```javascript
+   // CORRECT - Read from Supabase, Write to Local
+   const supabaseData = await supabasePrisma.user.findMany(); // READ ONLY
+   await localPrisma.user.createMany({ data: supabaseData }); // WRITE LOCAL
+   
+   // WRONG - Never write to Supabase
+   await supabasePrisma.user.create({ ... }); // NEVER DO THIS!
+   await supabasePrisma.user.update({ ... }); // NEVER DO THIS!
+   await supabasePrisma.user.delete({ ... }); // NEVER DO THIS!
+   ```
+
+4. **SUPABASE SCHEMA CHANGES**:
+   - **NEVER** auto-apply migrations to Supabase
+   - **ALWAYS** create migration locally first
+   - **ALWAYS** test with sample data locally
+   - **ALWAYS** backup Supabase before any schema change
+   - **ALWAYS** use additive changes (new nullable columns)
+   - **NEVER** drop columns or tables in Supabase
+   - **NEVER** rename columns without data migration plan
+
+5. **EMERGENCY SUPABASE ACCESS**:
+   - If write access to Supabase is absolutely necessary:
+     1. ❓ ASK: "Supabase'e yazma işlemi gerekli mi? Bu production veritabanı!"
+     2. ❓ ASK: "Ne yazmak istiyorsunuz? Detaylı açıklayın."
+     3. ❓ ASK: "Bu işlem geri alınabilir mi? Backup var mı?"
+     4. ❓ ASK: "ONAY: Supabase production'a [OPERATION] yapılacak. 'SUPABASE WRITE ONAY' yazın."
+   - Only proceed with exact text "SUPABASE WRITE ONAY"
+
+### 🔒 SUPABASE CONNECTION SAFETY 🔒
+```javascript
+// ALWAYS use read-only connection for Supabase
+const supabasePrisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.SUPABASE_URL // Read-only operations only
+    }
+  }
+});
+
+// NEVER use Supabase connection for:
+// - prisma migrate dev
+// - prisma migrate reset  
+// - prisma db push
+// - prisma db seed
+// - Any write operations
+```
 
 ## 🚫 FORBIDDEN PATTERNS FOR CLAUDE
 

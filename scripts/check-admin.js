@@ -1,60 +1,51 @@
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcryptjs');
-
 const prisma = new PrismaClient();
 
 async function checkAdmin() {
   try {
-    console.log('Checking admin user...');
-
-    // Find admin user
     const adminUser = await prisma.user.findUnique({
       where: { email: 'admin@school.edu' },
       include: {
         Staff: {
           include: {
             Role: true,
-            Department: true
+            Department: true,
+            School: true,
+            District: true
           }
         }
       }
     });
-
-    if (!adminUser) {
-      console.log('❌ Admin user not found!');
-      return;
-    }
-
-    console.log('✅ Admin user found:');
-    console.log('Email:', adminUser.email);
-    console.log('Name:', adminUser.name);
-    console.log('Staff ID:', adminUser.staff_id);
-    console.log('Has hashed password:', !!adminUser.hashedPassword);
     
-    if (adminUser.Staff && adminUser.Staff.length > 0) {
-      const staff = adminUser.Staff[0];
-      console.log('Role:', staff.Role?.title || 'No role');
-      console.log('Department:', staff.Department?.name || 'No department');
-    }
-
-    // Test password "1234"
-    if (adminUser.hashedPassword) {
-      const isValid = await bcrypt.compare('1234', adminUser.hashedPassword);
-      console.log('Password "1234" is valid:', isValid);
-      
-      if (!isValid) {
-        console.log('❌ Password "1234" is not valid!');
-        console.log('Hash:', adminUser.hashedPassword);
-      } else {
-        console.log('✅ Password "1234" is valid!');
+    if (adminUser) {
+      console.log('Admin user found:');
+      console.log('ID:', adminUser.id);
+      console.log('Email:', adminUser.email);
+      console.log('Name:', adminUser.name);
+      console.log('Has password:', Boolean(adminUser.hashedPassword));
+      console.log('Staff record:', adminUser.Staff.length > 0 ? 'Yes' : 'No');
+      if (adminUser.Staff[0]) {
+        console.log('Staff Role:', adminUser.Staff[0].Role.title);
+        console.log('Is Leadership:', adminUser.Staff[0].Role.is_leadership);
+        console.log('Department:', adminUser.Staff[0].Department.name);
+        console.log('School:', adminUser.Staff[0].School.name);
+        console.log('District:', adminUser.Staff[0].District.name);
       }
+    } else {
+      console.log('Admin user not found');
+      
+      // List all users
+      const allUsers = await prisma.user.findMany({
+        select: { id: true, email: true, name: true }
+      });
+      console.log('\nAll users in database:');
+      allUsers.forEach(u => console.log('- ' + u.email));
     }
-
   } catch (error) {
-    console.error('Error checking admin:', error);
+    console.error('Error:', error);
   } finally {
     await prisma.$disconnect();
   }
 }
 
-checkAdmin(); 
+checkAdmin();

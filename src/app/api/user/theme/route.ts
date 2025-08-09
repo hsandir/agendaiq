@@ -5,7 +5,10 @@ import { AuditLogger } from '@/lib/audit/audit-logger';
 import { z } from 'zod';
 
 const themeSchema = z.object({
-  theme: z.enum(['modern-purple', 'classic-light', 'dark-mode', 'high-contrast', 'nature-green']),
+  themeId: z.string().optional(), // Accept themeId from new interface
+  theme: z.string().optional(), // Accept theme for backward compatibility
+}).refine(data => data.themeId || data.theme, {
+  message: "Either themeId or theme must be provided"
 });
 
 // GET /api/user/theme - Get user's theme preference
@@ -34,6 +37,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST /api/user/theme - Update user's theme preference (for compatibility)
+export async function POST(request: NextRequest) {
+  return PUT(request);
+}
+
 // PUT /api/user/theme - Update user's theme preference
 export async function PUT(request: NextRequest) {
   const authResult = await withAuth(request);
@@ -45,11 +53,20 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
     const validatedData = themeSchema.parse(body);
+    
+    // Use themeId if provided, otherwise use theme
+    const themeToSave = validatedData.themeId || validatedData.theme || 'standard';
 
-    // Update user's theme preference
-    await prisma.user.update({
+    // Update user's theme preference (use upsert to handle missing records)
+    await prisma.user.upsert({
       where: { id: user.id },
-      data: { theme_preference: validatedData.theme },
+      update: { theme_preference: themeToSave },
+      create: {
+        id: user.id,
+        email: user.email || '',
+        name: user.name,
+        theme_preference: themeToSave,
+      },
     });
 
     // Log the theme change
@@ -60,12 +77,12 @@ export async function PUT(request: NextRequest) {
       userId: user.id,
       staffId: user.staff?.id,
       source: 'WEB_UI',
-      description: `Theme changed to ${validatedData.theme}`,
+      description: `Theme changed to ${themeToSave}`,
     });
 
     return NextResponse.json({
       success: true,
-      theme: validatedData.theme,
+      theme: themeToSave,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

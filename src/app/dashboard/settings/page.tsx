@@ -25,7 +25,7 @@ export default async function SettingsPage() {
           </p>
         </div>
         
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 max-w-7xl mx-auto">
           <div className="bg-card rounded-lg shadow p-6">
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
               <span className="text-green-600 font-bold">👤</span>
@@ -69,6 +69,22 @@ export default async function SettingsPage() {
               className="inline-flex items-center mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium"
             >
               Choose Theme →
+            </a>
+          </div>
+          
+          <div className="bg-card rounded-lg shadow p-6">
+            <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center mx-auto mb-4">
+              <span className="text-accent-foreground font-bold">📐</span>
+            </div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Layout Settings</h3>
+            <p className="text-muted-foreground text-sm">
+              Switch between different dashboard layouts to match your workflow preferences.
+            </p>
+            <a 
+              href="/dashboard/settings/layout"
+              className="inline-flex items-center mt-4 px-4 py-2 bg-accent text-accent-foreground rounded-md hover:bg-accent/90 transition-colors text-sm font-medium"
+            >
+              Change Layout →
             </a>
           </div>
         </div>

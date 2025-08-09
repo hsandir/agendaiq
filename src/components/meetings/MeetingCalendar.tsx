@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, List, ChevronLeft, ChevronRight, Clock, Users } from 'lucide-react';
+import { Calendar, List, ChevronLeft, ChevronRight, Clock, Users, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { safeFormatDateTime, safeFormatDate, safeFormatTime } from '@/lib/utils/safe-date';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths, isSameDay, isSameMonth, isToday } from 'date-fns';
 
@@ -27,6 +28,7 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const router = useRouter();
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
@@ -61,6 +63,13 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-lg">Meeting List</CardTitle>
           <div className="flex gap-2">
+            <Button 
+              size="sm"
+              onClick={() => router.push('/dashboard/meetings/new')}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Schedule Meeting
+            </Button>
             <Button 
               variant="outline" 
               size="sm"
@@ -134,6 +143,13 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
             </Button>
           </div>
           <div className="flex gap-2">
+            <Button 
+              size="sm"
+              onClick={() => router.push('/dashboard/meetings/new')}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Schedule Meeting
+            </Button>
             <Button 
               variant="outline" 
               size="sm"

@@ -5,6 +5,17 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Seeding CJCP Somerset Complete Database...');
+  
+  // Clean existing data in correct order (respecting foreign key constraints)
+  console.log('🧹 Cleaning existing data...');
+  await prisma.roleHierarchy.deleteMany({});
+  await prisma.staff.deleteMany({});
+  await prisma.user.deleteMany({});
+  await prisma.role.deleteMany({});
+  await prisma.department.deleteMany({});
+  await prisma.school.deleteMany({});
+  await prisma.district.deleteMany({});
+  console.log('✅ Existing data cleaned');
 
   // Create District and School
   const district = await prisma.district.create({

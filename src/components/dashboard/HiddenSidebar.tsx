@@ -52,6 +52,7 @@ const navigation: NavSection[] = [
     title: "Account",
     items: [
       { href: "/dashboard/settings/profile", label: "Profile", icon: FiUser },
+      { href: "/dashboard/settings/interface", label: "Interface & Theme", icon: FiMonitor },
       { href: "/dashboard/settings/security", label: "Security", icon: FiLock },
       { href: "/dashboard/settings/notifications", label: "Notifications", icon: FiBell },
     ],
@@ -87,12 +88,12 @@ const navigation: NavSection[] = [
     title: "Development Tools",
     adminOnly: true,
     items: [
+      { href: "/dashboard/development", label: "Development Tools", icon: FiPackage },
+      { href: "/dashboard/monitoring", label: "Live Monitoring", icon: FiActivity },
       { href: "/dashboard/system/dependencies", label: "Dependencies Management", icon: FiPackage },
       { href: "/dashboard/system/updates", label: "Package Updates", icon: FiDownload },
       { href: "/dashboard/system/database", label: "Database Management", icon: FiDatabase },
       { href: "/dashboard/system/migration", label: "Auth Migration & Diagnostics", icon: FiTrendingUp },
-      { href: "/dashboard/system/mock-data-tracker", label: "Mock Data Tracker", icon: FiSearch },
-      { href: "/dashboard/system/lint", label: "Code Quality Tools", icon: FiSearch },
     ],
   }] : []),
   {
