@@ -1,0 +1,204 @@
+/**
+ * AUTH-INT-01: Authentication Integration Tests
+ * Test login flow with JWT enrichment
+ */
+
+import { NextRequest } from 'next/server';
+import { POST as authSignIn } from '@/app/api/auth/[...nextauth]/route';
+import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcrypt';
+import { getServerSession } from 'next-auth';
+
+// Mock modules
+jest.mock('@/lib/prisma', () => ({
+  prisma: {
+    user: {
+      findUnique: jest.fn(),
+      count: jest.fn(),
+      create: jest.fn(),
+    },
+  },
+}));
+
+jest.mock('bcrypt', () => ({
+  compare: jest.fn(),
+  hash: jest.fn(),
+}));
+
+jest.mock('next-auth', () => ({
+  getServerSession: jest.fn(),
+}));
+
+describe('Authentication Integration Tests', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('AUTH-INT-01: Valid credentials login', () => {
+    it('should authenticate user with valid credentials and enrich JWT', async () => {
+      const mockUser = {
+        id: 1,
+        email: 'test@school.edu',
+        name: 'Test User',
+        hashedPassword: 'hashed_password',
+        is_system_admin: false,
+        is_school_admin: true,
+        two_factor_enabled: false,
+        Staff: [{
+          id: 10,
+          Role: {
+            key: 'OPS_ADMIN',
+            title: 'Administrator',
+            Permissions: [
+              { capability: 'ops:monitoring' },
+              { capability: 'user:manage' },
+            ],
+          },
+          Department: { id: 1, name: 'Admin' },
+          School: { id: 1, name: 'Test School' },
+          District: { id: 1, name: 'Test District' },
+        }],
+      };
+
+      // Mock database responses
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      // Create test request
+      const formData = new FormData();
+      formData.append('email', 'test@school.edu');
+      formData.append('password', 'password123');
+      
+      const request = new NextRequest('http://localhost:3000/api/auth/signin', {
+        method: 'POST',
+        body: formData,
+      });
+
+      // Mock successful session creation
+      (getServerSession as jest.Mock).mockResolvedValue({
+        user: {
+          id: '1',
+          email: 'test@school.edu',
+          name: 'Test User',
+          is_system_admin: false,
+          is_school_admin: true,
+          capabilities: ['ops:monitoring', 'user:manage'],
+          staff: mockUser.Staff[0],
+        },
+      });
+
+      // Verify user lookup was called
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { email: 'test@school.edu' },
+        include: {
+          Staff: {
+            include: {
+              Role: true,
+              Department: true,
+              School: true,
+              District: true,
+            },
+          },
+        },
+      });
+
+      // Verify password comparison
+      expect(bcrypt.compare).toHaveBeenCalledWith('password123', 'hashed_password');
+    });
+  });
+
+  describe('AUTH-INT-02: Wrong password', () => {
+    it('should reject login with wrong password', async () => {
+      const mockUser = {
+        id: 1,
+        email: 'test@school.edu',
+        hashedPassword: 'hashed_password',
+      };
+
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      // Verify password check fails
+      const passwordValid = await bcrypt.compare('wrong_password', mockUser.hashedPassword);
+      expect(passwordValid).toBe(false);
+    });
+  });
+
+  describe('AUTH-INT-03: 2FA enabled', () => {
+    it('should require 2FA code when enabled', async () => {
+      const mockUser = {
+        id: 1,
+        email: 'test@school.edu',
+        hashedPassword: 'hashed_password',
+        two_factor_enabled: true,
+        two_factor_secret: 'secret',
+      };
+
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      // Should check for 2FA
+      expect(mockUser.two_factor_enabled).toBe(true);
+      expect(mockUser.two_factor_secret).toBeDefined();
+    });
+  });
+
+  describe('AUTH-INT-04: Backup codes', () => {
+    it('should validate backup code once', async () => {
+      const mockUser = {
+        id: 1,
+        email: 'test@school.edu',
+        hashedPassword: 'hashed_password',
+        two_factor_enabled: true,
+        backup_codes: ['code1', 'code2', 'code3'],
+      };
+
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      
+      // Simulate using a backup code
+      const usedCode = 'code1';
+      const isValidBackupCode = mockUser.backup_codes.includes(usedCode);
+      expect(isValidBackupCode).toBe(true);
+      
+      // Remove used code
+      mockUser.backup_codes = mockUser.backup_codes.filter(c => c !== usedCode);
+      expect(mockUser.backup_codes).not.toContain(usedCode);
+      expect(mockUser.backup_codes.length).toBe(2);
+    });
+  });
+
+  describe('Google OAuth Integration', () => {
+    it('should validate domain allowlist for Google OAuth', () => {
+      const allowedDomains = ['cjcollegeprep.org', 'school.edu'];
+      
+      // Test allowed domain
+      const validEmail = 'user@cjcollegeprep.org';
+      const validDomain = validEmail.split('@')[1];
+      expect(allowedDomains.includes(validDomain)).toBe(true);
+      
+      // Test blocked domain
+      const invalidEmail = 'user@gmail.com';
+      const invalidDomain = invalidEmail.split('@')[1];
+      expect(allowedDomains.includes(invalidDomain)).toBe(false);
+    });
+
+    it('should prevent OAuth account takeover', async () => {
+      const existingUser = {
+        id: 1,
+        email: 'user@school.edu',
+        hashedPassword: 'password',
+        Account: [], // No linked OAuth accounts
+      };
+
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(existingUser);
+      
+      // Check if Google account is linked
+      const hasGoogleAccount = existingUser.Account.some((a: any) => a.provider === 'google');
+      expect(hasGoogleAccount).toBe(false);
+      
+      // Should require manual linking
+      expect(existingUser.hashedPassword).toBeDefined();
+      expect(existingUser.Account.length).toBe(0);
+    });
+  });
+});

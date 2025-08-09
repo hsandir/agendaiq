@@ -1,7 +1,8 @@
 import type { NextAuthOptions, User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
-// import GoogleProvider from "next-auth/providers/google"; // TODO: Add PrismaAdapter before enabling
+import GoogleProvider from "next-auth/providers/google";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import speakeasy from "speakeasy";
@@ -28,8 +29,9 @@ function isValidUserData(data: unknown): data is User {
 }
 
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   session: {
-    strategy: "jwt",
+    strategy: "jwt", // Still using JWT even with adapter
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
@@ -37,11 +39,17 @@ export const authOptions: NextAuthOptions = {
     error: "/auth/error",
   },
   providers: [
-    // TODO: Add PrismaAdapter before enabling Google OAuth
-    // GoogleProvider({
-    //   clientId: process.env.GOOGLE_CLIENT_ID || "",
-    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-    // }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code"
+        }
+      }
+    }),
     Credentials({
       name: "credentials",
       credentials: {
@@ -195,8 +203,20 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account }) {
-      // For Google sign in, check if user exists
+      // For Google sign in, check domain allowlist
       if (account?.provider === "google") {
+        // Domain allowlist
+        const allowedDomains = process.env.ALLOWED_OAUTH_DOMAINS?.split(',') || [
+          'cjcollegeprep.org',
+          'school.edu'
+        ];
+        
+        const userDomain = user.email?.split('@')[1];
+        if (!userDomain || !allowedDomains.includes(userDomain)) {
+          // Domain not allowed
+          return '/auth/signin?error=unauthorized_domain';
+        }
+
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email! }
         });
@@ -208,8 +228,22 @@ export const authOptions: NextAuthOptions = {
             // This will be the first user, they'll get admin privileges when created
             return true;
           }
-          // For subsequent Google users, they need to be invited/added through the admin interface
-          return false;
+          
+          // Check if there's an existing credentials account
+          // This prevents OAuth takeover of credentials accounts
+          const credentialsUser = await prisma.user.findUnique({
+            where: { email: user.email! },
+            include: { Account: true }
+          });
+          
+          if (credentialsUser && !credentialsUser.Account?.some(a => a.provider === 'google')) {
+            // User exists with credentials, needs to link accounts manually
+            return '/auth/signin?error=account_linking_required';
+          }
+          
+          // New OAuth user - can be created but with limited permissions
+          // Admin approval may be required (handled in user creation)
+          return true;
         }
       }
       return true;
