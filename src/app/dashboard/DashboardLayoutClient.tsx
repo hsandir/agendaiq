@@ -87,35 +87,21 @@ export function DashboardLayoutClient({
               )}
             </div>
             
-            <div className="flex items-center gap-2 sm:gap-4">
-              {/* Enhanced Search */}
-              <div className="hidden lg:flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2 min-w-[280px] focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all">
-                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-muted-foreground">
-                  <circle cx="11" cy="11" r="7"></circle>
-                  <path d="M21 21l-4.35-4.35"></path>
-                </svg>
-                <input 
-                  placeholder="Search meetings, notes, tasks..."
-                  className="w-full bg-transparent border-0 outline-0 text-sm text-foreground placeholder:text-muted-foreground"
-                />
+            {/* User Info */}
+            <div className="hidden md:flex items-center gap-3">
+              <div className="hidden lg:flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">{user.email}</span>
+                <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded-full font-medium">
+                  {currentRole?.title || 'No Role'}
+                </span>
               </div>
-              
-              {/* User Info */}
-              <div className="hidden md:flex items-center gap-3">
-                <div className="hidden lg:flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">{user.email}</span>
-                  <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded-full font-medium">
-                    {currentRole?.title || 'No Role'}
-                  </span>
-                </div>
-                <button
-                  onClick={() => signOut({ callbackUrl: '/auth/signin' })}
-                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="hidden sm:inline">Sign Out</span>
-                </button>
-              </div>
+              <button
+                onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </button>
             </div>
           </header>
 

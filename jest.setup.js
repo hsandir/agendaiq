@@ -3,6 +3,11 @@ import { TextEncoder, TextDecoder } from 'util'
 import 'whatwg-fetch'
 import { ReadableStream, WritableStream, TransformStream } from 'web-streams-polyfill'
 
+// Set test environment DATABASE_URL if not set
+if (!process.env.DATABASE_URL) {
+  process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/agendaiq_test'
+}
+
 // Mock next/dynamic
 jest.mock('next/dynamic', () => require('./__mocks__/next/dynamic'))
 
@@ -15,6 +20,7 @@ jest.mock('next/navigation', () => ({
       back: jest.fn(),
       prefetch: jest.fn(),
       reload: jest.fn(),
+      refresh: jest.fn(),
       pathname: '/',
       query: {},
       asPath: '/',

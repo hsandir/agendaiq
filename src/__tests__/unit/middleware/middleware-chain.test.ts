@@ -34,7 +34,10 @@ describe('Middleware Chain Tests', () => {
       const request = {
         url: 'http://localhost:3000/api/users',
         headers: new Headers(),
-        method: 'GET'
+        method: 'GET',
+        nextUrl: {
+          pathname: '/api/users'
+        }
       } as unknown as NextRequest;
       
       const { RateLimiters } = require('@/lib/utils/rate-limit');
@@ -50,7 +53,10 @@ describe('Middleware Chain Tests', () => {
       const request = {
         url: 'http://localhost:3000/api/users',
         headers: new Headers(),
-        method: 'GET'
+        method: 'GET',
+        nextUrl: {
+          pathname: '/api/users'
+        }
       } as unknown as NextRequest;
       
       const { RateLimiters } = require('@/lib/utils/rate-limit');
@@ -59,10 +65,12 @@ describe('Middleware Chain Tests', () => {
         error: 'Rate limit exceeded' 
       });
       
-      const mockResponse = NextResponse.json(
-        { error: 'Rate limit exceeded' },
-        { status: 429 }
-      );
+      const mockResponse = {
+        status: 429,
+        statusText: 'Too Many Requests',
+        headers: new Headers(),
+        json: async () => ({ error: 'Rate limit exceeded' })
+      };
       RateLimiters.api.createErrorResponse.mockReturnValue(mockResponse);
       
       const result = await rateLimitMiddleware(request);
@@ -77,7 +85,10 @@ describe('Middleware Chain Tests', () => {
       const request = {
         url: 'http://localhost:3000/api/admin/users',
         headers: new Headers(),
-        method: 'GET'
+        method: 'GET',
+        nextUrl: {
+          pathname: '/api/admin/users'
+        }
       } as unknown as NextRequest;
       
       const result = await auditMiddleware(request);
