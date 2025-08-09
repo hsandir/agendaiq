@@ -80,7 +80,9 @@ export async function middleware(request: NextRequest) {
       '/api/setup/check', 
       '/api/test-sentry',
       '/api/dev',  // Development tools - accessible without auth in dev mode
-      '/api/tests' // Test endpoints for development
+      '/api/tests', // Test endpoints for development
+      '/api/debug', // Debug endpoints for production troubleshooting
+      '/api/error-capture' // Error capture for monitoring
     ];
     const isPublic = publicEndpoints.some(endpoint => path.startsWith(endpoint));
     
