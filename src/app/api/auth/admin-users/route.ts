@@ -3,13 +3,41 @@ import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  // Check if this is first-time setup (no users exist yet)
+  try {
+    const userCount = await prisma.user.count();
+    const isFirstTimeSetup = userCount === 0;
+    
+    if (!isFirstTimeSetup) {
+      // Normal auth required if users already exist
+      const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireAdminRole: true });
+      if (!authResult.success) {
+        return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+      }
+    }
+  } catch (error) {
+    console.error('Error checking user count:', error);
+    return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
-  const user = authResult.user!;
 
   try {
+    const userCount = await prisma.user.count();
+    const isFirstTimeSetup = userCount === 0;
+    
+    if (isFirstTimeSetup) {
+      // First-time setup: return potential admin users from seed data
+      const potentialAdmins = [
+        { email: 'admin@school.edu', name: 'School Administrator' },
+        { email: 'sysadmin@cjcollegeprep.org', name: 'System Administrator' },
+        { email: 'nsercan@cjcollegeprep.org', name: 'Dr. Namik Sercan (CEO)' }
+      ];
+      
+      return NextResponse.json({
+        adminUsers: potentialAdmins,
+        isFirstTimeSetup: true
+      });
+    }
+
     // Find all users who have admin role
     const adminUsers = await prisma.user.findMany({
       where: {
@@ -45,7 +73,8 @@ export async function GET(request: NextRequest) {
       adminUsers: filteredAdminUsers.map(user => ({
         email: user.email,
         name: user.name
-      }))
+      })),
+      isFirstTimeSetup: false
     });
 
   } catch (error) {

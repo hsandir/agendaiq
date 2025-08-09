@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ThemeProvider } from "@/lib/theme/theme-provider";
+import { LayoutProvider } from "@/lib/layout/layout-provider";
 import { ThemeInitializer } from "@/components/theme/theme-initializer";
 import { ErrorBoundary } from "@/components/error-boundary";
 
@@ -52,7 +53,9 @@ export default function RootLayout({
           <ThemeInitializer />
           <AuthProvider>
             <ThemeProvider initialTheme="classic-light">
-              {children}
+              <LayoutProvider>
+                {children}
+              </LayoutProvider>
             </ThemeProvider>
           </AuthProvider>
         </ErrorBoundary>
