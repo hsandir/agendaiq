@@ -10,7 +10,6 @@ import "./signin.css";
 function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isFirstTimeSetup, setIsFirstTimeSetup] = useState(false);
   const [securityWarning, setSecurityWarning] = useState(false);
 
   // Check for security issue: credentials in URL
@@ -22,21 +21,6 @@ function SignInContent() {
     }
   }, [searchParams]);
 
-  // Check if this is the first user setup
-  const checkFirstTimeSetup = async () => {
-    try {
-      const isFirstUser = await fetch("/api/auth/check-first-user").then(res => res.json());
-      setIsFirstTimeSetup(isFirstUser);
-    } catch (error) {
-      console.error("Error checking first time setup:", error);
-    }
-  };
-
-  // Call this when component mounts
-  useEffect(() => {
-    checkFirstTimeSetup();
-  }, []);
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-muted py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
@@ -44,11 +28,9 @@ function SignInContent() {
           <h1 className="text-center text-4xl font-bold tracking-tight text-foreground">
             Welcome to AgendaIQ
           </h1>
-          {isFirstTimeSetup && (
-            <p className="mt-2 text-center text-sm text-muted-foreground">
-              Complete the initial setup by creating an admin account
-            </p>
-          )}
+          <p className="mt-2 text-center text-sm text-muted-foreground">
+            Sign in to your account to continue
+          </p>
         </div>
 
         {securityWarning && (
@@ -91,17 +73,15 @@ function SignInContent() {
           </div>
 
           {/* Email/Password Sign In Form */}
-          <SignInForm isFirstTimeSetup={isFirstTimeSetup} />
+          <SignInForm />
 
           {/* Sign Up Link */}
-          {!isFirstTimeSetup && (
-            <p className="mt-2 text-center text-sm text-muted-foreground">
-              Don't have an account?{" "}
-              <Link href="/auth/signup" className="font-medium text-primary hover:text-primary">
-                Sign up
-              </Link>
-            </p>
-          )}
+          <p className="mt-2 text-center text-sm text-muted-foreground">
+            Don't have an account?{" "}
+            <Link href="/auth/signup" className="font-medium text-primary hover:text-primary">
+              Sign up
+            </Link>
+          </p>
         </div>
       </div>
     </div>

@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload as FiUpload, Plus as FiPlus, Users as FiUsers, Book as FiBook, Edit2 as FiEdit2, Trash2 as FiTrash2 } from "lucide-react";
+import { Upload as FiUpload, Plus as FiPlus, Users as FiUsers, Book as FiBook, Edit2 as FiEdit2, Trash2 as FiTrash2, Shield, AlertTriangle } from "lucide-react";
+import Link from "next/link";
 
 interface School {
   id: string;
@@ -218,6 +219,45 @@ export default function SetupPage() {
                     Upload Student Data
                   </Button>
                 </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Initial System Setup Card - Only for admin use */}
+        <Card className="border-yellow-500 border-2">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-yellow-600" />
+              <CardTitle>Initial System Setup</CardTitle>
+            </div>
+            <CardDescription className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-yellow-600" />
+              <span>For system administrators only - Use with caution</span>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200 mb-3">
+                  This link should only be used when setting up a new system for the first time, 
+                  or when no admin accounts exist in the database.
+                </p>
+                <p className="text-sm text-yellow-700 dark:text-yellow-300 mb-4">
+                  <strong>Important:</strong> Only share this link with authorized system administrators.
+                  This page allows creation of administrator accounts with full system access.
+                </p>
+              </div>
+              
+              <Link href="/dashboard/admin/create-first-admin">
+                <Button variant="outline" className="w-full border-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20">
+                  <Shield className="mr-2 h-4 w-4" />
+                  Access Initial Admin Setup Page
+                </Button>
+              </Link>
+              
+              <div className="text-xs text-muted-foreground text-center">
+                URL: /dashboard/admin/create-first-admin
               </div>
             </div>
           </CardContent>

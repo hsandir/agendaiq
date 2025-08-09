@@ -59,9 +59,21 @@ export async function middleware(request: NextRequest) {
       '/api/auth', 
       '/api/health', 
       '/api/setup/check',
-      // REMOVED: /api/test-sentry, /api/dev, /api/tests, /api/debug - These require authentication
+      // ALL monitoring, debug, dev, test endpoints require authentication
     ];
     const isPublic = publicEndpoints.some(endpoint => path.startsWith(endpoint));
+    
+    // Special handling for monitoring endpoints with API key
+    if (path.startsWith('/api/monitoring/uptime')) {
+      const authHeader = request.headers.get('authorization');
+      const apiKey = authHeader?.replace('Bearer ', '');
+      const validApiKey = process.env.MONITORING_API_KEY;
+      
+      // If valid API key is provided, allow access without session
+      if (validApiKey && apiKey === validApiKey) {
+        return NextResponse.next();
+      }
+    }
     
     if (!isPublic && !token) {
       return NextResponse.json(
