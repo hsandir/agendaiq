@@ -8,6 +8,7 @@ import { SidebarWrapper } from "@/components/dashboard/SidebarWrapper";
 import { getLayoutPreference } from '@/lib/layout/layout-types';
 import { Monitor, UserCheck, Shield, Settings, MoreHorizontal, ChevronRight, Search, BarChart, CheckSquare, GitBranch, Brain, UserCog, LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import { MobileMenu } from '@/components/dashboard/MobileMenu';
 
 interface DashboardLayoutClientProps {
   children: React.ReactNode;
@@ -24,25 +25,21 @@ export function DashboardLayoutClient({
   currentRole, 
   userWithStaff 
 }: DashboardLayoutClientProps) {
-  // Get initial layout from localStorage before first render to prevent flash
-  const getInitialLayout = () => {
-    if (typeof window !== 'undefined') {
-      const savedLayout = localStorage.getItem('agendaiq-layout');
-      if (savedLayout) {
-        return savedLayout;
-      }
-    }
-    return 'modern';
-  };
-  
-  const [layoutId, setLayoutId] = useState(getInitialLayout);
+  // Start with a default layout to avoid hydration mismatch
+  const [layoutId, setLayoutId] = useState('modern');
   const [mounted, setMounted] = useState(false);
 
-  // Load layout preference from database
+  // Load layout preference from database and localStorage
   useEffect(() => {
     setMounted(true);
     
-    // Fetch from database
+    // First check localStorage for immediate update
+    const savedLayout = localStorage.getItem('agendaiq-layout');
+    if (savedLayout) {
+      setLayoutId(savedLayout);
+    }
+    
+    // Then fetch from database for persistence
     fetch('/api/user/layout')
       .then(res => res.json())
       .then(data => {
@@ -61,25 +58,26 @@ export function DashboardLayoutClient({
     const colWidth = layout.id === 'executive' ? '280px' : '260px';
     
     return (
-      <div className="grid min-h-screen bg-background text-foreground" 
+      <div className="md:grid min-h-screen bg-background text-foreground" 
            style={{ gridTemplateColumns: layout.sidebarPosition !== 'hidden' ? `${colWidth} 1fr` : '1fr' }}
            data-layout={layout.id}>
         
         {layout.sidebarPosition !== 'hidden' && (
           <SidebarWrapper 
             isAdmin={isAdmin} 
-            className="sticky top-0 h-screen bg-card shadow-lg border-r border-border" 
+            className="hidden md:block sticky top-0 h-screen bg-card shadow-lg border-r border-border" 
           />
         )}
 
         <main className="flex flex-col min-h-screen">
-          <header className="flex items-center justify-between px-6 lg:px-12 py-7 bg-background/95 backdrop-blur border-b border-border sticky top-0 z-10">
+          <header className="flex items-center justify-between px-4 sm:px-6 lg:px-12 py-4 sm:py-7 bg-background/95 backdrop-blur border-b border-border sticky top-0 z-10">
             <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
+              <MobileMenu user={user} currentRole={currentRole} isAdmin={isAdmin} />
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
               
               {layout.sidebarPosition === 'hidden' && (
                 <button 
-                  className="p-2 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground transition-colors"
+                  className="hidden md:block p-2 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground transition-colors"
                   aria-label="Open navigation menu"
                 >
                   <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
@@ -89,9 +87,9 @@ export function DashboardLayoutClient({
               )}
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               {/* Enhanced Search */}
-              <div className="hidden sm:flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2 min-w-[280px] focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all">
+              <div className="hidden lg:flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2 min-w-[280px] focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all">
                 <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-muted-foreground">
                   <circle cx="11" cy="11" r="7"></circle>
                   <path d="M21 21l-4.35-4.35"></path>
@@ -103,8 +101,8 @@ export function DashboardLayoutClient({
               </div>
               
               {/* User Info */}
-              <div className="flex items-center gap-3">
-                <div className="hidden md:flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-3">
+                <div className="hidden lg:flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">{user.email}</span>
                   <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded-full font-medium">
                     {currentRole?.title || 'No Role'}
@@ -121,7 +119,7 @@ export function DashboardLayoutClient({
             </div>
           </header>
 
-          <div className="flex-1 px-6 lg:px-12 py-8">
+          <div className="flex-1 px-4 sm:px-6 lg:px-12 py-4 sm:py-8">
             {children}
           </div>
         </main>
@@ -135,13 +133,16 @@ export function DashboardLayoutClient({
       <div className="flex min-h-screen bg-background text-foreground" data-layout="compact">
         <SidebarWrapper 
           isAdmin={isAdmin} 
-          className="w-56 sticky top-0 h-screen bg-card border-r border-border" 
+          className="hidden md:block w-56 sticky top-0 h-screen bg-card border-r border-border" 
         />
         
         <main className="flex-1 flex flex-col">
           <header className="flex items-center justify-between px-4 py-3 bg-card border-b border-border">
-            <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <MobileMenu user={user} currentRole={currentRole} isAdmin={isAdmin} />
+              <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
+            </div>
+            <div className="hidden md:flex items-center gap-2">
               <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded font-medium">
                 {currentRole?.title || 'No Role'}
               </span>
@@ -166,9 +167,10 @@ export function DashboardLayoutClient({
   if (layout.id === 'minimal') {
     return (
       <div className="min-h-screen bg-background text-foreground" data-layout="minimal">
-        <header className="flex items-center justify-between px-6 py-4 border-b border-border/30">
-          <div className="flex items-center gap-6">
-            <h1 className="text-xl font-bold text-foreground">AgendaIQ</h1>
+        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-4 border-b border-border/30">
+          <div className="flex items-center gap-4 sm:gap-6">
+            <MobileMenu user={user} currentRole={currentRole} isAdmin={isAdmin} />
+            <h1 className="text-lg sm:text-xl font-bold text-foreground">AgendaIQ</h1>
             
             {/* Minimal Navigation */}
             <nav className="hidden md:flex items-center space-x-1">
@@ -239,7 +241,7 @@ export function DashboardLayoutClient({
             </nav>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3 mt-3 sm:mt-0">
             <span className="text-sm text-muted-foreground">{user.email}</span>
             <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">
               {currentRole?.title || 'No Role'}
@@ -254,7 +256,7 @@ export function DashboardLayoutClient({
           </div>
         </header>
         
-        <main className="px-6 py-8">
+        <main className="px-4 sm:px-6 py-4 sm:py-8">
           {children}
         </main>
       </div>
@@ -268,7 +270,8 @@ export function DashboardLayoutClient({
       <nav className="bg-card text-card-foreground shadow border-b border-border sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-3 sm:gap-6">
+              <MobileMenu user={user} currentRole={currentRole} isAdmin={isAdmin} />
               <Link
                 href="/dashboard"
                 className="flex items-center px-3 py-2 font-semibold text-primary hover:text-primary/80 transition-colors"
@@ -511,7 +514,7 @@ export function DashboardLayoutClient({
                 </div>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-4">
               <div className="flex items-center space-x-3">
                 <span className="text-sm text-muted-foreground">
                   {user.email}

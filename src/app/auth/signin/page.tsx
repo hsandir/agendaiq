@@ -38,10 +38,10 @@ function SignInContent() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-muted py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-muted py-12 px-4 sm:px-6 lg:px-8" role="main" aria-label="Sign in page">
+      <div className="w-full max-w-md space-y-8" role="region" aria-label="Sign in form container">
         <div>
-          <h1 className="text-center text-4xl font-bold tracking-tight text-foreground">
+          <h1 className="text-center text-4xl font-bold tracking-tight text-foreground" role="heading" aria-level="1">
             Welcome to AgendaIQ
           </h1>
           {isFirstTimeSetup && (

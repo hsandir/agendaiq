@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { getLayoutPreference, layoutPreferences } from '@/lib/layout/layout-types';
-import { Check, Layout, Sidebar, Grid, Monitor, Minimize2, Palette, Paintbrush } from 'lucide-react';
+import { Check, Layout, Sidebar, Grid, Monitor, Minimize2, Palette, Paintbrush, Wand2 } from 'lucide-react';
+import { CustomThemeEditor } from '@/components/dashboard/CustomThemeEditor';
 
 const LayoutIcons = {
   'classic': Sidebar,
@@ -17,6 +18,7 @@ export function InterfaceSettingsClient() {
   const [currentThemeId, setCurrentThemeId] = useState('classic-light');
   const [isChanging, setIsChanging] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [showCustomEditor, setShowCustomEditor] = useState(false);
 
   // Load preferences from database and localStorage
   useEffect(() => {
@@ -151,11 +153,12 @@ export function InterfaceSettingsClient() {
     { id: 'midnight-blue', name: 'Midnight Blue', description: 'Deep blue theme for focus' },
     { id: 'forest-green', name: 'Forest Green', description: 'Natural green theme' },
     { id: 'warm-orange', name: 'Warm Orange', description: 'Energetic warm theme' },
-    { id: 'tasarim', name: 'Tasarım', description: 'Design with crisp corners and purple accents' },
+    { id: 'tasarim', name: 'AgendaIQ', description: 'Official AgendaIQ dark theme with purple accents' },
     { id: 'modern-purple', name: 'Modern Purple', description: 'Modern dark theme with purple accents' },
     { id: 'dark-mode', name: 'Dark Mode', description: 'Modern dark theme for reduced eye strain' },
     { id: 'high-contrast', name: 'High Contrast', description: 'Maximum contrast for accessibility' },
     { id: 'nature-green', name: 'Nature Green', description: 'Calming green theme inspired by nature' },
+    { id: 'custom', name: 'Custom Theme', description: 'Create your own personalized theme', special: true },
   ];
 
   return (
@@ -257,25 +260,36 @@ export function InterfaceSettingsClient() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {themeOptions.map((theme) => {
             const isSelected = currentThemeId === theme.id;
+            const isCustom = theme.id === 'custom';
 
             return (
               <button
                 key={theme.id}
-                onClick={() => handleThemeChange(theme.id)}
-                disabled={isChanging}
+                onClick={() => {
+                  if (isCustom) {
+                    setShowCustomEditor(true);
+                  } else {
+                    handleThemeChange(theme.id);
+                  }
+                }}
+                disabled={isChanging && !isCustom}
                 className={`
                   relative overflow-hidden rounded-lg border-2 p-4 text-left transition-all
-                  bg-card border-border hover:border-primary
-                  ${isSelected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}
-                  ${isChanging ? 'opacity-50 cursor-wait' : 'hover:scale-105 cursor-pointer'}
+                  ${isCustom ? 'bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/50 hover:border-purple-500' : 'bg-card border-border hover:border-primary'}
+                  ${isSelected && !isCustom ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}
+                  ${isChanging && !isCustom ? 'opacity-50 cursor-wait' : 'hover:scale-105 cursor-pointer'}
                 `}
               >
                 <div className="flex items-start gap-3">
-                  <Paintbrush className="h-6 w-6 text-primary flex-shrink-0" />
+                  {isCustom ? (
+                    <Wand2 className="h-6 w-6 text-purple-500 flex-shrink-0" />
+                  ) : (
+                    <Paintbrush className="h-6 w-6 text-primary flex-shrink-0" />
+                  )}
                   <div className="flex-1">
                     <h3 className="font-semibold text-foreground flex items-center gap-2">
                       {theme.name}
-                      {isSelected && (
+                      {isSelected && !isCustom && (
                         <Check className="h-4 w-4 text-green-600" />
                       )}
                     </h3>
@@ -365,6 +379,13 @@ export function InterfaceSettingsClient() {
                         <div className="h-3 w-6 rounded-sm" style={{ backgroundColor: '#84CC16' }} />
                       </>
                     )}
+                    {theme.id === 'custom' && (
+                      <>
+                        <div className="h-3 w-6 rounded-sm bg-gradient-to-r from-purple-500 to-pink-500" />
+                        <div className="h-3 w-6 rounded-sm bg-gradient-to-r from-blue-500 to-cyan-500" />
+                        <div className="h-3 w-6 rounded-sm bg-gradient-to-r from-green-500 to-yellow-500" />
+                      </>
+                    )}
                   </div>
                 </div>
               </button>
@@ -432,6 +453,28 @@ export function InterfaceSettingsClient() {
           </div>
         </div>
       </section>
+
+      {/* Custom Theme Editor Modal */}
+      {showCustomEditor && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-card rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-card border-b border-border p-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold">Custom Theme Editor</h2>
+              <button
+                onClick={() => setShowCustomEditor(false)}
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <CustomThemeEditor />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

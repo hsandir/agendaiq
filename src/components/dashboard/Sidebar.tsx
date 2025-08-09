@@ -103,11 +103,11 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" role="navigation" aria-label="Main sidebar">
       <div className="px-4 py-6 ml-12">
-        <h2 className="text-2xl font-bold text-foreground">AgendaIQ</h2>
+        <h2 className="text-2xl font-bold text-foreground" role="banner">AgendaIQ</h2>
       </div>
-      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto" aria-label="Main navigation">
+      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto" role="navigation" aria-label="Main navigation">
         {sidebarItems.map((section) => (
           <div key={section.title} className="mb-6">
             <h3 

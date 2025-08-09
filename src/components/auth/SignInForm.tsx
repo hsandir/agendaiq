@@ -91,9 +91,9 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
   };
 
   return (
-    <div className="w-full max-w-md space-y-8 rounded-lg bg-card p-6 shadow-lg">
+    <div className="w-full max-w-md space-y-8 rounded-lg bg-card p-6 shadow-lg" role="form" aria-label="Sign in form">
       <div>
-        <h2 className="text-center text-3xl font-bold tracking-tight text-foreground">
+        <h2 className="text-center text-3xl font-bold tracking-tight text-foreground" role="heading" aria-level="2">
           {isFirstTimeSetup ? 'Create Admin Account' : 'Sign in to your account'}
         </h2>
         {isFirstTimeSetup && (
@@ -102,7 +102,7 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
           </p>
         )}
       </div>
-      <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+      <form className="mt-8 space-y-6" onSubmit={handleSubmit} role="form" aria-label="Authentication form">
         {isFirstTimeSetup && adminUsers.length > 0 && (
           <div>
             <label htmlFor="admin-select" className="block text-sm font-medium text-foreground mb-2">
@@ -134,6 +134,8 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
               type="email"
               autoComplete="email"
               required
+              aria-label="Email address"
+              aria-required="true"
               defaultValue={isFirstTimeSetup && selectedAdminEmail ? selectedAdminEmail : ''}
               className="relative block w-full rounded-t-md border-0 py-1.5 text-foreground ring-1 ring-inset ring-gray-300 placeholder:text-muted-foreground focus:z-10 focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
               placeholder="Email address"
@@ -149,6 +151,8 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
               type="password"
               autoComplete={isFirstTimeSetup ? 'new-password' : 'current-password'}
               required
+              aria-label="Password"
+              aria-required="true"
               className="relative block w-full rounded-b-md border-0 py-1.5 text-foreground ring-1 ring-inset ring-gray-300 placeholder:text-muted-foreground focus:z-10 focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
               placeholder={isFirstTimeSetup ? 'Create password' : 'Password'}
             />
@@ -188,7 +192,7 @@ export function SignInForm({ isFirstTimeSetup = false }: SignInFormProps) {
         )}
 
         {error && (
-          <div className="rounded-md bg-destructive/10 p-4">
+          <div className="rounded-md bg-destructive/10 p-4" role="alert" aria-live="polite">
             <div className="flex">
               <div className="flex-shrink-0">
                 <FiShield className="h-5 w-5 text-destructive" aria-hidden="true" />
