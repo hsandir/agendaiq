@@ -183,7 +183,6 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     
     // Apply other theme properties
     if (theme.borderRadius?.md) root.style.setProperty('--radius', theme.borderRadius.md);
-    if (theme.fontSize?.base) root.style.setProperty('--font-size-base', theme.fontSize.base);
     
     // Update body class for theme
     document.body.className = `theme-${currentThemeId}`;
