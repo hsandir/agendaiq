@@ -129,16 +129,6 @@ export const sidebarItems: NavigationSection[] = [
             icon: ShieldCheck,
             children: [
               {
-                href: "/dashboard/settings/users",
-                label: "User Management",
-                icon: UserCheck,
-              },
-              {
-                href: "/dashboard/settings/roles",
-                label: "Role Management",
-                icon: Shield,
-              },
-              {
                 href: "/dashboard/settings/role-hierarchy",
                 label: "Role Hierarchy",
                 icon: TrendingUp,

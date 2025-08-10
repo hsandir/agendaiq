@@ -250,20 +250,12 @@ export function MobileMenu({ user, currentRole, isAdmin }: MobileMenuProps) {
                     <>
                       <div className="border-t border-border my-2" />
                       <Link
-                        href="/dashboard/settings/users"
-                        onClick={closeMenu}
-                        className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md"
-                      >
-                        <Users className="h-4 w-4 inline mr-2" />
-                        User Management
-                      </Link>
-                      <Link
-                        href="/dashboard/settings/roles"
+                        href="/dashboard/settings/role-hierarchy"
                         onClick={closeMenu}
                         className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md"
                       >
                         <Shield className="h-4 w-4 inline mr-2" />
-                        Role Management
+                        Role Hierarchy
                       </Link>
                       <Link
                         href="/dashboard/settings/system"

@@ -44,10 +44,49 @@ private/
 # Optional: Completed tasks documentation
 docs/completed/
 
+# Trash folder - removed components
+trash/
+
+# Temporary work tracking (NEVER commit)
+temp-work/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Environment variables
+.env
+.env.*
+!.env.example
+.env.local
+.env.production
+.env.production.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.backup
+
+# Sensitive files
+client_secret*.json
+cookies.txt
+*.key
+*.pem
+*.cert
+
+# Backup files
+backup*.sql
+restore*.sql
+*.backup
+backups/
+backup_*/
+
+# Logs and artifacts
+*.log
+dev.log
+test-results.json
+.vercel
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)

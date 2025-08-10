@@ -262,10 +262,10 @@ export default function PerformanceMonitor() {
               </CardHeader>
               <CardContent>
                 <div className={`text-2xl font-bold ${getStatusColor(status)}`}>
-                  {mounted ? `${metric.value}${metric.unit}` : '0.00'}
+                  {`${metric.value}${metric.unit}`}
                 </div>
                 <Progress 
-                  value={mounted ? (metric.value / metric.threshold) * 100 : 0} 
+                  value={(metric.value / metric.threshold) * 100} 
                   className="mt-2 h-1"
                 />
               </CardContent>
@@ -292,8 +292,8 @@ export default function PerformanceMonitor() {
                 <CardTitle className="text-sm">Current Theme</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-lg font-semibold">{theme?.name || 'Loading...'}</div>
-                <p className="text-sm text-muted-foreground">ID: {theme?.id || '-'}</p>
+                <div className="text-lg font-semibold">{theme?.name || 'Standard'}</div>
+                <p className="text-sm text-muted-foreground">ID: {theme?.id || 'standard'}</p>
               </CardContent>
             </Card>
 

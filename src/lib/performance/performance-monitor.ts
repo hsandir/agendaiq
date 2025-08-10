@@ -196,15 +196,24 @@ class PerformanceMonitor {
   }
 }
 
-// Singleton instance
-export const performanceMonitor = typeof window !== 'undefined' ? new PerformanceMonitor() : null;
+// Lazy singleton instance to prevent SSR issues
+let performanceMonitor: PerformanceMonitor | null = null;
+
+function getMonitor() {
+  if (typeof window === 'undefined') return null;
+  if (!performanceMonitor) {
+    performanceMonitor = new PerformanceMonitor();
+  }
+  return performanceMonitor;
+}
 
 // Hook for React components
 export function usePerformanceMetrics() {
+  const monitor = getMonitor();
   return {
-    getMetrics: () => performanceMonitor?.getMetrics() || [],
-    getAveragePageLoadTime: () => performanceMonitor?.getAveragePageLoadTime() || 0,
-    getAPIPerformance: () => performanceMonitor?.getAPIPerformance() || {},
-    clearMetrics: () => performanceMonitor?.clearMetrics(),
+    getMetrics: () => monitor?.getMetrics() || [],
+    getAveragePageLoadTime: () => monitor?.getAveragePageLoadTime() || 0,
+    getAPIPerformance: () => monitor?.getAPIPerformance() || {},
+    clearMetrics: () => monitor?.clearMetrics(),
   };
 }

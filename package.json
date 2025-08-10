@@ -31,7 +31,8 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
-    "db:reset": "prisma migrate reset",
+    "db:reset": "echo '⛔ DATABASE RESET IS FORBIDDEN! See CLAUDE.md for policy.' && exit 1",
+    "db:reset:force": "echo '⚠️ WARNING: This will DELETE ALL DATA!' && read -p 'Type DESTROY_ALL_DATA to continue: ' confirm && [ \"$confirm\" = \"DESTROY_ALL_DATA\" ] && prisma migrate reset || echo 'Aborted'",
     "postinstall": "prisma generate",
     "prepare": "husky"
   },
@@ -128,6 +129,7 @@
     "lru-cache": "10.4.3",
     "msw": "^2.10.4",
     "node-fetch": "^2.7.0",
+    "playwright": "^1.54.2",
     "postcss": "^8.5.6",
     "prisma": "^6.13.0",
     "pusher-js": "^8.4.0",

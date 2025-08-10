@@ -144,7 +144,9 @@ async function pushToGitHub(message: string = 'Automated backup') {
     
     const { stdout: status } = await execAsync('git status --porcelain', { cwd: process.cwd() });
     if (status.trim()) {
-      await execAsync(`git commit -m "${message} - ${timestamp}"`, { cwd: process.cwd() });
+      // Sanitize commit message to prevent command injection
+      const sanitizedMessage = message.replace(/[^a-zA-Z0-9\s\-_.]/g, '').substring(0, 100);
+      await execAsync(`git commit -m "${sanitizedMessage} - ${timestamp}"`, { cwd: process.cwd() });
     }
 
     // Try to push to GitHub
@@ -219,7 +221,9 @@ async function autoBackup(triggerReason: string = 'System update') {
 
     // Create auto backup
     await execAsync('git add -A', { cwd: process.cwd() });
-    await execAsync(`git commit -m "Auto-backup: ${triggerReason} - ${timestamp}"`, { cwd: process.cwd() });
+    // Sanitize trigger reason to prevent command injection
+    const sanitizedReason = triggerReason.replace(/[^a-zA-Z0-9\s\-_.]/g, '').substring(0, 100);
+    await execAsync(`git commit -m "Auto-backup: ${sanitizedReason} - ${timestamp}"`, { cwd: process.cwd() });
     
     // Create backup branch
     const { stdout: currentBranch } = await execAsync('git branch --show-current', { cwd: process.cwd() });

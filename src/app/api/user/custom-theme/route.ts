@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth/api-auth';
+import { withLightAuth } from '@/lib/auth/auth-utils-lite';
 import { prisma } from '@/lib/prisma';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { z } from 'zod';
@@ -28,25 +28,20 @@ const customThemeSchema = z.object({
 
 // GET /api/user/custom-theme - Get user's custom theme
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request);
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
-  }
-  const user = authResult.user!;
-
   try {
-    const userData = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { custom_theme: true },
-    });
-
-    if (!userData?.custom_theme) {
-      return NextResponse.json({ customTheme: null });
+    const authResult = await withLightAuth();
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
+    const user = authResult.user!;
 
-    return NextResponse.json({
-      customTheme: userData.custom_theme,
+    // User object already has custom_theme from lightweight auth
+    const response = NextResponse.json({
+      customTheme: user.custom_theme || null,
     });
+    
+    response.headers.set('Cache-Control', 'private, max-age=3600'); // 1 hour
+    return response;
   } catch (error) {
     console.error('Error fetching custom theme:', error);
     return NextResponse.json(
@@ -58,7 +53,7 @@ export async function GET(request: NextRequest) {
 
 // PUT /api/user/custom-theme - Save or update user's custom theme
 export async function PUT(request: NextRequest) {
-  const authResult = await withAuth(request);
+  const authResult = await withLightAuth();
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -68,25 +63,26 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const validatedData = customThemeSchema.parse(body);
 
-    // Save custom theme to user profile
+    // Save custom theme to user profile (optimized)
     await prisma.user.update({
       where: { id: user.id },
       data: {
         custom_theme: validatedData,
         theme_preference: 'custom', // Set theme preference to custom
       },
+      select: { id: true }, // Only select what we need
     });
 
-    // Log the custom theme save
-    await AuditLogger.logFromRequest(request, {
+    // Log the custom theme save asynchronously (don't wait)
+    AuditLogger.logFromRequest(request, {
       tableName: 'users',
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: user.staff?.id,
+      staffId: undefined,
       source: 'WEB_UI',
       description: `Custom theme "${validatedData.name}" saved`,
-    });
+    }).catch(err => console.error('Audit log failed:', err));
 
     return NextResponse.json({
       success: true,
@@ -110,32 +106,33 @@ export async function PUT(request: NextRequest) {
 
 // DELETE /api/user/custom-theme - Delete user's custom theme
 export async function DELETE(request: NextRequest) {
-  const authResult = await withAuth(request);
+  const authResult = await withLightAuth();
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
   const user = authResult.user!;
 
   try {
-    // Clear custom theme and reset to default
+    // Clear custom theme and reset to default (optimized)
     await prisma.user.update({
       where: { id: user.id },
       data: {
         custom_theme: Prisma.JsonNull,
         theme_preference: 'standard',
       },
+      select: { id: true }, // Only select what we need
     });
 
-    // Log the custom theme deletion
-    await AuditLogger.logFromRequest(request, {
+    // Log the custom theme deletion asynchronously (don't wait)
+    AuditLogger.logFromRequest(request, {
       tableName: 'users',
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: user.staff?.id,
+      staffId: undefined,
       source: 'WEB_UI',
       description: 'Custom theme deleted',
-    });
+    }).catch(err => console.error('Audit log failed:', err));
 
     return NextResponse.json({
       success: true,

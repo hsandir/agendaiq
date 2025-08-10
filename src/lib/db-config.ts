@@ -9,8 +9,14 @@ export function getDatabaseUrl(): string {
   }
   
   // Development (Local) - Use local PostgreSQL
-  console.log('Using local PostgreSQL database (Development)');
-  return process.env.DATABASE_URL || 'postgresql://hs:yeni@localhost:5432/agendaiq';
+  if (process.env.NODE_ENV !== 'test') {
+    console.log('Using local PostgreSQL database (Development)');
+  }
+  if (!process.env.DATABASE_URL) {
+    console.error('⚠️ DATABASE_URL not set! Please configure in .env.local');
+    return '';
+  }
+  return process.env.DATABASE_URL;
 }
 
 export function getDirectUrl(): string {
@@ -20,7 +26,11 @@ export function getDirectUrl(): string {
   }
   
   // Development - Same as regular URL for local
-  return process.env.DATABASE_URL || 'postgresql://hs:yeni@localhost:5432/agendaiq';
+  if (!process.env.DATABASE_URL) {
+    console.error('⚠️ DATABASE_URL not set! Please configure in .env.local');
+    return '';
+  }
+  return process.env.DATABASE_URL;
 }
 
 // Environment detection
@@ -32,8 +42,8 @@ export const isVercel = !!process.env.VERCEL;
 export const isSupabase = isProduction || isVercel;
 export const isLocalDb = !isSupabase;
 
-// Log current environment
-if (typeof window === 'undefined') {
+// Log current environment (only in development)
+if (typeof window === 'undefined' && process.env.NODE_ENV === 'development') {
   console.log('=== Database Configuration ===');
   console.log('Environment:', process.env.NODE_ENV);
   console.log('Is Vercel:', isVercel);

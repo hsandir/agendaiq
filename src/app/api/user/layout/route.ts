@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth/api-auth';
+import { withLightAuth } from '@/lib/auth/auth-utils-lite';
 import { prisma } from '@/lib/prisma';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { z } from 'zod';
@@ -13,25 +13,20 @@ const layoutSchema = z.object({
 
 // GET /api/user/layout - Get user's layout preference
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request);
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
-  }
-  const user = authResult.user!;
-
   try {
-    // Optimized query with minimal data selection
-    const userData = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { layout_preference: true },
-    });
+    const authResult = await withLightAuth();
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+    }
+    const user = authResult.user!;
 
+    // User object already has layout_preference from lightweight auth
     const response = NextResponse.json({
-      layout: userData?.layout_preference || 'modern',
+      layout: user.layout_preference || 'modern',
     });
-
+    
     // Add caching headers to reduce API calls
-    response.headers.set('Cache-Control', 'private, max-age=300'); // 5 minutes
+    response.headers.set('Cache-Control', 'private, max-age=3600'); // 1 hour
     
     return response;
   } catch (error) {
@@ -50,7 +45,7 @@ export async function POST(request: NextRequest) {
 
 // PUT /api/user/layout - Update user's layout preference
 export async function PUT(request: NextRequest) {
-  const authResult = await withAuth(request);
+  const authResult = await withLightAuth();
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -63,28 +58,23 @@ export async function PUT(request: NextRequest) {
     // Use layoutId if provided, otherwise use layout
     const layoutToSave = validatedData.layoutId || validatedData.layout || 'modern';
 
-    // Update user's layout preference (use upsert to handle missing records)
-    await prisma.user.upsert({
+    // Update user's layout preference (optimized query)
+    await prisma.user.update({
       where: { id: user.id },
-      update: { layout_preference: layoutToSave },
-      create: {
-        id: user.id,
-        email: user.email || '',
-        name: user.name,
-        layout_preference: layoutToSave,
-      },
+      data: { layout_preference: layoutToSave },
+      select: { id: true }, // Only select what we need
     });
 
-    // Log the layout change
-    await AuditLogger.logFromRequest(request, {
+    // Log the layout change asynchronously (don't wait)
+    AuditLogger.logFromRequest(request, {
       tableName: 'users',
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: user.staff?.id,
+      staffId: undefined,
       source: 'WEB_UI',
       description: `Layout changed to ${layoutToSave}`,
-    });
+    }).catch(err => console.error('Audit log failed:', err));
 
     return NextResponse.json({
       success: true,

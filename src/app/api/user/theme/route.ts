@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth/api-auth';
+import { withLightAuth } from '@/lib/auth/auth-utils-lite';
 import { prisma } from '@/lib/prisma';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { z } from 'zod';
@@ -13,25 +13,20 @@ const themeSchema = z.object({
 
 // GET /api/user/theme - Get user's theme preference
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request);
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
-  }
-  const user = authResult.user!;
-
   try {
-    // Optimized query with minimal data selection
-    const userData = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { theme_preference: true },
-    });
+    const authResult = await withLightAuth();
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+    }
+    const user = authResult.user!;
 
+    // User object already has theme_preference from lightweight auth
     const response = NextResponse.json({
-      theme: userData?.theme_preference || 'standard',
+      theme: user.theme_preference || 'standard',
     });
-
+    
     // Add caching headers to reduce API calls
-    response.headers.set('Cache-Control', 'private, max-age=300'); // 5 minutes
+    response.headers.set('Cache-Control', 'private, max-age=3600'); // 1 hour
     
     return response;
   } catch (error) {
@@ -50,7 +45,7 @@ export async function POST(request: NextRequest) {
 
 // PUT /api/user/theme - Update user's theme preference
 export async function PUT(request: NextRequest) {
-  const authResult = await withAuth(request);
+  const authResult = await withLightAuth();
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -63,28 +58,23 @@ export async function PUT(request: NextRequest) {
     // Use themeId if provided, otherwise use theme
     const themeToSave = validatedData.themeId || validatedData.theme || 'standard';
 
-    // Update user's theme preference (use upsert to handle missing records)
-    await prisma.user.upsert({
+    // Update user's theme preference (optimized query)
+    await prisma.user.update({
       where: { id: user.id },
-      update: { theme_preference: themeToSave },
-      create: {
-        id: user.id,
-        email: user.email || '',
-        name: user.name,
-        theme_preference: themeToSave,
-      },
+      data: { theme_preference: themeToSave },
+      select: { id: true }, // Only select what we need
     });
 
-    // Log the theme change
-    await AuditLogger.logFromRequest(request, {
+    // Log the theme change asynchronously (don't wait)
+    AuditLogger.logFromRequest(request, {
       tableName: 'users',
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: user.staff?.id,
+      staffId: undefined,
       source: 'WEB_UI',
       description: `Theme changed to ${themeToSave}`,
-    });
+    }).catch(err => console.error('Audit log failed:', err));
 
     return NextResponse.json({
       success: true,

@@ -258,7 +258,9 @@ export const authOptions: NextAuthOptions = {
       }
       
       // Fetch complete user info including capabilities
-      if (token.email && (trigger === 'signIn' || trigger === 'update' || !token.capabilities)) {
+      // PERFORMANCE: Only fetch on signIn or explicit update trigger
+      // Capabilities should be cached in the JWT token after initial sign-in
+      if (token.email && (trigger === 'signIn' || trigger === 'update')) {
         try {
           const dbUser = await prisma.user.findUnique({
             where: { email: token.email },

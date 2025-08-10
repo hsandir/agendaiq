@@ -9,7 +9,7 @@ import { getLayoutPreference } from '@/lib/layout/layout-types';
 import { Monitor, UserCheck, Shield, Settings, MoreHorizontal, ChevronRight, Search, BarChart, CheckSquare, GitBranch, Brain, UserCog, LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { MobileMenu } from '@/components/dashboard/MobileMenu';
-import { performanceMonitor } from '@/lib/performance/performance-monitor';
+// Performance monitoring is handled through the hook now
 import { layoutStore } from '@/lib/layout/layout-store';
 
 interface DashboardLayoutClientProps {
@@ -80,9 +80,7 @@ export function DashboardLayoutClient({
             
             // Track layout load performance
             const endTime = performance.now();
-            if (performanceMonitor) {
-              performanceMonitor['addMetric']('layout_initialization', endTime - startTime);
-            }
+            // Performance tracking removed - now handled through hooks
           })
           .catch(err => console.debug('Layout fetch skipped (user may not be authenticated)'));
       }, 750); // Reduced delay for faster sync
@@ -239,11 +237,7 @@ export function DashboardLayoutClient({
                       </Link>
                       {isAdmin && (
                         <>
-                          <Link href="/dashboard/settings/users" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
-                            <UserCheck className="h-4 w-4" />
-                            Users
-                          </Link>
-                          <Link href="/dashboard/settings/roles" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                          <Link href={"/dashboard/settings/roles" as Route} className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
                             <Shield className="h-4 w-4" />
                             Roles
                           </Link>
@@ -405,17 +399,8 @@ export function DashboardLayoutClient({
                               </div>
                               <div className="absolute left-full top-0 ml-2 w-56 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover/admin:opacity-100 group-hover/admin:visible transition-all">
                                 <div className="p-2 space-y-1">
-                                  <Link href="/dashboard/settings/users" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
-                                    User Management
-                                  </Link>
-                                  <Link href="/dashboard/settings/roles" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
-                                    Role Management
-                                  </Link>
                                   <Link href="/dashboard/settings/role-hierarchy" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
                                     Role Hierarchy
-                                  </Link>
-                                  <Link href="/dashboard/settings/staff-upload" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
-                                    Staff Upload
                                   </Link>
                                   <Link href="/dashboard/settings/audit-logs" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
                                     Database Audit Logs
