@@ -56,6 +56,8 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
         twoFactorCode: { label: "2FA Code", type: "text", optional: true },
+        rememberMe: { label: "Remember Me", type: "text", optional: true },
+        trustDevice: { label: "Trust Device", type: "text", optional: true },
       },
       async authorize(credentials, req): Promise<User | null> {
         try {
@@ -189,6 +191,14 @@ export const authOptions: NextAuthOptions = {
           // Log successful login
           // await AuditClient.logAuthEvent('login_success', userData.id, staff?.id, req);
           
+          // Add rememberMe flag to user data
+          if (credentials.rememberMe === 'true') {
+            (userData as any).rememberMe = true;
+          }
+          if (credentials.trustDevice === 'true') {
+            (userData as any).trustDevice = true;
+          }
+          
           return userData;
         } catch (error) {
           console.error('❌ Authorization error:', error instanceof Error ? error.message : String(error));
@@ -254,6 +264,22 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id.toString(); // Convert to string for JWT
         if (hasStaff(user)) {
           token.staff = user.staff;
+        }
+        
+        // Handle rememberMe and trustDevice flags
+        if ((user as any).rememberMe) {
+          token.rememberMe = true;
+          // Set longer expiry for remember me (30 days)
+          const maxAge = 30 * 24 * 60 * 60; // 30 days in seconds
+          token.exp = Math.floor(Date.now() / 1000) + maxAge;
+        } else {
+          // Default session expiry (1 day)
+          const maxAge = 24 * 60 * 60; // 1 day in seconds
+          token.exp = Math.floor(Date.now() / 1000) + maxAge;
+        }
+        
+        if ((user as any).trustDevice) {
+          token.trustDevice = true;
         }
       }
       
@@ -337,6 +363,13 @@ export const authOptions: NextAuthOptions = {
       session.user.is_system_admin = token.is_system_admin as boolean;
       session.user.is_school_admin = token.is_school_admin as boolean;
       session.user.capabilities = token.capabilities as string[];
+      
+      // Handle remember me expiry
+      if (token.rememberMe) {
+        // Extend session for remember me users
+        session.expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days
+      }
+      
       return session;
     },
   },

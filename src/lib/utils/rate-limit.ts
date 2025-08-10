@@ -132,6 +132,12 @@ export const RateLimiters = {
     interval: 5 * 60 * 1000, // 5 minutes
     uniqueTokenPerInterval: 1000,
   }),
+
+  // Lenient rate limiting for user preferences (theme/layout)
+  userPreferences: rateLimit({
+    interval: 60 * 1000, // 1 minute
+    uniqueTokenPerInterval: 1000,
+  }),
 };
 
 // Helper function to get client identifier
