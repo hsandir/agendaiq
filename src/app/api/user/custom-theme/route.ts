@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withLightAuth } from '@/lib/auth/auth-utils-lite';
+import { getCurrentUser } from '@/lib/auth/auth-utils';
 import { prisma } from '@/lib/prisma';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
+import { RateLimiters, getClientIdentifier } from '@/lib/utils/rate-limit';
 
 // More flexible validation to handle various color formats
 const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
@@ -29,11 +30,10 @@ const customThemeSchema = z.object({
 // GET /api/user/custom-theme - Get user's custom theme
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await withLightAuth();
-    if (!authResult.success) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
-    const user = authResult.user!;
 
     // User object already has custom_theme from lightweight auth
     const response = NextResponse.json({
@@ -53,11 +53,17 @@ export async function GET(request: NextRequest) {
 
 // PUT /api/user/custom-theme - Save or update user's custom theme
 export async function PUT(request: NextRequest) {
-  const authResult = await withLightAuth();
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  // Rate limiting
+  const clientId = getClientIdentifier(request);
+  const rateLimitResult = await RateLimiters.userPreferences.check(request, 10, clientId);
+  if (!rateLimitResult.success) {
+    return RateLimiters.userPreferences.createErrorResponse(rateLimitResult);
   }
-  const user = authResult.user!;
+
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
 
   try {
     const body = await request.json();
@@ -79,7 +85,7 @@ export async function PUT(request: NextRequest) {
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: undefined,
+      staffId: user.staff?.id,
       source: 'WEB_UI',
       description: `Custom theme "${validatedData.name}" saved`,
     }).catch(err => console.error('Audit log failed:', err));
@@ -106,11 +112,17 @@ export async function PUT(request: NextRequest) {
 
 // DELETE /api/user/custom-theme - Delete user's custom theme
 export async function DELETE(request: NextRequest) {
-  const authResult = await withLightAuth();
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  // Rate limiting
+  const clientId = getClientIdentifier(request);
+  const rateLimitResult = await RateLimiters.userPreferences.check(request, 10, clientId);
+  if (!rateLimitResult.success) {
+    return RateLimiters.userPreferences.createErrorResponse(rateLimitResult);
   }
-  const user = authResult.user!;
+
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
 
   try {
     // Clear custom theme and reset to default (optimized)
@@ -129,7 +141,7 @@ export async function DELETE(request: NextRequest) {
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: undefined,
+      staffId: user.staff?.id,
       source: 'WEB_UI',
       description: 'Custom theme deleted',
     }).catch(err => console.error('Audit log failed:', err));

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withLightAuth } from '@/lib/auth/auth-utils-lite';
+import { getCurrentUser } from '@/lib/auth/auth-utils';
 import { prisma } from '@/lib/prisma';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { z } from 'zod';
+import { RateLimiters, getClientIdentifier } from '@/lib/utils/rate-limit';
 
 const layoutSchema = z.object({
   layoutId: z.string().optional(),
@@ -14,11 +15,10 @@ const layoutSchema = z.object({
 // GET /api/user/layout - Get user's layout preference
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await withLightAuth();
-    if (!authResult.success) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
-    const user = authResult.user!;
 
     // User object already has layout_preference from lightweight auth
     const response = NextResponse.json({
@@ -45,11 +45,17 @@ export async function POST(request: NextRequest) {
 
 // PUT /api/user/layout - Update user's layout preference
 export async function PUT(request: NextRequest) {
-  const authResult = await withLightAuth();
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  // Rate limiting
+  const clientId = getClientIdentifier(request);
+  const rateLimitResult = await RateLimiters.userPreferences.check(request, 10, clientId);
+  if (!rateLimitResult.success) {
+    return RateLimiters.userPreferences.createErrorResponse(rateLimitResult);
   }
-  const user = authResult.user!;
+
+  const user = await getCurrentUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
 
   try {
     const body = await request.json();
@@ -71,7 +77,7 @@ export async function PUT(request: NextRequest) {
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: undefined,
+      staffId: user.staff?.id,
       source: 'WEB_UI',
       description: `Layout changed to ${layoutToSave}`,
     }).catch(err => console.error('Audit log failed:', err));
