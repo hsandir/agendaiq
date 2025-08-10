@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
+import { Capability } from '@/lib/auth/policy';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,8 +13,8 @@ export const metadata: Metadata = {
 };
 
 export default async function PermissionsPage() {
-  // Use new standardized auth system - only admins can access permissions
-  const user = await requireAuth(AuthPresets.requireAdmin);
+  // Use capability-based auth - permission management capability required
+  const user = await requireAuth({ requireAuth: true, requireCapability: Capability.PERM_MANAGE });
 
   // Fetch real permission data from database
   const roles = await prisma.role.findMany({

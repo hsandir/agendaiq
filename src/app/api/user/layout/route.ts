@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/auth-utils';
+import { getFastUser } from '@/lib/auth/auth-utils-fast';
 import { prisma } from '@/lib/prisma';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { z } from 'zod';
@@ -15,14 +16,19 @@ const layoutSchema = z.object({
 // GET /api/user/layout - Get user's layout preference
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
+    const user = await getFastUser();
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    // User object already has layout_preference from lightweight auth
+    // Get layout preference from database (fast query)
+    const userData = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { layout_preference: true }
+    });
+    
     const response = NextResponse.json({
-      layout: user.layout_preference || 'modern',
+      layout: userData?.layout_preference || 'modern',
     });
     
     // Add caching headers to reduce API calls
@@ -45,14 +51,17 @@ export async function POST(request: NextRequest) {
 
 // PUT /api/user/layout - Update user's layout preference
 export async function PUT(request: NextRequest) {
-  // Rate limiting
-  const clientId = getClientIdentifier(request);
-  const rateLimitResult = await RateLimiters.userPreferences.check(request, 10, clientId);
-  if (!rateLimitResult.success) {
-    return RateLimiters.userPreferences.createErrorResponse(rateLimitResult);
+  // Skip rate limiting in development for performance testing
+  if (process.env.NODE_ENV !== 'development') {
+    // Rate limiting
+    const clientId = getClientIdentifier(request);
+    const rateLimitResult = await RateLimiters.userPreferences.check(request, 10, clientId);
+    if (!rateLimitResult.success) {
+      return RateLimiters.userPreferences.createErrorResponse(rateLimitResult);
+    }
   }
 
-  const user = await getCurrentUser();
+  const user = await getFastUser();
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }

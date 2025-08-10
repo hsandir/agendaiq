@@ -138,6 +138,12 @@ export const RateLimiters = {
     interval: 60 * 1000, // 1 minute
     uniqueTokenPerInterval: 1000,
   }),
+  
+  // Very lenient rate limiting for development/testing
+  development: rateLimit({
+    interval: 60 * 1000, // 1 minute
+    uniqueTokenPerInterval: 1000,
+  }),
 };
 
 // Helper function to get client identifier

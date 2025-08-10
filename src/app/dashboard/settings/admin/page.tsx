@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminSettingsPage() {
-  // Use new standardized auth system - only admins can access
-  const user = await requireAuth(AuthPresets.requireAdmin);
+  // Use capability-based auth - only dev admins can access
+  const user = await requireAuth(AuthPresets.requireDevAdmin);
 
   return (
     <div>

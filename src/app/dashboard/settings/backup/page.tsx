@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 };
 
 export default async function BackupPage() {
-  // Auth control - only admins can access backup functionality
-  const user = await requireAuth(AuthPresets.requireAdmin);
+  // Auth control - only ops admins can access backup functionality
+  const user = await requireAuth(AuthPresets.requireOpsAdmin);
 
   // Initial backup data will be fetched by the client component
   // This ensures real-time data and proper error handling

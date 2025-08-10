@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default async function SystemSettingsPage() {
-  // Use standardized auth system - require admin for system settings
-  const user = await requireAuth(AuthPresets.requireAdmin);
+  // Use capability-based auth - require ops admin for system settings
+  const user = await requireAuth(AuthPresets.requireOpsAdmin);
 
   // Fetch system settings from database
   const settings = await prisma.systemSetting.findMany({

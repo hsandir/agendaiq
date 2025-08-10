@@ -7,8 +7,8 @@ const GITHUB_REPO = process.env.GITHUB_REPO;
 
 export async function GET(request: NextRequest) {
   try {
-    // Auth check - only admins
-    const user = await requireAuth(AuthPresets.requireAdmin);
+    // Auth check - development capability required
+    const user = await requireAuth(AuthPresets.requireDevelopment);
     
     const { searchParams } = new URL(request.url);
     const workflow_id = searchParams.get('workflow_id');
