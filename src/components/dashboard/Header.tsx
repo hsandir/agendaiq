@@ -50,7 +50,17 @@ export function Header() {
           </div>
 
           <button
-            onClick={() => signOut()}
+            onClick={async () => {
+              try {
+                await signOut({ 
+                  callbackUrl: '/auth/signin',
+                  redirect: true 
+                });
+              } catch (error) {
+                // Fallback to direct navigation if signOut fails
+                window.location.href = '/auth/signin';
+              }
+            }}
             className="text-sm text-muted-foreground hover:text-foreground"
           >
             Sign out

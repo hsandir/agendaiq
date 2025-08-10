@@ -35,6 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <SessionProvider 
       refetchInterval={0}
       refetchOnWindowFocus={false}
+      basePath="/api/auth"
     >
       <SentryUserSync />
       {children}

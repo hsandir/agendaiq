@@ -192,6 +192,11 @@ export const sidebarItems: NavigationSection[] = [
                 label: "Live Monitoring",
                 icon: Monitor,
               },
+              {
+                href: "/dashboard/development/performance",
+                label: "Performance Monitor",
+                icon: Activity,
+              },
             ],
           },
           {

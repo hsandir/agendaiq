@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { themes, Theme } from './themes';
 import { getContrastColor } from './theme-utils';
 
@@ -15,77 +15,104 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
+// Global state to persist across navigations (in-memory)
+let globalThemeState = {
+  currentThemeId: 'standard',
+  customTheme: null as any,
+  initialized: false,
+  lastFetch: 0
+};
+
 interface ThemeProviderProps {
   children: React.ReactNode;
   initialTheme?: string;
 }
 
 export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
-  // Start with a default theme to avoid context errors
-  const [currentThemeId, setCurrentThemeId] = useState(initialTheme || 'standard');
+  // Use global state for initial values to prevent flash
+  const [currentThemeId, setCurrentThemeId] = useState<string>(globalThemeState.currentThemeId);
+  const [customTheme, setCustomTheme] = useState<any>(globalThemeState.customTheme);
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [customTheme, setCustomTheme] = useState<any>(null);
 
-  // Load theme from localStorage and database on mount
+  // Initialize theme from localStorage ONCE on first mount
   useEffect(() => {
     setMounted(true);
     
-    // First check localStorage for immediate update
-    const savedTheme = localStorage.getItem('agendaiq-theme');
-    if (savedTheme) {
-      if (savedTheme === 'custom') {
-        // Load custom theme from localStorage first
-        const savedCustom = localStorage.getItem('agendaiq-custom-theme');
-        if (savedCustom) {
-          try {
-            setCustomTheme(JSON.parse(savedCustom));
-          } catch (e) {
-            console.error('Failed to parse custom theme from localStorage');
-          }
-        }
-      } else if (themes.find(t => t.id === savedTheme)) {
+    // Only initialize once per app lifecycle
+    if (!globalThemeState.initialized) {
+      globalThemeState.initialized = true;
+      
+      // Load from localStorage
+      const savedTheme = localStorage.getItem('agendaiq-theme');
+      const savedCustomTheme = localStorage.getItem('agendaiq-custom-theme');
+      
+      if (savedTheme && themes.find(t => t.id === savedTheme)) {
+        globalThemeState.currentThemeId = savedTheme;
         setCurrentThemeId(savedTheme);
       }
-    }
-    
-    // Fetch theme from database (API will check if user is authenticated)
-    Promise.all([
-      fetch('/api/user/theme')
-        .then(res => res.ok ? res.json() : null)
-        .catch(() => null),
-      fetch('/api/user/custom-theme')
-        .then(res => res.ok ? res.json() : null)
-        .catch(() => null)
-    ]).then(([themeData, customThemeData]) => {
-      if (customThemeData?.customTheme) {
-        setCustomTheme(customThemeData.customTheme);
-        localStorage.setItem('agendaiq-custom-theme', JSON.stringify(customThemeData.customTheme));
+      
+      if (savedCustomTheme) {
+        try {
+          const parsed = JSON.parse(savedCustomTheme);
+          globalThemeState.customTheme = parsed;
+          setCustomTheme(parsed);
+        } catch (e) {
+          console.error('Failed to parse custom theme');
+        }
       }
       
-      if (themeData?.theme) {
-        if (themeData.theme === 'custom' && customThemeData?.customTheme) {
-          setCurrentThemeId('custom');
-        } else if (themes.find(t => t.id === themeData.theme)) {
-          setCurrentThemeId(themeData.theme);
-        }
-        localStorage.setItem('agendaiq-theme', themeData.theme);
+      // Fetch from database ONCE after initial load (if user is logged in)
+      // Only if we haven't fetched in the last 5 minutes
+      const now = Date.now();
+      if (now - globalThemeState.lastFetch > 5 * 60 * 1000) {
+        globalThemeState.lastFetch = now;
+        
+        // Delayed fetch to not block initial render
+        setTimeout(() => {
+          fetch('/api/user/theme')
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+              if (data?.theme && data.theme !== globalThemeState.currentThemeId) {
+                globalThemeState.currentThemeId = data.theme;
+                setCurrentThemeId(data.theme);
+                localStorage.setItem('agendaiq-theme', data.theme);
+              }
+            })
+            .catch(() => {
+              // Silently ignore - user might not be logged in
+            });
+            
+          // Fetch custom theme if needed
+          if (globalThemeState.currentThemeId === 'custom') {
+            fetch('/api/user/custom-theme')
+              .then(res => res.ok ? res.json() : null)
+              .then(data => {
+                if (data?.customTheme) {
+                  globalThemeState.customTheme = data.customTheme;
+                  setCustomTheme(data.customTheme);
+                  localStorage.setItem('agendaiq-custom-theme', JSON.stringify(data.customTheme));
+                }
+              })
+              .catch(() => {
+                // Silently ignore
+              });
+          }
+        }, 1000); // 1 second delay to not interfere with initial page load
       }
-    }).catch(err => {
-      // Silently fail if user is not authenticated
-      console.debug('Theme fetch skipped (user may not be authenticated)');
-    });
-  }, []);
-
-  // Apply theme CSS variables with fallback support
-  useEffect(() => {
-    if (!mounted) {
-      return;
+    } else {
+      // Already initialized, just use global state
+      setCurrentThemeId(globalThemeState.currentThemeId);
+      setCustomTheme(globalThemeState.customTheme);
     }
+  }, []); // Empty deps - only run once
+
+  // Apply theme CSS variables
+  useEffect(() => {
+    if (!mounted) return;
 
     let theme: Theme;
     
-    // Use custom theme if selected
     if (currentThemeId === 'custom' && customTheme) {
       theme = {
         id: 'custom',
@@ -94,15 +121,13 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
         ...customTheme
       } as Theme;
     } else {
-      theme = themes.find(t => t.id === currentThemeId) || themes[1]; // Default to classic-light
-    }
-    
-    // Ensure CSS variables are supported (cross-browser compatibility)
-    if (!CSS || !CSS.supports || !CSS.supports('color', 'var(--test)')) {
-      console.warn('CSS variables not fully supported in this browser');
+      theme = themes.find(t => t.id === currentThemeId) || themes[0];
     }
 
-    // Helper to convert hex (#rrggbb) to H S L numbers string that Tailwind expects
+    // Apply CSS variables
+    const root = document.documentElement;
+    
+    // Helper to convert hex to HSL format that Tailwind expects
     const hexToHslVar = (hex: string): string => {
       const h = hex.replace('#', '');
       const r = parseInt(h.substring(0, 2), 16) / 255;
@@ -125,19 +150,12 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
       const lNum = Math.round(l * 100);
       return `${hNum} ${sNum}% ${lNum}%`;
     };
-
-    // Map our theme tokens to Tailwind CSS variables (expects HSL components, not hex)
+    
+    // Apply color variables with proper formatting
     const setVar = (name: string, valueHex: string) => {
       try {
         const hslValue = hexToHslVar(valueHex);
-        document.documentElement.style.setProperty(`--${name}`, hslValue);
-        
-        // Also set as RGB for better cross-browser compatibility
-        const hex = valueHex.replace('#', '');
-        const r = parseInt(hex.substring(0, 2), 16);
-        const g = parseInt(hex.substring(2, 4), 16);
-        const b = parseInt(hex.substring(4, 6), 16);
-        document.documentElement.style.setProperty(`--${name}-rgb`, `${r}, ${g}, ${b}`);
+        root.style.setProperty(`--${name}`, hslValue);
       } catch (err) {
         console.error(`Failed to set CSS variable --${name}:`, err);
       }
@@ -162,82 +180,104 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     setVar('border', theme.colors.border);
     setVar('input', theme.colors.inputBorder);
     setVar('ring', theme.colors.primary);
-
-    // Border radius token used by Tailwind extensions
-    document.documentElement.style.setProperty('--radius', theme.borderRadius.md);
-
-    // Mark current theme on the root for scoped overrides
-    document.documentElement.setAttribute('data-theme', currentThemeId);
-
+    
+    // Apply other theme properties
+    if (theme.borderRadius?.md) root.style.setProperty('--radius', theme.borderRadius.md);
+    if (theme.fontSize?.base) root.style.setProperty('--font-size-base', theme.fontSize.base);
+    
+    // Update body class for theme
+    document.body.className = `theme-${currentThemeId}`;
+    
     // Apply theme class for Tailwind dark mode support
     document.documentElement.classList.remove('light', 'dark');
-    if (theme.id === 'dark-mode' || theme.id === 'modern-purple' || theme.id === 'high-contrast' || theme.id === 'tasarim' || theme.id === 'midnight-blue' || theme.id === 'classic-dark') {
+    if (theme.id === 'dark-mode' || theme.id === 'modern-purple' || theme.id === 'high-contrast' || 
+        theme.id === 'tasarim' || theme.id === 'midnight-blue' || theme.id === 'classic-dark') {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.add('light');
     }
-
-    // Save to localStorage with error handling
-    try {
-      localStorage.setItem('agendaiq-theme', currentThemeId);
-    } catch (err) {
-      console.error('Failed to save theme to localStorage:', err);
-    }
-  }, [currentThemeId, mounted, customTheme]);
-
-  const setTheme = async (themeId: string) => {
-    const theme = themes.find(t => t.id === themeId);
-    if (!theme) return;
-
-    setIsLoading(true);
-    setCurrentThemeId(themeId);
     
-    // Save to localStorage immediately for instant feedback
+  }, [mounted, currentThemeId, customTheme]);
+
+  // Handle theme change - ONLY update database when user explicitly changes theme
+  const handleSetTheme = useCallback((themeId: string) => {
+    if (themeId === currentThemeId) return; // No change needed
+    
+    // Update local state immediately
+    setCurrentThemeId(themeId);
+    globalThemeState.currentThemeId = themeId;
     localStorage.setItem('agendaiq-theme', themeId);
-
-    // Save to database (API will check if user is authenticated)
-    try {
-      const response = await fetch('/api/user/theme', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ theme: themeId }),
+    
+    // Update database in background (fire and forget)
+    setIsLoading(true);
+    fetch('/api/user/theme', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ theme: themeId })
+    })
+      .catch(() => {
+        // Silently fail - localStorage is source of truth
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-      
-      if (!response.ok && response.status !== 401) {
-        console.error('Failed to save theme to database');
-      }
-    } catch (err) {
-      // Silently fail if user is not authenticated
-      console.debug('Theme save skipped (user may not be authenticated)');
-    }
+  }, [currentThemeId]);
 
-    setIsLoading(false);
-  };
+  // Handle custom theme update
+  const handleSetCustomTheme = useCallback((theme: any) => {
+    setCustomTheme(theme);
+    globalThemeState.customTheme = theme;
+    localStorage.setItem('agendaiq-custom-theme', JSON.stringify(theme));
+    
+    // Save to database in background
+    fetch('/api/user/custom-theme', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customTheme: theme })
+    }).catch(() => {
+      // Silently fail
+    });
+  }, []);
 
-  let currentTheme: Theme;
-  if (currentThemeId === 'custom' && customTheme) {
-    currentTheme = {
-      id: 'custom',
-      name: customTheme.name || 'Custom Theme',
-      description: 'Your personalized theme',
-      ...customTheme
-    } as Theme;
-  } else {
-    currentTheme = themes.find(t => t.id === currentThemeId) || themes[1];
+  // Get current theme object
+  const currentTheme = currentThemeId === 'custom' && customTheme
+    ? {
+        id: 'custom',
+        name: customTheme.name || 'Custom Theme',
+        description: 'Your personalized theme',
+        ...customTheme
+      } as Theme
+    : themes.find(t => t.id === currentThemeId) || themes[0];
+
+  // Don't render anything until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <ThemeContext.Provider
+        value={{
+          theme: themes[0], // Default theme for SSR
+          setTheme: () => {},
+          availableThemes: themes,
+          isLoading: false,
+          customTheme: null,
+          setCustomTheme: () => {}
+        }}
+      >
+        {children}
+      </ThemeContext.Provider>
+    );
   }
 
-  const value = {
-    theme: currentTheme,
-    setTheme,
-    availableThemes: themes,
-    isLoading,
-    customTheme,
-    setCustomTheme,
-  };
-
-  // Always provide the context to avoid useTheme errors
   return (
-    <ThemeContext.Provider value={value}>
+    <ThemeContext.Provider
+      value={{
+        theme: currentTheme,
+        setTheme: handleSetTheme,
+        availableThemes: themes,
+        isLoading,
+        customTheme,
+        setCustomTheme: handleSetCustomTheme
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

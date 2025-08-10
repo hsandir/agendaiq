@@ -9,6 +9,8 @@ import { getLayoutPreference } from '@/lib/layout/layout-types';
 import { Monitor, UserCheck, Shield, Settings, MoreHorizontal, ChevronRight, Search, BarChart, CheckSquare, GitBranch, Brain, UserCog, LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { MobileMenu } from '@/components/dashboard/MobileMenu';
+import { performanceMonitor } from '@/lib/performance/performance-monitor';
+import { layoutStore } from '@/lib/layout/layout-store';
 
 interface DashboardLayoutClientProps {
   children: React.ReactNode;
@@ -26,30 +28,68 @@ export function DashboardLayoutClient({
   userWithStaff 
 }: DashboardLayoutClientProps) {
   // Start with a default layout to avoid hydration mismatch
-  const [layoutId, setLayoutId] = useState('modern');
+  const [layoutId, setLayoutId] = useState(() => {
+    // First check if we have a layout in the store (persists across navigation)
+    const storeLayout = layoutStore.getCurrentLayout();
+    if (storeLayout) {
+      return storeLayout;
+    }
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('agendaiq-layout') || 'modern';
+    }
+    return 'modern';
+  });
   const [mounted, setMounted] = useState(false);
 
   // Load layout preference from database and localStorage
   useEffect(() => {
+    // Use singleton store to prevent re-initialization on every navigation
+    if (layoutStore.isInitialized()) {
+      setMounted(true);
+      return;
+    }
+    
+    const startTime = performance.now();
     setMounted(true);
+    layoutStore.setInitialized(true);
     
     // First check localStorage for immediate update
     const savedLayout = localStorage.getItem('agendaiq-layout');
-    if (savedLayout) {
+    if (savedLayout && savedLayout !== layoutId) {
       setLayoutId(savedLayout);
     }
     
-    // Then fetch from database for persistence
-    fetch('/api/user/layout')
-      .then(res => res.json())
-      .then(data => {
-        if (data.layout) {
-          setLayoutId(data.layout);
-          localStorage.setItem('agendaiq-layout', data.layout);
-        }
-      })
-      .catch(err => console.error('Failed to fetch layout preference:', err));
-  }, []);
+    // Only sync with database if needed (using singleton store)
+    if (layoutStore.needsSync()) {
+      // Optimized database sync with better caching
+      const dbSyncTimer = setTimeout(() => {
+        // Fetch from database with caching headers
+        fetch('/api/user/layout', {
+          headers: { 'Cache-Control': 'max-age=300' }
+        })
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            // Mark as synced in store
+            layoutStore.setLastSyncTime(Date.now());
+            
+            if (data?.layout && data.layout !== savedLayout) {
+              setLayoutId(data.layout);
+              layoutStore.setCurrentLayout(data.layout);
+              localStorage.setItem('agendaiq-layout', data.layout);
+            }
+            
+            // Track layout load performance
+            const endTime = performance.now();
+            if (performanceMonitor) {
+              performanceMonitor['addMetric']('layout_initialization', endTime - startTime);
+            }
+          })
+          .catch(err => console.debug('Layout fetch skipped (user may not be authenticated)'));
+      }, 750); // Reduced delay for faster sync
+      
+      return () => clearTimeout(dbSyncTimer);
+    }
+  }, []); // Empty dependency array - only run once per mount
 
   const layout = getLayoutPreference(layoutId);
 
@@ -73,7 +113,9 @@ export function DashboardLayoutClient({
           <header className="flex items-center justify-between px-4 sm:px-6 lg:px-12 py-4 sm:py-7 bg-background/95 backdrop-blur border-b border-border sticky top-0 z-10">
             <div className="flex items-center gap-4">
               <MobileMenu user={user} currentRole={currentRole} isAdmin={isAdmin} />
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
+                Dashboard - Meeting Intelligence Platform
+              </h1>
               
               {layout.sidebarPosition === 'hidden' && (
                 <button 
@@ -126,7 +168,7 @@ export function DashboardLayoutClient({
           <header className="flex items-center justify-between px-4 py-3 bg-card border-b border-border">
             <div className="flex items-center gap-3">
               <MobileMenu user={user} currentRole={currentRole} isAdmin={isAdmin} />
-              <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
+              <h1 className="text-lg font-semibold text-foreground">Dashboard - Meeting Intelligence Platform</h1>
             </div>
             <div className="hidden md:flex items-center gap-2">
               <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded font-medium">

@@ -20,14 +20,20 @@ export async function GET(request: NextRequest) {
   const user = authResult.user!;
 
   try {
+    // Optimized query with minimal data selection
     const userData = await prisma.user.findUnique({
       where: { id: user.id },
       select: { layout_preference: true },
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       layout: userData?.layout_preference || 'modern',
     });
+
+    // Add caching headers to reduce API calls
+    response.headers.set('Cache-Control', 'private, max-age=300'); // 5 minutes
+    
+    return response;
   } catch (error) {
     console.error('Error fetching layout preference:', error);
     return NextResponse.json(

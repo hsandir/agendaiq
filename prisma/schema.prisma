@@ -143,6 +143,7 @@ model User {
   updated_at                  DateTime           @updatedAt
   theme_preference            String?            @default("standard")
   layout_preference           String?            @default("modern")
+  custom_theme                Json?              // Stores custom theme data
   Account                     Account[]
   Session                     Session[]
   Staff                       Staff[]

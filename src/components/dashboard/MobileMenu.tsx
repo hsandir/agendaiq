@@ -283,9 +283,17 @@ export function MobileMenu({ user, currentRole, isAdmin }: MobileMenuProps) {
           {/* Sign Out */}
           <div className="border-t border-border pt-4 mt-4">
             <button
-              onClick={() => {
+              onClick={async () => {
                 closeMenu();
-                signOut({ callbackUrl: '/auth/signin' });
+                try {
+                  await signOut({ 
+                    callbackUrl: '/auth/signin',
+                    redirect: true 
+                  });
+                } catch (error) {
+                  // Fallback to direct navigation if signOut fails
+                  window.location.href = '/auth/signin';
+                }
               }}
               className="flex items-center gap-3 w-full px-3 py-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
             >

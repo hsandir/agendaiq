@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { getLayoutPreference, layoutPreferences } from '@/lib/layout/layout-types';
 import { Check, Layout, Sidebar, Grid, Monitor, Minimize2, Palette, Paintbrush, Wand2 } from 'lucide-react';
 import { CustomThemeEditor } from '@/components/dashboard/CustomThemeEditor';
+import { useTheme } from '@/lib/theme/theme-provider';
+import { themes } from '@/lib/theme/themes';
 
 const LayoutIcons = {
   'classic': Sidebar,
@@ -15,50 +17,54 @@ const LayoutIcons = {
 
 export function InterfaceSettingsClient() {
   const [currentLayoutId, setCurrentLayoutId] = useState('modern');
-  const [currentThemeId, setCurrentThemeId] = useState('classic-light');
   const [isChanging, setIsChanging] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [showCustomEditor, setShowCustomEditor] = useState(false);
+  
+  // Use centralized theme from ThemeProvider
+  const { theme: currentTheme, setTheme } = useTheme();
 
   // Load preferences from database and localStorage
   useEffect(() => {
     setMounted(true);
     
-    // First check localStorage
+    // First check localStorage for layout only
     const savedLayout = localStorage.getItem('agendaiq-layout');
-    const savedTheme = localStorage.getItem('agendaiq-theme');
+    // Theme is managed by ThemeProvider
     
     if (savedLayout) {
       setCurrentLayoutId(savedLayout);
     }
-    if (savedTheme) {
-      setCurrentThemeId(savedTheme);
-    }
     
-    // Then fetch from database
+    // Then fetch from database - use parallel requests for better performance
     const fetchPreferences = async () => {
       try {
-        // Fetch layout preference
-        const layoutRes = await fetch('/api/user/layout');
-        if (layoutRes.ok) {
+        // Fetch both preferences in parallel
+        const [layoutRes, themeRes] = await Promise.all([
+          fetch('/api/user/layout').catch(() => null),
+          fetch('/api/user/theme').catch(() => null)
+        ]);
+        
+        // Handle layout response
+        if (layoutRes?.ok) {
           const layoutData = await layoutRes.json();
-          if (layoutData.layout) {
+          if (layoutData.layout && layoutData.layout !== savedLayout) {
             setCurrentLayoutId(layoutData.layout);
             localStorage.setItem('agendaiq-layout', layoutData.layout);
           }
         }
         
-        // Fetch theme preference
-        const themeRes = await fetch('/api/user/theme');
-        if (themeRes.ok) {
-          const themeData = await themeRes.json();
-          if (themeData.theme) {
-            setCurrentThemeId(themeData.theme);
-            localStorage.setItem('agendaiq-theme', themeData.theme);
-          }
-        }
+        // Handle theme response - Let ThemeProvider handle this
+        // Theme is managed centrally by ThemeProvider
+        // if (themeRes?.ok) {
+        //   const themeData = await themeRes.json();
+        //   if (themeData.theme && themeData.theme !== savedTheme) {
+        //     setCurrentThemeId(themeData.theme);
+        //     // Don't set localStorage here - ThemeProvider handles it
+        //   }
+        // }
       } catch (error) {
-        console.error('Error fetching preferences:', error);
+        console.debug('Error fetching preferences:', error);
       }
     };
     
@@ -104,29 +110,14 @@ export function InterfaceSettingsClient() {
 
   const handleThemeChange = async (themeId: string) => {
     setIsChanging(true);
-    setCurrentThemeId(themeId);
     
-    // Save theme preference
-    localStorage.setItem('agendaiq-theme', themeId);
+    // Use centralized theme setter - it handles localStorage and database
+    setTheme(themeId);
     
-    // Apply theme via API call
-    try {
-      await fetch('/api/user/theme', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ themeId }),
-      });
-      
-      // Reload to apply theme
-      setTimeout(() => {
-        window.location.reload();
-      }, 300);
-    } catch (error) {
-      console.error('Error saving theme:', error);
+    // No reload needed - theme changes instantly
+    setTimeout(() => {
       setIsChanging(false);
-    }
+    }, 100);
   };
 
   if (!mounted) {
@@ -146,20 +137,8 @@ export function InterfaceSettingsClient() {
   const currentLayout = getLayoutPreference(currentLayoutId);
   
   // All available theme options
-  const themeOptions = [
-    { id: 'standard', name: 'Standard', description: 'Original standard theme' },
-    { id: 'classic-light', name: 'Classic Light', description: 'Clean and professional light theme' },
-    { id: 'classic-dark', name: 'Classic Dark', description: 'Easy on the eyes dark theme' },
-    { id: 'midnight-blue', name: 'Midnight Blue', description: 'Deep blue theme for focus' },
-    { id: 'forest-green', name: 'Forest Green', description: 'Natural green theme' },
-    { id: 'warm-orange', name: 'Warm Orange', description: 'Energetic warm theme' },
-    { id: 'tasarim', name: 'AgendaIQ', description: 'Official AgendaIQ dark theme with purple accents' },
-    { id: 'modern-purple', name: 'Modern Purple', description: 'Modern dark theme with purple accents' },
-    { id: 'dark-mode', name: 'Dark Mode', description: 'Modern dark theme for reduced eye strain' },
-    { id: 'high-contrast', name: 'High Contrast', description: 'Maximum contrast for accessibility' },
-    { id: 'nature-green', name: 'Nature Green', description: 'Calming green theme inspired by nature' },
-    { id: 'custom', name: 'Custom Theme', description: 'Create your own personalized theme', special: true },
-  ];
+  // Use themes from centralized theme system
+  const themeOptions = [...themes, { id: 'custom', name: 'Custom Theme', description: 'Create your own personalized theme', special: true }];
 
   return (
     <div className="space-y-12">
@@ -259,7 +238,7 @@ export function InterfaceSettingsClient() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {themeOptions.map((theme) => {
-            const isSelected = currentThemeId === theme.id;
+            const isSelected = currentTheme?.id === theme.id;
             const isCustom = theme.id === 'custom';
 
             return (
@@ -395,10 +374,10 @@ export function InterfaceSettingsClient() {
         
         <div className="mt-6 p-4 bg-accent/10 border border-accent/20 rounded-lg">
           <h4 className="font-semibold text-foreground mb-1">
-            Current Theme: {themeOptions.find(t => t.id === currentThemeId)?.name || 'Classic Light'}
+            Current Theme: {currentTheme?.name || 'Standard'}
           </h4>
           <p className="text-sm text-muted-foreground">
-            {themeOptions.find(t => t.id === currentThemeId)?.description || 'Default light theme'}
+            {currentTheme?.description || 'Default theme'}
           </p>
         </div>
       </section>
@@ -470,7 +449,7 @@ export function InterfaceSettingsClient() {
               </button>
             </div>
             <div className="p-6">
-              <CustomThemeEditor />
+              <CustomThemeEditor onClose={() => setShowCustomEditor(false)} />
             </div>
           </div>
         </div>

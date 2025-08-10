@@ -7,6 +7,8 @@ import { ReadableStream, WritableStream, TransformStream } from 'web-streams-pol
 if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/agendaiq_test'
 }
+// Always ensure test database URL for integration tests
+process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/agendaiq_test'
 
 // Mock next/dynamic
 jest.mock('next/dynamic', () => require('./__mocks__/next/dynamic'))
@@ -48,6 +50,23 @@ jest.mock('next-auth/react', () => ({
   signIn: jest.fn(),
   signOut: jest.fn(),
   SessionProvider: ({ children }) => children,
+}))
+
+// Mock next-auth server
+jest.mock('next-auth', () => ({
+  default: jest.fn(),
+}))
+
+// Mock next-auth/jwt
+jest.mock('next-auth/jwt', () => ({
+  getToken: jest.fn(),
+  encode: jest.fn(),
+  decode: jest.fn(),
+}))
+
+// Mock next-auth adapters
+jest.mock('@next-auth/prisma-adapter', () => ({
+  PrismaAdapter: jest.fn(),
 }))
 
 // Mock lucide-react - return mock components for all icons
@@ -114,9 +133,74 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
   disconnect: jest.fn(),
 }))
 
+// Mock NextResponse for middleware tests
+const mockNextResponse = {
+  json: jest.fn().mockImplementation((body, init) => ({
+    status: init?.status || 200,
+    headers: new Headers(init?.headers),
+    json: async () => body,
+    body: JSON.stringify(body)
+  })),
+  redirect: jest.fn().mockImplementation((url, status = 302) => ({
+    status,
+    headers: new Headers({ Location: url }),
+    url
+  })),
+  rewrite: jest.fn().mockImplementation((url) => ({
+    status: 200,
+    headers: new Headers(),
+    url
+  })),
+  next: jest.fn().mockImplementation(() => ({
+    status: 200,
+    headers: new Headers(),
+    body: null
+  }))
+};
+
+global.NextResponse = mockNextResponse;
+
+// Also mock it as a module
+jest.mock('next/server', () => ({
+  NextResponse: {
+    json: jest.fn().mockImplementation((body, init) => ({
+      status: init?.status || 200,
+      headers: new Headers(init?.headers),
+      json: async () => body,
+      body: JSON.stringify(body)
+    })),
+    redirect: jest.fn().mockImplementation((url, status = 302) => ({
+      status,
+      headers: new Headers({ Location: url }),
+      url
+    })),
+    rewrite: jest.fn().mockImplementation((url) => ({
+      status: 200,
+      headers: new Headers(),
+      url
+    })),
+    next: jest.fn().mockImplementation(() => ({
+      status: 200,
+      headers: new Headers(),
+      body: null
+    }))
+  },
+  NextRequest: class MockNextRequest {
+    constructor(url, init = {}) {
+      this.url = url;
+      this.method = init.method || 'GET';
+      this.headers = new Headers(init.headers);
+      this.nextUrl = new URL(url);
+    }
+  }
+}))
+
 // Add TextEncoder/TextDecoder for Node.js environment
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
+
+// Add setImmediate for Prisma
+global.setImmediate = global.setImmediate || ((fn, ...args) => setTimeout(fn, 0, ...args))
 
 // Mock fetch for tests
 global.fetch = jest.fn()

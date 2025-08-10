@@ -14,11 +14,9 @@ export class TestFactory {
       data: {
         email: faker.internet.email(),
         name: faker.person.fullName(),
-        password: hashedPassword,
-        emailVerified: true,
-        is_active: true,
+        hashedPassword: hashedPassword,
+        emailVerified: new Date(),
         two_factor_enabled: false,
-        preferences: {},
         ...overrides,
       },
     })
@@ -234,9 +232,6 @@ export class TestFactory {
           name: faker.location.county() + ' District',
           code: faker.string.alphanumeric(6).toUpperCase(),
           address: faker.location.streetAddress(),
-          phone: faker.phone.number(),
-          email: faker.internet.email(),
-          is_active: true,
         },
       })
     }

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useTheme } from '@/lib/theme/theme-provider';
 import { 
   Palette, 
   Save, 
@@ -107,10 +108,16 @@ const presetPalettes = [
   }
 ];
 
-export function CustomThemeEditor() {
+interface CustomThemeEditorProps {
+  onClose?: () => void;
+}
+
+export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
+  const { customTheme, setCustomTheme, setTheme } = useTheme();
   const [themeName, setThemeName] = useState('My Custom Theme');
   const [isDark, setIsDark] = useState(true);
   const [activeColorKey, setActiveColorKey] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [colors, setColors] = useState<Record<string, string>>({
     // Base colors
     background: '222 47 11',
@@ -156,6 +163,22 @@ export function CustomThemeEditor() {
   const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
 
+  // Load custom theme on mount
+  useEffect(() => {
+    if (customTheme) {
+      setThemeName(customTheme.name || 'My Custom Theme');
+      if (customTheme.colors) {
+        // Convert hex colors to HSL for the editor
+        const hslColors: Record<string, string> = {};
+        Object.entries(customTheme.colors).forEach(([key, hex]) => {
+          hslColors[key.replace(/([A-Z])/g, '-$1').toLowerCase()] = hexToHsl(hex);
+        });
+        setColors(hslColors);
+      }
+      setIsDark(customTheme.isDark || false);
+    }
+  }, [customTheme]);
+
   useEffect(() => {
     // Load saved themes from localStorage
     const saved = localStorage.getItem('agendaiq-custom-themes');
@@ -177,6 +200,31 @@ export function CustomThemeEditor() {
       return () => clearTimeout(timer);
     }
   }, [activeColorKey]);
+
+  // Helper function to convert hex to HSL string
+  const hexToHsl = (hex: string): string => {
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0, s = 0, l = (max + min) / 2;
+    
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    
+    return `${Math.round(h * 360)} ${Math.round(s * 100)} ${Math.round(l * 100)}`;
+  };
 
   const hslToHex = (hsl: string) => {
     const [h, s, l] = hsl.split(' ').map(Number);
@@ -209,29 +257,6 @@ export function CustomThemeEditor() {
     };
 
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-  };
-
-  const hexToHsl = (hex: string) => {
-    const r = parseInt(hex.slice(1, 3), 16) / 255;
-    const g = parseInt(hex.slice(3, 5), 16) / 255;
-    const b = parseInt(hex.slice(5, 7), 16) / 255;
-
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h = 0, s = 0, l = (max + min) / 2;
-
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      
-      switch (max) {
-        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
-        case g: h = ((b - r) / d + 2) / 6; break;
-        case b: h = ((r - g) / d + 4) / 6; break;
-      }
-    }
-
-    return `${Math.round(h * 360)} ${Math.round(s * 100)} ${Math.round(l * 100)}`;
   };
 
   const updateColor = (key: string, value: string) => {
@@ -299,23 +324,56 @@ export function CustomThemeEditor() {
     localStorage.setItem('agendaiq-custom-themes', JSON.stringify(updated));
   };
 
-  const applyTheme = () => {
-    // Apply the custom theme to CSS variables
-    const root = document.documentElement;
-    Object.entries(colors).forEach(([key, value]) => {
-      root.style.setProperty(`--${key}`, value);
-    });
-
-    // Save as active custom theme
-    localStorage.setItem('agendaiq-custom-theme', JSON.stringify({
-      name: themeName,
-      colors: colors,
-      isDark: isDark
-    }));
-    localStorage.setItem('agendaiq-theme', 'custom');
+  const applyTheme = async () => {
+    setIsLoading(true);
     
-    // Reload to apply theme
-    window.location.reload();
+    try {
+      // Convert HSL colors back to hex for API
+      const hexColors: Record<string, string> = {};
+      Object.entries(colors).forEach(([key, hsl]) => {
+        hexColors[key.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())] = hslToHex(hsl);
+      });
+
+      const customThemeData = {
+        name: themeName,
+        colors: hexColors,
+        isDark: isDark
+      };
+
+      // Save to database via API
+      const response = await fetch('/api/user/custom-theme', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(customThemeData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Update theme provider state
+        if (setCustomTheme) {
+          setCustomTheme(result.customTheme);
+        }
+        
+        // Switch to custom theme
+        await setTheme('custom');
+        
+        // Close the editor if callback provided
+        if (onClose) {
+          onClose();
+        }
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to save custom theme:', errorData);
+        alert(`Failed to save custom theme: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error saving custom theme:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const loadTheme = (theme: CustomTheme) => {
@@ -552,9 +610,13 @@ export function CustomThemeEditor() {
 
             {/* Action Buttons */}
             <div className="flex gap-2 pt-4">
-              <Button onClick={applyTheme} className="flex-1">
+              <Button 
+                onClick={applyTheme} 
+                className="flex-1"
+                disabled={isLoading}
+              >
                 <Sparkles className="h-4 w-4 mr-2" />
-                Apply Theme
+                {isLoading ? 'Saving...' : 'Save & Apply Theme'}
               </Button>
               <Button onClick={saveTheme} variant="outline">
                 <Save className="h-4 w-4 mr-2" />

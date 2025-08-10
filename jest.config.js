@@ -12,6 +12,8 @@ const customJestConfig = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     'lucide-react': '<rootDir>/__mocks__/lucide-react.js',
+    'jose': '<rootDir>/__mocks__/jose.js',
+    'openid-client': '<rootDir>/__mocks__/openid-client.js'
   },
   testMatch: [
     '<rootDir>/src/__tests__/**/*.test.{js,jsx,ts,tsx}',
@@ -24,7 +26,7 @@ const customJestConfig = {
     '<rootDir>/src/__tests__/performance/',
   ],
   transformIgnorePatterns: [
-    '/node_modules/(?!lucide-react)/',
+    '/node_modules/(?!(lucide-react|jose|openid-client|oauth|next-auth|@panva)/)/',
   ],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',

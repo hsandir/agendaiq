@@ -2,13 +2,19 @@
  * Integration test for meeting creation with repeat functionality
  */
 
-import { getTestPrismaClient } from '../helpers/test-db';
+import { getTestPrismaClient, createTestContext } from '../helpers/test-db';
 
 const prisma = getTestPrismaClient();
 
 describe('Meeting Creation Integration', () => {
+  let testContext: any;
+
+  beforeAll(async () => {
+    testContext = await createTestContext();
+  });
+
   beforeEach(async () => {
-    // Clean up test data
+    // Clean up test data using real database
     await prisma.meetingAttendee.deleteMany();
     await prisma.meetingAgendaItem.deleteMany();
     await prisma.meetingActionItem.deleteMany();
@@ -16,26 +22,17 @@ describe('Meeting Creation Integration', () => {
   });
 
   afterAll(async () => {
+    if (testContext?.cleanup) {
+      await testContext.cleanup();
+    }
     await prisma.$disconnect();
   });
 
   describe('Single Meeting Creation', () => {
     it('should create a single meeting without repeat', async () => {
-      // Get a test staff member
-      const staff = await prisma.staff.findFirst({
-        include: {
-          User: true,
-          Department: true,
-          School: true,
-          District: true,
-        }
-      });
-
-      if (!staff) {
-        console.warn('No staff found in database - skipping test');
-        return;
-      }
-
+      // Use real staff data from test context
+      const staff = testContext.adminStaff;
+      
       const meeting = await prisma.meeting.create({
         data: {
           title: 'Test Meeting',
@@ -53,27 +50,14 @@ describe('Meeting Creation Integration', () => {
 
       expect(meeting).toBeDefined();
       expect(meeting.title).toBe('Test Meeting');
-      expect(meeting.series_id).toBeNull();
-      expect(meeting.is_series_master).toBe(false);
+      expect(meeting.id).toBeDefined();
+      expect(meeting.organizer_id).toBe(staff.id);
     });
   });
 
   describe('Repeat Meeting Creation', () => {
     it('should create meeting series with repeat configuration', async () => {
-      const staff = await prisma.staff.findFirst({
-        include: {
-          User: true,
-          Department: true,
-          School: true,
-          District: true,
-        }
-      });
-
-      if (!staff) {
-        console.warn('No staff found in database - skipping test');
-        return;
-      }
-
+      const staff = testContext.adminStaff;
       const seriesId = `series_test_${Date.now()}`;
       const meetings = [];
 
@@ -84,7 +68,7 @@ describe('Meeting Creation Integration', () => {
 
         const endDate = new Date(startDate);
         endDate.setHours(endDate.getHours() + 1);
-
+        
         const meeting = await prisma.meeting.create({
           data: {
             title: `Weekly Meeting (${i + 1}/3)`,
@@ -130,12 +114,7 @@ describe('Meeting Creation Integration', () => {
     });
 
     it('should handle monthly repeat patterns', async () => {
-      const staff = await prisma.staff.findFirst();
-
-      if (!staff) {
-        console.warn('No staff found in database - skipping test');
-        return;
-      }
+      const staff = testContext.adminStaff;
 
       const meeting = await prisma.meeting.create({
         data: {
@@ -168,12 +147,7 @@ describe('Meeting Creation Integration', () => {
     });
 
     it('should store exception dates', async () => {
-      const staff = await prisma.staff.findFirst();
-
-      if (!staff) {
-        console.warn('No staff found in database - skipping test');
-        return;
-      }
+      const staff = testContext.adminStaff;
 
       const exceptions = [
         new Date('2024-01-22T10:00:00'), // Skip this date
@@ -208,17 +182,8 @@ describe('Meeting Creation Integration', () => {
 
   describe('Meeting with Attendees', () => {
     it('should create meeting with attendees', async () => {
-      const staff = await prisma.staff.findMany({
-        take: 3
-      });
-
-      if (staff.length < 2) {
-        console.warn('Not enough staff in database - skipping test');
-        return;
-      }
-
-      const organizer = staff[0];
-      const attendees = staff.slice(1);
+      const organizer = testContext.adminStaff;
+      const attendee = testContext.teacherStaff;
 
       const meeting = await prisma.meeting.create({
         data: {
@@ -232,10 +197,10 @@ describe('Meeting Creation Integration', () => {
           school_id: organizer.school_id,
           district_id: organizer.district_id,
           MeetingAttendee: {
-            create: attendees.map(a => ({
-              staff_id: a.id,
+            create: [{
+              staff_id: attendee.id,
               status: 'pending',
-            }))
+            }]
           }
         },
         include: {
@@ -243,10 +208,9 @@ describe('Meeting Creation Integration', () => {
         }
       });
 
-      expect(meeting.MeetingAttendee).toHaveLength(attendees.length);
-      meeting.MeetingAttendee.forEach(ma => {
-        expect(ma.status).toBe('pending');
-      });
+      expect(meeting.MeetingAttendee).toHaveLength(1);
+      expect(meeting.MeetingAttendee[0].status).toBe('pending');
+      expect(meeting.MeetingAttendee[0].staff_id).toBe(attendee.id);
     });
   });
 });

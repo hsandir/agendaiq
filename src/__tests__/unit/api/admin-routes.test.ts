@@ -3,13 +3,13 @@
  * Test capability-based access control for admin endpoints
  */
 
-import { withAuth } from '@/lib/auth/api-auth';
-import { NextRequest, NextResponse } from 'next/server';
-import { canAccessApi } from '@/lib/auth/policy';
-
-// Mock modules
-jest.mock('@/lib/auth/api-auth');
-jest.mock('@/lib/auth/policy');
+// Mock modules first before imports
+jest.mock('@/lib/auth/api-auth', () => ({
+  withAuth: jest.fn()
+}));
+jest.mock('@/lib/auth/policy', () => ({
+  canAccessApi: jest.fn()
+}));
 jest.mock('@/lib/prisma', () => ({
   prisma: {
     user: { findMany: jest.fn() },
@@ -17,6 +17,21 @@ jest.mock('@/lib/prisma', () => ({
     staff: { findMany: jest.fn() },
   },
 }));
+jest.mock('next/server', () => ({
+  NextRequest: jest.fn(),
+  NextResponse: {
+    json: jest.fn().mockImplementation((body, init) => ({
+      status: init?.status || 200,
+      headers: new Headers(init?.headers),
+      json: async () => body,
+      body: JSON.stringify(body)
+    }))
+  }
+}));
+
+import { withAuth } from '@/lib/auth/api-auth';
+import { NextRequest, NextResponse } from 'next/server';
+import { canAccessApi } from '@/lib/auth/policy';
 
 describe('Admin API Routes - Capability Tests', () => {
   beforeEach(() => {

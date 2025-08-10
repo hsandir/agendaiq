@@ -9,6 +9,19 @@ import { SidebarWrapper } from "@/components/dashboard/SidebarWrapper";
 import { isUserAdmin } from "@/lib/auth/admin-check";
 import { DashboardLayoutClient } from "./DashboardLayoutClient";
 
+// Preload critical resources for better performance
+function PreloadResources() {
+  return (
+    <>
+      <link rel="preload" href="/api/user/theme" as="fetch" crossOrigin="anonymous" />
+      <link rel="preload" href="/api/user/layout" as="fetch" crossOrigin="anonymous" />
+      <link rel="preload" href="/api/user/custom-theme" as="fetch" crossOrigin="anonymous" />
+      <link rel="prefetch" href="/dashboard/meetings" />
+      <link rel="prefetch" href="/dashboard/meeting-intelligence" />
+    </>
+  );
+}
+
 export default async function DashboardLayout({
   children,
 }: {
@@ -34,13 +47,16 @@ export default async function DashboardLayout({
   const isAdmin = isUserAdmin(userWithStaff as any);
 
   return (
-    <DashboardLayoutClient
-      isAdmin={isAdmin}
-      user={user}
-      currentRole={currentRole}
-      userWithStaff={userWithStaff}
-    >
-      {children}
-    </DashboardLayoutClient>
+    <>
+      <PreloadResources />
+      <DashboardLayoutClient
+        isAdmin={isAdmin}
+        user={user}
+        currentRole={currentRole}
+        userWithStaff={userWithStaff}
+      >
+        {children}
+      </DashboardLayoutClient>
+    </>
   );
 } 

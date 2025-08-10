@@ -4,27 +4,25 @@ import { prisma } from '@/lib/prisma';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { z } from 'zod';
 
+// More flexible validation to handle various color formats
+const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
+
 const customThemeSchema = z.object({
   name: z.string().min(1).max(50),
-  colors: z.object({
-    background: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    backgroundSecondary: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    text: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    textMuted: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    border: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    primary: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    primaryLight: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    primaryDark: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    secondary: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    secondaryLight: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    accent: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    success: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    warning: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    error: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    info: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    card: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
-    inputBorder: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+  colors: z.record(z.string()).refine((colors) => {
+    // Allow any color properties but validate hex format when present
+    for (const [key, value] of Object.entries(colors)) {
+      if (typeof value === 'string' && value.startsWith('#')) {
+        if (!hexColorRegex.test(value)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }, {
+    message: "Invalid hex color format"
   }),
+  isDark: z.boolean().optional(),
 });
 
 // GET /api/user/custom-theme - Get user's custom theme

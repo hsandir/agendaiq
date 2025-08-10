@@ -62,13 +62,14 @@ describe('SignInForm Component', () => {
     
     render(<SignInForm />);
     
+    const form = screen.getByRole('form', { name: /authentication form/i });
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByRole('button', { name: /sign in/i });
     
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
-    fireEvent.click(submitButton);
+    fireEvent.submit(form);
     
     await waitFor(() => {
       expect(submitButton).toBeDisabled();
@@ -81,18 +82,20 @@ describe('SignInForm Component', () => {
     
     render(<SignInForm />);
     
+    const form = screen.getByRole('form', { name: /authentication form/i });
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
-    const submitButton = screen.getByRole('button', { name: /sign in/i });
     
     fireEvent.change(emailInput, { target: { value: 'admin@school.edu' } });
     fireEvent.change(passwordInput, { target: { value: '1234' } });
-    fireEvent.click(submitButton);
+    fireEvent.submit(form);
     
     await waitFor(() => {
       expect(signIn).toHaveBeenCalledWith('credentials', {
         email: 'admin@school.edu',
         password: '1234',
+        rememberMe: 'false',
+        trustDevice: 'false',
         redirect: false,
       });
     });
@@ -103,13 +106,13 @@ describe('SignInForm Component', () => {
     
     render(<SignInForm />);
     
+    const form = screen.getByRole('form', { name: /authentication form/i });
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
-    const submitButton = screen.getByRole('button', { name: /sign in/i });
     
     fireEvent.change(emailInput, { target: { value: 'admin@school.edu' } });
     fireEvent.change(passwordInput, { target: { value: '1234' } });
-    fireEvent.click(submitButton);
+    fireEvent.submit(form);
     
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/dashboard');
@@ -124,13 +127,13 @@ describe('SignInForm Component', () => {
     
     render(<SignInForm />);
     
+    const form = screen.getByRole('form', { name: /authentication form/i });
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
-    const submitButton = screen.getByRole('button', { name: /sign in/i });
     
     fireEvent.change(emailInput, { target: { value: 'wrong@example.com' } });
     fireEvent.change(passwordInput, { target: { value: 'wrongpass' } });
-    fireEvent.click(submitButton);
+    fireEvent.submit(form);
     
     await waitFor(() => {
       expect(screen.getByText(/invalid email or password/i)).toBeInTheDocument();
@@ -145,13 +148,13 @@ describe('SignInForm Component', () => {
     
     render(<SignInForm />);
     
+    const form = screen.getByRole('form', { name: /authentication form/i });
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
-    const submitButton = screen.getByRole('button', { name: /sign in/i });
     
     fireEvent.change(emailInput, { target: { value: 'admin@school.edu' } });
     fireEvent.change(passwordInput, { target: { value: '1234' } });
-    fireEvent.click(submitButton);
+    fireEvent.submit(form);
     
     await waitFor(() => {
       // Now shows 2FA input field
@@ -165,13 +168,13 @@ describe('SignInForm Component', () => {
     
     render(<SignInForm />);
     
+    const form = screen.getByRole('form', { name: /authentication form/i });
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
-    const submitButton = screen.getByRole('button', { name: /sign in/i });
     
     fireEvent.change(emailInput, { target: { value: 'admin@school.edu' } });
     fireEvent.change(passwordInput, { target: { value: '1234' } });
-    fireEvent.click(submitButton);
+    fireEvent.submit(form);
     
     await waitFor(() => {
       expect(screen.getByText(/an error occurred/i)).toBeInTheDocument();
@@ -184,19 +187,25 @@ describe('SignInForm Component', () => {
     
     render(<SignInForm />);
     
+    const form = screen.getByRole('form', { name: /authentication form/i });
     const rememberCheckbox = screen.getByLabelText(/remember me/i);
     const emailInput = screen.getByPlaceholderText('Email address');
     const passwordInput = screen.getByPlaceholderText('Password');
-    const submitButton = screen.getByRole('button', { name: /sign in/i });
     
     fireEvent.click(rememberCheckbox);
     fireEvent.change(emailInput, { target: { value: 'admin@school.edu' } });
     fireEvent.change(passwordInput, { target: { value: '1234' } });
-    fireEvent.click(submitButton);
+    fireEvent.submit(form);
     
-    // Verify localStorage is set when remember me is checked
+    // Verify remember me state is passed correctly
     await waitFor(() => {
-      expect(rememberCheckbox).toBeChecked();
+      expect(signIn).toHaveBeenCalledWith('credentials', {
+        email: 'admin@school.edu',
+        password: '1234',
+        rememberMe: 'true',
+        trustDevice: 'false',
+        redirect: false,
+      });
     });
   });
 });

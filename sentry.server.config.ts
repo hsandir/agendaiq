@@ -3,13 +3,16 @@ import * as Sentry from '@sentry/nextjs';
 const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 Sentry.init({
-  dsn: SENTRY_DSN,
+  dsn: process.env.NODE_ENV === 'production' ? SENTRY_DSN : undefined,
   
-  // Adjust this value in production, or use tracesSampler for greater control
-  tracesSampleRate: 1.0,
+  // Lower sample rate in development
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 0,
   
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
+  
+  // Disable in development
+  enabled: process.env.NODE_ENV === 'production',
   
   // Environments
   environment: process.env.NODE_ENV,
@@ -26,10 +29,14 @@ Sentry.init({
   beforeSend(event, hint) {
     // Filter out specific errors in development
     if (process.env.NODE_ENV === 'development') {
-      // Ignore hot reload errors
+      // Ignore connection errors
       const error = hint.originalException as Error;
-      if (error && error.message && error.message.includes('ECONNREFUSED')) {
-        return null;
+      if (error && error.message) {
+        if (error.message.includes('ECONNREFUSED') || 
+            error.message.includes('ECONNRESET') ||
+            error.message.includes('aborted')) {
+          return null;
+        }
       }
     }
     

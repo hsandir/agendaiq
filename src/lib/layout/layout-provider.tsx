@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { LayoutPreference, getLayoutPreference, layoutPreferences } from './layout-types';
+import { layoutStore } from './layout-store';
 
 interface LayoutContextType {
   layout: LayoutPreference;
@@ -12,16 +13,30 @@ interface LayoutContextType {
 const LayoutContext = createContext<LayoutContextType | undefined>(undefined);
 
 export function LayoutProvider({ children }: { children: React.ReactNode }) {
-  const [currentLayoutId, setCurrentLayoutId] = useState('modern');
+  const [currentLayoutId, setCurrentLayoutId] = useState(() => {
+    // Use store first, then localStorage, then default
+    const storeLayout = layoutStore.getCurrentLayout();
+    if (storeLayout) return storeLayout;
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('agendaiq-layout') || 'modern';
+    }
+    return 'modern';
+  });
   const [mounted, setMounted] = useState(false);
 
   // Load layout preference from localStorage on mount
   useEffect(() => {
     setMounted(true);
+    // Skip if already initialized from store
+    if (layoutStore.isInitialized()) {
+      return;
+    }
     const savedLayout = localStorage.getItem('agendaiq-layout');
     if (savedLayout) {
       setCurrentLayoutId(savedLayout);
+      layoutStore.setCurrentLayout(savedLayout);
     }
+    layoutStore.setInitialized(true);
   }, []);
 
   // Apply layout changes
@@ -38,12 +53,14 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.setAttribute('data-content-layout', layout.contentLayout);
     document.documentElement.setAttribute('data-spacing', layout.spacing);
 
-    // Save to localStorage
+    // Save to localStorage and store
     localStorage.setItem('agendaiq-layout', currentLayoutId);
+    layoutStore.setCurrentLayout(currentLayoutId);
   }, [currentLayoutId, mounted]);
 
   const setLayout = (layoutId: string) => {
     setCurrentLayoutId(layoutId);
+    layoutStore.setCurrentLayout(layoutId);
   };
 
   const layout = getLayoutPreference(currentLayoutId);

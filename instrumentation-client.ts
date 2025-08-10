@@ -2,18 +2,21 @@ import * as Sentry from '@sentry/nextjs';
 
 const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
+// Export required hook for navigation instrumentation
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
+
 Sentry.init({
-  dsn: SENTRY_DSN,
+  dsn: process.env.NODE_ENV === 'production' ? SENTRY_DSN : undefined,
   
-  // Adjust this value in production, or use tracesSampler for greater control
-  tracesSampleRate: 1.0,
+  // Lower sample rate in development
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 0,
   
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
   
-  // Replay settings for session recording
-  replaysOnErrorSampleRate: 1.0,
-  replaysSessionSampleRate: 0.1,
+  // Disable replays in development
+  replaysOnErrorSampleRate: process.env.NODE_ENV === 'production' ? 1.0 : 0,
+  replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 0,
   
   integrations: [
     // Automatically instrument your app's pageloads and navigations
