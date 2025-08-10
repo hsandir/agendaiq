@@ -383,13 +383,24 @@ class SentryProvider implements MonitoringProvider {
   captureCheckIn(checkIn: CronJob): void {
     if (!this.initialized) return;
     
-    Sentry.captureCheckIn({
+    const checkInData: any = {
       monitorSlug: checkIn.monitorSlug,
       status: checkIn.status,
-      checkInId: checkIn.checkInId,
-      duration: checkIn.duration,
-      environment: checkIn.environment,
-    });
+    };
+    
+    if (checkIn.checkInId) {
+      checkInData.checkInId = checkIn.checkInId;
+    }
+    
+    if (checkIn.duration !== undefined) {
+      checkInData.duration = checkIn.duration;
+    }
+    
+    if (checkIn.environment) {
+      checkInData.environment = checkIn.environment;
+    }
+    
+    Sentry.captureCheckIn(checkInData);
   }
 
   startReplay(): void {
