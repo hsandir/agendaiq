@@ -224,27 +224,38 @@ When Claude creates ANY new file, it MUST follow the template system:
 // Remove unused HTTP methods
 ```
 
-### 2. **AUTHENTICATION SYSTEM COMPLIANCE**
+### 2. **AUTHENTICATION SYSTEM COMPLIANCE - CAPABILITY-BASED ONLY**
 
-Claude MUST always implement the standardized authentication system:
+Claude MUST always use the NEW capability-based authentication system:
 
 ```typescript
 // REQUIRED IMPORTS FOR ALL FILES
 import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils';
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 
-// PAGE AUTHENTICATION PATTERNS
-const user = await requireAuth(AuthPresets.requireAuth);      // Basic
-const user = await requireAuth(AuthPresets.requireStaff);    // Staff only
-const user = await requireAuth(AuthPresets.requireAdmin);    // Admin only
-const user = await requireAuth(AuthPresets.requireLeadership); // Leadership
+// PAGE AUTHENTICATION PATTERNS - USE PRESETS OR CAPABILITIES
+const user = await requireAuth(AuthPresets.requireAuth);         // Basic auth
+const user = await requireAuth(AuthPresets.requireDevAdmin);     // Dev admin only
+const user = await requireAuth(AuthPresets.requireOpsAdmin);     // Ops admin only
+const user = await requireAuth(AuthPresets.requireMonitoring);   // Monitoring access
+const user = await requireAuth(AuthPresets.requireLogs);         // Logs access
 
-// API AUTHENTICATION PATTERNS
-const authResult = await withAuth(request, { requireAdminRole: true });
+// API AUTHENTICATION PATTERNS - ALWAYS USE CAPABILITIES
+const authResult = await withAuth(request, { 
+  requireAuth: true,
+  requireCapability: Capability.OPS_BACKUP  // Use specific capability
+});
 if (!authResult.success) {
   return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
 }
-const user = authResult.user!;
+
+// ⛔ NEVER USE THESE DEPRECATED PATTERNS ⛔
+// WRONG: { requireAdminRole: true }        - Use requireCapability instead
+// WRONG: { requireStaff: true }            - Use requireCapability instead  
+// WRONG: { requireLeadership: true }       - Use requireCapability instead
+// WRONG: { requireOpsAdmin: true }         - Use requireCapability: Capability.OPS_*
+// WRONG: { requireDevAdmin: true }         - Use requireCapability: Capability.DEV_*
 ```
 
 ### 3. **SECURITY-FIRST DEVELOPMENT**
@@ -879,6 +890,52 @@ When providing code solutions, Claude should:
 6. **Verify** port 3000 usage
 7. **Confirm** real-time data implementation
 8. **Check** centralized authentication
+
+## 🔍 PERMISSIONS VERIFICATION DASHBOARD
+
+### Always Check Permissions for New Pages
+
+When Claude creates ANY new page or API route, it MUST:
+
+1. **Add the page to permissions-check dashboard**
+   - Edit `/src/app/dashboard/permissions-check/page.tsx`
+   - Add entry to `ALL_PAGES` array with correct auth type
+   - Specify the required capability
+
+2. **Verify the page at**: `/dashboard/permissions-check`
+   - Check if page appears in the list
+   - Verify correct auth type is set
+   - Confirm capability requirement
+   - Test with different user roles
+
+3. **Page Entry Format**:
+```typescript
+{
+  path: '/dashboard/new-page',
+  name: 'New Page Name',
+  category: 'Category', // Dashboard, Settings, Admin, School, Meetings, etc.
+  authType: 'requireAuth', // or requireOpsAdmin, requireDevAdmin, etc.
+  capability: Capability.SPECIFIC_CAP, // or null if basic auth
+  description: 'Brief description'
+}
+```
+
+4. **API Route Entry Format**:
+```typescript
+{
+  path: '/api/new-route',
+  method: 'GET/POST/PUT/DELETE',
+  capability: Capability.SPECIFIC_CAP
+}
+```
+
+5. **Auth Types**:
+   - `requireAuth` - Basic authentication only
+   - `requireDevAdmin` - System admin only (is_system_admin)
+   - `requireOpsAdmin` - School admin (is_school_admin)
+   - `requireCapability` - Specific capability required
+   - `client-side` - Client component with own auth
+   - `none` - No authentication (public)
 
 ## 🧪 AUTOMATIC TEST GENERATION RULES
 

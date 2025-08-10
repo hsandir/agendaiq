@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 
 // POST /api/monitoring/performance - Log performance metrics
 export async function POST(request: NextRequest) {
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
 
 // GET /api/monitoring/performance - Get performance summary (for admin dashboard)
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_MONITORING });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

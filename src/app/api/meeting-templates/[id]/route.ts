@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authResult = await withAuth(request, { requireStaff: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -72,7 +73,7 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.MEETING_CREATE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -142,7 +143,7 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.MEETING_CREATE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

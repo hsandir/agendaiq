@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 
 interface VercelDeployment {
   uid: string;
@@ -30,7 +31,7 @@ interface VercelDeployment {
 export async function GET(request: NextRequest) {
   try {
     // Authenticate user
-    const authResult = await withAuth(request, { requireStaff: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_MONITORING });
     if (!authResult.success) {
       return NextResponse.json(
         { error: authResult.error },

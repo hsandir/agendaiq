@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth/api-auth";
+import { Capability } from "@/lib/auth/policy";
 
 // GET Method - System alerts configuration
 export async function GET(request: NextRequest) {
   try {
     // REQUIRED: Auth check - Operations admin for alert configuration
-    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
+    const authResult = await withAuth(request, { 
+      requireAuth: true, 
+      requireCapability: Capability.OPS_ALERTS 
+    });
     
     if (!authResult.success) {
       return NextResponse.json(
@@ -214,8 +218,7 @@ export async function DELETE(request: NextRequest) {
     // REQUIRED: Auth check (usually operations admin only for deletes)
     const authResult = await withAuth(request, { 
       requireAuth: true,
-      requireStaff: true,
-      requireOpsAdmin: true,
+      requireCapability: Capability.OPS_ALERTS,
     });
     
     if (!authResult.success) {

@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth/api-auth";
+import { Capability } from '@/lib/auth/policy';
 import { prisma } from "@/lib/prisma";
 
 // GET Method - Role hierarchy
 export async function GET(request: NextRequest) {
   try {
     // REQUIRED: Auth check - Staff required for role hierarchy
-    const authResult = await withAuth(request, { requireStaff: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
     
     if (!authResult.success) {
       return NextResponse.json(

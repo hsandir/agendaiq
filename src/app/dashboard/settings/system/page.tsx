@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
+import { requireAuth } from '@/lib/auth/auth-utils';
+import { Capability } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
 import SystemSettingsClient from './SystemSettingsClient';
 
@@ -9,8 +10,8 @@ export const metadata: Metadata = {
 };
 
 export default async function SystemSettingsPage() {
-  // Use capability-based auth - require ops admin for system settings
-  const user = await requireAuth(AuthPresets.requireOpsAdmin);
+  // Use capability-based auth - require ops health capability for system settings
+  const user = await requireAuth({ requireAuth: true, requireCapability: Capability.OPS_HEALTH });
 
   // Fetch system settings from database
   const settings = await prisma.systemSetting.findMany({

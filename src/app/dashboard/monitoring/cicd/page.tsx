@@ -7,11 +7,12 @@ import { Suspense } from 'react';
 import { CICDMonitor } from '@/components/monitoring/CICDMonitor';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
+import { requireAuth } from '@/lib/auth/auth-utils';
+import { Capability } from '@/lib/auth/policy';
 
 export default async function CICDMonitoringPage() {
-  // Require staff authentication
-  await requireAuth(AuthPresets.requireStaff);
+  // Require CI/CD monitoring capability
+  await requireAuth({ requireAuth: true, requireCapability: Capability.DEV_CI });
 
   return (
     <div className="container mx-auto py-6 space-y-6">

@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { prisma } from "@/lib/prisma";
 
 // GET /api/school - Get all schools (admin) or user's school (non-admin)
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireStaff: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.SCHOOL_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -57,7 +58,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/school - Create a new school (admin only)
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.SCHOOL_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -124,7 +125,7 @@ export async function POST(request: NextRequest) {
 
 // PUT /api/school - Update a school (admin only)
 export async function PUT(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.SCHOOL_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
 import fs from 'fs/promises';
 import path from 'path';
 
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireDevAdmin: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

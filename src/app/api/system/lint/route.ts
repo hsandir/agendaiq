@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth/api-auth";
+import { Capability } from '@/lib/auth/policy';
 
 // GET Method - Lint status
 export async function GET(request: NextRequest) {
@@ -7,8 +8,7 @@ export async function GET(request: NextRequest) {
     // REQUIRED: Auth check - Developer admin for system lint
     const authResult = await withAuth(request, { 
       requireAuth: true, 
-      requireStaff: true, 
-      requireDevAdmin: true 
+      requireCapability: Capability.DEV_DEBUG
     });
     
     if (!authResult.success) {
@@ -57,8 +57,7 @@ export async function POST(request: NextRequest) {
     // REQUIRED: Auth check
     const authResult = await withAuth(request, { 
       requireAuth: true,
-      requireStaff: true,
-      requireDevAdmin: true
+      requireCapability: Capability.DEV_DEBUG
     });
     
     if (!authResult.success) {

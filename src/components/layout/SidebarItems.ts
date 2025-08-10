@@ -124,7 +124,7 @@ export const sidebarItems: NavigationSection[] = [
             ],
           },
           {
-            href: "/dashboard/settings/admin",
+            href: "/dashboard/settings/role-hierarchy",
             label: "Admin",
             icon: ShieldCheck,
             children: [

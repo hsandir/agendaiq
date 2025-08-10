@@ -90,7 +90,6 @@ export const RoutePolicy: Record<string, Capability | Capability[]> = {
   '/dashboard/system/database': Capability.OPS_DB_READ,
   
   // Settings - Administration
-  '/dashboard/settings/admin': Capability.DEV_DEBUG,
   '/dashboard/settings/audit': Capability.OPS_LOGS,
   '/dashboard/settings/audit-logs': Capability.OPS_LOGS,
   '/dashboard/settings/meeting-audit': Capability.OPS_LOGS,

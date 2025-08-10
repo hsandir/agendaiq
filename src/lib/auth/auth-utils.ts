@@ -261,8 +261,8 @@ export const AuthPresets = {
   requireLeadership: { requireAuth: true, requireStaff: true, requireLeadership: true }, // Legacy
   
   // New capability-based presets
-  requireDevAdmin: { requireAuth: true, requireDevAdmin: true },
-  requireOpsAdmin: { requireAuth: true, requireOpsAdmin: true },
+  requireDevAdmin: { requireAuth: true, requireCapability: Capability.DEV_DEBUG },
+  requireOpsAdmin: { requireAuth: true, requireCapability: Capability.OPS_HEALTH },
   requireAnyAdmin: { requireAuth: true, requireCapability: [Capability.USER_MANAGE, Capability.DEV_DEBUG] },
   
   // Development access

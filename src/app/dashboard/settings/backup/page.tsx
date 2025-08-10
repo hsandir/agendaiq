@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
+import { requireAuth } from '@/lib/auth/auth-utils';
+import { Capability } from '@/lib/auth/policy';
 import BackupClient from './BackupClient';
 
 export const metadata: Metadata = {
@@ -8,8 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default async function BackupPage() {
-  // Auth control - only ops admins can access backup functionality
-  const user = await requireAuth(AuthPresets.requireOpsAdmin);
+  // Auth control - only users with backup capability can access
+  const user = await requireAuth({ requireAuth: true, requireCapability: Capability.OPS_BACKUP });
 
   // Initial backup data will be fetched by the client component
   // This ensures real-time data and proper error handling

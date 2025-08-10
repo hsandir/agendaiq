@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { promises as fs } from 'fs';
@@ -11,8 +12,7 @@ export async function GET(request: NextRequest) {
   // Backup requires OPS_ADMIN (school admin) capabilities
   const authResult = await withAuth(request, { 
     requireAuth: true, 
-    requireStaff: true, 
-    requireOpsAdmin: true 
+    requireCapability: Capability.OPS_BACKUP 
   });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
@@ -43,8 +43,7 @@ export async function POST(request: NextRequest) {
   // Backup creation requires OPS_ADMIN (school admin) capabilities
   const authResult = await withAuth(request, { 
     requireAuth: true, 
-    requireStaff: true, 
-    requireOpsAdmin: true 
+    requireCapability: Capability.OPS_BACKUP 
   });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
@@ -651,7 +650,7 @@ async function createFullSystemBackup(components: string[] = ['database', 'setti
 
 // PUT method for uploading and restoring backups
 export async function PUT(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_BACKUP });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { auditSystem } from '@/lib/audit/hybrid-audit-system';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { AuditCategory } from '@prisma/client';
@@ -31,7 +32,7 @@ interface SortableAuditRecord {
 export async function GET(request: NextRequest) {
   try {
     // Require operations admin access
-    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability.USER_MANAGE });
     if (!authResult.success) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }

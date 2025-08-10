@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
@@ -10,7 +11,7 @@ export async function GET(request: NextRequest) {
     
     if (!isFirstTimeSetup) {
       // Normal auth required if users already exist - operations admin for user management
-      const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
+      const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE });
       if (!authResult.success) {
         return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
       }

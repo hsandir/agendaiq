@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth/api-auth";
+import { Capability } from '@/lib/auth/policy';
 
 // GET Method - System diagnostic (simplified)
 export async function GET(request: NextRequest) {
   try {
     // REQUIRED: Auth check - Developer admin for diagnostics
-    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireDevAdmin: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability.USER_MANAGE });
     
     if (!authResult.success) {
       return NextResponse.json(
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // REQUIRED: Auth check - Developer admin only
-    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireDevAdmin: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability.USER_MANAGE });
     
     if (!authResult.success) {
       return NextResponse.json(

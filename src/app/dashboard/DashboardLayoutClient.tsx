@@ -405,9 +405,6 @@ export function DashboardLayoutClient({
                                   <Link href="/dashboard/settings/audit-logs" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
                                     Database Audit Logs
                                   </Link>
-                                  <Link href="/dashboard/settings/admin" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
-                                    Admin Settings
-                                  </Link>
                                   <Link href="/dashboard/settings/school" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
                                     School Management
                                   </Link>
