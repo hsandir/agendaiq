@@ -62,7 +62,15 @@ class PerformanceMonitor {
       try {
         const response = await originalFetch(...args);
         const endTime = performance.now();
-        const url = typeof args[0] === 'string' ? args[0] : args[0]?.url;
+        let url: string | undefined;
+        
+        if (typeof args[0] === 'string') {
+          url = args[0];
+        } else if (args[0] && 'url' in args[0]) {
+          url = (args[0] as Request).url;
+        } else if (args[0] instanceof URL) {
+          url = args[0].toString();
+        }
         
         // Track API call performance
         if (url && url.includes('/api/user/')) {
@@ -73,7 +81,16 @@ class PerformanceMonitor {
         return response;
       } catch (error) {
         const endTime = performance.now();
-        const url = typeof args[0] === 'string' ? args[0] : args[0]?.url;
+        let url: string | undefined;
+        
+        if (typeof args[0] === 'string') {
+          url = args[0];
+        } else if (args[0] && 'url' in args[0]) {
+          url = (args[0] as Request).url;
+        } else if (args[0] instanceof URL) {
+          url = args[0].toString();
+        }
+        
         if (url) {
           const endpoint = url.split('/').pop() || 'unknown';
           this.addMetric(`api_error_${endpoint}`, endTime - startTime, url);
