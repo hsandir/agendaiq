@@ -135,7 +135,7 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
 
     return userWithCapabilities;
   } catch (error) {
-    Logger.error('Error getting current user:', error);
+    Logger.error('Error getting current user:', { error });
     return null;
   }
 }

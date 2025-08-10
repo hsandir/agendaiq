@@ -171,7 +171,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
         // Convert hex colors to HSL for the editor
         const hslColors: Record<string, string> = {};
         Object.entries(customTheme.colors).forEach(([key, hex]) => {
-          hslColors[key.replace(/([A-Z])/g, '-$1').toLowerCase()] = hexToHsl(hex);
+          hslColors[key.replace(/([A-Z])/g, '-$1').toLowerCase()] = hexToHsl(String(hex));
         });
         setColors(hslColors);
       }
@@ -279,30 +279,30 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
     });
     
     // Auto-generate complementary colors if not provided
-    if (!preset.colors.secondary) {
+    if (!('secondary' in preset.colors)) {
       const [h, s, l] = preset.colors.primary.split(' ').map(Number);
       newColors.secondary = `${(h + 60) % 360} ${s} ${l}`;
       newColors['secondary-foreground'] = preset.isDark ? '0 0 98' : '0 0 10';
     }
     
-    if (!preset.colors.accent) {
+    if (!('accent' in preset.colors)) {
       const [h, s, l] = preset.colors.primary.split(' ').map(Number);
       newColors.accent = `${(h + 180) % 360} ${s * 0.7} ${l * 1.2}`;
       newColors['accent-foreground'] = preset.isDark ? '0 0 98' : '0 0 10';
     }
     
-    if (!preset.colors.muted) {
+    if (!('muted' in preset.colors)) {
       newColors.muted = preset.isDark ? '240 5 84' : '240 5 96';
       newColors['muted-foreground'] = preset.isDark ? '240 4 46' : '240 4 16';
     }
     
-    if (!preset.colors.card) {
+    if (!('card' in preset.colors)) {
       const [h, s, l] = preset.colors.background.split(' ').map(Number);
       newColors.card = preset.isDark ? `${h} ${s} ${l + 5}` : `${h} ${s} ${l - 2}`;
       newColors['card-foreground'] = preset.colors.foreground;
     }
     
-    if (!preset.colors.border) {
+    if (!('border' in preset.colors)) {
       newColors.border = preset.isDark ? '240 6 20' : '240 6 80';
       newColors.input = newColors.border;
     }

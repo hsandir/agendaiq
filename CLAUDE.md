@@ -1,5 +1,146 @@
 # AgendaIQ - Claude AI Assistant Rules & Guidelines
 
+## 🚨🚨🚨 ABSOLUTE CRITICAL RULES - NEVER VIOLATE 🚨🚨🚨
+
+### ⛔⛔⛔ DELETION/REMOVAL STRICTLY PROHIBITED ⛔⛔⛔
+
+1. **NEVER DELETE ANY FILES OR COMPONENTS**
+   - ❌ NO FILE DELETION
+   - ❌ NO COMPONENT REMOVAL
+   - ❌ NO SIMPLIFICATION BY REMOVING CODE
+   - ❌ NO DISABLING FEATURES
+   - ❌ NO "SIMPLIFY" OPERATIONS THAT REMOVE CODE
+   - **IF DELETION IS ABSOLUTELY NECESSARY**: ASK IN CAPITAL LETTERS FIRST
+
+2. **NEVER DELETE DATABASE OR DATA**
+   - ❌ NEVER DROP TABLES
+   - ❌ NEVER TRUNCATE TABLES
+   - ❌ NEVER DELETE RECORDS
+   - ❌ ONLY ADDITIONS OR MODIFICATIONS ALLOWED
+   - **IF DATABASE DELETION IS NECESSARY**: ASK IN CAPITAL LETTERS FIRST
+
+3. **NEVER POSTPONE TASKS**
+   - ❌ NO "LET'S DO THIS LATER"
+   - ❌ NO SKIPPING REQUIRED IMPLEMENTATIONS
+   - ❌ COMPLETE ALL TASKS IMMEDIATELY
+   - **IF POSTPONEMENT IS NECESSARY**: ASK IN CAPITAL LETTERS FIRST
+
+### ✅ MANDATORY BEFORE ANY ACTION ✅
+**ALWAYS REVIEW THESE RULES FIRST BEFORE MAKING ANY CHANGES**
+
+---
+
+## 📝 TODO LIST & SESSION MANAGEMENT - CRITICAL
+
+### TODO LIST MANAGEMENT
+1. **ALWAYS MAINTAIN AN ACTIVE TODO LIST**
+   - Create todo list at the start of EVERY task
+   - Update status immediately when starting a task (in_progress)
+   - Mark as completed immediately when done
+   - NEVER leave tasks in limbo
+   - If terminal crashes, resume from todo list
+
+2. **TODO STATUS RULES**
+   - `pending`: Not started yet
+   - `in_progress`: Currently working on (ONLY ONE at a time)
+   - `completed`: Finished successfully
+
+3. **SESSION CONTINUITY**
+   - Save progress regularly in `.claude/session.json`
+   - Log all conversations in `.claude/history.md`
+
+---
+
+## 📁 DOCUMENTATION FOLDER STRUCTURE - MANDATORY
+
+### FOLDER ORGANIZATION RULES
+All markdown documentation files MUST be organized in the `/docs` folder with the following structure:
+
+```
+/Users/hs/Project/agendaiq/
+├── CLAUDE.md           # This file - AI assistant rules (STAYS IN ROOT)
+├── README.md           # Project readme (STAYS IN ROOT)
+└── docs/
+    ├── policies/       # All policy documents
+    │   ├── FILE_MANAGEMENT_PROTOCOL.md
+    │   ├── SECURITY_TESTING_POLICY.md
+    │   ├── SENTRY_MONITORING_POLICY.md
+    │   └── THEME_SYSTEM_RULES.md
+    │
+    ├── security/       # Security-related documentation
+    │   ├── SECURITY.md
+    │   ├── SECURITY_RULES.md
+    │   ├── SECURITY_ENV_ROTATION.md
+    │   ├── SUPABASE_CREDENTIALS_BACKUP.md
+    │   └── SUPABASE_VERIFIED_URLS.md
+    │
+    ├── reports/        # Analysis and reports
+    │   ├── SENTRY_ANALYSIS_REPORT.md
+    │   ├── PERFORMANCE_RESULTS.md
+    │   ├── AI_EVALUATION.md
+    │   ├── TEST_INFRASTRUCTURE_SUMMARY.md
+    │   └── TICKETS-REPORT.md
+    │
+    ├── completed/      # Completed tasks and todos
+    │   ├── COMPLETED_TODOS.md
+    │   └── SENTRY_IMPLEMENTATION_TASKS.md
+    │
+    ├── deployment/     # Deployment guides
+    │   ├── DEPLOYMENT.md
+    │   └── VERCEL_DEPLOYMENT_GUIDE.md
+    │
+    ├── guides/         # How-to guides
+    │   └── TESTING_GUIDE.md
+    │
+    └── architecture/   # System architecture docs
+        ├── AUTH-ROADMAP.md
+        ├── OAUTH-PLAN.md
+        ├── RBAC_SYSTEM.md
+        └── TEST_DB_SETUP.md
+```
+
+### DOCUMENT ACCESS RULES
+1. **When looking for documentation:**
+   - Policies → `/docs/policies/`
+   - Security info → `/docs/security/`
+   - Reports → `/docs/reports/`
+   - Completed tasks → `/docs/completed/`
+   - Deployment info → `/docs/deployment/`
+   - Guides → `/docs/guides/`
+   - Architecture → `/docs/architecture/`
+
+2. **When creating new documentation:**
+   - ALWAYS place in appropriate subfolder
+   - NEVER create MD files in project root (except README.md)
+   - Use clear, descriptive filenames
+
+3. **Git inclusion rules:**
+   - `/docs/policies/` → Include in git (project rules)
+   - `/docs/security/` → EXCLUDE sensitive files (credentials)
+   - `/docs/reports/` → Include in git (analysis reports)
+   - `/docs/completed/` → Optional (can exclude)
+   - `/docs/deployment/` → Include in git (deployment guides)
+   - `/docs/guides/` → Include in git (how-to guides)
+   - `/docs/architecture/` → Include in git (system design)
+   - On restart: Check todo list and continue from last task
+   - Track: Current task, completed tasks, next steps
+
+### SESSION RECOVERY PROTOCOL
+When terminal restarts or session resumes:
+1. Check `.claude/session.json` for last state
+2. Review todo list for incomplete tasks
+3. Continue from last `in_progress` task
+4. Announce: "Resuming work on: [task name]"
+5. DO NOT ask "what were we doing?"
+
+### CONVERSATION LOGGING
+- Log all important decisions in `.claude/history.md`
+- Format: `[TIMESTAMP] - ACTION - DETAILS`
+- Include: Files created, changes made, decisions taken
+- Update after each significant action
+
+---
+
 ## 🤖 Claude AI Integration Rules
 
 This document establishes the rules and guidelines for Claude AI when working with the AgendaIQ project - a comprehensive meeting and agenda management system for Turkish educational institutions.

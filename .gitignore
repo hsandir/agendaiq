@@ -25,8 +25,13 @@
 *.pem
 
 # SECURITY: Never commit sensitive files
-SUPABASE_CREDENTIALS_BACKUP.md
-SUPABASE_VERIFIED_URLS.md
+docs/security/SUPABASE_CREDENTIALS_BACKUP.md
+docs/security/SUPABASE_VERIFIED_URLS.md
+docs/security/*_CREDENTIALS.md
+docs/security/*_PASSWORDS.md
+docs/security/*_SECRETS.md
+docs/security/*_PRIVATE.md
+docs/security/*_SENSITIVE.md
 *_CREDENTIALS.md
 *_PASSWORDS.md
 *_SECRETS.md
@@ -35,6 +40,9 @@ SUPABASE_VERIFIED_URLS.md
 credentials/
 secrets/
 private/
+
+# Optional: Completed tasks documentation
+docs/completed/
 
 # debug
 npm-debug.log*

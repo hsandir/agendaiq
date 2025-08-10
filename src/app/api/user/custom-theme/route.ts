@@ -3,6 +3,7 @@ import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from '@/lib/prisma';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 
 // More flexible validation to handle various color formats
 const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
@@ -120,7 +121,7 @@ export async function DELETE(request: NextRequest) {
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        custom_theme: null,
+        custom_theme: Prisma.JsonNull,
         theme_preference: 'standard',
       },
     });

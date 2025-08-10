@@ -88,7 +88,7 @@ export function SignInForm() {
   return (
     <div className="w-full max-w-md space-y-8 rounded-lg bg-card p-6 shadow-lg" role="form" aria-label="Sign in form">
       <div>
-        <h2 className="text-center text-3xl font-bold tracking-tight text-foreground" role="heading" aria-level="2">
+        <h2 className="text-center text-3xl font-bold tracking-tight text-foreground" role="heading" aria-level={2}>
           Sign in to your account
         </h2>
       </div>

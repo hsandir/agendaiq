@@ -8,7 +8,7 @@ import { MonitoringConfig, SampleRates } from './types';
 // Environment detection
 const ENV = process.env.NODE_ENV || 'development';
 const IS_PRODUCTION = ENV === 'production';
-const IS_STAGING = ENV === 'staging';
+const IS_STAGING = process.env.VERCEL_ENV === 'preview';
 const IS_DEVELOPMENT = ENV === 'development';
 const IS_SERVER = typeof window === 'undefined';
 
