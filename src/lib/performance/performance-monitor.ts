@@ -62,18 +62,22 @@ class PerformanceMonitor {
       try {
         const response = await originalFetch(...args);
         const endTime = performance.now();
-        const url = typeof args[0] === 'string' ? args[0] : args[0].url;
+        const url = typeof args[0] === 'string' ? args[0] : args[0]?.url;
         
         // Track API call performance
-        if (url.includes('/api/user/')) {
-          this.addMetric(`api_${url.split('/').pop()}`, endTime - startTime, url);
+        if (url && url.includes('/api/user/')) {
+          const endpoint = url.split('/').pop() || 'unknown';
+          this.addMetric(`api_${endpoint}`, endTime - startTime, url);
         }
         
         return response;
       } catch (error) {
         const endTime = performance.now();
-        const url = typeof args[0] === 'string' ? args[0] : args[0].url;
-        this.addMetric(`api_error_${url.split('/').pop()}`, endTime - startTime, url);
+        const url = typeof args[0] === 'string' ? args[0] : args[0]?.url;
+        if (url) {
+          const endpoint = url.split('/').pop() || 'unknown';
+          this.addMetric(`api_error_${endpoint}`, endTime - startTime, url);
+        }
         throw error;
       }
     };

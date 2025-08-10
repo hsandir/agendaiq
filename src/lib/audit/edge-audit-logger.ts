@@ -92,11 +92,7 @@ export class EdgeAuditLogger {
       return cfConnectingIP;
     }
     
-    // Log warning for IP detection failure in development
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('EdgeAuditLogger: Could not determine client IP address from headers');
-    }
-    
+    // Return unknown instead of logging warning to avoid console spam
     return 'unknown';
   }
 

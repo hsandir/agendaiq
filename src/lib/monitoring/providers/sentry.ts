@@ -28,7 +28,7 @@ class SentryProvider implements MonitoringProvider {
   init(config: MonitoringConfig): void {
     if (this.initialized) return;
 
-    const sentryConfig: Sentry.ClientOptions = {
+    const sentryConfig: any = {
       dsn: config.enabled ? config.dsn : undefined,
       environment: config.environment,
       release: config.release,
@@ -48,7 +48,7 @@ class SentryProvider implements MonitoringProvider {
       allowUrls: ALLOW_URLS,
       
       // Dynamic sampling
-      tracesSampler: (samplingContext) => {
+      tracesSampler: (samplingContext: any) => {
         return getDynamicSampleRate({
           url: samplingContext.request?.url,
           error: !!samplingContext.error,
@@ -58,7 +58,7 @@ class SentryProvider implements MonitoringProvider {
       },
       
       // Before send hook for data sanitization
-      beforeSend: (event, hint) => {
+      beforeSend: (event: any, hint: any) => {
         // Allow custom beforeSend from config
         if (config.beforeSend) {
           const customEvent = config.beforeSend(this.sentryEventToErrorEvent(event));
@@ -103,7 +103,7 @@ class SentryProvider implements MonitoringProvider {
       },
       
       // Before send transaction for performance data
-      beforeSendTransaction: (transaction) => {
+      beforeSendTransaction: (transaction: any) => {
         // Add custom tags
         if (config.tags) {
           transaction.tags = { ...transaction.tags, ...config.tags };
@@ -156,26 +156,36 @@ class SentryProvider implements MonitoringProvider {
       switch (integration.name) {
         case 'BrowserTracing':
           if (typeof window !== 'undefined') {
-            integrations.push(
-              new Sentry.BrowserTracing(integration.options || {})
-            );
+            // BrowserTracing is now browserTracingIntegration in newer versions
+            const BrowserTracing = (Sentry as any).BrowserTracing || (Sentry as any).browserTracingIntegration;
+            if (BrowserTracing) {
+              integrations.push(
+                new BrowserTracing(integration.options || {})
+              );
+            }
           }
           break;
           
         case 'Replay':
           if (typeof window !== 'undefined') {
-            integrations.push(
-              new Sentry.Replay(integration.options || {})
-            );
+            const Replay = (Sentry as any).Replay || (Sentry as any).replayIntegration;
+            if (Replay) {
+              integrations.push(
+                new Replay(integration.options || {})
+              );
+            }
           }
           break;
           
         case 'ProfileIntegration':
           if (typeof window === 'undefined') {
             // Server-side profiling
-            integrations.push(
-              new Sentry.ProfilingIntegration()
-            );
+            const ProfilingIntegration = (Sentry as any).ProfilingIntegration || (Sentry as any).profilingIntegration;
+            if (ProfilingIntegration) {
+              integrations.push(
+                new ProfilingIntegration()
+              );
+            }
           }
           break;
       }
@@ -205,7 +215,7 @@ class SentryProvider implements MonitoringProvider {
   captureException(error: Error, context?: Record<string, any>): void {
     if (!this.initialized) return;
     
-    const scope = new Sentry.Scope();
+    const scope = new (Sentry as any).Scope();
     
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
@@ -219,7 +229,7 @@ class SentryProvider implements MonitoringProvider {
   captureMessage(message: string, level?: string, context?: Record<string, any>): void {
     if (!this.initialized) return;
     
-    const scope = new Sentry.Scope();
+    const scope = new (Sentry as any).Scope();
     
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
@@ -317,7 +327,7 @@ class SentryProvider implements MonitoringProvider {
       };
     }
     
-    const transaction = Sentry.startTransaction({
+    const transaction = (Sentry as any).startTransaction({
       name,
       op: op || 'custom',
     });
@@ -385,7 +395,7 @@ class SentryProvider implements MonitoringProvider {
   startReplay(): void {
     if (!this.initialized) return;
     
-    const replay = Sentry.getCurrentHub().getIntegration(Sentry.Replay);
+    const replay = (Sentry as any).getCurrentHub?.()?.getIntegration?.((Sentry as any).Replay);
     if (replay) {
       replay.start();
     }
@@ -394,7 +404,7 @@ class SentryProvider implements MonitoringProvider {
   stopReplay(): void {
     if (!this.initialized) return;
     
-    const replay = Sentry.getCurrentHub().getIntegration(Sentry.Replay);
+    const replay = (Sentry as any).getCurrentHub?.()?.getIntegration?.((Sentry as any).Replay);
     if (replay) {
       replay.stop();
     }

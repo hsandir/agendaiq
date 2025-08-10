@@ -185,7 +185,7 @@ export const SENSITIVE_FIELDS = [
 ];
 
 // Tags to be added to all events
-export const DEFAULT_TAGS = {
+export const DEFAULT_TAGS: Record<string, string> = {
   service: IS_SERVER ? 'api' : 'web',
   environment: ENV,
   region: process.env.VERCEL_REGION || 'eu-west-1',
@@ -193,7 +193,7 @@ export const DEFAULT_TAGS = {
   commit: process.env.VERCEL_GIT_COMMIT_SHA || 'unknown',
   branch: process.env.VERCEL_GIT_COMMIT_REF || 'unknown',
   runtime: IS_SERVER ? 'node' : 'browser',
-  node_version: IS_SERVER ? process.version : undefined,
+  ...(IS_SERVER && process.version ? { node_version: process.version } : {}),
 };
 
 // Performance monitoring thresholds
