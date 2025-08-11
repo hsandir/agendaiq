@@ -145,6 +145,14 @@ When terminal restarts or session resumes:
 
 This document establishes the rules and guidelines for Claude AI when working with the AgendaIQ project - a comprehensive meeting and agenda management system for Turkish educational institutions.
 
+## ⚠️ **IMPORTANT: READ MASTER RULES FIRST**
+**MANDATORY**: Before ANY operation, Claude MUST read:
+1. **`.claude/MASTER_RULES.md`** - SINGLE SOURCE OF TRUTH (highest priority)
+2. Then this file (CLAUDE.md) for Claude-specific guidelines
+3. Other rule files for additional context
+
+**The MASTER_RULES.md contains the CURRENT auth system (Capability-based with RoleKey enum)**
+
 ## 🔄 **MODEL SWITCHING STRATEGY**
 
 **AUTOMATIC MODEL SWITCHING PROTOCOL:**
@@ -224,38 +232,36 @@ When Claude creates ANY new file, it MUST follow the template system:
 // Remove unused HTTP methods
 ```
 
-### 2. **AUTHENTICATION SYSTEM COMPLIANCE - CAPABILITY-BASED ONLY**
+### 2. **AUTHENTICATION SYSTEM COMPLIANCE**
 
-Claude MUST always use the NEW capability-based authentication system:
+Claude MUST use the capability-based auth system as defined in **MASTER_RULES.md**:
 
 ```typescript
-// REQUIRED IMPORTS FOR ALL FILES
-import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils';
+// REQUIRED IMPORTS
+import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
 import { withAuth } from '@/lib/auth/api-auth';
-import { Capability } from '@/lib/auth/policy';
+import { Capability, RoleKey } from '@/lib/auth/policy';
 
-// PAGE AUTHENTICATION PATTERNS - USE PRESETS OR CAPABILITIES
-const user = await requireAuth(AuthPresets.requireAuth);         // Basic auth
-const user = await requireAuth(AuthPresets.requireDevAdmin);     // Dev admin only
-const user = await requireAuth(AuthPresets.requireOpsAdmin);     // Ops admin only
-const user = await requireAuth(AuthPresets.requireMonitoring);   // Monitoring access
-const user = await requireAuth(AuthPresets.requireLogs);         // Logs access
+// PAGE AUTHENTICATION - Use AuthPresets
+const user = await requireAuth(AuthPresets.requireAuth);        // Basic auth
+const user = await requireAuth(AuthPresets.requireStaff);      // Staff required
+const user = await requireAuth(AuthPresets.requireDevAdmin);   // Dev admin
+const user = await requireAuth(AuthPresets.requireOpsAdmin);   // Ops admin
 
-// API AUTHENTICATION PATTERNS - ALWAYS USE CAPABILITIES
-const authResult = await withAuth(request, { 
-  requireAuth: true,
-  requireCapability: Capability.OPS_BACKUP  // Use specific capability
+// API AUTHENTICATION - Use Capabilities
+const authResult = await withAuth(request, {
+  requireCapability: Capability.USER_MANAGE
 });
 if (!authResult.success) {
   return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
 }
+const user = authResult.user!;
 
-// ⛔ NEVER USE THESE DEPRECATED PATTERNS ⛔
-// WRONG: { requireAdminRole: true }        - Use requireCapability instead
-// WRONG: { requireStaff: true }            - Use requireCapability instead  
-// WRONG: { requireLeadership: true }       - Use requireCapability instead
-// WRONG: { requireOpsAdmin: true }         - Use requireCapability: Capability.OPS_*
-// WRONG: { requireDevAdmin: true }         - Use requireCapability: Capability.DEV_*
+// CHECK ROLE BY KEY (not title) - USE NUMERIC KEYS
+if (user.staff?.role?.key === RoleKey.DEV_ADMIN) { /* Dev admin */ }
+if (user.staff?.role?.key === RoleKey.OPS_ADMIN) { /* Ops admin */ }
+if (user.staff?.role?.key === RoleKey.ROLE_1) { /* Priority 1 role */ }
+if (user.staff?.role?.key === RoleKey.ROLE_5) { /* Priority 5 role */ }
 ```
 
 ### 3. **SECURITY-FIRST DEVELOPMENT**
@@ -292,21 +298,35 @@ if (!result.success) {
 
 ### 4. **ROLE HIERARCHY ENFORCEMENT**
 
-Claude must respect the educational hierarchy:
+Claude must use RoleKey enum as defined in **MASTER_RULES.md**:
 
 ```typescript
-// ROLE PRIORITY ORDER (1 = highest authority)
-1. Administrator (priority: 1, is_leadership: true)
-2. Superintendent (priority: 2, is_leadership: true)
-3. Principal (priority: 3, is_leadership: true)
-4. Vice Principal (priority: 4, is_leadership: true)
-5. Department Head (priority: 5, is_leadership: true)
-6. Teacher (priority: 6, is_leadership: false)
-7. Staff (priority: 7, is_leadership: false)
+// ROLE KEY SYSTEM (from database Role.key field)
+// System roles + numeric organizational roles
+enum RoleKey {
+  // System Roles
+  DEV_ADMIN = 'DEV_ADMIN',    // System Developer
+  OPS_ADMIN = 'OPS_ADMIN',    // Operations Administrator
+  
+  // Organizational Roles (numeric)
+  ROLE_1 = 'ROLE_1',    // Priority 1 (e.g., CEO)
+  ROLE_2 = 'ROLE_2',    // Priority 2 (e.g., COO)
+  ROLE_3 = 'ROLE_3',    // Priority 3 (e.g., Director)
+  ROLE_4 = 'ROLE_4',    // Priority 4 (e.g., Vice Director)
+  ROLE_5 = 'ROLE_5',    // Priority 5 (e.g., Manager)
+  ROLE_6 = 'ROLE_6',    // Priority 6
+  ROLE_7 = 'ROLE_7',    // Priority 7
+  ROLE_8 = 'ROLE_8',    // Priority 8
+  ROLE_9 = 'ROLE_9',    // Priority 9
+  ROLE_10 = 'ROLE_10',  // Priority 10
+}
 
-// PERMISSION CHECKING PATTERN
-const hasPermission = user.staff?.role.is_leadership || 
-                     user.staff?.role.title === 'Administrator';
+// PERMISSION CHECKING - Use capabilities, not titles
+import { can, isDevAdmin, isOpsAdmin } from '@/lib/auth/policy';
+
+if (can(user, Capability.MEETING_CREATE)) { /* Can create meetings */ }
+if (isDevAdmin(user)) { /* Is dev admin */ }
+if (isOpsAdmin(user)) { /* Is ops admin */ }
 ```
 
 ### 5. **DATABASE INTERACTION STANDARDS**
@@ -711,8 +731,12 @@ className="bg-blue-600 text-white px-4 py-2"
 // WRONG - Hardcoded
 const isAdmin = true;
 
-// CORRECT - Database check
+// WRONG - Using role title
 const isAdmin = user.staff?.role.title === 'Administrator';
+
+// CORRECT - Database check using RoleKey
+import { RoleKey } from '@/lib/auth/policy';
+const isAdmin = user.staff?.role.key === RoleKey.OPS_ADMIN;
 ```
 
 ❌ **Use inconsistent language**

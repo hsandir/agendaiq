@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from '@/lib/prisma';
-import { pusherServer, CHANNELS, EVENTS } from '@/lib/pusher';
+import { pusherServer, CHANNELS } from '@/lib/pusher';
 import { isAnyAdmin } from '@/lib/auth/policy';
 import { z } from 'zod';
 

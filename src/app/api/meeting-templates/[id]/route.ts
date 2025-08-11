@@ -12,7 +12,6 @@ export async function GET(
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
   
-  const user = authResult.user!;
 
   try {
     const { id } = await params;
@@ -78,7 +77,6 @@ export async function PUT(
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
   
-  const user = authResult.user!;
 
   try {
     const { id } = await params;
@@ -148,7 +146,6 @@ export async function DELETE(
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
   
-  const user = authResult.user!;
 
   try {
     const { id } = await params;

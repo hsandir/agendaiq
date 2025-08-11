@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
           env: { ...process.env, CI: 'true' }
         })
 
-        let outputBuffer = ''
+        const outputBuffer = ''
 
         testProcess.stdout.on('data', (data) => {
           const output = data.toString()

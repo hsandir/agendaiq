@@ -96,14 +96,14 @@ export default function MeetingSearchPage() {
         setMeetings(data.meetings || []);
       }
       if (searchType === 'all' || searchType === 'agenda') {
-        const safeAgendaItems = (data.agendaItems || []).map((item: any) => ({
+        const safeAgendaItems = (data.agendaItems || []).map((item: { meeting?: { id: number; title: string; startTime: string }; [key: string]: unknown }) => ({
           ...item,
           meeting: item.meeting || { id: 0, title: 'Unknown', startTime: new Date().toISOString() }
         }));
         setAgendaItems(safeAgendaItems);
       }
       if (searchType === 'all' || searchType === 'actions') {
-        const safeActionItems = (data.actionItems || []).map((item: any) => ({
+        const safeActionItems = (data.actionItems || []).map((item: { meeting?: { id: number; title: string }; assignedTo?: { name: string }; [key: string]: unknown }) => ({
           ...item,
           meeting: item.meeting || { id: 0, title: 'Unknown' },
           assignedTo: item.assignedTo || { name: 'Unassigned' }

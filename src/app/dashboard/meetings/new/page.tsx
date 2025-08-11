@@ -161,7 +161,7 @@ export default async function NewMeetingPage() {
         // Calculate dates based on repeat config
         meetingDates.push(startDate); // Include original date
         
-        let currentDate = new Date(startDate);
+        const currentDate = new Date(startDate);
         const maxOccurrences = data.repeatConfig.endType === 'after' ? 
           (data.repeatConfig.occurrences || 10) : 52;
         const endLimit = data.repeatConfig.endType === 'by' && data.repeatConfig.endDate ? 

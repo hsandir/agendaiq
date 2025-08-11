@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
+import { RoleKey } from '@/lib/auth/policy';
 
 interface AuthRequirements {
   requireStaff?: boolean;
@@ -38,16 +39,16 @@ export function withAuth<P extends object>(
         return;
       }
       
-      // Check admin requirement
-      if (requirements.requireAdmin && session.user?.staff?.role?.title !== 'Administrator') {
+      // Check admin requirement (using RoleKey enum)
+      if (requirements.requireAdmin && session.user?.staff?.role?.key !== RoleKey.OPS_ADMIN) {
         router.push('/dashboard');
         return;
       }
       
-      // Check allowed roles
+      // Check allowed roles (should use RoleKey values)
       if (requirements.allowedRoles && requirements.allowedRoles.length > 0) {
-        const userRole = session.user?.staff?.role?.title;
-        if (!userRole || !requirements.allowedRoles.includes(userRole)) {
+        const userRoleKey = session.user?.staff?.role?.key;
+        if (!userRoleKey || !requirements.allowedRoles.includes(userRoleKey)) {
           router.push('/dashboard');
           return;
         }
@@ -72,13 +73,13 @@ export function withAuth<P extends object>(
       return null;
     }
     
-    if (requirements.requireAdmin && session.user?.staff?.role?.title !== 'Administrator') {
+    if (requirements.requireAdmin && session.user?.staff?.role?.key !== RoleKey.OPS_ADMIN) {
       return null;
     }
     
     if (requirements.allowedRoles && requirements.allowedRoles.length > 0) {
-      const userRole = session.user?.staff?.role?.title;
-      if (!userRole || !requirements.allowedRoles.includes(userRole)) {
+      const userRoleKey = session.user?.staff?.role?.key;
+      if (!userRoleKey || !requirements.allowedRoles.includes(userRoleKey)) {
         return null;
       }
     }

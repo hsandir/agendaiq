@@ -7,7 +7,7 @@ const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
   try {
-    const { type, errors } = await request.json();
+    const { type } = await request.json();
 
     if (type === 'react-version-mismatch') {
       return await fixReactVersionMismatch();
@@ -298,7 +298,12 @@ async function autoFixAllErrors() {
       console.warn('Auto-backup failed:', error);
     }
 
-    const fixResults: any = {
+    const fixResults: {
+      reactFix: unknown | null;
+      nodeFix: unknown | null;
+      tailwindFix: unknown | null;
+      cacheFix: unknown | null;
+    } = {
       reactFix: null,
       nodeFix: null,
       tailwindFix: null,
@@ -309,7 +314,7 @@ async function autoFixAllErrors() {
     try {
       const nodeFixResponse = await fixNodeModulesIssues();
       fixResults.nodeFix = await nodeFixResponse.json();
-    } catch (error) {
+    } catch {
       fixResults.nodeFix = { error: 'Node.js fix failed' };
     }
 
@@ -317,7 +322,7 @@ async function autoFixAllErrors() {
     try {
       const reactFixResponse = await fixReactVersionMismatch();
       fixResults.reactFix = await reactFixResponse.json();
-    } catch (error) {
+    } catch {
       fixResults.reactFix = { error: 'React fix failed' };
     }
 
@@ -325,7 +330,7 @@ async function autoFixAllErrors() {
     try {
       const tailwindFixResponse = await fixTailwindCSSIssues();
       fixResults.tailwindFix = await tailwindFixResponse.json();
-    } catch (error) {
+    } catch {
       fixResults.tailwindFix = { error: 'TailwindCSS fix failed' };
     }
 

@@ -5,7 +5,7 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_OWNER = process.env.GITHUB_OWNER;
 const GITHUB_REPO = process.env.GITHUB_REPO;
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Auth check - development capability required
     await requireAuth(AuthPresets.requireDevelopment);

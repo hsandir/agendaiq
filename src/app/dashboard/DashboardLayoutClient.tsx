@@ -15,8 +15,8 @@ import { layoutStore } from '@/lib/layout/layout-store';
 interface DashboardLayoutClientProps {
   children: React.ReactNode;
   isAdmin: boolean;
-  user: { email: string; [key: string]: any };
-  currentRole: { title?: string; [key: string]: any } | null;
+  user: { email: string; name?: string; staff_id?: number | null; [key: string]: unknown };
+  currentRole: { title?: string; [key: string]: unknown } | null;
   userWithStaff: unknown;
 }
 

@@ -189,7 +189,7 @@ export function RepeatMeetingModal({
   };
 
   const getMonthlyWeekdayDate = (date: Date, week: number, weekday: number): Date => {
-    let nextMonth = addMonths(date, 1);
+    const nextMonth = addMonths(date, 1);
     const firstDay = startOfMonth(nextMonth);
     
     if (week === -1) {

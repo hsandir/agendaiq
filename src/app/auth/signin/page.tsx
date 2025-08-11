@@ -74,7 +74,7 @@ function SignInContent() {
 
           {/* Sign Up Link */}
           <p className="mt-2 text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/auth/signup" className="font-medium text-primary hover:text-primary">
               Sign up
             </Link>

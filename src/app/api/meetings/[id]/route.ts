@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth, AuthPresets } from "@/lib/auth/auth-utils";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/lib/auth/api-auth";
 import { Capability } from '@/lib/auth/policy';

@@ -48,14 +48,17 @@ import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils'
 import { checkAuthRequirements } from '@/lib/auth/auth-utils';
 import { withAuth } from '@/lib/auth/api-auth';
 
-// STANDARD AUTH PATTERNS FOR PAGES
+// STANDARD AUTH PATTERNS FOR PAGES (See MASTER_RULES.md for current system)
 const user = await requireAuth(AuthPresets.requireAuth);      // Basic auth
 const user = await requireAuth(AuthPresets.requireStaff);    // Staff required
-const user = await requireAuth(AuthPresets.requireAdmin);    // Admin required
-const user = await requireAuth(AuthPresets.requireLeadership); // Leadership required
+const user = await requireAuth(AuthPresets.requireDevAdmin);  // Dev admin only
+const user = await requireAuth(AuthPresets.requireOpsAdmin);  // Ops admin only
 
-// STANDARD AUTH PATTERNS FOR API ROUTES
-const authResult = await withAuth(request, { requireAdminRole: true });
+// STANDARD AUTH PATTERNS FOR API ROUTES (Use Capabilities)
+import { Capability } from '@/lib/auth/policy';
+const authResult = await withAuth(request, { 
+  requireCapability: Capability.USER_MANAGE  // Use specific capability
+});
 if (!authResult.success) {
   return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
 }
@@ -64,13 +67,25 @@ const user = authResult.user!;
 
 ### 2. USER ROLE HIERARCHY
 ```typescript
-// ROLE HIERARCHY (Priority Order)
-1. Administrator (priority: 1, is_leadership: true)
-2. Principal (priority: 2, is_leadership: true)  
-3. Vice Principal (priority: 3, is_leadership: true)
-4. Department Head (priority: 4, is_leadership: true)
-5. Teacher (priority: 5, is_leadership: false)
-6. Staff (priority: 6, is_leadership: false)
+// ROLE HIERARCHY - NUMERIC ROLEKEY SYSTEM
+// See MASTER_RULES.md for full details
+import { RoleKey } from '@/lib/auth/policy';
+
+// System Roles (fixed):
+RoleKey.DEV_ADMIN  // System Developer (highest privilege)
+RoleKey.OPS_ADMIN  // Operations Administrator
+
+// Organizational Roles (numeric, meaning varies by org):
+RoleKey.ROLE_1     // Priority 1 (e.g., CEO, Superintendent)
+RoleKey.ROLE_2     // Priority 2 (e.g., COO, Deputy)
+RoleKey.ROLE_3     // Priority 3 (e.g., Director, Principal)
+RoleKey.ROLE_4     // Priority 4 (e.g., Vice Director)
+RoleKey.ROLE_5     // Priority 5 (e.g., Manager, Department Head)
+RoleKey.ROLE_6     // Priority 6
+RoleKey.ROLE_7     // Priority 7
+RoleKey.ROLE_8     // Priority 8
+RoleKey.ROLE_9     // Priority 9
+RoleKey.ROLE_10    // Priority 10
 
 // USER DATA STRUCTURE
 interface AuthenticatedUser {
@@ -81,8 +96,9 @@ interface AuthenticatedUser {
     id: number;
     role: {
       id: number;
-      title: string;
-      priority: number;
+      key: string;        // RoleKey enum value
+      title: string;      // Display name (varies by org)
+      priority: number;   // 1-10 (lower = higher authority)
       category: string | null;
       is_leadership: boolean;
     };
@@ -135,7 +151,9 @@ import { withAuth } from '@/lib/auth/api-auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAdminRole: true });
+  const authResult = await withAuth(request, { 
+    requireCapability: Capability.USER_MANAGE  // Use capabilities, not roles
+  });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -263,9 +281,11 @@ const meeting = await prisma.meeting.create({
 
 #### Meeting Access Control
 ```typescript
-// Check meeting access permissions
+// Check meeting access permissions using capabilities
+import { can, Capability } from '@/lib/auth/policy';
+
 const hasAccess = meeting.organizer_id === user.staff!.id || 
-                 user.staff!.role.is_leadership ||
+                 can(user, Capability.MEETING_MANAGE) ||
                  meetingAttendees.some(a => a.staff_id === user.staff!.id);
 ```
 
@@ -396,6 +416,7 @@ GOOGLE_CLIENT_SECRET=
 ❌ Direct session access (use auth utilities)
 ❌ Custom CSS files (use Tailwind)
 ❌ Hardcoded user data (always fetch from database)
+❌ Using role titles instead of RoleKey enum (use role.key === RoleKey.XXX)
 ❌ Missing authentication checks
 ❌ Unhandled errors
 ❌ English text in user interfaces

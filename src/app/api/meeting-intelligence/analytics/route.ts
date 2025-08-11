@@ -8,7 +8,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
 
-  const user = authResult.user!;
   
   try {
     const searchParams = request.nextUrl.searchParams;

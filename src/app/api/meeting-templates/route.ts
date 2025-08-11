@@ -8,8 +8,6 @@ export async function GET(request: NextRequest) {
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
-  
-  const user = authResult.user!;
 
   try {
     const templates = await prisma.meetingTemplate.findMany({

@@ -22,7 +22,7 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 // Global state to persist across navigations (in-memory)
-let globalThemeState = {
+const globalThemeState = {
   currentThemeId: "standard",
   customTheme: null as any,
   initialized: false,

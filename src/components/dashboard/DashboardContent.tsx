@@ -2,6 +2,7 @@
 
 import { useLayout } from '@/lib/layout/layout-provider';
 import { layoutClasses } from '@/lib/layout/layout-types';
+import Link from "next/link";
 import { Calendar, Users, FileText } from "lucide-react";
 import { LucideIcon } from 'lucide-react';
 
@@ -108,12 +109,12 @@ export function DashboardContent({
     <section className="card p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-foreground">Today's Meetings</h2>
-        <a
+        <Link
           href="/dashboard/meetings"
           className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
         >
           View all →
-        </a>
+        </Link>
       </div>
       
       <div className="space-y-4">
@@ -140,7 +141,7 @@ export function DashboardContent({
           <div className="text-center py-12">
             <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">No upcoming meetings scheduled</p>
-            <a
+            <Link
               href="/dashboard/meetings"
               className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors"
             >
@@ -148,7 +149,7 @@ export function DashboardContent({
                 <path d="M11 5h2v14h-2zM5 11h14v2H5z"/>
               </svg>
               Schedule Meeting
-            </a>
+            </Link>
           </div>
         )}
       </div>
@@ -189,13 +190,13 @@ export function DashboardContent({
     <div className="mt-8 pt-6 border-t border-border/30">
       <h3 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wide">Quick Actions</h3>
       <div className="space-y-3">
-        <a 
+        <Link 
           href="/dashboard/meetings" 
           className="flex items-center gap-3 p-3 bg-primary/5 hover:bg-primary/10 rounded-lg transition-colors group"
         >
           <Calendar className="h-4 w-4 text-primary" />
           <span className="text-sm font-medium text-foreground group-hover:text-primary">Create Meeting</span>
-        </a>
+        </Link>
         <a 
           href="/dashboard/notes" 
           className="flex items-center gap-3 p-3 bg-background/30 hover:bg-background/50 rounded-lg transition-colors group"
