@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
     const suggestions = await MeetingSearchService.getSearchSuggestions(
       query,
-      type as any
+      type as 'all' | 'meetings' | 'agenda' | 'actions'
     );
 
     return NextResponse.json({ suggestions });

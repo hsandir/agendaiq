@@ -8,8 +8,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
 
-  const user = authResult.user!;
-  
   try {
     // Fetch meetings with parent-child relationships
     const meetings = await prisma.meeting.findMany({
@@ -122,7 +120,7 @@ export async function GET(request: NextRequest) {
         : 0,
       longestChain: Math.max(...chains.map(c => c.totalMeetings), 0),
       totalCarriedItems: meetings.reduce((sum, m) => 
-        sum + m.MeetingAgendaItems.filter((i: any) => i.carried_forward).length, 0
+        sum + m.MeetingAgendaItems.filter((i: { carried_forward: boolean }) => i.carried_forward).length, 0
       ),
       resolutionRate: chains.reduce((sum, c) => sum + c.efficiency, 0) / (chains.length || 1),
       averageResolutionTime: 7 // Simplified - would need more complex calculation
@@ -142,7 +140,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function buildMeetingNode(meeting: any, allMeetings: any[]): any {
+function buildMeetingNode(meeting: Record<string, unknown>, allMeetings: Record<string, unknown>[]): Record<string, unknown> {
   const children = allMeetings.filter(m => m.parent_meeting_id === meeting.id);
   
   return {
@@ -154,14 +152,14 @@ function buildMeetingNode(meeting: any, allMeetings: any[]): any {
     children: children.map(child => buildMeetingNode(child, allMeetings)),
     agendaItems: {
       total: meeting.MeetingAgendaItems.length,
-      resolved: meeting.MeetingAgendaItems.filter((i: any) => i.status === 'Resolved').length,
-      carriedForward: meeting.MeetingAgendaItems.filter((i: any) => i.carried_forward).length
+      resolved: meeting.MeetingAgendaItems.filter((i: { status: string }) => i.status === 'Resolved').length,
+      carriedForward: meeting.MeetingAgendaItems.filter((i: { carried_forward: boolean }) => i.carried_forward).length
     },
     actionItems: {
       total: meeting.MeetingActionItems.length,
-      completed: meeting.MeetingActionItems.filter((i: any) => i.status === 'Completed').length,
-      pending: meeting.MeetingActionItems.filter((i: any) => i.status === 'Pending').length,
-      overdue: meeting.MeetingActionItems.filter((i: any) => {
+      completed: meeting.MeetingActionItems.filter((i: { status: string }) => i.status === 'Completed').length,
+      pending: meeting.MeetingActionItems.filter((i: { status: string }) => i.status === 'Pending').length,
+      overdue: meeting.MeetingActionItems.filter((i: { due_date?: Date; status: string }) => {
         return i.due_date && i.due_date < new Date() && i.status !== 'Completed';
       }).length
     },
@@ -172,6 +170,6 @@ function buildMeetingNode(meeting: any, allMeetings: any[]): any {
   };
 }
 
-function getAllMeetingsInChain(node: any): any[] {
+function getAllMeetingsInChain(node: Record<string, unknown>): Record<string, unknown>[] {
   return [node, ...node.children.flatMap(getAllMeetingsInChain)];
 }

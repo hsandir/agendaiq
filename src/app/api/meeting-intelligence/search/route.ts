@@ -8,8 +8,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
 
-  const user = authResult.user!;
-  
   try {
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get('q') || '';
@@ -23,7 +21,7 @@ export async function GET(request: NextRequest) {
       });
     }
     
-    const searchResults: any = {};
+    const searchResults: Record<string, unknown> = {};
     
     // Search meetings
     if (type === 'all' || type === 'meetings') {

@@ -44,19 +44,19 @@ async function calculateBuildMetrics() {
 
     // Calculate metrics
     const totalBuilds = runs.length;
-    const successfulBuilds = runs.filter((r: any) => r.conclusion === 'success').length;
+    const successfulBuilds = runs.filter((r: { conclusion: string }) => r.conclusion === 'success').length;
     const successRate = totalBuilds > 0 ? (successfulBuilds / totalBuilds) * 100 : 0;
 
     // Calculate average duration for completed runs
-    const completedRuns = runs.filter((r: any) => r.status === 'completed' && r.run_started_at);
-    const totalDuration = completedRuns.reduce((acc: number, run: any) => {
+    const completedRuns = runs.filter((r: { status: string; run_started_at?: string }) => r.status === 'completed' && r.run_started_at);
+    const totalDuration = completedRuns.reduce((acc: number, run: { updated_at: string; run_started_at: string }) => {
       const duration = new Date(run.updated_at).getTime() - new Date(run.run_started_at).getTime();
       return acc + duration;
     }, 0);
     const averageDuration = completedRuns.length > 0 ? totalDuration / completedRuns.length : 0;
 
     // Calculate average queue time
-    const totalQueueTime = runs.reduce((acc: number, run: any) => {
+    const totalQueueTime = runs.reduce((acc: number, run: { run_started_at?: string; created_at: string }) => {
       if (run.run_started_at) {
         const queueTime = new Date(run.run_started_at).getTime() - new Date(run.created_at).getTime();
         return acc + queueTime;
@@ -70,7 +70,7 @@ async function calculateBuildMetrics() {
     let testsFailed = 0;
     let codeCoverage = 0;
 
-    const latestSuccess = runs.find((r: any) => r.conclusion === 'success');
+    const latestSuccess = runs.find((r: { conclusion: string }) => r.conclusion === 'success');
     if (latestSuccess) {
       // In a real implementation, fetch artifacts or check suite results
       // For now, return realistic estimates

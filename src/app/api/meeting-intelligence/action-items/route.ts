@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const priority = searchParams.get('priority') || 'all';
     
     // Build query conditions
-    const whereConditions: any = {};
+    const whereConditions: Record<string, unknown> = {};
     
     // Filter by ownership
     if (filter === 'my' && user.staff) {
@@ -170,7 +170,7 @@ export async function PATCH(request: NextRequest) {
   try {
     const { itemId, status } = await request.json();
     
-    const updateData: any = { status };
+    const updateData: Record<string, unknown> = { status };
     if (status === 'completed') {
       updateData.completed_at = new Date();
     }

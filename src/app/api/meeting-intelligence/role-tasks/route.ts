@@ -8,14 +8,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
 
-  const user = authResult.user!;
-  
   try {
     const searchParams = request.nextUrl.searchParams;
     const filter = searchParams.get('filter') || 'all';
     
     // Build role query conditions
-    const roleWhereConditions: any = {};
+    const roleWhereConditions: Record<string, unknown> = {};
     
     if (filter === 'leadership') {
       roleWhereConditions.is_leadership = true;
@@ -101,7 +99,20 @@ export async function GET(request: NextRequest) {
     
     // Transform roles with tasks
     const rolesWithTasks = roles.map(role => {
-      const tasks = role.ActionItems.map((item: any) => {
+      const tasks = role.ActionItems.map((item: {
+        id: number;
+        title: string;
+        description?: string;
+        status?: string;
+        priority?: string;
+        due_date?: Date;
+        created_at: Date;
+        Meeting?: {
+          id: number;
+          title: string;
+          start_time?: Date;
+        };
+      }) => {
         const now = new Date();
         const isOverdue = item.due_date && item.due_date < now && item.status !== 'Completed';
         

@@ -31,7 +31,15 @@ async function fetchVercelDeployments() {
     const data = await response.json();
     
     // Transform Vercel data to our format
-    return data.deployments?.map((deployment: any) => ({
+    return data.deployments?.map((deployment: {
+      target?: string;
+      meta?: { githubCommitSha?: string };
+      uid: string;
+      state: string;
+      created: number;
+      creator?: { username?: string; email?: string };
+      url?: string;
+    }) => ({
       environment: deployment.target || 'production',
       version: deployment.meta?.githubCommitSha?.substring(0, 7) || deployment.uid.substring(0, 7),
       status: mapVercelStatus(deployment.state),

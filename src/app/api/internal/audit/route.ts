@@ -14,8 +14,6 @@ export async function POST(request: NextRequest) {
       action,
       path,
       method,
-      ipAddress,
-      userAgent,
       success,
       errorMessage,
       metadata,

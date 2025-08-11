@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     
     // Calculate date range
     const now = new Date();
-    let startDate = new Date();
+    const startDate = new Date();
     
     switch (timeRange) {
       case 'week':
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Base query conditions
-    const whereConditions: any = {
+    const whereConditions: Record<string, unknown> = {
       start_time: {
         gte: startDate,
         lte: now
@@ -91,14 +91,14 @@ export async function GET(request: NextRequest) {
     // Calculate action item completion rate
     const totalActionItems = meetings.reduce((sum, m) => sum + m.MeetingActionItems.length, 0);
     const completedActionItems = meetings.reduce((sum, m) => 
-      sum + m.MeetingActionItems.filter((a: any) => a.status === 'Completed').length, 0
+      sum + m.MeetingActionItems.filter((a: { status: string }) => a.status === 'Completed').length, 0
     );
     const actionItemCompletionRate = totalActionItems > 0
       ? Math.round((completedActionItems / totalActionItems) * 100)
       : 0;
     
     // Meeting types distribution
-    const meetingsByType = meetings.reduce((acc: any[], m) => {
+    const meetingsByType = meetings.reduce((acc: Array<{ type: string; count: number }>, m) => {
       const existing = acc.find(t => t.type === (m.meeting_type || 'general'));
       if (existing) {
         existing.count++;
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
           dept.totalDuration += (m.end_time.getTime() - m.start_time.getTime()) / 60000;
         }
         dept.actionItems += m.MeetingActionItems.length;
-        dept.completedItems += m.MeetingActionItems.filter((a: any) => a.status === 'Completed').length;
+        dept.completedItems += m.MeetingActionItems.filter((a: { status: string }) => a.status === 'Completed').length;
       }
     });
     

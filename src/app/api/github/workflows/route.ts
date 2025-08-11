@@ -8,7 +8,7 @@ const GITHUB_REPO = process.env.GITHUB_REPO;
 export async function GET(request: NextRequest) {
   try {
     // Auth check - development capability required
-    const user = await requireAuth(AuthPresets.requireDevelopment);
+    await requireAuth(AuthPresets.requireDevelopment);
     
     if (!GITHUB_TOKEN || !GITHUB_OWNER || !GITHUB_REPO) {
       return NextResponse.json(
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Auth check - development capability required
-    const user = await requireAuth(AuthPresets.requireDevelopment);
+    await requireAuth(AuthPresets.requireDevelopment);
     
     const { workflow_id, ref = 'main', inputs = {} } = await request.json();
     

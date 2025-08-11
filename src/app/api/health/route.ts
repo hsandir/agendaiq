@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const checks = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     const startDb = Date.now();
     await prisma.$queryRaw`SELECT 1`;
     checks.checks.database = `healthy (${Date.now() - startDb}ms)`;
-  } catch (error) {
+  } catch {
     checks.checks.database = 'unhealthy';
     checks.status = 'degraded';
   }
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Readiness check for Kubernetes
-export async function HEAD(request: NextRequest) {
+export async function HEAD() {
   try {
     await prisma.$queryRaw`SELECT 1`;
     return new NextResponse(null, { status: 200 });

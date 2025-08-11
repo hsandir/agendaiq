@@ -64,7 +64,21 @@ export async function GET(request: NextRequest) {
       const sentryIssues = await response.json();
 
       // Transform Sentry issues to our format
-      const issues = Array.isArray(sentryIssues) ? sentryIssues.map((issue: any) => ({
+      const issues = Array.isArray(sentryIssues) ? sentryIssues.map((issue: {
+        id: string;
+        title?: string;
+        culprit?: string;
+        level?: string;
+        count?: number;
+        userCount?: number;
+        firstSeen?: string;
+        lastSeen?: string;
+        status?: string;
+        isRegression?: boolean;
+        platform?: string;
+        lastRelease?: { version: string };
+        assignedTo?: { name?: string; email?: string };
+      }) => ({
         id: issue.id,
         title: issue.title || 'Unknown Error',
         culprit: issue.culprit || 'Unknown location',

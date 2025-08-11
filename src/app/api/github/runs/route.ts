@@ -8,7 +8,7 @@ const GITHUB_REPO = process.env.GITHUB_REPO;
 export async function GET(request: NextRequest) {
   try {
     // Auth check - development capability required
-    const user = await requireAuth(AuthPresets.requireDevelopment);
+    await requireAuth(AuthPresets.requireDevelopment);
     
     const { searchParams } = new URL(request.url);
     const workflow_id = searchParams.get('workflow_id');
@@ -39,7 +39,20 @@ export async function GET(request: NextRequest) {
     const data = await response.json();
     
     return NextResponse.json({
-      workflow_runs: data.workflow_runs.map((run: any) => ({
+      workflow_runs: data.workflow_runs.map((run: {
+        id: number;
+        name: string;
+        status: string;
+        conclusion: string | null;
+        workflow_id: number;
+        created_at: string;
+        updated_at: string;
+        html_url: string;
+        head_branch: string;
+        head_sha: string;
+        run_number: number;
+        event: string;
+      }) => ({
         id: run.id,
         name: run.name,
         status: run.status,

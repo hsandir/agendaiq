@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   const onlyWithActionItems = searchParams.get('onlyWithActionItems') === 'true';
 
   try {
-    let whereClause: any = {};
+    const whereClause: Record<string, unknown> = {};
 
     // Search filter
     if (search) {
@@ -158,7 +158,7 @@ export async function GET(request: NextRequest) {
       attendees: meeting.MeetingAttendee.length,
       agendaItems: meeting.MeetingAgendaItems.length,
       actionItems: meeting.MeetingActionItems.length,
-      completedActions: meeting.MeetingActionItems.filter((item: any) => item.status === 'Completed').length,
+      completedActions: meeting.MeetingActionItems.filter((item: { status: string }) => item.status === 'Completed').length,
       department: meeting.Department?.name,
       isRecurring: !!meeting.repeat_type,
       parentMeetingId: meeting.parent_meeting_id

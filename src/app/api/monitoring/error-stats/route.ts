@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
       if (errorCountRes.ok) {
         const data = await errorCountRes.json();
         if (data.data && data.data.length > 0) {
-          const totalErrors = data.data.reduce((sum: number, point: any) => {
+          const totalErrors = data.data.reduce((sum: number, point: [string, Array<{ count: number }>]) => {
             const value = point[1] && point[1][0] ? point[1][0].count : 0;
             return sum + value;
           }, 0);
