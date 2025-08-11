@@ -177,7 +177,7 @@ export default function LocalMonitor() {
       // Local health checks (memory, performance, etc.)
       if (performance && 'memory' in performance) {
         const memoryInfo = (performance as { memory?: { usedJSHeapSize?: number; totalJSHeapSize?: number } }).memory;
-        const memoryUsed = memoryInfo.usedJSHeapSize / 1024 / 1024;
+        const memoryUsed = memoryInfo?.usedJSHeapSize ? memoryInfo.usedJSHeapSize / 1024 / 1024 : 0;
         if (memoryUsed > 100) { // If using more than 100MB
           const rawError = {
             id: `memory-warning-${Date.now()}`,

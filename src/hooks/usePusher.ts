@@ -80,7 +80,11 @@ export function usePusherChannel(
 
 interface PresenceMember {
   id: string;
-  info?: Record<string, unknown>;
+  info?: {
+    name: string;
+    role: string;
+    [key: string]: unknown;
+  };
 }
 
 export function usePresenceChannel(
@@ -107,8 +111,10 @@ export function usePresenceChannel(
 
     // Handle presence events
     channelRef.current.bind('pusher:subscription_succeeded', () => {
-      const membersList = Object.values(channelRef.current?.members.members || {});
-      setMembers(membersList);
+      const membersList = Object.values(channelRef.current?.members.members || {}) as PresenceMember[];
+      setMembers(membersList.filter((member): member is PresenceMember => 
+        typeof member === 'object' && member !== null && 'id' in member
+      ));
     });
 
     channelRef.current.bind('pusher:member_added', (member: PresenceMember) => {

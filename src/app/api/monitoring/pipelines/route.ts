@@ -131,37 +131,44 @@ function extractStages(run: GitHubWorkflowRun): PipelineStage[] {
     
     stages.push({
       name: 'Build',
-      status: 'running'
+      status: 'running',
+      duration: 0
     });
     
     stages.push({
       name: 'Test',
-      status: 'pending'
+      status: 'pending',
+      duration: 0
     });
     
     stages.push({
       name: 'Deploy',
-      status: 'pending'
+      status: 'pending',
+      duration: 0
     });
   } else {
     stages.push({
       name: 'Checkout',
-      status: 'pending'
+      status: 'pending',
+      duration: 0
     });
     
     stages.push({
       name: 'Build',
-      status: 'pending'
+      status: 'pending',
+      duration: 0
     });
     
     stages.push({
       name: 'Test',
-      status: 'pending'
+      status: 'pending',
+      duration: 0
     });
     
     stages.push({
       name: 'Deploy',
-      status: 'pending'
+      status: 'pending',
+      duration: 0
     });
   }
   

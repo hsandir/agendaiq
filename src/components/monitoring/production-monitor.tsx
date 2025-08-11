@@ -70,7 +70,7 @@ export default function ProductionMonitor() {
       stack: rawError.stack,
       url: rawError.url,
       userAgent: rawError.userAgent,
-      severity: rawError.severity || 'medium',
+      severity: (rawError.severity as "low" | "medium" | "high" | "critical") || 'medium',
       analysis,
       resolved: false
     };

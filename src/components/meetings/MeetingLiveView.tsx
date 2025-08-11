@@ -306,6 +306,17 @@ export function MeetingLiveView({
                   )}
                 </div>
                 
+                {(isOrganizer || isAdmin) && (
+                  <Link href={`/dashboard/meetings/${meeting.id}/edit`}>
+                    <Button
+                      variant="default"
+                      className="rounded-full"
+                    >
+                      Edit Meeting
+                    </Button>
+                  </Link>
+                )}
+                
                 <Button
                   onClick={refreshMeeting}
                   variant="outline"
@@ -463,14 +474,14 @@ export function MeetingLiveView({
                   Live Now ({members.length})
                 </h3>
                 <div className="space-y-2">
-                  {members.map((member: Record<string, unknown>) => (
+                  {members.map((member) => (
                     <div key={member.id} className="flex items-center gap-3 text-sm">
                       <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
                         <div className="w-2 h-2 bg-green-500 rounded-full" />
                       </div>
                       <div>
-                        <span className="text-foreground">{member.info.name}</span>
-                        <span className="text-muted-foreground text-xs ml-1">• {member.info.role}</span>
+                        <span className="text-foreground">{member.info?.name || 'Anonymous'}</span>
+                        <span className="text-muted-foreground text-xs ml-1">• {member.info?.role || 'User'}</span>
                       </div>
                     </div>
                   ))}

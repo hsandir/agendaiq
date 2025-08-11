@@ -1,13 +1,43 @@
 import { faker } from '@faker-js/faker'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, User, Staff, Role, Department, School, District, Meeting, MeetingAttendee, MeetingAgendaItem } from '@prisma/client'
 import bcrypt from 'bcryptjs'
+
+interface UserOverrides {
+  password?: string
+  email?: string
+  name?: string
+  emailVerified?: Date
+  two_factor_enabled?: boolean
+}
+
+interface StaffWithRelations extends Staff {
+  User: User
+  Role: Role
+  Department: Department & { School: School & { District: District } }
+  School: School & { District: District }
+  District: District
+}
+
+interface StaffOverrides {
+  user?: User
+  role?: Role
+  department?: Department & { School: School & { District: District } }
+  school?: School & { District: District }
+  district?: District
+}
+
+interface MeetingOverrides {
+  organizer?: StaffWithRelations
+  start_time?: Date
+  end_time?: Date
+}
 
 export class TestFactory {
   constructor(private prisma: PrismaClient) {}
 
   // User factory
-  async createUser(overrides: Record<string, unknown> = {}) {
-    const password = (overrides as { password?: string }).password || 'password123'
+  async createUser(overrides: UserOverrides = {}): Promise<User> {
+    const password = overrides.password || 'password123'
     const hashedPassword = await bcrypt.hash(password, 10)
 
     return this.prisma.user.create({
@@ -23,12 +53,12 @@ export class TestFactory {
   }
 
   // Staff factory
-  async createStaff(overrides: Record<string, unknown> = {}) {
+  async createStaff(overrides: StaffOverrides = {}): Promise<StaffWithRelations> {
     const user = overrides.user || await this.createUser()
     const role = overrides.role || await this.getOrCreateRole('Teacher')
     const department = overrides.department || await this.getOrCreateDepartment()
-    const school = overrides.school || (department as { School?: unknown }).School
-    const district = overrides.district || (school as { District?: unknown }).District
+    const school = overrides.school || department.School
+    const district = overrides.district || school.District
 
     return this.prisma.staff.create({
       data: {
@@ -37,7 +67,7 @@ export class TestFactory {
         department_id: department.id,
         school_id: school.id,
         district_id: district.id,
-        employee_id: faker.string.alphanumeric(8).toUpperCase(),
+        staff_id: faker.string.alphanumeric(8).toUpperCase(),
         hire_date: faker.date.past({ years: 5 }),
         phone: faker.phone.number(),
         office_location: faker.location.streetAddress(),
@@ -59,10 +89,10 @@ export class TestFactory {
   }
 
   // Meeting factory
-  async createMeeting(overrides: Record<string, unknown> = {}) {
+  async createMeeting(overrides: MeetingOverrides = {}): Promise<Meeting> {
     const organizer = overrides.organizer || await this.createStaff()
     const startTime = overrides.start_time || faker.date.future()
-    const endTime = new Date((startTime as Date).getTime() + 60 * 60 * 1000) // 1 hour later
+    const endTime = overrides.end_time || new Date(startTime.getTime() + 60 * 60 * 1000) // 1 hour later
 
     return this.prisma.meeting.create({
       data: {
@@ -107,7 +137,7 @@ export class TestFactory {
   }
 
   // Meeting with attendees
-  async createMeetingWithAttendees(attendeeCount: number = 3, overrides: Record<string, unknown> = {}) {
+  async createMeetingWithAttendees(attendeeCount: number = 3, overrides: MeetingOverrides = {}): Promise<{ meeting: Meeting; attendees: MeetingAttendee[] }> {
     const meeting = await this.createMeeting(overrides)
     const attendees = []
 
@@ -135,7 +165,7 @@ export class TestFactory {
   }
 
   // Agenda item factory
-  async createAgendaItem(meeting: { id: number }, overrides: Record<string, unknown> = {}) {
+  async createAgendaItem(meeting: { id: number }, overrides: Partial<MeetingAgendaItem> & { presenter?: StaffWithRelations } = {}): Promise<MeetingAgendaItem> {
     const presenter = overrides.presenter || await this.createStaff()
 
     return this.prisma.meetingAgendaItem.create({
@@ -145,7 +175,7 @@ export class TestFactory {
         description: faker.lorem.paragraph(),
         presenter_id: presenter.id,
         duration_minutes: faker.number.int({ min: 5, max: 30 }),
-        order_index: overrides.order_index || faker.number.int({ min: 1, max: 10 }),
+        order_index: overrides.order_index ?? faker.number.int({ min: 1, max: 10 }),
         item_type: faker.helpers.arrayElement(['DISCUSSION', 'PRESENTATION', 'DECISION', 'INFORMATION']),
         status: 'Pending',
         ...overrides,
@@ -154,7 +184,7 @@ export class TestFactory {
   }
 
   // Helper methods
-  private async getOrCreateRole(title: string = 'Teacher') {
+  private async getOrCreateRole(title: string = 'Teacher'): Promise<Role> {
     let role = await this.prisma.role.findFirst({ where: { title } })
     
     if (!role) {
@@ -170,7 +200,7 @@ export class TestFactory {
     return role
   }
 
-  private async getOrCreateDepartment() {
+  private async getOrCreateDepartment(): Promise<Department & { School: School & { District: District } }> {
     let department = await this.prisma.department.findFirst()
     
     if (!department) {
@@ -194,7 +224,7 @@ export class TestFactory {
     return department
   }
 
-  private async getOrCreateSchool() {
+  private async getOrCreateSchool(): Promise<School & { District: District }> {
     let school = await this.prisma.school.findFirst()
     
     if (!school) {
@@ -215,7 +245,7 @@ export class TestFactory {
     return school
   }
 
-  private async getOrCreateDistrict() {
+  private async getOrCreateDistrict(): Promise<District> {
     let district = await this.prisma.district.findFirst()
     
     if (!district) {
@@ -245,16 +275,16 @@ export class TestFactory {
   }
 
   // Bulk creation methods
-  async createUsers(count: number) {
-    const users = []
+  async createUsers(count: number): Promise<User[]> {
+    const users: User[] = []
     for (let i = 0; i < count; i++) {
       users.push(await this.createUser())
     }
     return users
   }
 
-  async createMeetings(count: number, organizer?: { id: number; department_id: number; school_id: number; district_id: number }) {
-    const meetings = []
+  async createMeetings(count: number, organizer?: StaffWithRelations): Promise<Meeting[]> {
+    const meetings: Meeting[] = []
     for (let i = 0; i < count; i++) {
       meetings.push(await this.createMeeting({ organizer }))
     }

@@ -55,10 +55,8 @@ export async function GET() {
       else if (status === '??') fileStatus = '??';
       
       changes.push({
-        path: file,
-        status: fileStatus,
-        additions: 0, // Would need diff for accurate counts
-        deletions: 0
+        file,
+        status: fileStatus
       });
       
       // Categorize files

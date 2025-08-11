@@ -91,6 +91,11 @@ export default async function EditMeetingPage({ params }: PageProps) {
     agenda: meeting.agenda || '',
     notes: meeting.notes || '',
     status: meeting.status || 'draft',
+    type: meeting.meeting_type || 'regular',
+    location: meeting.location || '',
+    zoomLink: meeting.zoom_link || '',
+    zoomMeetingId: meeting.zoom_meeting_id || '',
+    calendarIntegration: meeting.calendar_integration || 'none',
     attendees: meeting.MeetingAttendee.map(attendee => ({
       id: attendee.Staff.id.toString(),
       name: attendee.Staff.User.name || attendee.Staff.User.email || '',

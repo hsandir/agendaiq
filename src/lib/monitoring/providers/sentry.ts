@@ -117,7 +117,10 @@ class SentryProvider implements MonitoringProvider {
       beforeSendTransaction: (transaction: Record<string, unknown>) => {
         // Add custom tags
         if (config.tags) {
-          transaction.tags = { ...transaction.tags, ...config.tags };
+          transaction.tags = { 
+            ...(typeof transaction.tags === 'object' ? transaction.tags : {}), 
+            ...config.tags 
+          };
         }
         
         // Remove sensitive data from transaction
@@ -230,7 +233,8 @@ class SentryProvider implements MonitoringProvider {
     
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
-        scope.setContext(key, removeSensitiveFields(value));
+        const sanitizedValue = removeSensitiveFields(value as Record<string, unknown>);
+        scope.setContext(key, sanitizedValue as Record<string, unknown>);
       });
     }
     
@@ -244,7 +248,8 @@ class SentryProvider implements MonitoringProvider {
     
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
-        scope.setContext(key, removeSensitiveFields(value));
+        const sanitizedValue = removeSensitiveFields(value as Record<string, unknown>);
+        scope.setContext(key, sanitizedValue as Record<string, unknown>);
       });
     }
     
@@ -311,7 +316,8 @@ class SentryProvider implements MonitoringProvider {
 
   setContext(key: string, context: Record<string, unknown>): void {
     if (!this.initialized) return;
-    Sentry.setContext(key, removeSensitiveFields(context));
+    const sanitizedContext = removeSensitiveFields(context);
+    Sentry.setContext(key, sanitizedContext as Record<string, unknown>);
   }
 
   addBreadcrumb(breadcrumb: Breadcrumb): void {
@@ -359,24 +365,30 @@ class SentryProvider implements MonitoringProvider {
     if (!this.initialized) return;
     
     const sentryTransaction = this.transactions.get(transaction.name);
-    if (sentryTransaction) {
+    if (sentryTransaction && typeof sentryTransaction === 'object' && 'setStatus' in sentryTransaction) {
       if (transaction.status) {
-        sentryTransaction.setStatus(transaction.status);
+        (sentryTransaction as { setStatus: (status: string) => void }).setStatus(transaction.status);
       }
       
       if (transaction.tags) {
         Object.entries(transaction.tags).forEach(([key, value]) => {
-          sentryTransaction.setTag(key, value);
+          if ('setTag' in sentryTransaction) {
+            (sentryTransaction as { setTag: (key: string, value: string) => void }).setTag(key, value);
+          }
         });
       }
       
       if (transaction.data) {
         Object.entries(transaction.data).forEach(([key, value]) => {
-          sentryTransaction.setData(key, value);
+          if ('setData' in sentryTransaction) {
+            (sentryTransaction as { setData: (key: string, value: unknown) => void }).setData(key, value);
+          }
         });
       }
       
-      sentryTransaction.finish();
+      if ('finish' in sentryTransaction) {
+        (sentryTransaction as { finish: () => void }).finish();
+      }
       this.transactions.delete(transaction.name);
     }
   }
@@ -408,18 +420,26 @@ class SentryProvider implements MonitoringProvider {
   startReplay(): void {
     if (!this.initialized) return;
     
-    const replay = (Sentry as unknown as { getCurrentHub?: () => { getIntegration?: (integration: unknown) => { start?: () => void } } }).getCurrentHub?.()?.getIntegration?.((Sentry as unknown as { Replay?: unknown }).Replay);
-    if (replay) {
-      replay.start();
+    const sentryWithHub = Sentry as unknown as { getCurrentHub?: () => { getIntegration?: (integration: unknown) => { start?: () => void } } };
+    const currentHub = sentryWithHub.getCurrentHub?.();
+    if (currentHub?.getIntegration) {
+      const replay = currentHub.getIntegration((Sentry as unknown as { Replay?: unknown }).Replay);
+      if (replay?.start) {
+        replay.start();
+      }
     }
   }
 
   stopReplay(): void {
     if (!this.initialized) return;
     
-    const replay = (Sentry as unknown as { getCurrentHub?: () => { getIntegration?: (integration: unknown) => { stop?: () => void } } }).getCurrentHub?.()?.getIntegration?.((Sentry as unknown as { Replay?: unknown }).Replay);
-    if (replay) {
-      replay.stop();
+    const sentryWithHub = Sentry as unknown as { getCurrentHub?: () => { getIntegration?: (integration: unknown) => { stop?: () => void } } };
+    const currentHub = sentryWithHub.getCurrentHub?.();
+    if (currentHub?.getIntegration) {
+      const replay = currentHub.getIntegration((Sentry as unknown as { Replay?: unknown }).Replay);
+      if (replay?.stop) {
+        replay.stop();
+      }
     }
   }
 

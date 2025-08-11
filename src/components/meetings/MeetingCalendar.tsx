@@ -89,7 +89,11 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
               <p className="text-center text-muted-foreground py-8">No meetings scheduled</p>
             ) : (
               meetings.map(meeting => (
-                <div key={meeting.id} className="border rounded-lg p-3 hover:bg-muted">
+                <div 
+                  key={meeting.id} 
+                  className="border rounded-lg p-3 hover:bg-muted cursor-pointer transition-colors"
+                  onClick={() => router.push(`/dashboard/meetings/${meeting.id}`)}
+                >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <h4 className="font-medium">{meeting.title}</h4>
@@ -111,6 +115,7 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-primary text-sm hover:underline mt-2 inline-block"
+                      onClick={(e) => e.stopPropagation()}
                     >
                       Join Meeting
                     </a>
@@ -199,7 +204,7 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
                     title={meeting.title}
                     onClick={(e) => {
                       e.stopPropagation();
-                      router.push(`/dashboard/meetings/${meeting.id}/edit`);
+                      router.push(`/dashboard/meetings/${meeting.id}`);
                     }}
                   >
                     {safeFormatTime(meeting.startTime)} {meeting.title}
@@ -228,7 +233,7 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
                   <div 
                     key={meeting.id} 
                     className="bg-card p-2 rounded border cursor-pointer hover:bg-muted transition-colors"
-                    onClick={() => router.push(`/dashboard/meetings/${meeting.id}/edit`)}
+                    onClick={() => router.push(`/dashboard/meetings/${meeting.id}`)}
                   >
                     <div className="font-medium text-sm">{meeting.title}</div>
                     <div className="text-xs text-muted-foreground">

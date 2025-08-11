@@ -99,27 +99,14 @@ export async function GET(request: NextRequest) {
     
     // Transform roles with tasks
     const rolesWithTasks = roles.map(role => {
-      const tasks = role.ActionItems.map((item: {
-        id: number;
-        title: string;
-        description?: string;
-        status?: string;
-        priority?: string;
-        due_date?: Date;
-        created_at: Date;
-        Meeting?: {
-          id: number;
-          title: string;
-          start_time?: Date;
-        };
-      }) => {
+      const tasks = role.ActionItems.map((item) => {
         const now = new Date();
         const isOverdue = item.due_date && item.due_date < now && item.status !== 'Completed';
         
         return {
           id: item.id,
           title: item.title,
-          description: item.description,
+          description: item.description || undefined,
           status: isOverdue ? 'overdue' : (item.status || 'pending'),
           priority: item.priority || 'Medium',
           dueDate: item.due_date?.toISOString(),

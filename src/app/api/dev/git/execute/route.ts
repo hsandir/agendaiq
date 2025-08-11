@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     const { command, args = [] } = body;
 
     // Validate command
-    if (!ALLOWED_COMMANDS.includes(command)) {
+    if (!command || !ALLOWED_COMMANDS.includes(command)) {
       return NextResponse.json(
         { error: `Command '${command}' is not allowed` },
         { status: 400 }

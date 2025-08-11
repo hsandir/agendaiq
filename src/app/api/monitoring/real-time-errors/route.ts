@@ -14,6 +14,8 @@ interface StoredError extends ErrorReport {
     priorityScore: number;
   };
   resolved: boolean;
+  priority: number;
+  resolvedAt?: string;
 }
 
 interface PageAnalytics {
@@ -23,6 +25,10 @@ interface PageAnalytics {
   errorRate: number;
   lastErrorTime: string | null;
   healthScore: number;
+  recentErrors: number;
+  criticalCount: number;
+  highCount: number;
+  averagePriority: number;
 }
 
 // In-memory storage for real-time errors (Redis can be used in production)

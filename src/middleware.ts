@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { getToken, JWT } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 import { rateLimitMiddleware } from "@/lib/middleware/rate-limit-middleware";
 import { auditMiddleware } from "@/lib/middleware/audit-middleware";
@@ -13,25 +13,32 @@ interface NextAuthToken {
   is_school_admin?: boolean;
   capabilities?: string[];
   staff?: {
+    id: number;
     role?: {
-      key?: string;
+      id: number;
+      key?: string | null;
+      title: string;
+      is_leadership?: boolean;
     };
-  } & Record<string, unknown>;
+  };
 }
 
 // Helper function to convert token to UserWithCapabilities
-function tokenToUser(token: NextAuthToken | null): UserWithCapabilities | null {
+function tokenToUser(token: JWT | NextAuthToken | null): UserWithCapabilities | null {
   if (!token) return null;
   
+  const id = typeof token.id === 'string' ? parseInt(token.id) : (token.id as number);
+  if (!id) return null;
+  
   return {
-    id: typeof token.id === 'string' ? parseInt(token.id) : token.id,
-    email: token.email,
-    name: token.name,
-    is_system_admin: token.is_system_admin || token.staff?.role?.key === 'DEV_ADMIN' || false,
-    is_school_admin: token.is_school_admin || token.staff?.role?.key === 'OPS_ADMIN' || false,
-    roleKey: token.staff?.role?.key,
-    capabilities: token.capabilities || [],
-    staff: token.staff
+    id,
+    email: token.email as string | undefined,
+    name: token.name as string | undefined,
+    is_system_admin: Boolean(token.is_system_admin) || token.staff?.role?.key === 'DEV_ADMIN' || false,
+    is_school_admin: Boolean(token.is_school_admin) || token.staff?.role?.key === 'OPS_ADMIN' || false,
+    roleKey: token.staff?.role?.key || undefined,
+    capabilities: (token.capabilities as string[]) || [],
+    staff: token.staff as { id: number; role?: { id: number; key?: string | null; title: string; is_leadership?: boolean } } | undefined
   };
 }
 

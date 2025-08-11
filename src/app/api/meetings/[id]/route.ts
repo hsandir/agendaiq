@@ -12,12 +12,17 @@ import { z } from "zod";
 const updateMeetingSchema = z.object({
   title: z.string().min(1).max(255).optional(),
   description: z.string().optional(),
-  startTime: z.string().datetime().optional(),
-  endTime: z.string().datetime().optional(),
+  start_time: z.string().optional(), // Accept ISO string
+  end_time: z.string().optional(),   // Accept ISO string
+  meeting_type: z.string().optional(),
+  location: z.string().optional(),
+  zoom_meeting_id: z.string().optional(),
+  zoom_link: z.string().optional(),
+  calendar_integration: z.string().nullable().optional(),
   agenda: z.string().optional(),
   notes: z.string().optional(),
   status: z.string().optional(),
-  zoomLink: z.string().url().optional()
+  attendeeIds: z.array(z.string()).optional()
 });
 
 interface Props {
@@ -238,22 +243,45 @@ export async function PATCH(
     };
 
     // Prepare update data with proper types
-    const updateData: MeetingUpdateData = {};
+    const updateData: any = {};
     
-    if (sanitizedData.title !== undefined) updateData.title = sanitizedData.title;
-    if (sanitizedData.description !== undefined) updateData.description = sanitizedData.description;
-    if (sanitizedData.agenda !== undefined) updateData.agenda = sanitizedData.agenda;
-    if (sanitizedData.notes !== undefined) updateData.notes = sanitizedData.notes;
-    if (sanitizedData.status !== undefined) updateData.status = sanitizedData.status;
-    if (sanitizedData.startTime !== undefined) updateData.start_time = new Date(sanitizedData.startTime);
-    if (sanitizedData.endTime !== undefined) updateData.end_time = new Date(sanitizedData.endTime);
-    if (sanitizedData.zoomLink !== undefined) updateData.zoom_join_url = sanitizedData.zoomLink;
+    if (body.title !== undefined) updateData.title = body.title;
+    if (body.description !== undefined) updateData.description = body.description;
+    if (body.meeting_type !== undefined) updateData.meeting_type = body.meeting_type;
+    if (body.location !== undefined) updateData.location = body.location;
+    if (body.zoom_meeting_id !== undefined) updateData.zoom_meeting_id = body.zoom_meeting_id;
+    if (body.zoom_link !== undefined) updateData.zoom_link = body.zoom_link;
+    if (body.calendar_integration !== undefined) updateData.calendar_integration = body.calendar_integration;
+    if (body.agenda !== undefined) updateData.agenda = body.agenda;
+    if (body.notes !== undefined) updateData.notes = body.notes;
+    if (body.status !== undefined) updateData.status = body.status;
+    if (body.start_time !== undefined) updateData.start_time = new Date(body.start_time);
+    if (body.end_time !== undefined) updateData.end_time = new Date(body.end_time);
 
     // Update meeting
     const updatedMeeting = await prisma.meeting.update({
       where: { id: meetingId },
       data: updateData,
     });
+
+    // Update attendees if provided
+    if (body.attendeeIds && Array.isArray(body.attendeeIds)) {
+      // Remove existing attendees
+      await prisma.meetingAttendee.deleteMany({
+        where: { meeting_id: meetingId }
+      });
+
+      // Add new attendees
+      if (body.attendeeIds.length > 0) {
+        await prisma.meetingAttendee.createMany({
+          data: body.attendeeIds.map((staffId: string) => ({
+            meeting_id: meetingId,
+            staff_id: parseInt(staffId),
+            status: 'pending'
+          }))
+        });
+      }
+    }
 
     // Create audit log entry for meeting update
     await prisma.meetingAuditLog.create({

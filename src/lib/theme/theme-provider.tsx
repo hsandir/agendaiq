@@ -46,7 +46,7 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 // Global state to persist across navigations (in-memory)
 const globalThemeState = {
   currentThemeId: "standard",
-  customTheme: null as CustomTheme | null,
+  customTheme: undefined as CustomTheme | undefined,
   initialized: false,
   lastFetch: 0,
 };
@@ -61,7 +61,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
   const [currentThemeId, setCurrentThemeId] = useState<string>(
     globalThemeState.currentThemeId,
   );
-  const [customTheme, setCustomTheme] = useState<CustomTheme | null>(
+  const [customTheme, setCustomTheme] = useState<CustomTheme | undefined>(
     globalThemeState.customTheme,
   );
   const [mounted, setMounted] = useState(false);
@@ -327,7 +327,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
           setTheme: () => {},
           availableThemes: themes,
           isLoading: false,
-          customTheme: null,
+          customTheme: undefined,
           setCustomTheme: () => {},
         }}
       >
