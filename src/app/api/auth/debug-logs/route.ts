@@ -190,8 +190,8 @@ export async function GET(request: NextRequest) {
         currentToken: token ? {
           email: token.email,
           id: token.id,
-          exp: token.exp ? new Date(token.exp * 1000).toISOString() : null,
-          iat: token.iat ? new Date(token.iat * 1000).toISOString() : null,
+          exp: token.exp ? new Date(Number(token.exp) * 1000).toISOString() : null,
+          iat: token.iat ? new Date(Number(token.iat) * 1000).toISOString() : null,
           raw: token
         } : null
       };
