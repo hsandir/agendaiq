@@ -8,13 +8,13 @@ interface AdminUser {
   id: number;
   email: string;
   name: string | null;
-  hasPassword: boolean;
+  hashedPassword: string | null;
   Staff: {
-    role: {
+    Role: {
       title: string;
-      key: string;
-    };
-  } | null;
+      key: string | null;
+    } | null;
+  }[] | null;
 }
 
 interface CreateFirstAdminFormProps {
@@ -81,7 +81,7 @@ export function CreateFirstAdminForm({ adminUsers }: CreateFirstAdminFormProps) 
   };
 
   // Filter out users that already have passwords
-  const availableUsers = adminUsers.filter(user => !user.hasPassword);
+  const availableUsers = adminUsers.filter(user => !user.hashedPassword);
 
   if (availableUsers.length === 0) {
     return (
@@ -118,7 +118,7 @@ export function CreateFirstAdminForm({ adminUsers }: CreateFirstAdminFormProps) 
           <option value="">-- Select an admin user --</option>
           {availableUsers.map((user) => (
             <option key={user.id} value={user.id}>
-              {user.name || 'No Name'} ({user.email}) - {user.Staff?.role.title || 'Admin'}
+              {user.name || 'No Name'} ({user.email}) - {user.Staff?.[0]?.Role?.title || 'Admin'}
             </option>
           ))}
         </select>

@@ -7,7 +7,7 @@ export class TestFactory {
 
   // User factory
   async createUser(overrides: Record<string, unknown> = {}) {
-    const password = overrides.password || 'password123'
+    const password = (overrides as any).password || 'password123'
     const hashedPassword = await bcrypt.hash(password, 10)
 
     return this.prisma.user.create({

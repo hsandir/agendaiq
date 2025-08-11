@@ -37,7 +37,7 @@ export default async function CreateFirstAdminPage() {
             </p>
             <div className="flex gap-4">
               <Link 
-                href="/dashboard/settings/district-setup"
+                href="/dashboard/settings/setup"
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Go to District Setup
@@ -61,17 +61,17 @@ export default async function CreateFirstAdminPage() {
       OR: [
         { is_admin: true },
         { is_system_admin: true },
-        { Staff: { role: { key: { in: ['DEV_ADMIN', 'OPS_ADMIN'] } } } }
+        { Staff: { some: { Role: { key: { in: ['DEV_ADMIN', 'OPS_ADMIN'] } } } } }
       ]
     },
     select: {
       id: true,
       email: true,
       name: true,
-      hasPassword: true,
+      hashedPassword: true,
       Staff: {
         select: {
-          role: {
+          Role: {
             select: {
               title: true,
               key: true

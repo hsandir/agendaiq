@@ -93,7 +93,7 @@ export default function DependenciesPage() {
   };
 
   // Uyumluluk değerlendirmesi
-  const assessCompatibility = (pkg: unknown): CompatibilityInfo => {
+  const assessCompatibility = (pkg: any): CompatibilityInfo => {
     const { name, current, latest, type } = pkg;
     
     // Kritik paketler
@@ -466,7 +466,7 @@ export default function DependenciesPage() {
         
         // Outdated packages'ları dönüştür
         if (data.packages.outdated && data.packages.outdated.length > 0) {
-          data.packages.outdated.forEach((pkg: unknown) => {
+          data.packages.outdated.forEach((pkg: any) => {
             const compatibility = assessCompatibility(pkg);
             
             realDependencies.push({

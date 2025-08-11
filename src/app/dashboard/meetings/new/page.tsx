@@ -73,7 +73,19 @@ export default async function NewMeetingPage() {
     endTime: string;
     repeatType: string;
     repeatEndDate: string;
-    repeatConfig?: unknown; // RepeatConfig from modal
+    repeatConfig?: {
+      enabled: boolean;
+      pattern?: string;
+      interval?: number;
+      weekDays?: string[];
+      monthDay?: number;
+      monthWeek?: number;
+      monthWeekDay?: number;
+      endType?: string;
+      occurrences?: number;
+      endDate?: string;
+      exceptions?: string[];
+    }; // RepeatConfig from modal
     calendarIntegration: string;
     meetingType: string;
     zoomMeetingId: string;
@@ -290,11 +302,11 @@ export default async function NewMeetingPage() {
       // Provide more specific error messages
       let errorMessage = "Failed to create meeting. Please try again.";
       
-      if (error.message?.includes("Invalid time value") || error.message?.includes("Invalid date")) {
+      if (error instanceof Error && (error.message?.includes("Invalid time value") || error.message?.includes("Invalid date"))) {
         errorMessage = "Invalid date/time format. Please check your date and time selections.";
-      } else if (error.message?.includes("Start time and end time are required")) {
+      } else if (error instanceof Error && error.message?.includes("Start time and end time are required")) {
         errorMessage = "Both start and end times are required.";
-      } else if (error.message?.includes("End time must be after start time")) {
+      } else if (error instanceof Error && error.message?.includes("End time must be after start time")) {
         errorMessage = "End time must be after start time.";
       } else if (error instanceof Error) {
         errorMessage = error.message;
