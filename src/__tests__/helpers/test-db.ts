@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client'
-import { execSync } from 'child_process'
 import { TestFactory } from '../fixtures/factory'
 
 let prisma: PrismaClient
@@ -94,11 +93,11 @@ export async function withTransaction<T>(
   const prisma = getTestPrismaClient()
   
   return prisma.$transaction(async (tx) => {
-    const result = await fn(tx as PrismaClient)
+    await fn(tx as PrismaClient)
     throw new Error('Rollback') // Force rollback
   }).catch((error) => {
     if (error.message === 'Rollback') {
-      return error.result
+      return undefined as T
     }
     throw error
   })

@@ -506,7 +506,7 @@ export default function LintErrorManagementPage() {
                               )}
                             </div>
                             <div className="flex-1">
-                              <p className="text-foreground">{issue.message}</p>
+                              <p className="text-foreground">{issu(e instanceof Error ? e.message : String(e))}</p>
                               <p className="text-muted-foreground text-xs">
                                 Line {issue.line}:{issue.column} • {issue.rule}
                               </p>

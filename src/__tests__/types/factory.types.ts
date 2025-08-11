@@ -15,46 +15,46 @@ export type UserCreateOverrides = Partial<
 // Staff factory types
 export type StaffCreateOverrides = Partial<
   Omit<Prisma.StaffCreateInput, 'User' | 'Role' | 'Department' | 'School' | 'District'> & {
-    user?: any // Will be User type from Prisma
-    role?: any // Will be Role type from Prisma
-    department?: any // Will be Department type from Prisma
-    school?: any // Will be School type from Prisma
-    district?: any // Will be District type from Prisma
+    user?: unknown // Will be User type from Prisma
+    role?: unknown // Will be Role type from Prisma
+    department?: unknown // Will be Department type from Prisma
+    school?: unknown // Will be School type from Prisma
+    district?: unknown // Will be District type from Prisma
   }
 >
 
 // Meeting factory types
 export type MeetingCreateOverrides = Partial<
   Omit<Prisma.MeetingCreateInput, 'created_by_staff' | 'Department' | 'School' | 'attendees' | 'agenda_items' | 'attachments' | 'action_items' | 'decisions' | 'parent_meeting' | 'child_meetings'> & {
-    createdByStaff?: any
-    department?: any
-    school?: any
+    createdByStaff?: unknown
+    department?: unknown
+    school?: unknown
   }
 >
 
 // Agenda item factory types
 export type AgendaItemCreateOverrides = Partial<
   Omit<Prisma.AgendaItemCreateInput, 'Meeting' | 'presenter_staff' | 'responsible_staff' | 'action_items'> & {
-    meeting?: any
-    presenterStaff?: any
-    responsibleStaff?: any
+    meeting?: unknown
+    presenterStaff?: unknown
+    responsibleStaff?: unknown
   }
 >
 
 // Department factory types
 export type DepartmentCreateOverrides = Partial<
   Omit<Prisma.DepartmentCreateInput, 'School' | 'head_staff' | 'staff' | 'meetings'> & {
-    school?: any
-    headStaff?: any
+    school?: unknown
+    headStaff?: unknown
   }
 >
 
 // School factory types
 export type SchoolCreateOverrides = Partial<
   Omit<Prisma.SchoolCreateInput, 'District' | 'principal_staff' | 'vice_principal_staff' | 'departments' | 'staff' | 'meetings'> & {
-    district?: any
-    principalStaff?: any
-    vicePrincipalStaff?: any
+    district?: unknown
+    principalStaff?: unknown
+    vicePrincipalStaff?: unknown
   }
 >
 

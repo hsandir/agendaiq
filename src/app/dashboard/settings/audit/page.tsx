@@ -55,7 +55,7 @@ export default async function AuditPage() {
   // });
   
   // For now, return empty array since meetingAuditLog model doesn't exist
-  const auditLogs: any[] = [];
+  const auditLogs: unknown[] = [];
 
   // Map action types to icons and descriptions
   const getActionDetails = (action: string) => {

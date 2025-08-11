@@ -3,11 +3,8 @@
  * Test login flow with JWT enrichment
  */
 
-import { NextRequest } from 'next/server';
-import { POST as authSignIn } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
-import { getServerSession } from 'next-auth';
 
 // Mock modules
 jest.mock('@/lib/prisma', () => ({
@@ -71,7 +68,7 @@ describe('Authentication Integration Tests', () => {
       };
       
       // Call the mock to simulate what happens in the authorize function
-      const user = await prisma.user.findUnique({
+      await prisma.user.findUnique({
         where: { email: credentials.email },
         include: {
           Staff: {
@@ -86,7 +83,7 @@ describe('Authentication Integration Tests', () => {
       });
 
       // Simulate password check
-      const isValid = await bcrypt.compare(credentials.password, mockUser.hashedPassword);
+      await bcrypt.compare(credentials.password, mockUser.hashedPassword);
       
       // Verify the mocks were called correctly
       expect(prisma.user.findUnique).toHaveBeenCalledWith({
@@ -194,7 +191,7 @@ describe('Authentication Integration Tests', () => {
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(existingUser);
       
       // Check if Google account is linked
-      const hasGoogleAccount = existingUser.Account.some((a: any) => a.provider === 'google');
+      const hasGoogleAccount = existingUser.Account.some((a: { provider: string }) => a.provider === 'google');
       expect(hasGoogleAccount).toBe(false);
       
       // Should require manual linking

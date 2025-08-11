@@ -54,7 +54,7 @@ export async function GET() {
       success: true,
       totalErrors: errors.length, 
       recentErrors: errors.slice(-5).map(e => ({
-        message: e.message,
+        message: (e instanceof Error ? e.message : String(e)),
         timestamp: e.timestamp,
         url: e.url
       }))

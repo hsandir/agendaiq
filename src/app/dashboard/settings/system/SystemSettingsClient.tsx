@@ -58,7 +58,7 @@ export default function SystemSettingsClient({ initialSettings }: SystemSettings
     setHasChanges(hasAnyChanges);
   }, [settings, initialSettings]);
 
-  const handleSettingChange = (key: keyof SystemSettings, value: any) => {
+  const handleSettingChange = (key: keyof SystemSettings, value: unknown) => {
     setSettings(prev => ({
       ...prev,
       [key]: value

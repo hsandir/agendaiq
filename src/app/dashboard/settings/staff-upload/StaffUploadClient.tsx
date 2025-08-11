@@ -5,8 +5,8 @@ import { Upload as FiUpload, Download as FiDownload, AlertCircle as FiAlertCircl
 
 interface ConflictItem {
   field: string;
-  existing: any;
-  new: any;
+  existing: unknown;
+  new: unknown;
   action: string;
 }
 

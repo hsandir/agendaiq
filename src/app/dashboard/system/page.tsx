@@ -58,7 +58,7 @@ interface SystemStatus {
     running: boolean;
     port: number;
     uptime: string;
-    memory?: any;
+    memory?: unknown;
     node_version?: string;
   };
   linting: {

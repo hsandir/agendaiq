@@ -93,9 +93,9 @@ export default function RoleTasksPage() {
       const data = await response.json();
       
       // Ensure all tasks have proper structure
-      const safeRoles = (data.roles || []).map((roleData: any) => ({
+      const safeRoles = (data.roles || []).map((roleData: unknown) => ({
         ...roleData,
-        tasks: (roleData.tasks || []).map((task: any) => ({
+        tasks: (roleData.tasks || []).map((task: unknown) => ({
           ...task,
           meeting: task.meeting || { id: 0, title: 'Unknown', date: new Date().toISOString() }
         }))

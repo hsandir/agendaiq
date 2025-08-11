@@ -193,7 +193,7 @@ export default async function DashboardPage() {
           </div>
           
           <div className="space-y-4">
-            {upcomingMeetings.slice(0, 4).map((meeting: any) => (
+            {upcomingMeetings.slice(0, 4).map((meeting: unknown) => (
               <div
                 key={meeting.id}
                 className="flex items-center justify-between p-4 bg-background/50 border border-border/50 rounded-xl hover:bg-card/60 transition-colors group"

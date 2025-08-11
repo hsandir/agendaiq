@@ -179,7 +179,7 @@ export default function LocalMonitor() {
           };
           const enhancedError = processError(rawError);
           setErrors(prev => {
-            const exists = prev.find(e => e.message.includes('High memory usage'));
+            const exists = prev.find(e => (e instanceof Error ? e.message : String(e)).includes('High memory usage'));
             if (!exists) {
               return [enhancedError, ...prev.slice(0, 49)];
             }

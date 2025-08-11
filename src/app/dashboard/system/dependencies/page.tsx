@@ -83,7 +83,7 @@ export default function DependenciesPage() {
   const [operations, setOperations] = useState<UpdateOperation[]>([]);
   const [backups, setBackups] = useState<BackupInfo[]>([]);
   const [notifications, setNotifications] = useState<string[]>([]);
-  const [updateResult, setUpdateResult] = useState<{success: boolean; message: string; details?: any} | null>(null);
+  const [updateResult, setUpdateResult] = useState<{success: boolean; message: string; details?: unknown} | null>(null);
 
   const showNotification = (message: string) => {
     setNotifications(prev => [...prev, message]);
@@ -93,7 +93,7 @@ export default function DependenciesPage() {
   };
 
   // Uyumluluk değerlendirmesi
-  const assessCompatibility = (pkg: any): CompatibilityInfo => {
+  const assessCompatibility = (pkg: unknown): CompatibilityInfo => {
     const { name, current, latest, type } = pkg;
     
     // Kritik paketler
@@ -466,7 +466,7 @@ export default function DependenciesPage() {
         
         // Outdated packages'ları dönüştür
         if (data.packages.outdated && data.packages.outdated.length > 0) {
-          data.packages.outdated.forEach((pkg: any) => {
+          data.packages.outdated.forEach((pkg: unknown) => {
             const compatibility = assessCompatibility(pkg);
             
             realDependencies.push({
