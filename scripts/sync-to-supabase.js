@@ -3,11 +3,21 @@ const { PrismaClient } = require('@prisma/client');
 // Local database
 const localPrisma = new PrismaClient();
 
-// Supabase database
+// Supabase database - READ ONLY as per CLAUDE.md policy
+// WARNING: This script performs WRITE operations which violate the Supabase READ-ONLY policy
+// Only use with explicit approval and understanding of consequences
+
+if (process.env.ALLOW_SUPABASE_WRITE !== 'ABSOLUTELY_CERTAIN_I_UNDERSTAND_THE_RISKS') {
+  console.error('❌ SUPABASE WRITE OPERATIONS ARE FORBIDDEN!');
+  console.error('Per CLAUDE.md policy, Supabase must remain READ-ONLY.');
+  console.error('If you absolutely must write, set ALLOW_SUPABASE_WRITE=ABSOLUTELY_CERTAIN_I_UNDERSTAND_THE_RISKS');
+  process.exit(1);
+}
+
 const supabasePrisma = new PrismaClient({
   datasources: {
     db: {
-      url: "postgresql://postgres.tvhqasooledcffwogbvd:s%3Fr%26v6vXSCEc_8A@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+      url: process.env.SUPABASE_DATABASE_URL || "postgresql://postgres.tvhqasooledcffwogbvd:s%3Fr%26v6vXSCEc_8A@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
     }
   }
 });

@@ -90,7 +90,7 @@ export default function ActionItemsTrackingPage() {
       const data = await response.json();
       
       // Ensure all items have proper structure
-      const safeItems = (data.items || []).map((item: any) => ({
+      const safeItems = (data.items || []).map((item: unknown) => ({
         ...item,
         meeting: item.meeting || undefined,
         assignedRole: item.assignedRole || { id: 0, title: 'Unassigned' },

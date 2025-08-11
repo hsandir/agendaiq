@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, AuthPresets } from "@/lib/auth/auth-utils";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/lib/auth/api-auth";
+import { Capability } from '@/lib/auth/policy';
 import { Logger } from "@/lib/utils/logger";
 import { MeetingUpdateData } from "@/types/meeting";
 import { sanitizeMeetingData } from "@/lib/utils/sanitization";
@@ -175,7 +176,7 @@ export async function PATCH(
     const params = await props.params;
     
     // Use consistent auth pattern
-    const authResult = await withAuth(request, { requireStaff: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.MEETING_CREATE });
     if (!authResult.success) {
       return NextResponse.json(
         { error: authResult.error },

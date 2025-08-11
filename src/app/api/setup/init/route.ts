@@ -1,11 +1,12 @@
 import { NextResponse, NextRequest } from "next/server";
 import { withAuth } from "@/lib/auth/api-auth";
+import { Capability } from '@/lib/auth/policy';
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
     // Setup initialization requires DEV_ADMIN capabilities
-    const authResult = await withAuth(request, { requireDevAdmin: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_UPDATE });
     if (!authResult.success) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }

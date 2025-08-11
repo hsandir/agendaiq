@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default async function MeetingTemplatesPage() {
-  // Use standardized auth system - require admin for meeting templates
-  const user = await requireAuth(AuthPresets.requireAdmin);
+  // Use capability-based auth - require meeting management capability
+  const user = await requireAuth(AuthPresets.requireMeetingCreate);
 
   // Fetch meeting templates from database
   const templates = await prisma.meetingTemplate.findMany({

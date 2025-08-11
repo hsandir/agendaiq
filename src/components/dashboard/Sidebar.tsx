@@ -40,7 +40,17 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
       return (
         <div key={item.href}>
           <button
-            onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+            onClick={async () => {
+              try {
+                await signOut({ 
+                  callbackUrl: '/auth/signin',
+                  redirect: true 
+                });
+              } catch (error) {
+                // Fallback to direct navigation if signOut fails
+                window.location.href = '/auth/signin';
+              }
+            }}
             className="w-full flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-muted-foreground hover:bg-muted hover:text-foreground"
             aria-label={item.label}
           >
@@ -103,11 +113,11 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full" role="navigation" aria-label="Main sidebar">
       <div className="px-4 py-6 ml-12">
-        <h2 className="text-2xl font-bold text-foreground">AgendaIQ</h2>
+        <h2 className="text-2xl font-bold text-foreground" role="banner">AgendaIQ</h2>
       </div>
-      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto" aria-label="Main navigation">
+      <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto" role="navigation" aria-label="Main navigation">
         {sidebarItems.map((section) => (
           <div key={section.title} className="mb-6">
             <h3 

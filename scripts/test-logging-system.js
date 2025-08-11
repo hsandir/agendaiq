@@ -5,8 +5,8 @@
  * Tests both development and security logging with database persistence
  */
 
-import { devLogger, auditLogger } from '../src/lib/logging/index.js';
-import { DevLogCategory, AuditLogCategory, LogLevel } from '../src/lib/logging/types.js';
+const { devLogger, auditLogger } = require('../src/lib/logging/index');
+const { LogLevel } = require('../src/lib/logging/types');
 
 async function testLoggingSystem() {
   console.log('🧪 Testing Professional Dual-Layer Logging System...\n');
@@ -16,7 +16,7 @@ async function testLoggingSystem() {
     console.log('📊 Testing Development Logger...');
     
     await devLogger.info(
-      DevLogCategory.SYSTEM,
+      'SYSTEM',
       'Logging system test initiated',
       undefined,
       {

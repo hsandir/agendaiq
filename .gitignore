@@ -25,8 +25,13 @@
 *.pem
 
 # SECURITY: Never commit sensitive files
-SUPABASE_CREDENTIALS_BACKUP.md
-SUPABASE_VERIFIED_URLS.md
+docs/security/SUPABASE_CREDENTIALS_BACKUP.md
+docs/security/SUPABASE_VERIFIED_URLS.md
+docs/security/*_CREDENTIALS.md
+docs/security/*_PASSWORDS.md
+docs/security/*_SECRETS.md
+docs/security/*_PRIVATE.md
+docs/security/*_SENSITIVE.md
 *_CREDENTIALS.md
 *_PASSWORDS.md
 *_SECRETS.md
@@ -36,10 +41,52 @@ credentials/
 secrets/
 private/
 
+# Optional: Completed tasks documentation
+docs/completed/
+
+# Trash folder - removed components
+trash/
+
+# Temporary work tracking (NEVER commit)
+temp-work/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Environment variables
+.env
+.env.*
+!.env.example
+.env.local
+.env.production
+.env.production.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.backup
+
+# Sensitive files
+client_secret*.json
+cookies.txt
+*.key
+*.pem
+*.cert
+
+# Backup files
+backup*.sql
+restore*.sql
+*.backup
+backups/
+backup_*/
+
+# Logs and artifacts
+*.log
+dev.log
+test-results.json
+.vercel
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
@@ -59,6 +106,8 @@ node_modules_backup/
 .backup-metadata*.json
 logs/
 cookies*.txt
+prod_cookies*.txt
+prod_test_cookies*.txt
 lint-errors*.json
 **/node_modules_backup/
 organization_structure*.json
@@ -73,3 +122,19 @@ tailwind.config*.js
 next.config*.js
 .env.local
 dev.log
+.trash/
+
+# Test and debug files with sensitive data
+check_prod_user*.js
+update_prod_users.js
+setup_prod_admin.js
+fix_prod_admin.js
+TEMP_SUPABASE_MIGRATION.md
+SUPABASE_TEST_REPORT.txt
+fix_production_session.sh
+check_env_vars.js
+test_*.js
+*_test.js
+
+# API test routes that may expose passwords
+src/app/api/test-login/

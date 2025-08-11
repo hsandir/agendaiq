@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth/api-auth';
+import { getCurrentUser } from '@/lib/auth/auth-utils';
+import { getFastUser } from '@/lib/auth/auth-utils-fast';
 import { prisma } from '@/lib/prisma';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { z } from 'zod';
+import { RateLimiters, getClientIdentifier } from '@/lib/utils/rate-limit';
 
 const layoutSchema = z.object({
   layoutId: z.string().optional(),
@@ -13,21 +15,26 @@ const layoutSchema = z.object({
 
 // GET /api/user/layout - Get user's layout preference
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request);
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
-  }
-  const user = authResult.user!;
-
   try {
-    const userData = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { layout_preference: true },
-    });
+    const user = await getFastUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
 
-    return NextResponse.json({
+    // Get layout preference from database (fast query)
+    const userData = await prisma.user.findUnique({
+      where: { id: parseInt(user.id) },
+      select: { layout_preference: true }
+    });
+    
+    const response = NextResponse.json({
       layout: userData?.layout_preference || 'modern',
     });
+    
+    // Add caching headers to reduce API calls
+    response.headers.set('Cache-Control', 'private, max-age=3600'); // 1 hour
+    
+    return response;
   } catch (error) {
     console.error('Error fetching layout preference:', error);
     return NextResponse.json(
@@ -44,11 +51,20 @@ export async function POST(request: NextRequest) {
 
 // PUT /api/user/layout - Update user's layout preference
 export async function PUT(request: NextRequest) {
-  const authResult = await withAuth(request);
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  // Skip rate limiting in development for performance testing
+  if (process.env.NODE_ENV !== 'development') {
+    // Rate limiting
+    const clientId = getClientIdentifier(request);
+    const rateLimitResult = await RateLimiters.userPreferences.check(request, 10, clientId);
+    if (!rateLimitResult.success) {
+      return RateLimiters.userPreferences.createErrorResponse(rateLimitResult);
+    }
   }
-  const user = authResult.user!;
+
+  const user = await getFastUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  }
 
   try {
     const body = await request.json();
@@ -57,20 +73,15 @@ export async function PUT(request: NextRequest) {
     // Use layoutId if provided, otherwise use layout
     const layoutToSave = validatedData.layoutId || validatedData.layout || 'modern';
 
-    // Update user's layout preference (use upsert to handle missing records)
-    await prisma.user.upsert({
-      where: { id: user.id },
-      update: { layout_preference: layoutToSave },
-      create: {
-        id: user.id,
-        email: user.email || '',
-        name: user.name,
-        layout_preference: layoutToSave,
-      },
+    // Update user's layout preference (optimized query)
+    await prisma.user.update({
+      where: { id: parseInt(user.id) },
+      data: { layout_preference: layoutToSave },
+      select: { id: true }, // Only select what we need
     });
 
-    // Log the layout change
-    await AuditLogger.logFromRequest(request, {
+    // Log the layout change asynchronously (don't wait)
+    AuditLogger.logFromRequest(request, {
       tableName: 'users',
       recordId: user.id.toString(),
       operation: 'UPDATE',
@@ -78,7 +89,7 @@ export async function PUT(request: NextRequest) {
       staffId: user.staff?.id,
       source: 'WEB_UI',
       description: `Layout changed to ${layoutToSave}`,
-    });
+    }).catch(err => console.error('Audit log failed:', err));
 
     return NextResponse.json({
       success: true,

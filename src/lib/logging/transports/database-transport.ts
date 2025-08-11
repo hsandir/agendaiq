@@ -114,7 +114,7 @@ export class DatabaseTransport implements LogTransport {
 
     // Search in message
     if (query.search) {
-      where.message = { contains: query.search, mode: 'insensitive' };
+      wher(e instanceof Error ? e.message : String(e)) = { contains: query.search, mode: 'insensitive' };
     }
 
     const orderBy = {

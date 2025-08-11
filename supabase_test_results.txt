@@ -1,0 +1,16 @@
+=== SUPABASE API TESTS ===
+
+1. GET /api/users:
+Status: 401, Time: 0.020837s
+
+2. GET /api/roles:
+Status: 401, Time: 0.004119s
+
+3. GET /api/meetings:
+Status: 401, Time: 0.004257s
+
+4. GET /api/departments:
+Status: 401, Time: 0.004360s
+
+5. GET /api/school:
+Status: 401, Time: 0.004078s

@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { auditSystem } from '@/lib/audit/hybrid-audit-system';
 import { AuditCategory } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability.USER_MANAGE });
     if (!authResult.success) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }

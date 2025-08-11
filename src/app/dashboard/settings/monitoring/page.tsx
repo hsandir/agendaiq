@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default async function MonitoringSettingsPage() {
-  const user = await requireAuth(AuthPresets.requireAdmin);
+  const user = await requireAuth(AuthPresets.requireMonitoring);
   
   // Redirect to main monitoring page
   redirect('/dashboard/monitoring');

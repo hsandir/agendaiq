@@ -14,14 +14,16 @@ async function createAdmin() {
       return;
     }
     
-    // Create admin user
+    // Create admin user - Development System Administrator
     const hashedPassword = await bcrypt.hash('1234', 10);
     const adminUser = await prisma.user.create({
       data: {
         email: 'admin@school.edu',
-        name: 'Admin User',
+        name: 'Development Admin',
         hashedPassword: hashedPassword,
-        is_admin: true
+        is_admin: true,
+        is_system_admin: true,  // Development system administrator
+        is_school_admin: false  // Not a school admin
       }
     });
     

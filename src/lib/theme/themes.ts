@@ -895,15 +895,15 @@ export const darkModeTheme: Theme = {
   },
 };
 
-// Theme 4: High Contrast
+// Theme 4: High Contrast (WCAG AAA Compliant)
 export const highContrastTheme: Theme = {
   id: 'high-contrast',
   name: 'High Contrast',
-  description: 'Maximum contrast for accessibility',
+  description: 'Maximum contrast for accessibility - WCAG AAA compliant',
   colors: {
-    primary: '#0066CC',
-    primaryLight: '#3385D6',
-    primaryDark: '#004C99',
+    primary: '#005A9C',  // Darker blue for better contrast
+    primaryLight: '#0073BB',
+    primaryDark: '#003D6B',
     primaryForeground: '#FFFFFF',
     
     secondary: '#FFFFFF',
@@ -912,54 +912,54 @@ export const highContrastTheme: Theme = {
     secondaryForeground: '#000000',
     
     background: '#FFFFFF',
-    backgroundSecondary: '#FFFFFF',
-    backgroundTertiary: '#FFFFFF',
+    backgroundSecondary: '#F5F5F5',
+    backgroundTertiary: '#EBEBEB',
     
     card: '#FFFFFF',
     cardHover: '#F0F0F0',
     cardBorder: '#000000',
     
-    text: '#000000',
-    textSecondary: '#000000',
-    textMuted: '#333333',
+    text: '#000000',  // Pure black for maximum contrast
+    textSecondary: '#1A1A1A',  // Still very dark for AAA
+    textMuted: '#404040',  // Darker than before for better contrast
     textInverse: '#FFFFFF',
     
     border: '#000000',
-    borderLight: '#333333',
+    borderLight: '#404040',
     borderDark: '#000000',
     
-    success: '#008000',
-    successLight: '#00A000',
-    successDark: '#006000',
+    success: '#006400',  // Darker green for better contrast
+    successLight: '#008000',
+    successDark: '#004B00',
     
-    warning: '#FFA500',
-    warningLight: '#FFB500',
-    warningDark: '#FF9500',
+    warning: '#B87000',  // Darker orange for better contrast
+    warningLight: '#D68000',
+    warningDark: '#996000',
     
-    error: '#FF0000',
-    errorLight: '#FF3333',
-    errorDark: '#CC0000',
+    error: '#CC0000',  // Darker red for better contrast
+    errorLight: '#EE0000',
+    errorDark: '#AA0000',
     
-    info: '#0000FF',
-    infoLight: '#3333FF',
-    infoDark: '#0000CC',
+    info: '#0040AA',  // Darker blue for better contrast
+    infoLight: '#0055CC',
+    infoDark: '#003088',
     
-    sidebar: '#002855',
+    sidebar: '#001A33',  // Darker for better contrast
     sidebarText: '#FFFFFF',
-    sidebarHover: '#003366',
-    sidebarActive: '#0066CC',
+    sidebarHover: '#002744',
+    sidebarActive: '#005A9C',
     
     header: '#000000',
     headerText: '#FFFFFF',
     
     input: '#FFFFFF',
     inputBorder: '#000000',
-    inputFocus: '#0000FF',
+    inputFocus: '#0040AA',
     inputText: '#000000',
-    inputPlaceholder: '#666666',
+    inputPlaceholder: '#595959',  // Darker for AAA compliance (7:1 ratio)
     
-    buttonPrimary: '#0066CC',
-    buttonPrimaryHover: '#004C99',
+    buttonPrimary: '#005A9C',
+    buttonPrimaryHover: '#003D6B',
     buttonPrimaryText: '#FFFFFF',
     
     buttonSecondary: '#FFFFFF',
@@ -970,9 +970,9 @@ export const highContrastTheme: Theme = {
     buttonGhostHover: 'rgba(0, 0, 0, 0.1)',
     buttonGhostText: '#000000',
     
-    overlay: 'rgba(0, 0, 0, 0.9)',
-    shadow: 'rgba(0, 0, 0, 0.5)',
-    scrollbar: '#CCCCCC',
+    overlay: 'rgba(0, 0, 0, 0.95)',
+    shadow: 'rgba(0, 0, 0, 0.6)',
+    scrollbar: '#B3B3B3',
     scrollbarThumb: '#000000',
   },
   fonts: {

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import LocalMonitor from '@/components/monitoring/local-monitor';
 import ProductionMonitor from '@/components/monitoring/production-monitor';
 import EnhancedLiveMonitor from '@/components/monitoring/enhanced-live-monitor';
+import CICDMonitor from '@/components/development/ci-cd-monitor';
 import { AuthenticatedUser } from '@/lib/auth/auth-utils';
 
 interface MonitoringClientProps {
@@ -48,10 +49,11 @@ export default function MonitoringClient({ user }: MonitoringClientProps) {
 
       {/* Monitoring Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="enhanced">Professional Logging</TabsTrigger>
           <TabsTrigger value="local">Local Monitoring</TabsTrigger>
           <TabsTrigger value="production">Production Monitoring</TabsTrigger>
+          <TabsTrigger value="cicd">CI/CD Pipeline</TabsTrigger>
         </TabsList>
 
         <TabsContent value="enhanced">
@@ -64,6 +66,10 @@ export default function MonitoringClient({ user }: MonitoringClientProps) {
 
         <TabsContent value="production">
           <ProductionMonitor />
+        </TabsContent>
+
+        <TabsContent value="cicd">
+          <CICDMonitor />
         </TabsContent>
       </Tabs>
       

@@ -73,7 +73,7 @@ export default async function NewMeetingPage() {
     endTime: string;
     repeatType: string;
     repeatEndDate: string;
-    repeatConfig?: any; // RepeatConfig from modal
+    repeatConfig?: unknown; // RepeatConfig from modal
     calendarIntegration: string;
     meetingType: string;
     zoomMeetingId: string;
@@ -275,7 +275,7 @@ export default async function NewMeetingPage() {
         meetingCount: meetings.length
       };
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("=== Meeting Creation Error ===");
       console.error("Error details:", error);
       console.error("Input data received:", {

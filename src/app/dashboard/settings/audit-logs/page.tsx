@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default async function AuditLogsPage() {
-  const user = await requireAuth(AuthPresets.requireAdmin);
+  const user = await requireAuth(AuthPresets.requireLogs);
   
   return (
     <div className="space-y-6">

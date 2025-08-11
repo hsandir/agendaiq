@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 
 interface ProductionError {
   id: string;
@@ -14,7 +15,7 @@ interface ProductionError {
 // Admin-only production error monitoring with proper authentication
 export async function GET(request: NextRequest) {
   // Require operations admin authentication
-  const authResult = await withAuth(request, { requireOpsAdmin: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_MONITORING });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

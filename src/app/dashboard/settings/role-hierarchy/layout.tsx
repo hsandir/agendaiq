@@ -17,14 +17,14 @@ const submenuItems = [
     icon: FiEye,
   },
   {
-    href: '/dashboard/settings/role-hierarchy/management',
-    label: 'Management',
-    icon: FiEdit3,
-  },
-  {
     href: '/dashboard/settings/role-hierarchy/user-assignment',
     label: 'User Assignment',
     icon: FiUserCheck,
+  },
+  {
+    href: '/dashboard/settings/role-hierarchy/roles',
+    label: 'Role Management',
+    icon: FiEdit3,
   },
 ];
 

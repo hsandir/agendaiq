@@ -90,15 +90,13 @@ export const RoutePolicy: Record<string, Capability | Capability[]> = {
   '/dashboard/system/database': Capability.OPS_DB_READ,
   
   // Settings - Administration
-  '/dashboard/settings/admin': Capability.DEV_DEBUG,
   '/dashboard/settings/audit': Capability.OPS_LOGS,
   '/dashboard/settings/audit-logs': Capability.OPS_LOGS,
   '/dashboard/settings/meeting-audit': Capability.OPS_LOGS,
   '/dashboard/settings/backup': Capability.OPS_BACKUP,
   '/dashboard/settings/permissions': Capability.PERM_MANAGE,
-  '/dashboard/settings/roles': Capability.ROLE_MANAGE,
   '/dashboard/settings/role-hierarchy': Capability.ROLE_MANAGE,
-  '/dashboard/settings/users': Capability.USER_MANAGE,
+  '/dashboard/settings/role-hierarchy/roles': Capability.ROLE_MANAGE,
   '/dashboard/settings/school': Capability.SCHOOL_MANAGE,
   '/dashboard/settings/staff-upload': Capability.STAFF_IMPORT,
   '/dashboard/settings/setup': Capability.DEV_UPDATE,

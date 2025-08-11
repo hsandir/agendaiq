@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { prisma } from "@/lib/prisma";
 import { hash } from "bcryptjs";
 import { z } from "zod";
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
     return RateLimiters.api.createErrorResponse(rateLimitResult);
   }
 
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireDevAdmin: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

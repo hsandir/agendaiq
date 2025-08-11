@@ -32,7 +32,10 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt", // Still using JWT even with adapter
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60, // 30 days default (will be overridden by JWT callback for non-remember-me)
+  },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days for JWT token itself
   },
   pages: {
     signIn: "/auth/signin",
@@ -56,16 +59,20 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
         twoFactorCode: { label: "2FA Code", type: "text", optional: true },
+        rememberMe: { label: "Remember Me", type: "text", optional: true },
+        trustDevice: { label: "Trust Device", type: "text", optional: true },
       },
       async authorize(credentials, req): Promise<User | null> {
+        console.log('🔐 Login attempt for:', credentials?.email);
         try {
           // TODO: Add proper audit logging for NextAuth callbacks
           // Log login attempt
           // await AuditClient.logAuthEvent('login_attempt', undefined, undefined, req);
 
           if (!credentials?.email || !credentials?.password) {
+            console.error('Missing credentials');
             // await AuditClient.logSecurityEvent('login_missing_credentials', undefined, undefined, req, 'Missing email or password');
-            throw new Error("Missing credentials");
+            throw new Error("MISSING_CREDENTIALS|Email and password are required");
           }
 
           // Rate limiting for authentication attempts
@@ -88,7 +95,7 @@ export const authOptions: NextAuthOptions = {
             
             if (!rateLimitResult.success) {
               // await AuditClient.logSecurityEvent('login_rate_limited', undefined, undefined, req, `Rate limit exceeded: ${clientId}`);
-              throw new Error(rateLimitResult.error || "Too many login attempts. Please try again later.");
+              throw new Error("RATE_LIMITED|" + (rateLimitResult.error || "Too many login attempts. Please try again later"));
             }
           }
 
@@ -106,17 +113,25 @@ export const authOptions: NextAuthOptions = {
             }
           });
 
-          if (!user || !user.hashedPassword) {
-            // await AuditClient.logAuthEvent('login_failure', undefined, undefined, req, 'User not found or no password');
-            throw new Error("Invalid credentials");
+          if (!user) {
+            console.error('User not found:', credentials.email);
+            throw new Error("USER_NOT_FOUND|No account found with this email address");
+          }
+          
+          if (!user.hashedPassword) {
+            console.error('User has no password:', credentials.email);
+            throw new Error("NO_PASSWORD|Account exists but password not set. Please reset your password");
           }
 
           // Check password using bcrypt
+          console.log('Checking password for user:', user.email);
           const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
+          console.log('Password valid:', isValid);
           
           if (!isValid) {
+            console.error('Invalid password for user:', user.email);
             // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, 'Password mismatch');
-            throw new Error("Invalid credentials");
+            throw new Error("INVALID_PASSWORD|The password you entered is incorrect");
           }
 
           // Check 2FA if enabled
@@ -139,7 +154,7 @@ export const authOptions: NextAuthOptions = {
               
               if (!isBackupCode) {
                 // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, '2FA code invalid');
-                throw new Error("Invalid 2FA code");
+                throw new Error("INVALID_2FA|The 2FA code you entered is invalid or expired");
               }
 
               // Remove used backup code
@@ -154,9 +169,9 @@ export const authOptions: NextAuthOptions = {
 
           const staff = user.Staff[0];
           const userData = {
-            id: user.id.toString(), // Convert to string for NextAuth
+            id: String(user.id), // Ensure string conversion for NextAuth
             email: user.email,
-            name: user.name,
+            name: user.name || user.email,
             ...(staff && { 
               staff: {
                 id: staff.id,
@@ -189,9 +204,18 @@ export const authOptions: NextAuthOptions = {
           // Log successful login
           // await AuditClient.logAuthEvent('login_success', userData.id, staff?.id, req);
           
+          // Add rememberMe flag to user data
+          if (credentials.rememberMe === 'true') {
+            (userData as any).rememberMe = true;
+          }
+          if (credentials.trustDevice === 'true') {
+            (userData as any).trustDevice = true;
+          }
+          
           return userData;
         } catch (error) {
           console.error('❌ Authorization error:', error instanceof Error ? error.message : String(error));
+          console.error('Full error stack:', error instanceof Error ? error.stack : 'No stack');
           
           // Log authentication error
           // await AuditClient.logSecurityEvent('auth_error', undefined, undefined, req, error instanceof Error ? error.message : 'Unknown error');
@@ -255,10 +279,28 @@ export const authOptions: NextAuthOptions = {
         if (hasStaff(user)) {
           token.staff = user.staff;
         }
+        
+        // Handle rememberMe and trustDevice flags
+        if ((user as any).rememberMe) {
+          token.rememberMe = true;
+          // Set longer expiry for remember me (30 days)
+          const maxAge = 30 * 24 * 60 * 60; // 30 days in seconds
+          token.exp = Math.floor(Date.now() / 1000) + maxAge;
+        } else {
+          // Default session expiry (1 day)
+          const maxAge = 24 * 60 * 60; // 1 day in seconds
+          token.exp = Math.floor(Date.now() / 1000) + maxAge;
+        }
+        
+        if ((user as any).trustDevice) {
+          token.trustDevice = true;
+        }
       }
       
       // Fetch complete user info including capabilities
-      if (token.email && (trigger === 'signIn' || trigger === 'update' || !token.capabilities)) {
+      // PERFORMANCE: Only fetch on signIn or explicit update trigger
+      // Capabilities should be cached in the JWT token after initial sign-in
+      if (token.email && (trigger === 'signIn' || trigger === 'update')) {
         try {
           const dbUser = await prisma.user.findUnique({
             where: { email: token.email },
@@ -326,7 +368,7 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token.id) {
-        session.user.id = parseInt(token.id); // Convert back to number
+        session.user.id = token.id; // Keep as string
       }
       if (hasStaffToken(token)) {
         session.user.staff = token.staff;
@@ -335,6 +377,13 @@ export const authOptions: NextAuthOptions = {
       session.user.is_system_admin = token.is_system_admin as boolean;
       session.user.is_school_admin = token.is_school_admin as boolean;
       session.user.capabilities = token.capabilities as string[];
+      
+      // Handle remember me expiry
+      if (token.rememberMe) {
+        // Extend session for remember me users
+        session.expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days
+      }
+      
       return session;
     },
   },

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 
 const assignmentSchema = z.object({
@@ -14,7 +15,7 @@ const assignmentSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user and check operations admin permissions
-    const authResult = await withAuth(request, { requireOpsAdmin: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
     if (!authResult.success) {
       return NextResponse.json(
         { error: authResult.error },

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withAuth } from '@/lib/auth/api-auth'
+import { Capability } from '@/lib/auth/policy';
 import { TestGenerator } from '@/lib/testing/test-generator'
 import fs from 'fs/promises'
 import path from 'path'
 
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireDevAdmin: true })
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE })
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode })
   }
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
 
 // List files without tests
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireDevAdmin: true })
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE })
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode })
   }

@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth/api-auth";
+import { Capability } from "@/lib/auth/policy";
 import { prisma } from "@/lib/prisma";
 
 // GET Method
 export async function GET(request: NextRequest) {
   try {
-    // REQUIRED: Auth check with appropriate requirements
+    // REQUIRED: Auth check with appropriate capability
     const authResult = await withAuth(request, { 
       requireAuth: true,
-      // requireStaff: true,
-      // requireAdminRole: true,
-      // requireLeadership: true,
+      // requireCapability: Capability.USER_VIEW,  // For viewing users
+      // requireCapability: Capability.USER_MANAGE, // For managing users
+      // requireCapability: Capability.OPS_MONITORING, // For monitoring
+      // requireCapability: Capability.DEV_DEBUG, // For development
     });
     
     if (!authResult.success) {
@@ -160,7 +162,8 @@ export async function DELETE(request: NextRequest) {
   try {
     // REQUIRED: Auth check (usually admin only for deletes)
     const authResult = await withAuth(request, { 
-      requireAdminRole: true,
+      requireAuth: true,
+      requireCapability: Capability.USER_MANAGE, // Adjust based on resource
     });
     
     if (!authResult.success) {

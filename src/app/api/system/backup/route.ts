@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { promises as fs } from 'fs';
@@ -11,8 +12,7 @@ export async function GET(request: NextRequest) {
   // Backup requires OPS_ADMIN (school admin) capabilities
   const authResult = await withAuth(request, { 
     requireAuth: true, 
-    requireStaff: true, 
-    requireOpsAdmin: true 
+    requireCapability: Capability.OPS_BACKUP 
   });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
@@ -43,8 +43,7 @@ export async function POST(request: NextRequest) {
   // Backup creation requires OPS_ADMIN (school admin) capabilities
   const authResult = await withAuth(request, { 
     requireAuth: true, 
-    requireStaff: true, 
-    requireOpsAdmin: true 
+    requireCapability: Capability.OPS_BACKUP 
   });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
@@ -144,7 +143,9 @@ async function pushToGitHub(message: string = 'Automated backup') {
     
     const { stdout: status } = await execAsync('git status --porcelain', { cwd: process.cwd() });
     if (status.trim()) {
-      await execAsync(`git commit -m "${message} - ${timestamp}"`, { cwd: process.cwd() });
+      // Sanitize commit message to prevent command injection
+      const sanitizedMessage = message.replace(/[^a-zA-Z0-9\s\-_.]/g, '').substring(0, 100);
+      await execAsync(`git commit -m "${sanitizedMessage} - ${timestamp}"`, { cwd: process.cwd() });
     }
 
     // Try to push to GitHub
@@ -219,7 +220,9 @@ async function autoBackup(triggerReason: string = 'System update') {
 
     // Create auto backup
     await execAsync('git add -A', { cwd: process.cwd() });
-    await execAsync(`git commit -m "Auto-backup: ${triggerReason} - ${timestamp}"`, { cwd: process.cwd() });
+    // Sanitize trigger reason to prevent command injection
+    const sanitizedReason = triggerReason.replace(/[^a-zA-Z0-9\s\-_.]/g, '').substring(0, 100);
+    await execAsync(`git commit -m "Auto-backup: ${sanitizedReason} - ${timestamp}"`, { cwd: process.cwd() });
     
     // Create backup branch
     const { stdout: currentBranch } = await execAsync('git branch --show-current', { cwd: process.cwd() });
@@ -647,7 +650,7 @@ async function createFullSystemBackup(components: string[] = ['database', 'setti
 
 // PUT method for uploading and restoring backups
 export async function PUT(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_BACKUP });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

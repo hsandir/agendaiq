@@ -153,7 +153,7 @@ describe('Registration Flow', () => {
       const user = userEvent.setup()
       
       // Create a promise that we can control
-      let resolveFetch: any
+      let resolveFetch: unknown
       const fetchPromise = new Promise((resolve) => {
         resolveFetch = resolve
       })

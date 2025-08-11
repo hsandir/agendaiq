@@ -8,13 +8,16 @@ import { SidebarWrapper } from "@/components/dashboard/SidebarWrapper";
 import { getLayoutPreference } from '@/lib/layout/layout-types';
 import { Monitor, UserCheck, Shield, Settings, MoreHorizontal, ChevronRight, Search, BarChart, CheckSquare, GitBranch, Brain, UserCog, LogOut } from 'lucide-react';
 import { signOut } from 'next-auth/react';
+import { MobileMenu } from '@/components/dashboard/MobileMenu';
+// Performance monitoring is handled through the hook now
+import { layoutStore } from '@/lib/layout/layout-store';
 
 interface DashboardLayoutClientProps {
   children: React.ReactNode;
   isAdmin: boolean;
-  user: any;
-  currentRole: any;
-  userWithStaff: any;
+  user: unknown;
+  currentRole: unknown;
+  userWithStaff: unknown;
 }
 
 export function DashboardLayoutClient({ 
@@ -24,35 +27,67 @@ export function DashboardLayoutClient({
   currentRole, 
   userWithStaff 
 }: DashboardLayoutClientProps) {
-  // Get initial layout from localStorage before first render to prevent flash
-  const getInitialLayout = () => {
+  // Start with a default layout to avoid hydration mismatch
+  const [layoutId, setLayoutId] = useState(() => {
+    // First check if we have a layout in the store (persists across navigation)
+    const storeLayout = layoutStore.getCurrentLayout();
+    if (storeLayout) {
+      return storeLayout;
+    }
     if (typeof window !== 'undefined') {
-      const savedLayout = localStorage.getItem('agendaiq-layout');
-      if (savedLayout) {
-        return savedLayout;
-      }
+      return localStorage.getItem('agendaiq-layout') || 'modern';
     }
     return 'modern';
-  };
-  
-  const [layoutId, setLayoutId] = useState(getInitialLayout);
+  });
   const [mounted, setMounted] = useState(false);
 
-  // Load layout preference from database
+  // Load layout preference from database and localStorage
   useEffect(() => {
-    setMounted(true);
+    // Use singleton store to prevent re-initialization on every navigation
+    if (layoutStore.isInitialized()) {
+      setMounted(true);
+      return;
+    }
     
-    // Fetch from database
-    fetch('/api/user/layout')
-      .then(res => res.json())
-      .then(data => {
-        if (data.layout) {
-          setLayoutId(data.layout);
-          localStorage.setItem('agendaiq-layout', data.layout);
-        }
-      })
-      .catch(err => console.error('Failed to fetch layout preference:', err));
-  }, []);
+    const startTime = performance.now();
+    setMounted(true);
+    layoutStore.setInitialized(true);
+    
+    // First check localStorage for immediate update
+    const savedLayout = localStorage.getItem('agendaiq-layout');
+    if (savedLayout && savedLayout !== layoutId) {
+      setLayoutId(savedLayout);
+    }
+    
+    // Only sync with database if needed (using singleton store)
+    if (layoutStore.needsSync()) {
+      // Optimized database sync with better caching
+      const dbSyncTimer = setTimeout(() => {
+        // Fetch from database with caching headers
+        fetch('/api/user/layout', {
+          headers: { 'Cache-Control': 'max-age=300' }
+        })
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            // Mark as synced in store
+            layoutStore.setLastSyncTime(Date.now());
+            
+            if (data?.layout && data.layout !== savedLayout) {
+              setLayoutId(data.layout);
+              layoutStore.setCurrentLayout(data.layout);
+              localStorage.setItem('agendaiq-layout', data.layout);
+            }
+            
+            // Track layout load performance
+            const endTime = performance.now();
+            // Performance tracking removed - now handled through hooks
+          })
+          .catch(err => console.debug('Layout fetch skipped (user may not be authenticated)'));
+      }, 750); // Reduced delay for faster sync
+      
+      return () => clearTimeout(dbSyncTimer);
+    }
+  }, []); // Empty dependency array - only run once per mount
 
   const layout = getLayoutPreference(layoutId);
 
@@ -61,25 +96,28 @@ export function DashboardLayoutClient({
     const colWidth = layout.id === 'executive' ? '280px' : '260px';
     
     return (
-      <div className="grid min-h-screen bg-background text-foreground" 
+      <div className="md:grid min-h-screen bg-background text-foreground" 
            style={{ gridTemplateColumns: layout.sidebarPosition !== 'hidden' ? `${colWidth} 1fr` : '1fr' }}
            data-layout={layout.id}>
         
         {layout.sidebarPosition !== 'hidden' && (
           <SidebarWrapper 
             isAdmin={isAdmin} 
-            className="sticky top-0 h-screen bg-card shadow-lg border-r border-border" 
+            className="hidden md:block sticky top-0 h-screen bg-card shadow-lg border-r border-border" 
           />
         )}
 
         <main className="flex flex-col min-h-screen">
-          <header className="flex items-center justify-between px-6 lg:px-12 py-7 bg-background/95 backdrop-blur border-b border-border sticky top-0 z-10">
+          <header className="flex items-center justify-between px-4 sm:px-6 lg:px-12 py-4 sm:py-7 bg-background/95 backdrop-blur border-b border-border sticky top-0 z-10">
             <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-bold text-foreground tracking-tight">Dashboard</h1>
+              <MobileMenu user={user} currentRole={currentRole} isAdmin={isAdmin} />
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
+                Dashboard - Meeting Intelligence Platform
+              </h1>
               
               {layout.sidebarPosition === 'hidden' && (
                 <button 
-                  className="p-2 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground transition-colors"
+                  className="hidden md:block p-2 rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground transition-colors"
                   aria-label="Open navigation menu"
                 >
                   <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
@@ -89,39 +127,25 @@ export function DashboardLayoutClient({
               )}
             </div>
             
-            <div className="flex items-center gap-4">
-              {/* Enhanced Search */}
-              <div className="hidden sm:flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2 min-w-[280px] focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all">
-                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-muted-foreground">
-                  <circle cx="11" cy="11" r="7"></circle>
-                  <path d="M21 21l-4.35-4.35"></path>
-                </svg>
-                <input 
-                  placeholder="Search meetings, notes, tasks..."
-                  className="w-full bg-transparent border-0 outline-0 text-sm text-foreground placeholder:text-muted-foreground"
-                />
+            {/* User Info */}
+            <div className="hidden md:flex items-center gap-3">
+              <div className="hidden lg:flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">{user.email}</span>
+                <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded-full font-medium">
+                  {currentRole?.title || 'No Role'}
+                </span>
               </div>
-              
-              {/* User Info */}
-              <div className="flex items-center gap-3">
-                <div className="hidden md:flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">{user.email}</span>
-                  <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded-full font-medium">
-                    {currentRole?.title || 'No Role'}
-                  </span>
-                </div>
-                <button
-                  onClick={() => signOut({ callbackUrl: '/auth/signin' })}
-                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span className="hidden sm:inline">Sign Out</span>
-                </button>
-              </div>
+              <button
+                onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Sign Out</span>
+              </button>
             </div>
           </header>
 
-          <div className="flex-1 px-6 lg:px-12 py-8">
+          <div className="flex-1 px-4 sm:px-6 lg:px-12 py-4 sm:py-8">
             {children}
           </div>
         </main>
@@ -135,13 +159,16 @@ export function DashboardLayoutClient({
       <div className="flex min-h-screen bg-background text-foreground" data-layout="compact">
         <SidebarWrapper 
           isAdmin={isAdmin} 
-          className="w-56 sticky top-0 h-screen bg-card border-r border-border" 
+          className="hidden md:block w-56 sticky top-0 h-screen bg-card border-r border-border" 
         />
         
         <main className="flex-1 flex flex-col">
           <header className="flex items-center justify-between px-4 py-3 bg-card border-b border-border">
-            <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <MobileMenu user={user} currentRole={currentRole} isAdmin={isAdmin} />
+              <h1 className="text-lg font-semibold text-foreground">Dashboard - Meeting Intelligence Platform</h1>
+            </div>
+            <div className="hidden md:flex items-center gap-2">
               <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded font-medium">
                 {currentRole?.title || 'No Role'}
               </span>
@@ -166,9 +193,10 @@ export function DashboardLayoutClient({
   if (layout.id === 'minimal') {
     return (
       <div className="min-h-screen bg-background text-foreground" data-layout="minimal">
-        <header className="flex items-center justify-between px-6 py-4 border-b border-border/30">
-          <div className="flex items-center gap-6">
-            <h1 className="text-xl font-bold text-foreground">AgendaIQ</h1>
+        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-4 border-b border-border/30">
+          <div className="flex items-center gap-4 sm:gap-6">
+            <MobileMenu user={user} currentRole={currentRole} isAdmin={isAdmin} />
+            <h1 className="text-lg sm:text-xl font-bold text-foreground">AgendaIQ</h1>
             
             {/* Minimal Navigation */}
             <nav className="hidden md:flex items-center space-x-1">
@@ -209,11 +237,7 @@ export function DashboardLayoutClient({
                       </Link>
                       {isAdmin && (
                         <>
-                          <Link href="/dashboard/settings/users" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
-                            <UserCheck className="h-4 w-4" />
-                            Users
-                          </Link>
-                          <Link href="/dashboard/settings/roles" className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                          <Link href={"/dashboard/settings/roles" as Route} className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
                             <Shield className="h-4 w-4" />
                             Roles
                           </Link>
@@ -239,7 +263,7 @@ export function DashboardLayoutClient({
             </nav>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3 mt-3 sm:mt-0">
             <span className="text-sm text-muted-foreground">{user.email}</span>
             <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">
               {currentRole?.title || 'No Role'}
@@ -254,7 +278,7 @@ export function DashboardLayoutClient({
           </div>
         </header>
         
-        <main className="px-6 py-8">
+        <main className="px-4 sm:px-6 py-4 sm:py-8">
           {children}
         </main>
       </div>
@@ -268,7 +292,8 @@ export function DashboardLayoutClient({
       <nav className="bg-card text-card-foreground shadow border-b border-border sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-3 sm:gap-6">
+              <MobileMenu user={user} currentRole={currentRole} isAdmin={isAdmin} />
               <Link
                 href="/dashboard"
                 className="flex items-center px-3 py-2 font-semibold text-primary hover:text-primary/80 transition-colors"
@@ -374,23 +399,11 @@ export function DashboardLayoutClient({
                               </div>
                               <div className="absolute left-full top-0 ml-2 w-56 bg-card border border-border rounded-lg shadow-lg opacity-0 invisible group-hover/admin:opacity-100 group-hover/admin:visible transition-all">
                                 <div className="p-2 space-y-1">
-                                  <Link href="/dashboard/settings/users" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
-                                    User Management
-                                  </Link>
-                                  <Link href="/dashboard/settings/roles" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
-                                    Role Management
-                                  </Link>
                                   <Link href="/dashboard/settings/role-hierarchy" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
                                     Role Hierarchy
                                   </Link>
-                                  <Link href="/dashboard/settings/staff-upload" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
-                                    Staff Upload
-                                  </Link>
                                   <Link href="/dashboard/settings/audit-logs" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
                                     Database Audit Logs
-                                  </Link>
-                                  <Link href="/dashboard/settings/admin" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
-                                    Admin Settings
                                   </Link>
                                   <Link href="/dashboard/settings/school" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
                                     School Management
@@ -461,6 +474,9 @@ export function DashboardLayoutClient({
                                   <Link href="/dashboard/system/migration" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
                                     Auth Migration & Diagnostics
                                   </Link>
+                                  <Link href="/dashboard/development/permissions-check" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Permissions Check
+                                  </Link>
                                 </div>
                               </div>
                             </div>
@@ -511,7 +527,7 @@ export function DashboardLayoutClient({
                 </div>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-4">
               <div className="flex items-center space-x-3">
                 <span className="text-sm text-muted-foreground">
                   {user.email}

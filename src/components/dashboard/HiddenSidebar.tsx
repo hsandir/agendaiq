@@ -61,12 +61,8 @@ const navigation: NavSection[] = [
     title: "Administration",
     adminOnly: true,
     items: [
-      { href: "/dashboard/settings/users", label: "User Management", icon: FiUsers },
-      { href: "/dashboard/settings/roles", label: "Role Management", icon: FiShield },
       { href: "/dashboard/settings/role-hierarchy", label: "Role Hierarchy", icon: FiTrendingUp },
-      { href: "/dashboard/settings/staff-upload", label: "Staff Upload", icon: FiUpload },
       { href: "/dashboard/settings/audit-logs", label: "Database Audit Logs", icon: FiFileText },
-      { href: "/dashboard/settings/admin", label: "Admin Settings", icon: FiSettings },
       { href: "/dashboard/settings/school", label: "School Management", icon: FiHome },
       { href: "/dashboard/settings/permissions", label: "Permissions", icon: FiKey },
       { href: "/dashboard/settings/backup", label: "Backup & Restore", icon: FiHardDrive, adminOnly: true },
@@ -94,6 +90,7 @@ const navigation: NavSection[] = [
       { href: "/dashboard/system/updates", label: "Package Updates", icon: FiDownload },
       { href: "/dashboard/system/database", label: "Database Management", icon: FiDatabase },
       { href: "/dashboard/system/migration", label: "Auth Migration & Diagnostics", icon: FiTrendingUp },
+      { href: "/dashboard/development/permissions-check", label: "Permissions Check", icon: FiShield },
     ],
   }] : []),
   {

@@ -6,7 +6,7 @@ export class TestFactory {
   constructor(private prisma: PrismaClient) {}
 
   // User factory
-  async createUser(overrides: Partial<any> = {}) {
+  async createUser(overrides: Record<string, unknown> = {}) {
     const password = overrides.password || 'password123'
     const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -14,18 +14,16 @@ export class TestFactory {
       data: {
         email: faker.internet.email(),
         name: faker.person.fullName(),
-        password: hashedPassword,
-        emailVerified: true,
-        is_active: true,
+        hashedPassword: hashedPassword,
+        emailVerified: new Date(),
         two_factor_enabled: false,
-        preferences: {},
         ...overrides,
       },
     })
   }
 
   // Staff factory
-  async createStaff(overrides: Partial<any> = {}) {
+  async createStaff(overrides: Record<string, unknown> = {}) {
     const user = overrides.user || await this.createUser()
     const role = overrides.role || await this.getOrCreateRole('Teacher')
     const department = overrides.department || await this.getOrCreateDepartment()
@@ -61,7 +59,7 @@ export class TestFactory {
   }
 
   // Meeting factory
-  async createMeeting(overrides: Partial<any> = {}) {
+  async createMeeting(overrides: Record<string, unknown> = {}) {
     const organizer = overrides.organizer || await this.createStaff()
     const startTime = overrides.start_time || faker.date.future()
     const endTime = new Date(startTime.getTime() + 60 * 60 * 1000) // 1 hour later
@@ -109,7 +107,7 @@ export class TestFactory {
   }
 
   // Meeting with attendees
-  async createMeetingWithAttendees(attendeeCount: number = 3, overrides: Partial<any> = {}) {
+  async createMeetingWithAttendees(attendeeCount: number = 3, overrides: Record<string, unknown> = {}) {
     const meeting = await this.createMeeting(overrides)
     const attendees = []
 
@@ -138,7 +136,7 @@ export class TestFactory {
   }
 
   // Agenda item factory
-  async createAgendaItem(meeting: any, overrides: Partial<any> = {}) {
+  async createAgendaItem(meeting: { id: number }, overrides: Record<string, unknown> = {}) {
     const presenter = overrides.presenter || await this.createStaff()
 
     return this.prisma.meetingAgendaItem.create({
@@ -234,9 +232,6 @@ export class TestFactory {
           name: faker.location.county() + ' District',
           code: faker.string.alphanumeric(6).toUpperCase(),
           address: faker.location.streetAddress(),
-          phone: faker.phone.number(),
-          email: faker.internet.email(),
-          is_active: true,
         },
       })
     }
@@ -266,7 +261,7 @@ export class TestFactory {
     return users
   }
 
-  async createMeetings(count: number, organizer?: any) {
+  async createMeetings(count: number, organizer?: { id: number; department_id: number; school_id: number; district_id: number }) {
     const meetings = []
     for (let i = 0; i < count; i++) {
       meetings.push(await this.createMeeting({ organizer }))

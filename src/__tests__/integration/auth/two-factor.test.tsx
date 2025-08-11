@@ -60,7 +60,7 @@ describe('Two-Factor Authentication Flow', () => {
     it('submits valid 2FA code successfully', async () => {
       const user = userEvent.setup()
       const mockSignIn = signIn as jest.MockedFunction<typeof signIn>
-      mockSignIn.mockResolvedValueOnce({ error: null, ok: true } as any)
+      mockSignIn.mockResolvedValueOnce({ error: null, ok: true } as unknown)
       
       mockReplace.mockClear()
       
@@ -91,7 +91,7 @@ describe('Two-Factor Authentication Flow', () => {
       mockSignIn.mockResolvedValueOnce({ 
         error: 'Invalid verification code', 
         ok: false 
-      } as any)
+      } as unknown)
       
       render(<TwoFactorForm />)
       
@@ -154,7 +154,7 @@ describe('Two-Factor Authentication Flow', () => {
       const mockSignIn = signIn as jest.MockedFunction<typeof signIn>
       
       // Create a promise that we can control
-      let resolveSignIn: any
+      let resolveSignIn: unknown
       const signInPromise = new Promise((resolve) => {
         resolveSignIn = resolve
       })

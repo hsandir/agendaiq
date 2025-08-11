@@ -1,15 +1,14 @@
 import { PrismaClient } from '@prisma/client'
-import { execSync } from 'child_process'
 import { TestFactory } from '../fixtures/factory'
 
 let prisma: PrismaClient
 
 export function getTestPrismaClient(): PrismaClient {
   if (!prisma) {
-    const databaseUrl = process.env.DATABASE_URL?.replace(
-      /\/agendaiq(\?.*)?$/,
-      '/agendaiq_test$1'
-    )
+    // Force test database URL
+    const databaseUrl = 'postgresql://hs:yeni@localhost:5432/agendaiq_test';
+    
+    console.log('Using test database URL:', databaseUrl);
 
     prisma = new PrismaClient({
       datasources: {
@@ -51,35 +50,34 @@ export async function resetTestDatabase() {
 }
 
 export async function seedTestDatabase() {
-  const factory = getTestFactory()
+  const prisma = getTestPrismaClient()
   
-  // Create basic roles
-  const adminRole = await factory['getOrCreateRole']('Administrator')
-  const teacherRole = await factory['getOrCreateRole']('Teacher')
-  
-  // Create test users
-  const adminUser = await factory.createUser({
-    email: 'admin@test.com',
-    name: 'Test Admin',
+  // Use existing data from copied main database
+  const users = await prisma.user.findMany({
+    include: {
+      Staff: {
+        include: {
+          Role: true,
+          Department: true,
+          School: true,
+          District: true
+        }
+      }
+    }
   })
   
-  const teacherUser = await factory.createUser({
-    email: 'teacher@test.com',
-    name: 'Test Teacher',
-  })
+  if (users.length >= 2) {
+    const adminUser = users.find(u => u.Staff?.[0]?.Role?.is_leadership) || users[0]
+    const teacherUser = users.find(u => !u.Staff?.[0]?.Role?.is_leadership) || users[1]
+    const adminStaff = adminUser.Staff?.[0]
+    const teacherStaff = teacherUser.Staff?.[0]
+    
+    if (adminStaff && teacherStaff) {
+      return { adminUser, teacherUser, adminStaff, teacherStaff }
+    }
+  }
   
-  // Create staff records
-  const adminStaff = await factory.createStaff({
-    user: adminUser,
-    role: adminRole,
-  })
-  
-  const teacherStaff = await factory.createStaff({
-    user: teacherUser,
-    role: teacherRole,
-  })
-  
-  return { adminUser, teacherUser, adminStaff, teacherStaff }
+  throw new Error('Test database should have been seeded with data from main database')
 }
 
 export async function disconnectTestDatabase() {
@@ -95,11 +93,11 @@ export async function withTransaction<T>(
   const prisma = getTestPrismaClient()
   
   return prisma.$transaction(async (tx) => {
-    const result = await fn(tx as PrismaClient)
+    await fn(tx as PrismaClient)
     throw new Error('Rollback') // Force rollback
   }).catch((error) => {
     if (error.message === 'Rollback') {
-      return error.result
+      return undefined as T
     }
     throw error
   })

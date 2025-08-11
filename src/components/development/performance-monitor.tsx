@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
+import { usePerformanceMetrics } from '@/lib/performance/performance-monitor'
+import { useTheme } from '@/lib/theme/theme-provider'
 import { 
   ActivityIcon,
   CpuIcon,
@@ -17,7 +19,12 @@ import {
   ZapIcon,
   AlertTriangleIcon,
   TrendingUpIcon,
-  TrendingDownIcon
+  TrendingDownIcon,
+  PlayIcon,
+  StopCircleIcon,
+  RefreshCwIcon,
+  CheckCircleIcon,
+  XCircleIcon
 } from 'lucide-react'
 
 interface PerformanceMetric {
@@ -37,17 +44,40 @@ interface ApiEndpoint {
   errorRate: number
 }
 
+interface TestResult {
+  operation: string
+  startTime: number
+  endTime: number
+  duration: number
+  success: boolean
+}
+
 export default function PerformanceMonitor() {
   const [metrics, setMetrics] = useState<PerformanceMetric[]>([])
   const [apiEndpoints, setApiEndpoints] = useState<ApiEndpoint[]>([])
   const [isMonitoring, setIsMonitoring] = useState(false)
-  const [activeTab, setActiveTab] = useState('realtime')
+  const [activeTab, setActiveTab] = useState('dashboard')
+  const [testResults, setTestResults] = useState<TestResult[]>([])
+  const [isRunningTests, setIsRunningTests] = useState(false)
+  const [currentTest, setCurrentTest] = useState('')
+  const [mounted, setMounted] = useState(false)
+  
+  // Use the performance monitoring system we built
+  const { getMetrics, getAveragePageLoadTime, getAPIPerformance, clearMetrics } = usePerformanceMetrics()
+  const { setTheme, theme, availableThemes } = useTheme()
 
   useEffect(() => {
-    loadMetrics()
-    const interval = setInterval(loadMetrics, 5000)
-    return () => clearInterval(interval)
+    setMounted(true)
   }, [])
+
+  useEffect(() => {
+    // Only load metrics if monitoring is active and component is mounted
+    if (isMonitoring && mounted) {
+      loadMetrics()
+      const interval = setInterval(loadMetrics, 30000) // Changed to 30 seconds
+      return () => clearInterval(interval)
+    }
+  }, [isMonitoring, mounted])
 
   const loadMetrics = async () => {
     try {
@@ -100,6 +130,112 @@ export default function PerformanceMonitor() {
     }
   }
 
+  const measureOperation = async (operation: string, fn: () => Promise<any>): Promise<TestResult> => {
+    const startTime = performance.now()
+    let success = true
+    
+    try {
+      await fn()
+    } catch (error) {
+      success = false
+      console.error(`Test failed: ${operation}`, error)
+    }
+    
+    const endTime = performance.now()
+    return {
+      operation,
+      startTime,
+      endTime,
+      duration: Math.round((endTime - startTime) * 100) / 100,
+      success
+    }
+  }
+
+  const testThemeChanges = async () => {
+    const testResults: TestResult[] = []
+    const themes = ['standard', 'classic-light', 'classic-dark', 'modern-purple']
+    
+    for (const themeId of themes) {
+      setCurrentTest(`Testing theme change: ${themeId}`)
+      const result = await measureOperation(`Theme Change: ${themeId}`, async () => {
+        setTheme(themeId)
+        // Wait for theme to apply
+        await new Promise(resolve => setTimeout(resolve, 100))
+      })
+      testResults.push(result)
+      
+      // Small delay between theme changes
+      await new Promise(resolve => setTimeout(resolve, 200))
+    }
+    
+    return testResults
+  }
+
+  const testLayoutPreferences = async () => {
+    const testResults: TestResult[] = []
+    const layouts = ['modern', 'compact', 'minimal', 'classic']
+    
+    for (const layoutId of layouts) {
+      setCurrentTest(`Testing layout preference: ${layoutId}`)
+      const result = await measureOperation(`Layout API Call: ${layoutId}`, async () => {
+        const response = await fetch('/api/user/layout', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ layout: layoutId })
+        })
+        if (!response.ok) throw new Error('API call failed')
+      })
+      testResults.push(result)
+    }
+    
+    return testResults
+  }
+
+  const testAPIPerformance = async () => {
+    const testResults: TestResult[] = []
+    const apis = [
+      { name: 'Theme API', url: '/api/user/theme' },
+      { name: 'Layout API', url: '/api/user/layout' },
+      { name: 'Custom Theme API', url: '/api/user/custom-theme' }
+    ]
+    
+    for (const api of apis) {
+      setCurrentTest(`Testing ${api.name}`)
+      const result = await measureOperation(api.name, async () => {
+        const response = await fetch(api.url)
+        if (!response.ok && response.status !== 401) throw new Error('API call failed')
+      })
+      testResults.push(result)
+    }
+    
+    return testResults
+  }
+
+  const runAllTests = async () => {
+    setIsRunningTests(true)
+    setTestResults([])
+    
+    try {
+      // Test API performance
+      const apiResults = await testAPIPerformance()
+      setTestResults(prev => [...prev, ...apiResults])
+      
+      // Test theme changes
+      const themeResults = await testThemeChanges()
+      setTestResults(prev => [...prev, ...themeResults])
+      
+      // Test layout preferences  
+      const layoutResults = await testLayoutPreferences()
+      setTestResults(prev => [...prev, ...layoutResults])
+      
+    } catch (error) {
+      console.error('Performance test failed:', error)
+    } finally {
+      setIsRunningTests(false)
+      setCurrentTest('')
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Overview Cards */}
@@ -126,7 +262,7 @@ export default function PerformanceMonitor() {
               </CardHeader>
               <CardContent>
                 <div className={`text-2xl font-bold ${getStatusColor(status)}`}>
-                  {metric.value}{metric.unit}
+                  {`${metric.value}${metric.unit}`}
                 </div>
                 <Progress 
                   value={(metric.value / metric.threshold) * 100} 
@@ -140,12 +276,184 @@ export default function PerformanceMonitor() {
 
       {/* Detailed Metrics */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
+        <TabsList className="grid grid-cols-5 w-full">
+          <TabsTrigger value="dashboard">Dashboard Performance</TabsTrigger>
           <TabsTrigger value="realtime">Real-time</TabsTrigger>
           <TabsTrigger value="endpoints">API Endpoints</TabsTrigger>
           <TabsTrigger value="database">Database</TabsTrigger>
           <TabsTrigger value="cache">Cache</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="dashboard" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {/* Current Theme Info */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Current Theme</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-lg font-semibold">{theme?.name || 'Standard'}</div>
+                <p className="text-sm text-muted-foreground">ID: {theme?.id || 'standard'}</p>
+              </CardContent>
+            </Card>
+
+            {/* Performance Overview */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Average Page Load</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className={`text-2xl font-bold ${mounted && getAveragePageLoadTime() < 150 ? 'text-green-600' : 'text-red-600'}`}>
+                  {mounted ? `${getAveragePageLoadTime().toFixed(2)}ms` : '0.00ms'}
+                </div>
+                <p className={`text-xs ${mounted && getAveragePageLoadTime() < 150 ? 'text-green-600' : 'text-red-600'}`}>
+                  Target: &lt;150ms
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Test Status */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm">Test Results</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-lg font-semibold">
+                  {testResults.length === 0 ? 'No tests run' : `${testResults.filter(r => r.success).length}/${testResults.length} passed`}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {mounted && testResults.length > 0 && `Avg: ${(testResults.reduce((sum, r) => sum + r.duration, 0) / testResults.length).toFixed(2)}ms`}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Performance Test Controls */}
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Dashboard Performance Test</CardTitle>
+                  <CardDescription>Test theme and layout change performance</CardDescription>
+                </div>
+                <Button
+                  onClick={runAllTests}
+                  disabled={isRunningTests}
+                  className="min-w-[140px]"
+                >
+                  {isRunningTests ? (
+                    <>
+                      <RefreshCwIcon className="mr-2 h-4 w-4 animate-spin" />
+                      Testing...
+                    </>
+                  ) : (
+                    <>
+                      <PlayIcon className="mr-2 h-4 w-4" />
+                      Run Tests
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {isRunningTests && currentTest && (
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <p className="text-sm text-blue-800">🔄 {currentTest}</p>
+                </div>
+              )}
+
+              {/* API Performance Details */}
+              {Object.keys(getAPIPerformance()).length > 0 && (
+                <div className="mb-6">
+                  <h3 className="font-semibold mb-3">API Performance</h3>
+                  <div className="space-y-2">
+                    {Object.entries(getAPIPerformance()).map(([name, data]) => (
+                      <div key={name} className="flex justify-between items-center p-3 bg-background rounded-lg border">
+                        <span className="font-medium">{name}</span>
+                        <div className="text-right">
+                          <span className={`font-bold ${data.avg < 100 ? 'text-green-600' : 'text-red-600'}`}>
+                            {mounted ? `${data.avg.toFixed(2)}ms` : '0.00ms'}
+                          </span>
+                          <span className="text-sm text-muted-foreground ml-2">
+                            ({data.count} calls)
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Test Results */}
+              {testResults.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-3">Test Results</h3>
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {testResults.map((result, index) => (
+                      <div key={index} className="flex justify-between items-center p-3 bg-background rounded-lg border">
+                        <div className="flex items-center gap-2">
+                          {result.success ? (
+                            <CheckCircleIcon className="h-4 w-4 text-green-600" />
+                          ) : (
+                            <XCircleIcon className="h-4 w-4 text-red-600" />
+                          )}
+                          <span className="font-medium">{result.operation}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className={`font-bold ${result.duration < 100 ? 'text-green-600' : result.duration < 200 ? 'text-yellow-600' : 'text-red-600'}`}>
+                            {result.duration}ms
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Summary */}
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="font-semibold text-blue-800 mb-2">Summary</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div>
+                        <p className="text-blue-600">Total Tests</p>
+                        <p className="font-bold">{testResults.length}</p>
+                      </div>
+                      <div>
+                        <p className="text-green-600">Successful</p>
+                        <p className="font-bold">{testResults.filter(r => r.success).length}</p>
+                      </div>
+                      <div>
+                        <p className="text-red-600">Failed</p>
+                        <p className="font-bold">{testResults.filter(r => !r.success).length}</p>
+                      </div>
+                      <div>
+                        <p className="text-blue-600">Average Time</p>
+                        <p className="font-bold">
+                          {mounted && testResults.length > 0 ? (testResults.reduce((sum, r) => sum + r.duration, 0) / testResults.length).toFixed(2) : '0'}ms
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Performance Metrics from Monitor */}
+              {getMetrics().length > 0 && (
+                <div className="mt-6">
+                  <h3 className="font-semibold mb-3">Performance Metrics</h3>
+                  <ScrollArea className="h-40 border rounded-lg p-3">
+                    <div className="space-y-1 text-sm">
+                      {getMetrics().slice(-10).map((metric, index) => (
+                        <div key={index} className="flex justify-between">
+                          <span>{metric.name}</span>
+                          <span className="font-mono">{mounted ? `${metric.value.toFixed(2)}ms` : '0.00ms'}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="realtime" className="space-y-4">
           <Card>

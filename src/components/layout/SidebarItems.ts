@@ -124,20 +124,10 @@ export const sidebarItems: NavigationSection[] = [
             ],
           },
           {
-            href: "/dashboard/settings/admin",
+            href: "/dashboard/settings/role-hierarchy",
             label: "Admin",
             icon: ShieldCheck,
             children: [
-              {
-                href: "/dashboard/settings/users",
-                label: "User Management",
-                icon: UserCheck,
-              },
-              {
-                href: "/dashboard/settings/roles",
-                label: "Role Management",
-                icon: Shield,
-              },
               {
                 href: "/dashboard/settings/role-hierarchy",
                 label: "Role Hierarchy",
@@ -191,6 +181,16 @@ export const sidebarItems: NavigationSection[] = [
                 href: "/dashboard/monitoring",
                 label: "Live Monitoring",
                 icon: Monitor,
+              },
+              {
+                href: "/dashboard/development/performance",
+                label: "Performance Monitor",
+                icon: Activity,
+              },
+              {
+                href: "/dashboard/development/permissions-check",
+                label: "Permissions Check",
+                icon: Shield,
               },
             ],
           },

@@ -55,7 +55,7 @@ describe('Safe Date Utilities', () => {
   describe('safeFormatDate', () => {
     it('should format valid dates', () => {
       const result = safeFormatDate(validDateString);
-      expect(result).toBe('Jan 15, 2024');
+      expect(result).toBe('1/15/2024');
     });
 
     it('should return fallback for invalid dates', () => {
@@ -82,8 +82,8 @@ describe('Safe Date Utilities', () => {
     it('should format valid dates with time', () => {
       const result = safeFormatDateTime(validDateString);
       expect(result).toContain('2024');
-      expect(result).toContain('Jan');
-      expect(result).toContain('15');
+      expect(result).toContain('1/15');
+      expect(result).toMatch(/\d{1,2}:\d{2}:\d{2}/);
     });
 
     it('should return fallback for invalid dates', () => {

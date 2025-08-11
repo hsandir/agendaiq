@@ -1,8 +1,14 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { signIn } from 'next-auth/react'
 import LoginForm from '@/components/auth/login-form'
-import { mockFetchResponse, mockFetchError } from '@/__tests__/utils/test-utils'
+
+type SignInResponse = {
+  error?: string | null;
+  ok?: boolean;
+  status?: number;
+  url?: string | null;
+}
 
 // Mock next-auth
 jest.mock('next-auth/react', () => ({
@@ -68,7 +74,7 @@ describe('Login Flow', () => {
     it('submits login credentials successfully', async () => {
       const user = userEvent.setup()
       const mockSignIn = signIn as jest.MockedFunction<typeof signIn>
-      mockSignIn.mockResolvedValueOnce({ error: null, ok: true } as any)
+      mockSignIn.mockResolvedValueOnce({ error: null, ok: true } as SignInResponse)
       
       render(<LoginForm />)
       
@@ -95,7 +101,7 @@ describe('Login Flow', () => {
       mockSignIn.mockResolvedValueOnce({ 
         error: 'Invalid email or password', 
         ok: false 
-      } as any)
+      } as SignInResponse)
       
       render(<LoginForm />)
       
@@ -135,7 +141,7 @@ describe('Login Flow', () => {
       mockSignIn.mockResolvedValueOnce({ 
         error: 'TwoFactorRequired',
         ok: false 
-      } as any)
+      } as SignInResponse)
       
       render(<LoginForm />)
       
@@ -160,7 +166,7 @@ describe('Login Flow', () => {
       mockSignIn.mockResolvedValueOnce({ 
         error: 'AccountLocked',
         ok: false 
-      } as any)
+      } as SignInResponse)
       
       render(<LoginForm />)
       
@@ -180,7 +186,7 @@ describe('Login Flow', () => {
     it('includes remember me option in login', async () => {
       const user = userEvent.setup()
       const mockSignIn = signIn as jest.MockedFunction<typeof signIn>
-      mockSignIn.mockResolvedValueOnce({ error: null, ok: true } as any)
+      mockSignIn.mockResolvedValueOnce({ error: null, ok: true } as SignInResponse)
       
       render(<LoginForm />)
       

@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { prisma } from "@/lib/prisma";
 
 // GET /api/roles - List all roles
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireStaff: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/roles - Create a new role
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
 
 // PUT /api/roles - Update a role
 export async function PUT(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireOpsAdmin: true });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }

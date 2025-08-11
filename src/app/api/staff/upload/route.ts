@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -117,7 +118,7 @@ export async function POST(request: NextRequest) {
     }
 
     // REQUIRED: Auth check - Leadership required for staff upload
-    const authResult = await withAuth(request, { requireLeadership: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.STAFF_IMPORT });
     if (!authResult.success) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }

@@ -151,6 +151,15 @@ const sentryWebpackPluginOptions = {
   
   // Automatically instrument app router
   autoInstrumentAppDirectory: true,
+  
+  // Automatically instrument middleware
+  autoInstrumentMiddleware: true,
+  
+  // Disable telemetry to prevent connection issues
+  telemetry: false,
+  
+  // Disable automatic error capture in development
+  automaticVercelMonitors: false,
 };
 
 // Export the config wrapped with Sentry and Bundle Analyzer

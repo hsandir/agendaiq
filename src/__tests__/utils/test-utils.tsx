@@ -83,7 +83,7 @@ export function renderWithProviders(
 // API test helpers
 export const createMockRequest = (
   method: string = 'GET',
-  body?: any,
+  body?: unknown,
   headers?: Record<string, string>
 ): Request => {
   const url = 'http://localhost:3000/api/test'
@@ -104,7 +104,7 @@ export const createMockRequest = (
 
 export const createMockNextRequest = (
   method: string = 'GET',
-  body?: any,
+  body?: unknown,
   headers?: Record<string, string>
 ) => {
   const request = createMockRequest(method, body, headers)
@@ -114,11 +114,11 @@ export const createMockNextRequest = (
     text: async () => JSON.stringify(body),
     formData: async () => new FormData(),
     headers: new Headers(headers),
-  } as any
+  } as unknown
 }
 
 // Database test helpers
-export const createTestUser = (overrides?: Partial<any>) => ({
+export const createTestUser = (overrides?: Record<string, unknown>) => ({
   id: 1,
   email: 'test@example.com',
   name: 'Test User',
@@ -137,7 +137,7 @@ export const createTestUser = (overrides?: Partial<any>) => ({
   ...overrides,
 })
 
-export const createTestStaff = (overrides?: Partial<any>) => ({
+export const createTestStaff = (overrides?: Record<string, unknown>) => ({
   id: 1,
   user_id: 1,
   role_id: 1,
@@ -158,7 +158,7 @@ export const createTestStaff = (overrides?: Partial<any>) => ({
   ...overrides,
 })
 
-export const createTestMeeting = (overrides?: Partial<any>) => ({
+export const createTestMeeting = (overrides?: Record<string, unknown>) => ({
   id: 1,
   title: 'Test Meeting',
   description: 'Test meeting description',
@@ -180,7 +180,7 @@ export const createTestMeeting = (overrides?: Partial<any>) => ({
 export const waitForAsync = () => new Promise(resolve => setTimeout(resolve, 0))
 
 // Mock fetch responses
-export const mockFetchResponse = (data: any, status: number = 200) => {
+export const mockFetchResponse = (data: unknown, status: number = 200) => {
   global.fetch = jest.fn().mockResolvedValueOnce({
     ok: status >= 200 && status < 300,
     status,

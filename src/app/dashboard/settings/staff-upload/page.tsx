@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
+import { requireAuth } from '@/lib/auth/auth-utils';
+import { Capability } from '@/lib/auth/policy';
 import StaffUploadClient from './StaffUploadClient';
 
 export const metadata: Metadata = {
@@ -8,8 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default async function StaffUploadPage() {
-  // REQUIRED: Server-side auth check - Leadership required
-  const user = await requireAuth(AuthPresets.requireLeadership);
+  // REQUIRED: Server-side auth check - Staff import capability required
+  const user = await requireAuth({ requireAuth: true, requireCapability: Capability.STAFF_IMPORT });
 
   return <StaffUploadClient />;
 } 

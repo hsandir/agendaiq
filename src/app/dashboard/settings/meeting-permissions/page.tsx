@@ -9,8 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default async function MeetingPermissionsPage() {
-  // REQUIRED: Auth check - Admin required for permission management
-  const user = await requireAuth(AuthPresets.requireAdmin);
+  // REQUIRED: Auth check - Meeting management capability required
+  const user = await requireAuth(AuthPresets.requireMeetingCreate);
   
   // REQUIRED: Your page JSX here
   return (

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
 import { pusherServer, CHANNELS, EVENTS } from '@/lib/pusher';
 import { isAnyAdmin } from '@/lib/auth/policy';
@@ -136,7 +137,7 @@ export async function DELETE(
 ) {
   try {
     const params = await props.params;
-    const authResult = await withAuth(request, { requireOpsAdmin: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.MEETING_CREATE });
     if (!authResult.success) {
       return NextResponse.json(
         { error: authResult.error },

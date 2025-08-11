@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { handleRateLimitMonitoring, AdvancedRateLimiter } from '@/lib/utils/rate-limit-advanced';
 import { z } from 'zod';
 
@@ -13,7 +14,7 @@ const updateSchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     // Check authentication - operations admin only
-    const authResult = await withAuth(request, { requireOpsAdmin: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE });
     if (!authResult.success) {
       return NextResponse.json(
         { error: authResult.error },
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Check authentication - operations admin only
-    const authResult = await withAuth(request, { requireOpsAdmin: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE });
     if (!authResult.success) {
       return NextResponse.json(
         { error: authResult.error },
@@ -189,7 +190,7 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     // Check authentication - operations admin only
-    const authResult = await withAuth(request, { requireOpsAdmin: true });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE });
     if (!authResult.success) {
       return NextResponse.json(
         { error: authResult.error },
