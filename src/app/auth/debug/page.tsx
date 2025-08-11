@@ -557,9 +557,8 @@ export default function AuthDebugPage() {
                   </thead>
                   <tbody>
                     {logs.map((log) => (
-                      <>
+                      <React.Fragment key={log.id}>
                       <tr
-                        key={log.id}
                         className={`border-b ${
                           log.level === 'error' || log.level === 'critical' 
                             ? 'bg-red-50' 
@@ -618,7 +617,7 @@ export default function AuthDebugPage() {
                           </td>
                         </tr>
                       )}
-                      </>
+                      </React.Fragment>
                     ))}
                   </tbody>
                 </table>
