@@ -28,7 +28,7 @@ class SentryProvider implements MonitoringProvider {
   init(config: MonitoringConfig): void {
     if (this.initialized) return;
 
-    const sentryConfig: any = {
+    const sentryConfig: Record<string, unknown> = {
       dsn: config.enabled ? config.dsn : undefined,
       environment: config.environment,
       release: config.release,
@@ -48,7 +48,7 @@ class SentryProvider implements MonitoringProvider {
       allowUrls: ALLOW_URLS,
       
       // Dynamic sampling
-      tracesSampler: (samplingContext: any) => {
+      tracesSampler: (samplingContext: Record<string, unknown>) => {
         return getDynamicSampleRate({
           url: samplingContext.request?.url,
           error: !!samplingContext.error,
@@ -58,7 +58,7 @@ class SentryProvider implements MonitoringProvider {
       },
       
       // Before send hook for data sanitization
-      beforeSend: (event: any, hint: any) => {
+      beforeSend: (event: Record<string, unknown>, hint: Record<string, unknown>) => {
         // Allow custom beforeSend from config
         if (config.beforeSend) {
           const customEvent = config.beforeSend(this.sentryEventToErrorEvent(event));
@@ -103,7 +103,7 @@ class SentryProvider implements MonitoringProvider {
       },
       
       // Before send transaction for performance data
-      beforeSendTransaction: (transaction: any) => {
+      beforeSendTransaction: (transaction: Record<string, unknown>) => {
         // Add custom tags
         if (config.tags) {
           transaction.tags = { ...transaction.tags, ...config.tags };
@@ -145,8 +145,8 @@ class SentryProvider implements MonitoringProvider {
     this.initialized = true;
   }
 
-  private buildIntegrations(config: MonitoringConfig): any[] {
-    const integrations: any[] = [];
+  private buildIntegrations(config: MonitoringConfig): Array<Record<string, unknown>> {
+    const integrations: Array<Record<string, unknown>> = [];
     
     if (!config.integrations) return integrations;
     
@@ -194,7 +194,7 @@ class SentryProvider implements MonitoringProvider {
     return integrations;
   }
 
-  private sentryEventToErrorEvent(event: any): ErrorEvent {
+  private sentryEventToErrorEvent(event: Record<string, unknown>): ErrorEvent {
     return {
       message: event.message,
       level: event.level,
@@ -261,7 +261,7 @@ class SentryProvider implements MonitoringProvider {
     }
     
     // Never send email or other PII
-    const safeUser: any = {
+    const safeUser: Record<string, unknown> = {
       id: user.id,
       username: user.username,
       tenant_id: user.tenant_id,
@@ -383,7 +383,7 @@ class SentryProvider implements MonitoringProvider {
   captureCheckIn(checkIn: CronJob): void {
     if (!this.initialized) return;
     
-    const checkInData: any = {
+    const checkInData: Record<string, unknown> = {
       monitorSlug: checkIn.monitorSlug,
       status: checkIn.status,
     };
@@ -424,7 +424,7 @@ class SentryProvider implements MonitoringProvider {
   captureEvent(event: ErrorEvent): void {
     if (!this.initialized) return;
     
-    const sentryEvent: any = {
+    const sentryEvent: Record<string, unknown> = {
       message: event.message,
       level: this.mapLevel(event.level),
       timestamp: event.timestamp,

@@ -54,10 +54,10 @@ interface ExtendedMeeting extends Meeting {
   })[];
   MeetingAgendaItems: (MeetingAgendaItem & {
     ResponsibleStaff?: (Staff & { User: PrismaUser }) | null;
-    Comments: any[];
-    ActionItems: any[];
+    Comments: Array<Record<string, unknown>>;
+    ActionItems: Array<Record<string, unknown>>;
   })[];
-  MeetingActionItems: any[];
+  MeetingActionItems: Array<Record<string, unknown>>;
 }
 
 interface ExtendedStaff extends Staff {
@@ -68,7 +68,7 @@ interface ExtendedStaff extends Staff {
 
 interface Props {
   meeting: ExtendedMeeting;
-  currentUser: any;
+  currentUser: Record<string, unknown>;
   allStaff: ExtendedStaff[];
   isOrganizer: boolean;
   isAdmin: boolean;
@@ -96,35 +96,35 @@ export function MeetingLiveView({
 
   // Set up real-time updates with Pusher
   const eventHandlers = useMemo(() => ({
-    [EVENTS.AGENDA_ITEM_UPDATED]: (data: any) => {
+    [EVENTS.AGENDA_ITEM_UPDATED]: (data: Record<string, unknown>) => {
       setAgendaItems(prev => prev.map(item => 
         item.id === data.itemId ? { ...item, ...data.updates } : item
       ));
       setLastUpdate(new Date());
     },
-    [EVENTS.AGENDA_ITEM_ADDED]: (data: any) => {
+    [EVENTS.AGENDA_ITEM_ADDED]: (data: Record<string, unknown>) => {
       setAgendaItems(prev => [...prev, data.item]);
       setLastUpdate(new Date());
     },
-    [EVENTS.AGENDA_ITEM_DELETED]: (data: any) => {
+    [EVENTS.AGENDA_ITEM_DELETED]: (data: Record<string, unknown>) => {
       setAgendaItems(prev => prev.filter(item => item.id !== data.itemId));
       setLastUpdate(new Date());
     },
-    [EVENTS.USER_TYPING]: (data: any) => {
+    [EVENTS.USER_TYPING]: (data: Record<string, unknown>) => {
       setTypingUsers(prev => {
         const newMap = new Map(prev);
         newMap.set(data.itemId, { userId: data.userId, userName: data.userName });
         return newMap;
       });
     },
-    [EVENTS.USER_STOPPED_TYPING]: (data: any) => {
+    [EVENTS.USER_STOPPED_TYPING]: (data: Record<string, unknown>) => {
       setTypingUsers(prev => {
         const newMap = new Map(prev);
         newMap.delete(data.itemId);
         return newMap;
       });
     },
-    'comment-added': (data: any) => {
+    'comment-added': (data: Record<string, unknown>) => {
       setAgendaItems(prev => prev.map(item => 
         item.id === data.itemId 
           ? { ...item, Comments: [...(item.Comments || []), data.comment] }
@@ -164,7 +164,7 @@ export function MeetingLiveView({
     }
   };
 
-  const handleItemUpdate = async (itemId: number, updates: any) => {
+  const handleItemUpdate = async (itemId: number, updates: Record<string, unknown>) => {
     // Optimistic update
     setAgendaItems(prev => prev.map(item => 
       item.id === itemId ? { ...item, ...updates } : item
@@ -463,7 +463,7 @@ export function MeetingLiveView({
                   Live Now ({members.length})
                 </h3>
                 <div className="space-y-2">
-                  {members.map((member: any) => (
+                  {members.map((member: Record<string, unknown>) => (
                     <div key={member.id} className="flex items-center gap-3 text-sm">
                       <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
                         <div className="w-2 h-2 bg-green-500 rounded-full" />

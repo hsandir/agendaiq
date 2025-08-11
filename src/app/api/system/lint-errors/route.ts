@@ -57,11 +57,11 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid action. Use: summary, details, or fixable' }, { status: 400 });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Lint error API failed:', error);
-    await logError('LINT_API_ERROR', error.message, { action: 'GET' });
+    await logError('LINT_API_ERROR', error instanceof Error ? error.message : "Unknown error", { action: 'GET' });
     return NextResponse.json(
-      { error: 'Failed to get lint errors', details: error.message },
+      { error: 'Failed to get lint errors', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
@@ -80,11 +80,11 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid action. Use: fix, autofix, or report' }, { status: 400 });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Lint fix API failed:', error);
-    await logError('LINT_FIX_ERROR', error.message, { action: 'POST' });
+    await logError('LINT_FIX_ERROR', error instanceof Error ? error.message : "Unknown error", { action: 'POST' });
     return NextResponse.json(
-      { error: 'Failed to fix lint errors', details: error.message },
+      { error: 'Failed to fix lint errors', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
@@ -142,7 +142,7 @@ async function getLintSummary() {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error: any) {
+  } catch (error) {
     // ESLint might return non-zero exit code for errors, parse the output anyway
     try {
       const results: LintResult[] = JSON.parse(error.stdout || '[]');
@@ -223,7 +223,7 @@ async function getLintDetails(severity: string, limit: number, offset: number) {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error: any) {
+  } catch (error) {
     try {
       const results: LintResult[] = JSON.parse(error.stdout || '[]');
       const allErrors: (LintError & { filePath: string })[] = [];
@@ -286,7 +286,7 @@ async function getFixableErrors() {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error: any) {
+  } catch (error) {
     try {
       const results: LintResult[] = JSON.parse(error.stdout || '[]');
       const fixableErrors: (LintError & { filePath: string })[] = [];
@@ -339,7 +339,7 @@ async function autoFixErrors() {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error: any) {
+  } catch (error) {
     // Even if some errors remain, auto-fix might have worked partially
     try {
       const results: LintResult[] = JSON.parse(error.stdout || '[]');
@@ -359,7 +359,7 @@ async function autoFixErrors() {
   }
 }
 
-async function fixLintErrors(filePath: string, fixes: any[]) {
+async function fixLintErrors(filePath: string, fixes: Array<Record<string, unknown>>) {
   try {
     // Read the file
     const fullPath = path.join(process.cwd(), filePath);
@@ -390,12 +390,12 @@ async function fixLintErrors(filePath: string, fixes: any[]) {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error: any) {
-    throw new Error(`Failed to fix errors in ${filePath}: ${error.message}`);
+  } catch (error) {
+    throw new Error(`Failed to fix errors in ${filePath}: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
 }
 
-async function reportErrorsToAdmin(errors: any[]) {
+async function reportErrorsToAdmin(errors: Array<Record<string, unknown>>) {
   try {
     // Log to system error reporting
     await logError('LINT_ERROR_REPORT', 'Lint errors reported to admin', {
@@ -415,12 +415,12 @@ async function reportErrorsToAdmin(errors: any[]) {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error: any) {
-    throw new Error(`Failed to report errors: ${error.message}`);
+  } catch (error) {
+    throw new Error(`Failed to report errors: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
 }
 
-async function logError(type: string, message: string, details: any) {
+async function logError(type: string, message: string, details: Record<string, unknown>) {
   try {
     const logEntry = {
       type,

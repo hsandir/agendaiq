@@ -22,10 +22,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid fix type' }, { status: 400 });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error fix failed:', error);
     return NextResponse.json(
-      { error: 'Failed to fix errors', details: error.message },
+      { error: 'Failed to fix errors', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
@@ -67,9 +67,9 @@ async function fixReactVersionMismatch() {
           timeout: 120000 // 2 minutes
         });
         results.push({ command, success: true, output: stdout });
-      } catch (error: any) {
-        console.error(`Command failed: ${command}`, error.message);
-        results.push({ command, success: false, error: error.message });
+      } catch (error) {
+        console.error(`Command failed: ${command}`, error instanceof Error ? error.message : "Unknown error");
+        results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
       }
     }
 
@@ -80,9 +80,9 @@ async function fixReactVersionMismatch() {
       recommendation: 'Restart the development server to see changes'
     });
 
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to fix React version mismatch', details: error.message },
+      { error: 'Failed to fix React version mismatch', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
@@ -133,8 +133,8 @@ async function fixNodeModulesIssues() {
       try {
         const { stdout } = await execAsync(command, { cwd: process.cwd(), timeout: 120000 });
         results.push({ command, success: true, output: stdout });
-      } catch (error: any) {
-        results.push({ command, success: false, error: error.message });
+      } catch (error) {
+        results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
       }
     }
 
@@ -145,9 +145,9 @@ async function fixNodeModulesIssues() {
       fixes: Object.entries(fixes).map(([pkg, version]) => `${pkg}: ${version}`)
     });
 
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to fix Node.js issues', details: error.message },
+      { error: 'Failed to fix Node.js issues', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
@@ -226,8 +226,8 @@ module.exports = {
       try {
         const { stdout } = await execAsync(command, { cwd: process.cwd(), timeout: 60000 });
         results.push({ command, success: true, output: stdout });
-      } catch (error: any) {
-        results.push({ command, success: false, error: error.message });
+      } catch (error) {
+        results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
       }
     }
 
@@ -237,9 +237,9 @@ module.exports = {
       results
     });
 
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to fix TailwindCSS issues', details: error.message },
+      { error: 'Failed to fix TailwindCSS issues', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
@@ -260,8 +260,8 @@ async function fixNextCacheIssues() {
       try {
         const { stdout } = await execAsync(command, { cwd: process.cwd(), timeout: 30000 });
         results.push({ command, success: true, output: stdout });
-      } catch (error: any) {
-        results.push({ command, success: false, error: error.message });
+      } catch (error) {
+        results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
       }
     }
 
@@ -272,9 +272,9 @@ async function fixNextCacheIssues() {
       recommendation: 'Restart the development server'
     });
 
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to fix Next.js cache issues', details: error.message },
+      { error: 'Failed to fix Next.js cache issues', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
@@ -350,9 +350,9 @@ async function autoFixAllErrors() {
       recommendation: 'Restart the development server and run health check again'
     });
 
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { error: 'Auto-fix failed', details: error.message },
+      { error: 'Auto-fix failed', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }

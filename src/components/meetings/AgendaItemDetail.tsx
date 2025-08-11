@@ -37,10 +37,10 @@ import { format } from "date-fns";
 import { getSafeDate, safeFormatDate } from '@/lib/utils/safe-date';
 
 interface Props {
-  item: any;
-  meeting: any;
-  currentUser: any;
-  allStaff: any[];
+  item: Record<string, unknown>;
+  meeting: Record<string, unknown>;
+  currentUser: Record<string, unknown>;
+  allStaff: Array<Record<string, unknown>>;
   canEdit: boolean;
 }
 
@@ -364,7 +364,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                   {isEditing ? (
                     <Select
                       value={editData.status}
-                      onValueChange={(value: any) => setEditData({ ...editData, status: value })}
+                      onValueChange={(value: string) => setEditData({ ...editData, status: value })}
                     >
                       <SelectTrigger className="mt-1">
                         <SelectValue />
@@ -388,7 +388,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                   {isEditing ? (
                     <Select
                       value={editData.purpose}
-                      onValueChange={(value: any) => setEditData({ ...editData, purpose: value })}
+                      onValueChange={(value: string) => setEditData({ ...editData, purpose: value })}
                     >
                       <SelectTrigger className="mt-1">
                         <SelectValue />
@@ -414,7 +414,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                     {isEditing ? (
                       <Select
                         value={editData.solution_type || ''}
-                        onValueChange={(value: any) => setEditData({ ...editData, solution_type: value })}
+                        onValueChange={(value: string) => setEditData({ ...editData, solution_type: value })}
                       >
                         <SelectTrigger className="mt-1">
                           <SelectValue placeholder="Select type" />
@@ -440,7 +440,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                     {isEditing ? (
                       <Select
                         value={editData.decision_type || ''}
-                        onValueChange={(value: any) => setEditData({ ...editData, decision_type: value })}
+                        onValueChange={(value: string) => setEditData({ ...editData, decision_type: value })}
                       >
                         <SelectTrigger className="mt-1">
                           <SelectValue placeholder="Select type" />
@@ -553,7 +553,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
               
               {item.Attachments?.length > 0 ? (
                 <div className="space-y-2">
-                  {item.Attachments.map((attachment: any) => (
+                  {item.Attachments.map((attachment: Record<string, unknown>) => (
                     <div key={attachment.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted">
                       <FileText className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm text-foreground">{attachment.file_name}</span>

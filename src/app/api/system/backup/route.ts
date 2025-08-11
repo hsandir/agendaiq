@@ -30,10 +30,10 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Backup GET failed:', error);
     return NextResponse.json(
-      { error: 'Failed to process backup request', details: error.message },
+      { error: 'Failed to process backup request', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -66,10 +66,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid backup type' }, { status: 400 });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Backup POST failed:', error);
     return NextResponse.json(
-      { error: 'Failed to process backup request', details: error.message },
+      { error: 'Failed to process backup request', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -122,10 +122,10 @@ async function createBackup(message: string = 'Manual backup') {
       backup: backupInfo
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Backup creation failed:', error);
     return NextResponse.json(
-      { error: 'Failed to create backup', details: error.message },
+      { error: 'Failed to create backup', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
@@ -172,7 +172,7 @@ async function pushToGitHub(message: string = 'Automated backup') {
         backup: backupInfo
       });
 
-    } catch (pushError: any) {
+    } catch (pushError) {
       // If push fails, still save local backup info
       const backupInfo = {
         timestamp,
@@ -193,10 +193,10 @@ async function pushToGitHub(message: string = 'Automated backup') {
       });
     }
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('GitHub backup failed:', error);
     return NextResponse.json(
-      { error: 'Failed to backup to GitHub', details: error.message },
+      { error: 'Failed to backup to GitHub', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
@@ -228,7 +228,7 @@ async function autoBackup(triggerReason: string = 'System update') {
     const { stdout: currentBranch } = await execAsync('git branch --show-current', { cwd: process.cwd() });
     await execAsync(`git branch ${branchName}`, { cwd: process.cwd() });
 
-    const backupInfo: any = {
+    const backupInfo: Record<string, unknown> = {
       timestamp,
       branch: branchName,
       originalBranch: currentBranch.trim(),
@@ -257,10 +257,10 @@ async function autoBackup(triggerReason: string = 'System update') {
       backup: backupInfo
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Auto-backup failed:', error);
     return NextResponse.json(
-      { error: 'Auto-backup failed', details: error.message },
+      { error: 'Auto-backup failed', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
@@ -302,10 +302,10 @@ async function restoreBackup(backupBranch: string) {
       restore: restoreInfo
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Restore failed:', error);
     return NextResponse.json(
-      { error: 'Failed to restore backup', details: error.message },
+      { error: 'Failed to restore backup', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
@@ -328,7 +328,7 @@ async function listBackups() {
       const metadata = JSON.parse(await fs.readFile(metadataPath, 'utf-8'));
       
       for (const branch of backupBranches) {
-        const backupData = metadata.find((b: any) => b.branch === branch) || {
+        const backupData = metadata.find((b: Record<string, unknown>) => b.branch === branch) || {
           branch,
           timestamp: 'Unknown',
           message: 'No metadata available',
@@ -374,10 +374,10 @@ async function listBackups() {
       status: 'healthy'
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('List backups failed:', error);
     return NextResponse.json(
-      { error: 'Failed to list backups', details: error.message },
+      { error: 'Failed to list backups', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
@@ -415,16 +415,16 @@ async function getBackupStatus() {
       }
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Get backup status failed:', error);
     return NextResponse.json(
-      { error: 'Failed to get backup status', details: error.message },
+      { error: 'Failed to get backup status', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
 }
 
-async function saveBackupMetadata(backupInfo: any) {
+async function saveBackupMetadata(backupInfo: Record<string, unknown>) {
   try {
     const metadataPath = path.join(process.cwd(), '.backup-metadata.json');
     let metadata = [];
@@ -639,10 +639,10 @@ async function createFullSystemBackup(components: string[] = ['database', 'setti
       backup: backupInfo
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Full system backup failed:', error);
     return NextResponse.json(
-      { error: 'Failed to create full system backup', details: error.message },
+      { error: 'Failed to create full system backup', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
@@ -713,10 +713,10 @@ export async function PUT(request: NextRequest) {
       restore: restoreInfo
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Backup upload/restore failed:', error);
     return NextResponse.json(
-      { error: 'Failed to upload and restore backup', details: error.message },
+      { error: 'Failed to upload and restore backup', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
