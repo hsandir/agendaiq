@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
     });
     
     // Test database connection
-    let databaseStatus = { connected: false, message: 'Not tested', details: null as Record<string, unknown> | null };
+    let databaseStatus = { connected: false, message: 'Not tested', details: undefined as Record<string, unknown> | undefined };
     try {
       const userCount = await prisma.user.count();
       const dbUrl = process.env.DATABASE_URL || '';
