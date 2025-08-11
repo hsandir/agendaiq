@@ -21,6 +21,9 @@ export async function GET() {
       responseTime: 0,
       memoryUsage: process.memoryUsage(),
       cpuUsage: process.cpuUsage(),
+      dbLatency: 0,
+      totalChecks: 0,
+      passedChecks: 0,
     }
   };
 
