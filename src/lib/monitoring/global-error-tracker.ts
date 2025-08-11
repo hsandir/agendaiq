@@ -21,14 +21,14 @@ interface TrackedError {
   stack?: string;
   context: ErrorContext;
   breadcrumbs: BreadcrumbEntry[];
-  customData?: Record<string, any>;
+  customData?: Record<string, unknown>;
 }
 
 interface BreadcrumbEntry {
   timestamp: string;
   category: 'navigation' | 'user-interaction' | 'api-call' | 'console' | 'custom';
   message: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 class GlobalErrorTracker {
@@ -145,7 +145,7 @@ class GlobalErrorTracker {
     window.fetch = async (...args) => {
       const url = typeof args[0] === 'string' ? args[0] : 
                    (args[0] instanceof Request ? args[0].url : 
-                   (args[0] as any)?.url || 'unknown');
+                   (args[0] as { url?: string })?.url || 'unknown');
       const startTime = Date.now();
       
       try {
@@ -313,7 +313,7 @@ class GlobalErrorTracker {
       },
       pageLoadTime: performance?.timing ? 
         performance.timing.loadEventEnd - performance.timing.navigationStart : undefined,
-      networkSpeed: (navigator as any)?.connection?.effectiveType || 'unknown'
+      networkSpeed: (navigator as Navigator & { connection?: { effectiveType?: string } })?.connection?.effectiveType || 'unknown'
     };
   }
 
@@ -345,7 +345,7 @@ class GlobalErrorTracker {
     return 'Unknown';
   }
 
-  private addBreadcrumb(category: BreadcrumbEntry['category'], message: string, data?: any) {
+  private addBreadcrumb(category: BreadcrumbEntry['category'], message: string, data?: Record<string, unknown>) {
     this.breadcrumbs.push({
       timestamp: new Date().toISOString(),
       category,
@@ -416,7 +416,7 @@ class GlobalErrorTracker {
     }
   }
 
-  private stringifyArg(arg: any): string {
+  private stringifyArg(arg: unknown): string {
     if (typeof arg === 'string') return arg;
     if (typeof arg === 'number' || typeof arg === 'boolean') return String(arg);
     if (arg === null) return 'null';
@@ -430,7 +430,7 @@ class GlobalErrorTracker {
   }
 
   // Public methods
-  public captureMessage(message: string, level: 'info' | 'warning' | 'error' = 'info', extra?: any) {
+  public captureMessage(message: string, level: 'info' | 'warning' | 'error' = 'info', extra?: Record<string, unknown>) {
     this.addBreadcrumb('custom', `Manual Log: ${message}`, { level, extra });
     
     if (level === 'error') {
@@ -447,7 +447,7 @@ class GlobalErrorTracker {
     this.addBreadcrumb('custom', 'User Set', { userId });
   }
 
-  public setExtra(key: string, value: any) {
+  public setExtra(key: string, value: unknown) {
     this.addBreadcrumb('custom', 'Extra Data Set', { [key]: value });
   }
 
@@ -461,7 +461,7 @@ class GlobalErrorTracker {
 export const globalErrorTracker = new GlobalErrorTracker();
 
 // Helper function to manually capture errors
-export function captureError(error: Error | string, extra?: any) {
+export function captureError(error: Error | string, extra?: Record<string, unknown>) {
   if (typeof error === 'string') {
     globalErrorTracker.captureMessage(error, 'error', extra);
   } else {
@@ -473,7 +473,7 @@ export function captureError(error: Error | string, extra?: any) {
 }
 
 // Helper function to log messages
-export function captureMessage(message: string, level: 'info' | 'warning' | 'error' = 'info', extra?: any) {
+export function captureMessage(message: string, level: 'info' | 'warning' | 'error' = 'info', extra?: Record<string, unknown>) {
   globalErrorTracker.captureMessage(message, level, extra);
 }
 

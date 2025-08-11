@@ -35,6 +35,15 @@ interface LocalError {
   resolved?: boolean;
 }
 
+interface RawError {
+  id?: string;
+  timestamp: string;
+  message: string;
+  stack?: string;
+  url: string;
+  userAgent: string;
+}
+
 export default function LocalMonitor() {
   const [errors, setErrors] = useState<LocalError[]>([]);
   const [isMonitoring, setIsMonitoring] = useState(false);
@@ -47,7 +56,7 @@ export default function LocalMonitor() {
   const intervalRef = useRef<NodeJS.Timeout>();
 
   // Error processing with analysis
-  const processError = (rawError: any): LocalError => {
+  const processError = (rawError: RawError): LocalError => {
     const analysis = ErrorAnalyzer.analyzeError(rawError.message, rawError.url, rawError.stack);
     
     return {
@@ -167,7 +176,7 @@ export default function LocalMonitor() {
     intervalRef.current = setInterval(async () => {
       // Local health checks (memory, performance, etc.)
       if (performance && 'memory' in performance) {
-        const memoryInfo = (performance as any).memory;
+        const memoryInfo = (performance as { memory?: { usedJSHeapSize?: number; totalJSHeapSize?: number } }).memory;
         const memoryUsed = memoryInfo.usedJSHeapSize / 1024 / 1024;
         if (memoryUsed > 100) { // If using more than 100MB
           const rawError = {

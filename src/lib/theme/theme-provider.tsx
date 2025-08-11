@@ -10,13 +10,35 @@ import React, {
 import { themes, Theme } from "./themes";
 import { getContrastColor } from "./theme-utils";
 
+interface CustomTheme {
+  name?: string;
+  colors: {
+    background: string;
+    text: string;
+    card: string;
+    primary: string;
+    secondary: string;
+    primaryForeground?: string;
+    secondaryForeground?: string;
+    backgroundSecondary: string;
+    textMuted: string;
+    secondaryLight?: string;
+    error: string;
+    border: string;
+    inputBorder: string;
+  };
+  borderRadius?: {
+    md: string;
+  };
+}
+
 interface ThemeContextValue {
   theme: Theme;
   setTheme: (themeId: string) => void;
   availableThemes: Theme[];
   isLoading: boolean;
-  customTheme?: any;
-  setCustomTheme?: (theme: any) => void;
+  customTheme?: CustomTheme;
+  setCustomTheme?: (theme: CustomTheme) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
@@ -24,7 +46,7 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 // Global state to persist across navigations (in-memory)
 const globalThemeState = {
   currentThemeId: "standard",
-  customTheme: null as any,
+  customTheme: null as CustomTheme | null,
   initialized: false,
   lastFetch: 0,
 };
@@ -39,7 +61,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
   const [currentThemeId, setCurrentThemeId] = useState<string>(
     globalThemeState.currentThemeId,
   );
-  const [customTheme, setCustomTheme] = useState<any>(
+  const [customTheme, setCustomTheme] = useState<CustomTheme | null>(
     globalThemeState.customTheme,
   );
   const [mounted, setMounted] = useState(false);
@@ -270,7 +292,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
   );
 
   // Handle custom theme update
-  const handleSetCustomTheme = useCallback((theme: any) => {
+  const handleSetCustomTheme = useCallback((theme: CustomTheme) => {
     setCustomTheme(theme);
     globalThemeState.customTheme = theme;
     localStorage.setItem("agendaiq-custom-theme", JSON.stringify(theme));

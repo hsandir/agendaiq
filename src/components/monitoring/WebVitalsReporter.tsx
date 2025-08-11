@@ -3,7 +3,16 @@
 import { useEffect } from 'react';
 import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals';
 
-function sendToAnalytics(metric: any) {
+interface WebVitalsMetric {
+  name: string;
+  value: number;
+  rating: 'good' | 'needs-improvement' | 'poor';
+  delta: number;
+  id: string;
+  navigationType?: string;
+}
+
+function sendToAnalytics(metric: WebVitalsMetric) {
   // Send metrics to our API
   fetch('/api/monitoring/metrics', {
     method: 'POST',

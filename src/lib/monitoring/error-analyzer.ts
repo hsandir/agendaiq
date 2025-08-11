@@ -12,6 +12,15 @@ interface ErrorAnalysis {
   relatedErrors: string[];
 }
 
+interface ErrorData {
+  message: string;
+  url?: string;
+  stack?: string;
+  timestamp?: string;
+  severity?: string;
+  userId?: string;
+}
+
 interface ErrorPattern {
   pattern: RegExp;
   category: ErrorAnalysis['category'];
@@ -323,7 +332,7 @@ export class ErrorAnalyzer {
     return 'low';
   }
 
-  public static generateErrorReport(errors: any[]): {
+  public static generateErrorReport(errors: ErrorData[]): {
     summary: string;
     totalErrors: number;
     criticalCount: number;

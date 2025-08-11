@@ -67,7 +67,7 @@ class MonitoringManager {
   /**
    * Capture an exception/error
    */
-  captureException(error: Error | unknown, context?: Record<string, any>): void {
+  captureException(error: Error | unknown, context?: Record<string, unknown>): void {
     if (!this.provider || !this.config.enabled) return;
 
     // Convert unknown errors to Error objects
@@ -84,7 +84,7 @@ class MonitoringManager {
   captureMessage(
     message: string,
     level: 'debug' | 'info' | 'warning' | 'error' = 'info',
-    context?: Record<string, any>
+    context?: Record<string, unknown>
   ): void {
     if (!this.provider || !this.config.enabled) return;
     this.provider.captureMessage(message, level, context);
@@ -117,7 +117,7 @@ class MonitoringManager {
   /**
    * Set custom context
    */
-  setContext(key: string, context: Record<string, any>): void {
+  setContext(key: string, context: Record<string, unknown>): void {
     if (!this.provider) return;
     this.provider.setContext(key, context);
   }
@@ -228,7 +228,7 @@ class MonitoringManager {
     options?: {
       op?: string;
       tags?: Record<string, string>;
-      data?: Record<string, any>;
+      data?: Record<string, unknown>;
     }
   ): Promise<T> {
     const transaction = this.startTransaction(name, options?.op || 'function');

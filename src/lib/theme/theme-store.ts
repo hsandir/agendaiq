@@ -1,12 +1,34 @@
 'use client';
 
+interface CustomTheme {
+  name?: string;
+  colors: {
+    background: string;
+    text: string;
+    card: string;
+    primary: string;
+    secondary: string;
+    primaryForeground?: string;
+    secondaryForeground?: string;
+    backgroundSecondary: string;
+    textMuted: string;
+    secondaryLight?: string;
+    error: string;
+    border: string;
+    inputBorder: string;
+  };
+  borderRadius?: {
+    md: string;
+  };
+}
+
 // Singleton store for theme state that persists across navigation
 class ThemeStore {
   private static instance: ThemeStore;
   private initialized: boolean = false;
   private lastSyncTime: number = 0;
   private currentTheme: string | null = null;
-  private customTheme: any = null;
+  private customTheme: CustomTheme | null = null;
   
   private constructor() {}
   
@@ -41,11 +63,11 @@ class ThemeStore {
     this.currentTheme = theme;
   }
   
-  getCustomTheme(): any {
+  getCustomTheme(): CustomTheme | null {
     return this.customTheme;
   }
   
-  setCustomTheme(theme: any): void {
+  setCustomTheme(theme: CustomTheme | null): void {
     this.customTheme = theme;
   }
   

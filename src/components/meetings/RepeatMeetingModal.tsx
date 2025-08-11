@@ -240,7 +240,7 @@ export function RepeatMeetingModal({
               <Label className="text-base font-semibold mb-3 block">Repeat Pattern</Label>
               <RadioGroup
                 value={config.pattern}
-                onValueChange={(value) => setConfig({ ...config, pattern: value as any })}
+                onValueChange={(value) => setConfig({ ...config, pattern: value as RepeatConfig['pattern'] })}
               >
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted">
@@ -394,7 +394,7 @@ export function RepeatMeetingModal({
               <Label className="text-base font-semibold mb-3 block">End Date</Label>
               <RadioGroup
                 value={config.endType}
-                onValueChange={(value) => setConfig({ ...config, endType: value as any })}
+                onValueChange={(value) => setConfig({ ...config, endType: value as RepeatConfig['endType'] })}
               >
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">

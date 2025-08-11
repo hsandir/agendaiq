@@ -33,8 +33,8 @@ export interface ErrorEvent {
   tags?: Record<string, string>;
   user?: UserContext;
   request?: RequestContext;
-  contexts?: Record<string, any>;
-  extra?: Record<string, any>;
+  contexts?: Record<string, unknown>;
+  extra?: Record<string, unknown>;
   fingerprint?: string[];
   exception?: ExceptionInfo;
   breadcrumbs?: Breadcrumb[];
@@ -54,7 +54,7 @@ export interface RequestContext {
   method?: string;
   headers?: Record<string, string>;
   query_string?: string;
-  data?: any;
+  data?: unknown;
   cookies?: string;
   env?: Record<string, string>;
 }
@@ -90,21 +90,21 @@ export interface Breadcrumb {
   type?: 'default' | 'debug' | 'error' | 'navigation' | 'http' | 'info' | 'query' | 'transaction' | 'ui' | 'user';
   category?: string;
   message?: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
   level?: 'debug' | 'info' | 'warning' | 'error' | 'fatal';
 }
 
 export interface MonitoringIntegration {
   name: string;
   enabled: boolean;
-  options?: Record<string, any>;
+  options?: Record<string, unknown>;
 }
 
 export interface Transaction {
   name: string;
   op?: string;
   tags?: Record<string, string>;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
   startTimestamp?: number;
   endTimestamp?: number;
   status?: 'ok' | 'cancelled' | 'unknown' | 'invalid_argument' | 'deadline_exceeded' | 'not_found' | 'already_exists' | 'permission_denied' | 'resource_exhausted' | 'failed_precondition' | 'aborted' | 'out_of_range' | 'unimplemented' | 'internal_error' | 'unavailable' | 'data_loss' | 'unauthenticated';
@@ -118,7 +118,7 @@ export interface Span {
   description?: string;
   status?: string;
   tags?: Record<string, string>;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
   startTimestamp?: number;
   endTimestamp?: number;
 }
@@ -206,14 +206,14 @@ export interface AlertCondition {
 
 export interface AlertAction {
   type: 'email' | 'slack' | 'pagerduty' | 'webhook';
-  config: Record<string, any>;
+  config: Record<string, unknown>;
 }
 
 export interface MonitoringProvider {
   // Core methods
   init(config: MonitoringConfig): void;
-  captureException(error: Error, context?: Record<string, any>): void;
-  captureMessage(message: string, level?: string, context?: Record<string, any>): void;
+  captureException(error: Error, context?: Record<string, unknown>): void;
+  captureMessage(message: string, level?: string, context?: Record<string, unknown>): void;
   
   // User context
   setUser(user: UserContext | null): void;
@@ -221,7 +221,7 @@ export interface MonitoringProvider {
   // Tags and context
   setTags(tags: Record<string, string>): void;
   setTag(key: string, value: string): void;
-  setContext(key: string, context: Record<string, any>): void;
+  setContext(key: string, context: Record<string, unknown>): void;
   
   // Breadcrumbs
   addBreadcrumb(breadcrumb: Breadcrumb): void;

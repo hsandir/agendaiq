@@ -19,7 +19,7 @@ export const CACHE_DURATIONS = {
 } as const;
 
 // Create a cached function wrapper
-export function createCachedFunction<T extends (...args: any[]) => Promise<any>>(
+export function createCachedFunction<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
   tags: string[],
   options?: {
@@ -39,9 +39,9 @@ export function createCachedFunction<T extends (...args: any[]) => Promise<any>>
 
 // In-memory cache for frequently accessed data
 class MemoryCache {
-  private cache = new Map<string, { data: any; expiry: number }>();
+  private cache = new Map<string, { data: unknown; expiry: number }>();
 
-  set(key: string, data: any, ttlSeconds: number = 60) {
+  set(key: string, data: unknown, ttlSeconds: number = 60) {
     const expiry = Date.now() + ttlSeconds * 1000;
     this.cache.set(key, { data, expiry });
   }

@@ -180,7 +180,7 @@ export default function EnhancedLiveMonitor({
 
   // Get category icon
   const getCategoryIcon = (category: string) => {
-    const iconMap: Record<string, any> = {
+    const iconMap: Record<string, React.ReactNode> = {
       'api': <Globe className="h-3 w-3" />,
       'database': <Database className="h-3 w-3" />,
       'auth': <Shield className="h-3 w-3" />,

@@ -37,6 +37,16 @@ interface ProductionError {
   severity: 'low' | 'medium' | 'high' | 'critical';
 }
 
+interface RawProductionError {
+  id?: string;
+  timestamp: string;
+  message: string;
+  stack?: string;
+  url: string;
+  userAgent: string;
+  severity?: string;
+}
+
 export default function ProductionMonitor() {
   const [errors, setErrors] = useState<ProductionError[]>([]);
   const [isMonitoring, setIsMonitoring] = useState(false);
@@ -50,7 +60,7 @@ export default function ProductionMonitor() {
   const intervalRef = useRef<NodeJS.Timeout>();
 
   // Process production error with analysis
-  const processProductionError = (rawError: any): ProductionError => {
+  const processProductionError = (rawError: RawProductionError): ProductionError => {
     const analysis = ErrorAnalyzer.analyzeError(rawError.message, rawError.url, rawError.stack);
     
     return {
@@ -149,7 +159,7 @@ export default function ProductionMonitor() {
     intervalRef.current = setInterval(async () => {
       const prodErrors = await fetchProductionErrors();
       
-      prodErrors.forEach((error: any) => {
+      prodErrors.forEach((error: RawProductionError) => {
         setErrors(prev => {
           const exists = prev.find(e => e.id === error.id);
           if (!exists) {

@@ -13,9 +13,21 @@ export function sanitizePlainText(input: string): string {
   return DOMPurify.sanitize(input, { ALLOWED_TAGS: [] });
 }
 
+interface MeetingData {
+  title?: string;
+  description?: string;
+  agenda?: string;
+  notes?: string;
+  startTime?: string | Date;
+  endTime?: string | Date;
+  status?: string;
+  attendeeIds?: number[];
+  zoomLink?: string;
+}
+
 // Sanitize meeting data
-export function sanitizeMeetingData(data: any) {
-  const sanitized: any = {};
+export function sanitizeMeetingData(data: MeetingData): Partial<MeetingData> {
+  const sanitized: Partial<MeetingData> = {};
   
   if (data.title) {
     sanitized.title = sanitizePlainText(data.title).trim();
@@ -49,9 +61,20 @@ export function sanitizeMeetingData(data: any) {
   return sanitized;
 }
 
+interface AgendaItemData {
+  topic?: string;
+  problem_statement?: string;
+  proposed_solution?: string;
+  decisions_actions?: string;
+  status?: string;
+  priority?: string;
+  purpose?: string;
+  responsible_staff_id?: number | null;
+}
+
 // Sanitize agenda item data
-export function sanitizeAgendaItemData(data: any) {
-  const sanitized: any = {};
+export function sanitizeAgendaItemData(data: AgendaItemData): Partial<AgendaItemData> {
+  const sanitized: Partial<AgendaItemData> = {};
   
   if (data.topic) {
     sanitized.topic = sanitizePlainText(data.topic).trim();

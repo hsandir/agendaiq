@@ -7,36 +7,36 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 const isDebugEnabled = process.env.DEBUG === 'true';
 
 export const DebugLogger = {
-  log: (...args: any[]) => {
+  log: (...args: unknown[]) => {
     if (isDevelopment || isDebugEnabled) {
       console.log(...args);
     }
   },
   
-  error: (...args: any[]) => {
+  error: (...args: unknown[]) => {
     // Always log errors
     console.error(...args);
   },
   
-  warn: (...args: any[]) => {
+  warn: (...args: unknown[]) => {
     if (isDevelopment || isDebugEnabled) {
       console.warn(...args);
     }
   },
   
-  info: (...args: any[]) => {
+  info: (...args: unknown[]) => {
     if (isDevelopment || isDebugEnabled) {
       console.info(...args);
     }
   },
   
-  debug: (...args: any[]) => {
+  debug: (...args: unknown[]) => {
     if (isDebugEnabled) {
       console.debug(...args);
     }
   },
   
-  table: (data: any) => {
+  table: (data: unknown) => {
     if (isDevelopment || isDebugEnabled) {
       console.table(data);
     }

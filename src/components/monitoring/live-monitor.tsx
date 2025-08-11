@@ -34,6 +34,15 @@ interface ErrorEvent {
   fixed?: boolean;
 }
 
+interface ProductionError {
+  id: string;
+  timestamp: string;
+  message: string;
+  stack?: string;
+  url: string;
+  userAgent: string;
+}
+
 interface SystemHealth {
   database: 'healthy' | 'warning' | 'error';
   auth: 'healthy' | 'warning' | 'error';
@@ -212,7 +221,7 @@ export default function LiveMonitor() {
       const prodErrors = await fetchProductionErrors();
       
       // Production hatalarını ekle
-      prodErrors.forEach((error: any) => {
+      prodErrors.forEach((error: ProductionError) => {
         setErrors(prev => {
           const exists = prev.find(e => e.id === error.id);
           if (!exists) {

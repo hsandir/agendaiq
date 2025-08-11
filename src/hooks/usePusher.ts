@@ -11,7 +11,7 @@ export function usePusher() {
 
   useEffect(() => {
     if (!pusherRef.current) {
-      pusherRef.current = getPusherClient() as any;
+      pusherRef.current = getPusherClient();
       setPusher(pusherRef.current);
     }
 
@@ -28,7 +28,7 @@ export function usePusher() {
 
 export function usePusherChannel(
   channelName: string | null,
-  eventHandlers?: Record<string, (data: any) => void>
+  eventHandlers?: Record<string, (data: unknown) => void>
 ) {
   const pusher = usePusher();
   const [channel, setChannel] = useState<Channel | null>(null);
@@ -48,10 +48,10 @@ export function usePusherChannel(
     setChannel(channelRef.current);
 
     // Create stable handler functions that use ref
-    const stableHandlers: Record<string, (data: any) => void> = {};
+    const stableHandlers: Record<string, (data: unknown) => void> = {};
     if (handlersRef.current) {
       Object.entries(handlersRef.current).forEach(([event, _]) => {
-        stableHandlers[event] = (data: any) => {
+        stableHandlers[event] = (data: unknown) => {
           handlersRef.current?.[event]?.(data);
         };
       });
@@ -78,13 +78,18 @@ export function usePusherChannel(
   return channel;
 }
 
+interface PresenceMember {
+  id: string;
+  info?: Record<string, unknown>;
+}
+
 export function usePresenceChannel(
   channelName: string | null,
-  eventHandlers?: Record<string, (data: any) => void>
+  eventHandlers?: Record<string, (data: unknown) => void>
 ) {
   const pusher = usePusher();
   const [channel, setChannel] = useState<PresenceChannel | null>(null);
-  const [members, setMembers] = useState<any[]>([]);
+  const [members, setMembers] = useState<PresenceMember[]>([]);
   const channelRef = useRef<PresenceChannel | null>(null);
   const handlersRef = useRef(eventHandlers);
 
@@ -106,19 +111,19 @@ export function usePresenceChannel(
       setMembers(membersList);
     });
 
-    channelRef.current.bind('pusher:member_added', (member: any) => {
+    channelRef.current.bind('pusher:member_added', (member: PresenceMember) => {
       setMembers(prev => [...prev, member]);
     });
 
-    channelRef.current.bind('pusher:member_removed', (member: any) => {
+    channelRef.current.bind('pusher:member_removed', (member: PresenceMember) => {
       setMembers(prev => prev.filter(m => m.id !== member.id));
     });
 
     // Create stable handler functions
-    const stableHandlers: Record<string, (data: any) => void> = {};
+    const stableHandlers: Record<string, (data: unknown) => void> = {};
     if (handlersRef.current) {
       Object.entries(handlersRef.current).forEach(([event, _]) => {
-        stableHandlers[event] = (data: any) => {
+        stableHandlers[event] = (data: unknown) => {
           handlersRef.current?.[event]?.(data);
         };
       });

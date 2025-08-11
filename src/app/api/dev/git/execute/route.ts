@@ -77,10 +77,13 @@ export async function POST(request: NextRequest) {
     
     // Extract useful error message
     let errorMessage = 'Git command failed';
-    if (error.stderr) {
-      errorMessage = error.stderr;
-    } else if (error.message) {
-      errorMessage = error.message;
+    if (error && typeof error === 'object') {
+      const err = error as { stderr?: string; message?: string };
+      if (err.stderr) {
+        errorMessage = err.stderr;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
     }
 
     return NextResponse.json(

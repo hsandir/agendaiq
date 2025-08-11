@@ -55,8 +55,9 @@ export async function POST(request: NextRequest) {
     let errorMessage = 'Command execution failed';
     let errorOutput = '';
     
+    let exitCode = 1;
     if (error && typeof error === 'object') {
-      const err = error as { code?: string; stderr?: string; stdout?: string; message?: string };
+      const err = error as { code?: string | number; stderr?: string; stdout?: string; message?: string };
       if (err.code === 'ETIMEDOUT') {
         errorMessage = 'Command timed out';
       } else if (err.stderr) {
@@ -67,6 +68,16 @@ export async function POST(request: NextRequest) {
       } else if (err.message) {
         errorMessage = err.message;
       }
+      
+      // Extract exit code
+      if (typeof err.code === 'number') {
+        exitCode = err.code;
+      } else if (typeof err.code === 'string') {
+        const parsed = parseInt(err.code, 10);
+        if (!isNaN(parsed)) {
+          exitCode = parsed;
+        }
+      }
     }
     
     return NextResponse.json(
@@ -75,7 +86,7 @@ export async function POST(request: NextRequest) {
         command: body.command,
         error: errorMessage,
         output: errorOutput,
-        exitCode: error.code || 1,
+        exitCode,
         timestamp: new Date().toISOString(),
       },
       { status: 500 }

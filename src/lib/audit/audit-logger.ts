@@ -158,7 +158,16 @@ export class AuditLogger {
     limit?: number;
     offset?: number;
   } = {}) {
-    const where: any = {};
+    const where: {
+      table_name?: string;
+      operation?: string;
+      user_id?: number;
+      staff_id?: number;
+      created_at?: {
+        gte?: Date;
+        lte?: Date;
+      };
+    } = {};
 
     if (filters.tableName) where.table_name = filters.tableName;
     if (filters.operation) where.operation = filters.operation;
@@ -231,15 +240,15 @@ export class AuditLogger {
 
     return {
       totalLogs,
-      operationStats: operationStats.map((stat: any) => ({
+      operationStats: operationStats.map((stat) => ({
         operation: stat.operation,
         count: stat._count.operation
       })),
-      tableStats: tableStats.map((stat: any) => ({
+      tableStats: tableStats.map((stat) => ({
         table: stat.table_name,
         count: stat._count.table_name
       })),
-      topUsers: userStats.map((stat: any) => ({
+      topUsers: userStats.map((stat) => ({
         userId: stat.user_id,
         count: stat._count.user_id
       }))

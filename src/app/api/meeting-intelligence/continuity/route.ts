@@ -2,6 +2,28 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from '@/lib/prisma';
 
+interface MeetingNode {
+  id: unknown;
+  title: unknown;
+  date: string;
+  status: unknown;
+  parentId: unknown;
+  children: MeetingNode[];
+  agendaItems: {
+    total: number;
+    resolved: number;
+    carriedForward: number;
+  };
+  actionItems: {
+    total: number;
+    completed: number;
+    pending: number;
+    overdue: number;
+  };
+  attendeeCount: number;
+  duration: number;
+}
+
 export async function GET(request: NextRequest) {
   const authResult = await withAuth(request);
   if (!authResult.success) {
@@ -140,36 +162,36 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function buildMeetingNode(meeting: Record<string, unknown>, allMeetings: Record<string, unknown>[]): Record<string, unknown> {
+function buildMeetingNode(meeting: Record<string, unknown>, allMeetings: Record<string, unknown>[]): MeetingNode {
   const children = allMeetings.filter(m => m.parent_meeting_id === meeting.id);
   
   return {
     id: meeting.id,
     title: meeting.title,
-    date: meeting.start_time?.toISOString() || new Date().toISOString(),
+    date: (meeting.start_time as Date | undefined)?.toISOString() || new Date().toISOString(),
     status: meeting.status,
     parentId: meeting.parent_meeting_id,
     children: children.map(child => buildMeetingNode(child, allMeetings)),
     agendaItems: {
-      total: meeting.MeetingAgendaItems.length,
-      resolved: meeting.MeetingAgendaItems.filter((i: { status: string }) => i.status === 'Resolved').length,
-      carriedForward: meeting.MeetingAgendaItems.filter((i: { carried_forward: boolean }) => i.carried_forward).length
+      total: (meeting.MeetingAgendaItems as unknown[]).length,
+      resolved: (meeting.MeetingAgendaItems as { status: string }[]).filter(i => i.status === 'Resolved').length,
+      carriedForward: (meeting.MeetingAgendaItems as { carried_forward: boolean }[]).filter(i => i.carried_forward).length
     },
     actionItems: {
-      total: meeting.MeetingActionItems.length,
-      completed: meeting.MeetingActionItems.filter((i: { status: string }) => i.status === 'Completed').length,
-      pending: meeting.MeetingActionItems.filter((i: { status: string }) => i.status === 'Pending').length,
-      overdue: meeting.MeetingActionItems.filter((i: { due_date?: Date; status: string }) => {
+      total: (meeting.MeetingActionItems as unknown[]).length,
+      completed: (meeting.MeetingActionItems as { status: string }[]).filter(i => i.status === 'Completed').length,
+      pending: (meeting.MeetingActionItems as { status: string }[]).filter(i => i.status === 'Pending').length,
+      overdue: (meeting.MeetingActionItems as { due_date?: Date; status: string }[]).filter(i => {
         return i.due_date && i.due_date < new Date() && i.status !== 'Completed';
       }).length
     },
-    attendeeCount: meeting.MeetingAttendee.length,
+    attendeeCount: (meeting.MeetingAttendee as unknown[]).length,
     duration: meeting.start_time && meeting.end_time
-      ? Math.round((meeting.end_time.getTime() - meeting.start_time.getTime()) / 60000)
+      ? Math.round(((meeting.end_time as Date).getTime() - (meeting.start_time as Date).getTime()) / 60000)
       : 60
   };
 }
 
-function getAllMeetingsInChain(node: Record<string, unknown>): Record<string, unknown>[] {
+function getAllMeetingsInChain(node: MeetingNode): MeetingNode[] {
   return [node, ...node.children.flatMap(getAllMeetingsInChain)];
 }

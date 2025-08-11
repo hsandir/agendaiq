@@ -325,13 +325,13 @@ export function maskSensitiveData(str: string): string {
 }
 
 // Helper to remove sensitive fields from objects
-export function removeSensitiveFields(obj: any): any {
+export function removeSensitiveFields<T>(obj: T): T {
   if (!obj || typeof obj !== 'object') return obj;
   
   const cleaned = Array.isArray(obj) ? [...obj] : { ...obj };
   
   if (Array.isArray(cleaned)) {
-    return cleaned.map(item => removeSensitiveFields(item));
+    return cleaned.map(item => removeSensitiveFields(item)) as T;
   }
   
   Object.keys(cleaned).forEach(key => {
@@ -339,17 +339,17 @@ export function removeSensitiveFields(obj: any): any {
     
     // Check if field name is sensitive
     if (SENSITIVE_FIELDS.some(field => lowerKey.includes(field.toLowerCase()))) {
-      cleaned[key] = '[REDACTED]';
-    } else if (typeof cleaned[key] === 'object' && cleaned[key] !== null) {
+      (cleaned as Record<string, unknown>)[key] = '[REDACTED]';
+    } else if (typeof (cleaned as Record<string, unknown>)[key] === 'object' && (cleaned as Record<string, unknown>)[key] !== null) {
       // Recursively clean nested objects
-      cleaned[key] = removeSensitiveFields(cleaned[key]);
-    } else if (typeof cleaned[key] === 'string') {
+      (cleaned as Record<string, unknown>)[key] = removeSensitiveFields((cleaned as Record<string, unknown>)[key]);
+    } else if (typeof (cleaned as Record<string, unknown>)[key] === 'string') {
       // Mask sensitive patterns in string values
-      cleaned[key] = maskSensitiveData(cleaned[key]);
+      (cleaned as Record<string, unknown>)[key] = maskSensitiveData((cleaned as Record<string, unknown>)[key] as string);
     }
   });
   
-  return cleaned;
+  return cleaned as T;
 }
 
 // Export a ready-to-use configuration

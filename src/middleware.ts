@@ -5,8 +5,22 @@ import { rateLimitMiddleware } from "@/lib/middleware/rate-limit-middleware";
 import { auditMiddleware } from "@/lib/middleware/audit-middleware";
 import { canAccessRoute, canAccessApi, UserWithCapabilities } from "@/lib/auth/policy";
 
+interface NextAuthToken {
+  id?: string | number;
+  email?: string;
+  name?: string;
+  is_system_admin?: boolean;
+  is_school_admin?: boolean;
+  capabilities?: string[];
+  staff?: {
+    role?: {
+      key?: string;
+    };
+  } & Record<string, unknown>;
+}
+
 // Helper function to convert token to UserWithCapabilities
-function tokenToUser(token: any): UserWithCapabilities | null {
+function tokenToUser(token: NextAuthToken | null): UserWithCapabilities | null {
   if (!token) return null;
   
   return {

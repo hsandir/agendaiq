@@ -13,6 +13,12 @@ import type {
   Transaction,
   CronJob,
 } from '../types';
+
+// Helper type for Sentry integration
+type SentryIntegration = {
+  name: string;
+  new (options?: Record<string, unknown>): unknown;
+};
 import {
   IGNORE_ERRORS,
   DENY_URLS,
@@ -23,7 +29,7 @@ import {
 
 class SentryProvider implements MonitoringProvider {
   private initialized = false;
-  private transactions = new Map<string, any>();
+  private transactions = new Map<string, unknown>();
 
   init(config: MonitoringConfig): void {
     if (this.initialized) return;
@@ -49,11 +55,13 @@ class SentryProvider implements MonitoringProvider {
       
       // Dynamic sampling
       tracesSampler: (samplingContext: Record<string, unknown>) => {
+        const request = samplingContext.request as { url?: string } | undefined;
+        const user = samplingContext.user as { id?: string; segment?: string } | undefined;
         return getDynamicSampleRate({
-          url: samplingContext.request?.url,
+          url: request?.url,
           error: !!samplingContext.error,
-          userId: samplingContext.user?.id,
-          isVIP: samplingContext.user?.segment === 'vip',
+          userId: user?.id,
+          isVIP: user?.segment === 'vip',
         });
       },
       
@@ -66,26 +74,28 @@ class SentryProvider implements MonitoringProvider {
         }
         
         // Remove sensitive data
-        if (event.request) {
-          event.request = removeSensitiveFields(event.request);
+        const request = event.request as { headers?: Record<string, string>; query_string?: string } | undefined;
+        if (request) {
+          event.request = removeSensitiveFields(request);
           
           // Remove sensitive headers
-          if (event.request.headers) {
-            delete event.request.headers['authorization'];
-            delete event.request.headers['cookie'];
-            delete event.request.headers['x-api-key'];
-            delete event.request.headers['x-auth-token'];
+          if (request.headers) {
+            const headers = request.headers as Record<string, string>;
+            delete headers['authorization'];
+            delete headers['cookie'];
+            delete headers['x-api-key'];
+            delete headers['x-auth-token'];
           }
           
           // Clean query string
-          if (event.request.query_string) {
-            const params = new URLSearchParams(event.request.query_string);
+          if (request.query_string) {
+            const params = new URLSearchParams(request.query_string);
             ['token', 'password', 'api_key', 'secret'].forEach(param => {
               if (params.has(param)) {
                 params.set(param, '[REDACTED]');
               }
             });
-            event.request.query_string = params.toString();
+            event.request = { ...request, query_string: params.toString() };
           }
         }
         
@@ -95,8 +105,9 @@ class SentryProvider implements MonitoringProvider {
         }
         
         // Remove sensitive user data
-        if (event.user?.email) {
-          delete event.user.email; // Never send email
+        const user = event.user as { email?: string } | undefined;
+        if (user?.email) {
+          delete user.email; // Never send email
         }
         
         return event;
@@ -157,7 +168,7 @@ class SentryProvider implements MonitoringProvider {
         case 'BrowserTracing':
           if (typeof window !== 'undefined') {
             // BrowserTracing is now browserTracingIntegration in newer versions
-            const BrowserTracing = (Sentry as any).BrowserTracing || (Sentry as any).browserTracingIntegration;
+            const BrowserTracing = (Sentry as unknown as { BrowserTracing?: SentryIntegration; browserTracingIntegration?: SentryIntegration }).BrowserTracing || (Sentry as unknown as { BrowserTracing?: SentryIntegration; browserTracingIntegration?: SentryIntegration }).browserTracingIntegration;
             if (BrowserTracing) {
               integrations.push(
                 new BrowserTracing(integration.options || {})
@@ -168,7 +179,7 @@ class SentryProvider implements MonitoringProvider {
           
         case 'Replay':
           if (typeof window !== 'undefined') {
-            const Replay = (Sentry as any).Replay || (Sentry as any).replayIntegration;
+            const Replay = (Sentry as unknown as { Replay?: SentryIntegration; replayIntegration?: SentryIntegration }).Replay || (Sentry as unknown as { Replay?: SentryIntegration; replayIntegration?: SentryIntegration }).replayIntegration;
             if (Replay) {
               integrations.push(
                 new Replay(integration.options || {})
@@ -180,7 +191,7 @@ class SentryProvider implements MonitoringProvider {
         case 'ProfileIntegration':
           if (typeof window === 'undefined') {
             // Server-side profiling
-            const ProfilingIntegration = (Sentry as any).ProfilingIntegration || (Sentry as any).profilingIntegration;
+            const ProfilingIntegration = (Sentry as unknown as { ProfilingIntegration?: SentryIntegration; profilingIntegration?: SentryIntegration }).ProfilingIntegration || (Sentry as unknown as { ProfilingIntegration?: SentryIntegration; profilingIntegration?: SentryIntegration }).profilingIntegration;
             if (ProfilingIntegration) {
               integrations.push(
                 new ProfilingIntegration()
@@ -196,26 +207,26 @@ class SentryProvider implements MonitoringProvider {
 
   private sentryEventToErrorEvent(event: Record<string, unknown>): ErrorEvent {
     return {
-      message: event.message,
-      level: event.level,
-      timestamp: event.timestamp,
-      platform: event.platform,
-      logger: event.logger,
-      tags: event.tags,
-      user: event.user,
-      request: event.request,
-      contexts: event.contexts,
-      extra: event.extra,
-      fingerprint: event.fingerprint,
-      exception: event.exception,
-      breadcrumbs: event.breadcrumbs,
+      message: event.message as string | undefined,
+      level: event.level as "error" | "info" | "debug" | "warning" | "fatal" | undefined,
+      timestamp: event.timestamp as number | undefined,
+      platform: event.platform as string | undefined,
+      logger: event.logger as string | undefined,
+      tags: event.tags as Record<string, string> | undefined,
+      user: event.user as UserContext | undefined,
+      request: event.request as Record<string, unknown> | undefined,
+      contexts: event.contexts as Record<string, unknown> | undefined,
+      extra: event.extra as Record<string, unknown> | undefined,
+      fingerprint: event.fingerprint as string[] | undefined,
+      exception: event.exception as Record<string, unknown> | undefined,
+      breadcrumbs: event.breadcrumbs as Breadcrumb[] | undefined,
     };
   }
 
-  captureException(error: Error, context?: Record<string, any>): void {
+  captureException(error: Error, context?: Record<string, unknown>): void {
     if (!this.initialized) return;
     
-    const scope = new (Sentry as any).Scope();
+    const scope = new Sentry.Scope();
     
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
@@ -226,10 +237,10 @@ class SentryProvider implements MonitoringProvider {
     Sentry.captureException(error, scope);
   }
 
-  captureMessage(message: string, level?: string, context?: Record<string, any>): void {
+  captureMessage(message: string, level?: string, context?: Record<string, unknown>): void {
     if (!this.initialized) return;
     
-    const scope = new (Sentry as any).Scope();
+    const scope = new Sentry.Scope();
     
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
@@ -298,7 +309,7 @@ class SentryProvider implements MonitoringProvider {
     Sentry.setTag(key, value);
   }
 
-  setContext(key: string, context: Record<string, any>): void {
+  setContext(key: string, context: Record<string, unknown>): void {
     if (!this.initialized) return;
     Sentry.setContext(key, removeSensitiveFields(context));
   }
@@ -327,7 +338,7 @@ class SentryProvider implements MonitoringProvider {
       };
     }
     
-    const transaction = (Sentry as any).startTransaction({
+    const transaction = (Sentry as unknown as { startTransaction: (config: { name: string; op?: string }) => unknown }).startTransaction({
       name,
       op: op || 'custom',
     });
@@ -383,30 +394,21 @@ class SentryProvider implements MonitoringProvider {
   captureCheckIn(checkIn: CronJob): void {
     if (!this.initialized) return;
     
-    const checkInData: Record<string, unknown> = {
+    const checkInData = {
       monitorSlug: checkIn.monitorSlug,
       status: checkIn.status,
+      ...(checkIn.checkInId && { checkInId: checkIn.checkInId }),
+      ...(checkIn.duration !== undefined && { duration: checkIn.duration }),
+      ...(checkIn.environment && { environment: checkIn.environment }),
     };
     
-    if (checkIn.checkInId) {
-      checkInData.checkInId = checkIn.checkInId;
-    }
-    
-    if (checkIn.duration !== undefined) {
-      checkInData.duration = checkIn.duration;
-    }
-    
-    if (checkIn.environment) {
-      checkInData.environment = checkIn.environment;
-    }
-    
-    Sentry.captureCheckIn(checkInData);
+    (Sentry as unknown as { captureCheckIn: (data: Record<string, unknown>) => void }).captureCheckIn(checkInData);
   }
 
   startReplay(): void {
     if (!this.initialized) return;
     
-    const replay = (Sentry as any).getCurrentHub?.()?.getIntegration?.((Sentry as any).Replay);
+    const replay = (Sentry as unknown as { getCurrentHub?: () => { getIntegration?: (integration: unknown) => { start?: () => void } } }).getCurrentHub?.()?.getIntegration?.((Sentry as unknown as { Replay?: unknown }).Replay);
     if (replay) {
       replay.start();
     }
@@ -415,7 +417,7 @@ class SentryProvider implements MonitoringProvider {
   stopReplay(): void {
     if (!this.initialized) return;
     
-    const replay = (Sentry as any).getCurrentHub?.()?.getIntegration?.((Sentry as any).Replay);
+    const replay = (Sentry as unknown as { getCurrentHub?: () => { getIntegration?: (integration: unknown) => { stop?: () => void } } }).getCurrentHub?.()?.getIntegration?.((Sentry as unknown as { Replay?: unknown }).Replay);
     if (replay) {
       replay.stop();
     }
