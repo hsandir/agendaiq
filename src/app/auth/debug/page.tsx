@@ -383,7 +383,7 @@ export default function AuthDebugPage() {
                       }
                     </td>
                     <td className="py-2 text-gray-600">
-                      {systemStatus.session.user?.email || 'Not logged in'}
+                      {String(systemStatus.session.user?.email || 'Not logged in')}
                     </td>
                   </tr>
 
@@ -413,7 +413,7 @@ export default function AuthDebugPage() {
                       <td className="py-2" colSpan={2}>
                         <span className="text-xs text-gray-600">
                           {String(systemStatus.database.details.host)}:{String(systemStatus.database.details.port)}/{String(systemStatus.database.details.database)}
-                          {systemStatus.database.details.pooling && ` (${String(systemStatus.database.details.pooling)})`}
+                          {systemStatus.database.details.pooling ? ` (${String(systemStatus.database.details.pooling)})` : ''}
                         </span>
                       </td>
                     </tr>
