@@ -32,11 +32,11 @@ function tokenToUser(token: JWT | NextAuthToken | null): UserWithCapabilities | 
   
   return {
     id,
-    email: token.email as string | undefined,
+    email: token.email as string,
     name: token.name as string | undefined,
-    is_system_admin: Boolean(token.is_system_admin) || token.staff?.role?.key === 'DEV_ADMIN' || false,
-    is_school_admin: Boolean(token.is_school_admin) || token.staff?.role?.key === 'OPS_ADMIN' || false,
-    roleKey: token.staff?.role?.key || undefined,
+    is_system_admin: Boolean(token.is_system_admin) || (token.staff?.role && 'key' in token.staff.role && token.staff.role.key === 'DEV_ADMIN') || false,
+    is_school_admin: Boolean(token.is_school_admin) || (token.staff?.role && 'key' in token.staff.role && token.staff.role.key === 'OPS_ADMIN') || false,
+    roleKey: (token.staff?.role && 'key' in token.staff.role ? token.staff.role.key : undefined) as string | undefined,
     capabilities: (token.capabilities as string[]) || [],
     staff: token.staff as { id: number; role?: { id: number; key?: string | null; title: string; is_leadership?: boolean } } | undefined
   };

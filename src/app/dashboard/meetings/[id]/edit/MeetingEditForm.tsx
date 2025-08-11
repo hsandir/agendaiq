@@ -107,7 +107,9 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   const attendeeOptions: MultiSelectOption[] = users.map(user => ({
     value: user.id,
     label: user.name,
-    description: `${user.role} - ${user.department}`
+    email: user.email,
+    role: user.role,
+    department: user.department
   }));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -303,10 +305,9 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
             <Label>Select Attendees</Label>
             <MultiSelect
               options={attendeeOptions}
-              value={selectedAttendees || []}
+              selected={selectedAttendees || []}
               onChange={(value) => setSelectedAttendees(value || [])}
               placeholder="Search and select attendees..."
-              emptyMessage="No attendees found"
             />
             <p className="text-sm text-muted-foreground mt-1">
               {(selectedAttendees || []).length} attendee{(selectedAttendees || []).length !== 1 ? 's' : ''} selected
