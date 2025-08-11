@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
     // Get theme preference from database (fast query)
     const userData = await prisma.user.findUnique({
-      where: { id: parseInt(user.id) },
+      where: { id: user.id },
       select: { theme_preference: true }
     });
     
@@ -75,7 +75,7 @@ export async function PUT(request: NextRequest) {
 
     // Update user's theme preference (optimized query)
     await prisma.user.update({
-      where: { id: parseInt(user.id) },
+      where: { id: user.id },
       data: { theme_preference: themeToSave },
       select: { id: true }, // Only select what we need
     });
