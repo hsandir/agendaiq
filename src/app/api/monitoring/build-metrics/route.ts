@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/auth-utils';
 import { can, Capability } from '@/lib/auth/policy';
-import { prisma } from '@/lib/prisma';
 
 // Calculate build metrics from GitHub Actions
 async function calculateBuildMetrics() {
@@ -124,24 +123,25 @@ export async function GET(request: NextRequest) {
     const metrics = await calculateBuildMetrics();
 
     // Store metrics in database for historical tracking
-    try {
-      await prisma.buildMetrics.create({
-        data: {
-          total_builds: metrics.totalBuilds,
-          success_rate: metrics.successRate,
-          average_duration: Math.floor(metrics.averageDuration),
-          queue_time: Math.floor(metrics.queueTime),
-          tests_passed: metrics.testsPassed,
-          tests_failed: metrics.testsFailed,
-          code_coverage: metrics.codeCoverage,
-          vulnerabilities: metrics.vulnerabilities,
-          recorded_at: new Date()
-        }
-      });
-    } catch (dbError) {
-      // Ignore database errors - metrics table might not exist yet
-      console.log('Could not store metrics in database:', dbError);
-    }
+    // TODO: Add buildMetrics table to schema when needed
+    // try {
+    //   await prisma.buildMetrics.create({
+    //     data: {
+    //       total_builds: metrics.totalBuilds,
+    //       success_rate: metrics.successRate,
+    //       average_duration: Math.floor(metrics.averageDuration),
+    //       queue_time: Math.floor(metrics.queueTime),
+    //       tests_passed: metrics.testsPassed,
+    //       tests_failed: metrics.testsFailed,
+    //       code_coverage: metrics.codeCoverage,
+    //       vulnerabilities: metrics.vulnerabilities,
+    //       recorded_at: new Date()
+    //     }
+    //   });
+    // } catch (dbError) {
+    //   // Ignore database errors - metrics table might not exist yet
+    //   console.log('Could not store metrics in database:', dbError);
+    // }
 
     return NextResponse.json({
       metrics,
