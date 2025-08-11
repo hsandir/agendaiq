@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/auth-utils';
-import { hasCapability, Capability } from '@/lib/auth/policy';
+import { can, Capability } from '@/lib/auth/policy';
 
 // GitHub Actions API integration for real pipeline data
 async function fetchGitHubPipelines() {
@@ -151,7 +151,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check for CI/CD monitoring capability
-    if (!hasCapability(user, Capability.DEV_CI)) {
+    if (!can(user, Capability.DEV_CI)) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 

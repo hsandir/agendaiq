@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         hasPassword: true,
         Staff: {
           select: {
-            role: {
+            Role: {
               select: {
                 key: true,
                 is_leadership: true
