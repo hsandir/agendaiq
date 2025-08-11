@@ -72,9 +72,9 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions).catch(() => null);
     const token = await getToken({ req: request }).catch(() => null);
     
-    // Get headers and cookies
-    const headersList = headers();
-    const cookieStore = cookies();
+    // Get headers and cookies (await them in Next.js 15)
+    const headersList = await headers();
+    const cookieStore = await cookies();
     
     // Extract ALL headers for debugging - absolutely everything
     const allHeaders: Record<string, string> = {};
@@ -310,8 +310,8 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     
-    // Get request metadata
-    const headersList = headers();
+    // Get request metadata (await headers in Next.js 15)
+    const headersList = await headers();
     const ip = headersList.get('x-forwarded-for') || headersList.get('x-real-ip') || 'unknown';
     const userAgent = headersList.get('user-agent') || 'unknown';
     
