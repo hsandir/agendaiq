@@ -10,7 +10,7 @@ export async function GET() {
       connected: false,
       userCount: 0,
       adminCount: 0,
-      error: null
+      error: null as string | null
     },
     auth: {
       nextAuthConfigured: false,
@@ -18,8 +18,8 @@ export async function GET() {
       urlSet: false
     },
     firstUserCheck: {
-      result: null,
-      error: null
+      result: null as boolean | null,
+      error: null as string | null
     }
   };
 
