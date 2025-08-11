@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
+import { requireAuth } from '@/lib/auth/auth-utils';
+import { Capability } from '@/lib/auth/policy';
 import { RoleManagementForm } from "@/components/settings/RoleManagementForm";
 import { RoleHierarchyManagement } from "@/components/settings/RoleHierarchyManagement";
 
@@ -9,8 +10,8 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminSettingsPage() {
-  // Use new standardized auth system - only admins can access
-  const user = await requireAuth(AuthPresets.requireAdmin);
+  // Use capability-based auth - only dev admins can access
+  const user = await requireAuth({ requireAuth: true, requireCapability: Capability.DEV_DEBUG });
 
   return (
     <div>
