@@ -35,10 +35,10 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid action. Use: quick, full, or api-only' }, { status: 400 });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Health check failed:', error);
     return NextResponse.json(
-      { error: 'Failed to perform health check', details: error.message },
+      { error: 'Failed to perform health check', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -53,10 +53,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid request. Use type: "custom" with pages array' }, { status: 400 });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Custom health check failed:', error);
     return NextResponse.json(
-      { error: 'Failed to perform custom health check', details: error.message },
+      { error: 'Failed to perform custom health check', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -90,9 +90,9 @@ async function quickHealthCheck() {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { error: 'Quick health check failed', details: error.message },
+      { error: 'Quick health check failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -132,9 +132,9 @@ async function fullHealthCheck() {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { error: 'Full health check failed', details: error.message },
+      { error: 'Full health check failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -164,9 +164,9 @@ async function apiHealthCheck() {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { error: 'API health check failed', details: error.message },
+      { error: 'API health check failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -198,9 +198,9 @@ async function customHealthCheck(customPages: string[]) {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
-      { error: 'Custom health check failed', details: error.message },
+      { error: 'Custom health check failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -224,7 +224,7 @@ async function checkPage(url: string, name: string) {
     // Determine status based on response
     let status: 'success' | 'warning' | 'error' = 'success';
     let message = 'Page loaded successfully';
-    const details: any = {};
+    const details: Record<string, unknown> = {};
 
     if (!response.ok) {
       status = 'error';
@@ -307,16 +307,16 @@ async function checkPage(url: string, name: string) {
       timestamp: new Date().toISOString()
     };
 
-  } catch (error: any) {
+  } catch (error) {
     return {
       name,
       url,
       status: 'error' as const,
-      message: `Failed to load: ${error.message}`,
+      message: `Failed to load: ${error instanceof Error ? error.message : 'Unknown error'}`,
       statusCode: 0,
       responseTime: 0,
       contentType: 'unknown',
-      details: { error: error.message },
+      details: { error: error instanceof Error ? error.message : 'Unknown error' },
       timestamp: new Date().toISOString()
     };
   }
@@ -337,7 +337,7 @@ async function performSystemChecks() {
       message: `System API responded in ${responseTime}ms`,
       value: `${responseTime}ms`
     });
-  } catch (error: any) {
+  } catch (error) {
     checks.push({
       name: 'Server Responsiveness',
       status: 'error',

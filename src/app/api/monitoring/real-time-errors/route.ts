@@ -1,8 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ErrorAnalyzer } from '@/lib/monitoring/error-analyzer';
 
+interface StoredError extends ErrorReport {
+  id: string;
+  receivedAt: string;
+  analysis: {
+    category: string;
+    severity: string;
+    pageContext: string;
+    description: string;
+    impact: string;
+    solutions: string[];
+    priorityScore: number;
+  };
+  resolved: boolean;
+}
+
+interface PageAnalytics {
+  totalErrors: number;
+  severityBreakdown: Record<string, number>;
+  mostCommonCategory: string;
+  errorRate: number;
+  lastErrorTime: string | null;
+  healthScore: number;
+}
+
 // In-memory storage for real-time errors (Redis can be used in production)
-const errorStore: Map<string, any[]> = new Map();
+const errorStore: Map<string, StoredError[]> = new Map();
 const MAX_ERRORS_PER_PAGE = 100;
 
 interface ErrorReport {
@@ -101,7 +125,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const resolved = searchParams.get('resolved') === 'true';
 
-    let allErrors: any[] = [];
+    let allErrors: StoredError[] = [];
 
     if (pageContext) {
       // Errors for a specific page
@@ -185,7 +209,7 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-async function sendCriticalErrorNotification(error: any) {
+async function sendCriticalErrorNotification(error: StoredError) {
   // For critical error notifications
   // In real applications: email, Slack, webhook integrations
   console.error('🚨 CRITICAL ERROR DETECTED:', {
@@ -201,7 +225,7 @@ async function sendCriticalErrorNotification(error: any) {
 }
 
 function generatePageAnalytics() {
-  const analytics: Record<string, any> = {};
+  const analytics: Record<string, PageAnalytics> = {};
   
   for (const [page, errors] of errorStore.entries()) {
     const recentErrors = errors.filter(err => {
@@ -225,7 +249,7 @@ function generatePageAnalytics() {
   return analytics;
 }
 
-function getMostCommonCategory(errors: any[]): string {
+function getMostCommonCategory(errors: StoredError[]): string {
   const categories: Record<string, number> = {};
   
   errors.forEach(err => {
@@ -236,7 +260,7 @@ function getMostCommonCategory(errors: any[]): string {
     .sort(([,a], [,b]) => b - a)[0]?.[0] || 'unknown';
 }
 
-function calculatePageHealthScore(errors: any[]): number {
+function calculatePageHealthScore(errors: StoredError[]): number {
   if (errors.length === 0) return 100;
   
   const recentErrors = errors.filter(err => {

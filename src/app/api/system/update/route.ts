@@ -17,10 +17,10 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Update request failed:', error);
     return NextResponse.json(
-      { error: 'Failed to process update request', details: error.message },
+      { error: 'Failed to process update request', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -185,15 +185,15 @@ async function updatePackages(specificPackages?: string[]) {
         });
         updateReport.successful++;
 
-      } catch (error: any) {
-        console.error(`Failed to update ${pkg.name}:`, error.message);
+      } catch (error) {
+        console.error(`Failed to update ${pkg.name}:`, error instanceof Error ? error.message : 'Unknown error');
         
         updateReport.details.push({
           package: pkg.name,
           status: 'failed',
           from: pkg.current,
           to: pkg.wanted || pkg.latest,
-          error: error.message.split('\n')[0] // First line of error
+          error: error instanceof Error ? error.message : 'Unknown error'.split('\n')[0] // First line of error
         });
         updateReport.failed++;
       }
@@ -213,12 +213,12 @@ async function updatePackages(specificPackages?: string[]) {
         'Updates completed successfully!'
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Package update failed:', error);
     return NextResponse.json(
       { 
         error: 'Package update failed', 
-        details: error.message,
+        details: error instanceof Error ? error.message : 'Unknown error',
         suggestion: 'Try using System Management compatibility fix to resolve conflicts'
       },
       { status: 500 }
@@ -243,7 +243,7 @@ async function getDetailedPackageStatus() {
       outdated: outdatedList,
       total: outdatedList.length
     };
-  } catch (error: any) {
+  } catch (error) {
     if (error?.stdout) {
       try {
         const outdatedPackages = JSON.parse(error.stdout);

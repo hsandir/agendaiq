@@ -12,6 +12,22 @@ interface ProductionError {
   severity: 'low' | 'medium' | 'high' | 'critical';
 }
 
+interface DebugCheckData {
+  status: 'ok' | 'error' | 'degraded';
+  error?: string;
+  responseTime?: number;
+}
+
+interface DebugData {
+  overallStatus: 'ok' | 'degraded' | 'error';
+  summary: {
+    ok: number;
+    error: number;
+    degraded: number;
+  };
+  checks: Record<string, DebugCheckData>;
+}
+
 // Admin-only production error monitoring with proper authentication
 export async function GET(request: NextRequest) {
   // Require operations admin authentication
@@ -103,7 +119,7 @@ export async function GET(request: NextRequest) {
     try {
       const debugResponse = await fetch('http://localhost:3000/api/debug/production-status');
       if (debugResponse.ok) {
-        const debugData = await debugResponse.json();
+        const debugData = await debugResponse.json() as DebugData;
         
         if (debugData.overallStatus === 'error') {
           errors.push({
@@ -117,7 +133,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Add specific check errors with admin context
-        Object.entries(debugData.checks).forEach(([checkName, checkData]: [string, any]) => {
+        Object.entries(debugData.checks).forEach(([checkName, checkData]) => {
           if (checkData.status === 'error') {
             errors.push({
               id: `admin-check-error-${checkName}-${Date.now()}`,

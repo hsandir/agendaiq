@@ -2,6 +2,31 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/auth-utils';
 import { can, Capability } from '@/lib/auth/policy';
 
+// GitHub Actions API types
+interface GitHubWorkflowRun {
+  id: number;
+  head_branch: string;
+  head_sha: string;
+  actor?: { login: string };
+  head_commit?: { message: string };
+  display_title: string;
+  status: string;
+  conclusion: string | null;
+  created_at: string;
+  updated_at: string;
+  run_started_at: string | null;
+}
+
+interface GitHubWorkflowRunsResponse {
+  workflow_runs: GitHubWorkflowRun[];
+}
+
+interface PipelineStage {
+  name: string;
+  status: string;
+  duration: number;
+}
+
 // GitHub Actions API integration for real pipeline data
 async function fetchGitHubPipelines() {
   const owner = process.env.GITHUB_OWNER || 'anthropics';
@@ -30,10 +55,10 @@ async function fetchGitHubPipelines() {
       return [];
     }
 
-    const data = await response.json();
+    const data = await response.json() as GitHubWorkflowRunsResponse;
     
     // Transform GitHub Actions data to our format
-    return data.workflow_runs?.slice(0, 10).map((run: any) => ({
+    return data.workflow_runs?.slice(0, 10).map((run: GitHubWorkflowRun) => ({
       id: run.id.toString(),
       branch: run.head_branch,
       commit: run.head_sha,
@@ -67,7 +92,7 @@ function mapGitHubStatus(status: string, conclusion: string | null): string {
   return 'pending';
 }
 
-function extractStages(run: any) {
+function extractStages(run: GitHubWorkflowRun): PipelineStage[] {
   // Basic stage mapping - in real implementation, fetch jobs for detailed stages
   const stages = [];
   

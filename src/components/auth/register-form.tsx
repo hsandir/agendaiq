@@ -76,7 +76,7 @@ export default function RegisterForm() {
       if (!response.ok) {
         setError(data.error || 'Registration failed');
       } else {
-        router.push(`/auth/verify-email?email=${encodeURIComponent(formData.email)}` as any);
+        router.push(`/auth/verify-email?email=${encodeURIComponent(formData.email)}`);
       }
     } catch (error) {
       setError('An error occurred. Please try again.');

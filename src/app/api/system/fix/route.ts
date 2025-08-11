@@ -21,10 +21,10 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('System fix request failed:', error);
     return NextResponse.json(
-      { error: 'Failed to process system fix request', details: error.message },
+      { error: 'Failed to process system fix request', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -94,7 +94,7 @@ async function checkSystemHealth() {
 
     return NextResponse.json(health);
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('System health check failed:', error);
     return NextResponse.json(
       { 
@@ -186,13 +186,13 @@ async function fixSystemIssues() {
       nodeModulesFixed: results.nodeModulesFixed
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('System fix failed:', error);
     return NextResponse.json(
       { 
         success: false,
         error: 'System fix failed', 
-        details: error.message 
+        details: error instanceof Error ? error.message : 'Unknown error' 
       },
       { status: 500 }
     );

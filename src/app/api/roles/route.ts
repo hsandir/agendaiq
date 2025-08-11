@@ -3,6 +3,14 @@ import { withAuth } from '@/lib/auth/api-auth';
 import { Capability } from '@/lib/auth/policy';
 import { prisma } from "@/lib/prisma";
 
+// Role update data interface
+interface RoleUpdateData {
+  title?: string;
+  priority?: number;
+  is_leadership?: boolean;
+  category?: string;
+}
+
 // GET /api/roles - List all roles
 export async function GET(request: NextRequest) {
   const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
@@ -114,7 +122,7 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    const updateData: any = {};
+    const updateData: RoleUpdateData = {};
     if (title !== undefined) updateData.title = title;
     if (priority !== undefined) updateData.priority = priority;
     if (is_leadership !== undefined) updateData.is_leadership = is_leadership;

@@ -3,6 +3,41 @@ import { withAuth } from "@/lib/auth/api-auth";
 import { Capability } from '@/lib/auth/policy';
 import { prisma } from "@/lib/prisma";
 
+// Role with included relations from Prisma query
+interface RoleWithRelations {
+  id: number;
+  title: string;
+  level: number;
+  is_leadership: boolean;
+  category: string;
+  parent_id: number | null;
+  priority: number;
+  Department: {
+    id: number;
+    name: string;
+  } | null;
+  Staff: Array<{
+    id: number;
+    User: {
+      name: string;
+      email: string;
+    };
+  }>;
+}
+
+// Hierarchical role structure for response
+interface HierarchicalRole {
+  id: string;
+  title: string;
+  level: number;
+  is_leadership: boolean;
+  category: string;
+  parent_id: number | null;
+  Department: { id: string; name: string } | null;
+  Children: HierarchicalRole[];
+  Staff: Array<{ id: string; name: string; email: string }>;
+}
+
 // GET Method - Role hierarchy
 export async function GET(request: NextRequest) {
   try {
@@ -42,7 +77,7 @@ export async function GET(request: NextRequest) {
     const roleMap = new Map();
     
     // First pass: create role objects
-    allRoles.forEach((role: any) => {
+    allRoles.forEach((role: RoleWithRelations) => {
       roleMap.set(role.id, {
         id: role.id.toString(),
         title: role.title,
@@ -55,7 +90,7 @@ export async function GET(request: NextRequest) {
           name: role.Department.name
         } : null,
         Children: [],
-        Staff: role.Staff?.map((staff: any) => ({
+        Staff: role.Staff?.map((staff) => ({
           id: staff.id.toString(),
           User: {
             name: staff.User.name,

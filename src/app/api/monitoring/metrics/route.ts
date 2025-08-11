@@ -1,8 +1,21 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// Web Vitals metrics interface
+interface WebVitalsMetric {
+  name: string;
+  id: string;
+  value: number;
+  rating?: 'good' | 'needs-improvement' | 'poor';
+  delta?: number;
+  navigationType?: 'navigate' | 'reload' | 'back_forward' | 'prerender';
+  timestamp?: string;
+  url?: string;
+  userAgent?: string;
+}
+
 // Web Vitals collector
-const webVitalsBuffer: any[] = [];
+const webVitalsBuffer: WebVitalsMetric[] = [];
 const MAX_BUFFER_SIZE = 1000;
 
 export async function POST(request: Request) {

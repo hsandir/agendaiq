@@ -9,6 +9,16 @@ import { withAuth } from '@/lib/auth/api-auth';
 import { Capability } from '@/lib/auth/policy';
 import * as Sentry from '@sentry/nextjs';
 
+// Sentry session data types
+interface SentrySessionDataPoint {
+  [0]: number; // timestamp
+  [1]: Array<{ count: number }>;
+}
+
+interface SentrySessionResponse {
+  data: SentrySessionDataPoint[];
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Authenticate user
@@ -116,9 +126,9 @@ export async function GET(request: NextRequest) {
         );
 
         if (sessionRes.ok) {
-          const data = await sessionRes.json();
+          const data = await sessionRes.json() as SentrySessionResponse;
           if (data.data && data.data.length > 0) {
-            release.sessionCount = data.data.reduce((sum: number, point: any) => {
+            release.sessionCount = data.data.reduce((sum: number, point: SentrySessionDataPoint) => {
               const value = point[1] && point[1][0] ? point[1][0].count : 0;
               return sum + value;
             }, 0);

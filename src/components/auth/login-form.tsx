@@ -52,13 +52,13 @@ export default function LoginForm() {
         if (result.error === 'AccountLocked') {
           setError('Your account has been locked due to multiple failed login attempts');
         } else if (result.error === 'TwoFactorRequired') {
-          router.push(('/auth/two-factor?email=' + encodeURIComponent(email)) as any);
+          router.push('/auth/two-factor?email=' + encodeURIComponent(email));
           return;
         } else {
           setError('Invalid email or password');
         }
       } else if (result?.ok) {
-        router.push('/dashboard' as any);
+        router.push('/dashboard');
       }
     } catch (error) {
       setError('An error occurred. Please try again.');

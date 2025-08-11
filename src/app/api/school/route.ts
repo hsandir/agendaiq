@@ -3,6 +3,15 @@ import { withAuth } from '@/lib/auth/api-auth';
 import { Capability } from '@/lib/auth/policy';
 import { prisma } from "@/lib/prisma";
 
+// School update data interface
+interface SchoolUpdateData {
+  name?: string;
+  code?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+}
+
 // GET /api/school - Get all schools (admin) or user's school (non-admin)
 export async function GET(request: NextRequest) {
   const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.SCHOOL_MANAGE });
@@ -181,7 +190,7 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    const updateData: any = {};
+    const updateData: SchoolUpdateData = {};
     if (name !== undefined) updateData.name = name;
     if (code !== undefined) updateData.code = code;
     if (address !== undefined) updateData.address = address;

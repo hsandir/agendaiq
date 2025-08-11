@@ -4,8 +4,13 @@ import { Capability } from '@/lib/auth/policy';
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+// CSV record interface
+interface CSVRecord {
+  [key: string]: string;
+}
+
 // Simple CSV parser replacement
-function parseCSV(content: string): any[] {
+function parseCSV(content: string): CSVRecord[] {
   const lines = content.split('\n').filter(line => line.trim());
   if (lines.length === 0) return [];
   
@@ -14,7 +19,7 @@ function parseCSV(content: string): any[] {
   
   for (let i = 1; i < lines.length; i++) {
     const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-    const record: any = {};
+    const record: CSVRecord = {};
     headers.forEach((header, index) => {
       record[header] = values[index] || '';
     });
@@ -29,8 +34,8 @@ import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
 // Enhanced interfaces for preview system
 interface ConflictItem {
   field: string;
-  existing: any;
-  new: any;
+  existing: string | number | boolean;
+  new: string | number | boolean;
   action: string;
 }
 
@@ -135,7 +140,7 @@ export async function POST(request: NextRequest) {
 
     // Parse CSV file
     const text = await file.text();
-    let records: any[];
+    let records: CSVRecord[];
 
     try {
       console.log('📄 CSV file size:', text.length, 'bytes');
@@ -180,8 +185,8 @@ export async function POST(request: NextRequest) {
     const existingRoles = await prisma.role.findMany();
     const existingDepartments = await prisma.department.findMany();
     
-    const validRoles = existingRoles.map((r: any) => r.title);
-    const validDepartments = existingDepartments.map((d: any) => d.name);
+    const validRoles = existingRoles.map((r) => r.title);
+    const validDepartments = existingDepartments.map((d) => d.name);
 
     // Get the admin's school and district for creating staff records
     const adminStaff = user.staff!;
@@ -439,8 +444,8 @@ export async function POST(request: NextRequest) {
 
       for (const record of recordsToUpload) {
         try {
-          const role = existingRoles.find((r: any) => r.title === record.role);
-          const department = existingDepartments.find((d: any) => d.name === record.department);
+          const role = existingRoles.find((r) => r.title === record.role);
+          const department = existingDepartments.find((d) => d.name === record.department);
 
           if (!role || !department) {
             uploadErrors.push(`Row ${record.rowNumber}: Role or department not found`);

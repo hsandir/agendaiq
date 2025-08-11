@@ -196,7 +196,7 @@ export function TwoFactorSetup() {
             Download Codes
           </button>
           <button
-            onClick={() => router.push("/dashboard/settings" as any)}
+            onClick={() => router.push("/dashboard/settings")}
             className="bg-muted text-foreground px-4 py-2 rounded-md hover:bg-muted"
           >
             Done
