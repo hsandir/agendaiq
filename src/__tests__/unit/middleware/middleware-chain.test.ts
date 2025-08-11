@@ -3,7 +3,7 @@
  * Test that rate-limit and audit middleware don't bypass auth
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { middleware } from '@/middleware';
 import { rateLimitMiddleware } from '@/lib/middleware/rate-limit-middleware';
 import { auditMiddleware } from '@/lib/middleware/audit-middleware';
@@ -40,7 +40,7 @@ describe('Middleware Chain Tests', () => {
         }
       } as unknown as NextRequest;
       
-      const { RateLimiters } = require('@/lib/utils/rate-limit');
+      const { RateLimiters } = await import('@/lib/utils/rate-limit');
       RateLimiters.api.check.mockResolvedValue({ success: true });
       
       const result = await rateLimitMiddleware(request);
@@ -59,7 +59,7 @@ describe('Middleware Chain Tests', () => {
         }
       } as unknown as NextRequest;
       
-      const { RateLimiters } = require('@/lib/utils/rate-limit');
+      const { RateLimiters } = await import('@/lib/utils/rate-limit');
       RateLimiters.api.check.mockResolvedValue({ 
         success: false, 
         error: 'Rate limit exceeded' 
@@ -107,7 +107,7 @@ describe('Middleware Chain Tests', () => {
         nextUrl: new URL('http://localhost:3000/dashboard')
       } as unknown as NextRequest;
       
-      const { getToken } = require('next-auth/jwt');
+      const { getToken } = await import('next-auth/jwt');
       getToken.mockResolvedValue({
         id: '1',
         email: 'test@test.com',
@@ -134,7 +134,7 @@ describe('Middleware Chain Tests', () => {
         '/api/setup/check',
       ];
       
-      const { getToken } = require('next-auth/jwt');
+      const { getToken } = await import('next-auth/jwt');
       getToken.mockResolvedValue(null);
       
       for (const path of publicPaths) {
@@ -161,7 +161,7 @@ describe('Middleware Chain Tests', () => {
         '/api/test-sentry', // Should require DEV_DEBUG capability
       ];
       
-      const { getToken } = require('next-auth/jwt');
+      const { getToken } = await import('next-auth/jwt');
       getToken.mockResolvedValue(null);
       
       for (let i = 0; i < protectedPaths.length; i++) {

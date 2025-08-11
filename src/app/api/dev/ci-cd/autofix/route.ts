@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth/api-auth';
-import { z } from 'zod';
+// import { z } from 'zod';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs/promises';
@@ -8,18 +7,18 @@ import path from 'path';
 
 const execAsync = promisify(exec);
 
-// Schema for autofix request
-const autofixSchema = z.object({
-  errorType: z.string(),
-  errorMessage: z.string(),
-  context: z.object({
-    file: z.string().optional(),
-    line: z.number().optional(),
-    column: z.number().optional(),
-    workflow: z.string().optional(),
-    job: z.string().optional(),
-  }).optional(),
-});
+// Schema for autofix request  
+// const autofixSchema = z.object({
+//   errorType: z.string(),
+//   errorMessage: z.string(),
+//   context: z.object({
+//     file: z.string().optional(),
+//     line: z.number().optional(),
+//     column: z.number().optional(),
+//     workflow: z.string().optional(),
+//     job: z.string().optional(),
+//   }).optional(),
+// });
 
 interface AutofixSuggestion {
   id: string;

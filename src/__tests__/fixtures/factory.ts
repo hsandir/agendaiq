@@ -7,7 +7,7 @@ export class TestFactory {
 
   // User factory
   async createUser(overrides: Record<string, unknown> = {}) {
-    const password = (overrides as any).password || 'password123'
+    const password = (overrides as { password?: string }).password || 'password123'
     const hashedPassword = await bcrypt.hash(password, 10)
 
     return this.prisma.user.create({
@@ -27,8 +27,8 @@ export class TestFactory {
     const user = overrides.user || await this.createUser()
     const role = overrides.role || await this.getOrCreateRole('Teacher')
     const department = overrides.department || await this.getOrCreateDepartment()
-    const school = overrides.school || department.school
-    const district = overrides.district || school.district
+    const school = overrides.school || (department as { School?: unknown }).School
+    const district = overrides.district || (school as { District?: unknown }).District
 
     return this.prisma.staff.create({
       data: {
@@ -37,7 +37,7 @@ export class TestFactory {
         department_id: department.id,
         school_id: school.id,
         district_id: district.id,
-        employee_number: faker.string.alphanumeric(8).toUpperCase(),
+        employee_id: faker.string.alphanumeric(8).toUpperCase(),
         hire_date: faker.date.past({ years: 5 }),
         phone: faker.phone.number(),
         office_location: faker.location.streetAddress(),
@@ -62,7 +62,7 @@ export class TestFactory {
   async createMeeting(overrides: Record<string, unknown> = {}) {
     const organizer = overrides.organizer || await this.createStaff()
     const startTime = overrides.start_time || faker.date.future()
-    const endTime = new Date(startTime.getTime() + 60 * 60 * 1000) // 1 hour later
+    const endTime = new Date((startTime as Date).getTime() + 60 * 60 * 1000) // 1 hour later
 
     return this.prisma.meeting.create({
       data: {
@@ -118,7 +118,6 @@ export class TestFactory {
           meeting_id: meeting.id,
           staff_id: staff.id,
           status: faker.helpers.arrayElement(['PENDING', 'ACCEPTED', 'DECLINED']),
-          response_date: faker.date.recent(),
         },
         include: {
           Staff: {
@@ -148,7 +147,7 @@ export class TestFactory {
         duration_minutes: faker.number.int({ min: 5, max: 30 }),
         order_index: overrides.order_index || faker.number.int({ min: 1, max: 10 }),
         item_type: faker.helpers.arrayElement(['DISCUSSION', 'PRESENTATION', 'DECISION', 'INFORMATION']),
-        status: 'PENDING',
+        status: 'Pending',
         ...overrides,
       },
     })
@@ -181,8 +180,6 @@ export class TestFactory {
           name: faker.commerce.department(),
           code: faker.string.alphanumeric(6).toUpperCase(),
           school_id: school.id,
-          description: faker.lorem.sentence(),
-          is_active: true,
         },
         include: {
           School: {
@@ -208,11 +205,6 @@ export class TestFactory {
           code: faker.string.alphanumeric(6).toUpperCase(),
           district_id: district.id,
           address: faker.location.streetAddress(),
-          phone: faker.phone.number(),
-          email: faker.internet.email(),
-          principal_name: faker.person.fullName(),
-          vice_principal_name: faker.person.fullName(),
-          is_active: true,
         },
         include: {
           District: true,

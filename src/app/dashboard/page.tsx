@@ -193,17 +193,17 @@ export default async function DashboardPage() {
           </div>
           
           <div className="space-y-4">
-            {upcomingMeetings.slice(0, 4).map((meeting: unknown) => (
+            {upcomingMeetings.slice(0, 4).map((meeting) => (
               <div
                 key={meeting.id}
                 className="flex items-center justify-between p-4 bg-background/50 border border-border/50 rounded-xl hover:bg-card/60 transition-colors group"
               >
                 <div className="flex-1">
                   <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">
-                    {meeting.title}
+                    {String(meeting.title)}
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {safeFormatDateTime(meeting.start_time, undefined, 'No date set')}
+                    {safeFormatDateTime(meeting.start_time as Date | null, undefined, 'No date set')}
                   </p>
                 </div>
                 <div className="text-xs px-3 py-1 bg-primary/10 text-primary rounded-full">

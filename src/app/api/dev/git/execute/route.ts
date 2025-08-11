@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: any = {};
+  let body: { command?: string; args?: string[] } = {};
   try {
     body = await request.json();
     const { command, args = [] } = body;
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       output,
       timestamp: new Date().toISOString()
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Git execute error:', error);
     
     // Extract useful error message

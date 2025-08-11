@@ -34,7 +34,7 @@ export type MeetingCreateOverrides = Partial<
 
 // Agenda item factory types
 export type AgendaItemCreateOverrides = Partial<
-  Omit<Prisma.AgendaItemCreateInput, 'Meeting' | 'presenter_staff' | 'responsible_staff' | 'action_items'> & {
+  Omit<Prisma.MeetingAgendaItemCreateInput, 'Meeting' | 'presenter_staff' | 'responsible_staff' | 'action_items'> & {
     meeting?: unknown
     presenterStaff?: unknown
     responsibleStaff?: unknown

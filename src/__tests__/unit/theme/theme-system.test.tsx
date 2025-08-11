@@ -461,7 +461,6 @@ describe('Theme System Integration', () => {
 
     // Verify CSS variables are updated
     await waitFor(() => {
-      const darkTheme = themes.find(t => t.id === 'dark-mode')!;
       expect(document.documentElement.style.getPropertyValue('--primary')).toBeTruthy();
       expect(document.documentElement.style.getPropertyValue('--background')).toBeTruthy();
     });

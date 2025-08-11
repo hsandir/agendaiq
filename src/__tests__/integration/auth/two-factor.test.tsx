@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { signIn } from 'next-auth/react'
+import { signIn, type SignInResponse } from 'next-auth/react'
 import TwoFactorForm from '@/components/auth/two-factor-form'
 import { mockFetchResponse, mockFetchError } from '@/__tests__/utils/test-utils'
 
@@ -159,7 +159,7 @@ describe('Two-Factor Authentication Flow', () => {
         resolveSignIn = resolve
       })
       
-      mockSignIn.mockReturnValueOnce(signInPromise as any)
+      mockSignIn.mockReturnValueOnce(signInPromise as Promise<SignInResponse | undefined>)
       
       render(<TwoFactorForm />)
       

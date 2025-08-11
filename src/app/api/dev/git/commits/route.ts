@@ -22,10 +22,28 @@ export async function GET(request: NextRequest) {
       `git log --pretty=format:'%H|%h|%an|%ar|%s' --stat -n ${limit}`
     );
     
-    const commits: any[] = [];
+    const commits: Array<{
+      hash: string;
+      shortHash: string;
+      author: string;
+      date: string;
+      message: string;
+      files: number;
+      insertions: number;
+      deletions: number;
+    }> = [];
     const lines = stdout.split('\n');
     
-    let currentCommit: any = null;
+    let currentCommit: {
+      hash: string;
+      shortHash: string;
+      author: string;
+      date: string;
+      message: string;
+      files: number;
+      insertions: number;
+      deletions: number;
+    } | null = null;
     
     for (const line of lines) {
       if (line.includes('|') && line.split('|').length >= 5) {
@@ -65,12 +83,12 @@ export async function GET(request: NextRequest) {
       total: commits.length,
       timestamp: new Date().toISOString()
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Git commits error:', error);
     return NextResponse.json(
       { 
         error: 'Failed to get commit history',
-        details: error.message 
+        details: error instanceof Error ? error.message : 'Unknown error' 
       },
       { status: 500 }
     );

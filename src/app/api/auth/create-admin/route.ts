@@ -24,8 +24,6 @@ export async function POST(request: NextRequest) {
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
-  const user = authResult.user!;
-
   try {
     const body = await request.json();
     const validationResult = createAdminSchema.safeParse(body);

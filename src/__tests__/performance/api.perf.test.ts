@@ -146,7 +146,7 @@ test.describe('Page Load Performance', () => {
     const lcp = await page.evaluate(() => new Promise<number>(resolve => {
       new PerformanceObserver((list) => {
         const entries = list.getEntries()
-        const lastEntry = entries[entries.length - 1] as any
+        const lastEntry = entries[entries.length - 1] as PerformanceEntry & { startTime: number }
         resolve(lastEntry.startTime)
       }).observe({ entryTypes: ['largest-contentful-paint'] })
     }))
@@ -182,8 +182,8 @@ test.describe('Page Load Performance', () => {
         let cls = 0
         new PerformanceObserver((list) => {
           for (const entry of list.getEntries()) {
-            if (!(entry as any).hadRecentInput) {
-              cls += (entry as any).value
+            if (!(entry as PerformanceEntry & { hadRecentInput?: boolean }).hadRecentInput) {
+              cls += (entry as PerformanceEntry & { value: number }).value
             }
           }
           resolve(cls)
@@ -213,7 +213,7 @@ test.describe('Page Load Performance', () => {
       
       // Get memory usage
       const metrics = await page.evaluate(() => {
-        return (performance as any).memory?.usedJSHeapSize || 0
+        return (performance as Performance & { memory?: { usedJSHeapSize?: number } }).memory?.usedJSHeapSize || 0
       })
       
       memorySnapshots.push(metrics)

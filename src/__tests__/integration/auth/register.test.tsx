@@ -158,7 +158,7 @@ describe('Registration Flow', () => {
         resolveFetch = resolve
       })
       
-      global.fetch = jest.fn().mockReturnValueOnce(fetchPromise as any)
+      global.fetch = jest.fn().mockReturnValueOnce(fetchPromise as Promise<Response>)
       
       render(<RegisterForm />)
       

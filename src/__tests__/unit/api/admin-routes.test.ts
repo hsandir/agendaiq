@@ -30,7 +30,7 @@ jest.mock('next/server', () => ({
 }));
 
 import { withAuth } from '@/lib/auth/api-auth';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { canAccessApi } from '@/lib/auth/policy';
 
 describe('Admin API Routes - Capability Tests', () => {
@@ -125,13 +125,6 @@ describe('Admin API Routes - Capability Tests', () => {
     });
 
     it('should deny school admin access to dev endpoints', async () => {
-      const mockSchoolAdmin = {
-        id: 2,
-        email: 'ops@test.com',
-        is_school_admin: true,
-        capabilities: ['ops:admin', 'user:manage'],
-      };
-
       (withAuth as jest.Mock).mockResolvedValue({
         success: false,
         error: 'Insufficient permissions',
@@ -174,12 +167,6 @@ describe('Admin API Routes - Capability Tests', () => {
     });
 
     it('should deny editing others meetings without MEETING_EDIT', async () => {
-      const mockUser = {
-        id: 3,
-        email: 'teacher@test.com',
-        capabilities: ['meeting:edit:own', 'meeting:view'],
-      };
-
       (withAuth as jest.Mock).mockResolvedValue({
         success: false,
         error: 'Cannot edit meeting owned by another user',

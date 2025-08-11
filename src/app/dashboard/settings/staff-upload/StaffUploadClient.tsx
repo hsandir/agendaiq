@@ -552,7 +552,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
                               {record.conflicts.map((conflict, index) => (
                                 <div key={index} className="flex items-center">
                                   <FiRefreshCw className="h-3 w-3 mr-1" />
-                                  {conflict.field}: {conflict.existing} → {conflict.new}
+                                  {String(conflict.field)}: {String(conflict.existing)} → {String(conflict.new)}
                                 </div>
                               ))}
                             </div>
@@ -607,7 +607,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
                                         className="h-3 w-3 text-primary focus:ring-ring border-border rounded"
                                       />
                                       <span className="text-muted-foreground">
-                                        {conflict.field}: {conflict.existing} → {conflict.new}
+                                        {String(conflict.field)}: {String(conflict.existing)} → {String(conflict.new)}
                                       </span>
                                     </label>
                                   ))}

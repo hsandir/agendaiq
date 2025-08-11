@@ -460,7 +460,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Clear logs
-export async function DELETE(request: NextRequest) {
+export async function DELETE() {
   debugLogs = [];
   authFlowSteps = [];
   return NextResponse.json({ success: true, message: 'Logs and auth flow cleared' });

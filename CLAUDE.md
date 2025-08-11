@@ -447,6 +447,16 @@ Claude must include testing considerations:
 
 ### 11. **OPERATIONAL CONSTRAINTS**
 
+#### Error Resolution Policy
+- **MANDATORY**: Fix ALL errors before committing
+- **NEVER** use `--no-verify` or bypass pre-commit hooks
+- **NEVER** skip or ignore TypeScript errors
+- **NEVER** skip or ignore ESLint errors
+- **ALWAYS** fix all linting errors completely
+- **ALWAYS** fix all type errors completely
+- **NO PARTIAL FIXES**: Complete all error fixes before proceeding
+- **RULE**: If pre-commit fails, fix ALL issues, don't bypass
+
 #### Port Management
 - **MANDATORY**: Always use port 3000
 - **NEVER** change the port number

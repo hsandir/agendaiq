@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
 import { Capability } from '@/lib/auth/policy';
-import { prisma } from '@/lib/prisma';
+// import { prisma } from '@/lib/prisma';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       // Sort by date descending
       backupFiles.sort((a, b) => b.date.localeCompare(a.date));
       
-    } catch (error) {
+    } catch {
       // Backups directory doesn't exist or can't be accessed
       console.log('Backups directory not accessible');
     }

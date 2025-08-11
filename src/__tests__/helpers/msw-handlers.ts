@@ -4,9 +4,9 @@ import { http, HttpResponse } from 'msw'
 export const handlers = [
   // Auth endpoints
   http.post('/api/auth/login', async ({ request }) => {
-    const body = await request.json()
+    const body = await request.json() as { email?: string; password?: string }
     
-    if (body.email === 'admin@test.com' && body.password === 'password123') {
+    if (body?.email === 'admin@test.com' && body?.password === 'password123') {
       return HttpResponse.json({
         success: true,
         user: {
@@ -26,9 +26,9 @@ export const handlers = [
   }),
 
   http.post('/api/auth/register', async ({ request }) => {
-    const body = await request.json()
+    const body = await request.json() as { email?: string }
     
-    if (body.email === 'existing@test.com') {
+    if (body?.email === 'existing@test.com') {
       return HttpResponse.json(
         { error: 'Email already exists' },
         { status: 400 }
@@ -70,7 +70,7 @@ export const handlers = [
       {
         meeting: {
           id: 2,
-          ...body,
+          ...(body as object),
           status: 'SCHEDULED',
           createdAt: new Date().toISOString(),
         },

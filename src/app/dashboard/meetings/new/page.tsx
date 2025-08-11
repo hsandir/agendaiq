@@ -220,7 +220,7 @@ export default async function NewMeetingPage() {
             repeat_type: data.repeatType !== "none" ? data.repeatType : null,
             repeat_pattern: data.repeatConfig?.pattern || null,
             repeat_interval: data.repeatConfig?.interval || null,
-            repeat_weekdays: data.repeatConfig?.weekDays || [],
+            repeat_weekdays: data.repeatConfig?.weekDays?.map(day => parseInt(day)) || [],
             repeat_month_day: data.repeatConfig?.monthDay || null,
             repeat_month_week: data.repeatConfig?.monthWeek || null,
             repeat_month_weekday: data.repeatConfig?.monthWeekDay || null,

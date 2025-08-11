@@ -690,11 +690,11 @@ export default function DependenciesPage() {
           <CheckCircle className={`h-4 w-4 ${updateResult.success ? 'text-green-600' : 'text-destructive'}`} />
           <AlertDescription className={updateResult.success ? 'text-green-800' : 'text-destructive'}>
             {updateResult.message}
-            {updateResult.details && (
+            {updateResult.details ? (
               <div className="mt-2 text-sm">
-                <div>Details: {JSON.stringify(updateResult.details, null, 2)}</div>
+                <div>Details: {String(JSON.stringify(updateResult.details, null, 2))}</div>
               </div>
-            )}
+            ) : null}
           </AlertDescription>
         </Alert>
       )}

@@ -8,8 +8,6 @@ export async function GET(request: NextRequest) {
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
-  const user = authResult.user!;
-
   try {
     // Get all roles from the database
     const roles = await prisma.role.findMany({
@@ -41,8 +39,6 @@ export async function POST(request: NextRequest) {
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
-  const user = authResult.user!;
-
   try {
     const body = await request.json();
     const { title, priority, category, department_id } = body;

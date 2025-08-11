@@ -15,18 +15,18 @@ interface SortableAuditRecord {
   table_name?: string;
   action?: string;
   operation?: string;
-  User?: any;
-  Staff?: any;
+  User?: { email?: string };
+  Staff?: { Role?: { title?: string } };
   ip_address?: string;
   risk_score?: number;
   success?: boolean;
   error_message?: string;
   description?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   user_id?: number | null;
   staff_id?: number | null;
   record_id?: number | string | null;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export async function GET(request: NextRequest) {

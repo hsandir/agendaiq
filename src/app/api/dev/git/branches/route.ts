@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   // Only allow in development
   if (process.env.NODE_ENV !== 'development') {
     return NextResponse.json(
@@ -20,7 +20,14 @@ export async function GET(request: NextRequest) {
     // Get all branches with last commit info
     const { stdout: branchList } = await execAsync('git branch -a -v');
     
-    const branches: any[] = [];
+    const branches: Array<{
+      name: string;
+      current: boolean;
+      remote: boolean;
+      lastCommit: string;
+      ahead: number;
+      behind: number;
+    }> = [];
     const lines = branchList.split('\n').filter(Boolean);
     
     for (const line of lines) {
@@ -62,7 +69,7 @@ export async function GET(request: NextRequest) {
         const [behind, ahead] = revList.trim().split('\t');
         current.behind = parseInt(behind) || 0;
         current.ahead = parseInt(ahead) || 0;
-      } catch (e) {
+      } catch {
         // Remote might not exist
       }
     }
@@ -73,12 +80,12 @@ export async function GET(request: NextRequest) {
       total: branches.length,
       timestamp: new Date().toISOString()
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Git branches error:', error);
     return NextResponse.json(
       { 
         error: 'Failed to get branches',
-        details: error.message 
+        details: error instanceof Error ? error.message : 'Unknown error' 
       },
       { status: 500 }
     );

@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: any = {};
+  let body: { command?: string; cwd?: string; timeout?: number } = {};
   try {
     body = await request.json();
     const { command, cwd = process.cwd(), timeout = 30000 } = body;
@@ -48,22 +48,25 @@ export async function POST(request: NextRequest) {
       error: stderr || undefined,
       timestamp: new Date().toISOString(),
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Command execution failed:', error);
     
     // Extract useful error information
     let errorMessage = 'Command execution failed';
     let errorOutput = '';
     
-    if (error.code === 'ETIMEDOUT') {
-      errorMessage = 'Command timed out';
-    } else if (error.stderr) {
-      errorOutput = error.stderr;
-      errorMessage = error.stderr;
-    } else if (error.stdout) {
-      errorOutput = error.stdout;
-    } else if (error.message) {
-      errorMessage = error.message;
+    if (error && typeof error === 'object') {
+      const err = error as { code?: string; stderr?: string; stdout?: string; message?: string };
+      if (err.code === 'ETIMEDOUT') {
+        errorMessage = 'Command timed out';
+      } else if (err.stderr) {
+        errorOutput = err.stderr;
+        errorMessage = err.stderr;
+      } else if (err.stdout) {
+        errorOutput = err.stdout;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
     }
     
     return NextResponse.json(

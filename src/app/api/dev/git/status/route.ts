@@ -4,7 +4,7 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   // Only allow in development
   if (process.env.NODE_ENV !== 'development') {
     return NextResponse.json(
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       const [behindStr, aheadStr] = revList.trim().split('\t');
       behind = parseInt(behindStr) || 0;
       ahead = parseInt(aheadStr) || 0;
-    } catch (e) {
+    } catch {
       // Remote might not exist
     }
     
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     const modified: string[] = [];
     const untracked: string[] = [];
     const deleted: string[] = [];
-    const changes: any[] = [];
+    const changes: Array<{ file: string; status: string }> = [];
     
     lines.forEach(line => {
       const status = line.substring(0, 2);
@@ -89,12 +89,12 @@ export async function GET(request: NextRequest) {
       changes,
       timestamp: new Date().toISOString()
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Git status error:', error);
     return NextResponse.json(
       { 
         error: 'Failed to get git status',
-        details: error.message 
+        details: error instanceof Error ? error.message : 'Unknown error' 
       },
       { status: 500 }
     );

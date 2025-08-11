@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     // Create various types of logs
     const operations = ['CREATE', 'UPDATE', 'DELETE', 'READ', 'ERROR'];
     const tables = ['user', 'meeting', 'staff', 'school', 'district'];
-    const levels = ['info', 'warn', 'error', 'debug'];
+    // const levels = ['info', 'warn', 'error', 'debug'];
     
     for (let i = 0; i < 50; i++) {
       const operation = operations[Math.floor(Math.random() * operations.length)];

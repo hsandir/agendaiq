@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
-import { sendEmail } from "@/lib/email/send-email";
 import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
 import { Logger } from '@/lib/utils/logger';
 
@@ -35,8 +34,6 @@ export async function POST(request: Request) {
 
     // Generate reset token
     const resetToken = crypto.randomBytes(32).toString("hex");
-    const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-
     // TODO: Add resetToken and resetTokenExpiry fields to User model in schema
     // For now, we'll skip saving the token to the database
     // await prisma.user.update({

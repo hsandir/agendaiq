@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth/api-auth';
-import { z } from 'zod';
+// import { z } from 'zod';
 
 // Schema for query parameters
-const querySchema = z.object({
-  limit: z.string().optional().transform(val => val ? parseInt(val) : 30),
-  status: z.enum(['completed', 'in_progress', 'queued', 'failure', 'success', 'all']).optional(),
-  branch: z.string().optional(),
-});
+// const querySchema = z.object({
+//   limit: z.string().optional().transform(val => val ? parseInt(val) : 30),
+//   status: z.enum(['completed', 'in_progress', 'queued', 'failure', 'success', 'all']).optional(),
+//   branch: z.string().optional(),
+// });
 
 // GitHub API configuration
 const GITHUB_API_BASE = 'https://api.github.com';
@@ -425,11 +424,11 @@ export async function POST(request: NextRequest) {
 }
 
 // Helper function to analyze error patterns
-function analyzeErrorPatterns(failedRuns: any[]): Record<string, number> {
+function analyzeErrorPatterns(failedRuns: Array<{ failedJobs?: Array<{ logs?: string; failedSteps?: Array<{ name: string }> }> }>): Record<string, number> {
   const patterns: Record<string, number> = {};
 
   failedRuns.forEach(run => {
-    run.failedJobs?.forEach((job: any) => {
+    run.failedJobs?.forEach((job) => {
       const logs = job.logs || '';
       
       // Common error patterns
@@ -455,7 +454,7 @@ function analyzeErrorPatterns(failedRuns: any[]): Record<string, number> {
       });
 
       // Check failed steps
-      job.failedSteps?.forEach((step: any) => {
+      job.failedSteps?.forEach((step) => {
         const stepName = step.name.toLowerCase();
         if (stepName.includes('test')) {
           patterns['Test Step Failure'] = (patterns['Test Step Failure'] || 0) + 1;

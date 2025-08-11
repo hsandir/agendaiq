@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/auth-utils';
 import { getUserCapabilities } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const user = await getCurrentUser();
     
