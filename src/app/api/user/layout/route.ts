@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 
     // Get layout preference from database (fast query)
     const userData = await prisma.user.findUnique({
-      where: { id: parseInt(user.id) },
+      where: { id: user.id },
       select: { layout_preference: true }
     });
     
@@ -75,7 +75,7 @@ export async function PUT(request: NextRequest) {
 
     // Update user's layout preference (optimized query)
     await prisma.user.update({
-      where: { id: parseInt(user.id) },
+      where: { id: user.id },
       data: { layout_preference: layoutToSave },
       select: { id: true }, // Only select what we need
     });
