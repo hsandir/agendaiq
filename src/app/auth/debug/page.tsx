@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -343,7 +343,7 @@ export default function AuthDebugPage() {
                       }
                     </td>
                     <td className="py-2 text-gray-600">
-                      {systemStatus.database.details?.userCount} users in database
+                      {String(systemStatus.database.details?.userCount || 0)} users in database
                     </td>
                   </tr>
 
@@ -363,7 +363,7 @@ export default function AuthDebugPage() {
                       }
                     </td>
                     <td className="py-2 text-gray-600">
-                      {systemStatus.nextAuth.details?.NEXTAUTH_URL || 'URL not set'}
+                      {String(systemStatus.nextAuth.details?.NEXTAUTH_URL || 'URL not set')}
                     </td>
                   </tr>
 
@@ -412,8 +412,8 @@ export default function AuthDebugPage() {
                       <td className="py-2 font-medium">Database Details</td>
                       <td className="py-2" colSpan={2}>
                         <span className="text-xs text-gray-600">
-                          {systemStatus.database.details.host}:{systemStatus.database.details.port}/{systemStatus.database.details.database}
-                          {systemStatus.database.details.pooling && ` (${systemStatus.database.details.pooling})`}
+                          {String(systemStatus.database.details.host)}:{String(systemStatus.database.details.port)}/{String(systemStatus.database.details.database)}
+                          {systemStatus.database.details.pooling && ` (${String(systemStatus.database.details.pooling)})`}
                         </span>
                       </td>
                     </tr>
@@ -421,10 +421,10 @@ export default function AuthDebugPage() {
                       <td className="py-2 font-medium">Database Stats</td>
                       <td className="py-2" colSpan={2}>
                         <span className="text-xs text-gray-600">
-                          Users: {systemStatus.database.details.userCount} | 
-                          Roles: {systemStatus.database.details.roleCount} | 
-                          Schools: {systemStatus.database.details.schoolCount} | 
-                          Districts: {systemStatus.database.details.districtCount}
+                          Users: {String(systemStatus.database.details.userCount)} | 
+                          Roles: {String(systemStatus.database.details.roleCount)} | 
+                          Schools: {String(systemStatus.database.details.schoolCount)} | 
+                          Districts: {String(systemStatus.database.details.districtCount)}
                         </span>
                       </td>
                     </tr>
