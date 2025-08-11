@@ -183,14 +183,14 @@ export const sidebarItems: NavigationSection[] = [
                 icon: Monitor,
               },
               {
-                href: "/dashboard/monitoring/cicd",
-                label: "CI/CD Pipeline",
-                icon: GitBranch,
-              },
-              {
                 href: "/dashboard/development/performance",
                 label: "Performance Monitor",
                 icon: Activity,
+              },
+              {
+                href: "/dashboard/development/permissions-check",
+                label: "Permissions Check",
+                icon: Shield,
               },
             ],
           },

@@ -1,0 +1,10 @@
+=== AUTHENTICATED API TESTS ===
+
+1. GET /api/users (with auth):
+Status: 401, Time: 0.006761s
+
+2. GET /api/roles (with auth):
+Status: 401, Time: 0.007930s
+
+3. GET /api/meetings (with auth):
+Status: 401, Time: 0.006174s

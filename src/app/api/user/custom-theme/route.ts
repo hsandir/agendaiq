@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     // Get custom theme from database (fast query)
     const userData = await prisma.user.findUnique({
-      where: { id: user.id },
+      where: { id: parseInt(user.id) },
       select: { custom_theme: true }
     });
     
@@ -80,7 +80,7 @@ export async function PUT(request: NextRequest) {
 
     // Save custom theme to user profile (optimized)
     await prisma.user.update({
-      where: { id: user.id },
+      where: { id: parseInt(user.id) },
       data: {
         custom_theme: validatedData,
         theme_preference: 'custom', // Set theme preference to custom
@@ -139,7 +139,7 @@ export async function DELETE(request: NextRequest) {
   try {
     // Clear custom theme and reset to default (optimized)
     await prisma.user.update({
-      where: { id: user.id },
+      where: { id: parseInt(user.id) },
       data: {
         custom_theme: Prisma.JsonNull,
         theme_preference: 'standard',

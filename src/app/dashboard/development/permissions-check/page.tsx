@@ -68,14 +68,6 @@ const ALL_PAGES = [
 
   // Settings - Admin
   {
-    path: '/dashboard/settings/admin',
-    name: 'Admin Panel',
-    category: 'Admin',
-    authType: 'requireCapability',
-    capabilities: [Capability.DEV_DEBUG],
-    description: 'Developer admin panel'
-  },
-  {
     path: '/dashboard/settings/system',
     name: 'System Settings',
     category: 'Admin',

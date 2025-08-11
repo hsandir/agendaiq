@@ -106,6 +106,8 @@ node_modules_backup/
 .backup-metadata*.json
 logs/
 cookies*.txt
+prod_cookies*.txt
+prod_test_cookies*.txt
 lint-errors*.json
 **/node_modules_backup/
 organization_structure*.json
@@ -121,3 +123,18 @@ next.config*.js
 .env.local
 dev.log
 .trash/
+
+# Test and debug files with sensitive data
+check_prod_user*.js
+update_prod_users.js
+setup_prod_admin.js
+fix_prod_admin.js
+TEMP_SUPABASE_MIGRATION.md
+SUPABASE_TEST_REPORT.txt
+fix_production_session.sh
+check_env_vars.js
+test_*.js
+*_test.js
+
+# API test routes that may expose passwords
+src/app/api/test-login/

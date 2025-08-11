@@ -90,6 +90,7 @@ const navigation: NavSection[] = [
       { href: "/dashboard/system/updates", label: "Package Updates", icon: FiDownload },
       { href: "/dashboard/system/database", label: "Database Management", icon: FiDatabase },
       { href: "/dashboard/system/migration", label: "Auth Migration & Diagnostics", icon: FiTrendingUp },
+      { href: "/dashboard/development/permissions-check", label: "Permissions Check", icon: FiShield },
     ],
   }] : []),
   {

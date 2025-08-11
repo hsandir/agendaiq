@@ -474,6 +474,9 @@ export function DashboardLayoutClient({
                                   <Link href="/dashboard/system/migration" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
                                     Auth Migration & Diagnostics
                                   </Link>
+                                  <Link href="/dashboard/development/permissions-check" className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors">
+                                    Permissions Check
+                                  </Link>
                                 </div>
                               </div>
                             </div>
