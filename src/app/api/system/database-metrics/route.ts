@@ -63,7 +63,7 @@ export async function GET() {
       districtCount,
       sessionCount
     ] = await Promise.all([
-      prisma.(user as Record<string, unknown>).count(),
+      prisma.user.count(),
       prisma.staff.count(),
       prisma.meeting.count(),
       prisma.department.count(),
@@ -95,8 +95,8 @@ export async function GET() {
 
     // Get database uptime (process uptime as approximation)
     const uptimeSeconds = process.uptime();
-    const uptimeHours = Math.floor(uptimeSeconds / 3600);
-    const uptimeMinutes = Math.floor((uptimeSeconds % 3600) / 60);
+    const uptimeHours = Math.floor(uptimeSeconds / 3600));
+    const uptimeMinutes = Math.floor((uptimeSeconds % 3600) / 60));
     const uptimeString = `${uptimeHours}h ${uptimeMinutes}m`;
 
     // Create realistic performance metrics based on actual usage

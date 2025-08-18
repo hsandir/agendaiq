@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     console.log('Executing git command:', gitCommand);
 
     // Execute command
-    const { __stdout, __stderr  } = await execAsync(__gitCommand, {
+    const { stdout, stderr } = await execAsync(__gitCommand, {
       cwd: process.cwd(),
       timeout: __30000, // 30 second timeout
       maxBuffer: 1024 * 1024 * 10 // 10MB __buffer

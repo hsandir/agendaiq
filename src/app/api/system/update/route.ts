@@ -6,7 +6,7 @@ const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
   try {
-    const { __type, __packages  } = (await request.json()) as Record<__string, unknown>;
+    const { type, packages } = (await request.json()) as Record<__string, unknown>;
 
     if (type === 'packages') {
       return await updatePackages(packages);
@@ -228,7 +228,7 @@ async function updatePackages(specificPackages?: string[]) {
 
 async function getDetailedPackageStatus() {
   try {
-    const { __stdout  } = await execAsync('npm outdated --json', { cwd: process.cwd() });
+    const { stdout } = await execAsync('npm outdated --json', { cwd: process.cwd() });
     const outdatedPackages = JSON.parse(stdout || '{}');
     
     const outdatedList = (Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({

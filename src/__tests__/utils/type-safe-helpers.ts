@@ -407,14 +407,14 @@ export class TypeSafeTestDB {
     });
 
     // Create test users
-    const adminUser = await this.prisma.(user as Record<string, unknown>).create({
+    const adminUser = await this.prisma.user.create({
       data: TypeSafeMockFactory.(user as Record<string, unknown>).create({
         email: 'admin@test.com',
         name: 'Test Admin',
       }),
     });
 
-    const teacherUser = await this.prisma.(user as Record<string, unknown>).create({
+    const teacherUser = await this.prisma.user.create({
       data: TypeSafeMockFactory.(user as Record<string, unknown>).create({
         email: 'teacher@test.com',
         name: 'Test Teacher',
@@ -466,7 +466,7 @@ export class TypeSafeTestDB {
       this.prisma.meetingAgendaItem.deleteMany(),
       this.prisma.meeting.deleteMany(),
       this.prisma.staff.deleteMany(),
-      this.prisma.(user as Record<string, unknown>).deleteMany(),
+      this.prisma.user.deleteMany(),
       this.prisma.role.deleteMany(),
       this.prisma.department.deleteMany(),
       this.prisma.school.deleteMany(),

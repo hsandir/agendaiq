@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     // Auth check - development capability required
     await requireAuth(AuthPresets.requireDevelopment);
     
-    const { __searchParams  } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const workflow_id = searchParams.get('workflow_id');
     const status = searchParams.get('status'); // queued, in_progress, completed
     const per_page = searchParams.get('per_page') || '10';

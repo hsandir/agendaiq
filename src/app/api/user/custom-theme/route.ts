@@ -79,7 +79,7 @@ export async function PUT(request: NextRequest) {
     const validatedData = customThemeSchema.parse(body);
 
     // Save custom theme to user profile (optimized)
-    await prisma.(user as Record<string, unknown>).update({
+    await prisma.user.update({
       where: { id: user.id },
       data: {
         custom_theme: validatedData,
@@ -138,7 +138,7 @@ export async function DELETE(request: NextRequest) {
 
   try {
     // Clear custom theme and reset to default (optimized)
-    await prisma.(user as Record<string, unknown>).update({
+    await prisma.user.update({
       where: { id: user.id },
       data: {
         custom_theme: Prisma.JsonNull,

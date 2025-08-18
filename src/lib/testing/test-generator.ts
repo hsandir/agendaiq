@@ -152,7 +152,7 @@ describe('${info.name}', () => {
   })` : ''}
 
   it('applies custom className', () => {
-    const { __container  } = renderWithProviders(
+    const { container } = renderWithProviders(
       <${info.__name} ${info.props.length > 0 ? '{...__defaultProps} ' : ''}className="custom-class" />
     )
     

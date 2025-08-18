@@ -411,8 +411,8 @@ export class AuditLogger {
     });
 
     const violationsByRisk: Record<string, number> = {};
-    violations.forEachv => {
-      violationsByRisk[((v.riskLevel)] = violationsByRisk[((v.riskLevel)] || 0) + 1;
+    violations.forEach(v => {
+      violationsByRisk[v.riskLevel] = violationsByRisk[v.riskLevel] || 0) + 1;
     });
 
     return {

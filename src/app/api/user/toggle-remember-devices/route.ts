@@ -26,9 +26,9 @@ export async function POST(request: Request) {
     }
 
     // TODO: Toggle remember devices setting once field is added
-    // const updatedUser = await prisma.(user as Record<string, unknown>).update{
+    // const updatedUser = await prisma.user.update({
     //   where: { id: session.user.id as string },
-    //   data: { rememberDevices: !((user as Record<string, unknown>).rememberDevices },
+    //   data: { rememberDevices: !(user as Record<string, unknown>.rememberDevices },
     // });
 
     // For now, return error since rememberDevices field doesn't exist

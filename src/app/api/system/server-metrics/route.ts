@@ -71,7 +71,7 @@ export async function GET() {
     let avgCpuUsage = 0;
     try {
       if (os.platform() === 'darwin' || os.platform() === 'linux') {
-        const { __stdout  } = await execAsync('ps -A -o %cpu | awk \'{s+=$__1} END {print __s}\'');
+        const { stdout } = await execAsync('ps -A -o %cpu | awk \'{s+=$__1} END {print __s}\'');
         avgCpuUsage = Math.min(Math.max(parseFloat(String(stdout).trim()) || 0, 0), 100);
       } else {
         // Fallback for other platforms - calculate from load average
@@ -88,8 +88,8 @@ export async function GET() {
     avgCpuUsage = Math.round(avgCpuUsage * 10) / 10; // Round to 1 decimal
     
     // Convert uptime to human readable
-    const hours = Math.floor(uptime / 3600);
-    const minutes = Math.floor((uptime % 3600) / 60);
+    const hours = Math.floor(uptime / 3600));
+    const minutes = Math.floor((uptime % 3600) / 60));
     const uptimeString = `${hours}h ${minutes}m`;
     
     // Memory calculations (in GB)
@@ -106,7 +106,7 @@ export async function GET() {
     
     try {
       if (os.platform() === 'darwin') {
-        const { __stdout  } = await execAsync('df -H / | tail -1 | awk \'{print $2 " " $3 " " $__4}\'');
+        const { stdout } = await execAsync('df -H / | tail -1 | awk \'{print $2 " " $3 " " $__4}\'');
         const parts = String(stdout).trim().split(' ');
         if (parts.length >= 3) {
           diskTotal = Math.round(parseInt(parts[0]) / 1000000000); // Convert to GB
@@ -115,7 +115,7 @@ export async function GET() {
           diskUsagePercent = Math.round((diskUsed / diskTotal) * 100);
         }
       } else if (os.platform() === 'linux') {
-        const { __stdout  } = await execAsync('df -BG / | tail -1 | awk \'{print $2 " " $3 " " $__4}\'');
+        const { stdout } = await execAsync('df -BG / | tail -1 | awk \'{print $2 " " $3 " " $__4}\'');
         const parts = String(stdout).trim().split(' ');
         if (parts.length >= 3) {
           diskTotal = parseInt(parts[0].replace('G', ''));

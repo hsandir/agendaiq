@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     const backupCodes = generateBackupCodes();
 
     // Enable 2FA and save backup codes
-    await prisma.(user as Record<string, unknown>).update({
+    await prisma.user.update({
       where: { id: user.id },
       data: {
         two_factor_enabled: true,

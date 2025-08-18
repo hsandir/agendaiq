@@ -212,7 +212,7 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
     }
     
     // School admin gets ops and management capabilities
-    if ((user as Record<string, unknown>).is_school_admin) {
+    if (user as Record<string, unknown>.is_school_admin) {
       return Object.values(Capability).filter(cap => 
         cap.startsWith('ops:') || 
         cap.includes('manage') || 
@@ -222,8 +222,8 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
     }
     
     // Get capabilities from role permissions  
-    if ((user as Record<string, unknown>).Staff?.[0]?.Role?.Permissions) {
-      return (user as Record<string, unknown>).Staff[0].Role.Permissions.map((p: Record<string, unknown>) => p.capability);
+    if (user.Staff?.[0]?.Role?.Permissions) {
+      return user.Staff[0].Role.Permissions.map((p: Record<string, unknown>) => p.capability);
     }
     
     return [];
@@ -250,7 +250,7 @@ export function can(
   }
   
   // School admin special permissions
-  if ((user as Record<string, unknown>).is_school_admin) {
+  if (user as Record<string, unknown>.is_school_admin) {
     // School admin cannot access dev capabilities
     if (capability.startsWith('dev:')) return false;
     
@@ -264,7 +264,7 @@ export function can(
   }
   
   // Check user's specific capabilities
-  if ((user as Record<string, unknown>).capabilities && (user as Record<string, unknown>).capabilities.includes(capability)) {
+  if (user as Record<string, unknown>.capabilities && (user as Record<string, unknown>).capabilities.includes(capability)) {
     // Handle context-specific checks (e.g., own resources)
     if (capability === Capability.MEETING_EDIT_OWN && context?.ownerId) {
       return context.ownerId === user.id || context.ownerId === (user as any).staff?.id;
@@ -350,6 +350,6 @@ export async function enrichUserWithCapabilities(user: Record<string, unknown>):
   return {
     ...user,
     capabilities,
-    roleKey: (user as any).staff?.role?.key || (user as Record<string, unknown>).Staff?.Role?.key
+    roleKey: (user as any).staff?.role?.key || user.Staff?.Role?.key
   };
 }

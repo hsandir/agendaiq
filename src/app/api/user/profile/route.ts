@@ -60,13 +60,13 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = (await request.json()) as Record<string, unknown>;
-    const { __name, __phone  } = body;
+    const { name, phone } = body;
 
     const updateData: { name?: string; phone?: string } = {};
     if (name !== undefined) updateData.name = name;
     if (phone !== undefined) updateData.phone = phone;
 
-    const updatedUser = await prisma.(user as Record<string, unknown>).update({
+    const updatedUser = await prisma.user.update({
       where: { email: user.email },
       data: updateData,
       include: {

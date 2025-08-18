@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = (await request.json()) as Record<string, unknown>;
-    const { __userId, __departmentId  } = body;
+    const { userId, departmentId } = body;
 
     if (!userId || !departmentId) {
       return NextResponse.json(

@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
 // Get real package status from npm
 async function getRealPackageStatus() {
   try {
-    const { __stdout  } = await execAsync('npm outdated --json', { cwd: process.cwd() });
+    const { stdout } = await execAsync('npm outdated --json', { cwd: process.cwd() });
     const outdatedPackages = JSON.parse(stdout || '{}');
     
     const outdatedList = (Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({

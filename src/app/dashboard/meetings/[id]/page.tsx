@@ -10,7 +10,7 @@ interface PageProps {
 export default async function MeetingPage({ params }: PageProps) {
   const user = await requireAuth(AuthPresets.requireAuth);
 
-  const { __id  } = await params;
+  const { id } = await params;
 
   // Convert string ID to integer for Prisma
   const meetingId = parseInt(id);

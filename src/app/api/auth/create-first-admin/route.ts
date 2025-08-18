@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { __userId, __password  } = validation.data;
+    const { userId, password } = validation.data;
 
     // Check if user exists and doesn't have a password
     const user = await prisma.user.findUnique({
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if ((user as Record<string, unknown>).hashedPassword) {
+    if (user as Record<string, unknown>.hashedPassword) {
       return NextResponse.json(
         { error: 'User already has a password set' },
         { status: 400 }

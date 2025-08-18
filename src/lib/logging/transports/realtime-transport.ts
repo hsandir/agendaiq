@@ -58,11 +58,11 @@ export class RealtimeTransport implements LogTransport {
     const tags: string[] = [];
     
     // Add level tag
-    tags.push`level:${LogLevel[((entry.level)]}`);
+    tags.push(`level:${LogLevel[entry.level]}`);
     
     // Add category tag
     if ('category' in entry) {
-      tags.push`category:${(entry.category}`);
+      tags.push(`category:${entry.category}`);
     }
     
     // Add environment tag
@@ -171,12 +171,12 @@ export class RealtimeTransport implements LogTransport {
       byCategory: {} as Record<string, number>
     };
 
-    this.memoryBuffer.forEachevent => {
+    this.memoryBuffer.forEach(event => {
       // Count by severity
-      stats.bySeverity[((event.severity)] = stats.bySeverity[((event.severity)] || 0) + 1;
+      stats.bySeverity[event.severity] = (stats.bySeverity[event.severity] || 0) + 1;
       
       // Count by source
-      stats.bySource[(event.source)] = stats.bySource[((event.source)] || 0) + 1;
+      stats.bySource[event.source] = (stats.bySource[event.source] || 0) + 1;
       
       // Count by category
       stats.byCategory[String(event.category)] = (stats.byCategory[String(event.category)] || 0) + 1;

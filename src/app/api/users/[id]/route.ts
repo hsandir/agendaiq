@@ -102,7 +102,7 @@ export async function PUT(
     }
 
     // Update user
-    const updatedUser = await prisma.(user as Record<string, unknown>).update({
+    const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
         ...(body.name !== undefined && { name: body.name }),

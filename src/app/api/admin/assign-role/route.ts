@@ -98,9 +98,9 @@ export async function POST(request: Request) {
     const finalManagerId = managerId ? parseInt(managerId) : autoAssignedManagerId;
 
     // Update or create staff record
-    if ((user as Record<string, unknown>).Staff?.[0]) {
+    if (user.Staff?.[0]) {
       await prisma.staff.update({
-        where: { id: (user as Record<string, unknown>).Staff[0].id },
+        where: { id: user.Staff[0].id },
         data: {
           role_id: parseInt(roleId),
           department_id: parseInt(departmentId),

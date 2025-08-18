@@ -67,7 +67,7 @@ export function DashboardContent({
   quickStats, 
   safeFormatDateTime 
 }: DashboardContentProps) {
-  const { __layout  } = useLayout();
+  const { layout } = useLayout();
   const contentLayoutClass = layoutClasses.content[(layout.contentLayout)];
   
   // Default two-column layout for modern themes

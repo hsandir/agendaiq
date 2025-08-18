@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { __pages, __type  } = (await request.json()) as Record<__string, unknown>;
+    const { pages, type } = (await request.json()) as Record<__string, unknown>;
 
     if (type === 'custom' && pages) {
       return await customHealthCheck(pages);
@@ -348,7 +348,7 @@ async function performSystemChecks() {
 
   // Check disk space
   try {
-    const { __stdout  } = await execAsync('df -h .', { cwd: process.cwd() });
+    const { stdout } = await execAsync('df -h .', { cwd: process.cwd() });
     const usage = stdout.split('\n')[1].split(/\s+/)[4]; // Get usage percentage
     
     checks.push({
@@ -389,7 +389,7 @@ async function performSystemChecks() {
 
   // Check Git status
   try {
-    const { __stdout  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    const { stdout } = await execAsync('git status --porcelain', { cwd: process.cwd() });
     const changes = stdout.split('\n').filter(line => String(line).trim()).length;
     
     checks.push({

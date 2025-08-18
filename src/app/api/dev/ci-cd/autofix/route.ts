@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     // Development endpoint - no auth required
     console.log('Autofix API called');
 
-    const { __searchParams  } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const errorType = searchParams.get('errorType') || '';
     const errorMessage = searchParams.get('errorMessage') || '';
 
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     for (const command of suggestion.commands) {
       try {
         if (!dryRun) {
-          const { __stdout, __stderr  } = await execAsync(__command, {
+          const { stdout, stderr } = await execAsync(__command, {
             cwd: process.cwd(),
           });
           results.applied.push(`Command: ${command}\nOutput: ${stdout || stderr}`);

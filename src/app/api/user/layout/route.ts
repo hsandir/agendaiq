@@ -88,7 +88,7 @@ export async function PUT(request: NextRequest) {
     const layoutToSave = validatedData.layoutId || validatedData.layout || 'modern';
 
     // Update user's layout preference (optimized query)
-    await prisma.(user as Record<string, unknown>).update({
+    await prisma.user.update({
       where: { id: user.id },
       data: { layout_preference: layoutToSave },
       select: { id: true }, // Only select what we need

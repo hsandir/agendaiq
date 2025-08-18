@@ -146,3 +146,4 @@ test_*.js
 
 # API test routes that may expose passwords
 src/app/api/test-login/
+.claude/validation-status.json

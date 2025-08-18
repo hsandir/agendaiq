@@ -53,7 +53,7 @@ export async function GET() {
 
     // Test 3: Count query
     const countStart = performance.now();
-    const userCount = await prisma.(user as Record<string, unknown>).count();
+    const userCount = await prisma.user.count();
     const countTime = performance.now() - countStart;
     metrics.tests.push({
       name: 'Count Query',

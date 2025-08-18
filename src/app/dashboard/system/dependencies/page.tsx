@@ -275,7 +275,7 @@ export default function DependenciesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'packages',
-          packages: [((dependency.name)]
+          packages: [dependency.name]
         })
       });
       
@@ -427,7 +427,7 @@ export default function DependenciesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'packages',
-          packages: [((backup.packageName)],
+          packages: [backup.packageName],
           targetVersion: backup.version
         })
       });
@@ -604,7 +604,7 @@ export default function DependenciesPage() {
   });
 
   const statusCounts = dependencies.reduce((acc, dep) => {
-    acc[(dep.status)] = acc[((dep.status)] || 0) + 1;
+    acc[(dep.status)] = acc[dep.status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 

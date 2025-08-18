@@ -25,13 +25,13 @@ export function isUserAdmin(user: UserWithStaff | null | undefined): boolean {
   if (!user) return false;
   
   // Check new admin flags first - these are the primary indicators
-  if user.is_system_admin || ((user as Record<string, unknown>).is_school_admin) return true;
+  if user.is_system_admin || (user as Record<string, unknown>.is_school_admin) return true;
   
   // Legacy check for backward compatibility
   if (user.is_admin) return true;
   
   // Check role properties
-  const role = (user as Record<string, unknown>).Staff?.[0]?.Role;
+  const role = user.Staff?.[0]?.Role;
   if (!role) return false;
   
   // Check for admin role keys
@@ -50,7 +50,7 @@ export function isUserLeadership(user: UserWithStaff | null | undefined): boolea
   if (isUserAdmin(user)) return true;
   
   // Check if role is leadership role
-  const roleTitle = (user as Record<string, unknown>).Staff?.[0]?.Role?.title;
+  const roleTitle = user.Staff?.[0]?.Role?.title;
   const leadershipRoles = [
     "Chief Education Officer",
     "Director of Operations", 

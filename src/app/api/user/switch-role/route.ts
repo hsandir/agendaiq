@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     }
 
     const body = (await request.json()) as Record<string, unknown>;
-    const { __role  } = body;
+    const { role } = body;
 
     if (!role || !['admin', 'user'].includes(role)) {
       return NextResponse.json(
@@ -38,14 +38,14 @@ export async function POST(request: Request) {
       }
     });
 
-    if !user || !((user as Record<string, unknown>).Staff || (user as Record<string, unknown>).Staff.length === 0) {
+    if (!user || !(user.Staff || user.Staff.length === 0) {
       return NextResponse.json(
         { error: "User staff record not found" },
         { status: 404 }
       );
     }
 
-    const staffRecord = (user as Record<string, unknown>).Staff[0];
+    const staffRecord = user.Staff[0];
     let targetRole;
 
     if (role === 'admin') {

@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       return createErrorNextResponse("User management access required", 403);
     }
 
-    const users = await prisma.(user as Record<string, unknown>).findMany({
+    const users = await prisma.user.findMany({
       include: {
         Staff: {
           include: {

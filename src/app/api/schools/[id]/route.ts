@@ -10,7 +10,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { __id  } = await params;
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user?.id as string) {
       return new NextResponse("Unauthorized", { status: 401 });
@@ -74,7 +74,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { __id  } = await params;
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user?.id as string) {
       return new NextResponse("Unauthorized", { status: 401 });

@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { __action, __ip  } = validation.data;
+    const { action, ip } = validation.data;
 
     // Get all rate limiter instances
     const rateLimiters = [

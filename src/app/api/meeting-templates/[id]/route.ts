@@ -14,7 +14,7 @@ export async function GET(
   
 
   try {
-    const { __id  } = await params;
+    const { id } = await params;
     const templateId = parseInt(id);
     
     if (isNaN(templateId)) {
@@ -79,7 +79,7 @@ export async function PUT(
   
 
   try {
-    const { __id  } = await params;
+    const { id } = await params;
     const templateId = parseInt(id);
     
     if (isNaN(templateId)) {
@@ -148,7 +148,7 @@ export async function DELETE(
   
 
   try {
-    const { __id  } = await params;
+    const { id } = await params;
     const templateId = parseInt(id);
     
     if (isNaN(templateId)) {

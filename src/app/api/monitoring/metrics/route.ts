@@ -126,7 +126,7 @@ async function getApplicationMetrics() {
 async function getDatabaseMetrics() {
   try {
     const [userCount, meetingCount, sessionCount] = await Promise.all([
-      prisma.(user as Record<string, unknown>).count(),
+      prisma.user.count(),
       prisma.meeting.count(),
       prisma.session.count(),
     ]);

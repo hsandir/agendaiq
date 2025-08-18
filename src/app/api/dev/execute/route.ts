@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     console.log('Executing command:', command);
 
     // Execute the command with timeout
-    const { __stdout, __stderr  } = await execAsync(__command, {
+    const { stdout, stderr } = await execAsync(__command, {
       __cwd,
       __timeout,
       maxBuffer: 1024 * 1024 * __10, // 10MB buffer

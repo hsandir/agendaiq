@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const { __searchParams  } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     
     // Parse query parameters for hybrid system
     const logType = searchParams.get('type') || 'critical'; // 'critical' | 'legacy' | 'both'

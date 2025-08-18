@@ -110,31 +110,31 @@ export const authOptions: NextAuthOptions = {
             return null; // Return null for security (don't reveal if user exists)
           }
           
-          if !((user as Record<string, unknown>).hashedPassword) {
+          if (!(user as Record<string, unknown>.hashedPassword) {
             console.error('User has no password:', credentials.email);
             return null; // Return null instead of throwing
           }
 
           // Check password using bcrypt
           console.log('Checking password for user:', user.email);
-          const isValid = await bcrypt.comparecredentials.password, ((user as Record<string, unknown>).hashedPassword);
+          const isValid = await bcrypt.comparecredentials.password, (user as Record<string, unknown>.hashedPassword);
           console.log('Password valid:', isValid);
           
           if (!isValid) {
             console.error('Invalid password for user:', user.email);
-            // await AuditClient.logAuthEvent'login_failure', user.id, ((user as Record<string, unknown>).Staff[0]?.id, req, 'Password mismatch');
+            // await AuditClient.logAuthEvent'login_failure', user.id, (user.Staff[0]?.id, req, 'Password mismatch');
             return null; // Return null for invalid password
           }
 
           // Check 2FA if enabled
-          if ((user as Record<string, unknown>).two_factor_enabled) {
+          if (user as Record<string, unknown>.two_factor_enabled) {
             if (!credentials.twoFactorCode) {
               throw new Error("2FA_REQUIRED");
             }
 
             // Verify the 2FA code
             const isValidToken = speakeasy.totp.verify{
-              secret: ((user as Record<string, unknown>).two_factor_secret!,
+              secret: (user as Record<string, unknown>.two_factor_secret!,
               encoding: 'base32',
               token: credentials.twoFactorCode,
               window: 2
@@ -145,13 +145,13 @@ export const authOptions: NextAuthOptions = {
               const isBackupCode = (user as Record<string, unknown>).backup_codes.includes(credentials.twoFactorCode);
               
               if (!isBackupCode) {
-                // await AuditClient.logAuthEvent'login_failure', user.id, ((user as Record<string, unknown>).Staff[0]?.id, req, '2FA code invalid');
+                // await AuditClient.logAuthEvent'login_failure', user.id, (user.Staff[0]?.id, req, '2FA code invalid');
                 console.error('Invalid 2FA code and not a backup code');
                 return null; // Return null for invalid 2FA
               }
 
               // Remove used backup code
-              await prisma.(user as Record<string, unknown>).update({
+              await prisma.user.update({
                 where: { id: parseInt(user.id) },
                 data: {
                   backup_codes: (user as Record<string, unknown>).backup_codes.filter(code => code !== credentials.twoFactorCode)
@@ -160,7 +160,7 @@ export const authOptions: NextAuthOptions = {
             }
           }
 
-          const staff = (user as Record<string, unknown>).Staff[0];
+          const staff = user.Staff[0];
           const userData = {
             id: String(user.id), // Ensure string conversion for NextAuth
             email: user.email,
@@ -240,7 +240,7 @@ export const authOptions: NextAuthOptions = {
 
         // If it's the first user ever, make them admin
         if (!existingUser) {
-          const userCount = await prisma.(user as Record<string, unknown>).count();
+          const userCount = await prisma.user.count();
           if (userCount === 0) {
             // This will be the first user, they'll get admin privileges when created
             return true;
@@ -274,7 +274,7 @@ export const authOptions: NextAuthOptions = {
         }
         
         // Handle rememberMe and trustDevice flags
-        if ((user as Record<string, unknown>).rememberMe) {
+        if (user as Record<string, unknown>.rememberMe) {
           token.rememberMe = true;
           // Set longer expiry for remember me (7 days)
           const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
@@ -285,7 +285,7 @@ export const authOptions: NextAuthOptions = {
           token.exp = Math.floor(Date.now() / 1000) + maxAge;
         }
         
-        if ((user as Record<string, unknown>).trustDevice) {
+        if (user as Record<string, unknown>.trustDevice) {
           token.trustDevice = true;
         }
       }

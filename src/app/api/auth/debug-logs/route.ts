@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
     // Test database connection
     let databaseStatus = { connected: false, message: 'Not tested', details: undefined as Record<string, unknown> | undefined };
     try {
-      const userCount = await prisma.(user as Record<string, unknown>).count();
+      const userCount = await prisma.user.count();
       const dbUrl = process.env.DATABASE_URL || '';
       const urlParts = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^:\/]+):?(\d+)?\/(.+)/);
       
@@ -347,7 +347,7 @@ export async function POST(request: NextRequest) {
             ip,
             userAgent
           });
-        } else if !((user as Record<string, unknown>).hashedPassword) {
+        } else if (!(user as Record<string, unknown>).hashedPassword) {
           addLog({
             type: 'signin_attempt',
             level: 'error',
@@ -363,9 +363,9 @@ export async function POST(request: NextRequest) {
           });
         } else {
           // Test password
-          const isValidPassword = await bcrypt.comparebody.details.password, ((user as Record<string, unknown>).hashedPassword);
+          const isValidPassword = await bcrypt.compare(body.details.password as string, (user as Record<string, unknown>).hashedPassword as string);
           
-          addLog{
+          addLog({
             type: 'signin_attempt',
             level: isValidPassword ? 'info' : 'error',
             message: isValidPassword ? 
@@ -376,8 +376,8 @@ export async function POST(request: NextRequest) {
               userId: user.id,
               email: user.email,
               passwordValid: isValidPassword,
-              hasStaff: !!((user as Record<string, unknown>).Staff?.length,
-              staffRole: (user as Record<string, unknown>).Staff?.[0]?.Role?.title,
+              hasStaff: !!user.Staff?.length,
+              staffRole: user.Staff?.[0]?.Role?.title,
               timestamp: new Date().toISOString()
             },
             ip,
@@ -397,18 +397,18 @@ export async function POST(request: NextRequest) {
                   id: String(user.id),
                   email: user.email,
                   name: user.name,
-                  hasStaff: !!(user as Record<string, unknown>).Staff?.length,
-                  staffData: (user as Record<string, unknown>).Staff?.[0] || null
+                  hasStaff: !!user.Staff?.length,
+                  staffData: user.Staff?.[0] || null
                 }
               }
             });
             
             // Track auth flow
-            addAuthFlow'credentials_validated', {
+            addAuthFlow('credentials_validated', {
               email: user.email,
               userId: user.id,
-              hasStaff: !!((user as Record<string, unknown>).Staff?.length,
-              role: (user as Record<string, unknown>).Staff?.[0]?.Role?.title
+              hasStaff: !!user.Staff?.length,
+              role: user.Staff?.[0]?.Role?.title
             });
           }
         }
