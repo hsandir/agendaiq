@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Disable 2FA
-    await prisma.(user as Record<string, unknown>).update({
+    await prisma.user.update({
       where: { id: user.id },
       data: {
         two_factor_enabled: false,

@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Filter to only include users with Administrator role
-    const filteredAdminUsers = adminUsers.filteruser => 
+    const filteredAdminUsers = adminUsers.filter(user => 
       ((user as Record<string, unknown>).Staff.some(staff => staff.Role?.title === 'Administrator')
     );
 

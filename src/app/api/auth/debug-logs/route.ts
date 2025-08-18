@@ -84,9 +84,9 @@ export async function GET(request: NextRequest) {
     
     // Extract ALL cookies - no masking in development
     const allCookies: Record<string, string> = {};
-    cookieStore.getAll().forEachcookie => {
+    cookieStore.getAll().forEach(cookie => {
       // Show full cookie values for debugging
-      allCookies[((cookie.name)] = cookie.value || '[EMPTY]';
+      allCookies[cookie.name] = cookie.value || '[EMPTY]';
     });
     
     // Test database connection

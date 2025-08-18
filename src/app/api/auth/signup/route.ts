@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     const hashedPassword = await hash(password, 12);
 
     // Check if this is the first user
-    const userCount = await prisma.(user as Record<string, unknown>).count();
+    const userCount = await prisma.user.count();
     const isFirstUser = userCount === 0;
 
     // Create user

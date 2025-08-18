@@ -1,0 +1,31 @@
+# Team V2 Development - Temporary Ignore
+# This file ensures v2 development doesn't affect v1 deployment
+
+# V2 specific files
+**/team-v2/**
+**/teams-v2/**
+src/app/api/teams-v2/
+src/components/teams-v2/
+prisma/migrations/*team_v2*
+prisma/schema-v2.prisma
+.env.v2
+
+# V2 test data
+prisma/seed-v2.ts
+__tests__/v2/
+
+# V2 documentation (keep separate)
+docs/v2/
+
+# Temporary development files
+*.v2.ts
+*.v2.tsx
+*.team-v2.*
+
+# V2 build artifacts
+.next-v2/
+out-v2/
+
+# Keep v1 clean
+!src/app/api/teams/  # v1 teams if exists
+!src/components/teams/  # v1 teams if exists
