@@ -72,7 +72,7 @@ export const authOptions: NextAuthOptions = {
           if (!credentials?.email || !credentials?.password) {
             console.error('Missing credentials');
             // await AuditClient.logSecurityEvent('login_missing_credentials', undefined, undefined, req, 'Missing email or password');
-            throw new Error("MISSING_CREDENTIALS|Email and password are required");
+            return null; // Return null instead of throwing
           }
 
           // Rate limiting for authentication attempts
@@ -115,12 +115,12 @@ export const authOptions: NextAuthOptions = {
 
           if (!user) {
             console.error('User not found:', credentials.email);
-            throw new Error("USER_NOT_FOUND|No account found with this email address");
+            return null; // Return null for security (don't reveal if user exists)
           }
           
           if (!user.hashedPassword) {
             console.error('User has no password:', credentials.email);
-            throw new Error("NO_PASSWORD|Account exists but password not set. Please reset your password");
+            return null; // Return null instead of throwing
           }
 
           // Check password using bcrypt
@@ -131,7 +131,7 @@ export const authOptions: NextAuthOptions = {
           if (!isValid) {
             console.error('Invalid password for user:', user.email);
             // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, 'Password mismatch');
-            throw new Error("INVALID_PASSWORD|The password you entered is incorrect");
+            return null; // Return null for invalid password
           }
 
           // Check 2FA if enabled
@@ -154,7 +154,8 @@ export const authOptions: NextAuthOptions = {
               
               if (!isBackupCode) {
                 // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, '2FA code invalid');
-                throw new Error("INVALID_2FA|The 2FA code you entered is invalid or expired");
+                console.error('Invalid 2FA code and not a backup code');
+                return null; // Return null for invalid 2FA
               }
 
               // Remove used backup code
@@ -387,4 +388,14 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+  pages: {
+    signIn: '/auth/signin',
+    error: '/auth/error',
+    verifyRequest: '/auth/verify',
+  },
+  session: {
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  debug: process.env.NODE_ENV === 'development',
 }; 

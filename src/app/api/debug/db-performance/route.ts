@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getUltraFastUser } from '@/lib/auth/auth-utils-ultra-fast';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Check auth
     const user = await getUltraFastUser();
@@ -10,7 +10,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const metrics: any = {
+    interface TestResult {
+      name: string;
+      query: string;
+      time: string;
+      success: boolean;
+    }
+    
+    const metrics: {
+      timestamp: string;
+      tests: TestResult[];
+      summary?: Record<string, string | number>;
+    } = {
       timestamp: new Date().toISOString(),
       tests: []
     };
@@ -130,7 +141,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Calculate statistics
-    const times = metrics.tests.map((t: any) => parseFloat(t.time));
+    const times = metrics.tests.map(t => parseFloat(t.time));
     metrics.summary = {
       totalTests: metrics.tests.length,
       totalTime: times.reduce((a: number, b: number) => a + b, 0).toFixed(2) + 'ms',
