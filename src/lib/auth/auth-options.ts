@@ -30,16 +30,8 @@ function isValidUserData(data: unknown): data is User {
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
-  session: {
-    strategy: "jwt", // Still using JWT even with adapter
-    maxAge: 30 * 24 * 60 * 60, // 30 days default (will be overridden by JWT callback for non-remember-me)
-  },
   jwt: {
     maxAge: 30 * 24 * 60 * 60, // 30 days for JWT token itself
-  },
-  pages: {
-    signIn: "/auth/signin",
-    error: "/auth/error",
   },
   providers: [
     GoogleProvider({

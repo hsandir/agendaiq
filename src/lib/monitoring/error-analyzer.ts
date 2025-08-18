@@ -342,7 +342,7 @@ export class ErrorAnalyzer {
     topAffectedPages: string[];
     recommendations: string[];
   } {
-    const analyses = errors.map(err => this.analyzeError(err.message, err.url, err.stack));
+    const analyses = errors.map(err => this.analyzeError(err.message, err.url || '', err.stack));
     
     const summary = this.generateSummary(analyses);
     const totalErrors = errors.length;

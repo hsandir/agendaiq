@@ -9,7 +9,7 @@ interface RoleWithRelations {
   title: string;
   level: number;
   is_leadership: boolean;
-  category: string;
+  category: string | null;
   parent_id: number | null;
   priority: number;
   Department: {
@@ -19,7 +19,7 @@ interface RoleWithRelations {
   Staff: Array<{
     id: number;
     User: {
-      name: string;
+      name: string | null;
       email: string;
     };
   }>;
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
         title: role.title,
         level: role.level,
         is_leadership: role.is_leadership,
-        category: role.category,
+        category: role.category || '',
         parent_id: role.parent_id,
         Department: role.Department ? {
           id: role.Department.id.toString(),

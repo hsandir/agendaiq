@@ -1,10 +1,10 @@
 // Create a test user for authentication testing
 import { prisma } from '../src/lib/prisma';
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcryptjs';
 
 async function createTestUser() {
-  const email = 'test@example.com';
-  const password = 'Test123456!';
+  const email = 'test@agendaiq.com';
+  const password = 'TestUser2024!';
   
   try {
     // Check if user exists
@@ -31,10 +31,18 @@ async function createTestUser() {
         data: {
           email,
           hashedPassword,
-          name: 'Test User',
+          name: 'Test User Admin',
           emailVerified: new Date(),
           two_factor_enabled: false,
-          backup_codes: []
+          backup_codes: [],
+          theme_preference: 'standard',
+          layout_preference: 'modern',
+          login_notifications_enabled: true,
+          suspicious_alerts_enabled: true,
+          remember_devices_enabled: true,
+          is_admin: true,
+          is_system_admin: true,
+          is_school_admin: true
         }
       });
       
@@ -61,29 +69,68 @@ async function createTestUser() {
             data: {
               name: 'Test School',
               district_id: district.id,
-              school_code: 'TS001'
+              code: 'TS001'
             }
           });
           
           department = await prisma.department.create({
             data: {
               name: 'Administration',
-              school_id: school.id
+              school_id: school.id,
+              code: 'ADM001'
             }
           });
         }
         
-        const staff = await prisma.staff.create({
-          data: {
-            user_id: user.id,
-            role_id: role.id,
-            department_id: department.id,
-            school_id: department.school_id,
-            district_id: department.School?.district_id || null,
-            flags: [],
-            endorsements: []
-          }
+        // Get school and district info
+        const schoolInfo = await prisma.school.findUnique({
+          where: { id: department.school_id },
+          include: { District: true }
         });
+        
+        if (!schoolInfo?.district_id) {
+          throw new Error('School must have a valid district_id');
+        }
+        
+        // Check if staff already exists for this user
+        const existingStaff = await prisma.staff.findFirst({
+          where: { user_id: user.id }
+        });
+        
+        if (existingStaff) {
+          console.log('Staff record already exists, updating...');
+          await prisma.staff.update({
+            where: { id: existingStaff.id },
+            data: {
+              role_id: role.id,
+              department_id: department.id,
+              school_id: department.school_id,
+              district_id: schoolInfo.district_id,
+              flags: ['active', 'verified'],
+              endorsements: ['leadership', 'meeting_organizer'],
+              extension: '1001',
+              room: '101',
+              is_active: true,
+              hire_date: new Date('2020-01-01')
+            }
+          });
+        } else {
+          await prisma.staff.create({
+            data: {
+              user_id: user.id,
+              role_id: role.id,
+              department_id: department.id,
+              school_id: department.school_id,
+              district_id: schoolInfo.district_id,
+              flags: ['active', 'verified'],
+              endorsements: ['leadership', 'meeting_organizer'],
+              extension: '1001',
+              room: '101',
+              is_active: true,
+              hire_date: new Date('2020-01-01')
+            }
+          });
+        }
         
         console.log('✅ Staff record created with role:', role.title);
       }

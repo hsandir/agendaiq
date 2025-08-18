@@ -34,7 +34,7 @@ import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
 // Enhanced interfaces for preview system
 interface ConflictItem {
   field: string;
-  existing: string | number | boolean;
+  existing: string | number | boolean | null;
   new: string | number | boolean;
   action: string;
 }

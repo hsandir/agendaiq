@@ -10,6 +10,7 @@ interface SchoolUpdateData {
   address?: string;
   phone?: string;
   email?: string;
+  district_id?: number;
 }
 
 // GET /api/school - Get all schools (admin) or user's school (non-admin)

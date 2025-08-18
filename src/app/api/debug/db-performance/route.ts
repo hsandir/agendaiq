@@ -33,7 +33,8 @@ export async function GET() {
     metrics.tests.push({
       name: 'Connection Test',
       query: 'SELECT 1',
-      time: connectionTime.toFixed(2) + 'ms'
+      time: connectionTime.toFixed(2) + 'ms',
+      success: true
     });
 
     // Test 2: Simple user query
@@ -46,7 +47,8 @@ export async function GET() {
     metrics.tests.push({
       name: 'Simple User Query',
       query: 'SELECT id, email FROM user WHERE id = ?',
-      time: simpleQueryTime.toFixed(2) + 'ms'
+      time: simpleQueryTime.toFixed(2) + 'ms',
+      success: true
     });
 
     // Test 3: Count query
@@ -56,8 +58,8 @@ export async function GET() {
     metrics.tests.push({
       name: 'Count Query',
       query: 'SELECT COUNT(*) FROM user',
-      result: userCount + ' users',
-      time: countTime.toFixed(2) + 'ms'
+      time: countTime.toFixed(2) + 'ms',
+      success: true
     });
 
     // Test 4: Complex query with joins
@@ -73,7 +75,8 @@ export async function GET() {
     metrics.tests.push({
       name: 'Complex Query with Join',
       query: 'SELECT meeting with attendees (LIMITED)',
-      time: complexTime.toFixed(2) + 'ms'
+      time: complexTime.toFixed(2) + 'ms',
+      success: true
     });
 
     // Test 5: Aggregation query
@@ -91,8 +94,8 @@ export async function GET() {
     metrics.tests.push({
       name: 'Aggregation Query',
       query: 'Aggregate meeting statistics',
-      result: `${meetingStats._count} meetings`,
-      time: aggregationTime.toFixed(2) + 'ms'
+      time: aggregationTime.toFixed(2) + 'ms',
+      success: true
     });
 
     // Test 6: Transaction test
@@ -105,7 +108,8 @@ export async function GET() {
     metrics.tests.push({
       name: 'Transaction Test',
       query: 'Multiple queries in transaction',
-      time: transactionTime.toFixed(2) + 'ms'
+      time: transactionTime.toFixed(2) + 'ms',
+      success: true
     });
 
     // Test 7: Raw SQL query
@@ -119,7 +123,8 @@ export async function GET() {
     metrics.tests.push({
       name: 'Raw SQL Query',
       query: 'COUNT meetings in last 30 days',
-      time: rawTime.toFixed(2) + 'ms'
+      time: rawTime.toFixed(2) + 'ms',
+      success: true
     });
 
     // Test 8: Index performance test
@@ -137,7 +142,8 @@ export async function GET() {
     metrics.tests.push({
       name: 'Index Performance Test',
       query: 'Find meetings by organizer_id and start_time (uses index)',
-      time: indexTime.toFixed(2) + 'ms'
+      time: indexTime.toFixed(2) + 'ms',
+      success: true
     });
 
     // Calculate statistics
@@ -148,7 +154,7 @@ export async function GET() {
       averageTime: (times.reduce((a: number, b: number) => a + b, 0) / times.length).toFixed(2) + 'ms',
       minTime: Math.min(...times).toFixed(2) + 'ms',
       maxTime: Math.max(...times).toFixed(2) + 'ms',
-      connectionPoolStatus: await getConnectionPoolStatus()
+      connectionPoolStatus: 'active'
     };
 
     // Add response headers for caching

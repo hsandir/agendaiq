@@ -174,7 +174,7 @@ class SentryProvider implements MonitoringProvider {
             const BrowserTracing = (Sentry as unknown as { BrowserTracing?: SentryIntegration; browserTracingIntegration?: SentryIntegration }).BrowserTracing || (Sentry as unknown as { BrowserTracing?: SentryIntegration; browserTracingIntegration?: SentryIntegration }).browserTracingIntegration;
             if (BrowserTracing) {
               integrations.push(
-                new BrowserTracing(integration.options || {})
+                new BrowserTracing((integration.options as Record<string, unknown>) || {})
               );
             }
           }
@@ -185,7 +185,7 @@ class SentryProvider implements MonitoringProvider {
             const Replay = (Sentry as unknown as { Replay?: SentryIntegration; replayIntegration?: SentryIntegration }).Replay || (Sentry as unknown as { Replay?: SentryIntegration; replayIntegration?: SentryIntegration }).replayIntegration;
             if (Replay) {
               integrations.push(
-                new Replay(integration.options || {})
+                new Replay((integration.options as Record<string, unknown>) || {})
               );
             }
           }
@@ -197,7 +197,7 @@ class SentryProvider implements MonitoringProvider {
             const ProfilingIntegration = (Sentry as unknown as { ProfilingIntegration?: SentryIntegration; profilingIntegration?: SentryIntegration }).ProfilingIntegration || (Sentry as unknown as { ProfilingIntegration?: SentryIntegration; profilingIntegration?: SentryIntegration }).profilingIntegration;
             if (ProfilingIntegration) {
               integrations.push(
-                new ProfilingIntegration()
+                new ProfilingIntegration((integration.options as Record<string, unknown>) || {})
               );
             }
           }
