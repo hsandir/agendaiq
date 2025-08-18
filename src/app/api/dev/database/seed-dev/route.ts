@@ -50,10 +50,10 @@ export async function POST(request: NextRequest) {
     // Create some test run logs for test history
     const testRuns = [];
     for (let i = 0; i < 10; i++) {
-      const passed = Math.floor(Math.random() * 200) + 100);
-      const failed = Math.floor(Math.random() * 10));
-      const coverage = Math.floor(Math.random() * 30) + 60);
-      const duration = Math.floor(Math.random() * 300) + 60);
+      const passed = Math.floor(Math.random() * 200) + 100;
+      const failed = Math.floor(Math.random() * 10);
+      const coverage = Math.floor(Math.random() * 30) + 60;
+      const duration = Math.floor(Math.random() * 300) + 60;
       
       testRuns.push({
         table_name: 'test_run',

@@ -482,8 +482,8 @@ function calculateAverageDuration(runs: WorkflowRun[]): string {
   }, 0);
 
   const avgMs = totalDuration / completedRuns.length;
-  const minutes = Math.floor(avgMs / 60000));
-  const seconds = Math.floor((avgMs % 60000) / 1000));
+  const minutes = Math.floor(avgMs / 60000);
+  const seconds = Math.floor((avgMs % 60000) / 1000);
 
   return `${minutes}m ${seconds}s`;
 }

@@ -101,7 +101,7 @@ export async function GET() {
     // Test 6: Transaction test
     const transactionStart = performance.now();
     await prisma.$transaction(async (tx) => {
-      await tx.(user as Record<string, unknown>).findUnique({ where: { id: user.id } });
+      await tx.user.findUnique({ where: { id: user.id } });
       await tx.meeting.count();
     });
     const transactionTime = performance.now() - transactionStart;

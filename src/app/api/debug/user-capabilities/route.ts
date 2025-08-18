@@ -30,11 +30,11 @@ export async function GET() {
       }
     });
 
-    return NextResponse.json{
+    return NextResponse.json({
       userId: user.id,
       email: user.email,
       is_system_admin: user.is_system_admin,
-      is_school_admin: (user as Record<string, unknown>.is_school_admin,
+      is_school_admin: (user as Record<string, unknown>).is_school_admin,
       
       // From getUserCapabilities
       capabilities: capabilities,
