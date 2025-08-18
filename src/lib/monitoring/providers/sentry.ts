@@ -173,8 +173,9 @@ class SentryProvider implements MonitoringProvider {
             // BrowserTracing is now browserTracingIntegration in newer versions
             const BrowserTracing = (Sentry as unknown as { BrowserTracing?: SentryIntegration; browserTracingIntegration?: SentryIntegration }).BrowserTracing || (Sentry as unknown as { BrowserTracing?: SentryIntegration; browserTracingIntegration?: SentryIntegration }).browserTracingIntegration;
             if (BrowserTracing) {
+              const options = (integration.options && typeof integration.options === 'object' ? integration.options : {}) as any;
               integrations.push(
-                new BrowserTracing((integration.options && typeof integration.options === 'object' ? integration.options as Record<string, unknown> : {}))
+                (new (BrowserTracing as any)(options))
               );
             }
           }
@@ -184,8 +185,9 @@ class SentryProvider implements MonitoringProvider {
           if (typeof window !== 'undefined') {
             const Replay = (Sentry as unknown as { Replay?: SentryIntegration; replayIntegration?: SentryIntegration }).Replay || (Sentry as unknown as { Replay?: SentryIntegration; replayIntegration?: SentryIntegration }).replayIntegration;
             if (Replay) {
+              const options = (integration.options && typeof integration.options === 'object' ? integration.options : {}) as any;
               integrations.push(
-                new Replay((integration.options && typeof integration.options === 'object' ? integration.options as Record<string, unknown> : {}))
+                (new (Replay as any)(options))
               );
             }
           }
@@ -196,8 +198,9 @@ class SentryProvider implements MonitoringProvider {
             // Server-side profiling
             const ProfilingIntegration = (Sentry as unknown as { ProfilingIntegration?: SentryIntegration; profilingIntegration?: SentryIntegration }).ProfilingIntegration || (Sentry as unknown as { ProfilingIntegration?: SentryIntegration; profilingIntegration?: SentryIntegration }).profilingIntegration;
             if (ProfilingIntegration) {
+              const options = (integration.options && typeof integration.options === 'object' ? integration.options : {}) as any;
               integrations.push(
-                new ProfilingIntegration((integration.options && typeof integration.options === 'object' ? integration.options as Record<string, unknown> : {}))
+                (new (ProfilingIntegration as any)(options))
               );
             }
           }

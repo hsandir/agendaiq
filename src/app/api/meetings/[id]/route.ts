@@ -8,6 +8,19 @@ import { sanitizeMeetingData } from "@/lib/utils/sanitization";
 import { isAnyAdmin } from '@/lib/auth/policy';
 import { z } from "zod";
 
+// Validation schema for agenda items
+const agendaItemSchema = z.object({
+  id: z.union([z.number(), z.undefined()]),
+  topic: z.string().min(1),
+  description: z.string().optional(),
+  purpose: z.string().optional(),
+  priority: z.string().optional(),
+  duration_minutes: z.number().optional(),
+  responsible_staff_id: z.number().nullable().optional(),
+  status: z.string().optional(),
+  order_index: z.number()
+});
+
 // Validation schema for updating meetings
 const updateMeetingSchema = z.object({
   title: z.string().min(1).max(255).optional(),
@@ -22,7 +35,8 @@ const updateMeetingSchema = z.object({
   agenda: z.string().optional(),
   notes: z.string().optional(),
   status: z.string().optional(),
-  attendeeIds: z.array(z.string().transform(id => parseInt(id, 10))).optional()
+  attendeeIds: z.array(z.string().transform(id => parseInt(id, 10))).optional(),
+  agendaItems: z.array(agendaItemSchema).optional()
 });
 
 interface Props {

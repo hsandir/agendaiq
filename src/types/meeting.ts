@@ -1,10 +1,25 @@
-import { Meeting, MeetingAttendee, Staff, User, Role, Department, MeetingAgendaItem, MeetingActionItem } from '@prisma/client';
+import type { 
+  Meeting, 
+  MeetingAgendaItem, 
+  MeetingAttendee,
+  MeetingActionItem,
+  AgendaItemComment,
+  AgendaItemAttachment,
+  Staff,
+  User,
+  Role,
+  Department,
+  District,
+  School
+} from '@prisma/client';
 
 // Type for staff with related data
 export interface StaffWithRelations extends Staff {
-  User: Pick<User, 'id' | 'name' | 'email'>;
+  User: User;
   Role: Role;
-  Department?: Department;
+  Department?: Department | null;
+  School?: School | null;
+  District?: District | null;
 }
 
 // Type for meeting attendee with relations
@@ -16,10 +31,56 @@ export interface AttendeeWithRelations extends MeetingAttendee {
 export interface MeetingWithRelations extends Meeting {
   Staff: StaffWithRelations;
   MeetingAttendee: AttendeeWithRelations[];
-  MeetingAgendaItems?: MeetingAgendaItem[];
-  MeetingActionItems?: MeetingActionItem[];
-  Department?: Department;
+  MeetingAgendaItems?: AgendaItemWithRelations[];
+  MeetingActionItems?: ActionItemWithRelations[];
+  Department?: Department | null;
+  School?: School | null;
+  District?: District | null;
 }
+
+// Type for agenda item comment with relations
+export interface CommentWithRelations extends AgendaItemComment {
+  Staff: StaffWithRelations;
+}
+
+// Type for action item with relations
+export interface ActionItemWithRelations extends MeetingActionItem {
+  AssignedTo: StaffWithRelations | null;
+}
+
+// Type for agenda item with all relations
+export interface AgendaItemWithRelations extends MeetingAgendaItem {
+  Meeting: MeetingWithRelations;
+  ResponsibleStaff: StaffWithRelations | null;
+  Comments: CommentWithRelations[];
+  ActionItems: ActionItemWithRelations[];
+  Attachments: AgendaItemAttachment[];
+  _count?: {
+    Comments: number;
+    ActionItems: number;
+  };
+}
+
+// Simple staff for dropdowns/assignment
+export interface StaffForAssignment {
+  id: number;
+  User: {
+    id: number;  // Changed from string to number to match Prisma schema
+    name: string | null;
+    email: string;
+  };
+  Role: {
+    id: number;
+    title: string;
+  };
+  Department?: {
+    id: number;
+    name: string;
+  } | null;
+}
+
+// Use AuthenticatedUser from auth-utils instead of defining our own
+export { type AuthenticatedUser as AuthUser } from '@/lib/auth/auth-utils';
 
 // API Response types
 export interface MeetingResponse {

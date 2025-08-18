@@ -34,13 +34,12 @@ export async function GET(request: NextRequest) {
       return response;
     }
 
-    // Get theme preference from database (fast query)
-    const userData = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { theme_preference: true }
-    });
+    // Get theme preference from database (optimized query)
+    const userData = await prisma.$queryRaw<{theme_preference: string | null}[]>`
+      SELECT theme_preference FROM "User" WHERE id = ${user.id} LIMIT 1
+    `;
     
-    const theme = userData?.theme_preference || 'standard';
+    const theme = userData?.[0]?.theme_preference || 'standard';
     
     // Cache the result
     preferenceCache.set(user.id, { theme });

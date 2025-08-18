@@ -40,6 +40,11 @@ export default async function EditMeetingPage({ params }: PageProps) {
             }
           }
         }
+      },
+      MeetingAgendaItems: {
+        orderBy: {
+          order_index: 'asc'
+        }
       }
     },
   });
@@ -127,6 +132,17 @@ export default async function EditMeetingPage({ params }: PageProps) {
       name: attendee.Staff.User.name || attendee.Staff.User.email || '',
       email: attendee.Staff.User.email || '',
       status: attendee.status || 'pending'
+    })),
+    agendaItems: meeting.MeetingAgendaItems.map(item => ({
+      id: item.id.toString(),
+      topic: item.topic,
+      description: item.problem_statement || '',
+      purpose: item.purpose || 'Discussion',
+      priority: item.priority || 'Medium',
+      duration_minutes: item.duration_minutes || 15,
+      responsible_staff_id: item.responsible_staff_id?.toString() || null,
+      status: item.status || 'Pending',
+      order_index: item.order_index
     }))
   };
 

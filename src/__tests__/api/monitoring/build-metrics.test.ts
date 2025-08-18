@@ -8,6 +8,25 @@ import { GET } from '@/app/api/monitoring/build-metrics/route';
 import { withAuth } from '@/lib/auth/api-auth';
 import * as Sentry from '@sentry/nextjs';
 
+// Type definitions for response
+interface MetricsResponse {
+  metrics?: {
+    totalBuilds: number;
+    successRate: number;
+    averageDuration: number;
+    queueTime: number;
+    testsPassed: number;
+    testsFailed: number;
+    codeCoverage: number;
+    vulnerabilities: number;
+    errorRate: number;
+    crashFreeUsers: number;
+    p95Latency: number;
+    activeIssues: number;
+  };
+  error?: string;
+}
+
 // Mock dependencies
 jest.mock('@/lib/auth/api-auth');
 jest.mock('@octokit/rest');
@@ -47,7 +66,7 @@ describe('/api/monitoring/build-metrics', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as MetricsResponse;
 
       expect(mockWithAuth).toHaveBeenCalledWith(request, { requireStaffRole: true });
       expect(response.status).toBe(401);
@@ -70,7 +89,7 @@ describe('/api/monitoring/build-metrics', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as MetricsResponse;
 
       expect(response.status).toBe(200);
       expect(data.metrics).toMatchObject({
@@ -114,8 +133,8 @@ describe('/api/monitoring/build-metrics', () => {
         ]
       };
 
-      const Octokit = jest.requireMock('@octokit/rest').Octokit;
-      Octokit.mockImplementation(() => ({
+      const OctokitMock = jest.requireMock('@octokit/rest').Octokit as jest.MockedClass<unknown>;
+      OctokitMock.mockImplementation(() => ({
         actions: {
           listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: mockWorkflowRuns }),
           listWorkflowRunArtifacts: jest.fn().mockResolvedValue({
@@ -137,20 +156,20 @@ describe('/api/monitoring/build-metrics', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as MetricsResponse;
 
       expect(response.status).toBe(200);
-      expect(data.metrics.totalBuilds).toBe(100);
-      expect(data.metrics.successRate).toBeCloseTo(66.67, 1); // 2 out of 3 success
-      expect(data.metrics.averageDuration).toBeGreaterThan(0);
-      expect(data.metrics.testsPassed).toBe(150);
-      expect(data.metrics.testsFailed).toBe(2);
-      expect(data.metrics.codeCoverage).toBe(75.5);
+      expect(data.metrics?.totalBuilds).toBe(100);
+      expect(data.metrics?.successRate).toBeCloseTo(66.67, 1); // 2 out of 3 success
+      expect(data.metrics?.averageDuration).toBeGreaterThan(0);
+      expect(data.metrics?.testsPassed).toBe(150);
+      expect(data.metrics?.testsFailed).toBe(2);
+      expect(data.metrics?.codeCoverage).toBe(75.5);
     });
 
     it('should fetch Sentry metrics when configured', async () => {
-      const Octokit = jest.requireMock('@octokit/rest').Octokit;
-      Octokit.mockImplementation(() => ({
+      const OctokitMock = jest.requireMock('@octokit/rest').Octokit as jest.MockedClass<unknown>;
+      OctokitMock.mockImplementation(() => ({
         actions: {
           listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
         }
@@ -179,12 +198,12 @@ describe('/api/monitoring/build-metrics', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as MetricsResponse;
 
       expect(response.status).toBe(200);
-      expect(data.metrics.crashFreeUsers).toBe(98.5);
-      expect(data.metrics.errorRate).toBeCloseTo(0.25, 2);
-      expect(data.metrics.activeIssues).toBe(5);
+      expect(data.metrics?.crashFreeUsers).toBe(98.5);
+      expect(data.metrics?.errorRate).toBeCloseTo(0.25, 2);
+      expect(data.metrics?.activeIssues).toBe(5);
     });
   });
 
@@ -198,8 +217,8 @@ describe('/api/monitoring/build-metrics', () => {
     });
 
     it('should handle GitHub API errors gracefully', async () => {
-      const Octokit = jest.requireMock('@octokit/rest').Octokit;
-      Octokit.mockImplementation(() => ({
+      const OctokitMock = jest.requireMock('@octokit/rest').Octokit as jest.MockedClass<unknown>;
+      OctokitMock.mockImplementation(() => ({
         actions: {
           listWorkflowRunsForRepo: jest.fn().mockRejectedValue(new Error('GitHub API error'))
         }
@@ -212,16 +231,16 @@ describe('/api/monitoring/build-metrics', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as MetricsResponse;
 
       expect(response.status).toBe(200);
       expect(data.metrics).toBeDefined();
-      expect(data.metrics.totalBuilds).toBe(0);
+      expect(data.metrics?.totalBuilds).toBe(0);
     });
 
     it('should handle Sentry API errors gracefully', async () => {
-      const Octokit = jest.requireMock('@octokit/rest').Octokit;
-      Octokit.mockImplementation(() => ({
+      const OctokitMock = jest.requireMock('@octokit/rest').Octokit as jest.MockedClass<unknown>;
+      OctokitMock.mockImplementation(() => ({
         actions: {
           listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
         }
@@ -231,12 +250,12 @@ describe('/api/monitoring/build-metrics', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as MetricsResponse;
 
       expect(response.status).toBe(200);
       expect(data.metrics).toBeDefined();
-      expect(data.metrics.errorRate).toBe(0.2);
-      expect(data.metrics.crashFreeUsers).toBe(99.5);
+      expect(data.metrics?.errorRate).toBe(0.2);
+      expect(data.metrics?.crashFreeUsers).toBe(99.5);
     });
 
     it('should capture exceptions to Sentry on errors', async () => {
@@ -272,8 +291,8 @@ describe('/api/monitoring/build-metrics', () => {
     });
 
     it('should return all required metric fields', async () => {
-      const Octokit = jest.requireMock('@octokit/rest').Octokit;
-      Octokit.mockImplementation(() => ({
+      const OctokitMock = jest.requireMock('@octokit/rest').Octokit as jest.MockedClass<unknown>;
+      OctokitMock.mockImplementation(() => ({
         actions: {
           listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
         }

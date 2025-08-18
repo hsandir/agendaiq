@@ -41,6 +41,7 @@ import type {
   Department,
   Role
 } from "@prisma/client";
+import type { AuthenticatedUser } from '@/lib/auth/auth-utils';
 
 interface ExtendedMeeting extends Meeting {
   Department: Department;
@@ -68,7 +69,7 @@ interface ExtendedStaff extends Staff {
 
 interface Props {
   meeting: ExtendedMeeting;
-  currentUser: Record<string, unknown>;
+  currentUser: AuthenticatedUser;
   allStaff: ExtendedStaff[];
   isOrganizer: boolean;
   isAdmin: boolean;
@@ -96,49 +97,55 @@ export function MeetingLiveView({
 
   // Set up real-time updates with Pusher
   const eventHandlers = useMemo(() => ({
-    [EVENTS.AGENDA_ITEM_UPDATED]: (data: Record<string, unknown>) => {
-      if (typeof data.itemId === 'number' && data.updates && typeof data.updates === 'object') {
+    [EVENTS.AGENDA_ITEM_UPDATED]: (data: unknown) => {
+      const typedData = data as Record<string, unknown>;
+      if (typeof typedData.itemId === 'number' && typedData.updates && typeof typedData.updates === 'object') {
         setAgendaItems(prev => prev.map(item => 
-          item.id === data.itemId ? { ...item, ...(data.updates as Record<string, any>) } : item
+          item.id === typedData.itemId ? { ...item, ...(typedData.updates as Record<string, any>) } : item
         ));
         setLastUpdate(new Date());
       }
     },
-    [EVENTS.AGENDA_ITEM_ADDED]: (data: Record<string, unknown>) => {
-      if (data.item && typeof data.item === 'object') {
-        setAgendaItems(prev => [...prev, data.item as any]);
+    [EVENTS.AGENDA_ITEM_ADDED]: (data: unknown) => {
+      const typedData = data as Record<string, unknown>;
+      if (typedData.item && typeof typedData.item === 'object') {
+        setAgendaItems(prev => [...prev, typedData.item as any]);
         setLastUpdate(new Date());
       }
     },
-    [EVENTS.AGENDA_ITEM_DELETED]: (data: Record<string, unknown>) => {
-      if (typeof data.itemId === 'number') {
-        setAgendaItems(prev => prev.filter(item => item.id !== data.itemId));
+    [EVENTS.AGENDA_ITEM_DELETED]: (data: unknown) => {
+      const typedData = data as Record<string, unknown>;
+      if (typeof typedData.itemId === 'number') {
+        setAgendaItems(prev => prev.filter(item => item.id !== typedData.itemId));
         setLastUpdate(new Date());
       }
     },
-    [EVENTS.USER_TYPING]: (data: Record<string, unknown>) => {
-      if (typeof data.itemId === 'number' && typeof data.userId === 'number' && typeof data.userName === 'string') {
+    [EVENTS.USER_TYPING]: (data: unknown) => {
+      const typedData = data as Record<string, unknown>;
+      if (typeof typedData.itemId === 'number' && typeof typedData.userId === 'number' && typeof typedData.userName === 'string') {
         setTypingUsers(prev => {
           const newMap = new Map(prev);
-          newMap.set(data.itemId as number, { userId: data.userId as number, userName: data.userName as string });
+          newMap.set(typedData.itemId as number, { userId: typedData.userId as number, userName: typedData.userName as string });
           return newMap;
         });
       }
     },
-    [EVENTS.USER_STOPPED_TYPING]: (data: Record<string, unknown>) => {
-      if (typeof data.itemId === 'number') {
+    [EVENTS.USER_STOPPED_TYPING]: (data: unknown) => {
+      const typedData = data as Record<string, unknown>;
+      if (typeof typedData.itemId === 'number') {
         setTypingUsers(prev => {
           const newMap = new Map(prev);
-          newMap.delete(data.itemId as number);
+          newMap.delete(typedData.itemId as number);
           return newMap;
         });
       }
     },
-    'comment-added': (data: Record<string, unknown>) => {
-      if (typeof data.itemId === 'number' && data.comment && typeof data.comment === 'object') {
+    'comment-added': (data: unknown) => {
+      const typedData = data as Record<string, unknown>;
+      if (typeof typedData.itemId === 'number' && typedData.comment && typeof typedData.comment === 'object') {
         setAgendaItems(prev => prev.map(item => 
-          item.id === data.itemId 
-            ? { ...item, Comments: [...(item.Comments || []), data.comment as Record<string, unknown>] }
+          item.id === typedData.itemId 
+            ? { ...item, Comments: [...(item.Comments || []), typedData.comment as Record<string, unknown>] }
             : item
         ));
       }
@@ -451,7 +458,7 @@ export function MeetingLiveView({
                         onUpdate={(updates) => handleItemUpdate(item.id, updates)}
                         canEdit={isOrganizer || isAdmin || item.responsible_staff_id === currentUser.staff?.id}
                         currentUserId={currentUser.id}
-                        currentUserName={currentUser.name}
+                        currentUserName={currentUser.name || ''}
                         meetingId={meeting.id}
                       />
                       {typingUser && typingUser.userId !== currentUser.id && (

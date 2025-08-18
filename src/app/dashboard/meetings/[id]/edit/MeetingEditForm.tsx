@@ -12,8 +12,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MultiSelectV2 as MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select-v2";
 import { safeFormatDateTime, safeFormatDate, safeFormatTime } from '@/lib/utils/safe-date';
-import { Calendar, Clock, Users, Video, ArrowLeft, Save, X } from "lucide-react";
+import { Calendar, Clock, Users, Video, ArrowLeft, Save, X, Plus, Trash2, GripVertical, ChevronUp, ChevronDown, FileText } from "lucide-react";
 import { format } from "date-fns";
+
+interface AgendaItem {
+  id: string;
+  topic: string;
+  description: string;
+  purpose: string;
+  priority: string;
+  duration_minutes: number;
+  responsible_staff_id: string | null;
+  status: string;
+  order_index: number;
+}
 
 interface MeetingEditFormProps {
   meeting: {
@@ -36,6 +48,7 @@ interface MeetingEditFormProps {
       email: string;
       status: string;
     }>;
+    agendaItems?: AgendaItem[];
   };
   users: Array<{
     id: string;
@@ -92,6 +105,53 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   const [agenda, setAgenda] = useState(meeting.agenda);
   const [notes, setNotes] = useState(meeting.notes);
   
+  // Agenda Items
+  const [agendaItems, setAgendaItems] = useState<AgendaItem[]>(meeting.agendaItems || []);
+  
+  // Agenda Item functions
+  const addAgendaItem = () => {
+    const newItem: AgendaItem = {
+      id: `new-${Date.now()}`,
+      topic: '',
+      description: '',
+      purpose: 'Discussion',
+      priority: 'Medium',
+      duration_minutes: 15,
+      responsible_staff_id: null,
+      status: 'Pending',
+      order_index: agendaItems.length
+    };
+    setAgendaItems([...agendaItems, newItem]);
+  };
+  
+  const removeAgendaItem = (id: string) => {
+    setAgendaItems(agendaItems.filter(item => item.id !== id));
+  };
+  
+  const updateAgendaItem = (id: string, field: keyof AgendaItem, value: any) => {
+    setAgendaItems(agendaItems.map(item => 
+      item.id === id ? { ...item, [field]: value } : item
+    ));
+  };
+  
+  const moveAgendaItem = (id: string, direction: 'up' | 'down') => {
+    const index = agendaItems.findIndex(item => item.id === id);
+    if ((direction === 'up' && index === 0) || (direction === 'down' && index === agendaItems.length - 1)) {
+      return;
+    }
+    
+    const newItems = [...agendaItems];
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    [newItems[index], newItems[newIndex]] = [newItems[newIndex], newItems[index]];
+    
+    // Update order indices
+    newItems.forEach((item, idx) => {
+      item.order_index = idx;
+    });
+    
+    setAgendaItems(newItems);
+  };
+  
   // Integrations
   const [zoomMeetingId, setZoomMeetingId] = useState(meeting.zoomMeetingId || '');
   const [zoomLink, setZoomLink] = useState(meeting.zoomLink || '');
@@ -139,7 +199,18 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
           agenda,
           notes,
           status: isStep2 ? 'scheduled' : meeting.status,
-          attendeeIds: selectedAttendees
+          attendeeIds: selectedAttendees,
+          agendaItems: agendaItems.map((item, index) => ({
+            id: item.id.startsWith('new-') ? undefined : parseInt(item.id),
+            topic: item.topic,
+            description: item.description,
+            purpose: item.purpose,
+            priority: item.priority,
+            duration_minutes: item.duration_minutes,
+            responsible_staff_id: item.responsible_staff_id ? parseInt(item.responsible_staff_id) : null,
+            status: item.status,
+            order_index: index
+          }))
         }),
       });
 
@@ -336,30 +407,219 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
         </CardContent>
       </Card>
 
-      {/* Meeting Content */}
+      {/* Agenda Items */}
       <Card>
         <CardHeader>
-          <CardTitle>Meeting Content</CardTitle>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Agenda Items</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                {agendaItems.length} items • Total duration: {agendaItems.reduce((sum, item) => sum + (item.duration_minutes || 0), 0)} minutes
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                onClick={() => router.push(`/dashboard/meetings/${meetingId}/agenda`)}
+                variant="default"
+                size="sm"
+              >
+                <FileText className="h-4 w-4 mr-1" />
+                Full Editor
+              </Button>
+              <Button
+                type="button"
+                onClick={addAgendaItem}
+                variant="outline"
+                size="sm"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Quick Add
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {agendaItems.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No agenda items yet. Click "Add Item" to create one.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {agendaItems.map((item, index) => (
+                <div key={item.id} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="flex flex-col gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => moveAgendaItem(item.id, 'up')}
+                          disabled={index === 0}
+                        >
+                          <ChevronUp className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => moveAgendaItem(item.id, 'down')}
+                          disabled={index === agendaItems.length - 1}
+                        >
+                          <ChevronDown className="h-3 w-3" />
+                        </Button>
+                      </div>
+                      <span className="text-sm font-medium text-muted-foreground">#{index + 1}</span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeAgendaItem(item.id)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Topic *</Label>
+                      <Input
+                        value={item.topic}
+                        onChange={(e) => updateAgendaItem(item.id, 'topic', e.target.value)}
+                        placeholder="Agenda item topic"
+                        required
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label>Priority</Label>
+                      <Select 
+                        value={item.priority} 
+                        onValueChange={(value) => updateAgendaItem(item.id, 'priority', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Low">Low</SelectItem>
+                          <SelectItem value="Medium">Medium</SelectItem>
+                          <SelectItem value="High">High</SelectItem>
+                          <SelectItem value="Urgent">Urgent</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Label>Purpose</Label>
+                      <Select 
+                        value={item.purpose} 
+                        onValueChange={(value) => updateAgendaItem(item.id, 'purpose', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Discussion">Discussion</SelectItem>
+                          <SelectItem value="Decision">Decision</SelectItem>
+                          <SelectItem value="Information">Information</SelectItem>
+                          <SelectItem value="Review">Review</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label>Duration (minutes)</Label>
+                      <Input
+                        type="number"
+                        value={item.duration_minutes}
+                        onChange={(e) => updateAgendaItem(item.id, 'duration_minutes', parseInt(e.target.value) || 15)}
+                        min="1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label>Status</Label>
+                      <Select 
+                        value={item.status} 
+                        onValueChange={(value) => updateAgendaItem(item.id, 'status', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Pending">Pending</SelectItem>
+                          <SelectItem value="Ongoing">Ongoing</SelectItem>
+                          <SelectItem value="Resolved">Resolved</SelectItem>
+                          <SelectItem value="Deferred">Deferred</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label>Description</Label>
+                    <Textarea
+                      value={item.description}
+                      onChange={(e) => updateAgendaItem(item.id, 'description', e.target.value)}
+                      placeholder="Additional details about this agenda item..."
+                      rows={2}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label>Responsible Person</Label>
+                    <Select 
+                      value={item.responsible_staff_id || ''} 
+                      onValueChange={(value) => updateAgendaItem(item.id, 'responsible_staff_id', value || null)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select responsible person" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">None</SelectItem>
+                        {users.map(user => (
+                          <SelectItem key={user.id} value={user.id}>
+                            {user.name} ({user.role})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Meeting Notes */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Meeting Notes</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label htmlFor="agenda">Agenda</Label>
+            <Label htmlFor="agenda">Meeting Summary</Label>
             <Textarea
               id="agenda"
               value={agenda}
               onChange={(e) => setAgenda(e.target.value)}
-              placeholder="Meeting agenda items..."
-              rows={4}
+              placeholder="Overall meeting summary..."
+              rows={3}
             />
           </div>
 
           <div>
-            <Label htmlFor="notes">Notes</Label>
+            <Label htmlFor="notes">Additional Notes</Label>
             <Textarea
               id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Meeting notes..."
+              placeholder="Meeting notes, decisions, follow-ups..."
               rows={4}
             />
           </div>

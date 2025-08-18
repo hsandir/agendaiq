@@ -1,4 +1,4 @@
-import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
+import { requireAuth, AuthPresets, type AuthenticatedUser } from '@/lib/auth/auth-utils';
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { AgendaItemDetail } from '@/components/meetings/AgendaItemDetail';
@@ -96,10 +96,10 @@ export default async function AgendaItemPage(props: Props) {
 
   return (
     <AgendaItemDetail
-      item={agendaItem}
-      meeting={agendaItem.Meeting}
+      item={agendaItem as any}
+      meeting={agendaItem.Meeting as any}
       currentUser={user}
-      allStaff={allStaff}
+      allStaff={allStaff as any}
       canEdit={isOrganizer || hasAdminAccess || isResponsible}
     />
   );

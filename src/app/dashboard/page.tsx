@@ -137,6 +137,59 @@ export default async function DashboardPage() {
     }),
   ]);
 
+  // Fetch recent activity - real data
+  const recentActivity = await prisma.$transaction([
+    // Recent meetings created or updated
+    prisma.meeting.findMany({
+      where: {
+        OR: [
+          { organizer_id: userId },
+          {
+            MeetingAttendee: {
+              some: {
+                Staff: {
+                  user_id: userId
+                }
+              }
+            }
+          }
+        ]
+      },
+      orderBy: {
+        created_at: 'desc'
+      },
+      take: 3,
+      include: {
+        Staff: {
+          include: {
+            User: true
+          }
+        },
+        _count: {
+          select: {
+            MeetingAgendaItems: true,
+            MeetingAttendee: true
+          }
+        }
+      }
+    }),
+    // Recent notes
+    prisma.meetingNote.findMany({
+      where: {
+        Staff: {
+          user_id: userId
+        }
+      },
+      orderBy: {
+        created_at: 'desc'
+      },
+      take: 3,
+      include: {
+        Meeting: true
+      }
+    })
+  ]);
+
   const quickStats = [
     { name: "Upcoming Meetings", value: stats[0], icon: Calendar },
     { name: "Organized Meetings", value: stats[1], icon: Users },
@@ -235,25 +288,41 @@ export default async function DashboardPage() {
           <h2 className="text-xl font-semibold text-foreground mb-6">Recent Activity</h2>
           
           <div className="space-y-4">
-            <div className="p-4 bg-background/30 rounded-lg border border-border/30">
-              <p className="font-medium text-foreground mb-1">Meeting Intelligence Update</p>
-              <ul className="text-sm text-muted-foreground space-y-1 pl-4">
-                <li>• New AI-powered meeting summaries available</li>
-                <li>• Action items automatically extracted</li>
-                <li>• Follow-up tasks created in dashboard</li>
-              </ul>
-              <div className="text-xs text-muted-foreground mt-3 text-right">Just now</div>
-            </div>
+            {/* Recent Meetings Activity */}
+            {recentActivity[0].length > 0 ? (
+              recentActivity[0].map((meeting) => (
+                <div key={meeting.id} className="p-4 bg-background/30 rounded-lg border border-border/30">
+                  <p className="font-medium text-foreground mb-1">{meeting.title}</p>
+                  <ul className="text-sm text-muted-foreground space-y-1 pl-4">
+                    <li>• {meeting._count.MeetingAgendaItems} agenda items</li>
+                    <li>• {meeting._count.MeetingAttendee} attendees</li>
+                    <li>• Organized by {meeting.Staff.User.name || meeting.Staff.User.email}</li>
+                  </ul>
+                  <div className="text-xs text-muted-foreground mt-3 text-right">
+                    {meeting.created_at ? new Date(meeting.created_at).toLocaleString() : 'Recently'}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-4 bg-background/30 rounded-lg border border-border/30">
+                <p className="text-sm text-muted-foreground text-center">No recent meeting activity</p>
+              </div>
+            )}
 
-            <div className="p-4 bg-background/30 rounded-lg border border-border/30">
-              <p className="font-medium text-foreground mb-1">Team Collaboration</p>
-              <ul className="text-sm text-muted-foreground space-y-1 pl-4">
-                <li>• 3 new notes shared with your team</li>
-                <li>• Meeting room booking confirmed</li>
-                <li>• Presentation materials uploaded</li>
-              </ul>
-              <div className="text-xs text-muted-foreground mt-3 text-right">2 hours ago</div>
-            </div>
+            {/* Recent Notes Activity */}
+            {recentActivity[1].length > 0 && (
+              <div className="p-4 bg-background/30 rounded-lg border border-border/30">
+                <p className="font-medium text-foreground mb-1">Recent Notes</p>
+                <ul className="text-sm text-muted-foreground space-y-1 pl-4">
+                  {recentActivity[1].slice(0, 3).map((note) => (
+                    <li key={note.id}>• Note for: {note.Meeting.title}</li>
+                  ))}
+                </ul>
+                <div className="text-xs text-muted-foreground mt-3 text-right">
+                  {recentActivity[1][0].created_at ? new Date(recentActivity[1][0].created_at).toLocaleString() : 'Recently'}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Quick Actions */}

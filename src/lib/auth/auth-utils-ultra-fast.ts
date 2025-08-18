@@ -18,13 +18,28 @@ export interface UltraFastUser {
  * Get user ID from JWT token directly
  * Bypasses NextAuth for maximum performance
  */
+// Cache the decoded user with timestamp
+interface CachedUser {
+  user: UltraFastUser | null;
+  timestamp: number;
+}
+
+let cachedUser: CachedUser | undefined = undefined;
+const CACHE_DURATION = 1000; // 1 second cache
+
 export async function getUltraFastUser(): Promise<UltraFastUser | null> {
+  // Return cached user if still valid
+  if (cachedUser && (Date.now() - cachedUser.timestamp < CACHE_DURATION)) {
+    return cachedUser.user;
+  }
+  
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('next-auth.session-token') || 
                   cookieStore.get('__Secure-next-auth.session-token');
     
     if (!token?.value) {
+      cachedUser = { user: null, timestamp: Date.now() };
       return null;
     }
 
@@ -32,15 +47,21 @@ export async function getUltraFastUser(): Promise<UltraFastUser | null> {
     const decoded = jwt.decode(token.value) as any;
     
     if (!decoded?.id || !decoded?.email) {
+      cachedUser = { user: null, timestamp: Date.now() };
       return null;
     }
 
-    return {
+    const user: UltraFastUser = {
       id: parseInt(decoded.id),
-      email: decoded.email
+      email: decoded.email,
+      staff: decoded.staff || null
     };
+    
+    cachedUser = { user, timestamp: Date.now() };
+    return user;
   } catch (error) {
     console.error('Ultra fast auth error:', error);
+    cachedUser = { user: null, timestamp: Date.now() };
     return null;
   }
 }

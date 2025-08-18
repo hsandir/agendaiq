@@ -7,6 +7,19 @@ import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/monitoring/deployments/route';
 import { withAuth } from '@/lib/auth/api-auth';
 
+// Type definitions
+interface DeploymentResponse {
+  deployments?: Array<{
+    id: string;
+    name: string;
+    url: string;
+    created: number;
+    state: string;
+    creator: { username: string };
+  }>;
+  error?: string;
+}
+
 // Mock dependencies
 jest.mock('@/lib/auth/api-auth');
 
@@ -40,7 +53,7 @@ describe('/api/monitoring/deployments', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as DeploymentResponse;
 
       expect(mockWithAuth).toHaveBeenCalledWith(request, { requireStaffRole: true });
       expect(response.status).toBe(401);
@@ -62,7 +75,7 @@ describe('/api/monitoring/deployments', () => {
       
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as DeploymentResponse;
 
       expect(response.status).toBe(200);
       expect(data.deployments).toEqual([]);
@@ -78,7 +91,7 @@ describe('/api/monitoring/deployments', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as DeploymentResponse;
 
       expect(response.status).toBe(200);
       expect(data.deployments).toEqual([]);
@@ -127,7 +140,7 @@ describe('/api/monitoring/deployments', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as DeploymentResponse;
 
       expect(response.status).toBe(200);
       expect(data.deployments).toHaveLength(2);
@@ -199,7 +212,7 @@ describe('/api/monitoring/deployments', () => {
 
         const request = mockRequest();
         const response = await GET(request);
-        const data = await response.json();
+        const data = await response.json() as DeploymentResponse;
 
         expect(data.deployments[0].status).toBe(testCase.expected);
       }
@@ -218,7 +231,7 @@ describe('/api/monitoring/deployments', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as DeploymentResponse;
 
       expect(response.status).toBe(200);
       expect(data.deployments).toEqual([]);
@@ -231,7 +244,7 @@ describe('/api/monitoring/deployments', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as DeploymentResponse;
 
       expect(response.status).toBe(500);
       expect(data.error).toBe('Failed to fetch deployment data');

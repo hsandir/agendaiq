@@ -162,9 +162,9 @@ export default async function MeetingLivePage(props: Props) {
   return (
     <div className="min-h-screen bg-muted">
       <MeetingLiveView
-        meeting={fullMeeting}
+        meeting={fullMeeting as any}
         currentUser={user}
-        allStaff={allStaff}
+        allStaff={allStaff as any}
         isOrganizer={isOrganizer}
         isAdmin={hasAdminAccess}
       />

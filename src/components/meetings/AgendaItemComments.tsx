@@ -10,12 +10,16 @@ import { getSafeDate } from '@/lib/utils/safe-date';
 interface Comment {
   id: number;
   comment: string;
-  created_at: string;
+  created_at: string | Date;  // Support both string and Date
   Staff: {
     User: {
       id: number;
       name: string | null;
       email: string;
+    }
+    Role?: {
+      id: number;
+      title: string;
     }
   }
 }

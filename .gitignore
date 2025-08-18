@@ -60,6 +60,7 @@ yarn-error.log*
 .env.*
 !.env.example
 .env.local
+.env.local.example
 .env.production
 .env.production.local
 .env.development
@@ -67,6 +68,8 @@ yarn-error.log*
 .env.test
 .env.test.local
 .env.backup
+.env.vercel
+.env.vercel.check
 
 # Sensitive files
 client_secret*.json

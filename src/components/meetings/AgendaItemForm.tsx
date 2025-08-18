@@ -26,6 +26,7 @@ interface Staff {
 }
 
 export interface AgendaItemFormData {
+  id?: number;
   topic: string;
   problem_statement?: string;
   staff_initials?: string;
@@ -40,6 +41,9 @@ export interface AgendaItemFormData {
   future_implications?: boolean;
   duration_minutes?: number;
   order_index: number;
+  carried_forward?: boolean;
+  carry_forward_count?: number;
+  parent_item_id?: number;
 }
 
 interface AgendaItemFormProps {
@@ -48,10 +52,11 @@ interface AgendaItemFormProps {
   staff: Staff[];
   onUpdate: (index: number, item: AgendaItemFormData) => void;
   onRemove: (index: number) => void;
-  onMoveUp?: (index: number) => void;
-  onMoveDown?: (index: number) => void;
+  onMoveUp?: (index: number, direction: 'up' | 'down') => void;
+  onMoveDown?: (index: number, direction: 'up' | 'down') => void;
   isFirst: boolean;
   isLast: boolean;
+  readOnly?: boolean;
 }
 
 export function AgendaItemForm({

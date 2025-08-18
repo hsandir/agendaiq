@@ -35,12 +35,19 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { getSafeDate, safeFormatDate } from '@/lib/utils/safe-date';
+import type { 
+  AgendaItemWithRelations, 
+  MeetingWithRelations, 
+  StaffForAssignment 
+} from '@/types/meeting';
+import type { AuthenticatedUser } from '@/lib/auth/auth-utils';
+import { AgendaItemStatus, Purpose, SolutionType, DecisionType } from '@prisma/client';
 
 interface Props {
-  item: Record<string, unknown>;
-  meeting: Record<string, unknown>;
-  currentUser: Record<string, unknown>;
-  allStaff: Array<Record<string, unknown>>;
+  item: AgendaItemWithRelations;
+  meeting: MeetingWithRelations;
+  currentUser: AuthenticatedUser;
+  allStaff: StaffForAssignment[];
   canEdit: boolean;
 }
 
@@ -93,7 +100,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
         if (editData.status === 'Ongoing' && ongoingChoice) {
           if (ongoingChoice === 'new_meeting') {
             // Create new meeting with this item
-            router.push(`/dashboard/meetings/new?fromItem=${item.id}` as any);
+            router.push(`/dashboard/meetings/new?fromItem=${item.id}`);
           } else if (ongoingChoice === 'next_meeting') {
             // Add to next recurring meeting
             await addToNextMeeting();
@@ -364,7 +371,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                   {isEditing ? (
                     <Select
                       value={editData.status}
-                      onValueChange={(value: string) => setEditData({ ...editData, status: value })}
+                      onValueChange={(value) => setEditData({ ...editData, status: value as AgendaItemStatus })}
                     >
                       <SelectTrigger className="mt-1">
                         <SelectValue />
@@ -388,7 +395,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                   {isEditing ? (
                     <Select
                       value={editData.purpose}
-                      onValueChange={(value: string) => setEditData({ ...editData, purpose: value })}
+                      onValueChange={(value) => setEditData({ ...editData, purpose: value as Purpose })}
                     >
                       <SelectTrigger className="mt-1">
                         <SelectValue />
@@ -414,7 +421,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                     {isEditing ? (
                       <Select
                         value={editData.solution_type || ''}
-                        onValueChange={(value: string) => setEditData({ ...editData, solution_type: value })}
+                        onValueChange={(value) => setEditData({ ...editData, solution_type: value as SolutionType })}
                       >
                         <SelectTrigger className="mt-1">
                           <SelectValue placeholder="Select type" />
@@ -440,7 +447,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                     {isEditing ? (
                       <Select
                         value={editData.decision_type || ''}
-                        onValueChange={(value: string) => setEditData({ ...editData, decision_type: value })}
+                        onValueChange={(value) => setEditData({ ...editData, decision_type: value as DecisionType })}
                       >
                         <SelectTrigger className="mt-1">
                           <SelectValue placeholder="Select type" />
@@ -477,7 +484,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                         <SelectItem value="none">None</SelectItem>
                         {allStaff.map((s) => (
                           <SelectItem key={s.id} value={s.id.toString()}>
-                            {s.User.name}
+                            {s.User.name || s.User.email}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -490,7 +497,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                             <User className="h-4 w-4 text-primary" />
                           </div>
                           <div>
-                            <p className="font-medium text-foreground">{item.ResponsibleStaff.User.name}</p>
+                            <p className="font-medium text-foreground">{item.ResponsibleStaff.User.name || item.ResponsibleStaff.User.email}</p>
                             <p className="text-xs text-muted-foreground">{item.ResponsibleStaff.Role.title}</p>
                           </div>
                         </div>
@@ -553,7 +560,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
               
               {item.Attachments?.length > 0 ? (
                 <div className="space-y-2">
-                  {item.Attachments.map((attachment: Record<string, unknown>) => (
+                  {item.Attachments.map((attachment) => (
                     <div key={attachment.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted">
                       <FileText className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm text-foreground">{attachment.file_name}</span>
