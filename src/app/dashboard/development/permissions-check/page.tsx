@@ -72,7 +72,7 @@ const ALL_PAGES = [
     name: 'System Settings',
     category: 'Admin',
     authType: 'requireCapability',
-    capabilities: [Capability.OPS_HEALTH],
+    capabilities: [(Capability.OPS_HEALTH)],
     description: 'System configuration'
   },
   {
@@ -80,7 +80,7 @@ const ALL_PAGES = [
     name: 'Backup & Restore',
     category: 'Admin',
     authType: 'requireCapability',
-    capabilities: [Capability.OPS_BACKUP],
+    capabilities: [(Capability.OPS_BACKUP)],
     description: 'Database backups'
   },
   {
@@ -104,7 +104,7 @@ const ALL_PAGES = [
     name: 'Monitoring',
     category: 'Admin',
     authType: 'requireMonitoring',
-    capabilities: [Capability.OPS_MONITORING],
+    capabilities: [(Capability.OPS_MONITORING)],
     description: 'System monitoring'
   },
 
@@ -114,7 +114,7 @@ const ALL_PAGES = [
     name: 'School Settings',
     category: 'School',
     authType: 'requireCapability',
-    capabilities: [Capability.SCHOOL_MANAGE],
+    capabilities: [(Capability.SCHOOL_MANAGE)],
     description: 'School configuration'
   },
   {
@@ -146,7 +146,7 @@ const ALL_PAGES = [
     name: 'Manage Roles',
     category: 'School',
     authType: 'requireRoleManagement',
-    capabilities: [Capability.ROLE_MANAGE],
+    capabilities: [(Capability.ROLE_MANAGE)],
     description: 'Edit roles'
   },
   {
@@ -180,7 +180,7 @@ const ALL_PAGES = [
     name: 'Create Meeting',
     category: 'Meetings',
     authType: 'requireMeetingCreate',
-    capabilities: [Capability.MEETING_CREATE],
+    capabilities: [(Capability.MEETING_CREATE)],
     description: 'Create new meeting'
   },
   {
@@ -196,7 +196,7 @@ const ALL_PAGES = [
     name: 'Meeting Templates',
     category: 'Meetings',
     authType: 'requireMeetingCreate',
-    capabilities: [Capability.MEETING_CREATE],
+    capabilities: [(Capability.MEETING_CREATE)],
     description: 'Manage templates'
   },
   {
@@ -204,7 +204,7 @@ const ALL_PAGES = [
     name: 'Meeting Permissions',
     category: 'Meetings',
     authType: 'requireMeetingCreate',
-    capabilities: [Capability.MEETING_CREATE],
+    capabilities: [(Capability.MEETING_CREATE)],
     description: 'Meeting access control'
   },
   {
@@ -238,7 +238,7 @@ const ALL_PAGES = [
     name: 'CI/CD Pipeline',
     category: 'Monitoring',
     authType: 'requireCapability',
-    capabilities: [Capability.DEV_CI],
+    capabilities: [(Capability.DEV_CI)],
     description: 'CI/CD monitoring'
   },
   {
@@ -292,7 +292,7 @@ const API_ROUTES = [
 ];
 
 export default function PermissionsCheckPage() {
-  const { data: session, status } = useSession();
+  const { data: __session, __status  } = useSession();
   const [userCapabilities, setUserCapabilities] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -301,7 +301,7 @@ export default function PermissionsCheckPage() {
   useEffect(() => {
     if (session?.user) {
       // Get user capabilities from session
-      setUserCapabilities(session.user.capabilities || []);
+      setUserCapabilities(session.(user as Record<string, unknown>).capabilities || []);
       setLoading(false);
     } else if (status !== 'loading') {
       setLoading(false);
@@ -320,7 +320,7 @@ export default function PermissionsCheckPage() {
     
     // Check admin flags for specific auth types
     if (authType === 'requireDevAdmin' && session.user.is_system_admin) return true;
-    if (authType === 'requireOpsAdmin' && session.user.is_school_admin) return true;
+    if (authType === 'requireOpsAdmin' && session.(user as Record<string, unknown>).is_school_admin) return true;
     
     // If no capabilities required, access is granted
     if (!capabilities || capabilities.length === 0) return true;
@@ -331,7 +331,7 @@ export default function PermissionsCheckPage() {
       if (userCapabilities.includes(cap)) return true;
       
       // School admin has all ops: capabilities
-      if (session.user.is_school_admin && cap.startsWith('ops:')) return true;
+      if (session.(user as Record<string, unknown>).is_school_admin && cap.startsWith('ops:')) return true;
       
       return false;
     });
@@ -386,7 +386,7 @@ export default function PermissionsCheckPage() {
                 <strong className="text-gray-900">System Admin:</strong> {session.user.is_system_admin ? '✅' : '❌'}
               </div>
               <div>
-                <strong className="text-gray-900">School Admin:</strong> {session.user.is_school_admin ? '✅' : '❌'}
+                <strong className="text-gray-900">School Admin:</strong> {session.(user as Record<string, unknown>).is_school_admin ? '✅' : '❌'}
               </div>
               <div className="md:col-span-3">
                 <strong className="text-gray-900">Capabilities ({userCapabilities.length}):</strong>

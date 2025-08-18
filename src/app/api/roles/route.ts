@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     });
     
     return NextResponse.json(roles);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching roles:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -38,8 +38,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const { title, priority, is_leadership, category, description } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __title, __priority, __is_leadership, __category, __description  } = body;
 
     if (!title || priority === undefined) {
       return NextResponse.json(
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(role, { status: 201 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error creating role:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -86,8 +86,8 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const { id, title, priority, is_leadership, category, description } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __id, __title, __priority, __is_leadership, __category, __description  } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -136,7 +136,7 @@ export async function PUT(request: NextRequest) {
     });
 
     return NextResponse.json(role);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating role:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

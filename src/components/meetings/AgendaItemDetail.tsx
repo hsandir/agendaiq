@@ -109,7 +109,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
         
         router.refresh();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error saving:', error);
     } finally {
       setIsSaving(false);
@@ -132,7 +132,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
       if (!response.ok) {
         console.error('Failed to add to next meeting');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error adding to next meeting:', error);
     }
   };
@@ -167,7 +167,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
       if (response.ok) {
         router.refresh();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error adding comment:', error);
     }
   };
@@ -190,7 +190,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
       } else {
         console.error('Upload failed');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error uploading file:', error);
     }
   };

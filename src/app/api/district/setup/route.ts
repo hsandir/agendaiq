@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -16,19 +16,19 @@ export async function POST(request: Request) {
 
     // Get user with staff to check admin role
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.user.id as string },
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || !user.Staff?.[0]?.Role?.title || user.Staff[0].Role.title !== "Administrator") {
+    if !user || !((user as Record<string, unknown>).Staff?.[0]?.Role?.title || (user as Record<string, unknown>).Staff[0].Role.title !== "Administrator") {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
-    const body = await request.json();
-    const { name, address } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __name, __address  } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
     // Check if district already exists
     const existingDistrict = await prisma.district.findFirst({
-      where: { name: name.trim() },
+      where: { name: String(name).trim() },
     });
 
     if (existingDistrict) {
@@ -52,13 +52,13 @@ export async function POST(request: Request) {
     // Create district
     const district = await prisma.district.create({
       data: {
-        name: name.trim(),
+        name: String(name).trim(),
         address: address?.trim(),
       },
     });
 
     return NextResponse.json(district);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error creating district:", error);
     return NextResponse.json(
       { error: "Internal server error" },

@@ -90,7 +90,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
           const parsed = JSON.parse(savedCustomTheme);
           globalThemeState.customTheme = parsed;
           setCustomTheme(parsed);
-        } catch (e) {
+        } catch (e: unknown) {
           console.error("Failed to parse custom theme");
         }
       }
@@ -206,7 +206,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
       try {
         const hslValue = hexToHslVar(valueHex);
         root.style.setProperty(`--${name}`, hslValue);
-      } catch (err) {
+      } catch (err: unknown) {
         console.error(`Failed to set CSS variable --${name}:`, err);
       }
     };

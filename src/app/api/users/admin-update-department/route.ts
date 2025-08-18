@@ -16,7 +16,7 @@ export async function PUT(request: Request) {
 
     // Check if the current user is an administrator via staff relation
     const currentUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.user.id as string },
       include: { Staff: { include: { Role: true } } },
     });
     const isAdmin = currentUser?.Staff?.[0]?.Role?.title === 'Administrator';
@@ -27,7 +27,7 @@ export async function PUT(request: Request) {
       );
     }
 
-    const { userId, departmentId } = await request.json();
+    const { __userId, __departmentId  } = (await request.json()) as Record<__string, unknown>;
     const userIdNum = Number(userId);
     if (!userIdNum || !departmentId) {
       return NextResponse.json(
@@ -45,7 +45,7 @@ export async function PUT(request: Request) {
     // Update the staff's department
     const updatedStaff = await prisma.staff.update({
       where: { id: staff.id },
-      data: { department_id: departmentId },
+      data: { department_id: parseInt(departmentId) },
       include: { Role: true, Department: true },
     });
 

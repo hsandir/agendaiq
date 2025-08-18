@@ -93,13 +93,13 @@ export default function RoleTasksPage() {
       const data = await response.json();
       
       // Ensure all tasks have proper structure
-      const safeRoles = (data.roles || []).map((roleData: any) => ({
+      const safeRoles = (data.roles || []).map((roleData: Record<string, unknown>) => ({
         ...roleData,
-        tasks: (roleData.tasks || []).map((task: any) => ({
+        tasks: (roleData.tasks || []).map((task: Record<string, unknown>) => ({
           ...task,
           meeting: task.meeting || { id: 0, title: 'Unknown', date: new Date().toISOString() }
         }))
-      }));
+      })));
       setRolesWithTasks(safeRoles);
       setTransitionHistory(data.transitions || []);
       
@@ -108,7 +108,7 @@ export default function RoleTasksPage() {
         ?.filter((r: RoleWithTasks) => r.stats.overdueTasks > 0)
         .map((r: RoleWithTasks) => r.role.id) || [];
       setExpandedRoles(new Set(rolesWithOverdue));
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch role tasks:', error);
     } finally {
       setIsLoading(false);

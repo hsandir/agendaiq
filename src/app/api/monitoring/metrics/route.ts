@@ -20,7 +20,7 @@ const MAX_BUFFER_SIZE = 1000;
 
 export async function POST(request: Request) {
   try {
-    const metrics = await request.json() as WebVitalsMetric;
+    const metrics = await request.json() as Record<string, unknown>; as WebVitalsMetric;
     
     // Add timestamp
     const userAgent = request.headers.get('user-agent') ?? 'unknown';
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to collect metrics:', error);
     return NextResponse.json(
       { error: 'Failed to collect metrics' },
@@ -83,7 +83,7 @@ export async function GET() {
     };
 
     return NextResponse.json(metrics);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to get metrics:', error);
     return NextResponse.json(
       { error: 'Failed to get metrics' },
@@ -93,10 +93,10 @@ export async function GET() {
 }
 
 function calculatePercentiles(metricName: string) {
-  const values = webVitalsBuffer
+  const values = (webVitalsBuffer
     .filter(m => m.name === metricName)
     .map(m => m.value)
-    .sort((a, b) => a - b);
+    .sort((a, b) => a - b));
 
   if (values.length === 0) {
     return { p50: null, p75: null, p95: null, p99: null };
@@ -126,7 +126,7 @@ async function getApplicationMetrics() {
 async function getDatabaseMetrics() {
   try {
     const [userCount, meetingCount, sessionCount] = await Promise.all([
-      prisma.user.count(),
+      prisma.(user as Record<string, unknown>).count(),
       prisma.meeting.count(),
       prisma.session.count(),
     ]);
@@ -143,10 +143,10 @@ async function getDatabaseMetrics() {
       responseTime,
       status: responseTime < 100 ? 'healthy' : 'slow',
     };
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       status: 'error',
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : String(error),
     };
   }
 }

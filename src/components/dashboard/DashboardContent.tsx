@@ -67,8 +67,8 @@ export function DashboardContent({
   quickStats, 
   safeFormatDateTime 
 }: DashboardContentProps) {
-  const { layout } = useLayout();
-  const contentLayoutClass = layoutClasses.content[layout.contentLayout];
+  const { __layout  } = useLayout();
+  const contentLayoutClass = layoutClasses.content[(layout.contentLayout)];
   
   // Default two-column layout for modern themes
   const renderContent = () => {
@@ -89,11 +89,11 @@ export function DashboardContent({
       <h1 className="text-2xl font-bold text-foreground mb-2">Welcome back, {user.name}</h1>
       {(userWithStaff?.staff?.school || userWithStaff?.Staff?.[0]?.School) && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>{userWithStaff.staff?.school?.name || userWithStaff.Staff?.[0]?.School?.name}</span>
-          {(userWithStaff.staff?.school?.code || userWithStaff.Staff?.[0]?.School?.address) && (
+          <span>{(userWithStaff as any).staff?.school?.name || userWithStaff.Staff?.[0]?.School?.name}</span>
+          {((userWithStaff as any).staff?.school?.code || userWithStaff.Staff?.[0]?.School?.address) && (
             <>
               <span>•</span>
-              <span>{userWithStaff.staff?.school?.code || userWithStaff.Staff?.[0]?.School?.address}</span>
+              <span>{(userWithStaff as any).staff?.school?.code || userWithStaff.Staff?.[0]?.School?.address}</span>
             </>
           )}
         </div>
@@ -117,7 +117,7 @@ export function DashboardContent({
         </div>
       ))}
     </div>
-  );
+  ));
 
   const renderMeetingsList = () => (
     <section className="card p-6">
@@ -168,7 +168,7 @@ export function DashboardContent({
         )}
       </div>
     </section>
-  );
+  ));
 
   const renderActivitySummary = () => (
     <section className="card p-6">

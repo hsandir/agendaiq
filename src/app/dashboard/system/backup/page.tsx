@@ -70,7 +70,7 @@ export default function BackupManagementPage() {
         const data = await response.json();
         setBackups(data.backups || []);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch backups:', error);
       showNotification('Failed to fetch backup list');
     }
@@ -83,14 +83,14 @@ export default function BackupManagementPage() {
         const data = await response.json();
         setStatus(data.status);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch backup status:', error);
       showNotification('Failed to fetch backup status');
     }
   };
 
   const createManualBackup = async () => {
-    if (!backupMessage.trim()) {
+    if (!String(backupMessage).trim()) {
       showNotification('Please enter a backup message');
       return;
     }
@@ -116,7 +116,7 @@ export default function BackupManagementPage() {
         const error = await response.json();
         showNotification(`Backup failed: ${error.error}`);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Manual backup failed:', error);
       showNotification('Failed to create manual backup');
     } finally {
@@ -145,7 +145,7 @@ export default function BackupManagementPage() {
         const error = await response.json();
         showNotification(`GitHub push failed: ${error.error}`);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('GitHub push failed:', error);
       showNotification('Failed to push to GitHub');
     } finally {
@@ -178,7 +178,7 @@ export default function BackupManagementPage() {
         const error = await response.json();
         showNotification(`Restore failed: ${error.error}`);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Restore failed:', error);
       showNotification('Failed to restore backup');
     } finally {
@@ -348,7 +348,7 @@ export default function BackupManagementPage() {
             />
             <Button 
               onClick={createManualBackup}
-              disabled={processing || !backupMessage.trim()}
+              disabled={processing || !String(backupMessage).trim()}
               className="w-full"
             >
               <Save className="w-4 h-4 mr-2" />

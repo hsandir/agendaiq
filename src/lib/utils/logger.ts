@@ -216,7 +216,7 @@ export class Logger {
       const duration = Date.now() - start;
       this.performance(operation, duration, undefined, context);
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       const duration = Date.now() - start;
       this.error(`${operation} failed`, { error: String(error), duration }, context);
       throw error;
@@ -230,7 +230,7 @@ export class Logger {
       const duration = Date.now() - start;
       this.performance(operation, duration, undefined, context);
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       const duration = Date.now() - start;
       this.error(`${operation} failed`, { error: String(error), duration }, context);
       throw error;

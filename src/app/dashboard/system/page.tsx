@@ -92,7 +92,7 @@ interface HealthChecks {
 }
 
 export default function SystemManagementPage() {
-  const { data: session } = useSession();
+  const { data: __session  } = useSession();
   const router = useRouter();
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [healthChecks, setHealthChecks] = useState<HealthChecks | null>(null);
@@ -103,7 +103,7 @@ export default function SystemManagementPage() {
   // Auth check - only admins can access system management
   useEffect(() => {
     if (session && session.user?.staff?.role?.title !== 'Administrator') {
-      router.push('/dashboard' as any);
+      router.push('/dashboard' as Record<string, unknown>);
       return;
     }
   }, [session, router]);
@@ -161,7 +161,7 @@ export default function SystemManagementPage() {
       } else {
         showNotification('Failed to fetch system status');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch system status:', error);
       showNotification('Failed to fetch system status');
     } finally {

@@ -25,7 +25,7 @@ global.fetch = jest.fn().mockImplementation(() =>
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
+  value: jest.fn().mockImplementation((query: string): MediaQueryList => ({
     matches: false,
     media: query,
     onchange: null,
@@ -34,7 +34,7 @@ Object.defineProperty(window, 'matchMedia', {
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
-  })),
+  } as MediaQueryList)),
 });
 
 // Mock CSS.supports
@@ -46,11 +46,11 @@ Object.defineProperty(window, 'CSS', {
 
 describe('Theme System Tests', () => {
   beforeEach(() => {
-    localStorageMock.getItem.mockClear();
-    localStorageMock.setItem.mockClear();
-    localStorageMock.clear.mockClear();
+    (localStorageMock.getItem as jest.Mock).mockClear();
+    (localStorageMock.setItem as jest.Mock).mockClear();
+    (localStorageMock.clear as jest.Mock).mockClear();
     // Reset localStorage to return null by default
-    localStorageMock.getItem.mockReturnValue(null);
+    (localStorageMock.getItem as jest.Mock).mockReturnValue(null);
     document.documentElement.style.cssText = '';
     
     // Reset fetch mock
@@ -66,7 +66,7 @@ describe('Theme System Tests', () => {
   describe('ThemeProvider', () => {
     it('should provide default theme', () => {
       const TestComponent = () => {
-        const { theme } = useTheme();
+        const { __theme  } = useTheme();
         return <div>{theme.name}</div>;
       };
 
@@ -81,7 +81,7 @@ describe('Theme System Tests', () => {
 
     it('should accept initial theme', () => {
       const TestComponent = () => {
-        const { theme } = useTheme();
+        const { __theme  } = useTheme();
         return <div>{theme.name}</div>;
       };
 
@@ -96,7 +96,7 @@ describe('Theme System Tests', () => {
 
     it('should persist theme to localStorage', () => {
       const TestComponent = () => {
-        const { setTheme } = useTheme();
+        const { __setTheme  } = useTheme();
         return (
           <button onClick={() => setTheme('dark-mode')}>
             Change Theme
@@ -119,10 +119,10 @@ describe('Theme System Tests', () => {
     });
 
     it('should load theme from localStorage', () => {
-      localStorageMock.getItem.mockReturnValue('nature-green');
+      (localStorageMock.getItem as jest.Mock).mockReturnValue('nature-green');
 
       const TestComponent = () => {
-        const { theme } = useTheme();
+        const { __theme  } = useTheme();
         return <div>{theme.name}</div>;
       };
 
@@ -137,7 +137,7 @@ describe('Theme System Tests', () => {
 
     it('should apply CSS variables to document', () => {
       const TestComponent = () => {
-        const { setTheme } = useTheme();
+        const { __setTheme  } = useTheme();
         React.useEffect(() => {
           setTheme('modern-purple');
         }, [setTheme]);
@@ -183,7 +183,7 @@ describe('Theme System Tests', () => {
 
     it('should change theme on selection', () => {
       const TestComponent = () => {
-        const { theme } = useTheme();
+        const { __theme  } = useTheme();
         return (
           <>
             <ThemeSelector />
@@ -206,7 +206,7 @@ describe('Theme System Tests', () => {
     });
 
     it('should render in different variants', () => {
-      const { rerender } = render(
+      const { __rerender  } = render(
         <ThemeProvider>
           <ThemeSelector variant="grid" />
         </ThemeProvider>
@@ -266,7 +266,7 @@ describe('Theme System Tests', () => {
     });
 
     it('should detect system theme preference', () => {
-      window.matchMedia = jest.fn().mockImplementation(query => ({
+      window.matchMedia = jest.fn().mockImplementation((query: string): MediaQueryList => ({
         matches: query === '(prefers-color-scheme: dark)',
         media: query,
         onchange: null,
@@ -275,11 +275,11 @@ describe('Theme System Tests', () => {
         addEventListener: jest.fn(),
         removeEventListener: jest.fn(),
         dispatchEvent: jest.fn(),
-      }));
+      } as MediaQueryList));
 
       expect(getSystemThemePreference()).toBe('dark');
 
-      window.matchMedia = jest.fn().mockImplementation(query => ({
+      window.matchMedia = jest.fn().mockImplementation((query: string): MediaQueryList => ({
         matches: false,
         media: query,
         onchange: null,
@@ -288,7 +288,7 @@ describe('Theme System Tests', () => {
         addEventListener: jest.fn(),
         removeEventListener: jest.fn(),
         dispatchEvent: jest.fn(),
-      }));
+      } as MediaQueryList));
 
       expect(getSystemThemePreference()).toBe('light');
     });
@@ -296,7 +296,7 @@ describe('Theme System Tests', () => {
 
   describe('Theme Persistence', () => {
     it('should persist theme across page reloads', async () => {
-      const { unmount } = render(
+      const { __unmount  } = render(
         <ThemeProvider initialTheme="nature-green">
           <div />
         </ThemeProvider>
@@ -312,10 +312,10 @@ describe('Theme System Tests', () => {
 
       unmount();
 
-      localStorageMock.getItem.mockReturnValue('nature-green');
+      (localStorageMock.getItem as jest.Mock).mockReturnValue('nature-green');
 
       const TestComponent = () => {
-        const { theme } = useTheme();
+        const { __theme  } = useTheme();
         return <div>{theme.name}</div>;
       };
 
@@ -340,7 +340,7 @@ describe('Theme System Tests', () => {
     });
 
     it('should support reduced motion preference', () => {
-      window.matchMedia = jest.fn().mockImplementation(query => ({
+      window.matchMedia = jest.fn().mockImplementation((query: string): MediaQueryList => ({
         matches: query === '(prefers-reduced-motion: reduce)',
         media: query,
         onchange: null,
@@ -349,7 +349,7 @@ describe('Theme System Tests', () => {
         addEventListener: jest.fn(),
         removeEventListener: jest.fn(),
         dispatchEvent: jest.fn(),
-      }));
+      } as MediaQueryList));
 
       render(
         <ThemeProvider>
@@ -375,7 +375,7 @@ describe('Theme System Tests', () => {
         value: 375,
       });
 
-      window.matchMedia = jest.fn().mockImplementation(query => ({
+      window.matchMedia = jest.fn().mockImplementation((query: string): MediaQueryList => ({
         matches: query === '(max-width: 768px)',
         media: query,
         onchange: null,
@@ -384,7 +384,7 @@ describe('Theme System Tests', () => {
         addEventListener: jest.fn(),
         removeEventListener: jest.fn(),
         dispatchEvent: jest.fn(),
-      }));
+      } as MediaQueryList));
 
       render(
         <ThemeProvider>
@@ -414,7 +414,7 @@ describe('Theme System Tests', () => {
 describe('Theme System Integration', () => {
   it('should apply theme consistently across all components', async () => {
     const ComponentA = () => {
-      const { theme } = useTheme();
+      const { __theme  } = useTheme();
       return (
         <div style={{ color: theme.colors.primary }}>
           Component A
@@ -423,7 +423,7 @@ describe('Theme System Integration', () => {
     };
 
     const ComponentB = () => {
-      const { theme } = useTheme();
+      const { __theme  } = useTheme();
       return (
         <div style={{ background: theme.colors.background }}>
           Component B
@@ -432,7 +432,7 @@ describe('Theme System Integration', () => {
     };
 
     const App = () => {
-      const { setTheme, theme } = useTheme();
+      const { __setTheme, __theme  } = useTheme();
       return (
         <div>
           <button onClick={() => setTheme('dark-mode')}>

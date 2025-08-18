@@ -16,7 +16,7 @@ export default async function EditMeetingPage({ params }: PageProps) {
     throw new Error("Staff record not found");
   }
 
-  const { id } = await params;
+  const { __id  } = await params;
 
   // Convert string ID to integer for Prisma
   const meetingId = parseInt(id);
@@ -55,7 +55,7 @@ export default async function EditMeetingPage({ params }: PageProps) {
 
   // Check if user has permission to edit this meeting
   const hasAdminAccess = isAnyAdmin(user);
-  const isOrganizer = meeting.organizer_id === user.staff?.id;
+  const isOrganizer = meeting.organizer_id === (user as any).staff?.id;
 
   if (!hasAdminAccess && !isOrganizer) {
     redirect("/dashboard/meetings");
@@ -69,10 +69,10 @@ export default async function EditMeetingPage({ params }: PageProps) {
       },
       OR: [
         // Same department
-        { department_id: user.staff?.department?.id },
+        { department_id: parseInt(user).staff?.department?.id },
         // Leadership roles from same school
         { 
-          school_id: user.staff?.school?.id,
+          school_id: parseInt(user).staff?.school?.id,
           Role: {
             is_leadership: true
           }
@@ -101,13 +101,13 @@ export default async function EditMeetingPage({ params }: PageProps) {
     take: 100 // Limit for performance
   });
 
-  const transformedUsers = allStaff.map(staff => ({
+  const transformedUsers = (allStaff.map(staff => ({
     id: staff.id.toString(),
     name: staff.User.name || staff.User.email || '',
     email: staff.User.email || '',
     role: staff.Role.title,
     department: staff.Department.name
-  }));
+  })));
 
   // Check if this is a draft meeting (Step 2) or existing meeting (edit)
   const isStep2 = meeting.status === 'draft';

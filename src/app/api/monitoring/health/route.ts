@@ -72,11 +72,11 @@ export async function GET() {
 
     return NextResponse.json(health, { status: statusCode });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Health check failed:', error);
     
     health.status = 'unhealthy';
-    health.error = error instanceof Error ? error.message : 'Unknown error';
+    health.error = error instanceof Error ? error.message : String(error);
     health.metrics.responseTime = Date.now() - startTime;
     
     return NextResponse.json(health, { status: 500 });

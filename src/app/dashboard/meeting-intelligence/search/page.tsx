@@ -110,7 +110,7 @@ export default function MeetingSearchPage() {
         }));
         setActionItems(safeActionItems);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Search error:', error);
     } finally {
       setIsSearching(false);
@@ -182,7 +182,7 @@ export default function MeetingSearchPage() {
             {/* Search Type Filter */}
             <select
               value={searchType}
-              onChange={(e) => setSearchType(e.target.value as any)}
+              onChange={(e) => setSearchType(e.target.value as Record<string, unknown>)}
               className="px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="all">All</option>

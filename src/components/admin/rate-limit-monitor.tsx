@@ -54,7 +54,7 @@ export default function RateLimitMonitor() {
       const data = await response.json();
       setMetrics(data);
       setError(null);
-    } catch (err) {
+    } catch (err: unknown) {
       setError('Failed to load rate limit metrics');
       console.error(err);
     } finally {
@@ -92,7 +92,7 @@ export default function RateLimitMonitor() {
       alert(result.message);
       setIpInput('');
       await fetchMetrics();
-    } catch (err) {
+    } catch (err: unknown) {
       setError('Failed to perform action');
       console.error(err);
     } finally {
@@ -112,7 +112,7 @@ export default function RateLimitMonitor() {
       if (!response.ok) throw new Error('Failed to clear metrics');
       
       await fetchMetrics();
-    } catch (err) {
+    } catch (err: unknown) {
       setError('Failed to clear metrics');
       console.error(err);
     } finally {

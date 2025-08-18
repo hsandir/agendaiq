@@ -113,7 +113,7 @@ export { RealtimeTransport } from './transports/realtime-transport';
 export async function initializeLogging() {
   // Log system startup
   await devLogger.info(
-    'SYSTEM' as any,
+    'SYSTEM' as Record<string, unknown>,
     'Logging system initialized',
     {
       transports: devLogger['transports'].map(t => t.name),
@@ -146,7 +146,7 @@ export async function initializeLogging() {
  */
 export async function shutdownLogging() {
   await devLogger.info(
-    'SYSTEM' as any,
+    'SYSTEM' as Record<string, unknown>,
     'Shutting down logging system'
   );
   

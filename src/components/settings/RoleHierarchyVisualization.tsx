@@ -49,7 +49,7 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
       // Auto-expand top level roles
       const topLevelIds = data.roles?.filter((r: Role) => r.level <= 1).map((r: Role) => r.id) || [];
       setExpandedRoles(new Set(topLevelIds));
-    } catch (error) {
+    } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Failed to load hierarchy');
     } finally {
       setLoading(false);

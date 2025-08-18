@@ -342,7 +342,7 @@ export class ErrorAnalyzer {
     topAffectedPages: string[];
     recommendations: string[];
   } {
-    const analyses = errors.map(err => this.analyzeError(err.message, err.url || '', err.stack));
+    const analyses = (errors.map(err => this.analyzeError(err.message, err.url || '', err.stack)));
     
     const summary = this.generateSummary(analyses);
     const totalErrors = errors.length;
@@ -353,14 +353,14 @@ export class ErrorAnalyzer {
     
     // Most affected pages
     const pageCount: Record<string, number> = {};
-    analyses.forEach(a => {
-      pageCount[a.pageContext] = (pageCount[a.pageContext] || 0) + 1;
+    analyses.forEacha => {
+      pageCount[((a.pageContext)] = pageCount[((a.pageContext)] || 0) + 1;
     });
     
-    const topAffectedPages = Object.entries(pageCount)
+    const topAffectedPages = (Object.entries(pageCount)
       .sort(([,a], [,b]) => b - a)
       .slice(0, 5)
-      .map(([page]) => page);
+      .map(([page]) => page));
 
     // General recommendations
     const recommendations = this.generateRecommendations(analyses);
@@ -396,8 +396,8 @@ export class ErrorAnalyzer {
 
   private static generateRecommendations(analyses: ErrorAnalysis[]): string[] {
     const categoryCount: Record<string, number> = {};
-    analyses.forEach(a => {
-      categoryCount[a.category] = (categoryCount[a.category] || 0) + 1;
+    analyses.forEacha => {
+      categoryCount[((a.category)] = categoryCount[((a.category)] || 0) + 1;
     });
     
     const recommendations = [];

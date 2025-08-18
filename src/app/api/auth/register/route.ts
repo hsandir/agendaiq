@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return RateLimiters.registration.createErrorResponse(rateLimitResult);
     }
 
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
 
     // SECURITY FIX: Add input validation schema
     const registerSchema = z.object({
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { email, password, name } = validationResult.data;
+    const { __email, __password, __name  } = validationResult.data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
       status: 201,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error in register:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }

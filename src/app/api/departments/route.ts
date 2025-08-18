@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     });
     
     return NextResponse.json(departments);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching departments:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

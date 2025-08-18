@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -18,8 +18,8 @@ export async function POST(request: Request) {
 
     // TODO: Add twoFactorSecret and twoFactorEnabled fields to User model in schema
     // Save secret to user
-    // await prisma.user.update({
-    //   where: { id: session.user.id },
+    // await prisma.(user as Record<string, unknown>).update({
+    //   where: { id: session.user.id as string },
     //   data: {
     //     twoFactorSecret: secret,
     //     twoFactorEnabled: false, // Will be enabled after verification
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error in 2FA setup:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }

@@ -29,7 +29,7 @@ export default async function AuditPage() {
     }
   });
 
-  if (!userDetails || userDetails.Staff?.[0]?.Role?.title !== "Administrator") {
+  if !userDetails || (userDetails.Staff?.[0]?.Role?.title !== "Administrator") {
     redirect("/dashboard");
   }
 
@@ -66,7 +66,7 @@ export default async function AuditPage() {
       name?: string | null;
       email: string;
     };
-    details?: any;
+    details?: Record<string, unknown>;
   }
   const auditLogs: AuditLog[] = [];
 
@@ -117,7 +117,7 @@ export default async function AuditPage() {
               <div className="absolute left-0 top-0 w-px h-full bg-border" />
               <div className="space-y-8">
                 {auditLogs.map((log) => {
-                  const { icon: Icon, category } = getActionDetails(log.action);
+                  const { icon: __Icon, __category  } = getActionDetails(log.action);
                   return (
                     <div key={log.id} className="relative pl-8">
                       <div className="absolute left-0 top-2 -translate-x-1/2">

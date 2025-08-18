@@ -97,7 +97,7 @@ export default function HealthClient({ user }: HealthClientProps) {
       } else {
         console.error('Failed to fetch health data')
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching health data:', error)
     } finally {
       setIsLoading(false)

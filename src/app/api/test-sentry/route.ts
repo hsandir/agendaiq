@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
           ]
         }, { status: 400 });
     }
-  } catch (error) {
+  } catch (error: unknown) {
     // Use the server error handler
     return handleServerError(error, request, {
       message: 'Test error handled by Sentry',

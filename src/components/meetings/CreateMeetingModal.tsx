@@ -84,7 +84,7 @@ export function CreateMeetingModal({
         throw new Error('Failed to create meeting');
       }
       
-      const { data: meeting } = await meetingResponse.json();
+      const { data: __meeting  } = await meetingResponse.json();
       
       // Add the agenda item to the new meeting
       const agendaResponse = await fetch(`/api/meetings/${meeting.id}/agenda-items`, {
@@ -117,7 +117,7 @@ export function CreateMeetingModal({
       onOpenChange(false);
       router.push(`/dashboard/meetings/${meeting.id}/edit`);
       
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error creating meeting:', error);
       alert('Failed to create meeting. Please try again.');
     } finally {

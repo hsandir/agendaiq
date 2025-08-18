@@ -22,7 +22,7 @@ interface DatabaseMetrics {
     averageTime: string;
     minTime: string;
     maxTime: string;
-    connectionPoolStatus: any;
+    connectionPoolStatus: Record<string, unknown>;
   };
 }
 
@@ -43,7 +43,7 @@ export function DatabasePerformance() {
       
       const data = await response.json();
       setMetrics(data);
-    } catch (err) {
+    } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
@@ -139,7 +139,7 @@ export function DatabasePerformance() {
                   {metrics.tests.map((test, index) => {
                     const status = getTimeStatus(test.time);
                     const time = parseFloat(test.time);
-                    const maxTime = Math.max(...metrics.tests.map(t => parseFloat(t.time)));
+                    const maxTime = (Math.max(...metrics.tests.map(t => parseFloat(t.time))));
                     const percentage = (time / maxTime) * 100;
 
                     return (

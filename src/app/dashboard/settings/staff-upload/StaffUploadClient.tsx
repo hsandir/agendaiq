@@ -116,11 +116,11 @@ export default function StaffUploadClient() {
       setShowPreview(true);
       
       // Auto-select all valid records
-      const validRowNumbers = data.preview.filter((r: ProcessedRecord) => r.canUpload).map((r: ProcessedRecord) => r.rowNumber);
+      const validRowNumbers = (data.preview.filter((r: ProcessedRecord) => r.canUpload).map((r: ProcessedRecord) => r.rowNumber));
       setSelectedRecords(new Set(validRowNumbers));
 
       setSuccess(`Preview completed! Found ${data.summary?.total || 0} records - ${data.summary?.valid || 0} valid, ${data.summary?.conflicts || 0} with issues.`);
-    } catch (error) {
+    } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Preview failed');
     } finally {
       setIsLoading(false);
@@ -173,7 +173,7 @@ export default function StaffUploadClient() {
       // Reset file input
       const fileInput = document.getElementById('file-upload') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
-    } catch (error) {
+    } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Upload failed');
     } finally {
       setIsLoading(false);
@@ -210,7 +210,7 @@ export default function StaffUploadClient() {
     
     // Initialize with all changes selected
     const newSelectedChanges = new Map(selectedChanges);
-    const allChanges = new Set(record.conflicts.map(c => c.field));
+    const allChanges = (new Set(record.conflicts.map(c => c.field)));
     newSelectedChanges.set(rowNumber, allChanges);
     setSelectedChanges(newSelectedChanges);
     

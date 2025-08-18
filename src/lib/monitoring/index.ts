@@ -210,7 +210,7 @@ class MonitoringManager {
         this.finishTransaction(transaction);
         return result;
       }
-    } catch (error) {
+    } catch (error: unknown) {
       transaction.status = 'internal_error';
       transaction.endTimestamp = Date.now();
       this.finishTransaction(transaction);
@@ -245,7 +245,7 @@ class MonitoringManager {
       const result = await fn();
       transaction.status = 'ok';
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       transaction.status = 'internal_error';
       this.captureException(error, {
         transaction: name,
@@ -341,30 +341,29 @@ class MonitoringManager {
 const monitoring = new MonitoringManager();
 
 // Export convenience functions
-export const {
-  init: initMonitoring,
-  captureException,
-  captureMessage,
-  setUser: setMonitoringUser,
-  setTags: setMonitoringTags,
-  setTag: setMonitoringTag,
-  setContext: setMonitoringContext,
-  addBreadcrumb,
-  startTransaction,
-  finishTransaction,
-  captureCheckIn,
-  startReplay,
-  stopReplay,
-  captureEvent,
-  measurePerformance,
-  withMonitoring,
-  monitorAPICall,
-  monitorDatabaseQuery,
-  close: closeMonitoring,
-  isInitialized: isMonitoringInitialized,
-  getConfig: getMonitoringConfig,
-  updateConfig: updateMonitoringConfig,
-} = monitoring;
+export const { init: __initMonitoring,
+  __captureException,
+  __captureMessage,
+  setUser: __setMonitoringUser,
+  setTags: __setMonitoringTags,
+  setTag: __setMonitoringTag,
+  setContext: __setMonitoringContext,
+  __addBreadcrumb,
+  __startTransaction,
+  __finishTransaction,
+  __captureCheckIn,
+  __startReplay,
+  __stopReplay,
+  __captureEvent,
+  __measurePerformance,
+  __withMonitoring,
+  __monitorAPICall,
+  __monitorDatabaseQuery,
+  close: __closeMonitoring,
+  isInitialized: __isMonitoringInitialized,
+  getConfig: __getMonitoringConfig,
+  updateConfig: __updateMonitoringConfig,
+ } = monitoring;
 
 // Export the instance for direct access if needed
 export default monitoring;

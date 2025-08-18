@@ -63,7 +63,7 @@ export default function MeetingAnalyticsPage() {
       
       setMetrics(data.metrics);
       setDepartmentPerformance(data.departmentPerformance || []);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch analytics:', error);
     } finally {
       setIsLoading(false);
@@ -127,7 +127,7 @@ export default function MeetingAnalyticsPage() {
           
           <select
             value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value as any)}
+            onChange={(e) => setTimeRange(e.target.value as Record<string, unknown>)}
             className="px-3 py-2 border border-border rounded-lg bg-background text-foreground text-sm"
           >
             <option value="week">Last Week</option>

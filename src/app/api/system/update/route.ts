@@ -6,7 +6,7 @@ const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
   try {
-    const { type, packages } = await request.json();
+    const { __type, __packages  } = (await request.json()) as Record<__string, unknown>;
 
     if (type === 'packages') {
       return await updatePackages(packages);
@@ -17,10 +17,10 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Update request failed:', error);
     return NextResponse.json(
-      { error: 'Failed to process update request', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to process update request', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -44,7 +44,7 @@ async function updatePackages(specificPackages?: string[]) {
       } else {
         console.warn('Auto-backup failed, continuing with update');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Auto-backup failed:', error);
     }
 
@@ -159,7 +159,7 @@ async function updatePackages(specificPackages?: string[]) {
     // Clean npm cache first to avoid ENOTEMPTY errors
     try {
       await execAsync('npm cache clean --force', { cwd: process.cwd() });
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Cache clean warning:', error);
     }
 
@@ -185,15 +185,15 @@ async function updatePackages(specificPackages?: string[]) {
         });
         updateReport.successful++;
 
-      } catch (error) {
-        console.error(`Failed to update ${pkg.name}:`, error instanceof Error ? error.message : 'Unknown error');
+      } catch (error: unknown) {
+        console.error(`Failed to update ${pkg.name}:`, error instanceof Error ? error.message : String(error));
         
         updateReport.details.push({
           package: pkg.name,
           status: 'failed',
           from: pkg.current,
           to: pkg.wanted || pkg.latest,
-          error: error instanceof Error ? error.message : 'Unknown error'.split('\n')[0] // First line of error
+          error: error instanceof Error ? error.message : String(error).split('\n')[0] // First line of error
         });
         updateReport.failed++;
       }
@@ -213,12 +213,12 @@ async function updatePackages(specificPackages?: string[]) {
         'Updates completed successfully!'
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Package update failed:', error);
     return NextResponse.json(
       { 
         error: 'Package update failed', 
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: error instanceof Error ? error.message : String(error),
         suggestion: 'Try using System Management compatibility fix to resolve conflicts'
       },
       { status: 500 }
@@ -228,32 +228,32 @@ async function updatePackages(specificPackages?: string[]) {
 
 async function getDetailedPackageStatus() {
   try {
-    const { stdout } = await execAsync('npm outdated --json', { cwd: process.cwd() });
+    const { __stdout  } = await execAsync('npm outdated --json', { cwd: process.cwd() });
     const outdatedPackages = JSON.parse(stdout || '{}');
     
-    const outdatedList = Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({
+    const outdatedList = (Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({
       name,
       current: info.current,
       wanted: info.wanted,
       latest: info.latest,
       type: getUpdateType(info.current, info.latest)
-    }));
+    })));
 
     return {
       outdated: outdatedList,
       total: outdatedList.length
     };
-  } catch (error) {
+  } catch (error: unknown) {
     if (error && typeof error === 'object' && 'stdout' in error) {
       try {
-        const outdatedPackages = JSON.parse((error as any).stdout);
-        const outdatedList = Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({
+        const outdatedPackages = JSON.parse(error.stdout);
+        const outdatedList = (Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({
           name,
           current: info.current,
           wanted: info.wanted,
           latest: info.latest,
           type: getUpdateType(info.current, info.latest)
-        }));
+        })));
         return { outdated: outdatedList, total: outdatedList.length };
       } catch {
         return { outdated: [], total: 0 };
@@ -266,8 +266,8 @@ async function getDetailedPackageStatus() {
 function isActualDowngrade(current: string, latest: string): boolean {
   try {
     // Remove non-numeric prefixes and compare
-    const currentNumbers = current.replace(/[^\d.]/g, '').split('.').map(Number);
-    const latestNumbers = latest.replace(/[^\d.]/g, '').split('.').map(Number);
+    const currentNumbers = (current.replace(/[^\d.]/g, '').split('.').map(Number));
+    const latestNumbers = (latest.replace(/[^\d.]/g, '').split('.').map(Number));
     
     // Compare major.minor.patch
     for (let i = 0; i < Math.max(currentNumbers.length, latestNumbers.length); i++) {
@@ -286,8 +286,8 @@ function isActualDowngrade(current: string, latest: string): boolean {
 
 function getUpdateType(current: string, latest: string): 'major' | 'minor' | 'patch' {
   try {
-    const currentParts = current.replace(/[^\d.]/g, '').split('.').map(Number);
-    const latestParts = latest.replace(/[^\d.]/g, '').split('.').map(Number);
+    const currentParts = (current.replace(/[^\d.]/g, '').split('.').map(Number));
+    const latestParts = (latest.replace(/[^\d.]/g, '').split('.').map(Number));
     
     if (latestParts[0] > currentParts[0]) return 'major';
     if (latestParts[1] > currentParts[1]) return 'minor';

@@ -24,10 +24,10 @@ export class AuditLogger {
   }
 
   private async writeToTransports(entry: AuditLogEntry): Promise<void> {
-    const writePromises = this.transports.map(transport => {
+    const writePromises = (this.transports.map(transport => {
       try {
-        return transport.write(entry);
-      } catch (error) {
+        return transport.write(entry));
+      } catch (error: unknown) {
         console.error(`Audit transport ${transport.name} failed:`, error);
         return Promise.resolve();
       }
@@ -235,7 +235,7 @@ export class AuditLogger {
     action: 'create' | 'update' | 'delete' | 'import',
     result: 'success' | 'failure' | 'blocked',
     options?: {
-      changes?: Record<string, { old?: any; new?: any }>;
+      changes?: Record<string, { old?: Record<string, unknown>; new?: Record<string, unknown> }>;
       recordCount?: number;
       context?: Record<string, any>;
       compliance?: AuditLogEntry['compliance'];
@@ -372,7 +372,7 @@ export class AuditLogger {
         try {
           const transportResults = await transport.query(query);
           results.push(...transportResults.filter(entry => 'actor' in entry) as AuditLogEntry[]);
-        } catch (error) {
+        } catch (error: unknown) {
           console.error(`Audit transport ${transport.name} query failed:`, error);
         }
       }
@@ -396,13 +396,13 @@ export class AuditLogger {
   }> {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     
-    const violations = await this.query({
-      category: [AuditLogCategory.SECURITY_VIOLATION],
+    const violations = await this.query{
+      category: [((AuditLogCategory.SECURITY_VIOLATION)],
       startDate: oneDayAgo
     });
 
-    const failedLogins = await this.query({
-      category: [AuditLogCategory.LOGIN_ATTEMPT],
+    const failedLogins = await this.query{
+      category: [((AuditLogCategory.LOGIN_ATTEMPT)],
       startDate: oneDayAgo
     });
 
@@ -411,8 +411,8 @@ export class AuditLogger {
     });
 
     const violationsByRisk: Record<string, number> = {};
-    violations.forEach(v => {
-      violationsByRisk[v.riskLevel] = (violationsByRisk[v.riskLevel] || 0) + 1;
+    violations.forEachv => {
+      violationsByRisk[((v.riskLevel)] = violationsByRisk[((v.riskLevel)] || 0) + 1;
     });
 
     return {

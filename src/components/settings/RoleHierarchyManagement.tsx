@@ -42,7 +42,7 @@ export function RoleHierarchyManagement() {
       }
       const data = await res.json();
       setRoles(data);
-    } catch (error) {
+    } catch (error: unknown) {
       setError('Failed to fetch roles');
     }
   };
@@ -68,7 +68,7 @@ export function RoleHierarchyManagement() {
 
       setSuccess('Default roles initialized successfully');
       fetchRoles(); // Refresh the roles list
-    } catch (error) {
+    } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Failed to initialize roles');
     } finally {
       setIsLoading(false);
@@ -101,7 +101,7 @@ export function RoleHierarchyManagement() {
       setNewRoleName('');
       setSelectedSubordinates([]);
       fetchRoles(); // Refresh the roles list
-    } catch (error) {
+    } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Failed to add role');
     } finally {
       setIsLoading(false);
@@ -125,7 +125,7 @@ export function RoleHierarchyManagement() {
 
       setSuccess(`Successfully deleted role: ${roleTitle}`);
       fetchRoles(); // Refresh the roles list
-    } catch (error) {
+    } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Failed to delete role');
     } finally {
       setIsLoading(false);

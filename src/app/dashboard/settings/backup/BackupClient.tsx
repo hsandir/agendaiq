@@ -136,7 +136,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
       const data = await response.json();
       setBackupData(data);
       showNotification(`Loaded ${data.backups.length} backup entries`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch backup data:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch backup data';
       setError(errorMessage);
@@ -170,7 +170,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
       await fetchBackupData();
       
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Backup creation failed:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to create backup';
       showNotification(`Backup failed: ${errorMessage}`);
@@ -210,7 +210,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
       // Refresh backup list
       await fetchBackupData();
       
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Backup upload failed:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to upload backup';
       showNotification(`Upload failed: ${errorMessage}`);
@@ -250,7 +250,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
       
       showNotification('Backup created successfully!');
       await fetchBackupData(); // Refresh the list
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to create backup:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to create backup';
       showNotification(errorMessage);

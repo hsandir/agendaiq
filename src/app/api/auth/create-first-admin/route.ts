@@ -12,7 +12,7 @@ const createAdminSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Check if there are any users in the system first
-    const userCount = await prisma.user.count();
+    const userCount = await prisma.(user as Record<string, unknown>).count();
     
     // If users exist, require authentication
     if (userCount > 0) {
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
     const validation = createAdminSchema.safeParse(body);
 
     if (!validation.success) {
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { userId, password } = validation.data;
+    const { __userId, __password  } = validation.data;
 
     // Check if user exists and doesn't have a password
     const user = await prisma.user.findUnique({
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (user.hashedPassword) {
+    if ((user as Record<string, unknown>).hashedPassword) {
       return NextResponse.json(
         { error: 'User already has a password set' },
         { status: 400 }
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Update the user with the password
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.(user as Record<string, unknown>).update({
       where: { id: userId },
       data: {
         hashedPassword: hashedPassword,
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error creating first admin:', error);
     return NextResponse.json(
       { error: 'Failed to create admin account' },

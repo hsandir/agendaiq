@@ -45,7 +45,7 @@ export function SignInButton({ onSuccess }: SignInButtonProps) {
       if (result?.ok && onSuccess) {
         onSuccess();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Sign in error:", error);
     }
   };

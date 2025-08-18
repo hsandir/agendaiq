@@ -57,7 +57,7 @@ export async function initializeRoles() {
     }
 
     console.log('Default roles initialized successfully');
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error initializing roles:', error);
     throw error;
   }

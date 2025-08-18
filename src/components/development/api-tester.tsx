@@ -93,7 +93,7 @@ export default function ApiTester() {
         timestamp: new Date().toISOString(),
       }
       setHistory([historyItem, ...history.slice(0, 19)])
-    } catch (error) {
+    } catch (error: unknown) {
       setResponse({
         error: error instanceof Error ? error.message : 'An error occurred',
         duration: Date.now() - startTime,

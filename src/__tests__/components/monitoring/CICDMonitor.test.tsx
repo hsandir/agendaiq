@@ -147,7 +147,7 @@ describe('CICDMonitor Component', () => {
         expect(consoleSpy).toHaveBeenCalledWith('Failed to fetch CI/CD data:', expect.any(Error));
       });
 
-      consoleSpy.mockRestore();
+      (consoleSpy as jest.Mock).mockRestore();
     });
   });
 
@@ -204,7 +204,7 @@ describe('CICDMonitor Component', () => {
 
     it('should auto-refresh data every 10 seconds when enabled', async () => {
       const fetchSpy = global.fetch as jest.Mock;
-      fetchSpy.mockClear();
+      (fetchSpy as jest.Mock).mockClear();
 
       render(<CICDMonitor />);
 
@@ -234,7 +234,7 @@ describe('CICDMonitor Component', () => {
         expect(screen.getByText('Recent Pipeline Runs')).toBeInTheDocument();
       });
 
-      fetchSpy.mockClear();
+      (fetchSpy as jest.Mock).mockClear();
 
       // Click stop auto-refresh
       const stopButton = screen.getByRole('button', { name: /Stop Auto-refresh/i });
@@ -257,7 +257,7 @@ describe('CICDMonitor Component', () => {
         expect(screen.getByText('Recent Pipeline Runs')).toBeInTheDocument();
       });
 
-      fetchSpy.mockClear();
+      (fetchSpy as jest.Mock).mockClear();
       mockApiResponses();
 
       const refreshButton = screen.getByRole('button', { name: /^Refresh$/i });

@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return RateLimiters.registration.createErrorResponse(rateLimitResult);
     }
 
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
 
     // SECURITY FIX: Add input validation schema
     const signupSchema = z.object({
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { email, password } = validationResult.data;
+    const { __email, __password  } = validationResult.data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     const hashedPassword = await hash(password, 12);
 
     // Check if this is the first user
-    const userCount = await prisma.user.count();
+    const userCount = await prisma.(user as Record<string, unknown>).count();
     const isFirstUser = userCount === 0;
 
     // Create user
@@ -81,11 +81,11 @@ export async function POST(request: Request) {
           if (defaultDepartment) {
             await prisma.staff.create({
               data: {
-                user_id: user.id,
-                role_id: adminRole.id,
-                school_id: defaultSchool.id,
-                district_id: defaultDistrict.id,
-                department_id: defaultDepartment.id,
+                user_id: parseInt(user.id),
+                role_id: parseInt(adminRole.id),
+                school_id: parseInt(defaultSchool.id),
+                district_id: parseInt(defaultDistrict.id),
+                department_id: parseInt(defaultDepartment.id),
               },
             });
           }
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
         staff: userWithStaff?.Staff,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error in signup:", error);
     return NextResponse.json(
       { error: "An error occurred during signup" },

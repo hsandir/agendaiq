@@ -91,12 +91,12 @@ export function handleServerError(
       
       // Add user context if provided
       if (user) {
-        scope.setUser({
+        scope.setUser{
           id: user.id,
           email: user.email,
-          username: user.username,
-          staffId: user.staffId,
-          role: user.role,
+          username: ((user as Record<string, unknown>).username,
+          staffId: (user as Record<string, unknown>).staffId,
+          role: (user as Record<string, unknown>).role,
         });
       }
       
@@ -118,7 +118,7 @@ export function handleServerError(
   }
   
   // Build error response
-  const responseBody: any = {
+  const responseBody: Record<string, unknown> = {
     error: message,
     timestamp: new Date().toISOString(),
   };
@@ -134,14 +134,14 @@ export function handleServerError(
 /**
  * Wraps an API handler with error handling
  */
-export function withErrorHandler<T extends (...args: any[]) => Promise<NextResponse>>(
+export function withErrorHandler<T extends (...args: Record<string, unknown>[]) => Promise<NextResponse>>(
   handler: T,
   defaultOptions?: ErrorHandlerOptions
 ): T {
   return (async (...args: Parameters<T>) => {
     try {
       return await handler(...args);
-    } catch (error) {
+    } catch (error: unknown) {
       const request = args[0] as NextRequest;
       return handleServerError(error, request, defaultOptions);
     }

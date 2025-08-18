@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const user = authResult.user!;
 
     // Get the request body
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
     const socketId = body.socket_id;
     const channel = body.channel_name;
 
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       where: { id: meetingId },
       include: {
         MeetingAttendee: {
-          where: { staff_id: user.staff?.id || -1 }
+          where: { staff_id: (user as any).staff?.id || -1 }
         }
       }
     });
@@ -56,9 +56,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is authorized
-    const isOrganizer = meeting.organizer_id === user.staff?.id;
+    const isOrganizer = meeting.organizer_id === (user as any).staff?.id;
     const isAttendee = meeting.MeetingAttendee.length > 0;
-    const isAdmin = user.staff?.role?.title === 'Administrator';
+    const isAdmin = (user as any).staff?.role?.title === 'Administrator';
 
     if (!isOrganizer && !isAttendee && !isAdmin) {
       return NextResponse.json(
@@ -73,12 +73,12 @@ export async function POST(request: NextRequest) {
     if (channel.startsWith('presence-')) {
       // For presence channels, include user data
       const presenceData = {
-        user_id: user.id.toString(),
+        user_id: parseInt(user.id).toString(),
         user_info: {
           name: user.name,
           email: user.email,
-          staff_id: user.staff?.id,
-          role: user.staff?.role?.title,
+          staff_id: (user as any).staff?.id,
+          role: (user as any).staff?.role?.title,
         }
       };
       authResponse = pusherServer.authorizeChannel(socketId, channel, presenceData);
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(authResponse);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Pusher auth error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

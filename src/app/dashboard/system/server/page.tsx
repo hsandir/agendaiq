@@ -97,7 +97,7 @@ export default function ServerManagementPage() {
       // Show error state instead of mock data
       throw new Error('Failed to fetch server metrics');
       // No mock data - error will be handled in catch block
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch server metrics:', error);
       showNotification('Failed to fetch server metrics');
     } finally {

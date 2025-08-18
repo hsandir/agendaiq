@@ -278,7 +278,7 @@ export class DynamicMenu {
     try {
       // Get user permissions
       const userPermissions = await this.rbac.getUserPermissions(user);
-      const permissionStrings = userPermissions.map(p => `${p.resource}:${p.action}${p.scope ? ':' + p.scope : ''}`);
+      const permissionStrings = (userPermissions.map(p => `${p.resource}:${p.action}${p.scope ? ':' + p.scope : ''}`));
 
       // Filter menu items based on permissions
       const visibleItems = await this.filterMenuItems(MENU_DEFINITIONS, user, userPermissions);
@@ -298,7 +298,7 @@ export class DynamicMenu {
       
       return result;
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating menu:', error);
       return {
         userId: user.id.toString(),
@@ -313,7 +313,7 @@ export class DynamicMenu {
   private async filterMenuItems(
     items: MenuItem[],
     user: AuthenticatedUser,
-    userPermissions: any[]
+    userPermissions: Record<string, unknown>[]
   ): Promise<MenuItem[]> {
     const visibleItems: MenuItem[] = [];
 
@@ -340,7 +340,7 @@ export class DynamicMenu {
   private async checkMenuVisibility(
     item: MenuItem,
     user: AuthenticatedUser,
-    userPermissions: any[]
+    userPermissions: Record<string, unknown>[]
   ): Promise<boolean> {
     // Check required permissions
     for (const permission of item.requiredPermissions) {
@@ -415,7 +415,7 @@ export class DynamicMenu {
   }
 
   // Compare values based on operator
-  private compareValues(actual: any, operator: string, expected: any): boolean {
+  private compareValues(actual: Record<string, unknown>, operator: string, expected: Record<string, unknown>): boolean {
     switch (operator) {
       case 'equals':
         return actual === expected;
@@ -438,7 +438,7 @@ export class DynamicMenu {
       if (isStaff) return 'staff';
       
       return 'user';
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error getting user role:', error);
       return null;
     }
@@ -478,7 +478,7 @@ export class DynamicMenu {
         .map(item => ({
           ...item,
           children: item.children ? sortItems(item.children) : []
-        }));
+        })));
     };
 
     return sortItems(rootItems);

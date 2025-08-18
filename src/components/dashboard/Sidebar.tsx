@@ -30,7 +30,7 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
     setExpandedItems(newExpanded);
   };
 
-  const renderNavItem = (item: any, depth = 0) => {
+  const renderNavItem = (item: Record<string, unknown>, depth = 0) => {
     const hasChildren = item.children && item.children.length > 0;
     const isExpanded = expandedItems.has(item.href);
     const isItemActive = isActive(item.href);
@@ -46,7 +46,7 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
                   callbackUrl: '/auth/signin',
                   redirect: true 
                 });
-              } catch (error) {
+              } catch (error: unknown) {
                 // Fallback to direct navigation if signOut fails
                 window.location.href = '/auth/signin';
               }
@@ -105,7 +105,7 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
             role="group"
             aria-label={`${item.label} submenu`}
           >
-            {item.children.map((child: any) => renderNavItem(child, depth + 1))}
+            {item.children.map((child: Record<string, unknown>) => renderNavItem(child, depth + 1))}
           </div>
         )}
       </div>

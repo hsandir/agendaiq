@@ -29,10 +29,10 @@ export class DevLogger {
   }
 
   private async writeToTransports(entry: DevLogEntry): Promise<void> {
-    const writePromises = this.transports.map(transport => {
+    const writePromises = (this.transports.map(transport => {
       try {
-        return transport.write(entry);
-      } catch (error) {
+        return transport.write(entry));
+      } catch (error: unknown) {
         console.error(`Transport ${transport.name} failed:`, error);
         return Promise.resolve();
       }
@@ -255,7 +255,7 @@ export class DevLogger {
         try {
           const transportResults = await transport.query(query);
           results.push(...transportResults.filter(entry => 'category' in entry) as DevLogEntry[]);
-        } catch (error) {
+        } catch (error: unknown) {
           console.error(`Transport ${transport.name} query failed:`, error);
         }
       }
@@ -277,7 +277,7 @@ export class DevLogger {
         try {
           const stats = await transport.stats();
           allStats.push(stats);
-        } catch (error) {
+        } catch (error: unknown) {
           console.error(`Transport ${transport.name} stats failed:`, error);
         }
       }
@@ -288,12 +288,12 @@ export class DevLogger {
       return {
         totalLogs: 0,
         logsByLevel: {
-          [LogLevel.TRACE]: 0,
-          [LogLevel.DEBUG]: 0,
-          [LogLevel.INFO]: 0,
-          [LogLevel.WARN]: 0,
-          [LogLevel.ERROR]: 0,
-          [LogLevel.FATAL]: 0
+          [(LogLevel.TRACE)]: 0,
+          [(LogLevel.DEBUG)]: 0,
+          [(LogLevel.INFO)]: 0,
+          [(LogLevel.WARN)]: 0,
+          [(LogLevel.ERROR)]: 0,
+          [(LogLevel.FATAL)]: 0
         },
         logsByCategory: {},
         timeRange: {
@@ -306,12 +306,12 @@ export class DevLogger {
     const combinedStats: LogStats = {
       totalLogs: 0,
       logsByLevel: {
-        [LogLevel.TRACE]: 0,
-        [LogLevel.DEBUG]: 0,
-        [LogLevel.INFO]: 0,
-        [LogLevel.WARN]: 0,
-        [LogLevel.ERROR]: 0,
-        [LogLevel.FATAL]: 0
+        [(LogLevel.TRACE)]: 0,
+        [(LogLevel.DEBUG)]: 0,
+        [(LogLevel.INFO)]: 0,
+        [(LogLevel.WARN)]: 0,
+        [(LogLevel.ERROR)]: 0,
+        [(LogLevel.FATAL)]: 0
       },
       logsByCategory: {},
       timeRange: {

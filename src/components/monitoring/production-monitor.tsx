@@ -117,7 +117,7 @@ export default function ProductionMonitor() {
           }
         }];
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch production errors:', error);
       return [{
         id: `fetch-error-${Date.now()}`,
@@ -210,7 +210,7 @@ export default function ProductionMonitor() {
   const markAsResolved = (errorId: string) => {
     setErrors(prev => prev.map(err => 
       err.id === errorId ? { ...err, resolved: true } : err
-    ));
+    )));
   };
 
   const getSeverityIcon = (severity: string) => {

@@ -13,7 +13,7 @@ export async function POST() {
 
     // Disable 2FA and remove secret
     // TODO: Add twoFactorEnabled and twoFactorSecret fields to User model in schema
-    // await prisma.user.update({
+    // await prisma.(user as Record<string, unknown>).update({
     //   where: { email: session.user?.email! },
     //   data: {
     //     twoFactorEnabled: false,
@@ -25,7 +25,7 @@ export async function POST() {
     return new NextResponse("2FA functionality not available", { status: 501 });
 
     return new NextResponse("2FA disabled successfully", { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error disabling 2FA:", error);
     return new NextResponse("Internal server error", { status: 500 });
   }

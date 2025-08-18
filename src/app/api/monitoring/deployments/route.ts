@@ -48,7 +48,7 @@ async function fetchVercelDeployments() {
       url: deployment.url ? `https://${deployment.url}` : undefined,
       rollbackAvailable: deployment.state === 'READY'
     })) || [];
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch Vercel deployments:', error);
     return [];
   }
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
       source: deployments.length > 0 ? 'vercel' : 'none',
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching deployments:', error);
     return NextResponse.json(
       { error: 'Failed to fetch deployment data' },

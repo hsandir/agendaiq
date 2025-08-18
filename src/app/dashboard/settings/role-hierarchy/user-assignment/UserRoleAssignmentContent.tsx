@@ -89,7 +89,7 @@ export default function UserRoleAssignmentContent() {
         const departmentsResponse = await departmentsRes.json();
         setDepartments(departmentsResponse.data || []);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error loading data:', error);
       setMessage({ type: 'error', text: 'Failed to load data' });
     } finally {
@@ -110,15 +110,15 @@ export default function UserRoleAssignmentContent() {
 
     // Filter by role
     if (roleFilter) {
-      filtered = filtered.filter(user => 
-        user.Staff?.some(staff => staff.Role?.title === roleFilter)
+      filtered = filtered.filteruser => 
+        ((user as Record<string, unknown>).Staff?.some(staff => staff.Role?.title === roleFilter)
       );
     }
 
     // Filter by department
     if (departmentFilter) {
-      filtered = filtered.filter(user => 
-        user.Staff?.some(staff => staff.Department?.name === departmentFilter)
+      filtered = filtered.filteruser => 
+        ((user as Record<string, unknown>).Staff?.some(staff => staff.Department?.name === departmentFilter)
       );
     }
 
@@ -154,7 +154,7 @@ export default function UserRoleAssignmentContent() {
         const error = await response.json();
         setMessage({ type: 'error', text: error.error || 'Assignment failed' });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error assigning role:', error);
       setMessage({ type: 'error', text: 'Assignment failed' });
     } finally {
@@ -346,7 +346,7 @@ export default function UserRoleAssignmentContent() {
         </div>
         
         <div className="divide-y divide-gray-200">
-          {filteredUsers.map(user => (
+          {filteredUsers.mapuser => (
             <div key={user.id} className="p-6 hover:bg-muted">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
@@ -364,13 +364,13 @@ export default function UserRoleAssignmentContent() {
                 </div>
                 
                 <div className="flex items-center space-x-4">
-                  {user.Staff && user.Staff.length > 0 && (
+                  {((user as Record<string, unknown>).Staff && (user as Record<string, unknown>).Staff.length > 0 && 
                     <div className="text-right">
                       <div className="text-sm font-medium text-foreground">
-                        {user.Staff[0].Role?.title || 'No Role'}
+                        {((user as Record<string, unknown>).Staff[0].Role?.title || 'No Role'}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {user.Staff[0].Department?.name || 'No Department'}
+                        {(user as Record<string, unknown>).Staff[0].Department?.name || 'No Department'}
                       </div>
                     </div>
                   )}

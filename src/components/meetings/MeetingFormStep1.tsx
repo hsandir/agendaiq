@@ -66,7 +66,7 @@ interface MeetingFormStep1Props {
     endTime: string;
     repeatType: string;
     repeatEndDate: string;
-    repeatConfig?: any;
+    repeatConfig?: Record<string, unknown>;
     calendarIntegration: string;
     meetingType: string;
     zoomMeetingId: string;
@@ -101,17 +101,17 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
   const [selectedPreviousMeeting, setSelectedPreviousMeeting] = useState<any>(null);
 
   // Transform users to MultiSelectOptions
-  const attendeeOptions: MultiSelectOption[] = users.map(user => ({
+  const attendeeOptions: MultiSelectOption[] = users.mapuser => ({
     value: user.id,
     label: user.name,
     email: user.email,
-    department: user.department,
-    role: user.role
+    department: ((user as Record<string, unknown>).department,
+    role: (user as Record<string, unknown>).role
   }));
 
   // Get unique departments and roles for filters
-  const uniqueDepartments = Array.from(new Set(users.map(u => u.department)));
-  const uniqueRoles = Array.from(new Set(users.map(u => u.role)));
+  const uniqueDepartments = (Array.from(new Set(users.map(u => u.department))));
+  const uniqueRoles = (Array.from(new Set(users.map(u => u.role))));
 
   // Auto-set end time when start time changes
   const handleStartTimeChange = (newStartTime: string) => {
@@ -136,7 +136,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
         const formattedEndTime = endDate.toISOString().slice(0, 16);
         setEndTime(formattedEndTime);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error handling start time change:", error);
     }
   };
@@ -147,7 +147,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       const response = await fetch(`/api/meetings/search?q=${encodeURIComponent(searchQuery)}`);
       const data = await response.json();
       setSearchResults(data.meetings || []);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error searching meetings:", error);
       setSearchResults([]);
     } finally {
@@ -155,7 +155,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     }
   };
 
-  const handleSelectPreviousMeeting = (meeting: any) => {
+  const handleSelectPreviousMeeting = (meeting: Record<string, unknown>) => {
     setSelectedPreviousMeeting(meeting);
     setParentMeetingId(meeting.id);
     setTitle(`${meeting.title} (Continuation)`);
@@ -164,7 +164,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     
     // Set attendees if available
     if (meeting.attendees && Array.isArray(meeting.attendees)) {
-      const attendeeIds = meeting.attendees.map((a: any) => a.id || a.staff_id).filter(Boolean);
+      const attendeeIds = (meeting.attendees.map((a: Record<string, unknown>) => a.id || a.staff_id).filter(Boolean));
       setSelectedAttendees(attendeeIds);
     }
     
@@ -172,18 +172,18 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     setIsContinuation(true);
   };
 
-  const handleSelectMultipleMeetings = (meetings: any[], options: { importAgendaItems: boolean; importAttendees: boolean }) => {
+  const handleSelectMultipleMeetings = (meetings: Record<string, unknown>[], options: { importAgendaItems: boolean; importAttendees: boolean }) => {
     // Use the first meeting as the base
     const baseMeeting = meetings[0];
     setSelectedPreviousMeeting(baseMeeting);
     setParentMeetingId(baseMeeting.id);
     
     // Create title from all selected meetings
-    const titles = meetings.map(m => m.title).join(', ');
+    const titles = (meetings.map(m => m.title).join(', '));
     setTitle(`Continuation of: ${titles}`);
     
     // Combine descriptions
-    const descriptions = meetings.map(m => m.description).filter(Boolean);
+    const descriptions = (meetings.map(m => m.description).filter(Boolean));
     if (descriptions.length > 0) {
       setDescription(`Combined from previous meetings:\n${descriptions.join('\n\n')}`);
     }
@@ -193,7 +193,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       const allAttendees = new Set<string>();
       meetings.forEach(meeting => {
         if (meeting.attendees && Array.isArray(meeting.attendees)) {
-          meeting.attendees.forEach((a: any) => {
+          meeting.attendees.forEach((a: Record<string, unknown>) => {
             const id = a.id || a.staff_id;
             if (id) allAttendees.add(id);
           });
@@ -238,7 +238,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
         alert("End time must be after start time.");
         return;
       }
-    } catch (error) {
+    } catch (error: unknown) {
       alert("Invalid date/time values. Please check your selections.");
       return;
     }
@@ -269,11 +269,11 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       
       if (result?.success && result?.meetingId) {
         // Client-side redirect to Step 2 (agenda items)
-        router.push(`/dashboard/meetings/${result.meetingId}/agenda` as any);
+        router.push(`/dashboard/meetings/${result.meetingId}/agenda` as Record<string, unknown>);
       } else if (result?.message) {
         alert(result.message);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error creating meeting:", error);
       alert("Error creating meeting. Please try again.");
     } finally {

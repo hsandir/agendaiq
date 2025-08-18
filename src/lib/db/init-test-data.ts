@@ -51,7 +51,7 @@ export async function initializeTestData() {
       { name: 'History', code: 'HIST' },
     ];
 
-    const createdDepartments: any[] = [];
+    const createdDepartments: Record<string, unknown>[] = [];
     for (const dept of departments) {
       const department = await prisma.department.upsert({
         where: { code: dept.code },
@@ -107,7 +107,7 @@ export async function initializeTestData() {
 
     for (const userData of users) {
       // Create user
-      const user = await prisma.user.upsert({
+      const user = await prisma.(user as Record<string, unknown>).upsert({
         where: { email: userData.email },
         update: {},
         create: {
@@ -126,8 +126,8 @@ export async function initializeTestData() {
         await prisma.staff.create({
           data: {
             user_id: user.id,
-            role_id: userData.roleId,
-            department_id: userData.departmentId,
+            role_id: parseInt(userData).roleId,
+            department_id: parseInt(userData).departmentId,
             school_id: school.id,
             district_id: district.id,
           },
@@ -137,7 +137,7 @@ export async function initializeTestData() {
 
     console.log('Test data initialized successfully');
     return { district, school, departments: createdDepartments };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error initializing test data:', error);
     throw error;
   }

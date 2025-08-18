@@ -6,7 +6,7 @@ interface PageProps {
 }
 
 export default async function VerifyEmailPage({ searchParams }: PageProps) {
-  const { token } = await searchParams;
+  const { __token  } = await searchParams;
 
   if (!token) {
     redirect("/dashboard");
@@ -58,7 +58,7 @@ export default async function VerifyEmailPage({ searchParams }: PageProps) {
     }
 
     // Update user's email verification status
-    await prisma.user.update({
+    await prisma.(user as Record<string, unknown>).update({
       where: { email: verificationToken.identifier },
       data: { emailVerified: new Date() },
     });
@@ -82,7 +82,7 @@ export default async function VerifyEmailPage({ searchParams }: PageProps) {
         </div>
       </div>
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error verifying email:", error);
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted">

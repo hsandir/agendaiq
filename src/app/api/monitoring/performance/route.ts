@@ -6,7 +6,7 @@ import { Capability } from '@/lib/auth/policy';
 export async function POST(request: NextRequest) {
   // Performance monitoring doesn't require strict auth since it's for monitoring
   try {
-    const metric = await request.json();
+    const metric = (await request.json()) as Record<string, unknown>;
     
     // Only log in development with debug flag
     if (process.env.NODE_ENV === 'development' && process.env.DEBUG_PERFORMANCE === 'true') {
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     // Examples: Datadog, New Relic, custom analytics
     
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error logging performance metric:', error);
     return NextResponse.json(
       { error: 'Failed to log performance metric' },

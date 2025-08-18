@@ -81,7 +81,7 @@ export default function LiveMonitor() {
         const data = await response.json();
         return data.errors || [];
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch production errors:', error);
     }
     return [];
@@ -104,7 +104,7 @@ export default function LiveMonitor() {
       };
 
       setSystemHealth(newHealth);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Health check failed:', error);
     }
   };
@@ -163,9 +163,9 @@ export default function LiveMonitor() {
     const originalConsoleWarn = console.warn;
 
     console.error = (...args) => {
-      const message = args.map(arg => 
+      const message = (args.map(arg => 
         typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
-      ).join(' ');
+      ).join(' '));
 
       const errorEvent: ErrorEvent = {
         id: Date.now().toString(),
@@ -182,9 +182,9 @@ export default function LiveMonitor() {
     };
 
     console.warn = (...args) => {
-      const message = args.map(arg => 
+      const message = (args.map(arg => 
         typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
-      ).join(' ');
+      ).join(' '));
 
       const errorEvent: ErrorEvent = {
         id: Date.now().toString(),

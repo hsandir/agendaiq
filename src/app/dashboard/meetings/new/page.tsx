@@ -18,10 +18,10 @@ export default async function NewMeetingPage() {
       },
       OR: [
         // Same department
-        { department_id: currentStaff?.department?.id },
+        { department_id: parseInt(currentStaff)?.department?.id },
         // Leadership roles from same school
         { 
-          school_id: currentStaff?.school?.id,
+          school_id: parseInt(currentStaff)?.school?.id,
           Role: {
             is_leadership: true
           }
@@ -70,27 +70,27 @@ export default async function NewMeetingPage() {
   });
 
   // Transform staff data to match MeetingFormStep1 interface
-  const users = staff.map(s => ({
+  const users = (staff.map(s => ({
     id: s.id.toString(), // Use staff ID, not user ID
     name: s.User.name || s.User.email || "Unknown User",
     email: s.User.email || "",
     department: s.Department.name,
     role: s.Role.title,
-  }));
+  })));
 
   // Transform departments
-  const transformedDepartments = departments.map(d => ({
+  const transformedDepartments = (departments.map(d => ({
     id: d.id,
     name: d.name,
     code: d.code
-  }));
+  })));
 
   // Transform roles
-  const transformedRoles = roles.map(r => ({
+  const transformedRoles = (roles.map(r => ({
     id: r.id,
     title: r.title,
     category: r.category || undefined
-  }));
+  })));
 
   async function createMeeting(data: {
     title: string;
@@ -237,7 +237,7 @@ export default async function NewMeetingPage() {
         const meetingDate = datesToCreate[i];
         const endTime = new Date(meetingDate.getTime() + timeDuration);
         
-        const meeting = await prisma.meeting.create({
+        const meeting = (await prisma.meeting.create({
           data: {
             title: data.title + (datesToCreate.length > 1 ? ` (${i + 1}/${datesToCreate.length})` : ''),
             description: data.description || "",
@@ -264,9 +264,9 @@ export default async function NewMeetingPage() {
             parent_meeting_id: data.parentMeetingId || null,
             status: "draft", // Start as draft, will be scheduled in step 2
             organizer_id: staffWithRelations.id,
-            department_id: staffWithRelations.department_id,
-            school_id: staffWithRelations.school_id,
-            district_id: staffWithRelations.district_id,
+            department_id: parseInt(staffWithRelations).department_id,
+            school_id: parseInt(staffWithRelations).school_id,
+            district_id: parseInt(staffWithRelations).district_id,
             MeetingAttendee: {
               create: data.attendeeIds.map((staffId) => ({
                 staff_id: parseInt(staffId),
@@ -274,7 +274,7 @@ export default async function NewMeetingPage() {
               })),
             },
           },
-        });
+        }));
         
         meetings.push(meeting);
       }

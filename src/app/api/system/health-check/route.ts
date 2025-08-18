@@ -35,10 +35,10 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid action. Use: quick, full, or api-only' }, { status: 400 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Health check failed:', error);
     return NextResponse.json(
-      { error: 'Failed to perform health check', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to perform health check', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -46,17 +46,17 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { pages, type } = await request.json();
+    const { __pages, __type  } = (await request.json()) as Record<__string, unknown>;
 
     if (type === 'custom' && pages) {
       return await customHealthCheck(pages);
     }
 
     return NextResponse.json({ error: 'Invalid request. Use type: "custom" with pages array' }, { status: 400 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Custom health check failed:', error);
     return NextResponse.json(
-      { error: 'Failed to perform custom health check', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to perform custom health check', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -71,9 +71,9 @@ async function quickHealthCheck() {
       page.path === '/api/system/status'
     );
 
-    const results = await Promise.all(
+    const results = (await Promise.all(
       criticalPages.map(page => checkPage(baseUrl + page.path, page.name))
-    );
+    ));
 
     const summary = {
       total: results.length,
@@ -90,9 +90,9 @@ async function quickHealthCheck() {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: 'Quick health check failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Quick health check failed', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -132,9 +132,9 @@ async function fullHealthCheck() {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: 'Full health check failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Full health check failed', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -145,9 +145,9 @@ async function apiHealthCheck() {
     const baseUrl = 'http://localhost:3000';
     const apiPages = PAGES_TO_TEST.filter(page => page.path.startsWith('/api'));
 
-    const results = await Promise.all(
+    const results = (await Promise.all(
       apiPages.map(page => checkPage(baseUrl + page.path, page.name))
-    );
+    ));
 
     const summary = {
       total: results.length,
@@ -164,9 +164,9 @@ async function apiHealthCheck() {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: 'API health check failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'API health check failed', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -198,9 +198,9 @@ async function customHealthCheck(customPages: string[]) {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
-      { error: 'Custom health check failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Custom health check failed', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -307,16 +307,16 @@ async function checkPage(url: string, name: string) {
       timestamp: new Date().toISOString()
     };
 
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       name,
       url,
       status: 'error' as const,
-      message: `Failed to load: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      message: `Failed to load: ${error instanceof Error ? error.message : String(error)}`,
       statusCode: 0,
       responseTime: 0,
       contentType: 'unknown',
-      details: { error: error instanceof Error ? error.message : 'Unknown error' },
+      details: { error: error instanceof Error ? error.message : String(error) },
       timestamp: new Date().toISOString()
     };
   }
@@ -337,7 +337,7 @@ async function performSystemChecks() {
       message: `System API responded in ${responseTime}ms`,
       value: `${responseTime}ms`
     });
-  } catch (error) {
+  } catch (error: unknown) {
     checks.push({
       name: 'Server Responsiveness',
       status: 'error',
@@ -348,7 +348,7 @@ async function performSystemChecks() {
 
   // Check disk space
   try {
-    const { stdout } = await execAsync('df -h .', { cwd: process.cwd() });
+    const { __stdout  } = await execAsync('df -h .', { cwd: process.cwd() });
     const usage = stdout.split('\n')[1].split(/\s+/)[4]; // Get usage percentage
     
     checks.push({
@@ -389,8 +389,8 @@ async function performSystemChecks() {
 
   // Check Git status
   try {
-    const { stdout } = await execAsync('git status --porcelain', { cwd: process.cwd() });
-    const changes = stdout.split('\n').filter(line => line.trim()).length;
+    const { __stdout  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    const changes = stdout.split('\n').filter(line => String(line).trim()).length;
     
     checks.push({
       name: 'Git Status',

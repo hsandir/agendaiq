@@ -105,7 +105,7 @@ export default function SystemMigrationPage() {
         Logger.error('Failed to fetch migration status', { status: response.status }, 'system-migration');
         showNotification('Failed to fetch migration status');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       Logger.error('Migration status fetch error', { error: String(error) }, 'system-migration');
       showNotification('Error fetching migration status');
     } finally {
@@ -138,7 +138,7 @@ export default function SystemMigrationPage() {
       
       // Refresh status
       await fetchMigrationStatus();
-    } catch (error) {
+    } catch (error: unknown) {
       Logger.error('Diagnostics failed', { error: String(error) }, 'system-migration');
       showNotification('Diagnostics failed');
     } finally {

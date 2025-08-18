@@ -93,8 +93,8 @@ export default function DependenciesPage() {
   };
 
   // Uyumluluk değerlendirmesi
-  const assessCompatibility = (pkg: any): CompatibilityInfo => {
-    const { name, current, latest, type } = pkg;
+  const assessCompatibility = (pkg: Record<string, unknown>): CompatibilityInfo => {
+    const { __name, __current, __latest, __type  } = pkg;
     
     // Kritik paketler
     const criticalPackages = [
@@ -210,8 +210,8 @@ export default function DependenciesPage() {
   };
 
   const compareVersions = (a: string, b: string): number => {
-    const aParts = a.replace(/[^\d.]/g, '').split('.').map(Number);
-    const bParts = b.replace(/[^\d.]/g, '').split('.').map(Number);
+    const aParts = a.replace(/[^\d.]/g, '').split('.').map(Number));
+    const bParts = (b.replace(/[^\d.]/g, '').split('.').map(Number));
     
     for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
       const aPart = aParts[i] || 0;
@@ -270,12 +270,12 @@ export default function DependenciesPage() {
       
       setOperations(prev => [...prev, operation]);
       
-      const response = await fetch('/api/system/update', {
+      const response = await fetch'/api/system/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'packages',
-          packages: [dependency.name]
+          packages: [((dependency.name)]
         })
       });
       
@@ -304,7 +304,7 @@ export default function DependenciesPage() {
         throw new Error(result.message || 'Update failed');
       }
       
-    } catch (error) {
+    } catch (error: unknown) {
       setOperations(prev => prev.map(op => 
         op.id === operationId 
           ? { ...op, status: 'failed', endTime: new Date().toISOString(), error: String(error) }
@@ -358,14 +358,14 @@ export default function DependenciesPage() {
         await createBackup(pkg.name, pkg.currentVersion);
       }
       
-      const response = await fetch('/api/system/update', {
+      const response = (await fetch('/api/system/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'packages',
           packages: packagesToUpdate.map(p => p.name)
         })
-      });
+      }));
       
       const result = await response.json();
       
@@ -387,7 +387,7 @@ export default function DependenciesPage() {
         throw new Error(result.message || 'Bulk update failed');
       }
       
-    } catch (error) {
+    } catch (error: unknown) {
       setUpdateResult({
         success: false,
         message: `Bulk update failed: ${String(error)}`
@@ -422,12 +422,12 @@ export default function DependenciesPage() {
       
       setOperations(prev => [...prev, rollbackOperation]);
       
-      const response = await fetch('/api/system/update', {
+      const response = await fetch'/api/system/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'packages',
-          packages: [backup.packageName],
+          packages: [((backup.packageName)],
           targetVersion: backup.version
         })
       });
@@ -447,7 +447,7 @@ export default function DependenciesPage() {
         throw new Error(result.message || 'Rollback failed');
       }
       
-    } catch (error) {
+    } catch (error: unknown) {
       showNotification(`Rollback failed: ${String(error)}`);
       Logger.error('Rollback failed', { backupId, error: String(error) }, 'dependencies');
     } finally {
@@ -466,7 +466,7 @@ export default function DependenciesPage() {
         
         // Outdated packages'ları dönüştür
         if (data.packages.outdated && data.packages.outdated.length > 0) {
-          data.packages.outdated.forEach((pkg: any) => {
+          data.packages.outdated.forEach((pkg: Record<string, unknown>) => {
             const compatibility = assessCompatibility(pkg);
             
             realDependencies.push({
@@ -555,7 +555,7 @@ export default function DependenciesPage() {
         Logger.error('Failed to fetch system status', { status: response.status }, 'dependencies');
         showNotification('Failed to fetch dependencies data');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       Logger.error('Failed to fetch dependencies', { error: String(error) }, 'dependencies');
       showNotification('Error fetching dependencies');
     } finally {
@@ -604,7 +604,7 @@ export default function DependenciesPage() {
   });
 
   const statusCounts = dependencies.reduce((acc, dep) => {
-    acc[dep.status] = (acc[dep.status] || 0) + 1;
+    acc[(dep.status)] = acc[((dep.status)] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
@@ -790,7 +790,7 @@ export default function DependenciesPage() {
                               alert(`${dep.name} installed successfully`);
                               fetchDependencies();
                             }
-                          } catch (error) {
+                          } catch (error: unknown) {
                             alert(`Failed to install ${dep.name}`);
                           }
                         } else {
@@ -804,7 +804,7 @@ export default function DependenciesPage() {
                               alert(`${dep.name} updated successfully`);
                               fetchDependencies();
                             }
-                          } catch (error) {
+                          } catch (error: unknown) {
                             alert(`Failed to update ${dep.name}`);
                           }
                         }
@@ -832,19 +832,19 @@ export default function DependenciesPage() {
             }
             
             try {
-              const response = await fetch('/api/system/fix', {
+              const response = (await fetch('/api/system/fix', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                   action: 'install-multiple', 
                   packages: missingDeps.map(d => d.name) 
                 })
-              });
+              }));
               if (response.ok) {
                 alert(`Installing ${missingDeps.length} missing dependencies...`);
                 fetchDependencies();
               }
-            } catch (error) {
+            } catch (error: unknown) {
               alert('Failed to install missing dependencies');
             }
           }}

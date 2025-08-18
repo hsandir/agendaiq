@@ -29,7 +29,7 @@ export default function Error({
           url: window.location.href,
         }),
       }).catch(e => console.error('Failed to capture error:', e));
-    } catch (e) {
+    } catch (e: unknown) {
       console.error('Error capturing error:', e);
     }
   }, [error]);

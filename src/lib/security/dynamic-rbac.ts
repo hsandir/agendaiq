@@ -129,7 +129,7 @@ export class DynamicRBAC {
         timestamp: new Date()
       };
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error checking access:', error);
       return {
         granted: false,
@@ -179,7 +179,7 @@ export class DynamicRBAC {
       
       return permissions;
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error getting user permissions:', error);
       return [];
     }
@@ -239,7 +239,7 @@ export class DynamicRBAC {
 
       return { granted: false, reason: 'No inherited permissions found' };
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error checking inherited permissions:', error);
       return { granted: false, reason: 'Error checking inheritance' };
     }
@@ -272,7 +272,7 @@ export class DynamicRBAC {
       roleIds.push(...childRoles);
       
       return roleIds;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error getting role hierarchy:', error);
       return roleIds;
     }
@@ -293,7 +293,7 @@ export class DynamicRBAC {
         const grandChildren = await this.getChildRoles(child.child_role_id.toString());
         childRoles.push(...grandChildren);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error getting child roles:', error);
     }
 
@@ -315,7 +315,7 @@ export class DynamicRBAC {
         const grandParents = await this.getParentRoles(parent.parent_role_id.toString());
         parentRoles.push(...grandParents);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error getting parent roles:', error);
     }
 
@@ -328,7 +328,7 @@ export class DynamicRBAC {
       // In a real implementation, this would query a permissions table
       // For now, return mock permissions based on role
       return this.getMockPermissions(roleId);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error getting role permissions:', error);
       return [];
     }
@@ -428,7 +428,7 @@ export class DynamicRBAC {
         where: { user_id: user.id }
       });
       return !!staff;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error checking staff status:', error);
       return false;
     }

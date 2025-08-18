@@ -73,7 +73,7 @@ export function initClientMonitoring() {
  * Use this in your root component or auth provider
  */
 export function useMonitoringUser() {
-  const { data: session, status } = useSession();
+  const { data: __session, __status  } = useSession();
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -81,12 +81,12 @@ export function useMonitoringUser() {
     if (session?.user) {
       // Set user context for monitoring
       setMonitoringUser({
-        id: session.user.id,
+        id: session.user.id as string,
         username: session.user.name || undefined,
         // Never send email directly
-        tenant_id: session.user.staff?.school_id,
-        role: session.user.staff?.role?.title,
-        segment: session.user.staff?.role?.is_leadership ? 'vip' : 'standard',
+        tenant_id: session.(user as any).staff?.school_id,
+        role: session.(user as any).staff?.role?.title,
+        segment: session.(user as any).staff?.role?.is_leadership ? 'vip' : 'standard',
       });
 
       // Add breadcrumb for login

@@ -212,7 +212,7 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
     }
     
     // School admin gets ops and management capabilities
-    if (user.is_school_admin) {
+    if ((user as Record<string, unknown>).is_school_admin) {
       return Object.values(Capability).filter(cap => 
         cap.startsWith('ops:') || 
         cap.includes('manage') || 
@@ -222,12 +222,12 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
     }
     
     // Get capabilities from role permissions  
-    if (user.Staff?.[0]?.Role?.Permissions) {
-      return user.Staff[0].Role.Permissions.map((p: any) => p.capability);
+    if ((user as Record<string, unknown>).Staff?.[0]?.Role?.Permissions) {
+      return (user as Record<string, unknown>).Staff[0].Role.Permissions.map((p: Record<string, unknown>) => p.capability);
     }
     
     return [];
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error getting user capabilities:', error);
     return [];
   }
@@ -237,7 +237,7 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
 export function can(
   user: UserWithCapabilities | null | undefined, 
   capability: Capability | Capability[],
-  context?: any
+  context?: Record<string, unknown>
 ): boolean {
   if (!user) return false;
   
@@ -250,7 +250,7 @@ export function can(
   }
   
   // School admin special permissions
-  if (user.is_school_admin) {
+  if ((user as Record<string, unknown>).is_school_admin) {
     // School admin cannot access dev capabilities
     if (capability.startsWith('dev:')) return false;
     
@@ -264,10 +264,10 @@ export function can(
   }
   
   // Check user's specific capabilities
-  if (user.capabilities && user.capabilities.includes(capability)) {
+  if ((user as Record<string, unknown>).capabilities && (user as Record<string, unknown>).capabilities.includes(capability)) {
     // Handle context-specific checks (e.g., own resources)
     if (capability === Capability.MEETING_EDIT_OWN && context?.ownerId) {
-      return context.ownerId === user.id || context.ownerId === user.staff?.id;
+      return context.ownerId === user.id || context.ownerId === (user as any).staff?.id;
     }
     return true;
   }
@@ -278,12 +278,12 @@ export function can(
 // Helper functions
 export function isDevAdmin(user: UserWithCapabilities | null | undefined): boolean {
   if (!user) return false;
-  return user.is_system_admin === true || user.roleKey === RoleKey.DEV_ADMIN;
+  return user.is_system_admin === true || (user as Record<string, unknown>).roleKey === RoleKey.DEV_ADMIN;
 }
 
 export function isOpsAdmin(user: UserWithCapabilities | null | undefined): boolean {
   if (!user) return false;
-  return user.is_school_admin === true || user.roleKey === RoleKey.OPS_ADMIN;
+  return (user as Record<string, unknown>).is_school_admin === true || (user as Record<string, unknown>).roleKey === RoleKey.OPS_ADMIN;
 }
 
 export function isAnyAdmin(user: UserWithCapabilities | null | undefined): boolean {
@@ -344,12 +344,12 @@ export function canAccessApi(user: UserWithCapabilities | null | undefined, path
 }
 
 // Get user with capabilities (for auth)
-export async function enrichUserWithCapabilities(user: any): Promise<UserWithCapabilities> {
+export async function enrichUserWithCapabilities(user: Record<string, unknown>): Promise<UserWithCapabilities> {
   const capabilities = await getUserCapabilities(user.id);
   
   return {
     ...user,
     capabilities,
-    roleKey: user.staff?.role?.key || user.Staff?.Role?.key
+    roleKey: (user as any).staff?.role?.key || (user as Record<string, unknown>).Staff?.Role?.key
   };
 }

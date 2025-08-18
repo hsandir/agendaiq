@@ -17,7 +17,7 @@ export class MeetingSearchService {
     const offset = query.offset || 0;
 
     // Build where clause
-    const whereConditions: any[] = [];
+    const whereConditions: Record<string, unknown>[] = [];
 
     // Text search conditions
     if (searchTerm) {
@@ -36,7 +36,7 @@ export class MeetingSearchService {
     // Filter conditions
     if (query.filters) {
       if (query.filters.departmentId) {
-        whereConditions.push({ department_id: query.filters.departmentId });
+        whereConditions.push({ department_id: parseInt(query).filters.departmentId });
       }
       
       if (query.filters.staffId) {
@@ -53,7 +53,7 @@ export class MeetingSearchService {
       }
 
       if (query.filters.dateFrom || query.filters.dateTo) {
-        const dateFilter: any = {};
+        const dateFilter: Record<string, unknown> = {};
         if (query.filters.dateFrom) {
           dateFilter.gte = query.filters.dateFrom;
         }
@@ -198,7 +198,7 @@ export class MeetingSearchService {
       departmentId?: number;
     }
   ) {
-    const where: any = {
+    const where: Record<string, unknown> = {
       OR: [
         { topic: { contains: searchTerm, mode: 'insensitive' } },
         { problem_statement: { contains: searchTerm, mode: 'insensitive' } },
@@ -217,7 +217,7 @@ export class MeetingSearchService {
 
     if (filters?.departmentId) {
       where.Meeting = {
-        department_id: filters.departmentId
+        department_id: parseInt(filters).departmentId
       };
     }
 
@@ -280,7 +280,7 @@ export class MeetingSearchService {
     ].filter(word => word.length > 3);
 
     // Find meetings with similar keywords
-    const relatedMeetings = await prisma.meeting.findMany({
+    const relatedMeetings = (await prisma.meeting.findMany({
       where: {
         id: { not: meetingId },
         OR: keywords.map(keyword => ({
@@ -304,7 +304,7 @@ export class MeetingSearchService {
         start_time: 'desc'
       },
       take: limit
-    });
+    }));
 
     return relatedMeetings;
   }
@@ -320,7 +320,7 @@ export class MeetingSearchService {
       assignedToRoleId?: number;
     }
   ) {
-    const where: any = {
+    const where: Record<string, unknown> = {
       OR: [
         { title: { contains: searchTerm, mode: 'insensitive' } },
         { description: { contains: searchTerm, mode: 'insensitive' } },

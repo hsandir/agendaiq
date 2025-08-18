@@ -71,7 +71,7 @@ export function withLogging(
     try {
       // Execute the handler
       response = await handler(request);
-    } catch (err) {
+    } catch (err: unknown) {
       error = err instanceof Error ? err : new Error(String(err));
       
       // Log the error
@@ -204,7 +204,7 @@ async function logAuditTrail(
   path: string,
   statusCode: number,
   context: RequestContext,
-  metadata: any
+  metadata: Record<string, unknown>
 ) {
   if (!context.userId || !context.email) {
     // Can't audit without user context
@@ -293,7 +293,7 @@ export function apiLogger(
 /**
  * Database query logging wrapper
  */
-export function withDatabaseLogging<T extends (...args: any[]) => Promise<any>>(
+export function withDatabaseLogging<T extends (...args: Record<string, unknown>[]) => Promise<any>>(
   queryFunction: T,
   queryName: string
 ): T {
@@ -312,7 +312,7 @@ export function withDatabaseLogging<T extends (...args: any[]) => Promise<any>>(
       );
       
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       const duration = Date.now() - startTime;
       
       // Log failed query

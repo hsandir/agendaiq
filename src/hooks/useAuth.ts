@@ -14,7 +14,7 @@ interface UseAuthOptions {
 }
 
 interface UseAuthReturn {
-  user: any;
+  user: Record<string, unknown>;
   loading: boolean;
   error: Error | null;
   isAuthenticated: boolean;
@@ -29,16 +29,15 @@ interface UseAuthReturn {
  * Provides auth state and helper functions
  */
 export function useAuth(options: UseAuthOptions = {}): UseAuthReturn {
-  const {
-    redirectTo = '/auth/signin',
-    redirectIfFound = false,
-    requireAuth = false,
-    requireStaff = false,
-    requireAdmin = false,
+  const { redirectTo = '/auth/signin',
+    redirectIfFound = __false,
+    requireAuth = __false,
+    requireStaff = __false,
+    requireAdmin = __false,
     allowedRoles = []
-  } = options;
+   } = options;
   
-  const { data: session, status } = useSession();
+  const { data: __session, __status  } = useSession();
   const router = useRouter();
   const [error, setError] = useState<Error | null>(null);
   
@@ -70,32 +69,32 @@ export function useAuth(options: UseAuthOptions = {}): UseAuthReturn {
     
     // User found but should redirect if found
     if (redirectIfFound && isAuthenticated) {
-      router.push(redirectTo as any);
+      router.push(redirectTo as Record<string, unknown>);
       return;
     }
     
     // Check auth requirements
     if (requireAuth && !isAuthenticated) {
       setError(new Error('Authentication required'));
-      router.push(redirectTo as any);
+      router.push(redirectTo as Record<string, unknown>);
       return;
     }
     
     if (requireStaff && !isStaff) {
       setError(new Error('Staff access required'));
-      router.push('/dashboard' as any);
+      router.push('/dashboard' as Record<string, unknown>);
       return;
     }
     
     if (requireAdmin && !isAdmin) {
       setError(new Error('Admin access required'));
-      router.push('/dashboard' as any);
+      router.push('/dashboard' as Record<string, unknown>);
       return;
     }
     
     if (allowedRoles.length > 0 && !allowedRoles.includes(user?.staff?.role?.title || '')) {
       setError(new Error(`Required role: ${allowedRoles.join(' or ')}`));
-      router.push('/dashboard' as any);
+      router.push('/dashboard' as Record<string, unknown>);
       return;
     }
     

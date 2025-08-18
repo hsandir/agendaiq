@@ -72,7 +72,7 @@ async function fetchGitHubPipelines() {
         undefined,
       stages: extractStages(run),
     })) || [];
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch GitHub pipelines:', error);
     return [];
   }
@@ -195,7 +195,7 @@ export async function GET(request: NextRequest) {
       source: runs.length > 0 ? 'github' : 'none',
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching pipelines:', error);
     return NextResponse.json(
       { error: 'Failed to fetch pipeline data' },

@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     // This would typically initialize default districts, schools, departments, etc.
     
     return NextResponse.json({ message: "System initialized successfully" });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error initializing system:", error);
     return NextResponse.json(
       { error: "Internal server error" },

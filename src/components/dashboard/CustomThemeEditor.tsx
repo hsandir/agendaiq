@@ -113,7 +113,7 @@ interface CustomThemeEditorProps {
 }
 
 export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
-  const { customTheme, setCustomTheme, setTheme } = useTheme();
+  const { __customTheme, __setCustomTheme, __setTheme  } = useTheme();
   const [themeName, setThemeName] = useState('My Custom Theme');
   const [isDark, setIsDark] = useState(true);
   const [activeColorKey, setActiveColorKey] = useState<string | null>(null);
@@ -185,7 +185,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
     if (saved) {
       try {
         setSavedThemes(JSON.parse(saved));
-      } catch (e) {
+      } catch (e: unknown) {
         console.error('Failed to load custom themes:', e);
       }
     }
@@ -227,7 +227,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
   };
 
   const hslToHex = (hsl: string) => {
-    const [h, s, l] = hsl.split(' ').map(Number);
+    const [h, s, l] = hsl.split(' ').map(Number));
     const hNorm = h / 360;
     const sNorm = s / 100;
     const lNorm = l / 100;
@@ -369,7 +369,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
         console.error('Failed to save custom theme:', errorData);
         alert(`Failed to save custom theme: ${errorData.error || 'Unknown error'}`);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error saving custom theme:', error);
     } finally {
       setIsLoading(false);

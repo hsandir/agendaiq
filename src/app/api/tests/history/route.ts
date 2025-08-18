@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     // Transform logs to test history format
     const history = testLogs.map(log => {
-      const changes = log.field_changes as any || {};
+      const changes = log.field_changes as Record<string, unknown> || {};
       return {
         date: log.created_at.toISOString().split('T')[0],
         passed: changes.passed || 0,
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ history });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch test history:', error);
     return NextResponse.json(
       { error: 'Failed to fetch test history' },
@@ -80,8 +80,8 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = await request.json();
-    const { passed, failed, coverage, duration } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __passed, __failed, __coverage, __duration  } = body;
 
     // Log test run in audit log
     await prisma.auditLog.create({
@@ -90,8 +90,8 @@ export async function POST(request: NextRequest) {
         record_id: Date.now().toString(),
         operation: 'CREATE',
         source: 'SYSTEM',
-        user_id: user.id,
-        staff_id: user.staff?.id,
+        user_id: parseInt(user.id),
+        staff_id: (user as any).staff?.id,
         field_changes: {
           passed,
           failed,
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to save test history:', error);
     return NextResponse.json(
       { error: 'Failed to save test history' },

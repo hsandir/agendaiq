@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     // Return rate limiting metrics
     return await handleRateLimitMonitoring();
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching rate limit metrics:', error);
     return NextResponse.json(
       {
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
     const validation = updateSchema.safeParse(body);
 
     if (!validation.success) {
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { action, ip } = validation.data;
+    const { __action, __ip  } = validation.data;
 
     // Get all rate limiter instances
     const rateLimiters = [
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating rate limit configuration:', error);
     return NextResponse.json(
       {
@@ -206,7 +206,7 @@ export async function DELETE(request: NextRequest) {
       message: 'All rate limit data cleared',
       timestamp: new Date().toISOString(),
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error clearing rate limit data:', error);
     return NextResponse.json(
       {

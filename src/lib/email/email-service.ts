@@ -10,7 +10,7 @@ try {
   } else {
     Logger.warn('RESEND_API_KEY not found in environment variables. Email functionality will be disabled.', {}, 'email-service');
   }
-} catch (error) {
+} catch (error: unknown) {
   Logger.error('Failed to initialize Resend', { error: String(error) }, 'email-service');
 }
 
@@ -35,7 +35,7 @@ export async function sendEmail({ to, subject, html }: EmailOptions) {
     });
 
     return { success: true, data };
-  } catch (error) {
+  } catch (error: unknown) {
     Logger.error('Error sending email', { error: String(error), to, subject }, 'email-service');
     return { success: false, error };
   }

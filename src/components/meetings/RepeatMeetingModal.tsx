@@ -108,7 +108,7 @@ export function RepeatMeetingModal({
         console.error('Invalid start date:', start);
         return dates;
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error parsing start date:', error);
       return dates;
     }

@@ -93,7 +93,7 @@ export default function MeetingContinuityPage() {
       if (data.chains && data.chains.length > 0) {
         setExpandedChains(new Set([data.chains[0].id]));
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch continuity data:', error);
     } finally {
       setIsLoading(false);

@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
       })) : [];
 
       return NextResponse.json({ issues });
-    } catch (sentryError) {
+    } catch (sentryError: unknown) {
       console.error('Sentry fetch error:', sentryError);
       
       // Return sample data for development/testing
@@ -149,7 +149,7 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json({ issues: filteredIssues });
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error monitoring API error:', error);
     
     // Log to Sentry

@@ -134,7 +134,7 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
     // User successfully retrieved with capabilities
 
     return userWithCapabilities;
-  } catch (error) {
+  } catch (error: unknown) {
     Logger.error('Error getting current user:', { error });
     return null;
   }
@@ -216,7 +216,7 @@ export async function checkAuthRequirements(requirements: AuthRequirements = {})
     }
 
     // Check leadership requirement (legacy)
-    if (requirements.requireLeadership && !user.staff?.role?.is_leadership) {
+    if (requirements.requireLeadership && !(user as any).staff?.role?.is_leadership) {
       // Leadership access required but user is not leadership
       return { 
         authorized: false, 
@@ -227,7 +227,7 @@ export async function checkAuthRequirements(requirements: AuthRequirements = {})
 
     // Auth requirements satisfied
     return { authorized: true, user };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('❌ Error checking auth requirements:', error);
     Logger.error('Error checking auth requirements', { error: String(error) }, 'auth');
     return { 

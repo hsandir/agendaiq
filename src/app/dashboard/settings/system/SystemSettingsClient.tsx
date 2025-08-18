@@ -46,7 +46,7 @@ export default function SystemSettingsClient({ initialSettings }: SystemSettings
 
   const [isLoading, setIsLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
-  const { toast } = useToast();
+  const { __toast  } = useToast();
 
   // Check for changes
   useEffect(() => {
@@ -92,7 +92,7 @@ export default function SystemSettingsClient({ initialSettings }: SystemSettings
       Object.assign(initialSettings, settings);
       setHasChanges(false);
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error saving settings:', error);
       toast({
         title: "Error",

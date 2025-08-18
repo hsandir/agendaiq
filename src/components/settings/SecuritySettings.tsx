@@ -15,7 +15,7 @@ interface Device {
   is_trusted: boolean;
 }
 
-export function SecuritySettings({ user }: { user: any }) {
+export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
   const [devices, setDevices] = useState<Device[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [show2FASetup, setShow2FASetup] = useState(false);
@@ -31,7 +31,7 @@ export function SecuritySettings({ user }: { user: any }) {
       const response = await fetch("/api/devices");
       const data = await response.json();
       setDevices(data.devices || []);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to fetch devices:", error);
     } finally {
       setIsLoading(false);
@@ -49,7 +49,7 @@ export function SecuritySettings({ user }: { user: any }) {
       if (response.ok) {
         fetchDevices();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to update device:", error);
     }
   };
@@ -65,7 +65,7 @@ export function SecuritySettings({ user }: { user: any }) {
       if (response.ok) {
         fetchDevices();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to remove device:", error);
     }
   };
@@ -87,7 +87,7 @@ export function SecuritySettings({ user }: { user: any }) {
         const data = await response.json();
         alert(data.error || "Failed to disable 2FA");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to disable 2FA:", error);
     } finally {
       setIsDisabling2FA(false);
@@ -95,7 +95,7 @@ export function SecuritySettings({ user }: { user: any }) {
     }
   };
 
-  return (
+  return 
     <div className="space-y-8">
       {/* Two-Factor Authentication Section */}
       <section className="bg-card p-6 rounded-lg shadow-sm border">
@@ -104,7 +104,7 @@ export function SecuritySettings({ user }: { user: any }) {
           <h2 className="text-lg font-semibold">Two-Factor Authentication</h2>
         </div>
 
-        {user.two_factor_enabled ? (
+        {((user as Record<string, unknown>).two_factor_enabled ? (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
@@ -226,7 +226,7 @@ export function SecuritySettings({ user }: { user: any }) {
             <span className="text-sm">Login notifications</span>
             <input
               type="checkbox"
-              checked={user.login_notifications_enabled}
+              checked={(user as Record<string, unknown>).login_notifications_enabled}
               className="h-4 w-4 text-primary rounded focus:ring-ring"
               disabled
             />
@@ -236,7 +236,7 @@ export function SecuritySettings({ user }: { user: any }) {
             <span className="text-sm">Suspicious activity alerts</span>
             <input
               type="checkbox"
-              checked={user.suspicious_alerts_enabled}
+              checked={(user as Record<string, unknown>).suspicious_alerts_enabled}
               className="h-4 w-4 text-primary rounded focus:ring-ring"
               disabled
             />
@@ -246,7 +246,7 @@ export function SecuritySettings({ user }: { user: any }) {
             <span className="text-sm">Remember trusted devices</span>
             <input
               type="checkbox"
-              checked={user.remember_devices_enabled}
+              checked={(user as Record<string, unknown>).remember_devices_enabled}
               className="h-4 w-4 text-primary rounded focus:ring-ring"
               disabled
             />

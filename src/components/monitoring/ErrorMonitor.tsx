@@ -107,7 +107,7 @@ export function ErrorMonitor() {
         const data = await releaseRes.json();
         setReleaseHealth(data.release || null);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch error data:', error);
     } finally {
       setIsLoading(false);

@@ -21,7 +21,7 @@ export default async function MeetingManagementDashboard() {
     }
   });
 
-  if (!userDetails || userDetails.Staff?.[0]?.Role?.title !== "Administrator") {
+  if !userDetails || (userDetails.Staff?.[0]?.Role?.title !== "Administrator") {
     redirect("/dashboard");
   }
 

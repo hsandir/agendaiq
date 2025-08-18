@@ -57,10 +57,10 @@ export default function HealthOverviewPage() {
         const healthData = await healthResponse.json();
         setHealthChecks({
           total: healthData.results?.length || 0,
-          passing: healthData.results?.filter((r: any) => r.status === 'success').length || 0,
-          warning: healthData.results?.filter((r: any) => r.status === 'warning').length || 0,
-          failed: healthData.results?.filter((r: any) => r.status === 'error').length || 0,
-          checks: healthData.results?.map((result: any) => ({
+          passing: healthData.results?.filter((r: Record<string, unknown>) => r.status === 'success').length || 0,
+          warning: healthData.results?.filter((r: Record<string, unknown>) => r.status === 'warning').length || 0,
+          failed: healthData.results?.filter((r: Record<string, unknown>) => r.status === 'error').length || 0,
+          checks: healthData.results?.map((result: Record<string, unknown>) => ({
             name: result.name,
             status: result.status === 'success' ? 'pass' as const : 
                    result.status === 'warning' ? 'warning' as const : 'fail' as const,
@@ -68,7 +68,7 @@ export default function HealthOverviewPage() {
           })) || []
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch health data:', error);
     } finally {
       setIsLoading(false);

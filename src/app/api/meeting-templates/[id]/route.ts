@@ -14,7 +14,7 @@ export async function GET(
   
 
   try {
-    const { id } = await params;
+    const { __id  } = await params;
     const templateId = parseInt(id);
     
     if (isNaN(templateId)) {
@@ -59,7 +59,7 @@ export async function GET(
       }
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching meeting template:', error);
     return NextResponse.json(
       { error: 'Failed to fetch meeting template' },
@@ -79,7 +79,7 @@ export async function PUT(
   
 
   try {
-    const { id } = await params;
+    const { __id  } = await params;
     const templateId = parseInt(id);
     
     if (isNaN(templateId)) {
@@ -89,8 +89,8 @@ export async function PUT(
       );
     }
 
-    const body = await request.json();
-    const { name, description, duration, agenda, attendees, is_active } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __name, __description, __duration, __agenda, __attendees, __is_active  } = body;
 
     const template = await prisma.meetingTemplate.update({
       where: { id: templateId },
@@ -128,7 +128,7 @@ export async function PUT(
       }
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating meeting template:', error);
     return NextResponse.json(
       { error: 'Failed to update meeting template' },
@@ -148,7 +148,7 @@ export async function DELETE(
   
 
   try {
-    const { id } = await params;
+    const { __id  } = await params;
     const templateId = parseInt(id);
     
     if (isNaN(templateId)) {
@@ -179,7 +179,7 @@ export async function DELETE(
       message: 'Meeting template deleted successfully'
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error deleting meeting template:', error);
     return NextResponse.json(
       { error: 'Failed to delete meeting template' },

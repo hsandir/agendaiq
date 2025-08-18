@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ 
       suites: suites.sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name))
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to load test suites:', error)
     return NextResponse.json(
       { error: 'Failed to load test suites' },

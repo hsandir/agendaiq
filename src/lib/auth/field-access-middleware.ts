@@ -9,7 +9,7 @@ import {
 } from "./field-access-control";
 
 // Middleware to apply field-level access control to API responses
-export function withFieldAccess<T extends (...args: any[]) => Promise<NextResponse>>(
+export function withFieldAccess<T extends (...args: Record<string, unknown>[]) => Promise<NextResponse>>(
   handler: T,
   model: string
 ): T {
@@ -18,7 +18,7 @@ export function withFieldAccess<T extends (...args: any[]) => Promise<NextRespon
     
     // Get the request and user from args
     const request = args[0] as NextRequest;
-    const user = (request as any).user as User;
+    const user = request.user as User;
     
     if (!user) {
       return response;
@@ -57,8 +57,8 @@ export function withFieldAccess<T extends (...args: any[]) => Promise<NextRespon
 export async function validateFieldWrite(
   user: User,
   model: string,
-  data: any,
-  existingRecord?: any
+  data: Record<string, unknown>,
+  existingRecord?: Record<string, unknown>
 ): Promise<{ valid: boolean; errors: string[] }> {
   return validateWrite(user, model, data, existingRecord);
 }
@@ -72,7 +72,7 @@ export const GET = withFieldAccess(
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const users = await prisma.user.findMany();
+    const users = await prisma.(user as Record<string, unknown>).findMany();
     return NextResponse.json({ data: users });
   },
   'User'

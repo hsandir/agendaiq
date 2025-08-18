@@ -8,7 +8,7 @@ const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
   try {
-    const { action } = await request.json();
+    const { __action  } = (await request.json()) as Record<__string, unknown>;
 
     if (action === 'check') {
       return await checkSystemHealth();
@@ -21,10 +21,10 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('System fix request failed:', error);
     return NextResponse.json(
-      { error: 'Failed to process system fix request', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to process system fix request', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -41,14 +41,14 @@ async function checkSystemHealth() {
 
     // Check npm cache integrity
     try {
-      const { stdout: cacheVerify } = await execAsync('npm cache verify', { cwd: process.cwd() });
+      const { stdout: __cacheVerify  } = await execAsync('npm cache verify', { cwd: process.cwd() });
       if (cacheVerify.includes('Cache verified and compressed')) {
         health.cacheStatus = 'clean';
       } else {
         health.cacheStatus = 'corrupted';
         health.suggestion = 'Run cache clean and npm install to fix';
       }
-    } catch (error) {
+    } catch (error: unknown) {
       health.cacheStatus = 'corrupted';
       health.suggestion = 'NPM cache verification failed - clean needed';
     }
@@ -78,23 +78,23 @@ async function checkSystemHealth() {
       } else {
         health.nodeModulesStatus = 'clean';
       }
-    } catch (error) {
+    } catch (error: unknown) {
       health.nodeModulesStatus = 'unknown';
     }
 
     // Get last cache clean time
     try {
-      const { stdout: cacheInfo } = await execAsync('npm config get cache', { cwd: process.cwd() });
-      if (cacheInfo.trim()) {
+      const { stdout: __cacheInfo  } = await execAsync('npm config get cache', { cwd: process.cwd() });
+      if (String(cacheInfo).trim()) {
         health.lastCacheClean = 'Available';
       }
-    } catch (error) {
+    } catch (error: unknown) {
       // Ignore cache info errors
     }
 
     return NextResponse.json(health);
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('System health check failed:', error);
     return NextResponse.json(
       { 
@@ -141,13 +141,13 @@ async function fixSystemIssues() {
             const folderPath = join(nodeModulesPath, folder);
             await execAsync(`rm -rf "${folderPath}"`, { cwd: process.cwd() });
             results.details.push(`Removed: ${folder}`);
-          } catch (error) {
+          } catch (error: unknown) {
             results.details.push(`Failed to remove: ${folder}`);
           }
         }
         results.nodeModulesFixed = true;
       }
-    } catch (error) {
+    } catch (error: unknown) {
       results.details.push('Node modules check failed');
     }
 
@@ -156,7 +156,7 @@ async function fixSystemIssues() {
       await execAsync('npm cache clean --force', { cwd: process.cwd() });
       results.cacheFixed = true;
       results.details.push('NPM cache cleaned successfully');
-    } catch (error) {
+    } catch (error: unknown) {
       results.details.push('Cache clean failed');
     }
 
@@ -166,7 +166,7 @@ async function fixSystemIssues() {
         results.details.push('Reinstalling dependencies...');
         await execAsync('npm install', { cwd: process.cwd() });
         results.details.push('Dependencies reinstalled successfully');
-      } catch (error) {
+      } catch (error: unknown) {
         results.details.push('Dependency reinstall failed');
       }
     }
@@ -186,13 +186,13 @@ async function fixSystemIssues() {
       nodeModulesFixed: results.nodeModulesFixed
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('System fix failed:', error);
     return NextResponse.json(
       { 
         success: false,
         error: 'System fix failed', 
-        details: error instanceof Error ? error.message : 'Unknown error' 
+        details: error instanceof Error ? error.message : String(error) 
       },
       { status: 500 }
     );

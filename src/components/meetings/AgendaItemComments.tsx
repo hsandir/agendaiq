@@ -36,13 +36,13 @@ export function AgendaItemComments({ itemId, comments, onAddComment, canComment 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!newComment.trim() || isSubmitting) return;
+    if (!String(newComment).trim() || isSubmitting) return;
 
     setIsSubmitting(true);
     try {
-      await onAddComment(newComment.trim());
+      await onAddComment(String(newComment).trim());
       setNewComment("");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error adding comment:', error);
     } finally {
       setIsSubmitting(false);
@@ -70,7 +70,7 @@ export function AgendaItemComments({ itemId, comments, onAddComment, canComment 
             <Button
               size="sm"
               onClick={handleSubmit}
-              disabled={!newComment.trim() || isSubmitting}
+              disabled={!String(newComment).trim() || isSubmitting}
             >
               <Send className="h-4 w-4 mr-1" />
               {isSubmitting ? "Sending..." : "Send"}

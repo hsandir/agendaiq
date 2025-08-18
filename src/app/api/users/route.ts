@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       return createErrorNextResponse("User management access required", 403);
     }
 
-    const users = await prisma.user.findMany({
+    const users = await prisma.(user as Record<string, unknown>).findMany({
       include: {
         Staff: {
           include: {
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     }, 'api-users');
 
     return createSuccessNextResponse(users, 'Users retrieved successfully');
-  } catch (error) {
+  } catch (error: unknown) {
     Logger.error("Error in GET /api/users", { error: String(error) }, 'api-users');
     return createErrorNextResponse("Internal server error", 500);
   }

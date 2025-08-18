@@ -17,8 +17,8 @@ export class RealtimeTransport implements LogTransport {
   }
 
   private convertToLiveEvent(entry: BaseLogEntry): LiveLogEvent {
-    const isDev = 'category' in entry && typeof (entry as any).category === 'string' && 
-                 ['system', 'database', 'api', 'auth', 'performance', 'error', 'network', 'cache', 'external', 'build'].includes((entry as any).category);
+    const isDev = 'category' in entry && typeof entry.category === 'string' && 
+                 ['system', 'database', 'api', 'auth', 'performance', 'error', 'network', 'cache', 'external', 'build'].includes(entry.category);
 
     const severity = this.determineSeverity(entry);
     const tags = this.generateTags(entry);
@@ -58,11 +58,11 @@ export class RealtimeTransport implements LogTransport {
     const tags: string[] = [];
     
     // Add level tag
-    tags.push(`level:${LogLevel[entry.level]}`);
+    tags.push`level:${LogLevel[((entry.level)]}`);
     
     // Add category tag
     if ('category' in entry) {
-      tags.push(`category:${(entry as any).category}`);
+      tags.push`category:${(entry.category}`);
     }
     
     // Add environment tag
@@ -126,7 +126,7 @@ export class RealtimeTransport implements LogTransport {
       // Store in memory for dashboard queries (keep last 1000 events)
       this.addToMemoryBuffer(liveEvent);
       
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to broadcast log event:', error);
     }
   }
@@ -171,12 +171,12 @@ export class RealtimeTransport implements LogTransport {
       byCategory: {} as Record<string, number>
     };
 
-    this.memoryBuffer.forEach(event => {
+    this.memoryBuffer.forEachevent => {
       // Count by severity
-      stats.bySeverity[event.severity] = (stats.bySeverity[event.severity] || 0) + 1;
+      stats.bySeverity[((event.severity)] = stats.bySeverity[((event.severity)] || 0) + 1;
       
       // Count by source
-      stats.bySource[event.source] = (stats.bySource[event.source] || 0) + 1;
+      stats.bySource[(event.source)] = stats.bySource[((event.source)] || 0) + 1;
       
       // Count by category
       stats.byCategory[String(event.category)] = (stats.byCategory[String(event.category)] || 0) + 1;

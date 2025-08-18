@@ -173,9 +173,9 @@ class SentryProvider implements MonitoringProvider {
             // BrowserTracing is now browserTracingIntegration in newer versions
             const BrowserTracing = (Sentry as unknown as { BrowserTracing?: SentryIntegration; browserTracingIntegration?: SentryIntegration }).BrowserTracing || (Sentry as unknown as { BrowserTracing?: SentryIntegration; browserTracingIntegration?: SentryIntegration }).browserTracingIntegration;
             if (BrowserTracing) {
-              const options = (integration.options && typeof integration.options === 'object' ? integration.options : {}) as any;
+              const options = (integration.options && typeof integration.options === 'object' ? integration.options : {}) as Record<string, unknown>;
               integrations.push(
-                (new (BrowserTracing as any)(options))
+                (new (BrowserTracing as Record<string, unknown>)(options))
               );
             }
           }
@@ -185,9 +185,9 @@ class SentryProvider implements MonitoringProvider {
           if (typeof window !== 'undefined') {
             const Replay = (Sentry as unknown as { Replay?: SentryIntegration; replayIntegration?: SentryIntegration }).Replay || (Sentry as unknown as { Replay?: SentryIntegration; replayIntegration?: SentryIntegration }).replayIntegration;
             if (Replay) {
-              const options = (integration.options && typeof integration.options === 'object' ? integration.options : {}) as any;
+              const options = (integration.options && typeof integration.options === 'object' ? integration.options : {}) as Record<string, unknown>;
               integrations.push(
-                (new (Replay as any)(options))
+                (new (Replay as Record<string, unknown>)(options))
               );
             }
           }
@@ -198,9 +198,9 @@ class SentryProvider implements MonitoringProvider {
             // Server-side profiling
             const ProfilingIntegration = (Sentry as unknown as { ProfilingIntegration?: SentryIntegration; profilingIntegration?: SentryIntegration }).ProfilingIntegration || (Sentry as unknown as { ProfilingIntegration?: SentryIntegration; profilingIntegration?: SentryIntegration }).profilingIntegration;
             if (ProfilingIntegration) {
-              const options = (integration.options && typeof integration.options === 'object' ? integration.options : {}) as any;
+              const options = (integration.options && typeof integration.options === 'object' ? integration.options : {}) as Record<string, unknown>;
               integrations.push(
-                (new (ProfilingIntegration as any)(options))
+                (new (ProfilingIntegration as Record<string, unknown>)(options))
               );
             }
           }
@@ -282,10 +282,10 @@ class SentryProvider implements MonitoringProvider {
     // Never send email or other PII
     const safeUser: Record<string, unknown> = {
       id: user.id,
-      username: user.username,
-      tenant_id: user.tenant_id,
-      role: user.role,
-      segment: user.segment,
+      username: (user as Record<string, unknown>).username,
+      tenant_id: (user as Record<string, unknown>).tenant_id,
+      role: (user as Record<string, unknown>).role,
+      segment: (user as Record<string, unknown>).segment,
     };
     
     // Hash the user ID for privacy
@@ -301,7 +301,7 @@ class SentryProvider implements MonitoringProvider {
     let hash = 0;
     for (let i = 0; i < userId.length; i++) {
       const char = userId.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash) + char;
       hash = hash & hash; // Convert to 32bit integer
     }
     return `user_${Math.abs(hash)}`;
@@ -473,7 +473,7 @@ class SentryProvider implements MonitoringProvider {
     
     try {
       return await Sentry.close(timeout || 2000);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error closing Sentry:', error);
       return false;
     }

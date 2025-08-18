@@ -35,7 +35,7 @@ export function SignInForm() {
         try {
           const attemptData = JSON.parse(storedAttempt);
           setLastAttempt(attemptData);
-        } catch (e) {
+        } catch (e: unknown) {
           console.error('Failed to parse last attempt:', e);
         }
       }
@@ -158,7 +158,7 @@ export function SignInForm() {
           setError(errorInfo.message);
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setError('An error occurred during sign in');
       console.error('Sign in error:', error);
     } finally {
@@ -280,7 +280,7 @@ export function SignInForm() {
                 className="h-4 w-4 rounded border-border text-primary focus:ring-ring"
               />
               <label htmlFor="trust-device" className="ml-2 block text-sm text-foreground">
-                Trust this device for 30 days
+                Trust this device for 7 days
               </label>
             </div>
           </div>

@@ -98,9 +98,9 @@ export async function GET(request: NextRequest) {
     });
     
     // Transform roles with tasks
+    const now = new Date();
     const rolesWithTasks = roles.map(role => {
       const tasks = role.ActionItems.map((item) => {
-        const now = new Date();
         const isOverdue = item.due_date && item.due_date < now && item.status !== 'Completed';
         
         return {
@@ -181,7 +181,7 @@ export async function GET(request: NextRequest) {
       transitions
     });
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Role tasks error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch role tasks' },

@@ -149,7 +149,7 @@ export async function GET(request: NextRequest) {
       }
 
       return NextResponse.json({ release });
-    } catch (sentryError) {
+    } catch (sentryError: unknown) {
       console.error('Sentry release fetch error:', sentryError);
       
       // Return default data on error
@@ -165,7 +165,7 @@ export async function GET(request: NextRequest) {
         }
       });
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Release health API error:', error);
     
     // Log to Sentry

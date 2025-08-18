@@ -98,7 +98,7 @@ export default function ActionItemsTrackingPage() {
       }));
       setActionItems(safeItems);
       setStats(data.stats || null);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch action items:', error);
     } finally {
       setIsLoading(false);
@@ -116,7 +116,7 @@ export default function ActionItemsTrackingPage() {
       if (response.ok) {
         fetchActionItems();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to update status:', error);
     }
   };

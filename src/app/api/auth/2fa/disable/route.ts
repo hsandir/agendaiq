@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     const user = authResult.user!;
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
     
     if (!body.token) {
       return NextResponse.json(
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Disable 2FA
-    await prisma.user.update({
+    await prisma.(user as Record<string, unknown>).update({
       where: { id: user.id },
       data: {
         two_factor_enabled: false,
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       message: "2FA disabled successfully"
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('2FA Disable Error:', error);
     return NextResponse.json(
       { error: "Failed to disable 2FA" }, 

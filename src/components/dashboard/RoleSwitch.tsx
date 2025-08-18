@@ -42,7 +42,7 @@ export function RoleSwitch({ staff }: RoleSwitchProps) {
       
       // Force a hard refresh to ensure all data is updated
       window.location.reload();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error switching role:', error);
       setError(error instanceof Error ? error.message : 'Failed to switch role');
       // Reset the select to the original value on error

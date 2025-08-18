@@ -120,7 +120,7 @@ interface WorkflowJob {
   ];
 
   // Add mock failed jobs for the failed run
-  const failedRuns = mockRuns.filter(r => r.conclusion === 'failure').map(run => ({
+  const failedRuns = (mockRuns.filter(r => r.conclusion === 'failure').map(run => ({
     ...run,
     failedJobs: [
       {
@@ -135,7 +135,7 @@ interface WorkflowJob {
         ],
       },
     ],
-  }));
+  })));
 
   const successfulRuns = mockRuns.filter(r => r.conclusion !== 'failure');
   const allRuns = [...failedRuns, ...successfulRuns].sort((a, b) => 
@@ -169,7 +169,7 @@ export async function GET(request: NextRequest) {
     console.log('CI/CD API called, NODE_ENV:', process.env.NODE_ENV);
 
     // Parse query parameters
-    const { searchParams } = new URL(request.url);
+    const { __searchParams  } = new URL(request.url);
     const params = {
       limit: parseInt(searchParams.get('limit') || '30'),
       status: searchParams.get('status') || 'all',
@@ -221,7 +221,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch failed jobs details for failed runs
     const failedRuns = runs.filter(run => run.conclusion === 'failure');
-    const failedRunsWithDetails = await Promise.all(
+    const failedRunsWithDetails = (await Promise.all(
       failedRuns.slice(0, 10).map(async (run) => {
         try {
           const jobsResponse = await fetch(
@@ -241,7 +241,7 @@ export async function GET(request: NextRequest) {
             );
 
             // Get logs for failed jobs
-            const jobsWithLogs = await Promise.all(
+            const jobsWithLogs = (await Promise.all(
               failedJobs.map(async (job: WorkflowJob) => {
                 try {
                   const logsResponse = await fetch(
@@ -268,7 +268,7 @@ export async function GET(request: NextRequest) {
                     logs,
                     failedSteps: job.steps.filter(step => step.conclusion === 'failure'),
                   };
-                } catch (error) {
+                } catch (error: unknown) {
                   console.error(`Failed to fetch logs for job ${job.id}:`, error);
                   return {
                     ...job,
@@ -277,7 +277,7 @@ export async function GET(request: NextRequest) {
                   };
                 }
               })
-            );
+            ));
 
             return {
               ...run,
@@ -289,7 +289,7 @@ export async function GET(request: NextRequest) {
             ...run,
             failedJobs: [],
           };
-        } catch (error) {
+        } catch (error: unknown) {
           console.error(`Failed to fetch jobs for run ${run.id}:`, error);
           return {
             ...run,
@@ -297,7 +297,7 @@ export async function GET(request: NextRequest) {
           };
         }
       })
-    );
+    ));
 
     // Analyze common error patterns
     const errorPatterns = analyzeErrorPatterns(failedRunsWithDetails);
@@ -324,13 +324,13 @@ export async function GET(request: NextRequest) {
       stats,
       timestamp: new Date().toISOString(),
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching CI/CD runs:', error);
     return NextResponse.json(
       {
         error: 'Failed to fetch CI/CD runs',
         code: 'CI_CD_FETCH_ERROR',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: error instanceof Error ? error.message : String(error),
         timestamp: new Date().toISOString(),
       },
       { status: 500 }
@@ -344,8 +344,8 @@ export async function POST(request: NextRequest) {
     // Development endpoint - no auth required in dev mode
     console.log('CI/CD POST API called');
 
-    const body = await request.json();
-    const { action, runId, workflowId, branch = 'main' } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __action, __runId, __workflowId, branch = 'main'  } = body;
 
     if (!GITHUB_TOKEN) {
       return NextResponse.json(
@@ -409,13 +409,13 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error managing CI/CD run:', error);
     return NextResponse.json(
       {
         error: 'Failed to manage CI/CD run',
         code: 'CI_CD_ACTION_ERROR',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: error instanceof Error ? error.message : String(error),
         timestamp: new Date().toISOString(),
       },
       { status: 500 }

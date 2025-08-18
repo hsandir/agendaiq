@@ -61,7 +61,7 @@ export class ActionItemsService {
     completedBy?: number,
     notes?: string
   ) {
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       status,
       notes
     };
@@ -97,7 +97,7 @@ export class ActionItemsService {
     roleId?: number;
     staffId?: number;
   }) {
-    const where: any = {
+    const where: Record<string, unknown> = {
       status: {
         in: ['Pending', 'InProgress']
       },
@@ -116,7 +116,7 @@ export class ActionItemsService {
 
     if (filterOptions?.departmentId) {
       where.Meeting = {
-        department_id: filterOptions.departmentId
+        department_id: parseInt(filterOptions).departmentId
       };
     }
 
@@ -145,7 +145,7 @@ export class ActionItemsService {
     });
 
     // Update status to Overdue
-    const overdueIds = overdueItems.map(item => item.id);
+    const overdueIds = (overdueItems.map(item => item.id));
     if (overdueIds.length > 0) {
       await prisma.meetingActionItem.updateMany({
         where: {
@@ -173,11 +173,11 @@ export class ActionItemsService {
       roleId?: number;
     }
   ) {
-    const where: any = { status };
+    const where: Record<string, unknown> = { status };
 
     if (options?.departmentId) {
       where.Meeting = {
-        department_id: options.departmentId
+        department_id: parseInt(options).departmentId
       };
     }
 
@@ -224,11 +224,11 @@ export class ActionItemsService {
     dateFrom?: Date;
     dateTo?: Date;
   }) {
-    const where: any = {};
+    const where: Record<string, unknown> = {};
 
     if (filterOptions?.departmentId) {
       where.Meeting = {
-        department_id: filterOptions.departmentId
+        department_id: parseInt(filterOptions).departmentId
       };
     }
 
@@ -315,7 +315,7 @@ export class ActionItemsService {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const where: any = {
+    const where: Record<string, unknown> = {
       created_at: {
         gte: startDate
       }

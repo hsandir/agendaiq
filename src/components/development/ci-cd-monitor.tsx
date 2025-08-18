@@ -132,12 +132,12 @@ export default function CICDMonitor() {
       
       // Auto-expand failed runs
       if (data.runs && data.runs.length > 0) {
-        const failedRunIds = data.runs
+        const failedRunIds = (data.runs
           .filter((r: WorkflowRun) => r.conclusion === 'failure')
-          .map((r: WorkflowRun) => r.id);
+          .map((r: WorkflowRun) => r.id));
         setExpandedRuns(new Set(failedRunIds.slice(0, 3)));
       }
-    } catch (err: any) {
+    } catch (err: Record<string, unknown>) {
       console.error('Error fetching CI/CD runs:', err);
       // Set empty data on error
       setRuns([]);
@@ -163,7 +163,7 @@ export default function CICDMonitor() {
       
       const data = await response.json();
       setAutofixSuggestions(data.suggestions);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching autofix suggestions:', error);
       setAutofixSuggestions([]);
     }
@@ -198,9 +198,9 @@ export default function CICDMonitor() {
           await fetchRuns();
         }
       } else {
-        alert(`Failed to apply fix: ${result.results.failed.map((f: any) => f.error).join(', ')}`);
+        alert(`Failed to apply fix: ${result.results.failed.map((f: Record<string, unknown>) => f.error).join(', ')}`);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error applying autofix:', error);
       alert('Failed to apply autofix');
     } finally {
@@ -220,7 +220,7 @@ export default function CICDMonitor() {
       
       alert('Workflow run retry initiated');
       await fetchRuns();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error retrying run:', error);
       alert('Failed to retry run');
     }
@@ -257,7 +257,7 @@ export default function CICDMonitor() {
     }
   }, [selectedRun]);
 
-  const detectErrorType = (job: any): string => {
+  const detectErrorType = (job: Record<string, unknown>): string => {
     if (!job) return 'Unknown Error';
     
     const logs = job.logs || '';
@@ -275,7 +275,7 @@ export default function CICDMonitor() {
     return 'Unknown Error';
   };
 
-  const extractErrorMessage = (job: any): string => {
+  const extractErrorMessage = (job: Record<string, unknown>): string => {
     if (!job || !job.logs) return '';
     
     const lines = job.logs.split('\n');

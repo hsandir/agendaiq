@@ -30,11 +30,11 @@ export async function GET() {
       }
     });
 
-    return NextResponse.json({
+    return NextResponse.json{
       userId: user.id,
       email: user.email,
       is_system_admin: user.is_system_admin,
-      is_school_admin: user.is_school_admin,
+      is_school_admin: ((user as Record<string, unknown>).is_school_admin,
       
       // From getUserCapabilities
       capabilities: capabilities,
@@ -53,12 +53,12 @@ export async function GET() {
       
       // Debug info
       debugInfo: {
-        sessionCapabilities: user.capabilities || [],
+        sessionCapabilities: (user as Record<string, unknown>).capabilities || [],
         computedCapabilities: capabilities,
-        match: JSON.stringify(user.capabilities) === JSON.stringify(capabilities)
+        match: JSON.stringify((user as Record<string, unknown>).capabilities) === JSON.stringify(capabilities)
       }
     }, { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error checking capabilities:', error);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }

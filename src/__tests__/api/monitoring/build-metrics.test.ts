@@ -65,7 +65,7 @@ describe('/api/monitoring/build-metrics', () => {
   describe('Authentication', () => {
     it('should require staff authentication', async () => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockResolvedValueOnce({
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
         success: false,
         error: 'Authentication required',
         statusCode: 401
@@ -84,7 +84,7 @@ describe('/api/monitoring/build-metrics', () => {
   describe('Metrics Calculation', () => {
     beforeEach(() => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockResolvedValueOnce({
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
       });
@@ -141,7 +141,7 @@ describe('/api/monitoring/build-metrics', () => {
       };
 
       const OctokitMock = getMockOctokit();
-      OctokitMock.mockImplementation(() => createMockOctokitInstance({
+      (OctokitMock as jest.Mock).mockImplementation(() => createMockOctokitInstance({
         listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: mockWorkflowRuns }),
         listWorkflowRunArtifacts: jest.fn().mockResolvedValue({
           data: {
@@ -174,7 +174,7 @@ describe('/api/monitoring/build-metrics', () => {
 
     it('should fetch Sentry metrics when configured', async () => {
       const OctokitMock = getMockOctokit();
-      OctokitMock.mockImplementation(() => createMockOctokitInstance({
+      (OctokitMock as jest.Mock).mockImplementation(() => createMockOctokitInstance({
         listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
       }));
 
@@ -213,7 +213,7 @@ describe('/api/monitoring/build-metrics', () => {
   describe('Error Handling', () => {
     beforeEach(() => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockResolvedValueOnce({
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
       });
@@ -221,7 +221,7 @@ describe('/api/monitoring/build-metrics', () => {
 
     it('should handle GitHub API errors gracefully', async () => {
       const OctokitMock = getMockOctokit();
-      OctokitMock.mockImplementation(() => createMockOctokitInstance({
+      (OctokitMock as jest.Mock).mockImplementation(() => createMockOctokitInstance({
         listWorkflowRunsForRepo: jest.fn().mockRejectedValue(new Error('GitHub API error'))
       }));
 
@@ -241,7 +241,7 @@ describe('/api/monitoring/build-metrics', () => {
 
     it('should handle Sentry API errors gracefully', async () => {
       const OctokitMock = getMockOctokit();
-      OctokitMock.mockImplementation(() => createMockOctokitInstance({
+      (OctokitMock as jest.Mock).mockImplementation(() => createMockOctokitInstance({
         listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
       }));
 
@@ -259,8 +259,8 @@ describe('/api/monitoring/build-metrics', () => {
 
     it('should capture exceptions to Sentry on errors', async () => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockReset();
-      mockWithAuth.mockRejectedValueOnce(new Error('Unexpected error'));
+      (mockWithAuth as jest.Mock).mockReset();
+      (mockWithAuth as jest.Mock).mockRejectedValueOnce(new Error('Unexpected error'));
 
       const mockCaptureException = Sentry.captureException as jest.MockedFunction<typeof Sentry.captureException>;
 
@@ -283,7 +283,7 @@ describe('/api/monitoring/build-metrics', () => {
   describe('Metrics Structure', () => {
     beforeEach(() => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockResolvedValueOnce({
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
       });
@@ -291,7 +291,7 @@ describe('/api/monitoring/build-metrics', () => {
 
     it('should return all required metric fields', async () => {
       const OctokitMock = getMockOctokit();
-      OctokitMock.mockImplementation(() => createMockOctokitInstance({
+      (OctokitMock as jest.Mock).mockImplementation(() => createMockOctokitInstance({
         listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
       }));
 

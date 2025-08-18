@@ -47,7 +47,7 @@ export async function POST() {
     );
 
     return new NextResponse("Verification email sent", { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error sending verification email:", error);
     return new NextResponse("Internal server error", { status: 500 });
   }

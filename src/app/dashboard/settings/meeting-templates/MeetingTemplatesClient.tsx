@@ -60,7 +60,7 @@ export default function MeetingTemplatesClient({
     attendees: [] as string[],
     is_active: true
   });
-  const { toast } = useToast();
+  const { __toast  } = useToast();
 
   const availableAttendees = [
     ...roles.map(role => ({ type: 'role', value: role.title, label: `${role.title} (Role)` })),
@@ -123,7 +123,7 @@ export default function MeetingTemplatesClient({
       }
 
       resetForm();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error saving template:', error);
       toast({
         title: "Error",
@@ -156,7 +156,7 @@ export default function MeetingTemplatesClient({
         title: "Template Deleted",
         description: "Meeting template has been deleted successfully.",
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error deleting template:', error);
       toast({
         title: "Error",

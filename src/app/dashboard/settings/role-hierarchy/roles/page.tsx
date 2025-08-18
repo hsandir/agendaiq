@@ -53,14 +53,14 @@ export default async function RolePage() {
   );
 
   // Role distribution by department
-  const roleDistribution = departments.map(dept => ({
+  const roleDistribution = (departments.map(dept => ({
     name: dept.name,
     count: dept.Staff.length,
     roles: dept.Staff.map(staff => staff.Role?.title).filter(Boolean)
-  }));
+  })));
 
   // Leadership hierarchy
-  const leadershipHierarchy = roles
+  const leadershipHierarchy = (roles
     .filter(role => role.is_leadership)
     .sort((a, b) => a.priority - b.priority)
     .map(role => ({
@@ -68,7 +68,7 @@ export default async function RolePage() {
       priority: role.priority,
       staffCount: role.Staff.length,
       department: role.Department?.name || 'No Department'
-    }));
+    })));
 
   return (
     <div className="space-y-6">

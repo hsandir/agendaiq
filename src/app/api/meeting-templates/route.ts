@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       count: templates.length
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching meeting templates:', error);
     return NextResponse.json(
       { error: 'Failed to fetch meeting templates' },
@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = await request.json();
-    const { name, description, duration, agenda, attendees } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __name, __description, __duration, __agenda, __attendees  } = body;
 
     if (!name || !duration) {
       return NextResponse.json(
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
 
     // Get the staff record for the current user
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: parseInt(user.id) }
     });
 
     if (!staff) {
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error creating meeting template:', error);
     return NextResponse.json(
       { error: 'Failed to create meeting template' },

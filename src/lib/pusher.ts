@@ -3,11 +3,11 @@
 
 // Mock Pusher server (does nothing)
 export const pusherServer = {
-  trigger: async (channel: string, event: string, data: any) => {
+  trigger: async (channel: string, event: string, data: Record<string, unknown>) => {
     // No-op - real-time features temporarily disabled
     return Promise.resolve();
   },
-  authorizeChannel: (socketId: string, channel: string, presenceData?: any) => {
+  authorizeChannel: (socketId: string, channel: string, presenceData?: Record<string, unknown>) => {
     // Mock authorization - return a mock auth response
     return {
       auth: `${socketId}:mock-auth-signature`,

@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export function Header() {
-  const { data: session } = useSession();
+  const { data: __session  } = useSession();
 
   return (
     <header className="bg-card text-card-foreground border-b border-border">
@@ -30,7 +30,7 @@ export function Header() {
             <button className="flex items-center space-x-3 focus:outline-none">
               {session?.user?.image ? (
                 <Image
-                  src={session.user.image}
+                  src={session.(user as Record<string, unknown>).image}
                   alt={session.user.name || "User"}
                   width={32}
                   height={32}
@@ -56,7 +56,7 @@ export function Header() {
                   callbackUrl: '/auth/signin',
                   redirect: true 
                 });
-              } catch (error) {
+              } catch (error: unknown) {
                 // Fallback to direct navigation if signOut fails
                 window.location.href = '/auth/signin';
               }

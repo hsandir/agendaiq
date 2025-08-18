@@ -44,7 +44,7 @@ export default function RoleHierarchyContent() {
         // If regular roles API fails, try a simpler endpoint
         console.log('Unable to fetch role statistics');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch stats:', error);
     } finally {
       setLoading(false);

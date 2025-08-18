@@ -18,7 +18,7 @@ export class AuditClient {
           console.warn('Failed to send audit event to API');
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Audit API error:', error);
     }
   }

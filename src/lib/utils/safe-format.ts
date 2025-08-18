@@ -29,7 +29,7 @@ export function safeFormat(
     }
 
     return dateFnsFormat(date, formatString);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Date formatting error:', error, 'Value:', dateValue);
     return fallback;
   }
@@ -63,7 +63,7 @@ export function safeParseDate(dateValue: string | Date | null | undefined): Date
  * @param dateValue - The date value to check
  * @returns True if valid date, false otherwise
  */
-export function isValidDateValue(dateValue: any): boolean {
+export function isValidDateValue(dateValue: Record<string, unknown>): boolean {
   if (!dateValue) return false;
   
   try {

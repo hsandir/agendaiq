@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
       message: "Alerts configuration retrieved" 
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('System Alerts API Error:', error);
     return NextResponse.json(
       { 
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
     const user = authResult.user!;
 
     // Parse request body
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
 
     // REQUIRED: Input validation
     if (!body.REQUIRED_FIELD) {
@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
       message: "Create operation not implemented" 
     }, { status: 501 });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('API Error:', error);
     return NextResponse.json(
       { 
@@ -178,7 +178,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const user = authResult.user!;
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
 
     // Your update logic here
     // const result = await prisma.MODEL_NAME.update({
@@ -200,7 +200,7 @@ export async function PUT(request: NextRequest) {
       message: "Update operation not implemented" 
     }, { status: 501 });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('API Error:', error);
     return NextResponse.json(
       { 
@@ -228,7 +228,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const { searchParams } = new URL(request.url);
+    const { __searchParams  } = new URL(request.url);
     const id = searchParams.get('id');
 
     if (!id) {
@@ -252,7 +252,7 @@ export async function DELETE(request: NextRequest) {
       message: "Delete operation not implemented" 
     }, { status: 501 });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('API Error:', error);
     return NextResponse.json(
       { 

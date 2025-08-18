@@ -21,15 +21,15 @@ export class DatabaseTransport implements LogTransport {
 
     try {
       // Determine if this is a development or audit log
-      const isDev = 'category' in entry && typeof (entry as any).category === 'string' && 
-                   ['system', 'database', 'api', 'auth', 'performance', 'error', 'network', 'cache', 'external', 'build'].includes((entry as any).category);
+      const isDev = 'category' in entry && typeof entry.category === 'string' && 
+                   ['system', 'database', 'api', 'auth', 'performance', 'error', 'network', 'cache', 'external', 'build'].includes(entry.category);
 
       if (isDev) {
         await this.writeDevLog(entry as DevLogEntry);
       } else {
         await this.writeAuditLog(entry as AuditLogEntry);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to write log to database:', error);
       // Don't throw - logging should not break the application
     }
@@ -40,7 +40,7 @@ export class DatabaseTransport implements LogTransport {
       data: {
         id: entry.id,
         timestamp: new Date(entry.timestamp),
-        level: entry.level as any,
+        level: entry.level as Record<string, unknown>,
         message: entry.message,
         category: entry.category,
         component: entry.component,
@@ -70,7 +70,7 @@ export class DatabaseTransport implements LogTransport {
       data: {
         id: entry.id,
         timestamp: new Date(entry.timestamp),
-        level: entry.level as any,
+        level: entry.level as Record<string, unknown>,
         message: entry.message,
         category: entry.category,
         action: entry.action,
@@ -93,7 +93,7 @@ export class DatabaseTransport implements LogTransport {
   }
 
   async query(query: LogQuery): Promise<BaseLogEntry[]> {
-    const where: any = {};
+    const where: Record<string, unknown> = {};
 
     // Filter by level
     if (query.level && query.level.length > 0) {
@@ -190,7 +190,7 @@ export class DatabaseTransport implements LogTransport {
       });
 
       return entries.slice(0, query.limit || 100);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to query logs from database:', error);
       return [];
     }
@@ -220,12 +220,12 @@ export class DatabaseTransport implements LogTransport {
       ]);
 
       const logsByLevel: Record<LogLevel, number> = {
-        [LogLevel.TRACE]: 0,
-        [LogLevel.DEBUG]: 0,
-        [LogLevel.INFO]: 0,
-        [LogLevel.WARN]: 0,
-        [LogLevel.ERROR]: 0,
-        [LogLevel.FATAL]: 0
+        [(LogLevel.TRACE)]: 0,
+        [(LogLevel.DEBUG)]: 0,
+        [(LogLevel.INFO)]: 0,
+        [(LogLevel.WARN)]: 0,
+        [(LogLevel.ERROR)]: 0,
+        [(LogLevel.FATAL)]: 0
       };
 
       [...devStats, ...auditStats].forEach(stat => {
@@ -243,17 +243,17 @@ export class DatabaseTransport implements LogTransport {
           end: new Date().toISOString()
         }
       };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to get log stats:', error);
       return {
         totalLogs: 0,
         logsByLevel: {
-          [LogLevel.TRACE]: 0,
-          [LogLevel.DEBUG]: 0,
-          [LogLevel.INFO]: 0,
-          [LogLevel.WARN]: 0,
-          [LogLevel.ERROR]: 0,
-          [LogLevel.FATAL]: 0
+          [(LogLevel.TRACE)]: 0,
+          [(LogLevel.DEBUG)]: 0,
+          [(LogLevel.INFO)]: 0,
+          [(LogLevel.WARN)]: 0,
+          [(LogLevel.ERROR)]: 0,
+          [(LogLevel.FATAL)]: 0
         },
         logsByCategory: {},
         timeRange: {

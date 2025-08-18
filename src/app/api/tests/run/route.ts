@@ -8,13 +8,13 @@ export async function POST(request: NextRequest) {
   console.log('Test run API called')
 
   try {
-    const { suite, coverage = false } = await request.json()
+    const { __suite, coverage = __false  } = await request.json()
 
     // Create a stream response
     const encoder = new TextEncoder()
     const stream = new ReadableStream({
       async start(controller) {
-        const sendMessage = (data: any) => {
+        const sendMessage = (data: Record<__string, unknown>) => {
           controller.enqueue(encoder.encode(JSON.stringify(data) + '\n'))
         }
 
@@ -50,10 +50,10 @@ export async function POST(request: NextRequest) {
           
           // Simulate test suites
           const testSuites = [
-            { path: 'src/components/auth/__tests__/LoginForm.test.tsx', name: 'LoginForm', tests: 5 },
-            { path: 'src/components/dashboard/__tests__/DashboardCard.test.tsx', name: 'DashboardCard', tests: 3 },
-            { path: 'src/api/users/__tests__/users.test.ts', name: 'Users API', tests: 8 },
-            { path: 'src/lib/auth/__tests__/auth-utils.test.ts', name: 'Auth Utils', tests: 6 }
+            { path: 'src/components/auth/__tests__/LoginForm.test.tsx', name: 'LoginForm', tests: __5 },
+            { path: 'src/components/dashboard/__tests__/DashboardCard.test.tsx', name: 'DashboardCard', tests: __3 },
+            { path: 'src/api/users/__tests__/users.test.ts', name: 'Users API', tests: __8 },
+            { path: 'src/lib/auth/__tests__/auth-utils.test.ts', name: 'Auth Utils', tests: __6 }
           ]
           
           for (const suite of testSuites) {
@@ -234,7 +234,7 @@ export async function POST(request: NextRequest) {
         'Connection': 'keep-alive',
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     await Logger.error('Failed to run tests', { error: String(error) }, 'testing')
     return NextResponse.json(
       { error: 'Failed to run tests' },
@@ -243,7 +243,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function calculateCoverage(coverageMap: any) {
+function calculateCoverage(coverageMap: Record<string, unknown>) {
   const totals = {
     statements: { total: 0, covered: 0 },
     branches: { total: 0, covered: 0 },
@@ -251,7 +251,7 @@ function calculateCoverage(coverageMap: any) {
     lines: { total: 0, covered: 0 }
   }
 
-  Object.values(coverageMap).forEach((fileCoverage: any) => {
+  Object.values(coverageMap).forEach((fileCoverage: Record<string, unknown>) => {
     ['statements', 'branches', 'functions', 'lines'].forEach(type => {
       const summary = fileCoverage[type]
       if (summary) {
@@ -267,5 +267,5 @@ function calculateCoverage(coverageMap: any) {
       percentage: data.total > 0 ? (data.covered / data.total) * 100 : 0
     }
     return acc
-  }, {} as any)
+  }, {} as Record<string, unknown>)
 }

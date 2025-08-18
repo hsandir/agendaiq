@@ -157,7 +157,7 @@ export default function LintErrorManagementPage() {
       } else {
         console.error('Failed to fetch system status');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch lint status:', error);
       showNotification('Failed to fetch lint status');
     } finally {
@@ -202,7 +202,7 @@ export default function LintErrorManagementPage() {
       
       // Refresh lint status
       await fetchLintStatus();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Auto-fix failed:', error);
       showNotification('Auto-fix failed');
     } finally {

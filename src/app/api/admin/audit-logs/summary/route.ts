@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { __searchParams  } = new URL(request.url);
     const days = searchParams.get('days') ? parseInt(searchParams.get('days')!) : 30;
 
     const summary = await AuditLogger.getAuditSummary(days);
@@ -21,11 +21,11 @@ export async function GET(request: NextRequest) {
       period: `${days} days`
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching audit summary:', error);
     return NextResponse.json({
       error: 'Failed to fetch audit summary information',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error instanceof Error ? error.message : String(error)
     }, { status: 500 });
   }
 } 

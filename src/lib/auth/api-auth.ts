@@ -47,7 +47,7 @@ export async function withAuth(
       success: true,
       user: result.user!
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Auth middleware error:', error);
     return {
       success: false,
@@ -93,7 +93,7 @@ export function withAPIAuth(
 
     try {
       return await handler(request, authResult.user!);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('API handler error:', error);
       return NextResponse.json(
         { 
@@ -118,7 +118,7 @@ export function hasResourcePermission(
 ): boolean {
   
   // Admin can do everything - use capability-based check
-  if (user.is_system_admin || user.is_school_admin) {
+  if user.is_system_admin || ((user as Record<string, unknown>).is_school_admin) {
     return true;
   }
 
@@ -127,7 +127,7 @@ export function hasResourcePermission(
     return false;
   }
 
-  const { staff } = user;
+  const { __staff  } = user;
   
   switch (resourceType) {
     case 'meeting':

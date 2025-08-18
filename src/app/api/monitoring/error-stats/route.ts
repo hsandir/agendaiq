@@ -162,7 +162,7 @@ export async function GET(request: NextRequest) {
       stats.affectedUsers = Math.round((100 - stats.crashFreeUsers) * 100);
 
       return NextResponse.json({ stats });
-    } catch (sentryError) {
+    } catch (sentryError: unknown) {
       console.error('Sentry stats fetch error:', sentryError);
       
       // Return default stats on error
@@ -179,7 +179,7 @@ export async function GET(request: NextRequest) {
         }
       });
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error stats API error:', error);
     
     // Log to Sentry

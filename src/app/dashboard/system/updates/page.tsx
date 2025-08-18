@@ -84,7 +84,7 @@ export default function UpdatesPage() {
 
   // Compatibility assessment function
   const assessCompatibility = (pkg: PackageUpdate): CompatibilityInfo => {
-    const { name, type, current, latest } = pkg;
+    const { __name, __type, __current, __latest  } = pkg;
     
     // Critical packages that need special attention
     const criticalPackages = [
@@ -208,7 +208,7 @@ export default function UpdatesPage() {
       } else {
         console.error('Failed to fetch system status');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch updates:', error);
     } finally {
       setIsLoading(false);
@@ -227,7 +227,7 @@ export default function UpdatesPage() {
         const healthData = await response.json();
         setSystemHealth(healthData);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to check system health:', error);
     }
   };
@@ -259,7 +259,7 @@ export default function UpdatesPage() {
           message: `Fix failed: ${error.error}`
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Fix failed:', error);
       setUpdateResult({
         success: false,
@@ -293,7 +293,7 @@ export default function UpdatesPage() {
           setSelectedUpdates(new Set());
         }, 2000);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Update failed:', error);
       setUpdateResult({
         success: false,
@@ -372,7 +372,7 @@ export default function UpdatesPage() {
   });
 
   const typeCounts = updates.reduce((acc, update) => {
-    acc[update.type] = (acc[update.type] || 0) + 1;
+    acc[(update.type)] = acc[((update.type)] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
@@ -707,7 +707,7 @@ export default function UpdatesPage() {
                       <Button 
                         size="sm" 
                         variant={compatibility.recommendation === 'avoid' ? 'outline' : 'default'}
-                        onClick={() => performUpdate([update.name])}
+                        onClick={() => performUpdate[((update.name)])}
                         disabled={isUpdating || compatibility.recommendation === 'avoid'}
                         className={compatibility.recommendation === 'avoid' ? 'opacity-50' : ''}
                       >

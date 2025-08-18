@@ -30,10 +30,10 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Backup GET failed:', error);
     return NextResponse.json(
-      { error: 'Failed to process backup request', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to process backup request', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const { type, message, restore, components } = await request.json();
+    const { __type, __message, __restore, __components  } = (await request.json()) as Record<__string, unknown>;
 
     if (type === 'create') {
       return await createBackup(message);
@@ -66,10 +66,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid backup type' }, { status: 400 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Backup POST failed:', error);
     return NextResponse.json(
-      { error: 'Failed to process backup request', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to process backup request', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
@@ -81,17 +81,17 @@ async function createBackup(message: string = 'Manual backup') {
     const branchName = `backup/manual-${timestamp}`;
     
     // Get current branch and status
-    const { stdout: currentBranch } = await execAsync('git branch --show-current', { cwd: process.cwd() });
-    const { stdout: status } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: __status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
     
     // Create backup info
     const backupInfo = {
       timestamp: new Date().toISOString(),
       branch: branchName,
-      originalBranch: currentBranch.trim(),
+      originalBranch: String(currentBranch).trim(),
       message: message,
       type: 'manual',
-      changes: status.split('\n').filter(line => line.trim()).length,
+      changes: status.split('\n').filter(line => String(line).trim()).length,
       files: await getProjectFiles()
     };
 
@@ -99,7 +99,7 @@ async function createBackup(message: string = 'Manual backup') {
     await execAsync('git add -A', { cwd: process.cwd() });
     
     // Commit if there are changes
-    if (status.trim()) {
+    if (String(status).trim()) {
       // SECURITY FIX: Sanitize message input to prevent command injection
       const sanitizedMessage = message.replace(/["`$\\]/g, '\\$&').slice(0, 100);
       await execAsync(`git commit -m "${sanitizedMessage} - ${timestamp}"`, { cwd: process.cwd() });
@@ -110,7 +110,7 @@ async function createBackup(message: string = 'Manual backup') {
     await execAsync(`git checkout -b ${sanitizedBranchName}`, { cwd: process.cwd() });
     
     // Return to original branch - sanitize branch name
-    const sanitizedCurrentBranch = currentBranch.trim().replace(/[^a-zA-Z0-9_/-]/g, '_');
+    const sanitizedCurrentBranch = String(currentBranch).trim().replace(/[^a-zA-Z0-9_/-]/g, '_');
     await execAsync(`git checkout ${sanitizedCurrentBranch}`, { cwd: process.cwd() });
 
     // Save backup metadata
@@ -122,7 +122,7 @@ async function createBackup(message: string = 'Manual backup') {
       backup: backupInfo
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Backup creation failed:', error);
     return NextResponse.json(
       { error: 'Failed to create backup', details: error instanceof Error ? error.message : "Unknown error" },
@@ -136,13 +136,13 @@ async function pushToGitHub(message: string = 'Automated backup') {
     const timestamp = new Date().toISOString();
     
     // Get current branch
-    const { stdout: currentBranch } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
     
     // Stage and commit all changes
     await execAsync('git add -A', { cwd: process.cwd() });
     
-    const { stdout: status } = await execAsync('git status --porcelain', { cwd: process.cwd() });
-    if (status.trim()) {
+    const { stdout: __status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    if (String(status).trim()) {
       // Sanitize commit message to prevent command injection
       const sanitizedMessage = message.replace(/[^a-zA-Z0-9\s\-_.]/g, '').substring(0, 100);
       await execAsync(`git commit -m "${sanitizedMessage} - ${timestamp}"`, { cwd: process.cwd() });
@@ -150,14 +150,14 @@ async function pushToGitHub(message: string = 'Automated backup') {
 
     // Try to push to GitHub
     try {
-      const { stdout: pushOutput } = await execAsync(`git push origin ${currentBranch.trim()}`, { 
+      const { stdout: __pushOutput  } = await execAsync(`git push origin ${String(currentBranch).trim()}`, { 
         cwd: process.cwd(),
-        timeout: 30000 
+        timeout: __30000 
       });
 
       const backupInfo = {
         timestamp,
-        branch: currentBranch.trim(),
+        branch: String(currentBranch).trim(),
         message: message,
         type: 'github',
         pushed: true,
@@ -172,11 +172,11 @@ async function pushToGitHub(message: string = 'Automated backup') {
         backup: backupInfo
       });
 
-    } catch (pushError) {
+    } catch (pushError: unknown) {
       // If push fails, still save local backup info
       const backupInfo = {
         timestamp,
-        branch: currentBranch.trim(),
+        branch: String(currentBranch).trim(),
         message: message,
         type: 'github-failed',
         pushed: false,
@@ -193,7 +193,7 @@ async function pushToGitHub(message: string = 'Automated backup') {
       });
     }
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('GitHub backup failed:', error);
     return NextResponse.json(
       { error: 'Failed to backup to GitHub', details: error instanceof Error ? error.message : "Unknown error" },
@@ -208,9 +208,9 @@ async function autoBackup(triggerReason: string = 'System update') {
     const branchName = `backup/auto-${timestamp.replace(/[:.]/g, '-')}`;
     
     // Get project status
-    const { stdout: status } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    const { stdout: __status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
     
-    if (!status.trim()) {
+    if (!String(status).trim()) {
       return NextResponse.json({
         success: true,
         message: 'No changes to backup',
@@ -225,17 +225,17 @@ async function autoBackup(triggerReason: string = 'System update') {
     await execAsync(`git commit -m "Auto-backup: ${sanitizedReason} - ${timestamp}"`, { cwd: process.cwd() });
     
     // Create backup branch
-    const { stdout: currentBranch } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
     await execAsync(`git branch ${branchName}`, { cwd: process.cwd() });
 
     const backupInfo: Record<string, unknown> = {
       timestamp,
       branch: branchName,
-      originalBranch: currentBranch.trim(),
+      originalBranch: String(currentBranch).trim(),
       message: `Auto-backup: ${triggerReason}`,
       type: 'auto',
       trigger: triggerReason,
-      changes: status.split('\n').filter(line => line.trim()).length
+      changes: status.split('\n').filter(line => String(line).trim()).length
     };
 
     await saveBackupMetadata(backupInfo);
@@ -257,7 +257,7 @@ async function autoBackup(triggerReason: string = 'System update') {
       backup: backupInfo
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Auto-backup failed:', error);
     return NextResponse.json(
       { error: 'Auto-backup failed', details: error instanceof Error ? error.message : "Unknown error" },
@@ -269,7 +269,7 @@ async function autoBackup(triggerReason: string = 'System update') {
 async function restoreBackup(backupBranch: string) {
   try {
     // Get current status
-    const { stdout: currentBranch } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
     
     // Checkout to backup branch
     await execAsync(`git checkout ${backupBranch}`, { cwd: process.cwd() });
@@ -280,14 +280,14 @@ async function restoreBackup(backupBranch: string) {
     await execAsync(`git checkout -b ${restorePoint}`, { cwd: process.cwd() });
     
     // Return to main branch and merge
-    await execAsync(`git checkout ${currentBranch.trim()}`, { cwd: process.cwd() });
+    await execAsync(`git checkout ${String(currentBranch).trim()}`, { cwd: process.cwd() });
     await execAsync(`git merge ${backupBranch}`, { cwd: process.cwd() });
 
     const restoreInfo = {
       timestamp: new Date().toISOString(),
       restoredFrom: backupBranch,
       restorePoint: restorePoint,
-      currentBranch: currentBranch.trim()
+      currentBranch: String(currentBranch).trim()
     };
 
     await saveBackupMetadata({
@@ -302,7 +302,7 @@ async function restoreBackup(backupBranch: string) {
       restore: restoreInfo
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Restore failed:', error);
     return NextResponse.json(
       { error: 'Failed to restore backup', details: error instanceof Error ? error.message : "Unknown error" },
@@ -314,12 +314,12 @@ async function restoreBackup(backupBranch: string) {
 async function listBackups() {
   try {
     // Get all backup branches
-    const { stdout: branches } = await execAsync('git branch -a', { cwd: process.cwd() });
-    const backupBranches = branches
+    const { stdout: __branches  } = await execAsync('git branch -a', { cwd: process.cwd() });
+    const backupBranches = (branches
       .split('\n')
-      .map(branch => branch.trim().replace(/^\*\s*/, ''))
+      .map(branch => String(branch).trim().replace(/^\*\s*/, ''))
       .filter(branch => branch.includes('backup/'))
-      .slice(0, 20); // Limit to 20 most recent
+      .slice(0, 20)); // Limit to 20 most recent
 
     // Load backup metadata
     const backups = [];
@@ -374,7 +374,7 @@ async function listBackups() {
       status: 'healthy'
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('List backups failed:', error);
     return NextResponse.json(
       { error: 'Failed to list backups', details: error instanceof Error ? error.message : "Unknown error" },
@@ -385,9 +385,9 @@ async function listBackups() {
 
 async function getBackupStatus() {
   try {
-    const { stdout: currentBranch } = await execAsync('git branch --show-current', { cwd: process.cwd() });
-    const { stdout: status } = await execAsync('git status --porcelain', { cwd: process.cwd() });
-    const { stdout: lastCommit } = await execAsync('git log -1 --format="%H %s %ad" --date=iso', { cwd: process.cwd() });
+    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: __status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    const { stdout: __lastCommit  } = await execAsync('git log -1 --format="%H %s %ad" --date=iso', { cwd: process.cwd() });
     
     // Check GitHub connection
     let githubStatus = 'unknown';
@@ -399,23 +399,23 @@ async function getBackupStatus() {
     }
 
     // Get backup count
-    const { stdout: branches } = await execAsync('git branch -a', { cwd: process.cwd() });
+    const { stdout: __branches  } = await execAsync('git branch -a', { cwd: process.cwd() });
     const backupCount = branches.split('\n').filter(branch => branch.includes('backup/')).length;
 
     return NextResponse.json({
       success: true,
       status: {
-        currentBranch: currentBranch.trim(),
-        hasUncommittedChanges: status.trim().length > 0,
-        uncommittedFiles: status.split('\n').filter(line => line.trim()).length,
-        lastCommit: lastCommit.trim(),
+        currentBranch: String(currentBranch).trim(),
+        hasUncommittedChanges: String(status).trim().length > 0,
+        uncommittedFiles: status.split('\n').filter(line => String(line).trim()).length,
+        lastCommit: String(lastCommit).trim(),
         githubStatus,
         backupCount,
         diskUsage: await getDiskUsage()
       }
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Get backup status failed:', error);
     return NextResponse.json(
       { error: 'Failed to get backup status', details: error instanceof Error ? error.message : "Unknown error" },
@@ -441,15 +441,15 @@ async function saveBackupMetadata(backupInfo: Record<string, unknown>) {
     metadata = metadata.slice(-50);
     
     await fs.writeFile(metadataPath, JSON.stringify(metadata, null, 2));
-  } catch (error) {
+  } catch (error: unknown) {
     console.warn('Failed to save backup metadata:', error);
   }
 }
 
 async function getProjectFiles() {
   try {
-    const { stdout } = await execAsync('find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.json" | grep -v node_modules | grep -v .next | head -20', { cwd: process.cwd() });
-    return stdout.split('\n').filter(line => line.trim()).length;
+    const { __stdout  } = await execAsync('find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.json" | grep -v node_modules | grep -v .next | head -20', { cwd: process.cwd() });
+    return stdout.split('\n').filter(line => String(line).trim()).length;
   } catch {
     return 0;
   }
@@ -457,7 +457,7 @@ async function getProjectFiles() {
 
 async function getDiskUsage() {
   try {
-    const { stdout } = await execAsync('du -sh .', { cwd: process.cwd() });
+    const { __stdout  } = await execAsync('du -sh .', { cwd: process.cwd() });
     return stdout.split('\t')[0];
   } catch {
     return 'Unknown';
@@ -488,7 +488,7 @@ async function createFullSystemBackup(components: string[] = ['database', 'setti
         const dbStats = await fs.stat(dbBackupPath);
         totalSize += dbStats.size;
         includedComponents.push('Database');
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn('Database backup failed:', error);
       }
     }
@@ -529,7 +529,7 @@ async function createFullSystemBackup(components: string[] = ['database', 'setti
         const settingsStats = await fs.stat(settingsDir);
         totalSize += settingsStats.size;
         includedComponents.push('Settings');
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn('Settings backup failed:', error);
       }
     }
@@ -553,7 +553,7 @@ async function createFullSystemBackup(components: string[] = ['database', 'setti
           await fs.writeFile(path.join(filesBackupDir, '.gitkeep'), '');
           includedComponents.push('Files (Empty)');
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn('Files backup failed:', error);
       }
     }
@@ -571,7 +571,7 @@ async function createFullSystemBackup(components: string[] = ['database', 'setti
         const schemaStats = await fs.stat(schemaDir);
         totalSize += schemaStats.size;
         includedComponents.push('Schema');
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn('Schema backup failed:', error);
       }
     }
@@ -603,7 +603,7 @@ async function createFullSystemBackup(components: string[] = ['database', 'setti
         const logsStats = await fs.stat(logsDir);
         totalSize += logsStats.size;
         includedComponents.push('Logs');
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn('Logs backup failed:', error);
       }
     }
@@ -639,7 +639,7 @@ async function createFullSystemBackup(components: string[] = ['database', 'setti
       backup: backupInfo
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Full system backup failed:', error);
     return NextResponse.json(
       { error: 'Failed to create full system backup', details: error instanceof Error ? error.message : "Unknown error" },
@@ -713,7 +713,7 @@ export async function PUT(request: NextRequest) {
       restore: restoreInfo
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Backup upload/restore failed:', error);
     return NextResponse.json(
       { error: 'Failed to upload and restore backup', details: error instanceof Error ? error.message : "Unknown error" },

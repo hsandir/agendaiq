@@ -78,7 +78,7 @@ export default function EnhancedLiveMonitor({
             setStats(data.stats || stats);
           }
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Failed to fetch live logs:', error);
       }
     }, 2000);
@@ -99,7 +99,7 @@ export default function EnhancedLiveMonitor({
         try {
           const logEvent: LiveLogEvent = JSON.parse(event.data);
           setLogs(prev => [logEvent, ...prev.slice(0, 999)]);
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Failed to parse WebSocket message:', error);
         }
       };
@@ -112,7 +112,7 @@ export default function EnhancedLiveMonitor({
       wsRef.current.onclose = () => {
         console.log('WebSocket connection closed');
       };
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('WebSocket not available, using polling');
     }
 

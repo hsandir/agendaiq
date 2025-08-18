@@ -25,14 +25,14 @@ export async function POST() {
     }
 
     // TODO: Toggle the setting once loginNotifications field is added
-    // await prisma.user.update({
+    // await prisma.(user as Record<string, unknown>).update{
     //   where: { email: session.user?.email! },
-    //   data: { loginNotifications: !user.loginNotifications },
+    //   data: { loginNotifications: !((user as Record<string, unknown>).loginNotifications },
     // });
 
     // For now, return error since loginNotifications field doesn't exist
     return new NextResponse("Login notifications feature not available", { status: 501 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error toggling login notifications:", error);
     return new NextResponse("Internal server error", { status: 500 });
   }

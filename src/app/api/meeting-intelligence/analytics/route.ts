@@ -131,15 +131,15 @@ export async function GET(request: NextRequest) {
       }
     });
     
-    const meetingsByDepartment = Array.from(departmentMap.values()).map(dept => ({
+    const meetingsByDepartment = (Array.from(departmentMap.values()).map(dept => ({
       department: dept.department,
       count: dept.count,
       efficiency: dept.actionItems > 0 
         ? Math.round((dept.completedItems / dept.actionItems) * 100)
         : 100
-    }));
+    })));
     
-    const departmentPerformance = Array.from(departmentMap.values()).map(dept => ({
+    const departmentPerformance = (Array.from(departmentMap.values()).map(dept => ({
       department: dept.department,
       meetings: dept.count,
       avgDuration: dept.count > 0 ? Math.round(dept.totalDuration / dept.count) : 0,
@@ -150,7 +150,7 @@ export async function GET(request: NextRequest) {
       efficiency: dept.actionItems > 0 
         ? Math.round((dept.completedItems / dept.actionItems) * 100)
         : 100
-    }));
+    })));
     
     // Trend data (simplified)
     const trendData = [
@@ -196,7 +196,7 @@ export async function GET(request: NextRequest) {
       departmentPerformance
     });
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Analytics error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch analytics' },

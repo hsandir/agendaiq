@@ -18,9 +18,9 @@ export async function auditMiddleware(request: NextRequest): Promise<NextRespons
     const token = await getToken({ req: request });
     if (token?.id) {
       userId = parseInt(token.id); // Convert string id to number
-      staffId = token.staff?.id as number;
+      staffId = (token as any).staff?.id as number;
     }
-  } catch (error) {
+  } catch (error: unknown) {
     // Continue without user context
   }
 
@@ -40,7 +40,7 @@ export async function auditMiddleware(request: NextRequest): Promise<NextRespons
 
     // Store audit event in request for later processing
     // This will be handled by the final response in main middleware
-    (request as any)._auditEvent = auditEvent;
+    request._auditEvent = auditEvent;
   }
 
   // Return null to continue middleware chain

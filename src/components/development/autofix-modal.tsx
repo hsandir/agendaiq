@@ -33,7 +33,7 @@ interface AutofixModalProps {
   isOpen: boolean;
   onClose: () => void;
   type: 'test' | 'cicd';
-  failedItems: any[];
+  failedItems: Record<string, unknown>[];
 }
 
 interface FixStep {
@@ -176,7 +176,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
     setCurrentOutput([]);
   };
 
-  const analyzeErrors = (items: any[]): string[] => {
+  const analyzeErrors = (items: Record<string, unknown>[]): string[] => {
     const errorTypes = new Set<string>();
     
     items.forEach(item => {
@@ -260,7 +260,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
             break;
           }
         }
-      } catch (error) {
+      } catch (error: unknown) {
         setSteps(prev => prev.map((s, idx) => 
           idx === i ? { 
             ...s, 
@@ -329,7 +329,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
       const suggestions = suggestionsData.suggestions || [];
       
       // Find matching suggestion for this step
-      const matchingSuggestion = suggestions.find((s: any) => 
+      const matchingSuggestion = suggestions.find((s: Record<string, unknown>) => 
         s.id === step.id || 
         s.commands.some((cmd: string) => cmd.includes(step.command!.split(' ')[0]))
       );
@@ -344,7 +344,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
           title: step.name,
           description: step.description,
           confidence: 'medium',
-          commands: [step.command],
+          commands: [(step.command)],
           files: [],
           preventive: false
         };
@@ -372,7 +372,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
         }
         
         if (data.results && data.results.failed && data.results.failed.length > 0) {
-          data.results.failed.forEach((fail: any) => {
+          data.results.failed.forEach((fail: Record<string, unknown>) => {
             setCurrentOutput(prev => [...prev, `❌ ${fail.action}: ${fail.error}`]);
           });
         }
@@ -407,7 +407,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
       }
       
       if (data.results && data.results.failed && data.results.failed.length > 0) {
-        data.results.failed.forEach((fail: any) => {
+        data.results.failed.forEach((fail: Record<string, unknown>) => {
           setCurrentOutput(prev => [...prev, `❌ ${fail.action}: ${fail.error}`]);
         });
       }
@@ -418,7 +418,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
         error: data.results?.failed?.[0]?.error,
         duration: Date.now() - startTime
       };
-    } catch (error) {
+    } catch (error: unknown) {
       setCurrentOutput(prev => [...prev, `Error: ${error}`]);
       return {
         success: false,
@@ -432,9 +432,9 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
     // Analyze failed items to detect error type
     if (failedItems.length === 0) return 'Unknown Error';
     
-    const errorMessages = failedItems.map(item => 
+    const errorMessages = (failedItems.map(item => 
       item.error || item.logs || item.conclusion || ''
-    ).join(' ');
+    ).join(' '));
     
     if (errorMessages.includes('npm') || errorMessages.includes('node_modules')) return 'NPM Error';
     if (errorMessages.includes('TypeError') || errorMessages.includes('TS')) return 'TypeScript Error';

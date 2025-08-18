@@ -83,7 +83,7 @@ export default function DevelopmentClient({ user }: DevelopmentClientProps) {
         const data = await response.json()
         setStats(data)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load stats:', error)
     }
   }

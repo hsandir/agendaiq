@@ -122,7 +122,7 @@ export function MeetingHistoryModal({
         const data = await response.json();
         setMeetings(data.meetings || []);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error fetching meetings:", error);
       setMeetings([]);
     } finally {

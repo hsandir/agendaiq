@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const cpuUsage = os.loadavg()[0] * 100 / os.cpus().length;
     const totalMemory = os.totalmem();
     const freeMemory = os.freemem();
-    const memoryUsage = ((totalMemory - freeMemory) / totalMemory) * 100;
+    const memoryUsage = (totalMemory - freeMemory) / totalMemory) * 100;
     
     // Get database metrics - actual connection count
     const dbResult = await prisma.$queryRaw<{count: bigint}[]>`
@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Calculate real metrics for each endpoint
-    const apiEndpoints = await Promise.all(
+    const apiEndpoints = (await Promise.all(
       endpointStats.slice(0, 10).map(async (stat) => {
         // Get error count for this endpoint
         const errorLogs = await prisma.auditLog.count({
@@ -167,14 +167,14 @@ export async function GET(request: NextRequest) {
           errorRate: Math.round(errorRate * 100) / 100
         };
       })
-    );
+    ));
 
     return NextResponse.json({
       metrics,
       apiEndpoints,
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch metrics:', error);
     return NextResponse.json(
       { error: 'Failed to fetch metrics' },

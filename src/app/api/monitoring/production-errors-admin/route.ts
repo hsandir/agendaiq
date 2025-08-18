@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
       // For admin users, we can also check Vercel deployment status if needed
       // This would require Vercel API integration with proper credentials
       
-    } catch (err) {
+    } catch (err: unknown) {
       // If production is completely inaccessible, record this as critical
       errors.push({
         id: `conn-error-${Date.now()}`,
@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
           }
         });
       }
-    } catch (debugErr) {
+    } catch (debugErr: unknown) {
       console.log('Admin debug endpoint error:', debugErr);
     }
 
@@ -174,7 +174,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Admin production error monitoring failed:', error);
     return NextResponse.json({
       success: false,

@@ -110,7 +110,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
             { id: '2', content: 'Discussed the importance of meeting our Q3 targets.', author: 'Jane Smith', timestamp: new Date().toISOString() },
           ]);
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Failed to fetch meeting data:', error);
         // Use fallback data on error
         setAgendaItems([
@@ -124,13 +124,13 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
     };
 
     fetchMeetingData();
-  }, [meeting.id]);
+  }, [(meeting.id)]);
 
   const addNote = () => {
-    if (newNote.trim()) {
+    if (String(newNote).trim()) {
       const note: Note = {
         id: Date.now().toString(),
-        content: newNote.trim(),
+        content: String(newNote).trim(),
         author: 'Current User', // This would be the current user's name
         timestamp: new Date().toISOString(),
       };
@@ -140,11 +140,11 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
   };
 
   const addAgendaItem = () => {
-    if (newAgendaItem.title.trim()) {
+    if (newAgendaItem.String(title).trim()) {
       const item: AgendaItem = {
         id: Date.now().toString(),
-        title: newAgendaItem.title.trim(),
-        description: newAgendaItem.description.trim(),
+        title: newAgendaItem.String(title).trim(),
+        description: newAgendaItem.String(description).trim(),
         completed: false,
         order: agendaItems.length + 1,
       };
@@ -158,7 +158,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
       items.map(item =>
         item.id === id ? { ...item, completed: !item.completed } : item
       )
-    );
+    ));
   };
 
   const deleteAgendaItem = (id: string) => {

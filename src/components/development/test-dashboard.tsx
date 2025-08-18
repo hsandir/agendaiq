@@ -102,7 +102,7 @@ export default function TestDashboard() {
       const response = await fetch('/api/tests/suites')
       const data = await response.json()
       setTestSuites(data.suites || [])
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load test suites:', error)
     }
   }
@@ -114,7 +114,7 @@ export default function TestDashboard() {
       
       const data = await response.json()
       setTestHistory(data.history || [])
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load test history:', error)
       setTestHistory([])
     }
@@ -125,7 +125,7 @@ export default function TestDashboard() {
       const response = await fetch('/api/tests/generate')
       const data = await response.json()
       setUntestedFiles(data.untested || { components: [], apis: [] })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load untested files:', error)
     }
   }
@@ -173,12 +173,12 @@ export default function TestDashboard() {
                 suite.path === data.suite.path ? { ...suite, ...data.suite } : suite
               ))
             }
-          } catch (e) {
+          } catch (e: unknown) {
             setOutput(prev => [...prev, line])
           }
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Test run failed:', error)
       setOutput(prev => [...prev, `Error: ${error}`])
     } finally {
@@ -199,7 +199,7 @@ export default function TestDashboard() {
         await loadTestSuites()
         await loadUntestedFiles()
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to generate test:', error)
     }
   }

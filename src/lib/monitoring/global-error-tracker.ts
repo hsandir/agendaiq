@@ -114,7 +114,7 @@ class GlobalErrorTracker {
       this.addBreadcrumb('console', 'Console Error', { args: args.map(this.stringifyArg) });
       
       // Capture console errors as trackable errors
-      const message = args.map(this.stringifyArg).join(' ');
+      const message = (args.map(this.stringifyArg).join(' '));
       this.captureError({
         message: `Console Error: ${message}`,
         context: this.getErrorContext(),
@@ -174,7 +174,7 @@ class GlobalErrorTracker {
         }
 
         return response;
-      } catch (error) {
+      } catch (error: unknown) {
         const duration = Date.now() - startTime;
         
         this.addBreadcrumb('api-call', `Fetch Failed: ${url}`, {
@@ -285,7 +285,7 @@ class GlobalErrorTracker {
           }
         });
         observer.observe({ entryTypes: ['longtask'] });
-      } catch (e) {
+      } catch (e: unknown) {
         // PerformanceObserver not supported
       }
     }
@@ -363,7 +363,7 @@ class GlobalErrorTracker {
     if (this.isOnline) {
       try {
         await this.sendErrorToServer(error);
-      } catch (e) {
+      } catch (e: unknown) {
         // If sending fails, queue the error
         this.errorQueue.push(error);
       }
@@ -407,7 +407,7 @@ class GlobalErrorTracker {
       if (error) {
         try {
           await this.sendErrorToServer(error);
-        } catch (e) {
+        } catch (e: unknown) {
           // Re-queue the error if it still fails
           this.errorQueue.unshift(error);
           break;
@@ -424,7 +424,7 @@ class GlobalErrorTracker {
     
     try {
       return JSON.stringify(arg, null, 2);
-    } catch (e) {
+    } catch (e: unknown) {
       return String(arg);
     }
   }

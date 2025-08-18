@@ -27,12 +27,12 @@ export default function RegisterForm() {
     }
     
     // Validate required fields
-    if (!formData.name.trim()) {
+    if (!formData.String(name).trim()) {
       setError('Name is required');
       return;
     }
     
-    if (!formData.email.trim()) {
+    if (!formData.String(email).trim()) {
       setError('Email is required');
       return;
     }
@@ -76,9 +76,9 @@ export default function RegisterForm() {
       if (!response.ok) {
         setError(data.error || 'Registration failed');
       } else {
-        router.push(`/auth/verify-email?email=${encodeURIComponent(formData.email)}` as any);
+        router.push(`/auth/verify-email?email=${encodeURIComponent(formData.email)}` as Record<string, unknown>);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setError('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);

@@ -48,6 +48,11 @@
     "lock:acquire": "node .claude/file-lock-manager.js lock",
     "lock:release": "node .claude/file-lock-manager.js unlock",
     "lock:check": "node .claude/file-lock-manager.js check",
+    "fix:eslint": "node scripts/fix-eslint-warnings.js",
+    "fix:eslint:batch": "node scripts/batch-eslint-fix.js",
+    "fix:eslint:tests": "node scripts/batch-eslint-fix.js --tests-only",
+    "fix:eslint:api": "node scripts/batch-eslint-fix.js --api-only",
+    "fix:all": "npm run fix:eslint && npm run fix:eslint:batch && npm run lint",
     "lock:list": "node .claude/file-lock-manager.js list",
     "lock:cleanup": "node .claude/file-lock-manager.js cleanup"
   },

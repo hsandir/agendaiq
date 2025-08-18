@@ -22,7 +22,7 @@ export function InterfaceSettingsClient() {
   const [showCustomEditor, setShowCustomEditor] = useState(false);
   
   // Use centralized theme from ThemeProvider
-  const { theme: currentTheme, setTheme } = useTheme();
+  const { theme: __currentTheme, __setTheme  } = useTheme();
 
   // Load preferences from database and localStorage
   useEffect(() => {
@@ -63,7 +63,7 @@ export function InterfaceSettingsClient() {
         //     // Don't set localStorage here - ThemeProvider handles it
         //   }
         // }
-      } catch (error) {
+      } catch (error: unknown) {
         console.debug('Error fetching preferences:', error);
       }
     };
@@ -89,7 +89,7 @@ export function InterfaceSettingsClient() {
         },
         body: JSON.stringify({ layoutId }),
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error saving layout:', error);
     }
     

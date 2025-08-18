@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     // Auth check - development capability required
     await requireAuth(AuthPresets.requireDevelopment);
     
-    const { searchParams } = new URL(request.url);
+    const { __searchParams  } = new URL(request.url);
     const workflow_id = searchParams.get('workflow_id');
     const status = searchParams.get('status'); // queued, in_progress, completed
     const per_page = searchParams.get('per_page') || '10';
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
       })),
       total_count: data.total_count
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('GitHub API error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch workflow runs' },

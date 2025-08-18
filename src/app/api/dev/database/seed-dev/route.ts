@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     
     // Get counts
     const logCount = await prisma.auditLog.count();
-    const userCount = await prisma.user.count();
+    const userCount = await prisma.(user as Record<string, unknown>).count();
     const staffCount = await prisma.staff.count();
     
     return NextResponse.json({
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
         newLogs: auditLogs.length + testRuns.length
       }
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to seed development data:', error);
     return NextResponse.json(
       { error: 'Failed to seed development data' },

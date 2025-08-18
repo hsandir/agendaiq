@@ -63,7 +63,7 @@ export default function TestDashboard() {
       const response = await fetch('/api/tests/suites')
       const data = await response.json()
       setTestSuites(data.suites)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load test suites:', error)
     }
   }
@@ -107,12 +107,12 @@ export default function TestDashboard() {
                 suite.path === data.suite.path ? { ...suite, ...data.suite } : suite
               ))
             }
-          } catch (e) {
+          } catch (e: unknown) {
             setOutput(prev => [...prev, line])
           }
         })
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Test run failed:', error)
       setOutput(prev => [...prev, `Error: ${error}`])
     } finally {

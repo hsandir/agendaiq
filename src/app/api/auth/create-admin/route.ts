@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
   try {
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
     const validationResult = createAdminSchema.safeParse(body);
     
     if (!validationResult.success) {
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password } = validationResult.data;
+    const { __email, __password  } = validationResult.data;
     
     // Check if user exists and has admin role
     const existingUser = await prisma.user.findUnique({
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await hash(password, 12);
     
     // Update the user with the new password
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.(user as Record<string, unknown>).update({
       where: { email },
       data: {
         hashedPassword: hashedPassword,
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
         district: staff.District?.name
       } : null
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error creating admin user:", error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(

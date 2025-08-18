@@ -79,7 +79,7 @@ export default function AuthDebugPage() {
         localStorage.setItem('auth-debug-process', JSON.stringify(data.processInfo));
         localStorage.setItem('auth-debug-timestamp', new Date().toISOString());
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch debug logs:', error);
       
       // Try to load from localStorage if API fails
@@ -120,7 +120,7 @@ export default function AuthDebugPage() {
       let csrfToken = '';
       try {
         csrfToken = await getCsrfToken();
-      } catch (e) {
+      } catch (e: unknown) {
         console.error('Failed to get CSRF token:', e);
       }
 
@@ -170,7 +170,7 @@ export default function AuthDebugPage() {
       });
 
       await fetchLogs();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Test sign-in failed:', error);
       
       // Log the error
@@ -182,7 +182,7 @@ export default function AuthDebugPage() {
           level: 'error',
           message: 'Test sign-in failed',
           details: { 
-            error: error instanceof Error ? error.message : 'Unknown error',
+            error: error instanceof Error ? error.message : String(error),
             stack: error instanceof Error ? error.stack : undefined
           }
         })

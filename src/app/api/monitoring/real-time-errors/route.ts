@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error processing real-time error report:', error);
     return NextResponse.json({ 
       success: false, 
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { __searchParams  } = new URL(request.url);
     const pageContext = searchParams.get('page');
     const severity = searchParams.get('severity');
     const category = searchParams.get('category');
@@ -181,7 +181,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching real-time errors:', error);
     return NextResponse.json({ 
       success: false, 
@@ -193,7 +193,7 @@ export async function GET(request: NextRequest) {
 // Mark error as resolved
 export async function PATCH(request: NextRequest) {
   try {
-    const { errorId, resolved } = await request.json();
+    const { __errorId, __resolved  } = (await request.json()) as Record<__string, unknown>;
     
     // Find and update error in all pages
     for (const [page, errors] of errorStore.entries()) {
@@ -207,7 +207,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json({ 
       success: false, 
       error: 'Failed to update error status' 

@@ -52,11 +52,11 @@ export async function GET(request: NextRequest) {
       note: 'Password is hidden for security reasons'
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { 
         error: 'Failed to parse database configuration',
-        details: error instanceof Error ? error.message : 'Unknown error' 
+        details: error instanceof Error ? error.message : String(error) 
       },
       { status: 500 }
     );

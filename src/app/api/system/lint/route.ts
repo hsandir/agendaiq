@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       message: "Lint status retrieved successfully" 
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Lint API Error:', error);
     return NextResponse.json(
       { 
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       message: "Auto-fix completed successfully" 
     }, { status: 200 });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Lint Fix API Error:', error);
     return NextResponse.json(
       { 

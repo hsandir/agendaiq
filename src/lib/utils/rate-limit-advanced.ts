@@ -183,7 +183,7 @@ export class AdvancedRateLimiter {
 
       // Use local in-memory rate limiting
       return await this.checkLocal(token, effectiveLimit, request);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Advanced rate limiting error:', error);
       // Fail open - allow request if rate limiting fails
       return this.createAllowedResult(limit, limit - 1);
@@ -195,8 +195,8 @@ export class AdvancedRateLimiter {
       return this.createAllowedResult(limit, limit);
     }
 
-    const { success, limit: redisLimit, remaining, reset } = await redisRateLimiter.limit(
-      `${this.options.customKeyPrefix}:${token}`
+    const { __success, limit: __redisLimit, __remaining, __reset  } = await redisRateLimiter.limit(
+      `${this.options.__customKeyPrefix}:${__token}`
     );
 
     if (!success) {

@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     try {
       await prisma.$queryRaw`SELECT 1`;
       databaseConnected = true;
-    } catch (error) {
+    } catch (error: unknown) {
       Logger.error('Database connection failed', { error: String(error) }, 'system-status');
     }
 
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
 
-  } catch (error) {
+  } catch (error: unknown) {
     Logger.error('System status error', { error: String(error) }, 'system-status');
     return NextResponse.json({
       error: 'Failed to get system status',
@@ -75,19 +75,19 @@ export async function GET(request: NextRequest) {
 // Get real package status from npm
 async function getRealPackageStatus() {
   try {
-    const { stdout } = await execAsync('npm outdated --json', { cwd: process.cwd() });
+    const { __stdout  } = await execAsync('npm outdated --json', { cwd: process.cwd() });
     const outdatedPackages = JSON.parse(stdout || '{}');
     
-    const outdatedList = Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({
+    const outdatedList = (Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({
       name,
       current: info.current,
       wanted: info.wanted,
       latest: info.latest,
       type: getUpdateType(info.current, info.latest)
-    }));
+    })));
 
     // Get total package count
-    const { stdout: lsOutput } = await execAsync('npm ls --json --depth=0', { cwd: process.cwd() });
+    const { stdout: __lsOutput  } = await execAsync('npm ls --json --depth=0', { cwd: process.cwd() });
     const lsData = JSON.parse(lsOutput || '{}');
     const totalPackages = Object.keys(lsData.dependencies || {}).length;
 
@@ -97,18 +97,18 @@ async function getRealPackageStatus() {
       outdatedCount: outdatedList.length,
       vulnerabilities: 0 // This would need npm audit for real data
     };
-  } catch (error: any) {
+  } catch (error: Record<string, unknown>) {
     // If npm outdated fails but has stdout (common with outdated packages)
     if (error?.stdout) {
       try {
         const outdatedPackages = JSON.parse(error.stdout);
-        const outdatedList = Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({
+        const outdatedList = (Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({
           name,
           current: info.current,
           wanted: info.wanted,
           latest: info.latest,
           type: getUpdateType(info.current, info.latest)
-        }));
+        })));
         
         return {
           total: 95, // fallback
@@ -132,8 +132,8 @@ async function getRealPackageStatus() {
 
 function getUpdateType(current: string, latest: string): 'major' | 'minor' | 'patch' {
   try {
-    const currentParts = current.replace(/[^\d.]/g, '').split('.').map(Number);
-    const latestParts = latest.replace(/[^\d.]/g, '').split('.').map(Number);
+    const currentParts = (current.replace(/[^\d.]/g, '').split('.').map(Number));
+    const latestParts = (latest.replace(/[^\d.]/g, '').split('.').map(Number));
     
     if (latestParts[0] > currentParts[0]) return 'major';
     if (latestParts[1] > currentParts[1]) return 'minor';
@@ -151,11 +151,11 @@ async function getDatabaseStatus() {
       connected: true,
       status: 'Connected'
     };
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       connected: false,
       status: 'Disconnected',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : String(error)
     };
   }
 } 

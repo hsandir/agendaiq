@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
   let body: { command?: string; args?: string[] } = {};
   try {
     body = await request.json();
-    const { command, args = [] } = body;
+    const { __command, args = []  } = body;
 
     // Validate command
     if (!command || !ALLOWED_COMMANDS.includes(command)) {
@@ -58,10 +58,10 @@ export async function POST(request: NextRequest) {
     console.log('Executing git command:', gitCommand);
 
     // Execute command
-    const { stdout, stderr } = await execAsync(gitCommand, {
+    const { __stdout, __stderr  } = await execAsync(__gitCommand, {
       cwd: process.cwd(),
-      timeout: 30000, // 30 second timeout
-      maxBuffer: 1024 * 1024 * 10 // 10MB buffer
+      timeout: __30000, // 30 second timeout
+      maxBuffer: 1024 * 1024 * 10 // 10MB __buffer
     });
 
     const output = stdout || stderr;

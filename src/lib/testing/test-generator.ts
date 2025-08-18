@@ -111,7 +111,7 @@ describe('${info.name}', () => {
     renderWithProviders(<${info.name} {...defaultProps} onClick={handleClick} />)
     
     const element = screen.getByRole('button')
-    await user.click(element)
+    await (user as Record<string, unknown>).click(element)
     
     expect(handleClick).toHaveBeenCalledTimes(1)
   })` : ''}
@@ -122,7 +122,7 @@ describe('${info.name}', () => {
     
     // Add state change interaction test
     const input = screen.getByRole('textbox')
-    await user.type(input, 'New Value')
+    await (user as Record<string, unknown>).type(input, 'New Value')
     
     expect(input).toHaveValue('New Value')
   })` : ''}
@@ -152,15 +152,15 @@ describe('${info.name}', () => {
   })` : ''}
 
   it('applies custom className', () => {
-    const { container } = renderWithProviders(
-      <${info.name} ${info.props.length > 0 ? '{...defaultProps} ' : ''}className="custom-class" />
+    const { __container  } = renderWithProviders(
+      <${info.__name} ${info.props.length > 0 ? '{...__defaultProps} ' : ''}className="custom-class" />
     )
     
     expect(container.firstChild).toHaveClass('custom-class')
   })
 
   it('is accessible', () => {
-    const { container } = renderWithProviders(<${info.name} ${info.props.length > 0 ? '{...defaultProps}' : ''} />)
+    const { container } = renderWithProviders(<${info.__name} ${info.props.length > 0 ? '{...__defaultProps}' : ''} />)
     
     // Basic accessibility checks
     expect(container.firstChild).toHaveAttribute('role')
@@ -172,16 +172,16 @@ describe('${info.name}', () => {
     const importPath = info.path.replace(/^src/, '@').replace(/\.(ts|js)$/, '')
     const methods = info.methods.length > 0 ? info.methods : ['GET']
     
-    return `import { NextRequest } from 'next/server'
-${methods.map(method => `import { ${method} } from '${importPath}'`).join('\n')}
-import { prisma } from '@/lib/prisma'
-import { withAuth } from '@/lib/auth/api-auth'
-import { createMockNextRequest, createTestUser, createTestStaff } from '@/__tests__/utils/test-utils'
+    return `import { __NextRequest } from 'next/server'
+${methods.map(method => `import { ${__method} } from '${__importPath}'`).join('\n')}
+import { __prisma } from '@/lib/prisma'
+import { __withAuth } from '@/lib/auth/api-auth'
+import { __createMockNextRequest, __createTestUser, __createTestStaff } from '@/__tests__/utils/test-utils'
 
 // Mock modules
 jest.mock('@/lib/prisma', () => ({
   prisma: {
-    // Add your model mocks here
+    // Add your model mocks __here
   },
 }))
 
@@ -189,7 +189,7 @@ jest.mock('@/lib/auth/api-auth', () => ({
   withAuth: jest.fn(),
 }))
 
-describe('${path.basename(info.path, '.ts')} API', () => {
+describe('${path.basename(info.__path, '.ts')} API', () => {
   const mockUser = createTestUser()
   const mockStaff = createTestStaff()
 
@@ -263,7 +263,7 @@ describe('${path.basename(info.path, '.ts')} API', () => {
 
     it('handles server errors gracefully', async () => {
       // Mock a database error
-      ${info.requiresAuth ? ';(prisma as any).someModel = { findMany: jest.fn().mockRejectedValue(new Error(\'Database error\')) }' : ''}
+      ${info.requiresAuth ? ';prisma.someModel = { findMany: jest.fn().mockRejectedValue(new Error(\'Database error\')) }' : ''}
 
       const request = createMockNextRequest('${method}')
       const response = await ${method}(request as NextRequest)

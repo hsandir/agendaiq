@@ -1,5 +1,14 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, User, Staff, Role } from '@prisma/client'
 import { TestFactory } from '../fixtures/factory'
+
+type UserWithStaff = User & {
+  Staff: (Staff & {
+    Role: Role;
+    Department: unknown;
+    School: unknown;
+    District: unknown;
+  })[]
+}
 
 let prisma: PrismaClient
 
@@ -53,7 +62,7 @@ export async function seedTestDatabase() {
   const prisma = getTestPrismaClient()
   
   // Use existing data from copied main database
-  const users = await prisma.user.findMany({
+  const users: UserWithStaff[] = await prisma.user.findMany({
     include: {
       Staff: {
         include: {

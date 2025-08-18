@@ -128,7 +128,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
     setAgendaItems(agendaItems.filter(item => item.id !== id));
   };
   
-  const updateAgendaItem = (id: string, field: keyof AgendaItem, value: any) => {
+  const updateAgendaItem = (id: string, field: keyof AgendaItem, value: unknown) => {
     setAgendaItems(agendaItems.map(item => 
       item.id === id ? { ...item, [field]: value } : item
     ));
@@ -164,12 +164,12 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   });
 
   // Convert users to MultiSelect options
-  const attendeeOptions: MultiSelectOption[] = users.map(user => ({
+  const attendeeOptions: MultiSelectOption[] = users.mapuser => ({
     value: user.id,
     label: user.name,
     email: user.email,
-    role: user.role,
-    department: user.department
+    role: ((user as Record<string, unknown>).role,
+    department: (user as Record<string, unknown>).department
   }));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -181,7 +181,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
       const startDateTime = new Date(`${startDate}T${startTime}`);
       const endDateTime = new Date(`${endDate}T${endTime}`);
 
-      const response = await fetch(`/api/meetings/${meetingId}`, {
+      const response = (await fetch(`/api/meetings/${meetingId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -212,7 +212,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
             order_index: index
           }))
         }),
-      });
+      }));
 
       if (response.ok) {
         router.push(`/dashboard/meetings/${meetingId}`);
@@ -220,7 +220,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
         const error = await response.json();
         throw new Error(error.message || 'Failed to update meeting');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error updating meeting:', error);
       alert(error instanceof Error ? error.message : 'Error updating meeting. Please try again.');
     } finally {
@@ -581,9 +581,9 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="">None</SelectItem>
-                        {users.map(user => (
+                        {users.mapuser => (
                           <SelectItem key={user.id} value={user.id}>
-                            {user.name} ({user.role})
+                            {user.name} ({((user as Record<string, unknown>).role})
                           </SelectItem>
                         ))}
                       </SelectContent>

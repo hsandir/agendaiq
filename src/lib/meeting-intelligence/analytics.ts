@@ -14,7 +14,7 @@ export class MeetingAnalyticsService {
     dateTo?: Date;
     schoolId?: number;
   }): Promise<MeetingAnalytics> {
-    const where: any = {};
+    const where: Record<string, unknown> = {};
 
     if (options?.departmentId) {
       where.department_id = options.departmentId;
@@ -97,7 +97,7 @@ export class MeetingAnalyticsService {
     const carryForwardRate = totalMeetings > 0 ? (meetingsWithCarriedItems / totalMeetings) * 100 : 0;
 
     // Get department breakdown
-    const departmentBreakdown = await this.getDepartmentStatistics(departments.map(d => d.id), where);
+    const departmentBreakdown = (await this.getDepartmentStatistics(departments.map(d => d.id), where));
 
     return {
       totalMeetings,
@@ -116,12 +116,12 @@ export class MeetingAnalyticsService {
    */
   private static async getDepartmentStatistics(
     departmentIds: number[],
-    baseWhere: any
+    baseWhere: Record<string, unknown>
   ): Promise<DepartmentStats[]> {
     const stats: DepartmentStats[] = [];
 
     for (const deptId of departmentIds) {
-      const where = { ...baseWhere, department_id: deptId };
+      const where = { ...baseWhere, department_id: parseInt(deptId) };
 
       const [
         department,
@@ -268,7 +268,7 @@ export class MeetingAnalyticsService {
       dateTo?: Date;
     }
   ) {
-    const where: any = {};
+    const where: Record<string, unknown> = {};
 
     if (staffId) {
       where.staff_id = staffId;
@@ -350,7 +350,7 @@ export class MeetingAnalyticsService {
     dateFrom?: Date;
     dateTo?: Date;
   }) {
-    const where: any = {};
+    const where: Record<string, unknown> = {};
 
     if (options?.roleId) {
       where.assigned_to_role = options.roleId;
@@ -358,7 +358,7 @@ export class MeetingAnalyticsService {
 
     if (options?.departmentId) {
       where.Meeting = {
-        department_id: options.departmentId
+        department_id: parseInt(options).departmentId
       };
     }
 
@@ -416,13 +416,13 @@ export class MeetingAnalyticsService {
       // Count by status
       const status = item.status.toLowerCase().replace('_', '');
       if (status in metrics.byStatus) {
-        (metrics.byStatus as any)[status]++;
+        (metrics.byStatus as Record<string, unknown>)[status]++;
       }
 
       // Count by priority
       const priority = item.priority.toLowerCase();
       if (priority in metrics.byPriority) {
-        (metrics.byPriority as any)[priority]++;
+        (metrics.byPriority as Record<string, unknown>)[priority]++;
       }
 
       // Calculate completion time

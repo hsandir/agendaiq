@@ -16,7 +16,7 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
     throw new Error("Staff record not found");
   }
 
-  const { id } = await params;
+  const { __id  } = await params;
 
   // Convert string ID to integer for Prisma
   const meetingId = parseInt(id);
@@ -68,22 +68,22 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
 
   // Check if user has permission to edit this meeting's agenda
   const hasAdminAccess = isAnyAdmin(user);
-  const isOrganizer = meeting.organizer_id === user.staff?.id;
-  const isAttendee = meeting.MeetingAttendee.some(a => a.staff_id === user.staff?.id);
+  const isOrganizer = meeting.organizer_id === (user as any).staff?.id;
+  const isAttendee = meeting.MeetingAttendee.some(a => a.staff_id === (user as any).staff?.id);
 
   if (!hasAdminAccess && !isOrganizer && !isAttendee) {
     redirect("/dashboard/meetings");
   }
 
   // Get all staff for responsible person dropdown
-  const allStaff = await prisma.staff.findMany({
+  const allStaff = (await prisma.staff.findMany({
     where: {
       OR: [
         // Same department
-        { department_id: user.staff?.department?.id },
+        { department_id: parseInt(user).staff?.department?.id },
         // Leadership roles from same school
         { 
-          school_id: user.staff?.school?.id,
+          school_id: parseInt(user).staff?.school?.id,
           Role: {
             is_leadership: true
           }
@@ -102,7 +102,7 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
       Department: true
     },
     take: 200 // Limit for performance
-  });
+  }));
 
   // Get past meetings for importing agenda items
   const pastMeetings = await prisma.meeting.findMany({
@@ -111,12 +111,12 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
         not: meetingId
       },
       OR: [
-        { organizer_id: user.staff?.id },
-        { department_id: user.staff?.department?.id },
+        { organizer_id: (user as any).staff?.id },
+        { department_id: parseInt(user).staff?.department?.id },
         {
           MeetingAttendee: {
             some: {
-              staff_id: user.staff?.id
+              staff_id: (user as any).staff?.id
             }
           }
         }
@@ -142,11 +142,11 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
   });
 
   // Transform staff data to match the component's expected format
-  const staffForAgenda = allStaff.map(staff => ({
+  const staffForAgenda = (allStaff.map(staff => ({
     id: staff.id,
     name: staff.User.name || staff.User.email || 'Unknown',
     initials: staff.User.name?.split(' ').map(n => n[0]).join('').toUpperCase()
-  }));
+  })));
 
   return (
     <div className="max-w-7xl mx-auto py-6 px-4">

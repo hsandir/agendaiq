@@ -19,7 +19,7 @@ export function ApiPerformanceTest() {
   const [testing, setTesting] = useState(false)
   const [testCount, setTestCount] = useState(0)
 
-  const testEndpoint = async (url: string, method = 'GET', body?: any): Promise<TestResult> => {
+  const testEndpoint = async (url: string, method = 'GET', body?: Record<string, unknown>): Promise<TestResult> => {
     const start = performance.now()
     try {
       const response = await fetch(url, {
@@ -38,12 +38,12 @@ export function ApiPerformanceTest() {
         status: response.status,
         cached: headers['x-cache'] === 'HIT'
       }
-    } catch (error) {
+    } catch (error: unknown) {
       return {
         endpoint: url,
         time: performance.now() - start,
         status: 0,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : String(error)
       }
     }
   }

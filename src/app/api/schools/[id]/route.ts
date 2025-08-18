@@ -10,15 +10,15 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { __id  } = await params;
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     // Check if user is admin
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.user.id as string },
       include: { Staff: { include: { Role: true } } },
     });
 
@@ -26,17 +26,17 @@ export async function PUT(
       return new NextResponse("Forbidden", { status: 403 });
     }
 
-    const body = await request.json();
-    const { name, address, city, state, zipCode, phone, website, logo } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __name, __address, ___city, ___state, ___zipCode, ___phone, ___website, __logo  } = body;
 
-    if (!name || typeof name !== "string" || name.trim().length === 0) {
+    if (!name || typeof name !== "string" || String(name).trim().length === 0) {
       return new NextResponse("School name is required", { status: 400 });
     }
 
     const school = await prisma.school.update({
       where: { id: parseInt(id) },
       data: {
-        name: name.trim(),
+        name: String(name).trim(),
         address: address?.trim(),
         // TODO: Add these fields to School model in schema
         // city: city?.trim(),
@@ -52,7 +52,7 @@ export async function PUT(
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error in PUT /api/schools:", error);
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
@@ -74,15 +74,15 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { __id  } = await params;
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     // Check if user is admin
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.user.id as string },
       include: { Staff: { include: { Role: true } } },
     });
 
@@ -95,7 +95,7 @@ export async function DELETE(
     });
 
     return new NextResponse("School deleted successfully", { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error in DELETE /api/schools:", error);
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2025") {

@@ -11,8 +11,8 @@ interface ThemeContextValue {
   setTheme: (themeId: string) => void;
   availableThemes: Theme[];
   isLoading: boolean;
-  customTheme?: any;
-  setCustomTheme?: (theme: any) => void;
+  customTheme?: Record<string, unknown>;
+  setCustomTheme?: (theme: Record<string, unknown>) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
@@ -73,7 +73,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
             const parsedCustom = JSON.parse(savedCustom);
             setCustomTheme(parsedCustom);
             setCurrentThemeId('custom');
-          } catch (e) {
+          } catch (e: unknown) {
             console.error('Failed to parse custom theme from localStorage');
           }
         }
@@ -190,7 +190,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
         const g = parseInt(hex.substring(2, 4), 16);
         const b = parseInt(hex.substring(4, 6), 16);
         document.documentElement.style.setProperty(`--${name}-rgb`, `${r}, ${g}, ${b}`);
-      } catch (err) {
+      } catch (err: unknown) {
         console.error(`Failed to set CSS variable --${name}:`, err);
       }
     };
@@ -236,7 +236,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
       if (currentThemeId === 'custom' && customTheme) {
         themeStore.setCustomTheme(customTheme);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Failed to save theme to localStorage:', err);
     }
   }, [currentThemeId, mounted, customTheme]);
@@ -254,7 +254,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     // Save to localStorage immediately for instant feedback
     try {
       localStorage.setItem('agendaiq-theme', themeId);
-    } catch (err) {
+    } catch (err: unknown) {
       console.debug('localStorage not available');
     }
 

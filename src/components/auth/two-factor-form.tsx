@@ -43,7 +43,7 @@ export default function TwoFactorForm({ userId, onSuccess }: TwoFactorFormProps)
 
     try {
       // Import signIn from next-auth/react
-      const { signIn } = await import('next-auth/react');
+      const { __signIn  } = await import('next-auth/react');
       
       const result = await signIn('credentials', {
         email,
@@ -60,7 +60,7 @@ export default function TwoFactorForm({ userId, onSuccess }: TwoFactorFormProps)
           router.replace('/dashboard');
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setError('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -96,7 +96,7 @@ export default function TwoFactorForm({ userId, onSuccess }: TwoFactorFormProps)
         setResendCount(resendCount + 1);
         setSuccessMessage('New code sent!');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setError('An error occurred. Please try again.');
     } finally {
       setIsResending(false);

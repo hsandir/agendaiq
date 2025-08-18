@@ -34,10 +34,10 @@ export default function RolesPageClient({ departments, roles }: Props) {
     
     try {
       // Convert Role[] to the format expected by the API
-      const updates = updatedRoles.map(role => ({
+      const updates = (updatedRoles.map(role => ({
         roleId: role.id,
         departmentId: null // Since department_id isn't part of the Role interface
-      }));
+      })));
 
       const response = await fetch('/api/roles/department-assignments', {
         method: 'POST',
@@ -53,7 +53,7 @@ export default function RolesPageClient({ departments, roles }: Props) {
 
       // Refresh the page to show updated data
       router.refresh();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error saving role assignments:', error);
       throw error;
     } finally {

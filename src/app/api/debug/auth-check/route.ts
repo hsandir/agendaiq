@@ -25,8 +25,8 @@ export async function GET() {
 
   try {
     // 1. Test database connection
-    const userCount = await prisma.user.count();
-    const adminCount = await prisma.user.count({ where: { is_admin: true } });
+    const userCount = await prisma.(user as Record<string, unknown>).count();
+    const adminCount = await prisma.(user as Record<string, unknown>).count({ where: { is_admin: true } });
     
     debugInfo.database.connected = true;
     debugInfo.database.userCount = userCount;
@@ -35,8 +35,8 @@ export async function GET() {
     // First user check logic
     debugInfo.firstUserCheck.result = userCount === 0;
     
-  } catch (error) {
-    debugInfo.database.error = error instanceof Error ? error.message : 'Unknown error';
+  } catch (error: unknown) {
+    debugInfo.database.error = error instanceof Error ? error.message : String(error);
     debugInfo.database.connected = false;
     
     // IMPORTANT: Return false when database fails to prevent create account page

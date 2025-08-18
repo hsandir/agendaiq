@@ -11,7 +11,7 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
       return NextResponse.json({ error: "Staff record not found" }, { status: 404 });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { __searchParams  } = new URL(request.url);
     const query = searchParams.get('q') || '';
 
     if (query.length < 2) {
@@ -28,8 +28,8 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
       // Admins can search all meetings in their organization
       searchWhereClause = {
         OR: [
-          { school_id: staffRecord?.school?.id },
-          { district_id: staffRecord?.district?.id }
+          { school_id: parseInt(staffRecord)?.school?.id },
+          { district_id: parseInt(staffRecord)?.district?.id }
         ]
       };
     } else {
@@ -43,7 +43,7 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
         }
       });
 
-      const subordinateIds = subordinates.map(s => s.id);
+      const subordinateIds = (subordinates.map(s => s.id));
 
       searchWhereClause = {
         OR: [
@@ -144,7 +144,7 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
     });
 
     // Transform meetings for frontend
-    const transformedMeetings = meetings.map(meeting => ({
+    const transformedMeetings = (meetings.map(meeting => ({
       id: meeting.id,
       title: meeting.title,
       description: meeting.description,
@@ -163,7 +163,7 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
       attendees: meeting.MeetingAttendee.slice(0, 3).map(attendee => ({
         name: attendee.Staff.User.name,
       })),
-    }));
+    })));
 
     return NextResponse.json({ 
       meetings: transformedMeetings,
@@ -171,7 +171,7 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
       query: query
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error searching meetings:", error);
     return NextResponse.json(
       { error: "Internal server error" },

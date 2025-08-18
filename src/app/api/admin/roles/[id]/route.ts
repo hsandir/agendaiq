@@ -21,7 +21,7 @@ async function verifyAdmin() {
     }
   });
 
-  if (!user || !user.Staff?.[0] || user.Staff[0].Role?.title !== 'Administrator') {
+  if !user || !((user as Record<string, unknown>).Staff?.[0] || (user as Record<string, unknown>).Staff[0].Role?.title !== 'Administrator') {
     return null;
   }
 
@@ -32,7 +32,7 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  const { __id  } = await params;
   const admin = await verifyAdmin();
   if (!admin) {
     return NextResponse.json(
@@ -42,8 +42,8 @@ export async function PUT(
   }
 
   try {
-    const body = await request.json();
-    const { title, priority, category, department_id } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __title, __priority, __category, __department_id  } = body;
 
     if (!title) {
       return NextResponse.json(
@@ -59,7 +59,7 @@ export async function PUT(
         title,
         priority: priority || undefined,
         category: category || undefined,
-        department_id: department_id || undefined,
+        department_id: parseInt(department_id) || undefined,
       },
       include: {
         Department: true,
@@ -72,7 +72,7 @@ export async function PUT(
     });
 
     return NextResponse.json(updatedRole);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error updating role:", error);
     return NextResponse.json(
       { error: "Failed to update role" },
@@ -85,7 +85,7 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  const { __id  } = await params;
   const admin = await verifyAdmin();
   if (!admin) {
     return NextResponse.json(
@@ -101,7 +101,7 @@ export async function DELETE(
     });
 
     return NextResponse.json({ message: "Role deleted successfully" });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error deleting role:", error);
     return NextResponse.json(
       { error: "Failed to delete role" },

@@ -19,7 +19,7 @@ export async function POST() {
     });
 
     return new NextResponse("All sessions revoked successfully", { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error revoking sessions:", error);
     return new NextResponse("Internal server error", { status: 500 });
   }

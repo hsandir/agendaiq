@@ -56,7 +56,7 @@ export function MobileSidebar() {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b">
-            <Link href={"/dashboard" as any} className="flex items-center space-x-2">
+            <Link href={"/dashboard" as Record<string, unknown>} className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <span className="text-foreground font-bold text-sm">AQ</span>
               </div>
@@ -98,7 +98,7 @@ export function MobileSidebar() {
                               {item.children.map((child) => (
                                 <li key={child.href}>
                                   <Link
-                                    href={child.href as any}
+                                    href={child.href as Record<string, unknown>}
                                     className={`block px-3 py-2 text-sm rounded-md transition-colors ${
                                       pathname === child.href
                                         ? 'bg-primary text-primary-foreground font-medium'
@@ -113,7 +113,7 @@ export function MobileSidebar() {
                           </details>
                         ) : (
                           <Link
-                            href={item.href as any}
+                            href={item.href as Record<string, unknown>}
                             className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                               isActive
                                 ? 'bg-primary text-primary'

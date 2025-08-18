@@ -22,7 +22,7 @@ export default async function SystemSettingsPage() {
 
   // Convert to a more usable format
   const settingsObject = settings.reduce((acc, setting) => {
-    acc[setting.key] = setting.value;
+    acc[(setting.key)] = setting.value;
     return acc;
   }, {} as Record<string, any>);
 

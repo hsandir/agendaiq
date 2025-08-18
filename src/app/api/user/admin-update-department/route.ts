@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = await request.json();
-    const { userId, departmentId } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __userId, __departmentId  } = body;
 
     if (!userId || !departmentId) {
       return NextResponse.json(
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     // Update the staff record's department
     await prisma.staff.update({
       where: { id: userStaff.id },
-      data: { department_id: departmentId },
+      data: { department_id: parseInt(departmentId) },
     });
 
     // Get updated user with staff
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(updatedUser);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error updating user department:", error);
     return NextResponse.json(
       { error: "Internal server error" },

@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     response.headers.set('Cache-Control', 'private, max-age=3600');
     
     return response;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching layout preference:', error);
     return NextResponse.json(
       { error: 'Failed to fetch layout preference' },
@@ -81,14 +81,14 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
     const validatedData = layoutSchema.parse(body);
     
     // Use layoutId if provided, otherwise use layout
     const layoutToSave = validatedData.layoutId || validatedData.layout || 'modern';
 
     // Update user's layout preference (optimized query)
-    await prisma.user.update({
+    await prisma.(user as Record<string, unknown>).update({
       where: { id: user.id },
       data: { layout_preference: layoutToSave },
       select: { id: true }, // Only select what we need
@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest) {
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: user.staff?.id || undefined,
+      staffId: (user as any).staff?.id || undefined,
       source: 'WEB_UI',
       description: `Layout changed to ${layoutToSave}`,
     }).catch(err => console.error('Audit log failed:', err));
@@ -112,7 +112,7 @@ export async function PUT(request: NextRequest) {
       success: true,
       layout: layoutToSave,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Invalid layout selection', details: error.errors },

@@ -44,7 +44,7 @@ export async function getUltraFastUser(): Promise<UltraFastUser | null> {
     }
 
     // Decode JWT without verification for speed (only for non-critical operations)
-    const decoded = jwt.decode(token.value) as any;
+    const decoded = jwt.decode(token.value) as Record<string, unknown>;
     
     if (!decoded?.id || !decoded?.email) {
       cachedUser = { user: null, timestamp: Date.now() };
@@ -59,7 +59,7 @@ export async function getUltraFastUser(): Promise<UltraFastUser | null> {
     
     cachedUser = { user, timestamp: Date.now() };
     return user;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Ultra fast auth error:', error);
     cachedUser = { user: null, timestamp: Date.now() };
     return null;
@@ -105,10 +105,10 @@ export const preferenceCache = new PreferenceCache();
  * Cache for user staff data to avoid repeated DB queries
  */
 class UserStaffCache {
-  private cache = new Map<number, { data: any; timestamp: number }>();
+  private cache = new Map<number, { data: Record<string, unknown>; timestamp: number }>();
   private readonly TTL = 2 * 60 * 1000; // 2 minutes
 
-  get(userId: number): any | null {
+  get(userId: number): Record<string, unknown> | null {
     const entry = this.cache.get(userId);
     if (!entry) return null;
     
@@ -120,7 +120,7 @@ class UserStaffCache {
     return entry.data;
   }
 
-  set(userId: number, data: any) {
+  set(userId: number, data: Record<string, unknown>) {
     this.cache.set(userId, {
       data,
       timestamp: Date.now()

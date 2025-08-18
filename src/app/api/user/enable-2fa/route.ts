@@ -17,7 +17,7 @@ export async function POST() {
 
     // TODO: Add twoFactorSecret and twoFactorEnabled fields to User model in schema
     // Save secret and enable 2FA
-    // await prisma.user.update({
+    // await prisma.(user as Record<string, unknown>).update({
     //   where: { email: session.user?.email! },
     //   data: {
     //     twoFactorSecret: secret,
@@ -36,7 +36,7 @@ export async function POST() {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error enabling 2FA:", error);
     return new NextResponse("Internal server error", { status: 500 });
   }

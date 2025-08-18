@@ -75,7 +75,7 @@ export default function MockDataTrackerPage() {
       
       setReport(scanReport);
       showNotification(`Scan completed: Found ${scanReport.totalFiles} files with mock data usage`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to scan mock data usage:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to scan codebase';
       setError(errorMessage);
@@ -373,7 +373,7 @@ export default function MockDataTrackerPage() {
                         <div className="flex space-x-2">
                           {item.type === 'page' && (
                             <Button variant="outline" size="sm" asChild>
-                              <Link href={item.path as any}>
+                              <Link href={item.path as Record<string, unknown>}>
                                 <ExternalLink className="w-3 h-3 mr-1" />
                                 View Page
                               </Link>

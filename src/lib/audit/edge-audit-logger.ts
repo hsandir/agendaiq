@@ -47,7 +47,7 @@ export class EdgeAuditLogger {
       this.eventBuffer.push(event);
     } else {
       // Overwrite oldest event in circular fashion
-      this.eventBuffer[this.bufferIndex] = event;
+      this.eventBuffer[(this.bufferIndex)] = event;
       this.bufferIndex = (this.bufferIndex + 1) % this.MAX_BUFFER_SIZE;
     }
 

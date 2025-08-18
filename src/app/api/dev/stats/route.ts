@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
         requiresAttention: activeErrors > 0
       }
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch dev stats:', error);
     return NextResponse.json(
       { error: 'Failed to fetch development statistics' },

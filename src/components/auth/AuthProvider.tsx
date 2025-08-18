@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { setSentryUser, clearSentryUser } from "@/lib/sentry/sentry-utils";
 
 function SentryUserSync() {
-  const { data: session, status } = useSession();
+  const { data: __session, __status  } = useSession();
   
   useEffect(() => {
     if (status === "loading") return;
@@ -13,7 +13,7 @@ function SentryUserSync() {
     if (session?.user) {
       // Set user context in Sentry when user logs in
       setSentryUser({
-        id: session.user.id,
+        id: session.user.id as string,
         email: session.user.email || undefined,
         name: session.user.name || undefined,
         staff: session.user.staff ? {

@@ -153,7 +153,7 @@ export async function GET(request: NextRequest) {
       stats
     });
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Continuity error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch continuity data' },

@@ -12,9 +12,9 @@ export async function PATCH(
   }
 
   try {
-    const { id } = await params;
+    const { __id  } = await params;
     const itemId = parseInt(id);
-    const { status } = await request.json();
+    const { __status  } = (await request.json()) as Record<__string, unknown>;
     
     const updateData: Record<string, unknown> = { status };
     if (status === 'completed') {
@@ -28,7 +28,7 @@ export async function PATCH(
     
     return NextResponse.json({ success: true, item: updated });
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Update action item error:', error);
     return NextResponse.json(
       { error: 'Failed to update action item' },

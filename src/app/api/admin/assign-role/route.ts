@@ -11,7 +11,7 @@ async function findManagerId(roleTitle: string, departmentId: number) {
       const departmentChair = await prisma.staff.findFirst({
         where: {
           Role: { title: 'Department Chair' },
-          department_id: departmentId,
+          department_id: parseInt(departmentId),
         },
         include: { User: true },
       });
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
   try {
     // Verify admin access
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return NextResponse.json(
         { error: "Not authenticated" },
         { status: 401 }
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     }
 
     const body = (await request.json()) as AssignRoleRequest;
-    const { email, roleId, departmentId, managerId } = body;
+    const { __email, __roleId, __departmentId, __managerId  } = body;
 
     if (!email || !roleId || !departmentId) {
       return NextResponse.json(
@@ -98,13 +98,13 @@ export async function POST(request: Request) {
     const finalManagerId = managerId ? parseInt(managerId) : autoAssignedManagerId;
 
     // Update or create staff record
-    if (user.Staff?.[0]) {
+    if ((user as Record<string, unknown>).Staff?.[0]) {
       await prisma.staff.update({
-        where: { id: user.Staff[0].id },
+        where: { id: (user as Record<string, unknown>).Staff[0].id },
         data: {
           role_id: parseInt(roleId),
           department_id: parseInt(departmentId),
-          manager_id: finalManagerId,
+          manager_id: parseInt(finalManagerId),
         },
       });
     } else {
@@ -124,21 +124,21 @@ export async function POST(request: Request) {
           user_id: parseInt(user.id),
           role_id: parseInt(roleId),
           department_id: parseInt(departmentId),
-          school_id: defaultSchool.id,
-          district_id: defaultDistrict.id,
-          manager_id: finalManagerId,
+          school_id: parseInt(defaultSchool.id),
+          district_id: parseInt(defaultDistrict.id),
+          manager_id: parseInt(finalManagerId),
         },
       });
     }
 
     // Get updated user with staff
     const updatedUser = await prisma.user.findUnique({
-      where: { id: parseInt(user.id) },
+      where: { id: user.id },
       include: { Staff: { include: { Role: true, Department: true } } },
     });
 
     return NextResponse.json(updatedUser);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Role assignment error:", error);
     return NextResponse.json(
       { error: "Error assigning role" },

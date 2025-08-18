@@ -14,8 +14,8 @@ export function setSentryUser(user: Partial<User> & {
     id: user.id,
     email: user.email || undefined,
     username: user.name || undefined,
-    staffId: user.staff?.id,
-    role: user.staff?.role.title,
+    staffId: (user as any).staff?.id,
+    role: (user as any).staff?.role.title,
   });
 }
 
@@ -76,10 +76,10 @@ export function captureException(
     }
     
     if (user) {
-      scope.setUser({
+      scope.setUser{
         id: user.id,
         email: user.email,
-        staffId: user.staffId,
+        staffId: ((user as Record<string, unknown>).staffId,
       });
     }
     
@@ -106,7 +106,7 @@ export function startTransaction(
 /**
  * Wraps a function with error tracking
  */
-export function withSentry<T extends (...args: any[]) => any>(
+export function withSentry<T extends (...args: Record<string, unknown>[]) => any>(
   fn: T,
   options?: {
     name?: string;
@@ -141,7 +141,7 @@ export function withSentry<T extends (...args: any[]) => any>(
       
       transaction?.end();
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       transaction?.end();
       
       if (options?.captureError !== false) {
@@ -185,10 +185,10 @@ export const Performance = {
       const result = await queryFn();
       // SpanStatus type changed in newer Sentry versions
       // Using setHttpStatus instead for compatibility
-      (transaction as any)?.setHttpStatus?.(200);
+      (transaction as Record<string, unknown>)?.setHttpStatus?.(200);
       return result;
-    } catch (error) {
-      (transaction as any)?.setHttpStatus?.(500);
+    } catch (error: unknown) {
+      (transaction as Record<string, unknown>)?.setHttpStatus?.(500);
       throw error;
     } finally {
       transaction?.end();
@@ -208,10 +208,10 @@ export const Performance = {
       const result = await routeFn();
       // SpanStatus type changed in newer Sentry versions
       // Using setHttpStatus instead for compatibility
-      (transaction as any)?.setHttpStatus?.(200);
+      (transaction as Record<string, unknown>)?.setHttpStatus?.(200);
       return result;
-    } catch (error) {
-      (transaction as any)?.setHttpStatus?.(500);
+    } catch (error: unknown) {
+      (transaction as Record<string, unknown>)?.setHttpStatus?.(500);
       throw error;
     } finally {
       transaction?.end();

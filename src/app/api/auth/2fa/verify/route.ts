@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     }
 
     const user = authResult.user!;
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
     
     if (!body.token) {
       return NextResponse.json(
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     const backupCodes = generateBackupCodes();
 
     // Enable 2FA and save backup codes
-    await prisma.user.update({
+    await prisma.(user as Record<string, unknown>).update({
       where: { id: user.id },
       data: {
         two_factor_enabled: true,
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
       backupCodes: backupCodes
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('2FA Verify Error:', error);
     return NextResponse.json(
       { error: "Failed to verify 2FA" }, 

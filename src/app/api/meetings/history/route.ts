@@ -33,10 +33,10 @@ export async function GET(request: NextRequest) {
     // Tab-based filtering
     switch (tab) {
       case 'my_meetings':
-        whereClause.organizer_id = user.staff?.id;
+        whereClause.organizer_id = (user as any).staff?.id;
         break;
       case 'department':
-        if (user.staff?.department?.id) {
+        if ((user as any).staff?.department?.id) {
           if (includeSubDepartments) {
             // Get all departments in hierarchy
             const departments = await prisma.department.findMany({
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
         }
         break;
       case 'attended':
-        if (user.staff?.id) {
+        if ((user as any).staff?.id) {
           whereClause.OR = [
             { organizer_id: user.staff.id },
             { MeetingAttendee: { some: { staff_id: user.staff.id } } }
@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Transform data
-    const transformedMeetings = meetings.map(meeting => ({
+    const transformedMeetings = (meetings.map(meeting => ({
       id: meeting.id,
       title: meeting.title,
       description: meeting.description,
@@ -162,13 +162,13 @@ export async function GET(request: NextRequest) {
       department: meeting.Department?.name,
       isRecurring: !!meeting.repeat_type,
       parentMeetingId: meeting.parent_meeting_id
-    }));
+    })));
 
     return NextResponse.json({ 
       success: true,
       meetings: transformedMeetings 
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching meeting history:', error);
     return NextResponse.json(
       { error: 'Failed to fetch meeting history' },

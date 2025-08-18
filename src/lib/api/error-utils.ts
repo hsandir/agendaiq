@@ -14,7 +14,7 @@ export function apiError(message: string, status: number = 400) {
 export async function withApiErrorHandling<T>(fn: () => Promise<T | Response>) {
   try {
     return await fn();
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       return apiError(error.message, 500);
     }

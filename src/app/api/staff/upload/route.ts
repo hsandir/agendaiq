@@ -11,14 +11,14 @@ interface CSVRecord {
 
 // Simple CSV parser replacement
 function parseCSV(content: string): CSVRecord[] {
-  const lines = content.split('\n').filter(line => line.trim());
+  const lines = content.split('\n').filter(line => String(line).trim());
   if (lines.length === 0) return [];
   
-  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+  const headers = (lines[0].split(',').map(h => String(h).trim().replace(/^"|"$/g, '')));
   const records = [];
   
   for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+    const values = (lines[i].split(',').map(v => String(v).trim().replace(/^"|"$/g, '')));
     const record: CSVRecord = {};
     headers.forEach((header, index) => {
       record[header] = values[index] || '';
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
       console.log('✅ CSV parsed successfully. Records found:', records.length);
       console.log('📝 First record:', records[0]);
       
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('❌ CSV Parse Error:', error);
       return NextResponse.json({ 
         error: 'Invalid CSV format. Please check your file and try again.',
@@ -185,8 +185,8 @@ export async function POST(request: NextRequest) {
     const existingRoles = await prisma.role.findMany();
     const existingDepartments = await prisma.department.findMany();
     
-    const validRoles = existingRoles.map((r) => r.title);
-    const validDepartments = existingDepartments.map((d) => d.name);
+    const validRoles = (existingRoles.map((r) => r.title));
+    const validDepartments = (existingDepartments.map((d) => d.name));
 
     // Get the admin's school and district for creating staff records
     const adminStaff = user.staff!;
@@ -208,16 +208,16 @@ export async function POST(request: NextRequest) {
         if (!record.Email || !emailSchema.safeParse(record.Email).success) {
           recordErrors.push('Invalid email format');
         }
-        if (!record.Name || record.Name.trim().length === 0) {
+        if (!record.Name || record.String(Name).trim().length === 0) {
           recordErrors.push('Name is required');
         }
         if (!record.StaffId || !staffIdSchema.safeParse(record.StaffId).success) {
           recordErrors.push('Staff ID must be 3-15 characters');
         }
-        if (!record.Role || record.Role.trim().length === 0) {
+        if (!record.Role || record.String(Role).trim().length === 0) {
           recordErrors.push('Role is required');
         }
-        if (!record.Department || record.Department.trim().length === 0) {
+        if (!record.Department || record.String(Department).trim().length === 0) {
           recordErrors.push('Department is required');
         }
 
@@ -254,7 +254,7 @@ export async function POST(request: NextRequest) {
         // Check if StaffId already exists (if not updating existing user)
         let existingStaffId = null;
         if (record.StaffId) {
-          existingStaffId = await prisma.user.findFirst({
+          existingStaffId = await prisma.(user as Record<string, unknown>).findFirst({
             where: { 
               staff_id: record.StaffId,
               id: { not: existingUser?.id }
@@ -373,7 +373,7 @@ export async function POST(request: NextRequest) {
 
         processedRecords.push(processedRecord);
 
-      } catch (error) {
+      } catch (error: unknown) {
         let errorMessage = 'Processing error';
         
         if (error instanceof Error) {
@@ -459,7 +459,7 @@ export async function POST(request: NextRequest) {
 
           if (existingUser) {
             // Update existing user
-            await prisma.user.update({
+            await prisma.(user as Record<string, unknown>).update({
               where: { id: existingUser.id },
               data: { 
                 name: record.name,
@@ -471,8 +471,8 @@ export async function POST(request: NextRequest) {
               await prisma.staff.update({
                 where: { id: existingUser.Staff[0].id },
                 data: {
-                  role_id: role.id,
-                  department_id: department.id
+                  role_id: parseInt(role.id),
+                  department_id: parseInt(department.id)
                 }
               });
             } else {
@@ -483,11 +483,11 @@ export async function POST(request: NextRequest) {
 
               await prisma.staff.create({
                 data: {
-                  user_id: existingUser.id,
-                  role_id: role.id,
-                  department_id: department.id,
-                  school_id: adminStaff.school.id,
-                  district_id: adminStaff.district.id,
+                  user_id: parseInt(existingUser.id),
+                  role_id: parseInt(role.id),
+                  department_id: parseInt(department.id),
+                  school_id: parseInt(adminStaff).school.id,
+                  district_id: parseInt(adminStaff).district.id,
                 }
               });
             }
@@ -510,16 +510,16 @@ export async function POST(request: NextRequest) {
 
             await prisma.staff.create({
               data: {
-                user_id: newUser.id,
-                role_id: role.id,
-                department_id: department.id,
-                school_id: adminStaff.school.id,
-                district_id: adminStaff.district.id,
+                user_id: parseInt(newUser.id),
+                role_id: parseInt(role.id),
+                department_id: parseInt(department.id),
+                school_id: parseInt(adminStaff).school.id,
+                district_id: parseInt(adminStaff).district.id,
               }
             });
             created++;
           }
-        } catch (error) {
+        } catch (error: unknown) {
           uploadErrors.push(`Row ${record.rowNumber}: ${error instanceof Error ? error.message : 'Upload failed'}`);
         }
       }
@@ -530,7 +530,7 @@ export async function POST(request: NextRequest) {
         recordId: 'bulk',
         operation: 'BULK_CREATE',
         userId: user.id,
-        staffId: user.staff?.id,
+        staffId: (user as any).staff?.id,
         source: 'BULK_UPLOAD',
         description: `Staff bulk upload: ${created + updated} records processed (${created} created, ${updated} updated)`,
         metadata: {
@@ -554,11 +554,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Staff upload error:', error);
     return NextResponse.json({
       error: 'Internal server error',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error instanceof Error ? error.message : String(error)
     }, { status: 500 });
   }
 } 

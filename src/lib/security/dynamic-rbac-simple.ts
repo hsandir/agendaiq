@@ -64,7 +64,7 @@ export class DynamicRBAC {
         timestamp: new Date()
       };
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error checking access:', error);
       return {
         granted: false,

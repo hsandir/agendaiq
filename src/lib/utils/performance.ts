@@ -206,7 +206,7 @@ export async function measureTime<T>(
     
     Logger.performance(operation, duration, undefined, context);
     return result;
-  } catch (error) {
+  } catch (error: unknown) {
     const duration = Date.now() - startTime;
     
     Logger.error(`${operation} failed`, { 
@@ -231,7 +231,7 @@ export function usePerformanceMonitor() {
       if (duration > 100) {
         console.info(`Client operation: ${operation} took ${duration.toFixed(2)}ms`);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const duration = performance.now() - startTime;
       console.error(`Client operation failed: ${operation}`, { error, duration });
       throw error;

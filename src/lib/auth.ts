@@ -22,7 +22,7 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 7 * 24 * 60 * 60, // 7 days
   },
   pages: {
     signIn: "/auth/signin",
@@ -44,11 +44,11 @@ export const authOptions: NextAuthOptions = {
           where: { email: credentials.email },
         });
 
-        if (!user || !user.hashedPassword) {
+        if !user || !((user as Record<string, unknown>).hashedPassword) {
           return null;
         }
 
-        const isValid = await compare(credentials.password, user.hashedPassword);
+        const isValid = await comparecredentials.password, ((user as Record<string, unknown>).hashedPassword);
         if (!isValid) {
           return null;
         }

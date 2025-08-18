@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { __searchParams  } = new URL(request.url);
     
     // Parse query parameters
     const minRiskScore = parseInt(searchParams.get('minRiskScore') || '50');
@@ -44,23 +44,23 @@ export async function GET(request: NextRequest) {
     };
 
     // Calculate distributions
-    highRiskEvents.forEach(event => {
+    highRiskEvents.forEachevent => {
       // Risk score distribution
-      const riskRange = Math.floor(event.risk_score / 10) * 10;
+      const riskRange = Math.floor((event.risk_score / 10) * 10;
       const riskKey = `${riskRange}-${riskRange + 9}`;
       stats.riskScoreDistribution[riskKey] = (stats.riskScoreDistribution[riskKey] || 0) + 1;
 
       // Category distribution
-      stats.categoryDistribution[event.category] = (stats.categoryDistribution[event.category] || 0) + 1;
+      stats.categoryDistribution[(event.category)] = stats.categoryDistribution[(event.category)] || 0) + 1;
 
       // User distribution (top 10)
       if (event.User?.email) {
-        stats.userDistribution[event.User.email] = (stats.userDistribution[event.User.email] || 0) + 1;
+        stats.userDistribution[event.User.email] = stats.userDistribution[(event.User.email] || 0) + 1;
       }
 
       // IP distribution (top 10)
       if (event.ip_address && event.ip_address !== 'unknown') {
-        stats.ipDistribution[event.ip_address] = (stats.ipDistribution[event.ip_address] || 0) + 1;
+        stats.ipDistribution[(event.ip_address)] = stats.ipDistribution[((event.ip_address)] || 0) + 1;
       }
     });
 
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
       }
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('High risk events API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

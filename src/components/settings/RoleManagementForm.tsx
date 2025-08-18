@@ -38,7 +38,7 @@ interface User {
 
 export function RoleManagementForm() {
   const router = useRouter();
-  const { toast } = useToast();
+  const { __toast  } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -86,7 +86,7 @@ export function RoleManagementForm() {
       setDepartments(Array.isArray(deptData) ? deptData : (deptData.data || deptData.departments || []));
       setRoles(Array.isArray(rolesData) ? rolesData : (rolesData.data || rolesData.roles || []));
       setUsers(Array.isArray(usersData) ? usersData : (usersData.data || usersData.users || []));
-    } catch (error) {
+    } catch (error: unknown) {
       toast({
         title: 'Error',
         description: 'Failed to load data. Please try again.',
@@ -137,7 +137,7 @@ export function RoleManagementForm() {
 
       router.refresh();
       fetchData();
-    } catch (error) {
+    } catch (error: unknown) {
       toast({
         title: 'Error',
         description: error instanceof Error ? error.message : 'Failed to update user',

@@ -7,12 +7,12 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.user.id as string },
       include: { Staff: { include: { School: true } } },
     });
 
@@ -20,11 +20,11 @@ export async function GET() {
       return new NextResponse("School not found", { status: 404 });
     }
 
-    return new NextResponse(JSON.stringify(user.Staff[0].School), {
+    return new NextResponseJSON.stringify(((user as Record<string, unknown>).Staff[0].School), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error fetching user school:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
@@ -34,12 +34,12 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const body = await request.json();
-    const { schoolId } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __schoolId  } = body;
 
     if (!schoolId) {
       return new NextResponse("School ID is required", { status: 400 });
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
 
     // Find user's staff record
     const userStaff = await prisma.staff.findFirst({
-      where: { user_id: session.user.id },
+      where: { user_id: session.user.id as string },
     });
 
     if (!userStaff) {
@@ -66,12 +66,12 @@ export async function POST(request: Request) {
     // Update staff record's school
     await prisma.staff.update({
       where: { id: userStaff.id },
-      data: { school_id: schoolId },
+      data: { school_id: parseInt(schoolId) },
     });
 
     // Get updated user with staff
     const updatedUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.user.id as string },
       include: { Staff: { include: { School: true } } },
     });
 
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error updating user school:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
@@ -89,13 +89,13 @@ export async function POST(request: Request) {
 export async function DELETE() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     // Find user's staff record
     const userStaff = await prisma.staff.findFirst({
-      where: { user_id: session.user.id },
+      where: { user_id: session.user.id as string },
     });
 
     if (!userStaff) {
@@ -107,7 +107,7 @@ export async function DELETE() {
     // In that case, you might need to delete the staff record or handle differently
     
     return new NextResponse("School association removed", { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error removing user school:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }

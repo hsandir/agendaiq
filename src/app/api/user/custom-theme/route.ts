@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     
     response.headers.set('Cache-Control', 'private, max-age=3600'); // 1 hour
     return response;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching custom theme:', error);
     return NextResponse.json(
       { error: 'Failed to fetch custom theme' },
@@ -75,11 +75,11 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
     const validatedData = customThemeSchema.parse(body);
 
     // Save custom theme to user profile (optimized)
-    await prisma.user.update({
+    await prisma.(user as Record<string, unknown>).update({
       where: { id: user.id },
       data: {
         custom_theme: validatedData,
@@ -94,7 +94,7 @@ export async function PUT(request: NextRequest) {
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: user.staff?.id,
+      staffId: (user as any).staff?.id,
       source: 'WEB_UI',
       description: `Custom theme "${validatedData.name}" saved`,
     }).catch(err => console.error('Audit log failed:', err));
@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest) {
       success: true,
       customTheme: validatedData,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Invalid custom theme data', details: error.errors },
@@ -138,7 +138,7 @@ export async function DELETE(request: NextRequest) {
 
   try {
     // Clear custom theme and reset to default (optimized)
-    await prisma.user.update({
+    await prisma.(user as Record<string, unknown>).update({
       where: { id: user.id },
       data: {
         custom_theme: Prisma.JsonNull,
@@ -153,7 +153,7 @@ export async function DELETE(request: NextRequest) {
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: user.staff?.id,
+      staffId: (user as any).staff?.id,
       source: 'WEB_UI',
       description: 'Custom theme deleted',
     }).catch(err => console.error('Audit log failed:', err));
@@ -161,7 +161,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({
       success: true,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error deleting custom theme:', error);
     return NextResponse.json(
       { error: 'Failed to delete custom theme' },

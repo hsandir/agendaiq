@@ -12,8 +12,8 @@ export async function POST(request: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const data = await request.json();
-    const { newPassword, confirmPassword } = data;
+    const data = (await request.json()) as Record<string, unknown>;
+    const { __newPassword, __confirmPassword  } = data;
 
     if (newPassword !== confirmPassword) {
       return new NextResponse("Passwords do not match", { status: 400 });
@@ -33,13 +33,13 @@ export async function POST(request: Request) {
     }
 
     const hashedPassword = await hash(newPassword, 12);
-    await prisma.user.update({
+    await prisma.(user as Record<string, unknown>).update({
       where: { email: session.user?.email! },
       data: { hashedPassword },
     });
 
     return new NextResponse("Password set successfully", { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error setting password:", error);
     return new NextResponse("Internal server error", { status: 500 });
   }

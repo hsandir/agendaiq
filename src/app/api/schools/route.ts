@@ -8,7 +8,7 @@ import { Prisma } from "@prisma/client";
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
         name: true,
         address: true,
         code: true,
-        district_id: true,
+        district_id: parseInt(true),
         // TODO: Add these fields to School model in schema
         // city: true,
         // state: true,
@@ -33,7 +33,7 @@ export async function GET(request: Request) {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error in GET /api/schools:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
@@ -43,13 +43,13 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     // Check if user is admin
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.user.id as string },
       include: { Staff: { include: { Role: true } } },
     });
 
@@ -57,19 +57,19 @@ export async function POST(request: Request) {
       return new NextResponse("Forbidden", { status: 403 });
     }
 
-    const body = await request.json();
-    const { name, address, city, state, zipCode, phone, website, logo } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __name, __address, ___city, ___state, ___zipCode, ___phone, ___website, __logo  } = body;
 
-    if (!name || typeof name !== "string" || name.trim().length === 0) {
+    if (!name || typeof name !== "string" || String(name).trim().length === 0) {
       return new NextResponse("School name is required", { status: 400 });
     }
 
     const school = await prisma.school.create({
       data: {
-        name: name.trim(),
+        name: String(name).trim(),
         address: address?.trim(),
         code: `SCH${Date.now().toString().slice(-6)}`, // Generate unique code
-        district_id: 1, // TODO: Get from request or user's district
+        district_id: parseInt(1), // TODO: Get from request or user's district
         // TODO: Add these fields to School model in schema
         // city: city?.trim(),
         // state: state?.trim(),
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
       status: 201,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error in POST /api/schools:", error);
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {

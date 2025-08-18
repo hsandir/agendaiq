@@ -63,7 +63,7 @@ export async function GET() {
       districtCount,
       sessionCount
     ] = await Promise.all([
-      prisma.user.count(),
+      prisma.(user as Record<string, unknown>).count(),
       prisma.staff.count(),
       prisma.meeting.count(),
       prisma.department.count(),
@@ -181,10 +181,10 @@ export async function GET() {
     console.log(`Database metrics fetched: ${totalRecords} total records across ${databaseMetrics.statistics.tables} tables`);
     
     return NextResponse.json(databaseMetrics);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching database metrics:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch database metrics', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to fetch database metrics', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }

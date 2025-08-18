@@ -29,7 +29,7 @@ export function safeDate(input: string | Date | number | null | undefined): Safe
       date: isValid ? date : null,
       formatted: isValid ? date.toISOString() : 'Invalid date'
     };
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       isValid: false,
       date: null,
@@ -54,7 +54,7 @@ export function safeFormatDate(
 
   try {
     return result.date.toLocaleDateString('en-US', options);
-  } catch (error) {
+  } catch (error: unknown) {
     return fallback;
   }
 }
@@ -75,7 +75,7 @@ export function safeFormatDateTime(
 
   try {
     return result.date.toLocaleString('en-US', options);
-  } catch (error) {
+  } catch (error: unknown) {
     return fallback;
   }
 }
@@ -96,7 +96,7 @@ export function safeFormatTime(
 
   try {
     return result.date.toLocaleTimeString('en-US', options);
-  } catch (error) {
+  } catch (error: unknown) {
     return fallback;
   }
 }

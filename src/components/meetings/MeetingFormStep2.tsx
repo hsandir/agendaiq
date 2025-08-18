@@ -120,7 +120,7 @@ export function MeetingFormStep2({
     }
 
     // Validate all agenda items have titles
-    const invalidItems = agendaItems.filter(item => !item.title.trim());
+    const invalidItems = agendaItems.filter(item => !item.String(title).trim());
     if (invalidItems.length > 0) {
       alert("All agenda items must have a title.");
       return;
@@ -134,12 +134,12 @@ export function MeetingFormStep2({
       if (result.success) {
         const finalizeResult = await onFinalize();
         if (finalizeResult.success && finalizeResult.redirect) {
-          router.push(finalizeResult.redirect as any);
+          router.push(finalizeResult.redirect as Record<string, unknown>);
         }
       } else {
         alert(result.message || "Failed to save agenda items.");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error saving agenda items:", error);
       alert("Failed to save agenda items. Please try again.");
     } finally {
@@ -152,7 +152,7 @@ export function MeetingFormStep2({
     id: parseInt(a.id),
     name: a.name,
     role: a.role
-  }));
+  })));
 
   return (
     <div className="space-y-6">
@@ -317,7 +317,7 @@ export function MeetingFormStep2({
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => router.push('/dashboard/meetings' as any)}
+            onClick={() => router.push('/dashboard/meetings' as Record<string, unknown>)}
           >
             Cancel
           </Button>

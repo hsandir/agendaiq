@@ -31,7 +31,7 @@ export async function PATCH(
     }
     const user = authResult.user!;
 
-    const meetingId = parseInt(params.id);
+    const meetingId = params.id;
     const itemId = parseInt(params.itemId);
 
     if (isNaN(meetingId) || isNaN(itemId)) {
@@ -42,7 +42,7 @@ export async function PATCH(
     }
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
     const validationResult = updateSchema.safeParse(body);
 
     if (!validationResult.success) {
@@ -59,7 +59,7 @@ export async function PATCH(
         Meeting: {
           include: {
             MeetingAttendee: {
-              where: { staff_id: user.staff?.id || -1 }
+              where: { staff_id: (user as any).staff?.id || -1 }
             }
           }
         }
@@ -74,9 +74,9 @@ export async function PATCH(
     }
 
     // Check permissions
-    const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
+    const isOrganizer = agendaItem.Meeting.organizer_id === (user as any).staff?.id;
     const hasAdminAccess = isAnyAdmin(user);
-    const isResponsible = agendaItem.responsible_staff_id === user.staff?.id;
+    const isResponsible = agendaItem.responsible_staff_id === (user as any).staff?.id;
 
     if (!isOrganizer && !hasAdminAccess && !isResponsible) {
       return NextResponse.json(
@@ -121,7 +121,7 @@ export async function PATCH(
       data: updatedItem
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating agenda item:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -145,7 +145,7 @@ export async function DELETE(
     }
     const user = authResult.user!;
 
-    const meetingId = parseInt(params.id);
+    const meetingId = params.id;
     const itemId = parseInt(params.itemId);
 
     if (isNaN(meetingId) || isNaN(itemId)) {
@@ -180,7 +180,7 @@ export async function DELETE(
       message: 'Agenda item deleted successfully'
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error deleting agenda item:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

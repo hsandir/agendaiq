@@ -45,7 +45,7 @@ describe('/api/monitoring/deployments', () => {
   describe('Authentication', () => {
     it('should require staff authentication', async () => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockResolvedValueOnce({
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
         success: false,
         error: 'Authentication required',
         statusCode: 401
@@ -64,7 +64,7 @@ describe('/api/monitoring/deployments', () => {
   describe('Vercel Integration', () => {
     beforeEach(() => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockResolvedValueOnce({
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
       });
@@ -181,7 +181,7 @@ describe('/api/monitoring/deployments', () => {
   describe('Status Mapping', () => {
     beforeEach(() => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockResolvedValueOnce({
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
       });
@@ -222,7 +222,7 @@ describe('/api/monitoring/deployments', () => {
   describe('Error Handling', () => {
     it('should handle fetch errors', async () => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockResolvedValueOnce({
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
       });
@@ -240,7 +240,7 @@ describe('/api/monitoring/deployments', () => {
 
     it('should handle unexpected errors', async () => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockRejectedValueOnce(new Error('Unexpected error'));
+      (mockWithAuth as jest.Mock).mockRejectedValueOnce(new Error('Unexpected error'));
 
       const request = mockRequest();
       const response = await GET(request);

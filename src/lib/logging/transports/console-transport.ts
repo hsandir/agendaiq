@@ -15,24 +15,24 @@ export class ConsoleTransport implements LogTransport {
 
   private getColorForLevel(level: LogLevel): string {
     const colors = {
-      [LogLevel.TRACE]: '\x1b[90m', // gray
-      [LogLevel.DEBUG]: '\x1b[36m', // cyan
-      [LogLevel.INFO]: '\x1b[32m',  // green
-      [LogLevel.WARN]: '\x1b[33m',  // yellow
-      [LogLevel.ERROR]: '\x1b[31m', // red
-      [LogLevel.FATAL]: '\x1b[35m'  // magenta
+      [(LogLevel.TRACE)]: '\x1b[90m', // gray
+      [(LogLevel.DEBUG)]: '\x1b[36m', // cyan
+      [(LogLevel.INFO)]: '\x1b[32m',  // green
+      [(LogLevel.WARN)]: '\x1b[33m',  // yellow
+      [(LogLevel.ERROR)]: '\x1b[31m', // red
+      [(LogLevel.FATAL)]: '\x1b[35m'  // magenta
     };
     return colors[level] || '\x1b[0m';
   }
 
   private getLevelName(level: LogLevel): string {
     const names = {
-      [LogLevel.TRACE]: 'TRACE',
-      [LogLevel.DEBUG]: 'DEBUG',
-      [LogLevel.INFO]: 'INFO ',
-      [LogLevel.WARN]: 'WARN ',
-      [LogLevel.ERROR]: 'ERROR',
-      [LogLevel.FATAL]: 'FATAL'
+      [(LogLevel.TRACE)]: 'TRACE',
+      [(LogLevel.DEBUG)]: 'DEBUG',
+      [(LogLevel.INFO)]: 'INFO ',
+      [(LogLevel.WARN)]: 'WARN ',
+      [(LogLevel.ERROR)]: 'ERROR',
+      [(LogLevel.FATAL)]: 'FATAL'
     };
     return names[level];
   }

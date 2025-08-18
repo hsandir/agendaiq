@@ -13,7 +13,7 @@ export class RoleBasedAssignmentService {
       // Create transition record
       const transition = await tx.roleTransition.create({
         data: {
-          role_id: data.roleId,
+          role_id: parseInt(data).roleId,
           from_staff_id: data.fromStaffId,
           to_staff_id: data.toStaffId,
           pending_tasks: data.pendingTasks,
@@ -26,7 +26,7 @@ export class RoleBasedAssignmentService {
       // Transfer agenda items assigned to role
       await tx.meetingAgendaItem.updateMany({
         where: {
-          responsible_role_id: data.roleId,
+          responsible_role_id: parseInt(data).roleId,
           responsible_staff_id: data.fromStaffId,
           status: {
             in: ['Pending', 'Ongoing', 'Deferred']
@@ -55,7 +55,7 @@ export class RoleBasedAssignmentService {
       const [transferredAgendaItems, transferredActionItems] = await Promise.all([
         tx.meetingAgendaItem.count({
           where: {
-            responsible_role_id: data.roleId,
+            responsible_role_id: parseInt(data).roleId,
             responsible_staff_id: data.toStaffId
           }
         }),
@@ -101,7 +101,7 @@ export class RoleBasedAssignmentService {
     const [agendaItems, actionItems] = await Promise.all([
       prisma.meetingAgendaItem.findMany({
         where: {
-          responsible_role_id: roleId,
+          responsible_role_id: parseInt(roleId),
           ...agendaStatusFilter
         },
         include: {
@@ -180,7 +180,7 @@ export class RoleBasedAssignmentService {
     // Get current role holder
     const currentRoleHolder = await prisma.staff.findFirst({
       where: {
-        role_id: roleId,
+        role_id: parseInt(roleId),
         is_active: true
       },
       orderBy: {
@@ -196,7 +196,7 @@ export class RoleBasedAssignmentService {
       return await prisma.meetingAgendaItem.update({
         where: { id: taskId },
         data: {
-          responsible_role_id: roleId,
+          responsible_role_id: parseInt(roleId),
           responsible_staff_id: currentRoleHolder.id
         }
       });
@@ -216,7 +216,7 @@ export class RoleBasedAssignmentService {
    */
   static async getRoleTransitionHistory(roleId: number) {
     return await prisma.roleTransition.findMany({
-      where: { role_id: roleId },
+      where: { role_id: parseInt(roleId) },
       include: {
         FromStaff: {
           include: {

@@ -42,7 +42,7 @@ interface RoleData {
 export default function RoleManagement() {
   const [roles, setRoles] = useState<RoleData[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const { __toast  } = useToast();
 
   useEffect(() => {
     fetchRoles();
@@ -54,7 +54,7 @@ export default function RoleManagement() {
       if (!response.ok) throw new Error('Failed to fetch roles');
       const data = await response.json();
       setRoles(data);
-    } catch (error) {
+    } catch (error: unknown) {
       toast({
         title: 'Error',
         description: 'Failed to load roles. Please try again.',

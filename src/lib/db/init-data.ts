@@ -37,7 +37,7 @@ export async function initializeDefaultData() {
 
     console.log('Default school already exists');
     return school;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error initializing default data:', error);
     throw error;
   }

@@ -14,7 +14,7 @@ const errors: ErrorData[] = [];
 
 export async function POST(request: NextRequest) {
   try {
-    const errorData = await request.json();
+    const errorData = (await request.json()) as Record<string, unknown>;
     
     const capturedError: ErrorData = {
       message: errorData.message || 'Unknown error',
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     console.error('Client-side error captured:', capturedError);
     
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error capturing client error:', error);
     return NextResponse.json({ error: 'Failed to capture error' }, { status: 500 });
   }

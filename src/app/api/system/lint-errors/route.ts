@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid action. Use: summary, details, or fixable' }, { status: 400 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Lint error API failed:', error);
     await logError('LINT_API_ERROR', error instanceof Error ? error.message : "Unknown error", { action: 'GET' });
     return NextResponse.json(
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { action, filePath, fixes } = await request.json();
+    const { __action, __filePath, __fixes  } = (await request.json()) as Record<__string, unknown>;
 
     if (action === 'fix') {
       return await fixLintErrors(filePath, fixes);
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid action. Use: fix, autofix, or report' }, { status: 400 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Lint fix API failed:', error);
     await logError('LINT_FIX_ERROR', error instanceof Error ? error.message : "Unknown error", { action: 'POST' });
     return NextResponse.json(
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 
 async function getLintSummary() {
   try {
-    const { stdout, stderr } = await execAsync('npx eslint src/ --format json', { 
+    const { __stdout, __stderr  } = await execAsync('npx eslint src/ --format json', { 
       cwd: process.cwd() 
     });
     
@@ -130,10 +130,10 @@ async function getLintSummary() {
       });
     });
 
-    const topErrors = Array.from(errorTypes.entries())
+    const topErrors = (Array.from(errorTypes.entries())
       .sort(([,a], [,b]) => b - a)
       .slice(0, 10)
-      .map(([rule, count]) => ({ rule, count }));
+      .map(([rule, count]) => ({ rule, count })));
 
     return NextResponse.json({
       success: true,
@@ -142,10 +142,10 @@ async function getLintSummary() {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     // ESLint might return non-zero exit code for errors, parse the output anyway
     try {
-      const errorOutput = (error as any)?.stdout || '[]';
+      const errorOutput = (error as Record<string, unknown>)?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const summary = results.reduce((acc, result) => {
         acc.totalFiles++;
@@ -182,7 +182,7 @@ async function getLintSummary() {
 
 async function getLintDetails(severity: string, limit: number, offset: number) {
   try {
-    const { stdout } = await execAsync('npx eslint src/ --format json', { 
+    const { __stdout  } = await execAsync('npx eslint src/ --format json', { 
       cwd: process.cwd() 
     });
     
@@ -224,9 +224,9 @@ async function getLintDetails(severity: string, limit: number, offset: number) {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     try {
-      const errorOutput = (error as any)?.stdout || '[]';
+      const errorOutput = (error as Record<string, unknown>)?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const allErrors: (LintError & { filePath: string })[] = [];
       results.forEach(result => {
@@ -263,7 +263,7 @@ async function getLintDetails(severity: string, limit: number, offset: number) {
 
 async function getFixableErrors() {
   try {
-    const { stdout } = await execAsync('npx eslint src/ --format json', { 
+    const { __stdout  } = await execAsync('npx eslint src/ --format json', { 
       cwd: process.cwd() 
     });
     
@@ -288,9 +288,9 @@ async function getFixableErrors() {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     try {
-      const errorOutput = (error as any)?.stdout || '[]';
+      const errorOutput = (error as Record<string, unknown>)?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const fixableErrors: (LintError & { filePath: string })[] = [];
       results.forEach(result => {
@@ -319,7 +319,7 @@ async function getFixableErrors() {
 async function autoFixErrors() {
   try {
     // Run ESLint with --fix flag
-    const { stdout, stderr } = await execAsync('npx eslint src/ --fix --format json', { 
+    const { __stdout, __stderr  } = await execAsync('npx eslint src/ --fix --format json', { 
       cwd: process.cwd() 
     });
     
@@ -342,10 +342,10 @@ async function autoFixErrors() {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     // Even if some errors remain, auto-fix might have worked partially
     try {
-      const errorOutput = (error as any)?.stdout || '[]';
+      const errorOutput = (error as Record<string, unknown>)?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const remainingErrors = results.reduce((sum, result) => sum + result.errorCount, 0);
       const remainingWarnings = results.reduce((sum, result) => sum + result.warningCount, 0);
@@ -372,13 +372,13 @@ async function fixLintErrors(filePath: string, fixes: Array<Record<string, unkno
     // Apply fixes in reverse order (from end to beginning) to maintain positions
     let fixedContent = content;
     const sortedFixes = fixes.sort((a, b) => {
-      const aRange = (a as any).range as [number, number] | undefined;
-      const bRange = (b as any).range as [number, number] | undefined;
+      const aRange = a.range as [number, number] | undefined;
+      const bRange = b.range as [number, number] | undefined;
       return (bRange?.[0] || 0) - (aRange?.[0] || 0);
     });
 
     for (const fix of sortedFixes) {
-      const fixRange = (fix as any).range as [number, number] | undefined;
+      const fixRange = fix.range as [number, number] | undefined;
       if (!fixRange) continue;
       
       const before = fixedContent.slice(0, fixRange[0]);
@@ -401,7 +401,7 @@ async function fixLintErrors(filePath: string, fixes: Array<Record<string, unkno
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     throw new Error(`Failed to fix errors in ${filePath}: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
 }
@@ -426,7 +426,7 @@ async function reportErrorsToAdmin(errors: Array<Record<string, unknown>>) {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     throw new Error(`Failed to report errors: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
 }
@@ -448,7 +448,7 @@ async function logError(type: string, message: string, details: Record<string, u
     // You could also log to database here
     // await prisma.systemLog.create({ data: logEntry });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to log error:', error);
   }
 } 

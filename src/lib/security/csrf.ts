@@ -121,7 +121,7 @@ export function useCSRFToken() {
     // Get token from cookie
     const cookies = document.cookie.split(';');
     const csrfCookie = cookies.find(cookie => 
-      cookie.trim().startsWith(`${CSRFProtection['TOKEN_COOKIE']}=`)
+      String(cookie).trim().startsWith(`${CSRFProtection['TOKEN_COOKIE']}=`)
     );
     
     if (csrfCookie) {

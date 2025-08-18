@@ -52,8 +52,8 @@ describe('Login Flow', () => {
       const emailInput = screen.getByLabelText(/email/i)
       const submitButton = screen.getByRole('button', { name: /sign in/i })
       
-      await user.type(emailInput, 'invalid-email')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'invalid-email')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(await screen.findByText(/please enter a valid email/i)).toBeInTheDocument()
     })
@@ -65,8 +65,8 @@ describe('Login Flow', () => {
       const emailInput = screen.getByLabelText(/email/i)
       const submitButton = screen.getByRole('button', { name: /sign in/i })
       
-      await user.type(emailInput, 'test@example.com')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'test@example.com')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(await screen.findByText(/password is required/i)).toBeInTheDocument()
     })
@@ -74,7 +74,7 @@ describe('Login Flow', () => {
     it('submits login credentials successfully', async () => {
       const user = userEvent.setup()
       const mockSignIn = signIn as jest.MockedFunction<typeof signIn>
-      mockSignIn.mockResolvedValueOnce({ error: null, ok: true } as SignInResponse)
+      (mockSignIn as jest.Mock).mockResolvedValueOnce({ error: null, ok: true } as SignInResponse)
       
       render(<LoginForm />)
       
@@ -82,9 +82,9 @@ describe('Login Flow', () => {
       const passwordInput = screen.getByLabelText(/password/i)
       const submitButton = screen.getByRole('button', { name: /sign in/i })
       
-      await user.type(emailInput, 'test@example.com')
-      await user.type(passwordInput, 'password123')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'test@example.com')
+      await (user as Record<string, unknown>).type(passwordInput, 'password123')
+      await (user as Record<string, unknown>).click(submitButton)
       
       await waitFor(() => {
         expect(mockSignIn).toHaveBeenCalledWith('credentials', {
@@ -98,7 +98,7 @@ describe('Login Flow', () => {
     it('displays error message on failed login', async () => {
       const user = userEvent.setup()
       const mockSignIn = signIn as jest.MockedFunction<typeof signIn>
-      mockSignIn.mockResolvedValueOnce({ 
+      (mockSignIn as jest.Mock).mockResolvedValueOnce({ 
         error: 'Invalid email or password', 
         ok: false 
       } as SignInResponse)
@@ -109,9 +109,9 @@ describe('Login Flow', () => {
       const passwordInput = screen.getByLabelText(/password/i)
       const submitButton = screen.getByRole('button', { name: /sign in/i })
       
-      await user.type(emailInput, 'test@example.com')
-      await user.type(passwordInput, 'wrongpassword')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'test@example.com')
+      await (user as Record<string, unknown>).type(passwordInput, 'wrongpassword')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(await screen.findByText(/invalid email or password/i)).toBeInTheDocument()
     })
@@ -119,7 +119,7 @@ describe('Login Flow', () => {
     it('disables form during submission', async () => {
       const user = userEvent.setup()
       const mockSignIn = signIn as jest.MockedFunction<typeof signIn>
-      mockSignIn.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)))
+      (mockSignIn as jest.Mock).mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)))
       
       render(<LoginForm />)
       
@@ -127,9 +127,9 @@ describe('Login Flow', () => {
       const passwordInput = screen.getByLabelText(/password/i)
       const submitButton = screen.getByRole('button', { name: /sign in/i })
       
-      await user.type(emailInput, 'test@example.com')
-      await user.type(passwordInput, 'password123')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'test@example.com')
+      await (user as Record<string, unknown>).type(passwordInput, 'password123')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(submitButton).toBeDisabled()
       expect(screen.getByText(/signing in/i)).toBeInTheDocument()
@@ -138,7 +138,7 @@ describe('Login Flow', () => {
     it('redirects to 2FA page when required', async () => {
       const user = userEvent.setup()
       const mockSignIn = signIn as jest.MockedFunction<typeof signIn>
-      mockSignIn.mockResolvedValueOnce({ 
+      (mockSignIn as jest.Mock).mockResolvedValueOnce({ 
         error: 'TwoFactorRequired',
         ok: false 
       } as SignInResponse)
@@ -149,9 +149,9 @@ describe('Login Flow', () => {
       const passwordInput = screen.getByLabelText(/password/i)
       const submitButton = screen.getByRole('button', { name: /sign in/i })
       
-      await user.type(emailInput, 'test@example.com')
-      await user.type(passwordInput, 'password123')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'test@example.com')
+      await (user as Record<string, unknown>).type(passwordInput, 'password123')
+      await (user as Record<string, unknown>).click(submitButton)
       
       await waitFor(() => {
         expect(mockPush).toHaveBeenCalledWith('/auth/two-factor?email=test%40example.com')
@@ -163,7 +163,7 @@ describe('Login Flow', () => {
     it('shows account locked message after multiple failed attempts', async () => {
       const user = userEvent.setup()
       const mockSignIn = signIn as jest.MockedFunction<typeof signIn>
-      mockSignIn.mockResolvedValueOnce({ 
+      (mockSignIn as jest.Mock).mockResolvedValueOnce({ 
         error: 'AccountLocked',
         ok: false 
       } as SignInResponse)
@@ -174,9 +174,9 @@ describe('Login Flow', () => {
       const passwordInput = screen.getByLabelText(/password/i)
       const submitButton = screen.getByRole('button', { name: /sign in/i })
       
-      await user.type(emailInput, 'test@example.com')
-      await user.type(passwordInput, 'wrongpassword')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'test@example.com')
+      await (user as Record<string, unknown>).type(passwordInput, 'wrongpassword')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(await screen.findByText(/account has been locked/i)).toBeInTheDocument()
     })
@@ -186,14 +186,14 @@ describe('Login Flow', () => {
     it('includes remember me option in login', async () => {
       const user = userEvent.setup()
       const mockSignIn = signIn as jest.MockedFunction<typeof signIn>
-      mockSignIn.mockResolvedValueOnce({ error: null, ok: true } as SignInResponse)
+      (mockSignIn as jest.Mock).mockResolvedValueOnce({ error: null, ok: true } as SignInResponse)
       
       render(<LoginForm />)
       
       const rememberMeCheckbox = screen.getByLabelText(/remember me/i)
       expect(rememberMeCheckbox).toBeInTheDocument()
       
-      await user.click(rememberMeCheckbox)
+      await (user as Record<string, unknown>).click(rememberMeCheckbox)
       expect(rememberMeCheckbox).toBeChecked()
     })
   })

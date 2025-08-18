@@ -96,8 +96,8 @@ export function MeetingLiveView({
   }, []);
 
   // Set up real-time updates with Pusher
-  const eventHandlers = useMemo(() => ({
-    [EVENTS.AGENDA_ITEM_UPDATED]: (data: unknown) => {
+  const eventHandlers = useMemo(() => {
+    [((EVENTS.AGENDA_ITEM_UPDATED)]: (data: unknown) => {
       const typedData = data as Record<string, unknown>;
       if (typeof typedData.itemId === 'number' && typedData.updates && typeof typedData.updates === 'object') {
         setAgendaItems(prev => prev.map(item => 
@@ -106,21 +106,21 @@ export function MeetingLiveView({
         setLastUpdate(new Date());
       }
     },
-    [EVENTS.AGENDA_ITEM_ADDED]: (data: unknown) => {
+    [(EVENTS.AGENDA_ITEM_ADDED)]: (data: unknown) => {
       const typedData = data as Record<string, unknown>;
       if (typedData.item && typeof typedData.item === 'object') {
-        setAgendaItems(prev => [...prev, typedData.item as any]);
+        setAgendaItems(prev => [...prev, typedData.item as Record<string, unknown>]);
         setLastUpdate(new Date());
       }
     },
-    [EVENTS.AGENDA_ITEM_DELETED]: (data: unknown) => {
+    [(EVENTS.AGENDA_ITEM_DELETED)]: (data: unknown) => {
       const typedData = data as Record<string, unknown>;
       if (typeof typedData.itemId === 'number') {
         setAgendaItems(prev => prev.filter(item => item.id !== typedData.itemId));
         setLastUpdate(new Date());
       }
     },
-    [EVENTS.USER_TYPING]: (data: unknown) => {
+    [(EVENTS.USER_TYPING)]: (data: unknown) => {
       const typedData = data as Record<string, unknown>;
       if (typeof typedData.itemId === 'number' && typeof typedData.userId === 'number' && typeof typedData.userName === 'string') {
         setTypingUsers(prev => {
@@ -130,7 +130,7 @@ export function MeetingLiveView({
         });
       }
     },
-    [EVENTS.USER_STOPPED_TYPING]: (data: unknown) => {
+    [(EVENTS.USER_STOPPED_TYPING)]: (data: unknown) => {
       const typedData = data as Record<string, unknown>;
       if (typeof typedData.itemId === 'number') {
         setTypingUsers(prev => {
@@ -164,7 +164,7 @@ export function MeetingLiveView({
   );
 
   // Set up presence channel for live user tracking
-  const { members } = usePresenceChannel(
+  const { __members  } = usePresenceChannel(
     CHANNELS.presence(meeting.id),
     useMemo(() => ({}), [])
   );
@@ -178,16 +178,16 @@ export function MeetingLiveView({
         setAgendaItems(data.meeting.MeetingAgendaItems);
         setLastUpdate(new Date());
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error refreshing meeting:", error);
     }
   };
 
-  const handleItemUpdate = async (itemId: number, updates: Record<string, unknown>) => {
+  const handleItemUpdate = (async (itemId: number, updates: Record<string, unknown>) => {
     // Optimistic update
     setAgendaItems(prev => prev.map(item => 
       item.id === itemId ? { ...item, ...updates } : item
-    ));
+    )));
 
     try {
       const response = await fetch(`/api/meetings/${meeting.id}/agenda-items/${itemId}`, {
@@ -201,7 +201,7 @@ export function MeetingLiveView({
         // Revert on error
         await refreshMeeting();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error updating agenda item:", error);
       await refreshMeeting();
     }
@@ -233,7 +233,7 @@ export function MeetingLiveView({
         console.log('Agenda item added successfully');
         await refreshMeeting();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error adding agenda item:", error);
       alert('Failed to add agenda item. Please try again.');
     }
@@ -456,7 +456,7 @@ export function MeetingLiveView({
                         isExpanded={expandedItems.has(item.id)}
                         onToggleExpand={() => toggleItemExpanded(item.id)}
                         onUpdate={(updates) => handleItemUpdate(item.id, updates)}
-                        canEdit={isOrganizer || isAdmin || item.responsible_staff_id === currentUser.staff?.id}
+                        canEdit={isOrganizer || isAdmin || item.responsible_staff_id === (currentUser as any).staff?.id}
                         currentUserId={currentUser.id}
                         currentUserName={currentUser.name || ''}
                         meetingId={meeting.id}

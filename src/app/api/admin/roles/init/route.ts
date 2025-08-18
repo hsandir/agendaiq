@@ -6,16 +6,16 @@ import { prisma } from "@/lib/prisma";
 export async function POST() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.user.id as string },
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || user.Staff?.[0]?.Role?.title !== 'Administrator') {
+    if !user || ((user as Record<string, unknown>).Staff?.[0]?.Role?.title !== 'Administrator') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -30,10 +30,10 @@ export async function POST() {
     }
 
     const roles = [
-      { title: 'Administrator', priority: 1, department_id: defaultDepartment.id },
-      { title: 'STEM Chair', priority: 2, department_id: defaultDepartment.id },
-      { title: 'Department Chair', priority: 3, department_id: defaultDepartment.id },
-      { title: 'Teacher', priority: 4, department_id: defaultDepartment.id },
+      { title: 'Administrator', priority: 1, department_id: parseInt(defaultDepartment.id) },
+      { title: 'STEM Chair', priority: 2, department_id: parseInt(defaultDepartment.id) },
+      { title: 'Department Chair', priority: 3, department_id: parseInt(defaultDepartment.id) },
+      { title: 'Teacher', priority: 4, department_id: parseInt(defaultDepartment.id) },
     ];
 
     const createdRoles = [];
@@ -53,7 +53,7 @@ export async function POST() {
     }
 
     return NextResponse.json({ roles: createdRoles });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error initializing roles:", error);
     return NextResponse.json(
       { error: "Internal server error" },

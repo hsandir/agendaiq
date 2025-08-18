@@ -20,7 +20,7 @@ export async function GET(
     }
 
     const currentUser = authResult.user!;
-    const userId = parseInt(params.id);
+    const userId = params.id;
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -47,7 +47,7 @@ export async function GET(
 
     return NextResponse.json({ user: filteredUser });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Get User Error:', error);
     return NextResponse.json(
       { error: "Failed to fetch user" }, 
@@ -73,8 +73,8 @@ export async function PUT(
     }
 
     const currentUser = authResult.user!;
-    const userId = parseInt(params.id);
-    const body = await request.json();
+    const userId = params.id;
+    const body = (await request.json()) as Record<string, unknown>;
 
     // Get existing user
     const existingUser = await prisma.user.findUnique({
@@ -102,7 +102,7 @@ export async function PUT(
     }
 
     // Update user
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.(user as Record<string, unknown>).update({
       where: { id: userId },
       data: {
         ...(body.name !== undefined && { name: body.name }),
@@ -128,7 +128,7 @@ export async function PUT(
       message: "User updated successfully" 
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Update User Error:', error);
     return NextResponse.json(
       { error: "Failed to update user" }, 

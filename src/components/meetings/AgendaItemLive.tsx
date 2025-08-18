@@ -37,8 +37,8 @@ import Link from "next/link";
 
 interface ExtendedAgendaItem extends MeetingAgendaItem {
   ResponsibleStaff?: (Staff & { User: PrismaUser }) | null;
-  Comments: any[];
-  ActionItems: any[];
+  Comments: Record<string, unknown>[];
+  ActionItems: Record<string, unknown>[];
 }
 
 interface Props {
@@ -147,7 +147,7 @@ export function AgendaItemLive({
     
     // Use whisper for client events (works with presence channels)
     try {
-      const presenceChannel = channel as any;
+      const presenceChannel = channel as Record<string, unknown>;
       if (presenceChannel.whisper) {
         presenceChannel.whisper(EVENTS.USER_TYPING, {
           itemId: item.id,
@@ -155,7 +155,7 @@ export function AgendaItemLive({
           userName: currentUserName
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.debug('Whisper not available, typing indicator disabled');
     }
 
@@ -175,14 +175,14 @@ export function AgendaItemLive({
     
     // Use whisper for client events (works with presence channels)
     try {
-      const presenceChannel = channel as any;
+      const presenceChannel = channel as Record<string, unknown>;
       if (presenceChannel.whisper) {
         presenceChannel.whisper(EVENTS.USER_STOPPED_TYPING, {
           itemId: item.id,
           userId: currentUserId
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.debug('Whisper not available, typing indicator disabled');
     }
 
@@ -191,7 +191,7 @@ export function AgendaItemLive({
     }
   };
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: Record<string, unknown>) => {
     setEditData({ ...editData, [field]: value });
     emitTyping();
   };
@@ -219,7 +219,7 @@ export function AgendaItemLive({
       if (onUpdate) {
         onUpdate({ topic: item.topic }); // Trigger a refresh
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error adding comment:', error);
     }
   };
@@ -427,7 +427,7 @@ export function AgendaItemLive({
                 <label className="text-sm font-medium text-foreground">Purpose</label>
                 <Select
                   value={editData.purpose}
-                  onValueChange={(value: any) => setEditData({ ...editData, purpose: value })}
+                  onValueChange={(value: Record<string, unknown>) => setEditData({ ...editData, purpose: value })}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue />
@@ -447,7 +447,7 @@ export function AgendaItemLive({
                   value={editData.solution_type || 'none'}
                   onValueChange={(value) => setEditData({ 
                     ...editData, 
-                    solution_type: value === 'none' ? null : value as any
+                    solution_type: value === 'none' ? null : value as Record<string, unknown>
                   })}
                 >
                   <SelectTrigger className="mt-1">
@@ -468,7 +468,7 @@ export function AgendaItemLive({
                   value={editData.decision_type || 'none'}
                   onValueChange={(value) => setEditData({ 
                     ...editData, 
-                    decision_type: value === 'none' ? null : value as any
+                    decision_type: value === 'none' ? null : value as Record<string, unknown>
                   })}
                 >
                   <SelectTrigger className="mt-1">
@@ -511,7 +511,7 @@ export function AgendaItemLive({
                 <label className="text-sm font-medium text-foreground">Status</label>
                 <Select
                   value={editData.status}
-                  onValueChange={(value: any) => setEditData({ ...editData, status: value })}
+                  onValueChange={(value: Record<string, unknown>) => setEditData({ ...editData, status: value })}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue />
@@ -527,7 +527,7 @@ export function AgendaItemLive({
                 <label className="text-sm font-medium text-foreground">Priority</label>
                 <Select
                   value={editData.priority}
-                  onValueChange={(value: any) => setEditData({ ...editData, priority: value })}
+                  onValueChange={(value: Record<string, unknown>) => setEditData({ ...editData, priority: value })}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue />

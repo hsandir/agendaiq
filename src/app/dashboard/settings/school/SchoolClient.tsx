@@ -39,7 +39,7 @@ export default function SchoolClient({ initialSchool }: SchoolClientProps) {
         }
 
         setSchool(data);
-      } catch (error) {
+      } catch (error: unknown) {
         setError(error instanceof Error ? error.message : 'Failed to load school data');
       } finally {
         setIsLoading(false);
@@ -84,7 +84,7 @@ export default function SchoolClient({ initialSchool }: SchoolClientProps) {
 
       setSchool(data);
       setSuccess('School information updated successfully');
-    } catch (error) {
+    } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Failed to update school information');
     } finally {
       setIsSaving(false);

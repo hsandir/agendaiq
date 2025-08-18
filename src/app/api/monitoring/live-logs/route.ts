@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Import the realtime transport to access memory buffer
-    const { RealtimeTransport } = await import('@/lib/logging/transports/realtime-transport');
+    const { __RealtimeTransport  } = await import('@/lib/logging/transports/realtime-transport');
     
     // Create a temporary transport instance to access the buffer
     // In a real implementation, you'd want to maintain a singleton
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch live logs:', error);
     return NextResponse.json({
       success: false,

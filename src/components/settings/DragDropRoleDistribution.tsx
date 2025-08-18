@@ -42,10 +42,10 @@ export default function DragDropRoleDistribution({
     [newRoles[index], newRoles[newIndex]] = [newRoles[newIndex], newRoles[index]];
     
     // Update priorities
-    const updatedRoles = newRoles.map((role, idx) => ({
+    const updatedRoles = (newRoles.map((role, idx) => ({
       ...role,
       priority: idx + 1
-    }));
+    })));
     
     setRoles(updatedRoles);
     setHasChanges(true);
@@ -62,7 +62,7 @@ export default function DragDropRoleDistribution({
     try {
       await onSave(roles);
       setHasChanges(false);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to save role order:', error);
     } finally {
       setIsSaving(false);

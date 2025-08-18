@@ -110,31 +110,31 @@ export const authOptions: NextAuthOptions = {
             return null; // Return null for security (don't reveal if user exists)
           }
           
-          if (!user.hashedPassword) {
+          if !((user as Record<string, unknown>).hashedPassword) {
             console.error('User has no password:', credentials.email);
             return null; // Return null instead of throwing
           }
 
           // Check password using bcrypt
           console.log('Checking password for user:', user.email);
-          const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
+          const isValid = await bcrypt.comparecredentials.password, ((user as Record<string, unknown>).hashedPassword);
           console.log('Password valid:', isValid);
           
           if (!isValid) {
             console.error('Invalid password for user:', user.email);
-            // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, 'Password mismatch');
+            // await AuditClient.logAuthEvent'login_failure', user.id, ((user as Record<string, unknown>).Staff[0]?.id, req, 'Password mismatch');
             return null; // Return null for invalid password
           }
 
           // Check 2FA if enabled
-          if (user.two_factor_enabled) {
+          if ((user as Record<string, unknown>).two_factor_enabled) {
             if (!credentials.twoFactorCode) {
               throw new Error("2FA_REQUIRED");
             }
 
             // Verify the 2FA code
-            const isValidToken = speakeasy.totp.verify({
-              secret: user.two_factor_secret!,
+            const isValidToken = speakeasy.totp.verify{
+              secret: ((user as Record<string, unknown>).two_factor_secret!,
               encoding: 'base32',
               token: credentials.twoFactorCode,
               window: 2
@@ -142,25 +142,25 @@ export const authOptions: NextAuthOptions = {
 
             // Check backup codes if TOTP fails
             if (!isValidToken) {
-              const isBackupCode = user.backup_codes.includes(credentials.twoFactorCode);
+              const isBackupCode = (user as Record<string, unknown>).backup_codes.includes(credentials.twoFactorCode);
               
               if (!isBackupCode) {
-                // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, '2FA code invalid');
+                // await AuditClient.logAuthEvent'login_failure', user.id, ((user as Record<string, unknown>).Staff[0]?.id, req, '2FA code invalid');
                 console.error('Invalid 2FA code and not a backup code');
                 return null; // Return null for invalid 2FA
               }
 
               // Remove used backup code
-              await prisma.user.update({
-                where: { id: user.id },
+              await prisma.(user as Record<string, unknown>).update({
+                where: { id: parseInt(user.id) },
                 data: {
-                  backup_codes: user.backup_codes.filter(code => code !== credentials.twoFactorCode)
+                  backup_codes: (user as Record<string, unknown>).backup_codes.filter(code => code !== credentials.twoFactorCode)
                 }
               });
             }
           }
 
-          const staff = user.Staff[0];
+          const staff = (user as Record<string, unknown>).Staff[0];
           const userData = {
             id: String(user.id), // Ensure string conversion for NextAuth
             email: user.email,
@@ -199,19 +199,19 @@ export const authOptions: NextAuthOptions = {
           
           // Add rememberMe flag to user data
           if (credentials.rememberMe === 'true') {
-            (userData as any).rememberMe = true;
+            userData.rememberMe = true;
           }
           if (credentials.trustDevice === 'true') {
-            (userData as any).trustDevice = true;
+            userData.trustDevice = true;
           }
           
           return userData;
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('❌ Authorization error:', error instanceof Error ? error.message : String(error));
           console.error('Full error stack:', error instanceof Error ? error.stack : 'No stack');
           
           // Log authentication error
-          // await AuditClient.logSecurityEvent('auth_error', undefined, undefined, req, error instanceof Error ? error.message : 'Unknown error');
+          // await AuditClient.logSecurityEvent('auth_error', undefined, undefined, req, error instanceof Error ? error.message : String(error));
           
           return null;
         }
@@ -240,7 +240,7 @@ export const authOptions: NextAuthOptions = {
 
         // If it's the first user ever, make them admin
         if (!existingUser) {
-          const userCount = await prisma.user.count();
+          const userCount = await prisma.(user as Record<string, unknown>).count();
           if (userCount === 0) {
             // This will be the first user, they'll get admin privileges when created
             return true;
@@ -274,10 +274,10 @@ export const authOptions: NextAuthOptions = {
         }
         
         // Handle rememberMe and trustDevice flags
-        if ((user as any).rememberMe) {
+        if ((user as Record<string, unknown>).rememberMe) {
           token.rememberMe = true;
-          // Set longer expiry for remember me (30 days)
-          const maxAge = 30 * 24 * 60 * 60; // 30 days in seconds
+          // Set longer expiry for remember me (7 days)
+          const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
           token.exp = Math.floor(Date.now() / 1000) + maxAge;
         } else {
           // Default session expiry (1 day)
@@ -285,7 +285,7 @@ export const authOptions: NextAuthOptions = {
           token.exp = Math.floor(Date.now() / 1000) + maxAge;
         }
         
-        if ((user as any).trustDevice) {
+        if ((user as Record<string, unknown>).trustDevice) {
           token.trustDevice = true;
         }
       }
@@ -349,10 +349,10 @@ export const authOptions: NextAuthOptions = {
                   name: staff.District.name,
                   code: staff.District.code
                 }
-              } as any;
+              } as Record<string, unknown>;
             }
           }
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Error fetching user info for JWT:', error);
         }
       }
@@ -361,15 +361,15 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token.id) {
-        session.user.id = token.id; // Keep as string
+        session.user.id as string = token.id; // Keep as string
       }
       if (hasStaffToken(token)) {
         session.user.staff = token.staff;
       }
       // Add admin flags and capabilities to session
       session.user.is_system_admin = token.is_system_admin as boolean;
-      session.user.is_school_admin = token.is_school_admin as boolean;
-      session.user.capabilities = token.capabilities as string[];
+      session.(user as Record<string, unknown>).is_school_admin = token.is_school_admin as boolean;
+      session.(user as Record<string, unknown>).capabilities = token.capabilities as string[];
       
       // Handle remember me expiry
       if (token.rememberMe) {

@@ -69,7 +69,7 @@ export default function LogViewer() {
         // In normal mode, replace logs
         setLogs(data.logs)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load logs:', error)
     }
   }

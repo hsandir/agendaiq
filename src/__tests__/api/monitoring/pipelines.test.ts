@@ -34,7 +34,7 @@ describe('/api/monitoring/pipelines', () => {
   describe('Authentication', () => {
     it('should require staff authentication', async () => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockResolvedValueOnce({
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
         success: false,
         error: 'Authentication required',
         statusCode: 401
@@ -53,7 +53,7 @@ describe('/api/monitoring/pipelines', () => {
   describe('GitHub Integration', () => {
     beforeEach(() => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockResolvedValueOnce({
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
       } as AuthResult);
@@ -73,7 +73,7 @@ describe('/api/monitoring/pipelines', () => {
 
     it('should handle GitHub API errors gracefully', async () => {
       const MockedOctokit = getMockOctokit();
-      MockedOctokit.mockImplementation(() => ({
+      (MockedOctokit as jest.Mock).mockImplementation(() => ({
         actions: {
           listWorkflowRunsForRepo: jest.fn().mockRejectedValue(new Error('GitHub API error'))
         }
@@ -114,7 +114,7 @@ describe('/api/monitoring/pipelines', () => {
       };
 
       const MockedOctokit = getMockOctokit();
-      MockedOctokit.mockImplementation(() => ({
+      (MockedOctokit as jest.Mock).mockImplementation(() => ({
         actions: {
           listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: mockWorkflowRuns })
         }
@@ -139,7 +139,7 @@ describe('/api/monitoring/pipelines', () => {
   describe('Status Mapping', () => {
     beforeEach(() => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockResolvedValueOnce({
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
       } as AuthResult);
@@ -156,7 +156,7 @@ describe('/api/monitoring/pipelines', () => {
 
       for (const testCase of testCases) {
         const MockedOctokit = getMockOctokit();
-        MockedOctokit.mockImplementation(() => ({
+        (MockedOctokit as jest.Mock).mockImplementation(() => ({
           actions: {
             listWorkflowRunsForRepo: jest.fn().mockResolvedValue({
               data: {
@@ -186,7 +186,7 @@ describe('/api/monitoring/pipelines', () => {
   describe('Error Handling', () => {
     it('should handle unexpected errors', async () => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockRejectedValue(new Error('Unexpected error'));
+      (mockWithAuth as jest.Mock).mockRejectedValue(new Error('Unexpected error'));
 
       const request = mockRequest();
       const response = await GET(request);

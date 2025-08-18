@@ -52,7 +52,7 @@ describe('Error Monitoring APIs', () => {
     describe('Authentication', () => {
       it('should require staff authentication', async () => {
         const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-        mockWithAuth.mockResolvedValueOnce({
+        (mockWithAuth as jest.Mock).mockResolvedValueOnce({
           success: false,
           error: 'Authentication required',
           statusCode: 401
@@ -71,7 +71,7 @@ describe('Error Monitoring APIs', () => {
     describe('Sentry Integration', () => {
       beforeEach(() => {
         const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-        mockWithAuth.mockResolvedValueOnce({
+        (mockWithAuth as jest.Mock).mockResolvedValueOnce({
           success: true,
           user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
         });
@@ -162,7 +162,7 @@ describe('Error Monitoring APIs', () => {
   describe('/api/monitoring/error-stats', () => {
     beforeEach(() => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockResolvedValueOnce({
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
       });
@@ -265,7 +265,7 @@ describe('Error Monitoring APIs', () => {
   describe('/api/monitoring/release-health', () => {
     beforeEach(() => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockResolvedValueOnce({
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
       });
@@ -382,7 +382,7 @@ describe('Error Monitoring APIs', () => {
   describe('Error Handling', () => {
     it('should capture exceptions to Sentry', async () => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      mockWithAuth.mockRejectedValueOnce(new Error('Unexpected error'));
+      (mockWithAuth as jest.Mock).mockRejectedValueOnce(new Error('Unexpected error'));
 
       const mockCaptureException = Sentry.captureException as jest.MockedFunction<typeof Sentry.captureException>;
 

@@ -152,13 +152,13 @@ export function AgendaItemsEditor({
       problem_statement: item.problem_statement || undefined,
       staff_initials: item.staff_initials || undefined,
       responsible_staff_id: item.responsible_staff_id || undefined,
-      priority: item.priority as any,
-      purpose: item.purpose as any,
+      priority: item.priority as Record<string, unknown>,
+      purpose: item.purpose as Record<string, unknown>,
       proposed_solution: item.proposed_solution || undefined,
-      solution_type: item.solution_type as any || undefined,
+      solution_type: item.solution_type as Record<string, unknown> || undefined,
       decisions_actions: item.decisions_actions || undefined,
-      decision_type: item.decision_type as any || undefined,
-      status: item.status as any,
+      decision_type: item.decision_type as Record<string, unknown> || undefined,
+      status: item.status as Record<string, unknown>,
       future_implications: item.future_implications || false,
       duration_minutes: item.duration_minutes || 15,
       carried_forward: item.carried_forward,
@@ -221,7 +221,7 @@ export function AgendaItemsEditor({
       const data = await response.json()
 
       if (data.success && data.items) {
-        const imported: AgendaItemFormData[] = data.items.map((item: any, index: number) => ({
+        const imported: AgendaItemFormData[] = data.items.map((item: Record<string, unknown>, index: number) => ({
           topic: item.topic,
           problem_statement: item.problem_statement || undefined,
           staff_initials: item.staff_initials || undefined,
@@ -247,7 +247,7 @@ export function AgendaItemsEditor({
         setShowImportDialog(false)
         setSuccess(`Imported ${imported.length} agenda items`)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setError('Failed to import agenda items')
     }
   }
@@ -289,7 +289,7 @@ export function AgendaItemsEditor({
       } else {
         setError(data.error || 'Failed to save agenda items')
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setError('An error occurred while saving')
     } finally {
       setIsSubmitting(false)

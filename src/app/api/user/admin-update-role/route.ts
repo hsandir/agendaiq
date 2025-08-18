@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = await request.json();
-    const { userId, roleId } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __userId, __roleId  } = body;
 
     if (!userId || !roleId) {
       return NextResponse.json(
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     // Update the staff record's role
     await prisma.staff.update({
       where: { id: userStaff.id },
-      data: { role_id: roleId },
+      data: { role_id: parseInt(roleId) },
     });
 
     // Get updated user with staff
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(updatedUser);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error updating user role:", error);
     return NextResponse.json(
       { error: "Internal server error" },

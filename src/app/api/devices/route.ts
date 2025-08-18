@@ -18,13 +18,13 @@ export async function GET(request: NextRequest) {
     const user = authResult.user!;
 
     const devices = await prisma.device.findMany({
-      where: { user_id: user.id },
+      where: { user_id: parseInt(user.id) },
       orderBy: { last_active: 'desc' }
     });
 
     return NextResponse.json({ devices });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Get Devices Error:', error);
     return NextResponse.json(
       { error: "Failed to fetch devices" }, 
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     const user = authResult.user!;
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
 
     // Get device info from request
     const userAgent = request.headers.get('user-agent') || 'Unknown';
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     const device = await prisma.device.create({
       data: {
-        user_id: user.id,
+        user_id: parseInt(user.id),
         device_id: deviceId,
         device_name: body.device_name || `${deviceInfo.browser} on ${deviceInfo.os}`,
         device_type: deviceInfo.type,
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       message: "Device registered successfully" 
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Register Device Error:', error);
     return NextResponse.json(
       { error: "Failed to register device" }, 

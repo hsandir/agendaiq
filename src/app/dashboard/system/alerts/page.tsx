@@ -94,7 +94,7 @@ export default function AlertsConfigurationPage() {
       } else {
         throw new Error('Failed to fetch alerts configuration');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch alerts configuration:', error);
       showNotification('Failed to fetch alerts configuration');
       
@@ -141,7 +141,7 @@ export default function AlertsConfigurationPage() {
       } else {
         throw new Error('Failed to save configuration');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to save configuration:', error);
       showNotification('Failed to save configuration');
     } finally {

@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 export async function GET(request: NextRequest) {
   // Check if this is first-time setup (no users exist yet)
   try {
-    const userCount = await prisma.user.count();
+    const userCount = await prisma.(user as Record<string, unknown>).count();
     const isFirstTimeSetup = userCount === 0;
     
     if (!isFirstTimeSetup) {
@@ -16,13 +16,13 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
       }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error checking user count:', error);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
 
   try {
-    const userCount = await prisma.user.count();
+    const userCount = await prisma.(user as Record<string, unknown>).count();
     const isFirstTimeSetup = userCount === 0;
     
     if (isFirstTimeSetup) {
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Find all users who have admin role
-    const adminUsers = await prisma.user.findMany({
+    const adminUsers = await prisma.(user as Record<string, unknown>).findMany({
       where: {
         Staff: {
           some: {
@@ -66,8 +66,8 @@ export async function GET(request: NextRequest) {
     });
 
     // Filter to only include users with Administrator role
-    const filteredAdminUsers = adminUsers.filter(user => 
-      user.Staff.some(staff => staff.Role?.title === 'Administrator')
+    const filteredAdminUsers = adminUsers.filteruser => 
+      ((user as Record<string, unknown>).Staff.some(staff => staff.Role?.title === 'Administrator')
     );
 
     return NextResponse.json({
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       isFirstTimeSetup: false
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching admin users:', error);
     return NextResponse.json(
       { error: 'Failed to fetch admin users' },

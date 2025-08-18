@@ -48,8 +48,8 @@ export interface ActionItem {
 
 interface MeetingActionItemsProps {
   meetingId?: number;
-  agendaItems?: any[];
-  attendees: any[];
+  agendaItems?: Record<string, unknown>[];
+  attendees: Record<string, unknown>[];
   actionItems: ActionItem[];
   onChange: (items: ActionItem[]) => void;
   readOnly?: boolean;
@@ -304,7 +304,7 @@ export function MeetingActionItems({
                 <Label>Priority</Label>
                 <Select
                   value={newItem.priority || "medium"}
-                  onValueChange={(value: any) => setNewItem({ ...newItem, priority: value })}
+                  onValueChange={(value: Record<string, unknown>) => setNewItem({ ...newItem, priority: value })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -424,7 +424,7 @@ export function MeetingActionItems({
                                       <Label className="text-xs">Status</Label>
                                       <Select
                                         value={item.status}
-                                        onValueChange={(value: any) => 
+                                        onValueChange={(value: Record<string, unknown>) => 
                                           updateActionItem(item.originalIndex, { 
                                             status: value,
                                             completedDate: value === "completed" ? new Date().toISOString() : undefined
@@ -446,7 +446,7 @@ export function MeetingActionItems({
                                       <Label className="text-xs">Priority</Label>
                                       <Select
                                         value={item.priority}
-                                        onValueChange={(value: any) => 
+                                        onValueChange={(value: Record<string, unknown>) => 
                                           updateActionItem(item.originalIndex, { priority: value })
                                         }
                                       >

@@ -47,7 +47,7 @@ export const mockAdminSession: Session = {
   user: {
     ...mockSession.user,
     staff: {
-      ...(mockSession.user as unknown as { staff: any })?.staff,
+      ...((mockSession.user as { staff?: Record<string, unknown> })?.staff || {}),
       role: {
         id: '1',
         title: 'Administrator',

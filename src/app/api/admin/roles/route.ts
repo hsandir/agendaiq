@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(roles);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error fetching roles:", error);
     return NextResponse.json(
       { error: "Failed to fetch roles" },
@@ -40,8 +40,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
   try {
-    const body = await request.json();
-    const { title, priority, category, department_id } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __title, __priority, __category, __department_id  } = body;
 
     if (!title) {
       return NextResponse.json(
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(newRole);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error creating role:", error);
     return NextResponse.json(
       { error: "Failed to create role" },

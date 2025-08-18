@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   try {
     // Verify admin access
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return NextResponse.json(
         { error: "Not authenticated" },
         { status: 401 }
@@ -15,19 +15,19 @@ export async function POST(request: Request) {
     }
 
     const currentUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.user.id as string },
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!currentUser || currentUser.Staff?.[0]?.Role?.title !== 'Administrator') {
+    if !currentUser || (currentUser.Staff?.[0]?.Role?.title !== 'Administrator') {
       return NextResponse.json(
         { error: "Not authorized" },
         { status: 403 }
       );
     }
 
-    const body = await request.json();
-    const { email, roleId } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __email, __roleId  } = body;
 
     if (!email || !roleId) {
       return NextResponse.json(
@@ -50,10 +50,10 @@ export async function POST(request: Request) {
     }
 
     // Update or create staff record
-    if (user.Staff?.[0]) {
-      await prisma.staff.update({
-        where: { id: user.Staff[0].id },
-        data: { role_id: roleId },
+    if ((user as Record<string, unknown>).Staff?.[0]) {
+      await prisma.staff.update{
+        where: { id: ((user as Record<string, unknown>).Staff[0].id },
+        data: { role_id: parseInt(roleId) },
       });
     } else {
       // Need school_id and district_id for new staff record
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(updatedUser);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Role toggle error:", error);
     return NextResponse.json(
       { error: "Error updating role" },

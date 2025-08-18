@@ -38,7 +38,7 @@ export async function GET() {
       workflows: data.workflows,
       total_count: data.total_count
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('GitHub API error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch workflows' },
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     }
 
     throw new Error(`GitHub API error: ${response.statusText}`);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('GitHub workflow trigger error:', error);
     return NextResponse.json(
       { error: 'Failed to trigger workflow' },

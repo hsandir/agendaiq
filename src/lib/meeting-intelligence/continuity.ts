@@ -60,7 +60,7 @@ export class MeetingContinuityService {
         assignedToStaffId: item.assigned_to,
         dueDate: item.due_date || undefined,
         priority: item.priority,
-        status: item.status as any,
+        status: item.status as Record<string, unknown>,
         carryForwardCount: item.carry_forward_count + 1
       }))
     };
@@ -71,7 +71,7 @@ export class MeetingContinuityService {
    */
   static async createContinuationMeeting(
     parentMeetingId: number,
-    newMeetingData: any
+    newMeetingData: Record<string, unknown>
   ) {
     const continuityData = await this.getUnresolvedItems(parentMeetingId);
     
@@ -93,7 +93,7 @@ export class MeetingContinuityService {
             topic: `[Carried Forward] ${item.topic}`,
             problem_statement: item.problemStatement,
             responsible_staff_id: item.responsibleStaffId,
-            responsible_role_id: item.responsibleRoleId,
+            responsible_role_id: parseInt(item).responsibleRoleId,
             priority: item.priority,
             status: 'Pending',
             parent_item_id: item.parentItemId,
@@ -211,15 +211,15 @@ export class MeetingContinuityService {
     };
 
     // Calculate statistics
-    const countMeetings = (meetings: any[]): void => {
+    const countMeetings = (meetings: Record<string, unknown>[]): void => {
       for (const meeting of meetings) {
         stats.totalMeetingsInChain++;
         stats.totalCarriedItems += meeting.MeetingAgendaItems?.length || 0;
         stats.resolvedItems += meeting.MeetingAgendaItems?.filter(
-          (i: any) => i.status === 'Resolved'
+          (i: Record<string, unknown>) => i.status === 'Resolved'
         ).length || 0;
         stats.pendingItems += meeting.MeetingAgendaItems?.filter(
-          (i: any) => i.status !== 'Resolved'
+          (i: Record<string, unknown>) => i.status !== 'Resolved'
         ).length || 0;
         
         if (meeting.children) {

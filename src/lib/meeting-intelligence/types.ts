@@ -88,8 +88,8 @@ export interface DepartmentStats {
 
 export interface AIPlaceholder {
   type: 'summary' | 'actionExtraction' | 'transcription' | 'smartSearch';
-  input: any;
-  manualFallback?: any;
+  input: Record<string, unknown>;
+  manualFallback?: Record<string, unknown>;
   futureImplementation: string;
 }
 

@@ -72,6 +72,11 @@ class ValidationAgent {
         name: 'Language Consistency',
         check: () => this.checkLanguage(),
         critical: false
+      },
+      {
+        name: 'Git Commit Rules',
+        check: () => this.checkGitCommitRules(),
+        critical: true
       }
     ];
   }
@@ -268,6 +273,88 @@ class ValidationAgent {
     if (issues.length > 0) {
       this.log(`Turkish text found in ${issues.length} files`, 'WARNING');
       return false;
+    }
+    
+    return true;
+  }
+
+  checkGitCommitRules() {
+    const issues = [];
+    
+    try {
+      // Check recent git commits for Claude signatures
+      const gitLogResult = spawn('git', ['log', '--oneline', '-10', '--format=%B'], {
+        stdio: 'pipe',
+        cwd: process.cwd()
+      });
+      
+      let gitOutput = '';
+      gitLogResult.stdout.on('data', (data) => {
+        gitOutput += data.toString();
+      });
+      
+      gitLogResult.on('close', (code) => {
+        if (code === 0) {
+          const commits = gitOutput.split('\n');
+          
+          commits.forEach((commit, index) => {
+            // Check for Claude Code signature
+            if (commit.includes('Generated with [Claude Code]') || 
+                commit.includes('Co-Authored-By: Claude <noreply@anthropic.com>')) {
+              issues.push(`Recent commit contains Claude signature: "${commit.substring(0, 50)}..."`);
+            }
+          });
+        }
+      });
+      
+      // Check git history for --no-verify usage (this is harder to detect but we can check shell history)
+      const bashHistoryFile = path.join(require('os').homedir(), '.bash_history');
+      const zshHistoryFile = path.join(require('os').homedir(), '.zsh_history');
+      
+      // Check bash history
+      if (fs.existsSync(bashHistoryFile)) {
+        try {
+          const bashHistory = fs.readFileSync(bashHistoryFile, 'utf-8');
+          const recentLines = bashHistory.split('\n').slice(-100); // Check last 100 commands
+          
+          recentLines.forEach(line => {
+            if (line.includes('git commit') && line.includes('--no-verify')) {
+              issues.push(`Recent command used --no-verify: "${line}"`);
+            }
+          });
+        } catch (error) {
+          // Ignore if can't read history
+        }
+      }
+      
+      // Check zsh history  
+      if (fs.existsSync(zshHistoryFile)) {
+        try {
+          const zshHistory = fs.readFileSync(zshHistoryFile, 'utf-8');
+          const recentLines = zshHistory.split('\n').slice(-100); // Check last 100 commands
+          
+          recentLines.forEach(line => {
+            if (line.includes('git commit') && line.includes('--no-verify')) {
+              issues.push(`Recent command used --no-verify: "${line}"`);
+            }
+          });
+        } catch (error) {
+          // Ignore if can't read history
+        }
+      }
+      
+      // Additional warning about these rules
+      if (issues.length === 0) {
+        this.log('Git commit rules check: --no-verify and Claude signatures not detected', 'INFO');
+      } else {
+        issues.forEach(issue => this.log(issue, 'ERROR'));
+        this.log('REMINDER: Never use --no-verify and avoid Claude signatures in commits', 'ERROR');
+        return false;
+      }
+      
+    } catch (error) {
+      this.log(`Git commit rules check failed: ${error.message}`, 'WARNING');
+      return true; // Don't fail validation if git check fails
     }
     
     return true;

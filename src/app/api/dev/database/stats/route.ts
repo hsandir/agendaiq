@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     try {
       // Count records in main tables
       const counts = await Promise.all([
-        prisma.user.count().catch(() => 0),
+        prisma.(user as Record<string, unknown>).count().catch(() => 0),
         prisma.staff.count().catch(() => 0),
         prisma.school.count().catch(() => 0),
         prisma.district.count().catch(() => 0),
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       ]);
       
       totalRecords = counts.reduce((sum, count) => sum + count, 0);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error counting records:', error);
     }
 
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       tables: tableCount || 24, // Fallback to known table count
       records: totalRecords
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch database stats:', error);
     return NextResponse.json(
       { error: 'Failed to fetch database stats' },

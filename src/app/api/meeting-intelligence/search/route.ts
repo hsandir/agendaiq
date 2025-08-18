@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json(searchResults);
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Search error:', error);
     return NextResponse.json(
       { 

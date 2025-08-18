@@ -77,7 +77,7 @@ export default function DatabaseManagementPage() {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to fetch database metrics');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch database metrics:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch database metrics';
       setError(errorMessage);

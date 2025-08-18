@@ -40,7 +40,7 @@ export default function DatabaseManager() {
         const data = await response.json()
         setStats(data)
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load stats:', error)
     }
   }
@@ -52,7 +52,7 @@ export default function DatabaseManager() {
         const data = await response.json()
         setBackups(data.backups || [])
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load backups:', error)
     }
   }
@@ -65,7 +65,7 @@ export default function DatabaseManager() {
       })
       const data = await response.json()
       console.log('Migration result:', data)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Migration failed:', error)
     } finally {
       setIsLoading(false)
@@ -80,7 +80,7 @@ export default function DatabaseManager() {
       })
       const data = await response.json()
       console.log('Seed result:', data)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Seed failed:', error)
     } finally {
       setIsLoading(false)
@@ -102,7 +102,7 @@ export default function DatabaseManager() {
       } else {
         alert('Failed to seed development data')
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Seed dev data failed:', error)
       alert('Failed to seed development data')
     } finally {
@@ -122,7 +122,7 @@ export default function DatabaseManager() {
       })
       const data = await response.json()
       console.log('Reset result:', data)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Reset failed:', error)
     } finally {
       setIsLoading(false)
@@ -139,7 +139,7 @@ export default function DatabaseManager() {
       })
       const data = await response.json()
       setQueryResults(data)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Query failed:', error)
       setQueryResults({ error: error instanceof Error ? error.message : 'An error occurred' })
     } finally {

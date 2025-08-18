@@ -67,7 +67,7 @@ export function DateTimePicker({
           setSelectedTime(format(dateTime, "HH:mm"));
           setCustomTime(format(dateTime, "HH:mm"));
         }
-      } catch (e) {
+      } catch (e: unknown) {
         console.error("Invalid date value:", value);
       }
     }
@@ -113,7 +113,7 @@ export function DateTimePicker({
       if (isValid(dateTime)) {
         return format(dateTime, "MMM dd, yyyy 'at' HH:mm");
       }
-    } catch (e) {
+    } catch (e: unknown) {
       return "";
     }
     return "";

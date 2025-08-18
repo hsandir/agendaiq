@@ -58,9 +58,9 @@ export async function GET(request: NextRequest) {
       if (!staffRecord.School) {
         return NextResponse.json({ error: "No school assigned" }, { status: 404 });
       }
-      return NextResponse.json([staffRecord.School]);
+      return NextResponse.json[((staffRecord.School)]);
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error fetching schools:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const { name, code, address, phone, email, district_id } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __name, __code, __address, ___phone, __email, __district_id  } = body;
 
     if (!name || !code || !district_id) {
       return NextResponse.json(
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(school, { status: 201 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error creating school:", error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -141,8 +141,8 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const { id, name, code, address, phone, email, district_id } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __id, __name, __code, __address, ___phone, __email, __district_id  } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -208,7 +208,7 @@ export async function PUT(request: NextRequest) {
     });
 
     return NextResponse.json(school);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error updating school:", error);
     return NextResponse.json(
       { error: "Internal server error" },

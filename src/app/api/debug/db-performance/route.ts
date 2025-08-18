@@ -53,7 +53,7 @@ export async function GET() {
 
     // Test 3: Count query
     const countStart = performance.now();
-    const userCount = await prisma.user.count();
+    const userCount = await prisma.(user as Record<string, unknown>).count();
     const countTime = performance.now() - countStart;
     metrics.tests.push({
       name: 'Count Query',
@@ -101,7 +101,7 @@ export async function GET() {
     // Test 6: Transaction test
     const transactionStart = performance.now();
     await prisma.$transaction(async (tx) => {
-      await tx.user.findUnique({ where: { id: user.id } });
+      await tx.(user as Record<string, unknown>).findUnique({ where: { id: user.id } });
       await tx.meeting.count();
     });
     const transactionTime = performance.now() - transactionStart;
@@ -147,7 +147,7 @@ export async function GET() {
     });
 
     // Calculate statistics
-    const times = metrics.tests.map(t => parseFloat(t.time));
+    const times = (metrics.tests.map(t => parseFloat(t.time)));
     metrics.summary = {
       totalTests: metrics.tests.length,
       totalTime: times.reduce((a: number, b: number) => a + b, 0).toFixed(2) + 'ms',
@@ -163,12 +163,12 @@ export async function GET() {
     response.headers.set('X-Database-Performance', 'measured');
     
     return response;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Database performance test error:', error);
     return NextResponse.json(
       { 
         error: 'Database performance test failed',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
     );
@@ -179,13 +179,13 @@ export async function GET() {
 async function getConnectionPoolStatus() {
   try {
     // Get Prisma metrics
-    const metrics = await (prisma as any).$metrics?.json();
+    const metrics = await prisma.$metrics?.json();
     
     return {
       status: 'active',
       metrics: metrics || 'Metrics not available'
     };
-  } catch (error) {
+  } catch (error: unknown) {
     return {
       status: 'unknown',
       error: 'Could not retrieve connection pool metrics'

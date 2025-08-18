@@ -28,8 +28,8 @@ import { signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 
 interface MobileMenuProps {
-  user: any;
-  currentRole: any;
+  user: Record<string, unknown>;
+  currentRole: Record<string, unknown>;
   isAdmin: boolean;
 }
 
@@ -282,7 +282,7 @@ export function MobileMenu({ user, currentRole, isAdmin }: MobileMenuProps) {
                     callbackUrl: '/auth/signin',
                     redirect: true 
                   });
-                } catch (error) {
+                } catch (error: unknown) {
                   // Fallback to direct navigation if signOut fails
                   window.location.href = '/auth/signin';
                 }

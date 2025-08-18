@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
       message: "Hierarchical role structure retrieved" 
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Role Hierarchy API Error:', error);
     return NextResponse.json(
       { 

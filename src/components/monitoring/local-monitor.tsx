@@ -114,9 +114,9 @@ export default function LocalMonitor() {
     window.addEventListener('unhandledrejection', handleUnhandledRejection);
 
     console.error = (...args) => {
-      const message = args.map(arg => 
+      const message = (args.map(arg => 
         typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
-      ).join(' ');
+      ).join(' '));
 
       // Only capture actual errors, not regular console.error usage
       if (message.toLowerCase().includes('error') || message.toLowerCase().includes('failed')) {
@@ -136,9 +136,9 @@ export default function LocalMonitor() {
     };
 
     console.warn = (...args) => {
-      const message = args.map(arg => 
+      const message = (args.map(arg => 
         typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
-      ).join(' ');
+      ).join(' '));
 
       // Only capture warnings that seem important
       if (message.toLowerCase().includes('deprecated') || message.toLowerCase().includes('warning')) {
@@ -238,7 +238,7 @@ export default function LocalMonitor() {
   const markAsResolved = (errorId: string) => {
     setErrors(prev => prev.map(err => 
       err.id === errorId ? { ...err, resolved: true } : err
-    ));
+    )));
   };
 
   const getSeverityIcon = (severity: string) => {

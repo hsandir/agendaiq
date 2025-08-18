@@ -11,7 +11,7 @@ export default async function DistrictSetupPage() {
     redirect("/auth/signin");
   }
 
-  if (session.user.staff?.role?.title !== "Administrator") {
+  if (session.(user as any).staff?.role?.title !== "Administrator") {
     redirect("/dashboard");
   }
 

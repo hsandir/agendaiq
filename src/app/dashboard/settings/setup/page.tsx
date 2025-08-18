@@ -38,7 +38,7 @@ export default function SetupPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to fetch schools");
       setSchools(Array.isArray(data) ? data : [data]);
-    } catch (e) {
+    } catch (e: unknown) {
       setError((e instanceof Error ? e.message : String(e)) || "Failed to fetch schools");
     } finally {
       setLoading(false);
@@ -70,7 +70,7 @@ export default function SetupPage() {
       const res = await fetch(`/api/school?id=${school.id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Failed to delete school");
       await fetchSchools();
-    } catch (e) {
+    } catch (e: unknown) {
       alert((e instanceof Error ? e.message : String(e)) || "Failed to delete school");
     } finally {
       setSaving(false);
@@ -91,7 +91,7 @@ export default function SetupPage() {
       if (!res.ok) throw new Error("Failed to save school");
       closeModal();
       await fetchSchools();
-    } catch (e) {
+    } catch (e: unknown) {
       alert((e instanceof Error ? e.message : String(e)) || "Failed to save school");
     } finally {
       setSaving(false);

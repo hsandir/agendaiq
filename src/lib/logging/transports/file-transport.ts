@@ -32,7 +32,7 @@ export class FileTransport implements LogTransport {
       await fs.mkdir(this.baseDir, { recursive: true });
       await fs.mkdir(path.join(this.baseDir, 'dev'), { recursive: true });
       await fs.mkdir(path.join(this.baseDir, 'audit'), { recursive: true });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to create log directories:', error);
     }
   }
@@ -46,7 +46,7 @@ export class FileTransport implements LogTransport {
     const baseData = {
       id: entry.id,
       timestamp: entry.timestamp,
-      level: LogLevel[entry.level],
+      level: LogLevel[(entry.level)],
       message: entry.message,
       context: entry.context,
       metadata: entry.metadata
@@ -93,19 +93,19 @@ export class FileTransport implements LogTransport {
         // Clean up old backups
         const dir = path.dirname(filePath);
         const files = await fs.readdir(dir);
-        const logFiles = files
+        const logFiles = (files
           .filter(f => f.startsWith(path.basename(filePath)))
           .map(f => ({
             name: f,
             path: path.join(dir, f),
-            stat: null as any
-          }));
+            stat: null as Record<string, unknown>
+          })));
 
         // Get file stats
         for (const file of logFiles) {
           try {
             file.stat = await fs.stat(file.path);
-          } catch (error) {
+          } catch (error: unknown) {
             // Skip files we can't stat
           }
         }
@@ -118,12 +118,12 @@ export class FileTransport implements LogTransport {
           .forEach(async (file) => {
             try {
               await fs.unlink(file.path);
-            } catch (error) {
+            } catch (error: unknown) {
               console.error(`Failed to delete old log file ${file.path}:`, error);
             }
           });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       // File doesn't exist yet, which is fine
     }
   }
@@ -134,8 +134,8 @@ export class FileTransport implements LogTransport {
     }
 
     try {
-      const isDev = 'category' in entry && typeof (entry as any).category === 'string' && 
-                   ['system', 'database', 'api', 'auth', 'performance', 'error', 'network', 'cache', 'external', 'build'].includes((entry as any).category);
+      const isDev = 'category' in entry && typeof entry.category === 'string' && 
+                   ['system', 'database', 'api', 'auth', 'performance', 'error', 'network', 'cache', 'external', 'build'].includes(entry.category);
       
       const logType = isDev ? 'dev' : 'audit';
       const fileName = this.getLogFileName(logType);
@@ -146,7 +146,7 @@ export class FileTransport implements LogTransport {
       // Write log entry
       const logLine = this.formatLogEntry(entry) + '\n';
       await fs.appendFile(fileName, logLine, 'utf8');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to write log to file:', error);
     }
   }
@@ -171,7 +171,7 @@ export class FileTransport implements LogTransport {
       for (const filePath of filesToRead) {
         try {
           const content = await fs.readFile(filePath, 'utf8');
-          const lines = content.split('\n').filter(line => line.trim());
+          const lines = content.split('\n').filter(line => String(line).trim());
           
           for (const line of lines) {
             try {
@@ -198,11 +198,11 @@ export class FileTransport implements LogTransport {
                 ...entry,
                 level: LogLevel[entry.level as keyof typeof LogLevel]
               });
-            } catch (parseError) {
+            } catch (parseError: unknown) {
               // Skip invalid JSON lines
             }
           }
-        } catch (fileError) {
+        } catch (fileError: unknown) {
           // File might not exist, continue with next file
         }
       }
@@ -218,7 +218,7 @@ export class FileTransport implements LogTransport {
       const start = query.offset || 0;
       const end = start + (query.limit || 100);
       return results.slice(start, end);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to query logs from files:', error);
       return [];
     }

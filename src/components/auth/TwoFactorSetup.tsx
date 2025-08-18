@@ -29,7 +29,7 @@ export function TwoFactorSetup() {
       setQrCode(data.qrCode);
       setManualKey(data.manualEntryKey);
       setStep('verify');
-    } catch (error) {
+    } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);
@@ -55,7 +55,7 @@ export function TwoFactorSetup() {
 
       setBackupCodes(data.backupCodes);
       setStep('complete');
-    } catch (error) {
+    } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);

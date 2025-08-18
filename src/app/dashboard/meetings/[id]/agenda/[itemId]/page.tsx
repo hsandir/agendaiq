@@ -10,7 +10,7 @@ interface Props {
 
 export default async function AgendaItemPage(props: Props) {
   const user = await requireAuth(AuthPresets.requireAuth);
-  const params = await props.params;
+  const params = await (props as Record<string, unknown>).params;
 
   const meetingId = parseInt(params.id);
   const itemId = parseInt(params.itemId);
@@ -33,7 +33,7 @@ export default async function AgendaItemPage(props: Props) {
             }
           },
           MeetingAttendee: {
-            where: { staff_id: user.staff?.id || -1 }
+            where: { staff_id: (user as any).staff?.id || -1 }
           }
         }
       },
@@ -76,10 +76,10 @@ export default async function AgendaItemPage(props: Props) {
   }
 
   // Check permissions
-  const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
+  const isOrganizer = agendaItem.Meeting.organizer_id === (user as any).staff?.id;
   const isAttendee = agendaItem.Meeting.MeetingAttendee.length > 0;
   const hasAdminAccess = isAnyAdmin(user);
-  const isResponsible = agendaItem.responsible_staff_id === user.staff?.id;
+  const isResponsible = agendaItem.responsible_staff_id === (user as any).staff?.id;
 
   if (!isOrganizer && !isAttendee && !hasAdminAccess) {
     notFound();
@@ -96,10 +96,10 @@ export default async function AgendaItemPage(props: Props) {
 
   return (
     <AgendaItemDetail
-      item={agendaItem as any}
-      meeting={agendaItem.Meeting as any}
+      item={agendaItem as Record<string, unknown>}
+      meeting={agendaItem.Meeting as Record<string, unknown>}
       currentUser={user}
-      allStaff={allStaff as any}
+      allStaff={allStaff as Record<string, unknown>}
       canEdit={isOrganizer || hasAdminAccess || isResponsible}
     />
   );

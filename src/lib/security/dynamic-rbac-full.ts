@@ -40,8 +40,8 @@ export interface RolePermission {
 interface StaffWithRole {
   id: number;
   user_id: number;
-  school_id: number;
-  department_id: number;
+  school_id: parseInt(number);
+  department_id: parseInt(number);
   Role: {
     id: number;
     title: string;
@@ -165,7 +165,7 @@ export class DynamicRBAC {
         timestamp: new Date()
       };
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error checking access:', error);
       return {
         granted: false,
@@ -203,7 +203,7 @@ export class DynamicRBAC {
               title: true,
               priority: true,
               is_leadership: true,
-              department_id: true
+              department_id: parseInt(true)
             }
           },
           School: {
@@ -225,14 +225,14 @@ export class DynamicRBAC {
       const typedStaffRecords: StaffWithRole[] = staffRecords.map(record => ({
         id: record.id,
         user_id: record.user_id,
-        school_id: record.school_id,
-        department_id: record.department_id,
+        school_id: parseInt(record).school_id,
+        department_id: parseInt(record).department_id,
         Role: {
           id: record.Role.id,
           title: record.Role.title,
           priority: record.Role.priority,
           is_leadership: record.Role.is_leadership,
-          department_id: record.Role.department_id || undefined
+          department_id: parseInt(record).Role.department_id || undefined
         },
         School: {
           id: record.School.id,
@@ -250,7 +250,7 @@ export class DynamicRBAC {
       
       return typedStaffRecords;
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error getting user staff records:', error);
       return [];
     }
@@ -306,7 +306,7 @@ export class DynamicRBAC {
             title: true,
             priority: true,
             is_leadership: true,
-            department_id: true
+            department_id: parseInt(true)
           }
         });
 
@@ -314,7 +314,7 @@ export class DynamicRBAC {
           // Convert null to undefined for type compatibility
           const roleWithConvertedDeptId = {
             ...parentRole,
-            department_id: parentRole.department_id || undefined
+            department_id: parseInt(parentRole).department_id || undefined
           };
           
           const parentAccess = await this.checkDirectRolePermissions(
@@ -334,7 +334,7 @@ export class DynamicRBAC {
 
       return { granted: false, reason: 'No inherited permissions found' };
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error checking inherited permissions:', error);
       return { granted: false, reason: 'Error checking inheritance' };
     }
@@ -421,17 +421,17 @@ export class DynamicRBAC {
       // Get role hierarchy relationships
       const hierarchyRecords = await prisma.roleHierarchy.findMany({
         where: { child_role_id: parseInt(roleId) },
-        select: { parent_role_id: true }
+        select: { parent_role_id: parseInt(true) }
       });
 
-      const parentIds = hierarchyRecords.map(r => r.parent_role_id.toString());
+      const parentIds = (hierarchyRecords.map(r => r.parent_role_id.toString()));
       
       // Cache results
       this.roleHierarchyCache.set(cacheKey, parentIds);
       
       return parentIds;
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error getting parent roles:', error);
       return [];
     }
@@ -588,7 +588,7 @@ export class DynamicRBAC {
       
       return uniqueRoles;
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error getting role hierarchy:', error);
       return [roleId];
     }
@@ -599,12 +599,12 @@ export class DynamicRBAC {
     try {
       const hierarchyRecords = await prisma.roleHierarchy.findMany({
         where: { parent_role_id: parseInt(roleId) },
-        select: { child_role_id: true }
+        select: { child_role_id: parseInt(true) }
       });
 
       return hierarchyRecords.map(r => r.child_role_id.toString());
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error getting child roles:', error);
       return [];
     }
@@ -627,7 +627,7 @@ export class DynamicRBAC {
           title: true,
           priority: true,
           is_leadership: true,
-          department_id: true
+          department_id: parseInt(true)
         }
       });
 
@@ -638,7 +638,7 @@ export class DynamicRBAC {
       // Convert null to undefined for type compatibility
       const roleWithConvertedDeptId = {
         ...role,
-        department_id: role.department_id || undefined
+        department_id: parseInt(role).department_id || undefined
       };
       
       // Generate permissions based on role
@@ -649,7 +649,7 @@ export class DynamicRBAC {
       
       return permissions;
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error getting role permissions:', error);
       return [];
     }

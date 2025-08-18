@@ -19,14 +19,14 @@ export async function PUT(
     }
 
     const user = authResult.user!;
-    const deviceId = parseInt(params.id);
-    const body = await request.json();
+    const deviceId = params.id;
+    const body = (await request.json()) as Record<string, unknown>;
 
     // Verify device belongs to user
     const device = await prisma.device.findFirst({
       where: {
         id: deviceId,
-        user_id: user.id
+        user_id: parseInt(user.id)
       }
     });
 
@@ -51,7 +51,7 @@ export async function PUT(
       message: body.is_trusted ? "Device trusted" : "Device untrusted" 
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Update Device Error:', error);
     return NextResponse.json(
       { error: "Failed to update device" }, 
@@ -77,13 +77,13 @@ export async function DELETE(
     }
 
     const user = authResult.user!;
-    const deviceId = parseInt(params.id);
+    const deviceId = params.id;
 
     // Verify device belongs to user
     const device = await prisma.device.findFirst({
       where: {
         id: deviceId,
-        user_id: user.id
+        user_id: parseInt(user.id)
       }
     });
 
@@ -103,7 +103,7 @@ export async function DELETE(
       message: "Device removed successfully" 
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Delete Device Error:', error);
     return NextResponse.json(
       { error: "Failed to remove device" }, 

@@ -92,7 +92,7 @@ async function calculateBuildMetrics() {
       codeCoverage,
       vulnerabilities
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to calculate build metrics:', error);
     return {
       totalBuilds: 0,
@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
     //       recorded_at: new Date()
     //     }
     //   });
-    // } catch (dbError) {
+    // } catch (dbError: unknown) {
     //   // Ignore database errors - metrics table might not exist yet
     //   console.log('Could not store metrics in database:', dbError);
     // }
@@ -147,7 +147,7 @@ export async function GET(request: NextRequest) {
       metrics,
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching build metrics:', error);
     return NextResponse.json(
       { error: 'Failed to fetch build metrics' },

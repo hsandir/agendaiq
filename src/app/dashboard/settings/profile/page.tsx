@@ -11,7 +11,7 @@ interface School {
 }
 
 export default function ProfilePage() {
-  const { data: session } = useSession();
+  const { data: __session  } = useSession();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -41,7 +41,7 @@ export default function ProfilePage() {
           role: data.role || '',
           schoolId: data.school?.id || '',
         });
-      } catch (error) {
+      } catch (error: unknown) {
         setError('Failed to load profile');
       }
     };
@@ -58,7 +58,7 @@ export default function ProfilePage() {
         // Handle both array and single school responses
         const schoolsList = Array.isArray(data) ? data : (data.schools || [data]);
         setSchools(schoolsList);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Failed to load schools:', error);
       }
     };
@@ -87,7 +87,7 @@ export default function ProfilePage() {
       }
 
       setSuccess(true);
-    } catch (error) {
+    } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Failed to update profile');
     } finally {
       setIsLoading(false);
@@ -95,7 +95,7 @@ export default function ProfilePage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const { __name, __value  } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 

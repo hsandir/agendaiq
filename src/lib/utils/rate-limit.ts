@@ -66,7 +66,7 @@ export function rateLimit({
           remaining,
           reset: tokenData.resetTime
         };
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Rate limiting error:', error);
         // Fail open - allow request if rate limiting fails
         return {

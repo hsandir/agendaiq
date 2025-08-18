@@ -98,7 +98,7 @@ export default function GitOperations() {
       const data = await response.json();
       setGitStatus(data.status);
       setFileChanges(data.changes || []);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load git status:', error);
     } finally {
       setLoading(false);
@@ -110,7 +110,7 @@ export default function GitOperations() {
       const response = await fetch('/api/dev/git/commits?limit=50');
       const data = await response.json();
       setCommits(data.commits || []);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load commit history:', error);
     }
   };
@@ -120,7 +120,7 @@ export default function GitOperations() {
       const response = await fetch('/api/dev/git/branches');
       const data = await response.json();
       setBranches(data.branches || []);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load branches:', error);
     }
   };
@@ -140,7 +140,7 @@ export default function GitOperations() {
       }
       
       return data;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Git command failed:', error);
       setTerminalOutput(prev => [...prev, `Error: ${error}`]);
       return { success: false, error };
@@ -168,7 +168,7 @@ export default function GitOperations() {
   };
 
   const handleCommit = async () => {
-    if (!commitMessage.trim()) {
+    if (!String(commitMessage).trim()) {
       alert('Please enter a commit message');
       return;
     }
@@ -190,7 +190,7 @@ export default function GitOperations() {
         await loadCommitHistory();
         alert('Changes committed successfully!');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Commit failed:', error);
       alert('Failed to commit changes');
     } finally {
@@ -226,7 +226,7 @@ export default function GitOperations() {
   };
 
   const handleCreateBranch = async () => {
-    if (!newBranchName.trim()) {
+    if (!String(newBranchName).trim()) {
       alert('Please enter a branch name');
       return;
     }
@@ -552,7 +552,7 @@ export default function GitOperations() {
                   <Button
                     size="sm"
                     onClick={handleCreateBranch}
-                    disabled={!newBranchName.trim()}
+                    disabled={!String(newBranchName).trim()}
                   >
                     <Plus className="h-4 w-4 mr-1" />
                     Create

@@ -136,8 +136,8 @@ test.describe('Page Load Performance', () => {
         
         // Resource timing
         resources: performance.getEntriesByType('resource').length,
-        totalResourceSize: performance.getEntriesByType('resource').reduce((total, resource: unknown) => 
-          total + (resource.transferSize || 0), 0
+        totalResourceSize: performance.getEntriesByType('resource').reduce((total, resource) => 
+          total + ((resource as PerformanceResourceTiming).transferSize || 0), 0
         ),
       }
     })

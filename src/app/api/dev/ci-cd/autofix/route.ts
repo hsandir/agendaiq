@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     // Development endpoint - no auth required
     console.log('Autofix API called');
 
-    const { searchParams } = new URL(request.url);
+    const { __searchParams  } = new URL(request.url);
     const errorType = searchParams.get('errorType') || '';
     const errorMessage = searchParams.get('errorMessage') || '';
 
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       suggestions,
       timestamp: new Date().toISOString(),
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error generating autofix suggestions:', error);
     return NextResponse.json(
       {
@@ -69,8 +69,8 @@ export async function POST(request: NextRequest) {
     // Development endpoint - no auth required
     console.log('Autofix POST API called');
 
-    const body = await request.json();
-    const { suggestionId, errorType, errorMessage, dryRun = true, customSuggestion } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __suggestionId, __errorType, __errorMessage, dryRun = __true, __customSuggestion  } = body;
 
     // Use custom suggestion if provided, otherwise generate and find
     let suggestion: AutofixSuggestion;
@@ -102,17 +102,17 @@ export async function POST(request: NextRequest) {
     for (const command of suggestion.commands) {
       try {
         if (!dryRun) {
-          const { stdout, stderr } = await execAsync(command, {
+          const { __stdout, __stderr  } = await execAsync(__command, {
             cwd: process.cwd(),
           });
           results.applied.push(`Command: ${command}\nOutput: ${stdout || stderr}`);
         } else {
           results.applied.push(`[DRY RUN] Would execute: ${command}`);
         }
-      } catch (error) {
+      } catch (error: unknown) {
         results.failed.push({
           action: `Command: ${command}`,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? error.message : String(error),
         });
       }
     }
@@ -147,10 +147,10 @@ export async function POST(request: NextRequest) {
         } else {
           results.applied.push(`[DRY RUN] Would ${file.action} file: ${file.path}`);
         }
-      } catch (error) {
+      } catch (error: unknown) {
         results.failed.push({
           action: `File ${file.action}: ${file.path}`,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? error.message : String(error),
         });
       }
     }
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
         await execAsync('git add -A');
         await execAsync(`git commit -m "Auto-fix: ${suggestion.title}\n\nApplied automatic fix for ${errorType}"`);
         results.applied.push('Created git commit for changes');
-      } catch (error) {
+      } catch (error: unknown) {
         // Commit might fail if no changes were made
         console.log('Git commit failed (might be no changes):', error);
       }
@@ -173,13 +173,13 @@ export async function POST(request: NextRequest) {
       results,
       timestamp: new Date().toISOString(),
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error applying autofix:', error);
     return NextResponse.json(
       {
         error: 'Failed to apply autofix',
         code: 'AUTOFIX_APPLY_ERROR',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: error instanceof Error ? error.message : String(error),
         timestamp: new Date().toISOString(),
       },
       { status: 500 }

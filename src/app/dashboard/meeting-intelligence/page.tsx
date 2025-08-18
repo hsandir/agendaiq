@@ -13,7 +13,7 @@ export default async function MeetingIntelligenceDashboard() {
   
   // Get overdue action items
   const overdueItems = await ActionItemsService.getOverdueActionItems({
-    staffId: user.staff?.id
+    staffId: (user as any).staff?.id
   });
   
   // Get action items stats
@@ -113,7 +113,7 @@ export default async function MeetingIntelligenceDashboard() {
           return (
             <Link
               key={index}
-              href={stat.href as any}
+              href={stat.href as Record<string, unknown>}
               className="bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <div className="flex items-center justify-between">
@@ -139,7 +139,7 @@ export default async function MeetingIntelligenceDashboard() {
           return (
             <Link
               key={index}
-              href={feature.href as any}
+              href={feature.href as Record<string, unknown>}
               className="bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-all hover:scale-105"
             >
               <div className="flex items-start space-x-4">

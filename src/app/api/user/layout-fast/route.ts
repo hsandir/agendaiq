@@ -21,7 +21,7 @@ async function getFastUser(req: NextRequest) {
                       cookieHeader.match(/__Secure-next-auth\.session-token=([^;]+)/);
     if (!tokenMatch) return null;
     
-    const decoded = jwt.decode(tokenMatch[1]) as any;
+    const decoded = jwt.decode(tokenMatch[1]) as Record<string, unknown>;
     
     // NextAuth stores user data differently - check various fields
     const userId = decoded?.id || decoded?.sub || decoded?.userId;
@@ -33,7 +33,7 @@ async function getFastUser(req: NextRequest) {
       id: typeof userId === 'string' ? parseInt(userId) : userId, 
       email: userEmail || 'unknown'
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Fast auth error:', error);
     return null;
   }
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     res.headers.set('X-Cache', 'MISS');
     return res;
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Layout API error:', error);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
@@ -91,7 +91,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Auth required' }, { status: 401 });
     }
     
-    const { layout } = await request.json();
+    const { __layout  } = (await request.json()) as Record<__string, unknown>;
     if (!layout) {
       return NextResponse.json({ error: 'Layout required' }, { status: 400 });
     }
@@ -108,7 +108,7 @@ export async function PUT(request: NextRequest) {
     res.headers.set('X-Time', `${Date.now() - start}ms`);
     return res;
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Layout update error:', error);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }

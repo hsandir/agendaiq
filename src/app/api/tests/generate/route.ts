@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       testPath,
       content
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to generate test:', error)
     return NextResponse.json(
       { error: 'Failed to generate test' },
@@ -130,7 +130,7 @@ export async function GET(request: NextRequest) {
         total: testFiles.length
       }
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to list untested files:', error)
     return NextResponse.json(
       { error: 'Failed to list untested files' },

@@ -113,7 +113,7 @@ export function CICDMonitor() {
         const data = await metricsRes.json();
         setMetrics(data.metrics || null);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to fetch CI/CD data:', error);
     } finally {
       setIsLoading(false);

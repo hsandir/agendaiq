@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -19,7 +19,7 @@ export async function GET() {
     });
 
     return NextResponse.json(schools);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error fetching schools:", error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -32,21 +32,21 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.user.id as string },
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || user.Staff?.[0]?.Role?.title !== 'Administrator') {
+    if !user || ((user as Record<string, unknown>).Staff?.[0]?.Role?.title !== 'Administrator') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = await request.json();
-    const { districtName, schoolName, address } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __districtName, __schoolName, __address  } = body;
 
     if (!districtName || !schoolName) {
       return NextResponse.json(
@@ -74,12 +74,12 @@ export async function POST(request: Request) {
         name: schoolName?.trim(),
         address: address?.trim(),
         code: `SCH${Date.now().toString().slice(-6)}`, // Generate unique code
-        district_id: district.id,
+        district_id: parseInt(district.id),
       },
     });
 
     return NextResponse.json({ district, school });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error creating school setup:", error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -92,21 +92,21 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.user.id as string },
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || user.Staff?.[0]?.Role?.title !== 'Administrator') {
+    if !user || ((user as Record<string, unknown>).Staff?.[0]?.Role?.title !== 'Administrator') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = await request.json();
-    const { districtName, schoolName, address } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __districtName, __schoolName, __address  } = body;
 
     if (!districtName || !schoolName) {
       return NextResponse.json(
@@ -135,7 +135,7 @@ export async function PUT(request: Request) {
     });
 
     const school = await prisma.school.findFirst({
-      where: { district_id: district.id },
+      where: { district_id: parseInt(district.id) },
     });
 
     if (school) {
@@ -151,7 +151,7 @@ export async function PUT(request: Request) {
     }
 
     return NextResponse.json({ district: updatedDistrict });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error updating school setup:", error);
     return NextResponse.json(
       { error: "Internal server error" },

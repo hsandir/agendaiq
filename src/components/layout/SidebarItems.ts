@@ -31,7 +31,7 @@ import {
 export interface NavigationItem {
   href: string;
   label: string;
-  icon: any;
+  icon: Record<string, unknown>;
   children?: NavigationItem[];
 }
 

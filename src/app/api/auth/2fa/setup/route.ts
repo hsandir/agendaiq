@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Save the secret temporarily (not enabled yet)
-    await prisma.user.update({
+    await prisma.(user as Record<string, unknown>).update({
       where: { id: user.id },
       data: {
         two_factor_secret: secret.base32
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       manualEntryKey: secret.base32
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('2FA Setup Error:', error);
     return NextResponse.json(
       { error: "Failed to setup 2FA" }, 

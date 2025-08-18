@@ -72,7 +72,7 @@ export function AgendaItemForm({
 }: AgendaItemFormProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const handleChange = (field: keyof AgendaItemFormData, value: any) => {
+  const handleChange = (field: keyof AgendaItemFormData, value: Record<string, unknown>) => {
     onUpdate(index, { ...item, [field]: value });
   };
 

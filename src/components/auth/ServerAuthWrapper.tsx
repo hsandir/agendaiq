@@ -25,7 +25,7 @@ export default async function ServerAuthWrapper({
     }
     
     return <>{children}</>;
-  } catch (error) {
+  } catch (error: unknown) {
     // Auth failed, redirect to fallback
     redirect(fallbackUrl);
   }

@@ -6,7 +6,7 @@ export default async function MeetingsPage() {
   try {
     const user = await requireAuth(AuthPresets.requireAuth);
     return <MeetingsPageClient />;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Authentication error:', error);
     redirect('/dashboard?error=auth_required');
   }

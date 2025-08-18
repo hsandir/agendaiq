@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     // Convert to a more usable format
     const settingsObject = settings.reduce((acc, setting) => {
-      acc[setting.key] = setting.value;
+      acc[(setting.key)] = setting.value;
       return acc;
     }, {} as Record<string, any>);
 
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       count: settings.length
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching system settings:', error);
     return NextResponse.json(
       { error: 'Failed to fetch system settings' },
@@ -48,8 +48,8 @@ export async function PUT(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = await request.json();
-    const { settings } = body;
+    const body = (await request.json()) as Record<string, unknown>;
+    const { __settings  } = body;
 
     if (!settings || typeof settings !== 'object') {
       return NextResponse.json(
@@ -66,11 +66,11 @@ export async function PUT(request: NextRequest) {
       try {
         const updatedSetting = await prisma.systemSetting.upsert({
           where: { key },
-          update: { value: value as any },
-          create: { key, value: value as any }
+          update: { value: value as Record<string, unknown> },
+          create: { key, value: value as Record<string, unknown> }
         });
         updatedSettings.push(updatedSetting);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`Error updating setting ${key}:`, error);
         errors.push(`Failed to update ${key}`);
       }
@@ -93,7 +93,7 @@ export async function PUT(request: NextRequest) {
       updatedCount: updatedSettings.length
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error updating system settings:', error);
     return NextResponse.json(
       { error: 'Failed to update system settings' },

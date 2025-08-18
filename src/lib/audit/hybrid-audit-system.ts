@@ -165,7 +165,7 @@ class HybridAuditSystem {
         });
       }
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Critical audit logging failed:', error);
       // Fallback to operational logging
       await this.logOperational({
@@ -173,7 +173,7 @@ class HybridAuditSystem {
         metadata: { 
           eventCategory: event.category,
           eventAction: event.action,
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : String(error)
         }
       });
     }
@@ -206,7 +206,7 @@ class HybridAuditSystem {
       const logLine = JSON.stringify(logEntry) + '\n';
       await fs.appendFile(logFile, logLine, 'utf8');
 
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Operational logging failed:', error);
       // Last resort: console log
       if (!this.isProduction) {
@@ -379,7 +379,7 @@ class HybridAuditSystem {
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('File cleanup failed:', error);
     }
   }

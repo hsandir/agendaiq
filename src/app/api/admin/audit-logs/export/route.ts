@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { __searchParams  } = new URL(request.url);
     
     // Parse parameters
     const format = searchParams.get('format') || 'csv'; // 'csv' | 'json'
@@ -172,7 +172,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Export audit logs API error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

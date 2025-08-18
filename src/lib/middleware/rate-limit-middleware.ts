@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { RateLimiters, getClientIdentifier } from '@/lib/utils/rate-limit';
 
 // Route-specific rate limiting configuration
-const ROUTE_RATE_LIMITS: Record<string, { limiter: any; limit: number }> = {
+const ROUTE_RATE_LIMITS: Record<string, { limiter: Record<string, unknown>; limit: number }> = {
   // Authentication routes
   '/api/auth/register': { limiter: RateLimiters.registration, limit: 3 },
   '/api/auth/forgot-password': { limiter: RateLimiters.passwordReset, limit: 5 },

@@ -7,7 +7,7 @@ const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
   try {
-    const { type } = await request.json();
+    const { __type  } = (await request.json()) as Record<__string, unknown>;
 
     if (type === 'react-version-mismatch') {
       return await fixReactVersionMismatch();
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid fix type' }, { status: 400 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fix failed:', error);
     return NextResponse.json(
       { error: 'Failed to fix errors', details: error instanceof Error ? error.message : "Unknown error" },
@@ -45,7 +45,7 @@ async function fixReactVersionMismatch() {
           message: 'Pre-React fix backup' 
         })
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Auto-backup failed:', error);
     }
 
@@ -62,12 +62,12 @@ async function fixReactVersionMismatch() {
     for (const command of fixCommands) {
       try {
         console.log(`Running: ${command}`);
-        const { stdout, stderr } = await execAsync(command, { 
+        const { __stdout, __stderr  } = await execAsync(__command, { 
           cwd: process.cwd(),
-          timeout: 120000 // 2 minutes
+          timeout: 120000 // 2 __minutes
         });
         results.push({ command, success: true, output: stdout });
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`Command failed: ${command}`, error instanceof Error ? error.message : "Unknown error");
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
       }
@@ -80,7 +80,7 @@ async function fixReactVersionMismatch() {
       recommendation: 'Restart the development server to see changes'
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { error: 'Failed to fix React version mismatch', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
@@ -131,9 +131,9 @@ async function fixNodeModulesIssues() {
     const results = [];
     for (const command of fixCommands) {
       try {
-        const { stdout } = await execAsync(command, { cwd: process.cwd(), timeout: 120000 });
+        const { __stdout  } = await execAsync(__command, { cwd: process.cwd(), timeout: __120000 });
         results.push({ command, success: true, output: stdout });
-      } catch (error) {
+      } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
       }
     }
@@ -145,7 +145,7 @@ async function fixNodeModulesIssues() {
       fixes: Object.entries(fixes).map(([pkg, version]) => `${pkg}: ${version}`)
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { error: 'Failed to fix Node.js issues', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
@@ -224,9 +224,9 @@ module.exports = {
     const results = [];
     for (const command of commands) {
       try {
-        const { stdout } = await execAsync(command, { cwd: process.cwd(), timeout: 60000 });
+        const { __stdout  } = await execAsync(__command, { cwd: process.cwd(), timeout: __60000 });
         results.push({ command, success: true, output: stdout });
-      } catch (error) {
+      } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
       }
     }
@@ -237,7 +237,7 @@ module.exports = {
       results
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { error: 'Failed to fix TailwindCSS issues', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
@@ -258,9 +258,9 @@ async function fixNextCacheIssues() {
     const results = [];
     for (const command of commands) {
       try {
-        const { stdout } = await execAsync(command, { cwd: process.cwd(), timeout: 30000 });
+        const { __stdout  } = await execAsync(__command, { cwd: process.cwd(), timeout: __30000 });
         results.push({ command, success: true, output: stdout });
-      } catch (error) {
+      } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
       }
     }
@@ -272,7 +272,7 @@ async function fixNextCacheIssues() {
       recommendation: 'Restart the development server'
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { error: 'Failed to fix Next.js cache issues', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
@@ -294,7 +294,7 @@ async function autoFixAllErrors() {
           message: 'Pre-auto-fix comprehensive backup' 
         })
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn('Auto-backup failed:', error);
     }
 
@@ -344,7 +344,7 @@ async function autoFixAllErrors() {
     try {
       const cacheFixResponse = await fixNextCacheIssues();
       fixResults.cacheFix = await cacheFixResponse.json();
-    } catch (error) {
+    } catch (error: unknown) {
       fixResults.cacheFix = { error: 'Cache fix failed' };
     }
 
@@ -361,7 +361,7 @@ async function autoFixAllErrors() {
       recommendation: 'Restart the development server and run health check again'
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { error: 'Auto-fix failed', details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }

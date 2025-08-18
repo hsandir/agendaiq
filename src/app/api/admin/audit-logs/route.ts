@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { __searchParams  } = new URL(request.url);
     
     // Parse query parameters for hybrid system
     const logType = searchParams.get('type') || 'critical'; // 'critical' | 'legacy' | 'both'
@@ -135,11 +135,11 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching audit logs:', error);
     return NextResponse.json({
       error: 'Failed to fetch audit log records',
-      details: error instanceof Error ? error.message : 'Unknown error'
+      details: error instanceof Error ? error.message : String(error)
     }, { status: 500 });
   }
 } 

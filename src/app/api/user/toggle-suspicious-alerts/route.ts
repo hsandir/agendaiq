@@ -25,14 +25,14 @@ export async function POST() {
     }
 
     // TODO: Toggle the setting once suspiciousAlerts field is added
-    // await prisma.user.update({
+    // await prisma.(user as Record<string, unknown>).update{
     //   where: { email: session.user?.email! },
-    //   data: { suspiciousAlerts: !user.suspiciousAlerts },
+    //   data: { suspiciousAlerts: !((user as Record<string, unknown>).suspiciousAlerts },
     // });
 
     // For now, return error since suspiciousAlerts field doesn't exist
     return new NextResponse("Suspicious alerts feature not available", { status: 501 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error toggling suspicious activity alerts:", error);
     return new NextResponse("Internal server error", { status: 500 });
   }

@@ -43,7 +43,7 @@ export async function GET(request: NextRequest, props: Props) {
       );
     }
 
-    const meetingId = parseInt(params.id);
+    const meetingId = params.id;
 
     const agendaItems = await prisma.meetingAgendaItem.findMany({
       where: { meeting_id: meetingId },
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest, props: Props) {
       success: true,
       data: agendaItems
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error fetching agenda items:", error);
     return NextResponse.json(
       { error: "Failed to fetch agenda items" },
@@ -103,8 +103,8 @@ export async function POST(request: NextRequest, props: Props) {
     }
     const user = authResult.user!;
 
-    const meetingId = parseInt(params.id);
-    const body = await request.json();
+    const meetingId = params.id;
+    const body = (await request.json()) as Record<string, unknown>;
     
     const result = createAgendaItemsSchema.safeParse(body);
     if (!result.success) {
@@ -129,8 +129,8 @@ export async function POST(request: NextRequest, props: Props) {
       );
     }
 
-    const isOrganizer = meeting.organizer_id === user.staff?.id;
-    const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
+    const isOrganizer = meeting.organizer_id === (user as any).staff?.id;
+    const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === (user as any).staff?.id);
 
     if (!isOrganizer && !isAttendee) {
       return NextResponse.json(
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest, props: Props) {
       recordId: meetingId.toString(),
       operation: 'BULK_CREATE',
       userId: user.id,
-      staffId: user.staff?.id,
+      staffId: (user as any).staff?.id,
       source: 'WEB_UI',
       description: `Created ${createdItems.length} agenda items for meeting ${meeting.title}`
     });
@@ -243,7 +243,7 @@ export async function POST(request: NextRequest, props: Props) {
       message: `Successfully created ${createdItems.length} agenda items`
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error creating agenda items:", error);
     return NextResponse.json(
       { error: "Failed to create agenda items" },
@@ -266,8 +266,8 @@ export async function PUT(request: NextRequest, props: Props) {
     }
     const user = authResult.user!;
 
-    const meetingId = parseInt(params.id);
-    const body = await request.json();
+    const meetingId = params.id;
+    const body = (await request.json()) as Record<string, unknown>;
     
     const result = createAgendaItemsSchema.safeParse(body);
     if (!result.success) {
@@ -285,7 +285,7 @@ export async function PUT(request: NextRequest, props: Props) {
       message: "Agenda items updated successfully"
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error updating agenda items:", error);
     return NextResponse.json(
       { error: "Failed to update agenda items" },

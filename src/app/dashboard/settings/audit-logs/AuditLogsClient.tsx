@@ -284,7 +284,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
         }));
       }
       
-    } catch (err) {
+    } catch (err: unknown) {
       const auditError = categorizeError(err, 'loading audit logs');
       console.error(`[${auditError.category}] ${auditError.message}:`, auditError.details);
       setError(`${auditError.message}. Please try again.`);
@@ -301,7 +301,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
         const data = await response.json();
         setHighRiskStats(data.stats);
       }
-    } catch (err) {
+    } catch (err: unknown) {
       const auditError = categorizeError(err, 'loading high-risk statistics');
       console.error(`[${auditError.category}] ${auditError.message}:`, auditError.details);
     }
@@ -315,7 +315,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
       
       const data = await response.json();
       setSummary(data.data);
-    } catch (err) {
+    } catch (err: unknown) {
       const auditError = categorizeError(err, 'loading audit summary');
       console.error(`[${auditError.category}] ${auditError.message}:`, auditError.details);
     }
@@ -396,12 +396,12 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
   // Permission validation helper
   const canViewAuditDetails = useCallback((log: AuditLog): boolean => {
     // Ops Admin can view all logs
-    if (user.staff?.role.key === RoleKey.OPS_ADMIN) {
+    if ((user as any).staff?.role.key === RoleKey.OPS_ADMIN) {
       return true;
     }
 
     // Leadership can view logs from their own organization
-    if (user.staff?.role.is_leadership) {
+    if ((user as any).staff?.role.is_leadership) {
       // Can view logs from same user or their own staff actions
       if (isCriticalLog(log)) {
         return log.user_id === user.id || log.staff_id === user.staff.id;
@@ -413,10 +413,10 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
 
     // Regular staff can only view their own audit logs
     if (isCriticalLog(log)) {
-      return log.user_id === user.id || log.staff_id === user.staff?.id;
+      return log.user_id === user.id || log.staff_id === (user as any).staff?.id;
     } else {
       // For legacy logs, check the User/Staff relations
-      return log.User?.id === user.id || log.Staff?.id === user.staff?.id;
+      return log.User?.id === user.id || log.Staff?.id === (user as any).staff?.id;
     }
   }, [user]);
 
@@ -462,7 +462,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
       a.download = filename;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (err) {
+    } catch (err: unknown) {
       const auditError = categorizeError(err, 'exporting audit logs');
       console.error(`[${auditError.category}] ${auditError.message}:`, auditError.details);
       setError(`Export failed: ${auditError.message}`);

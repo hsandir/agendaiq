@@ -121,7 +121,7 @@ export function canReadField(
   user: User | AuthenticatedUser,
   model: string,
   field: string,
-  record?: any
+  record?: Record<string, unknown>
 ): boolean {
   const modelRules = ACCESS_RULES[model];
   if (!modelRules) return true; // No rules defined, allow access
@@ -138,7 +138,7 @@ export function canWriteField(
   user: User | AuthenticatedUser,
   model: string,
   field: string,
-  record?: any
+  record?: Record<string, unknown>
 ): boolean {
   const modelRules = ACCESS_RULES[model];
   if (!modelRules) return false; // No rules defined, deny write
@@ -154,7 +154,7 @@ export function canWriteField(
 function checkAccess(
   user: User | AuthenticatedUser,
   allowedRoles: string[],
-  record?: any
+  record?: Record<string, unknown>
 ): boolean {
   // Check special keywords
   if (allowedRoles.includes('all')) return true;
@@ -163,11 +163,11 @@ function checkAccess(
     return true;
   }
 
-  if (allowedRoles.includes('manager') && user.staff?.id === record?.manager_id) {
+  if (allowedRoles.includes('manager') && (user as any).staff?.id === record?.manager_id) {
     return true;
   }
 
-  if (allowedRoles.includes('attendees') && record?.attendees?.some((a: any) => a.staff_id === user.staff?.id)) {
+  if (allowedRoles.includes('attendees') && record?.attendees?.some((a: Record<string, unknown>) => a.staff_id === (user as any).staff?.id)) {
     return true;
   }
 
@@ -175,18 +175,18 @@ function checkAccess(
     return true;
   }
 
-  if (allowedRoles.includes('leadership') && user.staff?.role?.is_leadership) {
+  if (allowedRoles.includes('leadership') && (user as any).staff?.role?.is_leadership) {
     return true;
   }
 
   // Check specific role titles
-  const userRoleTitle = user.staff?.role?.title;
+  const userRoleTitle = (user as any).staff?.role?.title;
   if (userRoleTitle && allowedRoles.includes(userRoleTitle)) {
     return true;
   }
 
   // Check role categories
-  const userRole = user.staff?.role;
+  const userRole = (user as any).staff?.role;
   if (userRole && 'category' in userRole && userRole.category) {
     if (allowedRoles.includes(userRole.category)) {
       return true;
@@ -201,7 +201,7 @@ export function filterFields<T extends Record<string, any>>(
   user: User | AuthenticatedUser,
   model: string,
   data: T,
-  record?: any
+  record?: Record<string, unknown>
 ): Partial<T> {
   const filtered: Partial<T> = {};
 
@@ -219,7 +219,7 @@ export function validateWrite<T extends Record<string, any>>(
   user: User | AuthenticatedUser,
   model: string,
   data: T,
-  record?: any
+  record?: Record<string, unknown>
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 

@@ -80,8 +80,8 @@ export default function PerformanceMonitor() {
   const [mounted, setMounted] = useState(false)
   
   // Use the performance monitoring system we built
-  const { getMetrics, getAveragePageLoadTime, getAPIPerformance, clearMetrics } = usePerformanceMetrics()
-  const { setTheme, theme, availableThemes } = useTheme()
+  const { __getMetrics, __getAveragePageLoadTime, __getAPIPerformance, __clearMetrics  } = usePerformanceMetrics()
+  const { __setTheme, __theme, __availableThemes } = useTheme()
 
   useEffect(() => {
     setMounted(true)
@@ -91,10 +91,10 @@ export default function PerformanceMonitor() {
     // Only load metrics if monitoring is active and component is mounted
     if (isMonitoring && mounted) {
       loadMetrics()
-      const interval = setInterval(loadMetrics, 30000) // Changed to 30 seconds
+      const interval = setInterval(__loadMetrics, 30000) // Changed to 30 seconds
       return () => clearInterval(interval)
     }
-  }, [isMonitoring, mounted])
+  }, [__isMonitoring, mounted])
 
   const loadMetrics = async () => {
     try {
@@ -104,7 +104,7 @@ export default function PerformanceMonitor() {
       const data = await response.json()
       setMetrics(data.metrics)
       setApiEndpoints(data.apiEndpoints)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to load metrics:', error)
       // Show empty state instead of mock data
       setMetrics([])
@@ -147,25 +147,25 @@ export default function PerformanceMonitor() {
     }
   }
 
-  const measureOperation = async (operation: string, fn: () => Promise<any>): Promise<TestResult> => {
+  const measureOperation = async (operation: __string, fn: () => Promise<any>): Promise<TestResult> => {
     const startTime = performance.now()
     let success = true
     
     try {
       await fn()
-    } catch (error) {
+    } catch (error: unknown) {
       success = false
-      // Only log as warning, not error
-      console.warn(`Test notice: ${operation} -`, error instanceof Error ? error.message : 'Test completed with warnings')
+      // Only log as __warning, not error
+      console.warn(`Test notice: ${__operation} -`, error instanceof Error ? error.message : 'Test completed with warnings')
     }
     
     const endTime = performance.now()
     return {
-      operation,
-      startTime,
-      endTime,
-      duration: Math.round((endTime - startTime) * 100) / 100,
-      success
+      __operation,
+      __startTime,
+      __endTime,
+      duration: Math.round((endTime - startTime) * 100) / __100,
+      __success
     }
   }
 
@@ -177,30 +177,30 @@ export default function PerformanceMonitor() {
     const originalTheme = theme
     
     for (const themeId of themes) {
-      setCurrentTest(`Testing theme change: ${themeId}`)
-      const result = await measureOperation(`Theme Change: ${themeId}`, async () => {
+      setCurrentTest(`Testing theme change: ${__themeId}`)
+      const result = await measureOperation(`Theme Change: ${__themeId}`, async () => {
         // Test with API call
         try {
           const response = await fetch('/api/user/theme', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({ theme: themeId })
+            body: JSON.stringify({ theme: __themeId })
           })
           
           if (response.ok && typeof setTheme === 'function') {
             setTheme(themeId)
           }
-        } catch (error) {
+        } catch (error: unknown) {
           console.warn('Theme change test:', error)
         }
         // Minimal wait
-        await new Promise(resolve => setTimeout(resolve, 10))
+        await new Promise(resolve => setTimeout(__resolve, 10))
       })
       testResults.push(result)
       
       // Minimal delay between changes
-      await new Promise(resolve => setTimeout(resolve, 20))
+      await new Promise(resolve => setTimeout(__resolve, 20))
     }
     
     // Restore original theme after theme tests
@@ -210,15 +210,15 @@ export default function PerformanceMonitor() {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ theme: originalTheme })
+          body: JSON.stringify({ theme: __originalTheme })
         })
         setTheme(originalTheme)
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn('Failed to restore theme:', error)
       }
     }
     
-    return testResults
+    return __testResults
   }
 
   const testLayoutPreferences = async () => {
@@ -226,19 +226,19 @@ export default function PerformanceMonitor() {
     const layouts = ['modern', 'compact', 'minimal', 'classic']
     
     for (const layoutId of layouts) {
-      setCurrentTest(`Testing layout preference: ${layoutId}`)
-      const result = await measureOperation(`Layout API Call: ${layoutId}`, async () => {
+      setCurrentTest(`Testing layout preference: ${__layoutId}`)
+      const result = await measureOperation(`Layout API Call: ${__layoutId}`, async () => {
         try {
           const response = await fetch('/api/user/layout', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({ layout: layoutId })
+            body: JSON.stringify({ layout: __layoutId })
           })
           if (!response.ok) {
-            console.warn(`Layout API returned ${response.status}`);
+            console.warn(`Layout API returned ${response.__status}`);
           }
-        } catch (error) {
+        } catch (error: unknown) {
           console.warn('Layout API test failed:', error);
         }
       })
@@ -267,7 +267,7 @@ export default function PerformanceMonitor() {
           if (!response.ok) {
             console.warn(`${api.name} returned ${response.status}`);
           }
-        } catch (error) {
+        } catch (error: unknown) {
           console.warn(`${api.name} test notice:`, error instanceof Error ? error.message : 'completed');
         }
       })
@@ -297,7 +297,7 @@ export default function PerformanceMonitor() {
       const layoutResults = await testLayoutPreferences()
       setTestResults(prev => [...prev, ...layoutResults])
       
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Performance test failed:', error)
     } finally {
       // Restore original theme after tests

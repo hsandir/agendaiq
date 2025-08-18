@@ -7,18 +7,17 @@ import { auditSystem } from '@/lib/audit/hybrid-audit-system';
  */
 export async function POST(request: NextRequest) {
   try {
-    const auditEvent = await request.json();
+    const auditEvent = (await request.json()) as Record<string, unknown>;
     
     // Extract event data
-    const {
-      action,
-      path,
-      method,
-      success,
-      errorMessage,
-      metadata,
-      category
-    } = auditEvent;
+    const { __action,
+      __path,
+      __method,
+      __success,
+      __errorMessage,
+      __metadata,
+      __category
+     } = auditEvent;
 
     // Determine category and log appropriately
     if (category === 'AUTH') {
@@ -69,7 +68,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Internal audit API error:', error);
     return NextResponse.json({ 
       success: false, 

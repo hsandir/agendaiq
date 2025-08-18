@@ -44,7 +44,7 @@ export default async function DashboardLayout({
   });
 
   const currentRole = userWithStaff?.Staff?.[0]?.Role || null;
-  const isAdmin = isUserAdmin(userWithStaff as any);
+  const isAdmin = isUserAdmin(userWithStaff as Record<string, unknown>);
 
   return (
     <>
@@ -54,7 +54,7 @@ export default async function DashboardLayout({
         user={{
           email: user.email,
           name: user.name || undefined,
-          staff_id: user.staff?.id || null,
+          staff_id: (user as any).staff?.id || null,
         }}
         currentRole={currentRole}
         userWithStaff={userWithStaff}

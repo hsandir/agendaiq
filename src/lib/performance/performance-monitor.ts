@@ -52,7 +52,7 @@ class PerformanceMonitor {
           resolve(lcp.startTime);
         }
       }).observe({ entryTypes: ['largest-contentful-paint'] });
-    }) as any;
+    }) as Record<string, unknown>;
   }
 
   private interceptFetch() {
@@ -79,7 +79,7 @@ class PerformanceMonitor {
         }
         
         return response;
-      } catch (error) {
+      } catch (error: unknown) {
         const endTime = performance.now();
         let url: string | undefined;
         
@@ -152,7 +152,7 @@ class PerformanceMonitor {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(metric),
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.debug('Performance metric reporting failed:', error);
     }
   }
@@ -174,9 +174,9 @@ class PerformanceMonitor {
     const apiMetrics = this.metrics.filter(m => m.name.startsWith('api_'));
     const grouped: Record<string, number[]> = {};
     
-    apiMetrics.forEach(metric => {
-      if (!grouped[metric.name]) grouped[metric.name] = [];
-      grouped[metric.name].push(metric.value);
+    apiMetrics.forEachmetric => {
+      if (!grouped[((metric.name)]) grouped[(metric.name)] = [];
+      grouped[(metric.name)].push(metric.value);
     });
     
     const result: Record<string, { avg: number; count: number }> = {};

@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       message: "Diagnostic completed" 
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('System Diagnostic API Error:', error);
     return NextResponse.json(
       { 
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       templates: 'templates/cursor-templates/'
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('System Diagnostic API Error:', error);
     return NextResponse.json(
       { 

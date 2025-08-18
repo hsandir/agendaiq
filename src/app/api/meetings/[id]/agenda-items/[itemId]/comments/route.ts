@@ -48,7 +48,7 @@ export async function GET(
       data: comments
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching comments:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -72,7 +72,7 @@ export async function POST(
     }
     const user = authResult.user!;
 
-    const meetingId = parseInt(params.id);
+    const meetingId = params.id;
     const itemId = parseInt(params.itemId);
 
     if (isNaN(meetingId) || isNaN(itemId)) {
@@ -83,7 +83,7 @@ export async function POST(
     }
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = (await request.json()) as Record<string, unknown>;
     const validationResult = createCommentSchema.safeParse(body);
 
     if (!validationResult.success) {
@@ -100,7 +100,7 @@ export async function POST(
         Meeting: {
           include: {
             MeetingAttendee: {
-              where: { staff_id: user.staff?.id || -1 }
+              where: { staff_id: (user as any).staff?.id || -1 }
             }
           }
         }
@@ -115,7 +115,7 @@ export async function POST(
     }
 
     // Check permissions
-    const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
+    const isOrganizer = agendaItem.Meeting.organizer_id === (user as any).staff?.id;
     const isAttendee = agendaItem.Meeting.MeetingAttendee.length > 0;
     const hasAdminAccess = isAnyAdmin(user);
 
@@ -163,7 +163,7 @@ export async function POST(
       data: comment
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error creating comment:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

@@ -21,7 +21,7 @@ export async function POST(
     }
     const user = authResult.user!;
 
-    const meetingId = parseInt(params.id);
+    const meetingId = params.id;
     const itemId = parseInt(params.itemId);
 
     if (isNaN(meetingId) || isNaN(itemId)) {
@@ -38,7 +38,7 @@ export async function POST(
         Meeting: {
           include: {
             MeetingAttendee: {
-              where: { staff_id: user.staff?.id || -1 }
+              where: { staff_id: (user as any).staff?.id || -1 }
             }
           }
         }
@@ -53,7 +53,7 @@ export async function POST(
     }
 
     // Check permissions
-    const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
+    const isOrganizer = agendaItem.Meeting.organizer_id === (user as any).staff?.id;
     const isAttendee = agendaItem.Meeting.MeetingAttendee.length > 0;
     const hasAdminAccess = isAnyAdmin(user);
 
@@ -110,7 +110,7 @@ export async function POST(
       data: attachment
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error uploading attachment:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -158,7 +158,7 @@ export async function GET(
       data: attachments
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching attachments:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

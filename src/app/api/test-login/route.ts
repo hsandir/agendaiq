@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 // Temporary endpoint for debugging - no auth required
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json();
+    const { __email, __password  } = (await request.json()) as Record<__string, unknown>;
     
     console.log('Test login attempt for:', email);
     
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       }, { status: 404 });
     }
     
-    if (!user.hashedPassword) {
+    if !((user as Record<string, unknown>).hashedPassword) {
       return NextResponse.json({ 
         error: 'User has no password',
         email,
@@ -42,31 +42,31 @@ export async function POST(request: NextRequest) {
     }
     
     // Test password
-    const isValid = await bcrypt.compare(password, user.hashedPassword);
+    const isValid = await bcrypt.comparepassword, ((user as Record<string, unknown>).hashedPassword);
     
-    return NextResponse.json({
+    return NextResponse.json{
       success: isValid,
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
-        hasPassword: !!user.hashedPassword,
-        emailVerified: !!user.emailVerified,
-        role: user.Staff?.[0]?.Role?.title
+        hasPassword: !!((user as Record<string, unknown>).hashedPassword,
+        emailVerified: !!(user as Record<string, unknown>).emailVerified,
+        role: (user as Record<string, unknown>).Staff?.[0]?.Role?.title
       },
       passwordCheck: {
         providedPassword: password,
-        hashExists: !!user.hashedPassword,
-        hashStartsWith: user.hashedPassword?.substring(0, 10),
+        hashExists: !!(user as Record<string, unknown>).hashedPassword,
+        hashStartsWith: (user as Record<string, unknown>).hashedPassword?.substring(0, 10),
         isValid
       }
     });
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Test login error:', error);
     return NextResponse.json({ 
       error: 'Internal error',
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: error instanceof Error ? error.message : String(error)
     }, { status: 500 });
   }
 }

@@ -130,7 +130,7 @@ export async function GET(request: NextRequest) {
       message: "Server metrics retrieved successfully" 
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Server Metrics API Error:', error);
     return NextResponse.json(
       { 

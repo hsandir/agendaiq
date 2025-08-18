@@ -44,7 +44,7 @@ export class AuditLogger {
           metadata: data.metadata || undefined,
         }
       });
-    } catch (error) {
+    } catch (error: unknown) {
       Logger.error('Failed to create audit log', { 
         error: String(error), 
         tableName: data.tableName, 

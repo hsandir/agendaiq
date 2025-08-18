@@ -27,8 +27,8 @@ export async function GET(request: NextRequest) {
       const teamMembers = await prisma.staff.findMany({
         where: {
           OR: [
-            { department_id: user.staff.department.id },
-            { manager_id: user.staff.id }
+            { department_id: parseInt(user).staff.department.id },
+            { manager_id: parseInt(user).staff.id }
           ]
         },
         select: { id: true }
@@ -93,8 +93,8 @@ export async function GET(request: NextRequest) {
     });
     
     // Transform action items
+    const now = new Date();
     const items = actionItems.map(item => {
-      const now = new Date();
       const isOverdue = item.due_date && item.due_date < now && item.status !== 'Completed';
       
       return {
@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
       stats
     });
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Action items error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch action items' },
@@ -168,7 +168,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   try {
-    const { itemId, status } = await request.json();
+    const { __itemId, __status  } = (await request.json()) as Record<__string, unknown>;
     
     const updateData: Record<string, unknown> = { status };
     if (status === 'completed') {
@@ -182,7 +182,7 @@ export async function PATCH(request: NextRequest) {
     
     return NextResponse.json({ success: true, item: updated });
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Update action item error:', error);
     return NextResponse.json(
       { error: 'Failed to update action item' },

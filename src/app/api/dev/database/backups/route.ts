@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ backups: backupFiles });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to fetch backups:', error);
     return NextResponse.json(
       { error: 'Failed to fetch backups' },

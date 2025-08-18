@@ -15,7 +15,7 @@ export async function GET() {
 
     // Check if user is admin via staff relation
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.user.id as string },
       include: { Staff: { include: { Role: true } } },
     });
     const isAdmin = user?.Staff?.[0]?.Role?.title === 'Administrator';
@@ -26,7 +26,7 @@ export async function GET() {
       );
     }
 
-    const users = await prisma.user.findMany({
+    const users = await prisma.(user as Record<string, unknown>).findMany({
       include: {
         Staff: { include: { Role: true, Department: true, School: true } },
       },
@@ -36,7 +36,7 @@ export async function GET() {
     });
 
     return NextResponse.json(users);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching users:', error);
     return NextResponse.json(
       { error: 'Failed to fetch users' },

@@ -50,7 +50,7 @@ async function runSystemChecks(): Promise<SystemCheck[]> {
         'PostgreSQL connection active'
       ]
     })
-  } catch (error) {
+  } catch (error: unknown) {
     checks.push({
       id: 'database',
       name: 'Database Connection',
@@ -59,7 +59,7 @@ async function runSystemChecks(): Promise<SystemCheck[]> {
       lastRun: new Date(),
       duration: performance.now() - dbCheckStart,
       details: [
-        `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Error: ${error instanceof Error ? error.message : String(error)}`,
         'Database connection failed'
       ]
     })
@@ -68,7 +68,7 @@ async function runSystemChecks(): Promise<SystemCheck[]> {
   // Authentication system check
   const authCheckStart = performance.now()
   try {
-    const userCount = await prisma.user.count()
+    const userCount = await prisma.(user as Record<string, unknown>).count()
     const authCheckDuration = performance.now() - authCheckStart
     
     checks.push({
@@ -84,7 +84,7 @@ async function runSystemChecks(): Promise<SystemCheck[]> {
         'Authentication system operational'
       ]
     })
-  } catch (error) {
+  } catch (error: unknown) {
     checks.push({
       id: 'authentication',
       name: 'Authentication System',
@@ -93,7 +93,7 @@ async function runSystemChecks(): Promise<SystemCheck[]> {
       lastRun: new Date(),
       duration: performance.now() - authCheckStart,
       details: [
-        `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Error: ${error instanceof Error ? error.message : String(error)}`,
         'Authentication check failed'
       ]
     })
@@ -118,7 +118,7 @@ async function runSystemChecks(): Promise<SystemCheck[]> {
         'File system accessible'
       ]
     })
-  } catch (error) {
+  } catch (error: unknown) {
     checks.push({
       id: 'filesystem',
       name: 'File System',
@@ -127,7 +127,7 @@ async function runSystemChecks(): Promise<SystemCheck[]> {
       lastRun: new Date(),
       duration: performance.now() - fsCheckStart,
       details: [
-        `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Error: ${error instanceof Error ? error.message : String(error)}`,
         'File system check failed'
       ]
     })
@@ -372,12 +372,12 @@ export async function GET(request: NextRequest) {
       alerts: alerts.slice(0, 5) // Limit to 5 most recent alerts
     })
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Health check error:', error)
     return NextResponse.json(
       { 
         error: 'Failed to retrieve health data',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
     )

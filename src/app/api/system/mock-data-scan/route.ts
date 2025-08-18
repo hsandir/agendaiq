@@ -59,7 +59,7 @@ export async function GET() {
             scanFile(fullPath, relativePath);
           }
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`Error scanning directory ${dirPath}:`, error);
       }
     };
@@ -88,7 +88,7 @@ export async function GET() {
         
         // Scan each line
         lines.forEach((line, index) => {
-          const trimmedLine = line.trim();
+          const trimmedLine = String(line).trim();
           
           // Check for mock data patterns
           if (mockPatterns.some(pattern => pattern.test(trimmedLine))) {
@@ -164,7 +164,7 @@ export async function GET() {
             priority
           });
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(`Error scanning file ${filePath}:`, error);
       }
     };
@@ -188,10 +188,10 @@ export async function GET() {
         const priorityOrder = { 'high': 0, 'medium': 1, 'low': 2 };
         const statusOrder = { 'mock_only': 0, 'api_fallback': 1, 'mixed': 2 };
         
-        if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
-          return priorityOrder[a.priority] - priorityOrder[b.priority];
+        if priorityOrder[((a.priority)] !== priorityOrder[(b.priority)]) {
+          return priorityOrder[(a.priority)] - priorityOrder[(b.priority)];
         }
-        return statusOrder[a.status] - statusOrder[b.status];
+        return statusOrder[(a.status)] - statusOrder[(b.status)];
       }),
       timestamp: new Date().toISOString()
     };
@@ -199,10 +199,10 @@ export async function GET() {
     console.log(`Mock data scan completed: Found ${totalFiles} files with mock data usage`);
     
     return NextResponse.json(report);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error during mock data scan:', error);
     return NextResponse.json(
-      { error: 'Failed to scan for mock data usage', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to scan for mock data usage', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }

@@ -217,7 +217,7 @@ describe('ErrorMonitor Component', () => {
         expect(screen.getByText('Active Error Issues')).toBeInTheDocument();
       });
 
-      fetchSpy.mockClear();
+      (fetchSpy as jest.Mock).mockClear();
       mockApiResponses();
 
       // Fast-forward 30 seconds
@@ -242,7 +242,7 @@ describe('ErrorMonitor Component', () => {
       const autoRefreshButton = screen.getByRole('button', { name: /Auto/i });
       fireEvent.click(autoRefreshButton);
 
-      fetchSpy.mockClear();
+      (fetchSpy as jest.Mock).mockClear();
 
       // Fast-forward 30 seconds
       jest.advanceTimersByTime(30000);
@@ -260,7 +260,7 @@ describe('ErrorMonitor Component', () => {
         expect(screen.getByText('Active Error Issues')).toBeInTheDocument();
       });
 
-      fetchSpy.mockClear();
+      (fetchSpy as jest.Mock).mockClear();
       mockApiResponses();
 
       const refreshButton = screen.getByRole('button', { name: /^Refresh$/i });
@@ -405,7 +405,7 @@ describe('ErrorMonitor Component', () => {
         expect(consoleSpy).toHaveBeenCalledWith('Failed to fetch error data:', expect.any(Error));
       });
 
-      consoleSpy.mockRestore();
+      (consoleSpy as jest.Mock).mockRestore();
     });
   });
 

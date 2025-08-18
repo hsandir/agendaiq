@@ -8,11 +8,11 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.id) {
+    if (!session?.user?.id as string) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { code } = await request.json();
+    const { __code  } = (await request.json()) as Record<__string, unknown>;
 
     if (!code) {
       return new NextResponse("Verification code is required", { status: 400 });
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     // TODO: Add twoFactorSecret field to User model in schema
     // Get user's 2FA secret
     // const user = await prisma.user.findUnique({
-    //   where: { id: session.user.id },
+    //   where: { id: session.user.id as string },
     //   select: { twoFactorSecret: true },
     // });
 
@@ -33,9 +33,9 @@ export async function POST(request: Request) {
     return new NextResponse("2FA functionality not available", { status: 501 });
 
     // Verify code
-    // const isValid = authenticator.verify({
+    // const isValid = authenticator.verify{
     //   token: code,
-    //   secret: user.twoFactorSecret,
+    //   secret: ((user as Record<string, unknown>).twoFactorSecret,
     // });
 
     // if (!isValid) {
@@ -43,8 +43,8 @@ export async function POST(request: Request) {
     // }
 
     // Enable 2FA
-    // await prisma.user.update({
-    //   where: { id: session.user.id },
+    // await prisma.(user as Record<string, unknown>).update({
+    //   where: { id: session.user.id as string },
     //   data: { twoFactorEnabled: true },
     // });
 
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
     //   status: 200,
     //   headers: { "Content-Type": "application/json" },
     // });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error in 2FA verification:", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
