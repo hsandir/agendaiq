@@ -18,10 +18,10 @@ export default async function NewMeetingPage() {
       },
       OR: [
         // Same department
-        { department_id: currentStaff?.department_id },
+        { department_id: currentStaff?.department?.id },
         // Leadership roles from same school
         { 
-          school_id: currentStaff?.school_id,
+          school_id: currentStaff?.school?.id,
           Role: {
             is_leadership: true
           }

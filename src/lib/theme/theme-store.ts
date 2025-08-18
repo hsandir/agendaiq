@@ -2,6 +2,7 @@
 
 interface CustomTheme {
   name?: string;
+  isDark?: boolean;
   colors: {
     background: string;
     text: string;

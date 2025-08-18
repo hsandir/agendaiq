@@ -244,9 +244,9 @@ async function getDetailedPackageStatus() {
       total: outdatedList.length
     };
   } catch (error) {
-    if (error?.stdout) {
+    if (error && typeof error === 'object' && 'stdout' in error) {
       try {
-        const outdatedPackages = JSON.parse(error.stdout);
+        const outdatedPackages = JSON.parse((error as any).stdout);
         const outdatedList = Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({
           name,
           current: info.current,

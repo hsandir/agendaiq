@@ -51,7 +51,11 @@ export default async function DashboardLayout({
       <PreloadResources />
       <DashboardLayoutClient
         isAdmin={isAdmin}
-        user={user}
+        user={{
+          email: user.email,
+          name: user.name || undefined,
+          staff_id: user.staff?.id || null,
+        }}
         currentRole={currentRole}
         userWithStaff={userWithStaff}
       >

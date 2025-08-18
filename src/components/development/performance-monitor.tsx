@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { usePerformanceMetrics } from '@/lib/performance/performance-monitor'
 import { useTheme } from '@/lib/theme/theme-provider'
+import { DatabasePerformance } from './database-performance'
 import { 
   ActivityIcon,
   CpuIcon,

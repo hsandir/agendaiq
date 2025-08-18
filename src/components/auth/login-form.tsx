@@ -52,7 +52,7 @@ export default function LoginForm() {
         if (result.error === 'AccountLocked') {
           setError('Your account has been locked due to multiple failed login attempts');
         } else if (result.error === 'TwoFactorRequired') {
-          router.push('/auth/two-factor?email=' + encodeURIComponent(email));
+          router.push(`/auth/two-factor?email=${encodeURIComponent(email)}` as any);
           return;
         } else {
           setError('Invalid email or password');

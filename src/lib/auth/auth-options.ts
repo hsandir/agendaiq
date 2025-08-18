@@ -31,7 +31,7 @@ function isValidUserData(data: unknown): data is User {
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   jwt: {
-    maxAge: 30 * 24 * 60 * 60, // 30 days for JWT token itself
+    maxAge: 8 * 60 * 60, // 8 hours for JWT token
   },
   providers: [
     GoogleProvider({
@@ -373,8 +373,11 @@ export const authOptions: NextAuthOptions = {
       
       // Handle remember me expiry
       if (token.rememberMe) {
-        // Extend session for remember me users
-        session.expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days
+        // Extend session for remember me users to 7 days
+        session.expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 days
+      } else {
+        // Default 8 hour session
+        session.expires = new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(); // 8 hours
       }
       
       return session;
@@ -387,7 +390,8 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 8 * 60 * 60, // 8 hours (reasonable for work day)
+    updateAge: 60 * 60, // Update session every hour
   },
   debug: process.env.NODE_ENV === 'development',
 }; 

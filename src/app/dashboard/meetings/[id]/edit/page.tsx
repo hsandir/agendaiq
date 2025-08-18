@@ -64,10 +64,10 @@ export default async function EditMeetingPage({ params }: PageProps) {
       },
       OR: [
         // Same department
-        { department_id: user.staff?.department_id },
+        { department_id: user.staff?.department?.id },
         // Leadership roles from same school
         { 
-          school_id: user.staff?.school_id,
+          school_id: user.staff?.school?.id,
           Role: {
             is_leadership: true
           }
@@ -118,8 +118,8 @@ export default async function EditMeetingPage({ params }: PageProps) {
     notes: meeting.notes || '',
     status: meeting.status || 'draft',
     type: meeting.meeting_type || 'regular',
-    location: meeting.location || '',
-    zoomLink: meeting.zoom_link || '',
+    location: '', // Meeting model doesn't have location field
+    zoomLink: meeting.zoom_join_url || '',
     zoomMeetingId: meeting.zoom_meeting_id || '',
     calendarIntegration: meeting.calendar_integration || 'none',
     attendees: meeting.MeetingAttendee.map(attendee => ({

@@ -97,39 +97,51 @@ export function MeetingLiveView({
   // Set up real-time updates with Pusher
   const eventHandlers = useMemo(() => ({
     [EVENTS.AGENDA_ITEM_UPDATED]: (data: Record<string, unknown>) => {
-      setAgendaItems(prev => prev.map(item => 
-        item.id === data.itemId ? { ...item, ...data.updates } : item
-      ));
-      setLastUpdate(new Date());
+      if (typeof data.itemId === 'number' && data.updates && typeof data.updates === 'object') {
+        setAgendaItems(prev => prev.map(item => 
+          item.id === data.itemId ? { ...item, ...(data.updates as Record<string, any>) } : item
+        ));
+        setLastUpdate(new Date());
+      }
     },
     [EVENTS.AGENDA_ITEM_ADDED]: (data: Record<string, unknown>) => {
-      setAgendaItems(prev => [...prev, data.item]);
-      setLastUpdate(new Date());
+      if (data.item && typeof data.item === 'object') {
+        setAgendaItems(prev => [...prev, data.item as any]);
+        setLastUpdate(new Date());
+      }
     },
     [EVENTS.AGENDA_ITEM_DELETED]: (data: Record<string, unknown>) => {
-      setAgendaItems(prev => prev.filter(item => item.id !== data.itemId));
-      setLastUpdate(new Date());
+      if (typeof data.itemId === 'number') {
+        setAgendaItems(prev => prev.filter(item => item.id !== data.itemId));
+        setLastUpdate(new Date());
+      }
     },
     [EVENTS.USER_TYPING]: (data: Record<string, unknown>) => {
-      setTypingUsers(prev => {
-        const newMap = new Map(prev);
-        newMap.set(data.itemId, { userId: data.userId, userName: data.userName });
-        return newMap;
-      });
+      if (typeof data.itemId === 'number' && typeof data.userId === 'number' && typeof data.userName === 'string') {
+        setTypingUsers(prev => {
+          const newMap = new Map(prev);
+          newMap.set(data.itemId as number, { userId: data.userId as number, userName: data.userName as string });
+          return newMap;
+        });
+      }
     },
     [EVENTS.USER_STOPPED_TYPING]: (data: Record<string, unknown>) => {
-      setTypingUsers(prev => {
-        const newMap = new Map(prev);
-        newMap.delete(data.itemId);
-        return newMap;
-      });
+      if (typeof data.itemId === 'number') {
+        setTypingUsers(prev => {
+          const newMap = new Map(prev);
+          newMap.delete(data.itemId as number);
+          return newMap;
+        });
+      }
     },
     'comment-added': (data: Record<string, unknown>) => {
-      setAgendaItems(prev => prev.map(item => 
-        item.id === data.itemId 
-          ? { ...item, Comments: [...(item.Comments || []), data.comment] }
-          : item
-      ));
+      if (typeof data.itemId === 'number' && data.comment && typeof data.comment === 'object') {
+        setAgendaItems(prev => prev.map(item => 
+          item.id === data.itemId 
+            ? { ...item, Comments: [...(item.Comments || []), data.comment as Record<string, unknown>] }
+            : item
+        ));
+      }
     },
     'pusher:subscription_succeeded': () => {
       setIsConnected(true);

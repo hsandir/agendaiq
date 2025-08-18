@@ -12,6 +12,7 @@ import { getContrastColor } from "./theme-utils";
 
 interface CustomTheme {
   name?: string;
+  isDark?: boolean;
   colors: {
     background: string;
     text: string;

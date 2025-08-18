@@ -19,7 +19,21 @@ interface UserWithStaff extends User {
     role: {
       title: string;
     };
+    school?: {
+      name: string;
+      code: string | null;
+    };
   } | null;
+  Staff?: Array<{
+    id: number;
+    Role: {
+      title: string;
+    };
+    School: {
+      name: string;
+      address?: string;
+    };
+  }>;
 }
 
 // Meeting type
@@ -73,13 +87,13 @@ export function DashboardContent({
   const renderWelcomeHeader = () => (
     <div className="mb-8">
       <h1 className="text-2xl font-bold text-foreground mb-2">Welcome back, {user.name}</h1>
-      {userWithStaff?.Staff?.[0]?.School && (
+      {(userWithStaff?.staff?.school || userWithStaff?.Staff?.[0]?.School) && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>{userWithStaff.Staff[0].School.name}</span>
-          {userWithStaff.Staff[0].School.address && (
+          <span>{userWithStaff.staff?.school?.name || userWithStaff.Staff?.[0]?.School?.name}</span>
+          {(userWithStaff.staff?.school?.code || userWithStaff.Staff?.[0]?.School?.address) && (
             <>
               <span>•</span>
-              <span>{userWithStaff.Staff[0].School.address}</span>
+              <span>{userWithStaff.staff?.school?.code || userWithStaff.Staff?.[0]?.School?.address}</span>
             </>
           )}
         </div>

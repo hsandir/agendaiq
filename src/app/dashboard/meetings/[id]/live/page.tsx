@@ -124,10 +124,10 @@ export default async function MeetingLivePage(props: Props) {
     where: {
       OR: [
         // Same department
-        { department_id: user.staff?.department_id },
+        { department_id: user.staff?.department?.id },
         // Leadership roles from same school
         { 
-          school_id: user.staff?.school_id,
+          school_id: user.staff?.school?.id,
           Role: {
             is_leadership: true
           }

@@ -21,8 +21,15 @@ interface MeetingData {
   startTime?: string | Date;
   endTime?: string | Date;
   status?: string;
-  attendeeIds?: number[];
+  attendeeIds?: number[] | string[];
   zoomLink?: string;
+  location?: string;
+  start_time?: string | Date;
+  end_time?: string | Date;
+  meeting_type?: string;
+  zoom_meeting_id?: string;
+  zoom_link?: string;
+  calendar_integration?: string | null;
 }
 
 // Sanitize meeting data
@@ -49,7 +56,21 @@ export function sanitizeMeetingData(data: MeetingData): Partial<MeetingData> {
   if (data.startTime) sanitized.startTime = data.startTime;
   if (data.endTime) sanitized.endTime = data.endTime;
   if (data.status) sanitized.status = data.status;
-  if (data.attendeeIds) sanitized.attendeeIds = data.attendeeIds;
+  if (data.attendeeIds) {
+    // Convert string[] to number[] if needed
+    sanitized.attendeeIds = Array.isArray(data.attendeeIds) 
+      ? data.attendeeIds.map(id => typeof id === 'string' ? parseInt(id, 10) : id)
+      : data.attendeeIds;
+  }
+  
+  // Handle additional fields
+  if (data.location) sanitized.location = sanitizePlainText(data.location).trim();
+  if (data.start_time) sanitized.start_time = data.start_time;
+  if (data.end_time) sanitized.end_time = data.end_time;
+  if (data.meeting_type) sanitized.meeting_type = data.meeting_type;
+  if (data.zoom_meeting_id) sanitized.zoom_meeting_id = data.zoom_meeting_id;
+  if (data.zoom_link) sanitized.zoom_link = data.zoom_link;
+  if (data.calendar_integration !== undefined) sanitized.calendar_integration = data.calendar_integration;
   if (data.zoomLink) {
     // Validate zoom link format
     const zoomRegex = /^https:\/\/([\w-]+\.)?zoom\.us\/(j|s|w)\/[\w-]+/;

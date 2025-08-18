@@ -9,6 +9,9 @@ import jwt from 'jsonwebtoken';
 export interface UltraFastUser {
   id: number;
   email: string;
+  staff?: {
+    id: number;
+  } | null;
 }
 
 /**

@@ -180,7 +180,7 @@ async function pushToGitHub(message: string = 'Automated backup') {
         message: message,
         type: 'github-failed',
         pushed: false,
-        error: pushError.message
+        error: pushError instanceof Error ? pushError.message : String(pushError)
       };
 
       await saveBackupMetadata(backupInfo);
