@@ -41,8 +41,8 @@ export async function GET(request: NextRequest) {
 
     // Server uptime
     const uptimeSeconds = process.uptime();
-    const uptimeDays = Math.floor(uptimeSeconds / 86400));
-    const uptimeHours = Math.floor((uptimeSeconds % 86400) / 3600));
+    const uptimeDays = Math.floor(uptimeSeconds / 86400);
+    const uptimeHours = Math.floor((uptimeSeconds % 86400) / 3600);
 
     // Health status determination
     let healthStatus: 'healthy' | 'warning' | 'critical' = 'healthy';

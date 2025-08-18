@@ -147,3 +147,10 @@ test_*.js
 # API test routes that may expose passwords
 src/app/api/test-login/
 .claude/validation-status.json
+
+# Team V2 files (separate development)
+src/app/api/teams-v2/
+src/app/dashboard/teams-v2/
+src/components/teams-v2/
+src/lib/prisma-v2.ts
+*.backup-*

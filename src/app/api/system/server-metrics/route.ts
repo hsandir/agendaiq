@@ -88,8 +88,8 @@ export async function GET() {
     avgCpuUsage = Math.round(avgCpuUsage * 10) / 10; // Round to 1 decimal
     
     // Convert uptime to human readable
-    const hours = Math.floor(uptime / 3600));
-    const minutes = Math.floor((uptime % 3600) / 60));
+    const hours = Math.floor(uptime / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
     const uptimeString = `${hours}h ${minutes}m`;
     
     // Memory calculations (in GB)
