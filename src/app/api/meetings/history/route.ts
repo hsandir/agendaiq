@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
         whereClause.start_time = { gte: monthStart };
         break;
       case 'quarter':
-        const quarter = Math.floor(now.getMonth() / 3));
+        const quarter = Math.floor(now.getMonth() / 3);
         const quarterStart = new Date(now.getFullYear(), quarter * 3, 1);
         whereClause.start_time = { gte: quarterStart };
         break;

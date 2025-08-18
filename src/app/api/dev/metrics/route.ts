@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const cpuUsage = os.loadavg()[0] * 100 / os.cpus().length;
     const totalMemory = os.totalmem();
     const freeMemory = os.freemem();
-    const memoryUsage = (totalMemory - freeMemory) / totalMemory) * 100;
+    const memoryUsage = ((totalMemory - freeMemory) / totalMemory) * 100;
     
     // Get database metrics - actual connection count
     const dbResult = await prisma.$queryRaw<{count: bigint}[]>`
@@ -153,7 +153,7 @@ export async function GET(request: NextRequest) {
           if (timeDiffs.length > 0) {
             avgResponseTime = Math.round(timeDiffs.reduce((a, b) => a + b, 0) / timeDiffs.length);
             timeDiffs.sort((a, b) => a - b);
-            const p95Index = Math.floor(timeDiffs.length * 0.95));
+            const p95Index = Math.floor(timeDiffs.length * 0.95);
             p95ResponseTime = timeDiffs[p95Index] || avgResponseTime * 2;
           }
         }
