@@ -38,7 +38,7 @@ export default async function DebugCapabilitiesPage() {
     userId: user.id,
     email: user.email,
     is_system_admin: user.is_system_admin || false,
-    is_school_admin: (user as Record<string, unknown>).is_school_admin || false,
+    is_school_admin: user.is_school_admin || false,
     
     // Role info
     role: userWithRole?.Staff?.[0]?.Role?.title || 'No Role',

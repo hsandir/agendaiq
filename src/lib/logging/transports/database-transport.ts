@@ -40,7 +40,7 @@ export class DatabaseTransport implements LogTransport {
       data: {
         id: entry.id,
         timestamp: new Date(entry.timestamp),
-        level: entry.level as Record<string, unknown>,
+        level: entry.level,
         message: entry.message,
         category: entry.category,
         component: entry.component,
@@ -70,7 +70,7 @@ export class DatabaseTransport implements LogTransport {
       data: {
         id: entry.id,
         timestamp: new Date(entry.timestamp),
-        level: entry.level as Record<string, unknown>,
+        level: entry.level,
         message: entry.message,
         category: entry.category,
         action: entry.action,

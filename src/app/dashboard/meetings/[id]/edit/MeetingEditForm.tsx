@@ -164,12 +164,12 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   });
 
   // Convert users to MultiSelect options
-  const attendeeOptions: MultiSelectOption[] = users.map(user => ({
+  const attendeeOptions: MultiSelectOption[] = users.mapuser => ({
     value: user.id,
     label: user.name,
     email: user.email,
     role: (user as Record<string, unknown>.role,
-    department: (user as Record<string, unknown>).department
+    department: (user.department
   }));
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -520,7 +520,7 @@ export default function DesignSystemDemoPage() {
               </Button>
               
               <Avatar className="w-8 h-8">
-                <AvatarImage src="/avatars/(user as Record<string, unknown>).jpg" />
+                <AvatarImage src="/avatars/user.jpg" />
                 <AvatarFallback>U</AvatarFallback>
               </Avatar>
             </div>

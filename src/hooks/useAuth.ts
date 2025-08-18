@@ -69,32 +69,32 @@ export function useAuth(options: UseAuthOptions = {}): UseAuthReturn {
     
     // User found but should redirect if found
     if (redirectIfFound && isAuthenticated) {
-      router.push(redirectTo as Record<string, unknown>);
+      router.pushredirectTo;
       return;
     }
     
     // Check auth requirements
     if (requireAuth && !isAuthenticated) {
       setError(new Error('Authentication required'));
-      router.push(redirectTo as Record<string, unknown>);
+      router.pushredirectTo;
       return;
     }
     
     if (requireStaff && !isStaff) {
       setError(new Error('Staff access required'));
-      router.push('/dashboard' as Record<string, unknown>);
+      router.push'/dashboard';
       return;
     }
     
     if (requireAdmin && !isAdmin) {
       setError(new Error('Admin access required'));
-      router.push('/dashboard' as Record<string, unknown>);
+      router.push'/dashboard';
       return;
     }
     
     if (allowedRoles.length > 0 && !allowedRoles.includes(user?.staff?.role?.title || '')) {
       setError(new Error(`Required role: ${allowedRoles.join(' or ')}`));
-      router.push('/dashboard' as Record<string, unknown>);
+      router.push'/dashboard';
       return;
     }
     

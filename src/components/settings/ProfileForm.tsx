@@ -131,7 +131,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
           type="text"
           name="role"
           id="role"
-          value={(user as Record<string, unknown>).role || 'USER'}
+          value={user.role || 'USER'}
           disabled
           className="mt-1 block w-full rounded-md border border-border bg-muted py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
         />

@@ -28,7 +28,7 @@ export default async function DashboardPage() {
     },
   });
   
-  const isAdmin = isUserAdmin(userWithStaff as Record<string, unknown>);
+  const isAdmin = isUserAdminuserWithStaff;
   
   // If no district exists and user is admin, redirect to district setup
   if (districtCount === 0 && isAdmin) {

@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default async function MeetingLivePage(props: Props) {
-  const params = await (props as Record<string, unknown>).params;
+  const params = await props.params;
   const user = await requireAuth(AuthPresets.requireStaff);
   
   const meetingId = parseInt(params.id);

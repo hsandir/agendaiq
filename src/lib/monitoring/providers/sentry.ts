@@ -174,8 +174,8 @@ class SentryProvider implements MonitoringProvider {
             const BrowserTracing = (Sentry as unknown as { BrowserTracing?: SentryIntegration; browserTracingIntegration?: SentryIntegration }).BrowserTracing || (Sentry as unknown as { BrowserTracing?: SentryIntegration; browserTracingIntegration?: SentryIntegration }).browserTracingIntegration;
             if (BrowserTracing) {
               const options = (integration.options && typeof integration.options === 'object' ? integration.options : {}) as Record<string, unknown>;
-              integrations.push(
-                (new (BrowserTracing as Record<string, unknown>)(options))
+              integrations.push
+                (new (BrowserTracing(options))
               );
             }
           }
@@ -186,8 +186,8 @@ class SentryProvider implements MonitoringProvider {
             const Replay = (Sentry as unknown as { Replay?: SentryIntegration; replayIntegration?: SentryIntegration }).Replay || (Sentry as unknown as { Replay?: SentryIntegration; replayIntegration?: SentryIntegration }).replayIntegration;
             if (Replay) {
               const options = (integration.options && typeof integration.options === 'object' ? integration.options : {}) as Record<string, unknown>;
-              integrations.push(
-                (new (Replay as Record<string, unknown>)(options))
+              integrations.push
+                (new (Replay(options))
               );
             }
           }
@@ -199,8 +199,8 @@ class SentryProvider implements MonitoringProvider {
             const ProfilingIntegration = (Sentry as unknown as { ProfilingIntegration?: SentryIntegration; profilingIntegration?: SentryIntegration }).ProfilingIntegration || (Sentry as unknown as { ProfilingIntegration?: SentryIntegration; profilingIntegration?: SentryIntegration }).profilingIntegration;
             if (ProfilingIntegration) {
               const options = (integration.options && typeof integration.options === 'object' ? integration.options : {}) as Record<string, unknown>;
-              integrations.push(
-                (new (ProfilingIntegration as Record<string, unknown>)(options))
+              integrations.push
+                (new (ProfilingIntegration(options))
               );
             }
           }
@@ -236,8 +236,8 @@ class SentryProvider implements MonitoringProvider {
     
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
-        const sanitizedValue = removeSensitiveFields(value as Record<string, unknown>);
-        scope.setContext(key, sanitizedValue as Record<string, unknown>);
+        const sanitizedValue = removeSensitiveFieldsvalue;
+        scope.setContextkey, sanitizedValue;
       });
     }
     
@@ -251,8 +251,8 @@ class SentryProvider implements MonitoringProvider {
     
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
-        const sanitizedValue = removeSensitiveFields(value as Record<string, unknown>);
-        scope.setContext(key, sanitizedValue as Record<string, unknown>);
+        const sanitizedValue = removeSensitiveFieldsvalue;
+        scope.setContextkey, sanitizedValue;
       });
     }
     
@@ -282,10 +282,10 @@ class SentryProvider implements MonitoringProvider {
     // Never send email or other PII
     const safeUser: Record<string, unknown> = {
       id: user.id,
-      username: (user as Record<string, unknown>).username,
-      tenant_id: (user as Record<string, unknown>).tenant_id,
-      role: (user as Record<string, unknown>).role,
-      segment: (user as Record<string, unknown>).segment,
+      username: user.username,
+      tenant_id: user.tenant_id,
+      role: user.role,
+      segment: user.segment,
     };
     
     // Hash the user ID for privacy
@@ -320,7 +320,7 @@ class SentryProvider implements MonitoringProvider {
   setContext(key: string, context: Record<string, unknown>): void {
     if (!this.initialized) return;
     const sanitizedContext = removeSensitiveFields(context);
-    Sentry.setContext(key, sanitizedContext as Record<string, unknown>);
+    Sentry.setContextkey, sanitizedContext;
   }
 
   addBreadcrumb(breadcrumb: Breadcrumb): void {

@@ -416,13 +416,13 @@ export class MeetingAnalyticsService {
       // Count by status
       const status = item.status.toLowerCase().replace('_', '');
       if (status in metrics.byStatus) {
-        (metrics.byStatus as Record<string, unknown>)[status]++;
+        metrics.byStatus[status]++;
       }
 
       // Count by priority
       const priority = item.priority.toLowerCase();
       if (priority in metrics.byPriority) {
-        (metrics.byPriority as Record<string, unknown>)[priority]++;
+        metrics.byPriority[priority]++;
       }
 
       // Calculate completion time

@@ -10,7 +10,7 @@ interface Props {
 
 export default async function AgendaItemPage(props: Props) {
   const user = await requireAuth(AuthPresets.requireAuth);
-  const params = await (props as Record<string, unknown>).params;
+  const params = await props.params;
 
   const meetingId = parseInt(params.id);
   const itemId = parseInt(params.itemId);

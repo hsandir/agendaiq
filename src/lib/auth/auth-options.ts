@@ -110,14 +110,14 @@ export const authOptions: NextAuthOptions = {
             return null; // Return null for security (don't reveal if user exists)
           }
           
-          if (!(user as Record<string, unknown>.hashedPassword) {
+          if (!user.hashedPassword) {
             console.error('User has no password:', credentials.email);
             return null; // Return null instead of throwing
           }
 
           // Check password using bcrypt
           console.log('Checking password for user:', user.email);
-          const isValid = await bcrypt.comparecredentials.password, (user as Record<string, unknown>.hashedPassword);
+          const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
           console.log('Password valid:', isValid);
           
           if (!isValid) {
@@ -127,7 +127,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Check 2FA if enabled
-          if (user as Record<string, unknown>.two_factor_enabled) {
+          if (user.two_factor_enabled) {
             if (!credentials.twoFactorCode) {
               throw new Error("2FA_REQUIRED");
             }
@@ -142,7 +142,7 @@ export const authOptions: NextAuthOptions = {
 
             // Check backup codes if TOTP fails
             if (!isValidToken) {
-              const isBackupCode = (user as Record<string, unknown>).backup_codes.includes(credentials.twoFactorCode);
+              const isBackupCode = user.backup_codes.includes(credentials.twoFactorCode);
               
               if (!isBackupCode) {
                 // await AuditClient.logAuthEvent'login_failure', user.id, (user.Staff[0]?.id, req, '2FA code invalid');
@@ -154,7 +154,7 @@ export const authOptions: NextAuthOptions = {
               await prisma.user.update({
                 where: { id: parseInt(user.id) },
                 data: {
-                  backup_codes: (user as Record<string, unknown>).backup_codes.filter(code => code !== credentials.twoFactorCode)
+                  backup_codes: user.backup_codes.filter(code => code !== credentials.twoFactorCode)
                 }
               });
             }
@@ -368,8 +368,8 @@ export const authOptions: NextAuthOptions = {
       }
       // Add admin flags and capabilities to session
       session.user.is_system_admin = token.is_system_admin as boolean;
-      session.(user as Record<string, unknown>).is_school_admin = token.is_school_admin as boolean;
-      session.(user as Record<string, unknown>).capabilities = token.capabilities as string[];
+      session.user.is_school_admin = token.is_school_admin as boolean;
+      session.user.capabilities = token.capabilities as string[];
       
       // Handle remember me expiry
       if (token.rememberMe) {

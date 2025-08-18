@@ -8,7 +8,7 @@ import Link from "next/link";
 export function Header() {
   const { data: __session  } = useSession();
 
-  return (
+  return 
     <header className="bg-card text-card-foreground border-b border-border">
       <div className="flex items-center justify-between px-4 py-4">
         <div className="flex items-center space-x-4">
@@ -30,7 +30,7 @@ export function Header() {
             <button className="flex items-center space-x-3 focus:outline-none">
               {session?.user?.image ? (
                 <Image
-                  src={session.(user as Record<string, unknown>).image}
+                  src={session.(user.image}
                   alt={session.user.name || "User"}
                   width={32}
                   height={32}

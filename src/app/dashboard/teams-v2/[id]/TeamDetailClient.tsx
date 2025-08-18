@@ -15,6 +15,7 @@ import {
   Building
 } from 'lucide-react';
 import { format } from 'date-fns';
+import AddMemberModal from '@/components/teams-v2/AddMemberModal';
 
 interface TeamDetailClientProps {
   team: any;
@@ -375,6 +376,21 @@ export default function TeamDetailClient({ team, currentUserId, isLead }: TeamDe
           </div>
         )}
       </div>
+
+      {/* Add Member Modal */}
+      {isAddingMember && (
+        <AddMemberModal
+          isOpen={isAddingMember}
+          onClose={() => setIsAddingMember(false)}
+          onSuccess={() => {
+            setIsAddingMember(false);
+            // Refresh the page to show new members
+            window.location.reload();
+          }}
+          teamId={team.id}
+          currentMembers={team.members.map((m: any) => m.user_id)}
+        />
+      )}
     </div>
   );
 }

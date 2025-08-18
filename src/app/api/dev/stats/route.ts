@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       }
     });
     
-    const testCoverage = (latestTestRun?.field_changes as Record<string, unknown>)?.coverage as number || 0;
+    const testCoverage = latestTestRun?.field_changes?.coverage as number || 0;
     
     // Get previous coverage for comparison
     const previousTestRun = await prisma.auditLog.findFirst({
@@ -48,13 +48,13 @@ export async function GET(request: NextRequest) {
       }
     });
     
-    const previousCoverage = (previousTestRun?.field_changes as Record<string, unknown>)?.coverage as number || 0;
+    const previousCoverage = previousTestRun?.field_changes?.coverage as number || 0;
     const coverageChange = testCoverage - previousCoverage;
     
     // Check build status (simulated for now)
     const buildStatus = 'passing';
     const buildTime = latestTestRun ? 
-      ((latestTestRun.field_changes as Record<string, unknown>)?.duration as number || 0) : 
+      (latestTestRun.field_changes?.duration as number || 0) : 
       0;
     
     // Check API health by counting recent errors

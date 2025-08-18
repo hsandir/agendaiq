@@ -118,11 +118,11 @@ export class TypeSafeMockFactory {
     }),
 
     createMany: (count: number, overrides: Partial<User> = {}): User[] => {
-      return Array.from({ length: count }, () => TypeSafeMockFactory.(user as Record<string, unknown>).create(overrides));
+      return Array.from({ length: count }, () => TypeSafeMockFactory.user.create(overrides));
     },
 
     createWithRelations: (relations: { staff?: Partial<Staff> } = {}): User => {
-      const user = TypeSafeMockFactory.(user as Record<string, unknown>).create();
+      const user = TypeSafeMockFactory.user.create();
       if (relations.staff) {
         // This would be implemented with proper relations
         // For now, return the base user
@@ -308,15 +308,15 @@ export class TypeSafeMockFactory {
   };
 
   static session(userOverrides: Partial<User> = {}): Session {
-    const user = this.(user as Record<string, unknown>).create(userOverrides);
+    const user = this.user.create(userOverrides);
     return {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
-        emailVerified: (user as Record<string, unknown>).emailVerified,
-        is_active: (user as Record<string, unknown>).is_active,
+        emailVerified: user.emailVerified,
+        is_active: user.is_active,
         staff: {
           id: 'staff-test',
           user_id: parseInt(user.id.split('-')[1], 36),
@@ -407,15 +407,15 @@ export class TypeSafeTestDB {
     });
 
     // Create test users
-    const adminUser = await this.prisma.user.create({
-      data: TypeSafeMockFactory.(user as Record<string, unknown>).create({
+    const adminUser = await this.prisma.user.create{
+      data: TypeSafeMockFactory.(user.create({
         email: 'admin@test.com',
         name: 'Test Admin',
       }),
     });
 
-    const teacherUser = await this.prisma.user.create({
-      data: TypeSafeMockFactory.(user as Record<string, unknown>).create({
+    const teacherUser = await this.prisma.user.create{
+      data: TypeSafeMockFactory.(user.create({
         email: 'teacher@test.com',
         name: 'Test Teacher',
       }),

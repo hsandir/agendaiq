@@ -220,9 +220,9 @@ describe('Comprehensive Component Tests', () => {
         const passwordInput = screen.getByTestId('password-input');
         const submitButton = screen.getByTestId('submit-button');
 
-        await (user as Record<string, unknown>).type(emailInput, 'test@example.com');
-        await (user as Record<string, unknown>).type(passwordInput, 'password123');
-        await (user as Record<string, unknown>).click(submitButton);
+        await user.type(emailInput, 'test@example.com');
+        await user.type(passwordInput, 'password123');
+        await user.click(submitButton);
 
         await waitFor(() => {
           expect(mockSubmit).toHaveBeenCalledWith({
@@ -264,13 +264,13 @@ describe('Comprehensive Component Tests', () => {
         const submitButton = screen.getByTestId('submit-button');
 
         // Tab through form elements
-        await (user as Record<string, unknown>).tab();
+        await user.tab();
         expect(emailInput).toHaveFocus();
 
-        await (user as Record<string, unknown>).tab();
+        await user.tab();
         expect(passwordInput).toHaveFocus();
 
-        await (user as Record<string, unknown>).tab();
+        await user.tab();
         expect(submitButton).toHaveFocus();
       });
 
@@ -279,7 +279,7 @@ describe('Comprehensive Component Tests', () => {
         render(<SignInForm onSubmit={mockSubmit} />);
 
         const emailInput = screen.getByTestId('email-input');
-        await (user as Record<string, unknown>).type(emailInput, 'invalid-email');
+        await user.type(emailInput, 'invalid-email');
         
         // Check HTML5 validation
         expect(emailInput).toHaveAttribute('type', 'email');
@@ -433,10 +433,10 @@ describe('Comprehensive Component Tests', () => {
           />
         );
 
-        await (user as Record<string, unknown>).click(screen.getByTestId('edit-button'));
+        await user.click(screen.getByTestId('edit-button'));
         expect(mockEdit).toHaveBeenCalledWith(1);
 
-        await (user as Record<string, unknown>).click(screen.getByTestId('delete-button'));
+        await user.click(screen.getByTestId('delete-button'));
         expect(mockDelete).toHaveBeenCalledWith(1);
       });
 
@@ -634,8 +634,8 @@ describe('Comprehensive Component Tests', () => {
         const searchInput = screen.getByTestId('search-input');
         const searchButton = screen.getByTestId('search-button');
 
-        await (user as Record<string, unknown>).type(searchInput, 'test query');
-        await (user as Record<string, unknown>).click(searchButton);
+        await user.type(searchInput, 'test query');
+        await user.click(searchButton);
 
         expect(mockSearch).toHaveBeenCalledWith('test query');
       });
@@ -647,7 +647,7 @@ describe('Comprehensive Component Tests', () => {
         render(<MockSearchComponent onSearch={mockSearch} />);
 
         const searchInput = screen.getByTestId('search-input');
-        await (user as Record<string, unknown>).type(searchInput, 'test query{enter}');
+        await user.type(searchInput, 'test query{enter}');
 
         expect(mockSearch).toHaveBeenCalledWith('test query');
       });
@@ -784,11 +784,11 @@ describe('Comprehensive Component Tests', () => {
       const searchInput = screen.getByTestId('search-input');
 
       // Rapidly type and change input
-      await (user as Record<string, unknown>).type(searchInput, 'a');
-      await (user as Record<string, unknown>).clear(searchInput);
-      await (user as Record<string, unknown>).type(searchInput, 'b');
-      await (user as Record<string, unknown>).clear(searchInput);
-      await (user as Record<string, unknown>).type(searchInput, 'final query');
+      await user.type(searchInput, 'a');
+      await user.clear(searchInput);
+      await user.type(searchInput, 'b');
+      await user.clear(searchInput);
+      await user.type(searchInput, 'final query');
 
       // Component should handle rapid changes without errors
       expect(searchInput).toHaveValue('final query');

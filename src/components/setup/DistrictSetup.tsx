@@ -34,7 +34,7 @@ export function DistrictSetup() {
         throw new Error(error.message || 'Failed to create district');
       }
 
-      router.push('/dashboard' as Record<string, unknown>);
+      router.push'/dashboard';
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred');
     } finally {

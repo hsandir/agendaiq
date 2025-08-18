@@ -301,7 +301,7 @@ export default function PermissionsCheckPage() {
   useEffect(() => {
     if (session?.user) {
       // Get user capabilities from session
-      setUserCapabilities(session.(user as Record<string, unknown>).capabilities || []);
+      setUserCapabilitiessession.(user.capabilities || []);
       setLoading(false);
     } else if (status !== 'loading') {
       setLoading(false);
@@ -320,7 +320,7 @@ export default function PermissionsCheckPage() {
     
     // Check admin flags for specific auth types
     if (authType === 'requireDevAdmin' && session.user.is_system_admin) return true;
-    if (authType === 'requireOpsAdmin' && session.(user as Record<string, unknown>).is_school_admin) return true;
+    if authType === 'requireOpsAdmin' && session.(user.is_school_admin) return true;
     
     // If no capabilities required, access is granted
     if (!capabilities || capabilities.length === 0) return true;
@@ -331,7 +331,7 @@ export default function PermissionsCheckPage() {
       if (userCapabilities.includes(cap)) return true;
       
       // School admin has all ops: capabilities
-      if (session.(user as Record<string, unknown>).is_school_admin && cap.startsWith('ops:')) return true;
+      if session.(user.is_school_admin && cap.startsWith('ops:')) return true;
       
       return false;
     });
@@ -369,7 +369,7 @@ export default function PermissionsCheckPage() {
     );
   }
 
-  return (
+  return 
     <div className="p-8 bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-gray-900">Permissions Check Dashboard</h1>
@@ -386,7 +386,7 @@ export default function PermissionsCheckPage() {
                 <strong className="text-gray-900">System Admin:</strong> {session.user.is_system_admin ? '✅' : '❌'}
               </div>
               <div>
-                <strong className="text-gray-900">School Admin:</strong> {session.(user as Record<string, unknown>).is_school_admin ? '✅' : '❌'}
+                <strong className="text-gray-900">School Admin:</strong> {session.(user.is_school_admin ? '✅' : '❌'}
               </div>
               <div className="md:col-span-3">
                 <strong className="text-gray-900">Capabilities ({userCapabilities.length}):</strong>

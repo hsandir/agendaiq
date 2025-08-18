@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Filter, Search } from 'lucide-react';
 import TeamCard from '@/components/teams-v2/TeamCard';
+import CreateTeamModal from '@/components/teams-v2/CreateTeamModal';
 import { useRouter } from 'next/navigation';
 
 interface Team {
@@ -23,12 +24,13 @@ interface Team {
   };
 }
 
-export default function TeamsPageClient({ userId }: { userId: number }) {
+export default function TeamsPageClient({ userId, schoolId }: { userId: number; schoolId: number }) {
   const router = useRouter();
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'ALL' | 'ACTIVE' | 'ARCHIVED'>('ACTIVE');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
     fetchTeams();
@@ -60,8 +62,12 @@ export default function TeamsPageClient({ userId }: { userId: number }) {
   );
 
   const handleCreateTeam = () => {
-    // TODO: Open create team modal or navigate to create page
-    alert('Create team feature coming soon!');
+    setIsCreateModalOpen(true);
+  };
+
+  const handleCreateSuccess = () => {
+    setIsCreateModalOpen(false);
+    fetchTeams(); // Refresh the teams list
   };
 
   const handleTeamClick = (teamId: string) => {
@@ -177,6 +183,14 @@ export default function TeamsPageClient({ userId }: { userId: number }) {
           )}
         </div>
       )}
+
+      {/* Create Team Modal */}
+      <CreateTeamModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={handleCreateSuccess}
+        schoolId={schoolId}
+      />
     </div>
   );
 }

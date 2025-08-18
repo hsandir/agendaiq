@@ -76,10 +76,10 @@ export function captureException(
     }
     
     if (user) {
-      scope.setUser{
+      scope.setUser({
         id: user.id,
         email: user.email,
-        staffId: (user as Record<string, unknown>.staffId,
+        staffId: user.staffId
       });
     }
     
@@ -185,10 +185,10 @@ export const Performance = {
       const result = await queryFn();
       // SpanStatus type changed in newer Sentry versions
       // Using setHttpStatus instead for compatibility
-      (transaction as Record<string, unknown>)?.setHttpStatus?.(200);
+      transaction?.setHttpStatus?.(200);
       return result;
     } catch (error: unknown) {
-      (transaction as Record<string, unknown>)?.setHttpStatus?.(500);
+      transaction?.setHttpStatus?.(500);
       throw error;
     } finally {
       transaction?.end();
@@ -208,10 +208,10 @@ export const Performance = {
       const result = await routeFn();
       // SpanStatus type changed in newer Sentry versions
       // Using setHttpStatus instead for compatibility
-      (transaction as Record<string, unknown>)?.setHttpStatus?.(200);
+      transaction?.setHttpStatus?.(200);
       return result;
     } catch (error: unknown) {
-      (transaction as Record<string, unknown>)?.setHttpStatus?.(500);
+      transaction?.setHttpStatus?.(500);
       throw error;
     } finally {
       transaction?.end();

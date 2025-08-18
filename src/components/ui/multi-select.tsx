@@ -130,7 +130,7 @@ export function MultiSelect({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between min-h-[((2 as Record<string, unknown>).5rem)] h-auto"
+            className="w-full justify-between min-h-[(2.5rem)] h-auto"
           >
             <div className="flex flex-wrap gap-1 flex-1 text-left">
               {selected.length === 0 ? (

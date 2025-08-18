@@ -52,6 +52,8 @@ interface LintStatus {
 
 export default function LintErrorManagementPage() {
   const [lintStatus, setLintStatus] = useState<LintStatus | null>(null);
+  const [typeCastingViolations, setTypeCastingViolations] = useState<any>(null);
+  const [dangerousPatterns, setDangerousPatterns] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [fixing, setFixing] = useState(false);
   const [fixProgress, setFixProgress] = useState(0);
@@ -67,6 +69,10 @@ export default function LintErrorManagementPage() {
   const fetchLintStatus = async () => {
     try {
       setLoading(true);
+      
+      // Fetch type casting violations first (most critical)
+      await fetchTypeCastingViolations();
+      await fetchDangerousPatterns();
       
       // First try the dedicated lint API
       const lintResponse = await fetch('/api/system/lint', {
@@ -162,6 +168,97 @@ export default function LintErrorManagementPage() {
       showNotification('Failed to fetch lint status');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchTypeCastingViolations = async () => {
+    try {
+      const response = await fetch('/api/system/lint-errors?action=type-casting-violations', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setTypeCastingViolations(data);
+        if (data.count > 0) {
+          showNotification(`Found ${data.count} critical type casting violations!`);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch type casting violations:', error);
+    }
+  };
+
+  const fetchDangerousPatterns = async () => {
+    try {
+      const response = await fetch('/api/system/lint-errors?action=dangerous-patterns', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setDangerousPatterns(data);
+        if (data.summary.riskLevel === 'HIGH') {
+          showNotification(`HIGH RISK: ${data.summary.totalOccurrences} dangerous patterns detected!`);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch dangerous patterns:', error);
+    }
+  };
+
+  const handleAutoFixTypeCasting = async () => {
+    try {
+      setFixing(true);
+      setFixProgress(0);
+
+      // Show progress
+      const interval = setInterval(() => {
+        setFixProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(interval);
+            return 90;
+          }
+          return prev + 20;
+        });
+      }, 300);
+
+      // Call the auto-fix script
+      const response = await fetch('/api/system/lint-errors', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'autofix-type-casting' })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Type casting auto-fix failed');
+      }
+      
+      const result = await response.json();
+      
+      setFixProgress(100);
+      showNotification(`Type casting auto-fix completed! Fixed ${result.fixedCount || 0} issues.`);
+      
+      // Refresh all status
+      await fetchTypeCastingViolations();
+      await fetchDangerousPatterns();
+      await fetchLintStatus();
+      
+    } catch (error) {
+      console.error('Type casting auto-fix failed:', error);
+      showNotification('Type casting auto-fix failed');
+    } finally {
+      setFixing(false);
+      setFixProgress(0);
     }
   };
 
@@ -316,6 +413,121 @@ export default function LintErrorManagementPage() {
                 <span className="text-sm text-muted-foreground">{fixProgress}%</span>
               </div>
               <Progress value={fixProgress} className="w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Critical Type Casting Violations Section */}
+      {typeCastingViolations && typeCastingViolations.count > 0 && (
+        <Card className="mb-6 border-red-500 bg-red-50">
+          <CardHeader>
+            <CardTitle className="flex items-center text-red-800">
+              <AlertTriangle className="h-6 w-6 mr-2 text-red-600" />
+              CRITICAL: Type Casting Violations Detected
+            </CardTitle>
+            <CardDescription className="text-red-700">
+              Found {typeCastingViolations.count} dangerous type casting patterns that can cause syntax errors
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-red-800">
+                  These violations MUST be fixed to prevent build failures
+                </span>
+                <Button 
+                  onClick={handleAutoFixTypeCasting}
+                  variant="destructive"
+                  size="sm"
+                  disabled={fixing}
+                >
+                  {fixing ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      Fixing...
+                    </>
+                  ) : (
+                    <>
+                      <Wrench className="w-4 h-4 mr-2" />
+                      Auto-Fix Critical Issues
+                    </>
+                  )}
+                </Button>
+              </div>
+              
+              <div className="space-y-2">
+                {typeCastingViolations.violations.slice(0, 5).map((violation: any, index: number) => (
+                  <div key={index} className="bg-white p-3 rounded border border-red-200">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-red-800">{violation.filePath}</p>
+                        <p className="text-xs text-red-600">Line {violation.line}: {violation.content}</p>
+                        <p className="text-xs text-red-500 mt-1">{violation.suggestion}</p>
+                      </div>
+                      <Badge variant="destructive" className="text-xs">
+                        {violation.type}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+                
+                {typeCastingViolations.violations.length > 5 && (
+                  <p className="text-xs text-red-600 mt-2">
+                    ... and {typeCastingViolations.violations.length - 5} more critical violations
+                  </p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Dangerous Patterns Risk Assessment */}
+      {dangerousPatterns && dangerousPatterns.summary.riskLevel !== 'LOW' && (
+        <Card className="mb-6 border-orange-500 bg-orange-50">
+          <CardHeader>
+            <CardTitle className="flex items-center text-orange-800">
+              <AlertCircle className="h-5 w-5 mr-2 text-orange-600" />
+              Risk Assessment: {dangerousPatterns.summary.riskLevel} RISK
+            </CardTitle>
+            <CardDescription className="text-orange-700">
+              Risk Score: {dangerousPatterns.summary.riskScore} | {dangerousPatterns.summary.totalOccurrences} dangerous patterns detected
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 md:grid-cols-2">
+              {dangerousPatterns.patterns.filter((p: any) => p.occurrences > 0).map((pattern: any, index: number) => (
+                <div key={index} className="bg-white p-3 rounded border border-orange-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-orange-800">{pattern.name}</p>
+                      <p className="text-xs text-orange-600">{pattern.description}</p>
+                    </div>
+                    <div className="text-right">
+                      <Badge 
+                        variant={pattern.severity === 'critical' ? 'destructive' : 'outline'}
+                        className={pattern.severity === 'critical' ? 'border-red-500 text-red-700' : 'border-orange-500 text-orange-700'}
+                      >
+                        {pattern.occurrences}
+                      </Badge>
+                      <p className="text-xs text-orange-500 mt-1">{pattern.severity}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-4 p-3 bg-orange-100 rounded">
+              <h4 className="text-sm font-medium text-orange-800 mb-2">Recommendations:</h4>
+              <ul className="text-xs text-orange-700 space-y-1">
+                {dangerousPatterns.recommendations.map((rec: string, index: number) => (
+                  <li key={index} className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>{rec}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </CardContent>
         </Card>

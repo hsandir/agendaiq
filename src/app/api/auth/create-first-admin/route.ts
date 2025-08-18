@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if ((user as Record<string, unknown>).hashedPassword) {
+    if (user.hashedPassword) {
       return NextResponse.json(
         { error: 'User already has a password set' },
         { status: 400 }

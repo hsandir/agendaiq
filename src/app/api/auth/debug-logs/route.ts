@@ -347,7 +347,7 @@ export async function POST(request: NextRequest) {
             ip,
             userAgent
           });
-        } else if (!(user as Record<string, unknown>).hashedPassword) {
+        } else if (!user.hashedPassword) {
           addLog({
             type: 'signin_attempt',
             level: 'error',
@@ -363,7 +363,7 @@ export async function POST(request: NextRequest) {
           });
         } else {
           // Test password
-          const isValidPassword = await bcrypt.compare(body.details.password as string, (user as Record<string, unknown>).hashedPassword as string);
+          const isValidPassword = await bcrypt.comparebody.details.password as string, (user.hashedPassword as string);
           
           addLog({
             type: 'signin_attempt',

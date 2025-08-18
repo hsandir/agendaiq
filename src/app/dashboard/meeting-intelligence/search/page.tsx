@@ -182,7 +182,7 @@ export default function MeetingSearchPage() {
             {/* Search Type Filter */}
             <select
               value={searchType}
-              onChange={(e) => setSearchType(e.target.value as Record<string, unknown>)}
+              onChange={(e) => setSearchTypee.target.value}
               className="px-4 py-3 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="all">All</option>

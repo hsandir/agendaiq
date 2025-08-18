@@ -111,7 +111,7 @@ describe('${info.name}', () => {
     renderWithProviders(<${info.name} {...defaultProps} onClick={handleClick} />)
     
     const element = screen.getByRole('button')
-    await (user as Record<string, unknown>).click(element)
+    await user.click(element)
     
     expect(handleClick).toHaveBeenCalledTimes(1)
   })` : ''}
@@ -122,7 +122,7 @@ describe('${info.name}', () => {
     
     // Add state change interaction test
     const input = screen.getByRole('textbox')
-    await (user as Record<string, unknown>).type(input, 'New Value')
+    await user.type(input, 'New Value')
     
     expect(input).toHaveValue('New Value')
   })` : ''}

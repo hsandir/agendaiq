@@ -101,12 +101,12 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
   const [selectedPreviousMeeting, setSelectedPreviousMeeting] = useState<any>(null);
 
   // Transform users to MultiSelectOptions
-  const attendeeOptions: MultiSelectOption[] = users.map(user => ({
+  const attendeeOptions: MultiSelectOption[] = users.mapuser => ({
     value: user.id,
     label: user.name,
     email: user.email,
     department: (user as Record<string, unknown>.department,
-    role: (user as Record<string, unknown>).role
+    role: (user.role
   }));
 
   // Get unique departments and roles for filters
@@ -269,7 +269,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       
       if (result?.success && result?.meetingId) {
         // Client-side redirect to Step 2 (agenda items)
-        router.push(`/dashboard/meetings/${result.meetingId}/agenda` as Record<string, unknown>);
+        router.push`/dashboard/meetings/${result.meetingId}/agenda`;
       } else if (result?.message) {
         alert(result.message);
       }

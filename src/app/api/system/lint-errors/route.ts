@@ -54,9 +54,13 @@ export async function GET(request: NextRequest) {
       return await getLintDetails(severity, limit, offset);
     } else if (action === 'fixable') {
       return await getFixableErrors();
+    } else if (action === 'type-casting-violations') {
+      return await getTypeCastingViolations();
+    } else if (action === 'dangerous-patterns') {
+      return await getDangerousPatterns();
     }
 
-    return NextResponse.json({ error: 'Invalid action. Use: summary, details, or fixable' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid action. Use: summary, details, fixable, type-casting-violations, or dangerous-patterns' }, { status: 400 });
   } catch (error: unknown) {
     console.error('Lint error API failed:', error);
     await logError('LINT_API_ERROR', error instanceof Error ? error.message : "Unknown error", { action: 'GET' });
@@ -69,7 +73,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { __action, __filePath, __fixes  } = (await request.json()) as Record<__string, unknown>;
+    const body = await request.json();
+    const { action, filePath, fixes } = body;
 
     if (action === 'fix') {
       return await fixLintErrors(filePath, fixes);
@@ -145,7 +150,7 @@ async function getLintSummary() {
   } catch (error: unknown) {
     // ESLint might return non-zero exit code for errors, parse the output anyway
     try {
-      const errorOutput = (error as Record<string, unknown>)?.stdout || '[]';
+      const errorOutput = error?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const summary = results.reduce((acc, result) => {
         acc.totalFiles++;
@@ -226,7 +231,7 @@ async function getLintDetails(severity: string, limit: number, offset: number) {
 
   } catch (error: unknown) {
     try {
-      const errorOutput = (error as Record<string, unknown>)?.stdout || '[]';
+      const errorOutput = error?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const allErrors: (LintError & { filePath: string })[] = [];
       results.forEach(result => {
@@ -290,7 +295,7 @@ async function getFixableErrors() {
 
   } catch (error: unknown) {
     try {
-      const errorOutput = (error as Record<string, unknown>)?.stdout || '[]';
+      const errorOutput = error?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const fixableErrors: (LintError & { filePath: string })[] = [];
       results.forEach(result => {
@@ -345,7 +350,7 @@ async function autoFixErrors() {
   } catch (error: unknown) {
     // Even if some errors remain, auto-fix might have worked partially
     try {
-      const errorOutput = (error as Record<string, unknown>)?.stdout || '[]';
+      const errorOutput = error?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const remainingErrors = results.reduce((sum, result) => sum + result.errorCount, 0);
       const remainingWarnings = results.reduce((sum, result) => sum + result.warningCount, 0);
@@ -429,6 +434,179 @@ async function reportErrorsToAdmin(errors: Array<Record<string, unknown>>) {
   } catch (error: unknown) {
     throw new Error(`Failed to report errors: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
+}
+
+async function getTypeCastingViolations() {
+  try {
+    const { stdout } = await execAsync(
+      'grep -rn "as Record<string, unknown>" src/ --include="*.ts" --include="*.tsx" || true',
+      { cwd: process.cwd() }
+    );
+
+    const violations: Array<{
+      filePath: string;
+      line: number;
+      content: string;
+      severity: 'critical';
+      type: 'DANGEROUS_TYPE_CASTING';
+      suggestion: string;
+    }> = [];
+
+    if (stdout) {
+      const lines = stdout.trim().split('\n');
+      lines.forEach(line => {
+        const match = line.match(/^([^:]+):(\d+):(.+)$/);
+        if (match) {
+          const [, filePath, lineNumber, content] = match;
+          violations.push({
+            filePath: filePath.replace(process.cwd(), ''),
+            line: parseInt(lineNumber),
+            content: content.trim(),
+            severity: 'critical',
+            type: 'DANGEROUS_TYPE_CASTING',
+            suggestion: 'Replace with proper TypeScript interfaces or type guards'
+          });
+        }
+      });
+    }
+
+    // Also check for multiple chained assertions
+    const { stdout: chainedAssertions } = await execAsync(
+      'grep -rn "as.*as" src/ --include="*.ts" --include="*.tsx" || true',
+      { cwd: process.cwd() }
+    );
+
+    if (chainedAssertions) {
+      const lines = chainedAssertions.trim().split('\n');
+      lines.forEach(line => {
+        const match = line.match(/^([^:]+):(\d+):(.+)$/);
+        if (match) {
+          const [, filePath, lineNumber, content] = match;
+          violations.push({
+            filePath: filePath.replace(process.cwd(), ''),
+            line: parseInt(lineNumber),
+            content: content.trim(),
+            severity: 'critical',
+            type: 'CHAINED_TYPE_CASTING',
+            suggestion: 'Avoid chained type assertions - use single proper type assertion or type guards'
+          });
+        }
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      violations,
+      count: violations.length,
+      summary: {
+        critical: violations.length,
+        mostCommonPatterns: getPatternSummary(violations)
+      },
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error: unknown) {
+    console.error('Failed to scan for type casting violations:', error);
+    return NextResponse.json(
+      { error: 'Failed to scan for violations', details: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
+  }
+}
+
+async function getDangerousPatterns() {
+  try {
+    const patterns = [
+      {
+        name: 'Record<string, unknown> casting',
+        pattern: 'as Record<string, unknown>',
+        severity: 'critical',
+        description: 'Dangerous type casting that can cause syntax errors'
+      },
+      {
+        name: 'Unknown type casting',
+        pattern: 'as unknown',
+        severity: 'high',
+        description: 'Type casting to unknown bypasses TypeScript safety'
+      },
+      {
+        name: 'Chained type assertions',
+        pattern: 'as.*as',
+        severity: 'critical',
+        description: 'Multiple chained type assertions can cause syntax errors'
+      },
+      {
+        name: 'Any type usage',
+        pattern: ': any',
+        severity: 'medium',
+        description: 'Using any type bypasses TypeScript type checking'
+      }
+    ];
+
+    const results = [];
+
+    for (const pattern of patterns) {
+      const { stdout } = await execAsync(
+        `grep -rn "${pattern.pattern}" src/ --include="*.ts" --include="*.tsx" | wc -l || echo 0`,
+        { cwd: process.cwd() }
+      );
+      
+      const count = parseInt(stdout.trim()) || 0;
+      results.push({
+        ...pattern,
+        occurrences: count
+      });
+    }
+
+    // Get total risk score
+    const riskScore = results.reduce((total, pattern) => {
+      const multiplier = pattern.severity === 'critical' ? 10 : 
+                       pattern.severity === 'high' ? 5 : 
+                       pattern.severity === 'medium' ? 2 : 1;
+      return total + (pattern.occurrences * multiplier);
+    }, 0);
+
+    return NextResponse.json({
+      success: true,
+      patterns: results,
+      summary: {
+        totalPatterns: results.length,
+        totalOccurrences: results.reduce((sum, p) => sum + p.occurrences, 0),
+        riskScore,
+        riskLevel: riskScore > 50 ? 'HIGH' : riskScore > 20 ? 'MEDIUM' : 'LOW'
+      },
+      recommendations: [
+        'Replace "as Record<string, unknown>" with proper TypeScript interfaces',
+        'Use type guards instead of "as unknown" casting',
+        'Avoid chained type assertions completely',
+        'Define specific types instead of using "any"'
+      ],
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error: unknown) {
+    console.error('Failed to scan for dangerous patterns:', error);
+    return NextResponse.json(
+      { error: 'Failed to scan patterns', details: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
+  }
+}
+
+function getPatternSummary(violations: Array<{ type: string; filePath: string }>) {
+  const summary: Record<string, { count: number; files: string[] }> = {};
+  
+  violations.forEach(violation => {
+    if (!summary[violation.type]) {
+      summary[violation.type] = { count: 0, files: [] };
+    }
+    summary[violation.type].count++;
+    if (!summary[violation.type].files.includes(violation.filePath)) {
+      summary[violation.type].files.push(violation.filePath);
+    }
+  });
+
+  return summary;
 }
 
 async function logError(type: string, message: string, details: Record<string, unknown>) {

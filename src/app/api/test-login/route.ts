@@ -50,14 +50,14 @@ export async function POST(request: NextRequest) {
         id: user.id,
         email: user.email,
         name: user.name,
-        hasPassword: !!(user as Record<string, unknown>.hashedPassword,
-        emailVerified: !!(user as Record<string, unknown>).emailVerified,
+        hasPassword: !!user as Record<string, unknown>.hashedPassword,
+        emailVerified: !!(user.emailVerified,
         role: user.Staff?.[0]?.Role?.title
       },
       passwordCheck: {
         providedPassword: password,
-        hashExists: !!(user as Record<string, unknown>).hashedPassword,
-        hashStartsWith: (user as Record<string, unknown>).hashedPassword?.substring(0, 10),
+        hashExists: !!user.hashedPassword,
+        hashStartsWith: user.hashedPassword?.substring(0, 10),
         isValid
       }
     });

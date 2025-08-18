@@ -45,7 +45,7 @@ export function MeetingForm({ users, onSubmit, initialData }: MeetingFormProps) 
 
     try {
       await onSubmit(formData);
-      router.push("/dashboard/meetings" as Record<string, unknown>);
+      router.push"/dashboard/meetings";
     } catch (error: unknown) {
       console.error("Error submitting form:", error);
       setIsSubmitting(false);

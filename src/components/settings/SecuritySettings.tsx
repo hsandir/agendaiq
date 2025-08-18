@@ -226,7 +226,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
             <span className="text-sm">Login notifications</span>
             <input
               type="checkbox"
-              checked={(user as Record<string, unknown>).login_notifications_enabled}
+              checked={user.login_notifications_enabled}
               className="h-4 w-4 text-primary rounded focus:ring-ring"
               disabled
             />
@@ -236,7 +236,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
             <span className="text-sm">Suspicious activity alerts</span>
             <input
               type="checkbox"
-              checked={(user as Record<string, unknown>).suspicious_alerts_enabled}
+              checked={user.suspicious_alerts_enabled}
               className="h-4 w-4 text-primary rounded focus:ring-ring"
               disabled
             />
@@ -246,7 +246,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
             <span className="text-sm">Remember trusted devices</span>
             <input
               type="checkbox"
-              checked={(user as Record<string, unknown>).remember_devices_enabled}
+              checked={user.remember_devices_enabled}
               className="h-4 w-4 text-primary rounded focus:ring-ring"
               disabled
             />

@@ -201,7 +201,7 @@ describe('[COMPONENT_NAME]', () => {
       // render(<[COMPONENT_NAME] {...defaultProps} onClick={handleClick} />);
       
       // const button = screen.getByRole('button');
-      // await (user as Record<string, unknown>).click(button);
+      // await user.click(button);
       
       // expect(handleClick).toHaveBeenCalledTimes(1);
     });
@@ -219,7 +219,7 @@ describe('[COMPONENT_NAME]', () => {
       // );
       
       // const button = screen.getByRole('button');
-      // await (user as Record<string, unknown>).click(button);
+      // await user.click(button);
       
       // expect(handleClick).not.toHaveBeenCalled();
     });
@@ -232,7 +232,7 @@ describe('[COMPONENT_NAME]', () => {
       
       // const button = screen.getByRole('button');
       // button.focus();
-      // await (user as Record<string, unknown>).keyboard('{Enter}');
+      // await user.keyboard('{Enter}');
       
       // expect(handleClick).toHaveBeenCalledTimes(1);
     });
@@ -251,10 +251,10 @@ describe('[COMPONENT_NAME]', () => {
       // );
       
       // const button = screen.getByRole('button');
-      // await (user as Record<string, unknown>).click(button);
+      // await user.click(button);
       // expect(handleFocus).toHaveBeenCalledTimes(1);
       
-      // await (user as Record<string, unknown>).tab();
+      // await user.tab();
       // expect(handleBlur).toHaveBeenCalledTimes(1);
     });
 
@@ -263,12 +263,12 @@ describe('[COMPONENT_NAME]', () => {
       // render(<[COMPONENT_NAME] {...defaultProps} />);
       
       // const button = screen.getByRole('button');
-      // await (user as Record<string, unknown>).hover(button);
+      // await user.hover(button);
       
       // Verify hover state changes (e.g., CSS classes, tooltips)
       // expect(button).toHaveClass('hover-state');
       
-      // await (user as Record<string, unknown>).unhover(button);
+      // await user.unhover(button);
       // expect(button).not.toHaveClass('hover-state');
     });
   });
@@ -289,7 +289,7 @@ describe('[COMPONENT_NAME]', () => {
       );
       
       // const button = screen.getByRole('button');
-      // await (user as Record<string, unknown>).click(button);
+      // await user.click(button);
       
       // expect(handleSubmit).toHaveBeenCalledTimes(1);
     });
@@ -377,7 +377,7 @@ describe('[COMPONENT_NAME]', () => {
       // );
       
       // const retryButton = screen.getByRole('button', { name: /retry/i });
-      // await (user as Record<string, unknown>).click(retryButton);
+      // await user.click(retryButton);
       
       // expect(handleRetry).toHaveBeenCalledTimes(1);
     });
