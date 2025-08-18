@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       include: { Staff: { include: { Role: true } } },
     });
 
-    if !currentUser || (currentUser.Staff?.[0]?.Role?.title !== 'Administrator') {
+    if (!currentUser || (currentUser.Staff?.[0]?.Role?.title !== 'Administrator')) {
       return NextResponse.json(
         { error: "Not authorized" },
         { status: 403 }

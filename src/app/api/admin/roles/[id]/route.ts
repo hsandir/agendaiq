@@ -21,7 +21,7 @@ async function verifyAdmin() {
     }
   });
 
-  if !user || !((user as Record<string, unknown>).Staff?.[0] || (user as Record<string, unknown>).Staff[0].Role?.title !== 'Administrator') {
+  if (!user || !((user as Record<string, unknown>).Staff?.[0] || (user as Record<string, unknown>).Staff[0].Role?.title !== 'Administrator')) {
     return null;
   }
 
