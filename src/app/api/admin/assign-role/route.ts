@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
+import { AssignRoleRequest } from "@/types";
 
 async function findManagerId(roleTitle: string, departmentId: number) {
   switch (roleTitle) {
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
     }
 
     const currentUser = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: session.user.id as string },
       include: { Staff: { include: { Role: true } } },
     });
 
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = await request.json();
+    const body = (await request.json()) as AssignRoleRequest;
     const { email, roleId, departmentId, managerId } = body;
 
     if (!email || !roleId || !departmentId) {
@@ -89,20 +90,20 @@ export async function POST(request: Request) {
 
     // Get role title for manager assignment
     const role = await prisma.role.findUnique({
-      where: { id: roleId },
+      where: { id: parseInt(roleId) },
     });
 
     // Find or determine manager ID
-    const autoAssignedManagerId = role ? await findManagerId(role.title, departmentId) : null;
-    const finalManagerId = managerId || autoAssignedManagerId;
+    const autoAssignedManagerId = role ? await findManagerId(role.title, parseInt(departmentId)) : null;
+    const finalManagerId = managerId ? parseInt(managerId) : autoAssignedManagerId;
 
     // Update or create staff record
     if (user.Staff?.[0]) {
       await prisma.staff.update({
         where: { id: user.Staff[0].id },
         data: {
-          role_id: roleId,
-          department_id: departmentId,
+          role_id: parseInt(roleId),
+          department_id: parseInt(departmentId),
           manager_id: finalManagerId,
         },
       });
@@ -120,9 +121,9 @@ export async function POST(request: Request) {
 
       await prisma.staff.create({
         data: {
-          user_id: user.id,
-          role_id: roleId,
-          department_id: departmentId,
+          user_id: parseInt(user.id),
+          role_id: parseInt(roleId),
+          department_id: parseInt(departmentId),
           school_id: defaultSchool.id,
           district_id: defaultDistrict.id,
           manager_id: finalManagerId,
@@ -132,7 +133,7 @@ export async function POST(request: Request) {
 
     // Get updated user with staff
     const updatedUser = await prisma.user.findUnique({
-      where: { id: user.id },
+      where: { id: parseInt(user.id) },
       include: { Staff: { include: { Role: true, Department: true } } },
     });
 

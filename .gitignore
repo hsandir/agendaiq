@@ -24,6 +24,11 @@
 .DS_Store
 *.pem
 
+# DOCUMENTATION FILES - ALL .md FILES SHOULD BE IGNORED
+*.md
+**/*.md
+!README.md
+
 # SECURITY: Never commit sensitive files
 docs/security/SUPABASE_CREDENTIALS_BACKUP.md
 docs/security/SUPABASE_VERIFIED_URLS.md

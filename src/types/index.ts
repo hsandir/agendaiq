@@ -57,4 +57,140 @@ export interface SessionUser {
   role: string;
   department: string | null;
   school: string | null;
+}
+
+// API request types
+export interface CreateUserRequest {
+  name: string;
+  email: string;
+  password: string;
+  role?: string;
+  department?: string;
+  school?: string;
+}
+
+export interface UpdateUserRequest {
+  name?: string;
+  email?: string;
+  role?: string;
+  department?: string;
+  school?: string;
+}
+
+export interface CreateSchoolRequest {
+  name: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  phone?: string;
+  website?: string;
+  logo?: string;
+  districtId?: string;
+}
+
+export interface CreateDistrictRequest {
+  name: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  phone?: string;
+  website?: string;
+  logo?: string;
+}
+
+export interface SetupInitialRequest {
+  adminName: string;
+  adminEmail: string;
+  adminPassword: string;
+  districtName: string;
+  schoolName: string;
+  [key: string]: unknown;
+}
+
+export interface AssignRoleRequest {
+  email: string;
+  roleId: string;
+  departmentId: string;
+  managerId?: string;
+}
+
+// API response types with proper structure
+export interface UserWithRelations {
+  id: string;
+  email: string;
+  name: string | null;
+  staff?: {
+    id: string;
+    role: {
+      id: string;
+      title: string;
+      is_leadership: boolean;
+      priority: number;
+    };
+    department?: {
+      id: string;
+      name: string;
+    };
+    school?: {
+      id: string;
+      name: string;
+    };
+    district?: {
+      id: string;
+      name: string;
+    };
+  };
+}
+
+// Error handling types
+export interface ApiError extends Error {
+  statusCode?: number;
+  code?: string;
+}
+
+// Test utility types
+export interface MockUser extends UserWithRelations {
+  [key: string]: unknown;
+}
+
+export interface MockSession {
+  user: MockUser;
+  expires: string;
+}
+
+// Audit log types
+export interface AuditRecord {
+  id: string;
+  tableName: string;
+  recordId: string;
+  operation: string;
+  userId?: string;
+  staffId?: string;
+  description?: string;
+  risk_score?: number;
+  category?: string;
+  ip_address?: string;
+  User?: {
+    email: string;
+    name?: string;
+  };
+  createdAt: Date;
+}
+
+export interface SortableAuditRecord extends AuditRecord {
+  [key: string]: unknown;
+}
+
+// Monitoring types
+export interface LogEntry {
+  level: string;
+  message: string;
+  timestamp: string;
+  meta?: Record<string, unknown>;
+}
+
+export interface MonitoringMetrics {
+  [key: string]: unknown;
 } 

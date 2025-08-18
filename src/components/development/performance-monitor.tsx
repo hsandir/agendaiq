@@ -173,12 +173,26 @@ export default function PerformanceMonitor() {
     const testResults: TestResult[] = []
     const themes = ['standard', 'classic-light']
     
+    // Save original theme
+    const originalTheme = theme
+    
     for (const themeId of themes) {
       setCurrentTest(`Testing theme change: ${themeId}`)
       const result = await measureOperation(`Theme Change: ${themeId}`, async () => {
-        // Only test the theme change locally without API call
-        if (typeof setTheme === 'function') {
-          setTheme(themeId)
+        // Test with API call
+        try {
+          const response = await fetch('/api/user/theme', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ theme: themeId })
+          })
+          
+          if (response.ok && typeof setTheme === 'function') {
+            setTheme(themeId)
+          }
+        } catch (error) {
+          console.warn('Theme change test:', error)
         }
         // Minimal wait
         await new Promise(resolve => setTimeout(resolve, 10))
@@ -187,6 +201,21 @@ export default function PerformanceMonitor() {
       
       // Minimal delay between changes
       await new Promise(resolve => setTimeout(resolve, 20))
+    }
+    
+    // Restore original theme after theme tests
+    if (originalTheme && typeof setTheme === 'function') {
+      try {
+        await fetch('/api/user/theme', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ theme: originalTheme })
+        })
+        setTheme(originalTheme)
+      } catch (error) {
+        console.warn('Failed to restore theme:', error)
+      }
     }
     
     return testResults
@@ -252,6 +281,9 @@ export default function PerformanceMonitor() {
     setIsRunningTests(true)
     setTestResults([])
     
+    // Save current theme before tests
+    const originalTheme = theme
+    
     try {
       // Test API performance
       const apiResults = await testAPIPerformance()
@@ -268,6 +300,13 @@ export default function PerformanceMonitor() {
     } catch (error) {
       console.error('Performance test failed:', error)
     } finally {
+      // Restore original theme after tests
+      if (originalTheme && typeof setTheme === 'function') {
+        setTimeout(() => {
+          setTheme(originalTheme)
+        }, 100)
+      }
+      
       setIsRunningTests(false)
       setCurrentTest('')
     }

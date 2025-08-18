@@ -41,7 +41,7 @@ describe('Middleware Chain Tests', () => {
       } as unknown as NextRequest;
       
       const { RateLimiters } = await import('@/lib/utils/rate-limit');
-      RateLimiters.api.check.mockResolvedValue({ success: true });
+      (RateLimiters.api.check as jest.Mock).mockResolvedValue({ success: true });
       
       const result = await rateLimitMiddleware(request);
       
@@ -60,7 +60,7 @@ describe('Middleware Chain Tests', () => {
       } as unknown as NextRequest;
       
       const { RateLimiters } = await import('@/lib/utils/rate-limit');
-      RateLimiters.api.check.mockResolvedValue({ 
+      (RateLimiters.api.check as jest.Mock).mockResolvedValue({ 
         success: false, 
         error: 'Rate limit exceeded' 
       });
@@ -71,7 +71,7 @@ describe('Middleware Chain Tests', () => {
         headers: new Headers(),
         json: async () => ({ error: 'Rate limit exceeded' })
       };
-      RateLimiters.api.createErrorResponse.mockReturnValue(mockResponse);
+      (RateLimiters.api.createErrorResponse as jest.Mock).mockReturnValue(mockResponse);
       
       const result = await rateLimitMiddleware(request);
       
@@ -108,7 +108,7 @@ describe('Middleware Chain Tests', () => {
       } as unknown as NextRequest;
       
       const { getToken } = await import('next-auth/jwt');
-      getToken.mockResolvedValue({
+      (getToken as jest.Mock).mockResolvedValue({
         id: '1',
         email: 'test@test.com',
         capabilities: [],
@@ -135,7 +135,7 @@ describe('Middleware Chain Tests', () => {
       ];
       
       const { getToken } = await import('next-auth/jwt');
-      getToken.mockResolvedValue(null);
+      (getToken as jest.Mock).mockResolvedValue(null);
       
       for (const path of publicPaths) {
         const request = {
@@ -162,7 +162,7 @@ describe('Middleware Chain Tests', () => {
       ];
       
       const { getToken } = await import('next-auth/jwt');
-      getToken.mockResolvedValue(null);
+      (getToken as jest.Mock).mockResolvedValue(null);
       
       for (let i = 0; i < protectedPaths.length; i++) {
         const path = protectedPaths[i];

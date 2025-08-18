@@ -23,15 +23,18 @@ export async function POST(request: Request) {
     const metrics = await request.json() as WebVitalsMetric;
     
     // Add timestamp
+    const userAgent = request.headers.get('user-agent') ?? 'unknown';
+    const ip = request.headers.get('x-forwarded-for') ?? 'unknown';
+    
     const metricWithTime: WebVitalsMetric & {
       timestamp: string;
-      userAgent: string | null;
+      userAgent: string;
       ip: string;
     } = {
       ...metrics,
       timestamp: new Date().toISOString(),
-      userAgent: request.headers.get('user-agent'),
-      ip: request.headers.get('x-forwarded-for') || 'unknown',
+      userAgent,
+      ip,
     };
 
     // Buffer metrics (in production, send to analytics service)

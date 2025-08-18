@@ -2,60 +2,61 @@ import React from 'react'
 import { render, RenderOptions } from '@testing-library/react'
 import { SessionProvider } from 'next-auth/react'
 import { Session } from 'next-auth'
+// Remove unused imports
 
 // Mock session data
 export const mockSession: Session = {
   expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
   user: {
-    id: 1,
+    id: '1',
     email: 'test@example.com',
     name: 'Test User',
     emailVerified: true,
     is_active: true,
     staff: {
-      id: 1,
+      id: '1',
       user_id: 1,
       role_id: 1,
       department_id: 1,
       school_id: 1,
       district_id: 1,
       role: {
-        id: 1,
+        id: '1',
         title: 'Teacher',
         is_leadership: false,
         priority: 6,
       },
       department: {
-        id: 1,
+        id: '1',
         name: 'Mathematics',
       },
       school: {
-        id: 1,
+        id: '1',
         name: 'Test School',
       },
       district: {
-        id: 1,
+        id: '1',
         name: 'Test District',
       },
     },
   },
-}
+} as Session
 
 export const mockAdminSession: Session = {
   ...mockSession,
   user: {
     ...mockSession.user,
     staff: {
-      ...mockSession.user.staff!,
+      ...(mockSession.user as unknown as { staff: any })?.staff,
       role: {
-        id: 1,
+        id: '1',
         title: 'Administrator',
         is_leadership: true,
         priority: 1,
       },
     },
   },
-}
+} as Session
 
 // Custom render function with providers
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
@@ -114,7 +115,11 @@ export const createMockNextRequest = (
     text: async () => JSON.stringify(body),
     formData: async () => new FormData(),
     headers: new Headers(headers),
-  } as unknown
+  } as Request & {
+    json: () => Promise<unknown>;
+    text: () => Promise<string>;
+    formData: () => Promise<FormData>;
+  }
 }
 
 // Database test helpers
