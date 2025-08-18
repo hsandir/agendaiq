@@ -174,8 +174,8 @@ class PerformanceMonitor {
     const apiMetrics = this.metrics.filter(m => m.name.startsWith('api_'));
     const grouped: Record<string, number[]> = {};
     
-    apiMetrics.forEachmetric => {
-      if (!grouped[((metric.name)]) grouped[(metric.name)] = [];
+    apiMetrics.forEach(metric => {
+      if (!grouped[metric.name]) grouped[(metric.name)] = [];
       grouped[(metric.name)].push(metric.value);
     });
     

@@ -342,10 +342,10 @@ export function removeSensitiveFields<T>(obj: T): T {
       (cleaned as Record<string, unknown>)[key] = '[REDACTED]';
     } else if (typeof (cleaned as Record<string, unknown>)[key] === 'object' && (cleaned as Record<string, unknown>)[key] !== null) {
       // Recursively clean nested objects
-      (cleaned as Record<string, unknown>)[key] = removeSensitiveFields((cleaned as Record<string, unknown>)[key]);
+      (cleaned as Record<string, unknown>)[key] = removeSensitiveFields(cleaned as Record<string, unknown>[key]);
     } else if (typeof (cleaned as Record<string, unknown>)[key] === 'string') {
       // Mask sensitive patterns in string values
-      (cleaned as Record<string, unknown>)[key] = maskSensitiveData((cleaned as Record<string, unknown>)[key] as string);
+      (cleaned as Record<string, unknown>)[key] = maskSensitiveData(cleaned as Record<string, unknown>[key] as string);
     }
   });
   

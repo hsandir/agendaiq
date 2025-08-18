@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       include: { Staff: { include: { Role: true } } },
     });
 
-    if !user || !((user as Record<string, unknown>).Staff?.[0]?.Role?.title || (user as Record<string, unknown>).Staff[0].Role.title !== "Administrator") {
+    if (!user || !(user.Staff?.[0]?.Role?.title || user.Staff[0].Role.title !== "Administrator") {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     }
 
     const body = (await request.json()) as Record<string, unknown>;
-    const { __name, __address  } = body;
+    const { name, address } = body;
 
     if (!name) {
       return NextResponse.json(

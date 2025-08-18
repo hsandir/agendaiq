@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { __email, __password  } = validationResult.data;
+    const { email, password } = validationResult.data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -81,11 +81,11 @@ export async function POST(request: Request) {
           if (defaultDepartment) {
             await prisma.staff.create({
               data: {
-                user_id: parseInt(user.id),
-                role_id: parseInt(adminRole.id),
-                school_id: parseInt(defaultSchool.id),
-                district_id: parseInt(defaultDistrict.id),
-                department_id: parseInt(defaultDepartment.id),
+                user_id: user.id,
+                role_id: adminRole.id,
+                school_id: defaultSchool.id,
+                district_id: defaultDistrict.id,
+                department_id: defaultDepartment.id,
               },
             });
           }

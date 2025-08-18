@@ -11,7 +11,7 @@ export async function POST(request: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { __searchParams  } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const deviceIdStr = searchParams.get("id");
 
     if (!deviceIdStr) {

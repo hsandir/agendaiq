@@ -101,11 +101,11 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
   const [selectedPreviousMeeting, setSelectedPreviousMeeting] = useState<any>(null);
 
   // Transform users to MultiSelectOptions
-  const attendeeOptions: MultiSelectOption[] = users.mapuser => ({
+  const attendeeOptions: MultiSelectOption[] = users.map(user => ({
     value: user.id,
     label: user.name,
     email: user.email,
-    department: ((user as Record<string, unknown>).department,
+    department: (user as Record<string, unknown>.department,
     role: (user as Record<string, unknown>).role
   }));
 

@@ -13,7 +13,7 @@ export default async function CreateFirstAdminPage() {
   });
 
   // Check if there are already users in the system
-  const userCount = await prisma.(user as Record<string, unknown>).count();
+  const userCount = await prisma.user.count();
   const districtCount = await prisma.district.count();
   const schoolCount = await prisma.school.count();
 
@@ -56,7 +56,7 @@ export default async function CreateFirstAdminPage() {
   }
 
   // Get pre-created admin users from database
-  const adminUsers = await prisma.(user as Record<string, unknown>).findMany({
+  const adminUsers = await prisma.user.findMany({
     where: {
       OR: [
         { is_admin: true },

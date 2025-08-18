@@ -11,7 +11,7 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
       return NextResponse.json({ error: "Staff record not found" }, { status: 404 });
     }
 
-    const { __searchParams  } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const query = searchParams.get('q') || '';
 
     if (query.length < 2) {

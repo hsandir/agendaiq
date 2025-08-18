@@ -81,7 +81,7 @@ export function CreateFirstAdminForm({ adminUsers }: CreateFirstAdminFormProps) 
   };
 
   // Filter out users that already have passwords
-  const availableUsers = adminUsers.filteruser => !((user as Record<string, unknown>).hashedPassword);
+  const availableUsers = adminUsers.filter(user => !(user as Record<string, unknown>.hashedPassword);
 
   if (availableUsers.length === 0) {
     return (
@@ -118,7 +118,7 @@ export function CreateFirstAdminForm({ adminUsers }: CreateFirstAdminFormProps) 
           <option value="">-- Select an admin user --</option>
           {availableUsers.map((user) => (
             <option key={user.id} value={user.id}>
-              {user.name || 'No Name'} ({user.email}) - {(user as Record<string, unknown>).Staff?.[0]?.Role?.title || 'Admin'}
+              {user.name || 'No Name'} ({user.email}) - {user.Staff?.[0]?.Role?.title || 'Admin'}
             </option>
           ))}
         </select>

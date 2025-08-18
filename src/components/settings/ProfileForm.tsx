@@ -63,9 +63,9 @@ export function ProfileForm({ user }: ProfileFormProps) {
         </label>
         <div className="mt-2 flex items-center space-x-4">
           <div className="relative h-12 w-12 rounded-full overflow-hidden">
-            {((user as Record<string, unknown>).image ? 
+            {(user as Record<string, unknown>.image ? 
               <Image
-                src={((user as Record<string, unknown>).image}
+                src={(user as Record<string, unknown>.image}
                 alt={user.name || 'Profile picture'}
                 fill
                 className="object-cover"

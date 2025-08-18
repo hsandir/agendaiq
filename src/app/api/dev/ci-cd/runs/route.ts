@@ -169,7 +169,7 @@ export async function GET(request: NextRequest) {
     console.log('CI/CD API called, NODE_ENV:', process.env.NODE_ENV);
 
     // Parse query parameters
-    const { __searchParams  } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const params = {
       limit: parseInt(searchParams.get('limit') || '30'),
       status: searchParams.get('status') || 'all',
@@ -482,8 +482,8 @@ function calculateAverageDuration(runs: WorkflowRun[]): string {
   }, 0);
 
   const avgMs = totalDuration / completedRuns.length;
-  const minutes = Math.floor(avgMs / 60000);
-  const seconds = Math.floor((avgMs % 60000) / 1000);
+  const minutes = Math.floor(avgMs / 60000)));
+  const seconds = Math.floor((avgMs % 60000) / 1000)));
 
   return `${minutes}m ${seconds}s`;
 }

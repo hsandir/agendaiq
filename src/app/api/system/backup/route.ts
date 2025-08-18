@@ -448,7 +448,7 @@ async function saveBackupMetadata(backupInfo: Record<string, unknown>) {
 
 async function getProjectFiles() {
   try {
-    const { __stdout  } = await execAsync('find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.json" | grep -v node_modules | grep -v .next | head -20', { cwd: process.cwd() });
+    const { stdout } = await execAsync('find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.json" | grep -v node_modules | grep -v .next | head -20', { cwd: process.cwd() });
     return stdout.split('\n').filter(line => String(line).trim()).length;
   } catch {
     return 0;
@@ -457,7 +457,7 @@ async function getProjectFiles() {
 
 async function getDiskUsage() {
   try {
-    const { __stdout  } = await execAsync('du -sh .', { cwd: process.cwd() });
+    const { stdout } = await execAsync('du -sh .', { cwd: process.cwd() });
     return stdout.split('\t')[0];
   } catch {
     return 'Unknown';

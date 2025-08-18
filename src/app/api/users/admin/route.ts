@@ -26,7 +26,7 @@ export async function GET() {
       );
     }
 
-    const users = await prisma.(user as Record<string, unknown>).findMany({
+    const users = await prisma.user.findMany({
       include: {
         Staff: { include: { Role: true, Department: true, School: true } },
       },

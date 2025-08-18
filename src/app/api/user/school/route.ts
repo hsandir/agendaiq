@@ -20,7 +20,7 @@ export async function GET() {
       return new NextResponse("School not found", { status: 404 });
     }
 
-    return new NextResponseJSON.stringify(((user as Record<string, unknown>).Staff[0].School), {
+    return new NextResponseJSON.stringify((user.Staff[0].School), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     }
 
     const body = (await request.json()) as Record<string, unknown>;
-    const { __schoolId  } = body;
+    const { schoolId } = body;
 
     if (!schoolId) {
       return new NextResponse("School ID is required", { status: 400 });

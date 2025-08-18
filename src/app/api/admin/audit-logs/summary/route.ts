@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const { __searchParams  } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const days = searchParams.get('days') ? parseInt(searchParams.get('days')!) : 30;
 
     const summary = await AuditLogger.getAuditSummary(days);

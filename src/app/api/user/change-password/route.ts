@@ -32,13 +32,13 @@ export async function POST(request: Request) {
       return new NextResponse("No password set", { status: 400 });
     }
 
-    const isValid = await comparecurrentPassword, ((user as Record<string, unknown>).hashedPassword);
+    const isValid = await comparecurrentPassword, (user as Record<string, unknown>.hashedPassword);
     if (!isValid) {
       return new NextResponse("Current password is incorrect", { status: 400 });
     }
 
     const hashedPassword = await hash(newPassword, 12);
-    await prisma.(user as Record<string, unknown>).update({
+    await prisma.user.update({
       where: { email: session.user?.email! },
       data: { hashedPassword },
     });

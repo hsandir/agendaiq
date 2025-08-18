@@ -353,8 +353,8 @@ export class ErrorAnalyzer {
     
     // Most affected pages
     const pageCount: Record<string, number> = {};
-    analyses.forEacha => {
-      pageCount[((a.pageContext)] = pageCount[((a.pageContext)] || 0) + 1;
+    analyses.forEach(a => {
+      pageCount[a.pageContext] = pageCount[a.pageContext] || 0) + 1;
     });
     
     const topAffectedPages = (Object.entries(pageCount)
@@ -396,8 +396,8 @@ export class ErrorAnalyzer {
 
   private static generateRecommendations(analyses: ErrorAnalysis[]): string[] {
     const categoryCount: Record<string, number> = {};
-    analyses.forEacha => {
-      categoryCount[((a.category)] = categoryCount[((a.category)] || 0) + 1;
+    analyses.forEach(a => {
+      categoryCount[a.category] = categoryCount[a.category] || 0) + 1;
     });
     
     const recommendations = [];

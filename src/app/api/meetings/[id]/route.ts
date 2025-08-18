@@ -207,7 +207,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Staff record not found" }, { status: 404 });
     }
 
-    const { __id  } = params;
+    const { id } = params;
     const meetingId = parseInt(id);
     if (isNaN(meetingId)) {
       return NextResponse.json({ error: "Invalid meeting ID" }, { status: 400 });

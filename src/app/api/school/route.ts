@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
       if (!staffRecord.School) {
         return NextResponse.json({ error: "No school assigned" }, { status: 404 });
       }
-      return NextResponse.json[((staffRecord.School)]);
+      return NextResponse.json[staffRecord.School]);
     }
   } catch (error: unknown) {
     console.error("Error fetching schools:", error);

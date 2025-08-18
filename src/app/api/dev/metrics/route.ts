@@ -153,7 +153,7 @@ export async function GET(request: NextRequest) {
           if (timeDiffs.length > 0) {
             avgResponseTime = Math.round(timeDiffs.reduce((a, b) => a + b, 0) / timeDiffs.length);
             timeDiffs.sort((a, b) => a - b);
-            const p95Index = Math.floor(timeDiffs.length * 0.95);
+            const p95Index = Math.floor(timeDiffs.length * 0.95)));
             p95ResponseTime = timeDiffs[p95Index] || avgResponseTime * 2;
           }
         }

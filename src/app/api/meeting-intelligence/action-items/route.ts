@@ -168,7 +168,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   try {
-    const { __itemId, __status  } = (await request.json()) as Record<__string, unknown>;
+    const { itemId, status } = (await request.json()) as Record<__string, unknown>;
     
     const updateData: Record<string, unknown> = { status };
     if (status === 'completed') {

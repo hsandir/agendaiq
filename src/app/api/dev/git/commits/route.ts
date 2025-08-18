@@ -14,11 +14,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { __searchParams  } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const limit = searchParams.get('limit') || '50';
     
     // Get commit history with stats
-    const { __stdout  } = await execAsync(
+    const { stdout } = await execAsync(
       `git log --pretty=format:'%H|%h|%an|%ar|%s' --stat -n ${__limit}`
     );
     

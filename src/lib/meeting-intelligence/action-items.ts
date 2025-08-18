@@ -116,7 +116,7 @@ export class ActionItemsService {
 
     if (filterOptions?.departmentId) {
       where.Meeting = {
-        department_id: parseInt(filterOptions).departmentId
+        department_id: filterOptions.departmentId
       };
     }
 
@@ -145,7 +145,7 @@ export class ActionItemsService {
     });
 
     // Update status to Overdue
-    const overdueIds = (overdueItems.map(item => item.id));
+    const overdueIds = overdueItems.map(item => item.id);
     if (overdueIds.length > 0) {
       await prisma.meetingActionItem.updateMany({
         where: {
@@ -177,7 +177,7 @@ export class ActionItemsService {
 
     if (options?.departmentId) {
       where.Meeting = {
-        department_id: parseInt(options).departmentId
+        department_id: options.departmentId
       };
     }
 
@@ -228,7 +228,7 @@ export class ActionItemsService {
 
     if (filterOptions?.departmentId) {
       where.Meeting = {
-        department_id: parseInt(filterOptions).departmentId
+        department_id: filterOptions.departmentId
       };
     }
 

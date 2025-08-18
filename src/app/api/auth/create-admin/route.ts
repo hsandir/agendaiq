@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { __email, __password  } = validationResult.data;
+    const { email, password } = validationResult.data;
     
     // Check if user exists and has admin role
     const existingUser = await prisma.user.findUnique({

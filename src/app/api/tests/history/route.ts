@@ -43,10 +43,10 @@ export async function GET(request: NextRequest) {
         date.setDate(date.getDate() - i);
         
         const baseTests = 250;
-        const passed = Math.floor(Math.random() * 20) + (baseTests - 25);
+        const passed = Math.floor(Math.random() * 20) + (baseTests - 25)));
         const failed = baseTests - passed;
-        const coverage = Math.floor(Math.random() * 15) + 75; // 75-90%
-        const duration = Math.floor(Math.random() * 60) + 180; // 180-240 seconds
+        const coverage = Math.floor(Math.random() * 15) + 75)); // 75-90%
+        const duration = Math.floor(Math.random() * 60) + 180)); // 180-240 seconds
         
         simulatedHistory.push({
           date: date.toISOString().split('T')[0],

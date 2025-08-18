@@ -372,7 +372,7 @@ export default function UpdatesPage() {
   });
 
   const typeCounts = updates.reduce((acc, update) => {
-    acc[(update.type)] = acc[((update.type)] || 0) + 1;
+    acc[(update.type)] = acc[update.type] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
@@ -707,7 +707,7 @@ export default function UpdatesPage() {
                       <Button 
                         size="sm" 
                         variant={compatibility.recommendation === 'avoid' ? 'outline' : 'default'}
-                        onClick={() => performUpdate[((update.name)])}
+                        onClick={() => performUpdate[update.name])}
                         disabled={isUpdating || compatibility.recommendation === 'avoid'}
                         className={compatibility.recommendation === 'avoid' ? 'opacity-50' : ''}
                       >

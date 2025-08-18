@@ -88,7 +88,7 @@ export async function PUT(request: NextRequest) {
     const themeToSave = validatedData.themeId || validatedData.theme || 'standard';
 
     // Update user's theme preference (optimized query)
-    await prisma.(user as Record<string, unknown>).update({
+    await prisma.user.update({
       where: { id: user.id },
       data: { theme_preference: themeToSave },
       select: { id: true }, // Only select what we need

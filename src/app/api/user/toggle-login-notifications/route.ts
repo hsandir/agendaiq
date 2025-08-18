@@ -25,9 +25,9 @@ export async function POST() {
     }
 
     // TODO: Toggle the setting once loginNotifications field is added
-    // await prisma.(user as Record<string, unknown>).update{
+    // await prisma.user.update({
     //   where: { email: session.user?.email! },
-    //   data: { loginNotifications: !((user as Record<string, unknown>).loginNotifications },
+    //   data: { loginNotifications: !(user as Record<string, unknown>.loginNotifications },
     // });
 
     // For now, return error since loginNotifications field doesn't exist

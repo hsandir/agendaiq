@@ -107,7 +107,7 @@ export async function initializeTestData() {
 
     for (const userData of users) {
       // Create user
-      const user = await prisma.(user as Record<string, unknown>).upsert({
+      const user = await prisma.user.upsert({
         where: { email: userData.email },
         update: {},
         create: {

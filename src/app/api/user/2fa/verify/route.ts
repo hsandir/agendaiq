@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { __code  } = (await request.json()) as Record<__string, unknown>;
+    const { code } = (await request.json()) as Record<__string, unknown>;
 
     if (!code) {
       return new NextResponse("Verification code is required", { status: 400 });
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     // Verify code
     // const isValid = authenticator.verify{
     //   token: code,
-    //   secret: ((user as Record<string, unknown>).twoFactorSecret,
+    //   secret: (user as Record<string, unknown>.twoFactorSecret,
     // });
 
     // if (!isValid) {
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     // }
 
     // Enable 2FA
-    // await prisma.(user as Record<string, unknown>).update({
+    // await prisma.user.update({
     //   where: { id: session.user.id as string },
     //   data: { twoFactorEnabled: true },
     // });

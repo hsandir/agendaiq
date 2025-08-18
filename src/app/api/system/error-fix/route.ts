@@ -7,7 +7,7 @@ const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
   try {
-    const { __type  } = (await request.json()) as Record<__string, unknown>;
+    const { type } = (await request.json()) as Record<__string, unknown>;
 
     if (type === 'react-version-mismatch') {
       return await fixReactVersionMismatch();
@@ -62,7 +62,7 @@ async function fixReactVersionMismatch() {
     for (const command of fixCommands) {
       try {
         console.log(`Running: ${command}`);
-        const { __stdout, __stderr  } = await execAsync(__command, { 
+        const { stdout, stderr } = await execAsync(__command, { 
           cwd: process.cwd(),
           timeout: 120000 // 2 __minutes
         });
@@ -131,7 +131,7 @@ async function fixNodeModulesIssues() {
     const results = [];
     for (const command of fixCommands) {
       try {
-        const { __stdout  } = await execAsync(__command, { cwd: process.cwd(), timeout: __120000 });
+        const { stdout } = await execAsync(__command, { cwd: process.cwd(), timeout: __120000 });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
@@ -224,7 +224,7 @@ module.exports = {
     const results = [];
     for (const command of commands) {
       try {
-        const { __stdout  } = await execAsync(__command, { cwd: process.cwd(), timeout: __60000 });
+        const { stdout } = await execAsync(__command, { cwd: process.cwd(), timeout: __60000 });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
@@ -258,7 +258,7 @@ async function fixNextCacheIssues() {
     const results = [];
     for (const command of commands) {
       try {
-        const { __stdout  } = await execAsync(__command, { cwd: process.cwd(), timeout: __30000 });
+        const { stdout } = await execAsync(__command, { cwd: process.cwd(), timeout: __30000 });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });

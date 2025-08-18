@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Import the realtime transport to access memory buffer
-    const { __RealtimeTransport  } = await import('@/lib/logging/transports/realtime-transport');
+    const { RealtimeTransport } = await import('@/lib/logging/transports/realtime-transport');
     
     // Create a temporary transport instance to access the buffer
     // In a real implementation, you'd want to maintain a singleton

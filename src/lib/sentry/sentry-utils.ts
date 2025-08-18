@@ -79,7 +79,7 @@ export function captureException(
       scope.setUser{
         id: user.id,
         email: user.email,
-        staffId: ((user as Record<string, unknown>).staffId,
+        staffId: (user as Record<string, unknown>.staffId,
       });
     }
     

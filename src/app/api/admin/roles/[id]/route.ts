@@ -21,7 +21,7 @@ async function verifyAdmin() {
     }
   });
 
-  if (!user || !((user as Record<string, unknown>).Staff?.[0] || (user as Record<string, unknown>).Staff[0].Role?.title !== 'Administrator')) {
+  if (!user || !(user.Staff?.[0] || user.Staff[0].Role?.title !== 'Administrator')) {
     return null;
   }
 
@@ -32,7 +32,7 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { __id  } = await params;
+  const { id } = await params;
   const admin = await verifyAdmin();
   if (!admin) {
     return NextResponse.json(
@@ -85,7 +85,7 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { __id  } = await params;
+  const { id } = await params;
   const admin = await verifyAdmin();
   if (!admin) {
     return NextResponse.json(

@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 
 async function getLintSummary() {
   try {
-    const { __stdout, __stderr  } = await execAsync('npx eslint src/ --format json', { 
+    const { stdout, stderr } = await execAsync('npx eslint src/ --format json', { 
       cwd: process.cwd() 
     });
     
@@ -182,7 +182,7 @@ async function getLintSummary() {
 
 async function getLintDetails(severity: string, limit: number, offset: number) {
   try {
-    const { __stdout  } = await execAsync('npx eslint src/ --format json', { 
+    const { stdout } = await execAsync('npx eslint src/ --format json', { 
       cwd: process.cwd() 
     });
     
@@ -263,7 +263,7 @@ async function getLintDetails(severity: string, limit: number, offset: number) {
 
 async function getFixableErrors() {
   try {
-    const { __stdout  } = await execAsync('npx eslint src/ --format json', { 
+    const { stdout } = await execAsync('npx eslint src/ --format json', { 
       cwd: process.cwd() 
     });
     
@@ -319,7 +319,7 @@ async function getFixableErrors() {
 async function autoFixErrors() {
   try {
     // Run ESLint with --fix flag
-    const { __stdout, __stderr  } = await execAsync('npx eslint src/ --fix --format json', { 
+    const { stdout, stderr } = await execAsync('npx eslint src/ --fix --format json', { 
       cwd: process.cwd() 
     });
     

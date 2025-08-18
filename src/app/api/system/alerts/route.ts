@@ -228,7 +228,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const { __searchParams  } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 
     if (!id) {

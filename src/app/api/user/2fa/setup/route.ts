@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
     // TODO: Add twoFactorSecret and twoFactorEnabled fields to User model in schema
     // Save secret to user
-    // await prisma.(user as Record<string, unknown>).update({
+    // await prisma.user.update({
     //   where: { id: session.user.id as string },
     //   data: {
     //     twoFactorSecret: secret,

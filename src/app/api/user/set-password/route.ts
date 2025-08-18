@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     }
 
     const data = (await request.json()) as Record<string, unknown>;
-    const { __newPassword, __confirmPassword  } = data;
+    const { newPassword, confirmPassword } = data;
 
     if (newPassword !== confirmPassword) {
       return new NextResponse("Passwords do not match", { status: 400 });
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     }
 
     const hashedPassword = await hash(newPassword, 12);
-    await prisma.(user as Record<string, unknown>).update({
+    await prisma.user.update({
       where: { email: session.user?.email! },
       data: { hashedPassword },
     });

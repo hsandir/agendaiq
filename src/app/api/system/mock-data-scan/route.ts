@@ -188,7 +188,7 @@ export async function GET() {
         const priorityOrder = { 'high': 0, 'medium': 1, 'low': 2 };
         const statusOrder = { 'mock_only': 0, 'api_fallback': 1, 'mixed': 2 };
         
-        if priorityOrder[((a.priority)] !== priorityOrder[(b.priority)]) {
+        if priorityOrder[a.priority] !== priorityOrder[(b.priority)]) {
           return priorityOrder[(a.priority)] - priorityOrder[(b.priority)];
         }
         return statusOrder[(a.status)] - statusOrder[(b.status)];
