@@ -3,12 +3,25 @@
  * Tests for error monitoring endpoints
  */
 
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 import { NextRequest } from 'next/server';
 import { GET as getErrors } from '@/app/api/monitoring/errors/route';
 import { GET as getErrorStats } from '@/app/api/monitoring/error-stats/route';
 import { GET as getReleaseHealth } from '@/app/api/monitoring/release-health/route';
 import { withAuth } from '@/lib/auth/api-auth';
 import * as Sentry from '@sentry/nextjs';
+import {
+  ErrorsResponse,
+  ErrorStatsResponse,
+  ReleaseHealthResponse,
+  SentryIssue,
+  SentryStatsData,
+  SentryReleaseData
+} from '../types/monitoring-responses';
+import { ApiErrorResponse } from '../types/api-responses';
 
 // Mock dependencies
 jest.mock('@/lib/auth/api-auth');
@@ -47,7 +60,7 @@ describe('Error Monitoring APIs', () => {
 
         const request = mockRequest('http://localhost:3000/api/monitoring/errors');
         const response = await getErrors(request);
-        const data = await response.json();
+        const data = await response.json() as ApiErrorResponse;
 
         expect(mockWithAuth).toHaveBeenCalledWith(request, { requireStaffRole: true });
         expect(response.status).toBe(401);
@@ -69,7 +82,7 @@ describe('Error Monitoring APIs', () => {
         
         const request = mockRequest('http://localhost:3000/api/monitoring/errors');
         const response = await getErrors(request);
-        const data = await response.json();
+        const data = await response.json() as ErrorsResponse;
 
         expect(response.status).toBe(200);
         expect(data.issues).toEqual([]);
@@ -77,7 +90,7 @@ describe('Error Monitoring APIs', () => {
       });
 
       it('should fetch and transform Sentry issues', async () => {
-        const mockSentryIssues = [
+        const mockSentryIssues: SentryIssue[] = [
           {
             id: 'issue-1',
             title: 'TypeError: Cannot read property',
@@ -97,12 +110,12 @@ describe('Error Monitoring APIs', () => {
 
         (global.fetch as jest.Mock).mockResolvedValueOnce({
           ok: true,
-          json: async () => mockSentryIssues
+          json: async (): Promise<SentryIssue[]> => mockSentryIssues
         });
 
         const request = mockRequest('http://localhost:3000/api/monitoring/errors');
         const response = await getErrors(request);
-        const data = await response.json();
+        const data = await response.json() as ErrorsResponse;
 
         expect(response.status).toBe(200);
         expect(data.issues).toHaveLength(1);
@@ -137,7 +150,7 @@ describe('Error Monitoring APIs', () => {
 
         const request = mockRequest('http://localhost:3000/api/monitoring/errors');
         const response = await getErrors(request);
-        const data = await response.json();
+        const data = await response.json() as ErrorsResponse;
 
         expect(response.status).toBe(200);
         expect(data.issues).toHaveLength(3);
@@ -160,7 +173,7 @@ describe('Error Monitoring APIs', () => {
       
       const request = mockRequest('http://localhost:3000/api/monitoring/error-stats');
       const response = await getErrorStats(request);
-      const data = await response.json();
+      const data = await response.json() as ErrorStatsResponse;
 
       expect(response.status).toBe(200);
       expect(data.stats).toMatchObject({
@@ -180,21 +193,21 @@ describe('Error Monitoring APIs', () => {
       (global.fetch as jest.Mock)
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: async (): Promise<SentryStatsData> => ({
             data: [[1234567890, [{ count: 0.993 }]]]
           })
         })
         // Mock crash-free sessions response
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: async (): Promise<SentryStatsData> => ({
             data: [[1234567890, [{ count: 0.987 }]]]
           })
         })
         // Mock error count response
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: async (): Promise<SentryStatsData> => ({
             data: [[1234567890, [{ count: 15 }]]]
           })
         })
@@ -202,29 +215,29 @@ describe('Error Monitoring APIs', () => {
         .mockResolvedValueOnce({
           ok: true,
           headers: new Headers({ 'X-Hits': '25' }),
-          json: async () => []
+          json: async (): Promise<unknown[]> => []
         })
         // Mock new issues response
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => new Array(5)
+          json: async (): Promise<unknown[]> => new Array(5)
         })
         // Mock resolved issues response
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => new Array(8)
+          json: async (): Promise<unknown[]> => new Array(8)
         })
         // Mock p95 response time
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: async (): Promise<SentryStatsData> => ({
             data: [[1234567890, [{ count: 320 }]]]
           })
         });
 
       const request = mockRequest('http://localhost:3000/api/monitoring/error-stats');
       const response = await getErrorStats(request);
-      const data = await response.json();
+      const data = await response.json() as ErrorStatsResponse;
 
       expect(response.status).toBe(200);
       expect(data.stats.crashFreeUsers).toBe(99.3);
@@ -241,7 +254,7 @@ describe('Error Monitoring APIs', () => {
 
       const request = mockRequest('http://localhost:3000/api/monitoring/error-stats');
       const response = await getErrorStats(request);
-      const data = await response.json();
+      const data = await response.json() as ErrorStatsResponse;
 
       expect(response.status).toBe(200);
       expect(data.stats.crashFreeUsers).toBe(99.7);
@@ -263,7 +276,7 @@ describe('Error Monitoring APIs', () => {
       
       const request = mockRequest('http://localhost:3000/api/monitoring/release-health');
       const response = await getReleaseHealth(request);
-      const data = await response.json();
+      const data = await response.json() as ReleaseHealthResponse;
 
       expect(response.status).toBe(200);
       expect(data.release).toMatchObject({
@@ -278,7 +291,7 @@ describe('Error Monitoring APIs', () => {
     });
 
     it('should fetch release data from Sentry', async () => {
-      const mockReleaseData = {
+      const mockReleaseData: SentryReleaseData = {
         adoption: 85,
         sessions: 5000,
         crashFreeUsers: 0.992,
@@ -288,12 +301,12 @@ describe('Error Monitoring APIs', () => {
 
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => mockReleaseData
+        json: async (): Promise<SentryReleaseData> => mockReleaseData
       });
 
       const request = mockRequest('http://localhost:3000/api/monitoring/release-health');
       const response = await getReleaseHealth(request);
-      const data = await response.json();
+      const data = await response.json() as ReleaseHealthResponse;
 
       expect(response.status).toBe(200);
       expect(data.release).toMatchObject({
@@ -318,7 +331,7 @@ describe('Error Monitoring APIs', () => {
       for (const testCase of testCases) {
         (global.fetch as jest.Mock).mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: async (): Promise<SentryReleaseData> => ({
             crashFreeUsers: testCase.crashFreeRate,
             newGroups: testCase.newIssues,
             totalEvents: testCase.errorCount
@@ -327,7 +340,7 @@ describe('Error Monitoring APIs', () => {
 
         const request = mockRequest('http://localhost:3000/api/monitoring/release-health');
         const response = await getReleaseHealth(request);
-        const data = await response.json();
+        const data = await response.json() as ReleaseHealthResponse;
 
         expect(data.release.status).toBe(testCase.expectedStatus);
       }
@@ -343,21 +356,21 @@ describe('Error Monitoring APIs', () => {
         // Mock crash-free rate response
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: async (): Promise<SentryStatsData> => ({
             data: [[1234567890, [{ count: 0.996 }]]]
           })
         })
         // Mock session count response
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({
+          json: async (): Promise<SentryStatsData> => ({
             data: [[1234567890, [{ count: 1500 }]]]
           })
         });
 
       const request = mockRequest('http://localhost:3000/api/monitoring/release-health');
       const response = await getReleaseHealth(request);
-      const data = await response.json();
+      const data = await response.json() as ReleaseHealthResponse;
 
       expect(response.status).toBe(200);
       expect(data.release.crashFreeRate).toBe(99.6);

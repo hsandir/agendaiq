@@ -103,7 +103,7 @@ export function AgendaItemForm({
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => onMoveUp(index)}
+                onClick={() => onMoveUp(index, 'up')}
               >
                 <ChevronUp className="h-4 w-4" />
               </Button>
@@ -113,7 +113,7 @@ export function AgendaItemForm({
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => onMoveDown(index)}
+                onClick={() => onMoveDown(index, 'down')}
               >
                 <ChevronDown className="h-4 w-4" />
               </Button>

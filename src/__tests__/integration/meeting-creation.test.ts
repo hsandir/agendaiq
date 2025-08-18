@@ -3,11 +3,12 @@
  */
 
 import { getTestPrismaClient, createTestContext } from '../helpers/test-db';
+import type { TestContext } from '../types/test-context';
 
 const prisma = getTestPrismaClient();
 
 describe('Meeting Creation Integration', () => {
-  let testContext: unknown;
+  let testContext: TestContext;
 
   beforeAll(async () => {
     testContext = await createTestContext();

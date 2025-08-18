@@ -6,7 +6,7 @@ import { mockFetchResponse, mockFetchError } from '@/__tests__/utils/test-utils'
 
 // Mock next-auth
 jest.mock('next-auth/react', () => ({
-  ...jest.requireActual('next-auth/react'),
+  ...(jest.requireActual('next-auth/react') as object),
   signIn: jest.fn(),
 }))
 

@@ -141,12 +141,19 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
     take: 20 // Last 20 meetings
   });
 
+  // Transform staff data to match the component's expected format
+  const staffForAgenda = allStaff.map(staff => ({
+    id: staff.id,
+    name: staff.User.name || staff.User.email || 'Unknown',
+    initials: staff.User.name?.split(' ').map(n => n[0]).join('').toUpperCase()
+  }));
+
   return (
     <div className="max-w-7xl mx-auto py-6 px-4">
       <AgendaItemsEditor
         meeting={meeting}
         currentUser={user}
-        allStaff={allStaff}
+        allStaff={staffForAgenda}
         pastMeetings={pastMeetings}
         canEdit={hasAdminAccess || isOrganizer}
       />

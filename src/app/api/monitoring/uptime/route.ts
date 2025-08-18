@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     // Simple database connectivity check (no data exposed)
     await prisma.$queryRaw`SELECT 1`;
     response.status = 'healthy';
-  } catch (error) {
+  } catch {
     // Don't expose error details
     response.status = 'degraded';
   }

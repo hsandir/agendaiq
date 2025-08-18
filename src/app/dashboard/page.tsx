@@ -54,22 +54,21 @@ export default async function DashboardPage() {
   }
   
   const userId = userWithStaff?.id;
+  const staffId = userWithStaff?.Staff?.[0]?.id;
   
   if (!userId) {
     redirect("/auth/signin");
   }
   
   // Fetch upcoming meetings for the user
-  const upcomingMeetings = await prisma.meeting.findMany({
+  const upcomingMeetings = staffId ? await prisma.meeting.findMany({
     where: {
       OR: [
-        { organizer_id: userId },
+        { organizer_id: staffId },
         {
           MeetingAttendee: {
             some: {
-              Staff: {
-                user_id: userId
-              },
+              staff_id: staffId,
               status: "ACCEPTED",
             },
           },
@@ -99,23 +98,21 @@ export default async function DashboardPage() {
       start_time: "asc",
     },
     take: 5,
-  });
+  }) : [];
 
   // Fetch quick stats
-  const stats = await prisma.$transaction([
+  const stats = staffId ? await prisma.$transaction([
     prisma.meeting.count({
       where: {
         start_time: {
           gte: new Date(),
         },
         OR: [
-          { organizer_id: userId },
+          { organizer_id: staffId },
           {
             MeetingAttendee: {
               some: {
-                Staff: {
-                  user_id: userId
-                },
+                staff_id: staffId,
                 status: "ACCEPTED",
               },
             },
@@ -125,31 +122,27 @@ export default async function DashboardPage() {
     }),
     prisma.meeting.count({
       where: {
-        organizer_id: userId,
+        organizer_id: staffId,
       },
     }),
     prisma.meetingNote.count({
       where: {
-        Staff: {
-          user_id: userId,
-        },
+        staff_id: staffId,
       },
     }),
-  ]);
+  ]) : [0, 0, 0];
 
   // Fetch recent activity - real data
-  const recentActivity = await prisma.$transaction([
+  const recentActivity = staffId ? await prisma.$transaction([
     // Recent meetings created or updated
     prisma.meeting.findMany({
       where: {
         OR: [
-          { organizer_id: userId },
+          { organizer_id: staffId },
           {
             MeetingAttendee: {
               some: {
-                Staff: {
-                  user_id: userId
-                }
+                staff_id: staffId
               }
             }
           }
@@ -176,9 +169,7 @@ export default async function DashboardPage() {
     // Recent notes
     prisma.meetingNote.findMany({
       where: {
-        Staff: {
-          user_id: userId
-        }
+        staff_id: staffId
       },
       orderBy: {
         created_at: 'desc'
@@ -188,7 +179,7 @@ export default async function DashboardPage() {
         Meeting: true
       }
     })
-  ]);
+  ]) : [[], []];
 
   const quickStats = [
     { name: "Upcoming Meetings", value: stats[0], icon: Calendar },

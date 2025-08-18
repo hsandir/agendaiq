@@ -3,10 +3,17 @@
  * Tests for /api/monitoring/build-metrics endpoint
  */
 
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+
 import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/monitoring/build-metrics/route';
 import { withAuth } from '@/lib/auth/api-auth';
 import * as Sentry from '@sentry/nextjs';
+import { getMockOctokit, createMockOctokitInstance, MockWorkflowRunsResponse } from '../types/octokit-mock';
+import { ApiErrorResponse } from '../types/api-responses';
 
 // Type definitions for response
 interface MetricsResponse {
@@ -66,7 +73,7 @@ describe('/api/monitoring/build-metrics', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json() as MetricsResponse;
+      const data = await response.json() as ApiErrorResponse;
 
       expect(mockWithAuth).toHaveBeenCalledWith(request, { requireStaffRole: true });
       expect(response.status).toBe(401);
@@ -109,7 +116,7 @@ describe('/api/monitoring/build-metrics', () => {
     });
 
     it('should calculate GitHub metrics correctly', async () => {
-      const mockWorkflowRuns = {
+      const mockWorkflowRuns: MockWorkflowRunsResponse = {
         total_count: 100,
         workflow_runs: [
           {
@@ -133,19 +140,17 @@ describe('/api/monitoring/build-metrics', () => {
         ]
       };
 
-      const OctokitMock = jest.requireMock('@octokit/rest').Octokit as jest.MockedClass<unknown>;
-      OctokitMock.mockImplementation(() => ({
-        actions: {
-          listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: mockWorkflowRuns }),
-          listWorkflowRunArtifacts: jest.fn().mockResolvedValue({
-            data: {
-              artifacts: [
-                { name: 'test-results', size: 1024 },
-                { name: 'coverage-report', size: 2048 }
-              ]
-            }
-          })
-        }
+      const OctokitMock = getMockOctokit();
+      OctokitMock.mockImplementation(() => createMockOctokitInstance({
+        listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: mockWorkflowRuns }),
+        listWorkflowRunArtifacts: jest.fn().mockResolvedValue({
+          data: {
+            artifacts: [
+              { name: 'test-results', size: 1024 },
+              { name: 'coverage-report', size: 2048 }
+            ]
+          }
+        })
       }));
 
       // Mock Sentry API responses
@@ -168,11 +173,9 @@ describe('/api/monitoring/build-metrics', () => {
     });
 
     it('should fetch Sentry metrics when configured', async () => {
-      const OctokitMock = jest.requireMock('@octokit/rest').Octokit as jest.MockedClass<unknown>;
-      OctokitMock.mockImplementation(() => ({
-        actions: {
-          listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
-        }
+      const OctokitMock = getMockOctokit();
+      OctokitMock.mockImplementation(() => createMockOctokitInstance({
+        listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
       }));
 
       // Mock Sentry crash-free users response
@@ -217,11 +220,9 @@ describe('/api/monitoring/build-metrics', () => {
     });
 
     it('should handle GitHub API errors gracefully', async () => {
-      const OctokitMock = jest.requireMock('@octokit/rest').Octokit as jest.MockedClass<unknown>;
-      OctokitMock.mockImplementation(() => ({
-        actions: {
-          listWorkflowRunsForRepo: jest.fn().mockRejectedValue(new Error('GitHub API error'))
-        }
+      const OctokitMock = getMockOctokit();
+      OctokitMock.mockImplementation(() => createMockOctokitInstance({
+        listWorkflowRunsForRepo: jest.fn().mockRejectedValue(new Error('GitHub API error'))
       }));
 
       (global.fetch as jest.Mock).mockResolvedValue({
@@ -239,11 +240,9 @@ describe('/api/monitoring/build-metrics', () => {
     });
 
     it('should handle Sentry API errors gracefully', async () => {
-      const OctokitMock = jest.requireMock('@octokit/rest').Octokit as jest.MockedClass<unknown>;
-      OctokitMock.mockImplementation(() => ({
-        actions: {
-          listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
-        }
+      const OctokitMock = getMockOctokit();
+      OctokitMock.mockImplementation(() => createMockOctokitInstance({
+        listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
       }));
 
       (global.fetch as jest.Mock).mockRejectedValue(new Error('Sentry API error'));
@@ -291,11 +290,9 @@ describe('/api/monitoring/build-metrics', () => {
     });
 
     it('should return all required metric fields', async () => {
-      const OctokitMock = jest.requireMock('@octokit/rest').Octokit as jest.MockedClass<unknown>;
-      OctokitMock.mockImplementation(() => ({
-        actions: {
-          listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
-        }
+      const OctokitMock = getMockOctokit();
+      OctokitMock.mockImplementation(() => createMockOctokitInstance({
+        listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
       }));
 
       (global.fetch as jest.Mock).mockResolvedValue({
@@ -304,7 +301,7 @@ describe('/api/monitoring/build-metrics', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as MetricsResponse;
 
       expect(data.metrics).toHaveProperty('totalBuilds');
       expect(data.metrics).toHaveProperty('successRate');

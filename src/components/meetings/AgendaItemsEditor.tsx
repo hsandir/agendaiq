@@ -101,18 +101,10 @@ interface Meeting {
   }>
 }
 
-interface Staff {
+interface StaffForAgenda {
   id: number
-  User: {
-    name: string | null
-    email: string | null
-  }
-  Role: {
-    title: string
-  }
-  Department: {
-    name: string
-  } | null
+  name: string
+  initials?: string
 }
 
 interface PastMeeting {
@@ -127,7 +119,7 @@ interface PastMeeting {
 interface AgendaItemsEditorProps {
   meeting: Meeting
   currentUser: AuthenticatedUser
-  allStaff: Staff[]
+  allStaff: StaffForAgenda[]
   pastMeetings: PastMeeting[]
   canEdit: boolean
 }
@@ -379,9 +371,9 @@ export function AgendaItemsEditor({
 
       {/* Alerts */}
       {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+        <Alert className="border-red-200 bg-red-50">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">{error}</AlertDescription>
         </Alert>
       )}
 

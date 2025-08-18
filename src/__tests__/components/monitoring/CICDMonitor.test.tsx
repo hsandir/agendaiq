@@ -17,6 +17,64 @@ jest.mock('@/components/monitoring/ErrorMonitor', () => ({
 global.fetch = jest.fn();
 
 describe('CICDMonitor Component', () => {
+  // Shared mock function for API responses
+  const mockApiResponses = (): void => {
+    (global.fetch as jest.Mock)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          runs: [
+            {
+              id: '1',
+              branch: 'main',
+              commit: 'abc123',
+              author: 'testuser',
+              message: 'Test commit',
+              status: 'success',
+              startTime: new Date().toISOString(),
+              duration: 300000,
+              stages: [
+                { name: 'Build', status: 'success' },
+                { name: 'Test', status: 'success' },
+                { name: 'Deploy', status: 'success' }
+              ]
+            }
+          ]
+        })
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          deployments: [
+            {
+              environment: 'production',
+              version: '1.0.0',
+              status: 'success',
+              deployedAt: new Date().toISOString(),
+              deployedBy: 'deployuser',
+              url: 'https://example.com',
+              rollbackAvailable: true
+            }
+          ]
+        })
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          metrics: {
+            totalBuilds: 100,
+            successRate: 95,
+            averageDuration: 300000,
+            queueTime: 30000,
+            testsPassed: 150,
+            testsFailed: 5,
+            codeCoverage: 85,
+            vulnerabilities: 0
+          }
+        })
+      });
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
@@ -38,62 +96,6 @@ describe('CICDMonitor Component', () => {
   });
 
   describe('Data Fetching', () => {
-    const mockApiResponses = () => {
-      (global.fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            runs: [
-              {
-                id: '1',
-                branch: 'main',
-                commit: 'abc123',
-                author: 'testuser',
-                message: 'Test commit',
-                status: 'success',
-                startTime: new Date().toISOString(),
-                duration: 300000,
-                stages: [
-                  { name: 'Build', status: 'success' },
-                  { name: 'Test', status: 'success' },
-                  { name: 'Deploy', status: 'success' }
-                ]
-              }
-            ]
-          })
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            deployments: [
-              {
-                environment: 'production',
-                version: '1.0.0',
-                status: 'success',
-                deployedAt: new Date().toISOString(),
-                deployedBy: 'deployuser',
-                url: 'https://example.com',
-                rollbackAvailable: true
-              }
-            ]
-          })
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => ({
-            metrics: {
-              totalBuilds: 100,
-              successRate: 95,
-              averageDuration: 300000,
-              queueTime: 30000,
-              testsPassed: 150,
-              testsFailed: 5,
-              codeCoverage: 85,
-              vulnerabilities: 0
-            }
-          })
-        });
-    };
 
     it('should fetch and display pipeline data', async () => {
       mockApiResponses();

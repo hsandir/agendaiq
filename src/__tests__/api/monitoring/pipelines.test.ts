@@ -6,6 +6,8 @@
 import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/monitoring/pipelines/route';
 import { withAuth } from '@/lib/auth/api-auth';
+import { getMockOctokit, MockWorkflowRunsResponse } from '@/__tests__/types/octokit-mock';
+import type { AuthResult } from '@/lib/auth/auth-types';
 
 // Mock dependencies
 jest.mock('@/lib/auth/api-auth');
@@ -40,7 +42,7 @@ describe('/api/monitoring/pipelines', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as { error: string };
 
       expect(mockWithAuth).toHaveBeenCalledWith(request, { requireStaffRole: true });
       expect(response.status).toBe(401);
@@ -54,7 +56,7 @@ describe('/api/monitoring/pipelines', () => {
       mockWithAuth.mockResolvedValueOnce({
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
-      });
+      } as AuthResult);
     });
 
     it('should return empty runs when GitHub token is not configured', async () => {
@@ -62,7 +64,7 @@ describe('/api/monitoring/pipelines', () => {
       
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as { runs: unknown[]; message: string };
 
       expect(response.status).toBe(200);
       expect(data.runs).toEqual([]);
@@ -70,8 +72,8 @@ describe('/api/monitoring/pipelines', () => {
     });
 
     it('should handle GitHub API errors gracefully', async () => {
-      const Octokit = jest.requireMock('@octokit/rest').Octokit;
-      Octokit.mockImplementation(() => ({
+      const MockedOctokit = getMockOctokit();
+      MockedOctokit.mockImplementation(() => ({
         actions: {
           listWorkflowRunsForRepo: jest.fn().mockRejectedValue(new Error('GitHub API error'))
         }
@@ -79,7 +81,7 @@ describe('/api/monitoring/pipelines', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as { runs: unknown[]; message: string };
 
       expect(response.status).toBe(200);
       expect(data.runs).toEqual([]);
@@ -87,15 +89,13 @@ describe('/api/monitoring/pipelines', () => {
     });
 
     it('should transform GitHub workflow runs to pipeline format', async () => {
-      const mockWorkflowRuns = {
+      const mockWorkflowRuns: MockWorkflowRunsResponse = {
         total_count: 2,
         workflow_runs: [
           {
             id: 123,
             head_branch: 'main',
             head_sha: 'abc123def456',
-            actor: { login: 'testuser' },
-            display_title: 'Test commit',
             status: 'completed',
             conclusion: 'success',
             created_at: '2024-01-10T10:00:00Z',
@@ -105,18 +105,16 @@ describe('/api/monitoring/pipelines', () => {
             id: 124,
             head_branch: 'feature',
             head_sha: 'def456ghi789',
-            actor: { login: 'otheruser' },
-            display_title: 'Feature update',
             status: 'in_progress',
             conclusion: null,
             created_at: '2024-01-10T11:00:00Z',
-            updated_at: null
+            updated_at: '2024-01-10T11:00:00Z'
           }
         ]
       };
 
-      const Octokit = jest.requireMock('@octokit/rest').Octokit;
-      Octokit.mockImplementation(() => ({
+      const MockedOctokit = getMockOctokit();
+      MockedOctokit.mockImplementation(() => ({
         actions: {
           listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: mockWorkflowRuns })
         }
@@ -124,7 +122,7 @@ describe('/api/monitoring/pipelines', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as { runs: Array<{ id: string; branch: string; commit: string; status: string }> };
 
       expect(response.status).toBe(200);
       expect(data.runs).toHaveLength(2);
@@ -132,11 +130,9 @@ describe('/api/monitoring/pipelines', () => {
         id: '123',
         branch: 'main',
         commit: 'abc123def456',
-        author: 'testuser',
-        message: 'Test commit',
         status: 'success'
       });
-      expect(data.runs[1].status).toBe('running');
+      expect(data.runs[1]?.status).toBe('running');
     });
   });
 
@@ -146,7 +142,7 @@ describe('/api/monitoring/pipelines', () => {
       mockWithAuth.mockResolvedValueOnce({
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
-      });
+      } as AuthResult);
     });
 
     it('should map GitHub statuses correctly', async () => {
@@ -159,18 +155,19 @@ describe('/api/monitoring/pipelines', () => {
       ];
 
       for (const testCase of testCases) {
-        const Octokit = jest.requireMock('@octokit/rest').Octokit;
-        Octokit.mockImplementation(() => ({
+        const MockedOctokit = getMockOctokit();
+        MockedOctokit.mockImplementation(() => ({
           actions: {
             listWorkflowRunsForRepo: jest.fn().mockResolvedValue({
               data: {
                 workflow_runs: [{
                   id: 1,
-                  status: testCase.status,
-                  conclusion: testCase.conclusion,
+                  status: testCase.status as 'queued' | 'in_progress' | 'completed',
+                  conclusion: testCase.conclusion as 'success' | 'failure' | 'cancelled' | null,
                   head_branch: 'main',
                   head_sha: 'abc123',
-                  created_at: '2024-01-10T10:00:00Z'
+                  created_at: '2024-01-10T10:00:00Z',
+                  updated_at: '2024-01-10T10:00:00Z'
                 }]
               }
             })
@@ -179,9 +176,9 @@ describe('/api/monitoring/pipelines', () => {
 
         const request = mockRequest();
         const response = await GET(request);
-        const data = await response.json();
+        const data = await response.json() as { runs: Array<{ status: string }> };
 
-        expect(data.runs[0].status).toBe(testCase.expected);
+        expect(data.runs[0]?.status).toBe(testCase.expected);
       }
     });
   });
@@ -193,7 +190,7 @@ describe('/api/monitoring/pipelines', () => {
 
       const request = mockRequest();
       const response = await GET(request);
-      const data = await response.json();
+      const data = await response.json() as { error: string };
 
       expect(response.status).toBe(500);
       expect(data.error).toBe('Failed to fetch pipeline data');

@@ -20,10 +20,14 @@ const MAX_BUFFER_SIZE = 1000;
 
 export async function POST(request: Request) {
   try {
-    const metrics = await request.json();
+    const metrics = await request.json() as WebVitalsMetric;
     
     // Add timestamp
-    const metricWithTime = {
+    const metricWithTime: WebVitalsMetric & {
+      timestamp: string;
+      userAgent: string | null;
+      ip: string;
+    } = {
       ...metrics,
       timestamp: new Date().toISOString(),
       userAgent: request.headers.get('user-agent'),

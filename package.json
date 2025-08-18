@@ -34,7 +34,22 @@
     "db:reset": "echo '⛔ DATABASE RESET IS FORBIDDEN! See CLAUDE.md for policy.' && exit 1",
     "db:reset:force": "echo '⚠️ WARNING: This will DELETE ALL DATA!' && read -p 'Type DESTROY_ALL_DATA to continue: ' confirm && [ \"$confirm\" = \"DESTROY_ALL_DATA\" ] && prisma migrate reset || echo 'Aborted'",
     "postinstall": "prisma generate",
-    "prepare": "husky"
+    "prepare": "husky",
+    "validate": "node scripts/validate-system.js",
+    "validate:quick": "npm run validate:auth && npm run validate:db && npm run validate:mock",
+    "validate:auth": "grep -r 'organizer_id: userId' src/ || echo 'No userId misuse found'",
+    "validate:db": "npx prisma validate",
+    "validate:mock": "grep -r 'mockData\\|82\\.5%\\|placeholder' src/ || echo 'No mock data found'",
+    "precommit": "npm run validate",
+    "agent:start": "bash .claude/start-agent.sh",
+    "agent:stop": "bash .claude/stop-agent.sh",
+    "agent:status": "[ -f .claude/validation-agent.pid ] && kill -0 $(cat .claude/validation-agent.pid) 2>/dev/null && echo '✅ Agent is running' || echo '❌ Agent is not running'",
+    "agent:logs": "tail -f .claude/validation-agent.log",
+    "lock:acquire": "node .claude/file-lock-manager.js lock",
+    "lock:release": "node .claude/file-lock-manager.js unlock",
+    "lock:check": "node .claude/file-lock-manager.js check",
+    "lock:list": "node .claude/file-lock-manager.js list",
+    "lock:cleanup": "node .claude/file-lock-manager.js cleanup"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",

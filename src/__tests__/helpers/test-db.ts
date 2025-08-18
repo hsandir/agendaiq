@@ -96,7 +96,7 @@ export async function withTransaction<T>(
     await fn(tx as PrismaClient)
     throw new Error('Rollback') // Force rollback
   }).catch((error) => {
-    if (error.message === 'Rollback') {
+    if (error instanceof Error && error.message === 'Rollback') {
       return undefined as T
     }
     throw error
