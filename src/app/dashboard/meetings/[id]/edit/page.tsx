@@ -56,18 +56,44 @@ export default async function EditMeetingPage({ params }: PageProps) {
     redirect("/dashboard/meetings");
   }
 
-  // Get all staff users for the attendees dropdown (in case they want to modify attendees)
+  // Get relevant staff for attendees dropdown (same department/school + leadership)
   const allStaff = await prisma.staff.findMany({
     where: {
       NOT: {
         user_id: user.id,
+      },
+      OR: [
+        // Same department
+        { department_id: user.staff?.department_id },
+        // Leadership roles from same school
+        { 
+          school_id: user.staff?.school_id,
+          Role: {
+            is_leadership: true
+          }
+        }
+      ]
+    },
+    select: {
+      id: true,
+      User: {
+        select: {
+          name: true,
+          email: true
+        }
+      },
+      Role: {
+        select: {
+          title: true
+        }
+      },
+      Department: {
+        select: {
+          name: true
+        }
       }
     },
-    include: {
-      User: true,
-      Role: true,
-      Department: true
-    }
+    take: 100 // Limit for performance
   });
 
   const transformedUsers = allStaff.map(staff => ({

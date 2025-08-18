@@ -546,59 +546,7 @@ export default function PerformanceMonitor() {
         </TabsContent>
 
         <TabsContent value="database" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Database Performance</CardTitle>
-              <CardDescription>Query performance and connection metrics</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <h3 className="font-medium">Connection Pool</h3>
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span>Active Connections</span>
-                      <span className="font-medium">- / -</span>
-                    </div>
-                    <Progress value={0} />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span>Idle Connections</span>
-                      <span className="font-medium">-</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <h3 className="font-medium">Query Performance</h3>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span>Avg Query Time</span>
-                      <span className="font-medium">-</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Slow Queries (&gt;100ms)</span>
-                      <span className="font-medium">-</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Failed Queries</span>
-                      <span className="font-medium">-</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <h3 className="font-medium mb-2">Slow Query Log</h3>
-                <ScrollArea className="h-[200px] border rounded-lg p-3">
-                  <div className="space-y-2 text-xs font-mono">
-                    <p className="text-muted-foreground text-center">No slow queries</p>
-                  </div>
-                </ScrollArea>
-              </div>
-            </CardContent>
-          </Card>
+          <DatabasePerformance />
         </TabsContent>
 
         <TabsContent value="cache" className="space-y-4">

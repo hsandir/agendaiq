@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth/auth-utils';
 import { getFastUser } from '@/lib/auth/auth-utils-fast';
+import { getUltraFastUser, preferenceCache } from '@/lib/auth/auth-utils-ultra-fast';
 import { prisma } from '@/lib/prisma';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { z } from 'zod';
@@ -16,9 +17,21 @@ const layoutSchema = z.object({
 // GET /api/user/layout - Get user's layout preference
 export async function GET(request: NextRequest) {
   try {
-    const user = await getFastUser();
+    // Use ultra-fast auth for better performance
+    const user = await getUltraFastUser();
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+
+    // Check cache first
+    const cached = preferenceCache.get(user.id);
+    if (cached?.layout) {
+      const response = NextResponse.json({
+        layout: cached.layout,
+      });
+      response.headers.set('X-Cache', 'HIT');
+      response.headers.set('Cache-Control', 'private, max-age=3600');
+      return response;
     }
 
     // Get layout preference from database (fast query)
@@ -27,12 +40,14 @@ export async function GET(request: NextRequest) {
       select: { layout_preference: true }
     });
     
-    const response = NextResponse.json({
-      layout: userData?.layout_preference || 'modern',
-    });
+    const layout = userData?.layout_preference || 'modern';
     
-    // Add caching headers to reduce API calls
-    response.headers.set('Cache-Control', 'private, max-age=3600'); // 1 hour
+    // Cache the result
+    preferenceCache.set(user.id, { layout });
+    
+    const response = NextResponse.json({ layout });
+    response.headers.set('X-Cache', 'MISS');
+    response.headers.set('Cache-Control', 'private, max-age=3600');
     
     return response;
   } catch (error) {
@@ -61,7 +76,7 @@ export async function PUT(request: NextRequest) {
     }
   }
 
-  const user = await getFastUser();
+  const user = await getUltraFastUser();
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
   }
@@ -79,6 +94,9 @@ export async function PUT(request: NextRequest) {
       data: { layout_preference: layoutToSave },
       select: { id: true }, // Only select what we need
     });
+
+    // Clear cache for this user
+    preferenceCache.clear(user.id);
 
     // Log the layout change asynchronously (don't wait)
     AuditLogger.logFromRequest(request, {

@@ -145,7 +145,8 @@ async function getLintSummary() {
   } catch (error) {
     // ESLint might return non-zero exit code for errors, parse the output anyway
     try {
-      const results: LintResult[] = JSON.parse(error.stdout || '[]');
+      const errorOutput = (error as any)?.stdout || '[]';
+      const results: LintResult[] = JSON.parse(errorOutput);
       const summary = results.reduce((acc, result) => {
         acc.totalFiles++;
         acc.totalErrors += result.errorCount;
@@ -225,7 +226,8 @@ async function getLintDetails(severity: string, limit: number, offset: number) {
 
   } catch (error) {
     try {
-      const results: LintResult[] = JSON.parse(error.stdout || '[]');
+      const errorOutput = (error as any)?.stdout || '[]';
+      const results: LintResult[] = JSON.parse(errorOutput);
       const allErrors: (LintError & { filePath: string })[] = [];
       results.forEach(result => {
         result.messages.forEach(msg => {
@@ -288,7 +290,8 @@ async function getFixableErrors() {
 
   } catch (error) {
     try {
-      const results: LintResult[] = JSON.parse(error.stdout || '[]');
+      const errorOutput = (error as any)?.stdout || '[]';
+      const results: LintResult[] = JSON.parse(errorOutput);
       const fixableErrors: (LintError & { filePath: string })[] = [];
       results.forEach(result => {
         result.messages.forEach(msg => {
@@ -342,7 +345,8 @@ async function autoFixErrors() {
   } catch (error) {
     // Even if some errors remain, auto-fix might have worked partially
     try {
-      const results: LintResult[] = JSON.parse(error.stdout || '[]');
+      const errorOutput = (error as any)?.stdout || '[]';
+      const results: LintResult[] = JSON.parse(errorOutput);
       const remainingErrors = results.reduce((sum, result) => sum + result.errorCount, 0);
       const remainingWarnings = results.reduce((sum, result) => sum + result.warningCount, 0);
 
@@ -367,11 +371,18 @@ async function fixLintErrors(filePath: string, fixes: Array<Record<string, unkno
 
     // Apply fixes in reverse order (from end to beginning) to maintain positions
     let fixedContent = content;
-    const sortedFixes = fixes.sort((a, b) => b.range[0] - a.range[0]);
+    const sortedFixes = fixes.sort((a, b) => {
+      const aRange = (a as any).range as [number, number] | undefined;
+      const bRange = (b as any).range as [number, number] | undefined;
+      return (bRange?.[0] || 0) - (aRange?.[0] || 0);
+    });
 
     for (const fix of sortedFixes) {
-      const before = fixedContent.slice(0, fix.range[0]);
-      const after = fixedContent.slice(fix.range[1]);
+      const fixRange = (fix as any).range as [number, number] | undefined;
+      if (!fixRange) continue;
+      
+      const before = fixedContent.slice(0, fixRange[0]);
+      const after = fixedContent.slice(fixRange[1]);
       fixedContent = before + fix.text + after;
     }
 

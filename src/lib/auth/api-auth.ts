@@ -5,6 +5,8 @@ import {
   AuthRequirements, 
   AuthenticatedUser 
 } from './auth-utils';
+import { getUltraFastUser, userStaffCache } from './auth-utils-ultra-fast';
+import { prisma } from '@/lib/prisma';
 
 /**
  * API Response types
@@ -25,6 +27,7 @@ export async function withAuth(
 ): Promise<APIAuthResult> {
   
   try {
+    // For client-side API calls, use the standard auth flow
     const result = await checkAuthRequirements(requirements);
     
     if (!result.authorized) {
@@ -33,6 +36,11 @@ export async function withAuth(
         error: result.error || 'Access denied',
         statusCode: result.user ? 403 : 401
       };
+    }
+
+    // Cache the user data for subsequent requests
+    if (result.user) {
+      userStaffCache.set(result.user.id, result.user);
     }
 
     return {

@@ -10,23 +10,49 @@ export default async function NewMeetingPage() {
   // Try to get staff record if exists
   const currentStaff = user.staff;
 
-  // Fetch all staff except the current user, with their user info and additional details
+  // Fetch relevant staff for meeting invites (same department/school + leadership)
   const staff = await prisma.staff.findMany({
     where: {
       NOT: {
         user_id: user.id,
       },
+      OR: [
+        // Same department
+        { department_id: currentStaff?.department_id },
+        // Leadership roles from same school
+        { 
+          school_id: currentStaff?.school_id,
+          Role: {
+            is_leadership: true
+          }
+        }
+      ]
     },
-    include: {
-      User: true,
-      Department: true,
-      Role: true
+    select: {
+      id: true,
+      User: {
+        select: {
+          name: true,
+          email: true
+        }
+      },
+      Department: {
+        select: {
+          name: true
+        }
+      },
+      Role: {
+        select: {
+          title: true
+        }
+      }
     },
     orderBy: {
       User: {
         name: "asc",
       }
     },
+    take: 100 // Limit for performance
   });
 
   // Fetch departments for filtering

@@ -174,6 +174,7 @@ export function MeetingLiveView({
       const response = await fetch(`/api/meetings/${meeting.id}/agenda-items/${itemId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(updates)
       });
 
@@ -188,10 +189,12 @@ export function MeetingLiveView({
   };
 
   const addNewAgendaItem = async () => {
+    console.log('Adding new agenda item...');
     try {
       const response = await fetch(`/api/meetings/${meeting.id}/agenda-items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           items: [{
             topic: 'New Agenda Item',
@@ -203,11 +206,17 @@ export function MeetingLiveView({
         })
       });
 
-      if (response.ok) {
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Failed to add agenda item:', errorData);
+        alert(`Failed to add agenda item: ${errorData.error || 'Unknown error'}`);
+      } else {
+        console.log('Agenda item added successfully');
         await refreshMeeting();
       }
     } catch (error) {
       console.error("Error adding agenda item:", error);
+      alert('Failed to add agenda item. Please try again.');
     }
   };
 
@@ -374,8 +383,14 @@ export function MeetingLiveView({
                   
                   {(isOrganizer || isAdmin) && (
                     <Button 
-                      onClick={addNewAgendaItem} 
-                      className="rounded-full bg-primary hover:bg-primary"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        addNewAgendaItem();
+                      }} 
+                      className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 z-10 relative"
+                      type="button"
+                      style={{ zIndex: 10, position: 'relative' }}
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Add Item
@@ -396,7 +411,15 @@ export function MeetingLiveView({
                     <h3 className="text-lg font-medium text-foreground mb-2">No agenda items yet</h3>
                     <p className="text-muted-foreground mb-4">Get started by adding your first agenda item</p>
                     {(isOrganizer || isAdmin) && (
-                      <Button onClick={addNewAgendaItem} className="rounded-full">
+                      <Button 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          addNewAgendaItem();
+                        }} 
+                        className="rounded-full"
+                        type="button"
+                      >
                         <Plus className="h-4 w-4 mr-2" />
                         Add First Item
                       </Button>

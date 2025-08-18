@@ -22,7 +22,7 @@ const updateMeetingSchema = z.object({
   agenda: z.string().optional(),
   notes: z.string().optional(),
   status: z.string().optional(),
-  attendeeIds: z.array(z.string()).optional()
+  attendeeIds: z.array(z.string().transform(id => parseInt(id, 10))).optional()
 });
 
 interface Props {

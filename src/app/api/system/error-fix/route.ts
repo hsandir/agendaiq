@@ -298,11 +298,17 @@ async function autoFixAllErrors() {
       console.warn('Auto-backup failed:', error);
     }
 
+    interface FixResult {
+      success?: boolean;
+      error?: string;
+      [key: string]: unknown;
+    }
+
     const fixResults: {
-      reactFix: unknown | null;
-      nodeFix: unknown | null;
-      tailwindFix: unknown | null;
-      cacheFix: unknown | null;
+      reactFix: FixResult | null;
+      nodeFix: FixResult | null;
+      tailwindFix: FixResult | null;
+      cacheFix: FixResult | null;
     } = {
       reactFix: null,
       nodeFix: null,

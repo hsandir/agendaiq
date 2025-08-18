@@ -67,22 +67,31 @@ export class TestFactory {
         department_id: department.id,
         school_id: school.id,
         district_id: district.id,
-        staff_id: faker.string.alphanumeric(8).toUpperCase(),
         hire_date: faker.date.past({ years: 5 }),
-        phone: faker.phone.number(),
-        office_location: faker.location.streetAddress(),
         is_active: true,
-        is_on_leave: false,
-        subjects: [faker.word.noun()],
-        bio: faker.lorem.paragraph(),
-        specializations: [faker.word.adjective()],
+        flags: [],
+        endorsements: [],
+        extension: null,
+        room: null,
         ...overrides,
       },
       include: {
         User: true,
         Role: true,
-        Department: true,
-        School: true,
+        Department: {
+          include: {
+            School: {
+              include: {
+                District: true,
+              },
+            },
+          },
+        },
+        School: {
+          include: {
+            District: true,
+          },
+        },
         District: true,
       },
     })
@@ -104,15 +113,8 @@ export class TestFactory {
         department_id: organizer.department_id,
         school_id: organizer.school_id,
         district_id: organizer.district_id,
-        status: 'SCHEDULED',
-        location: faker.location.streetAddress(),
+        status: 'draft',
         meeting_type: 'REGULAR',
-        is_recurring: false,
-        is_public: true,
-        allow_guests: false,
-        record_meeting: false,
-        send_reminders: true,
-        reminder_minutes: 15,
         ...overrides,
       },
       include: {
@@ -171,12 +173,12 @@ export class TestFactory {
     return this.prisma.meetingAgendaItem.create({
       data: {
         meeting_id: meeting.id,
-        title: faker.lorem.sentence(),
-        description: faker.lorem.paragraph(),
-        presenter_id: presenter.id,
+        topic: faker.lorem.sentence(),
+        problem_statement: faker.lorem.paragraph(),
+        responsible_staff_id: presenter.id,
+        purpose: faker.helpers.arrayElement(['Discussion', 'Decision', 'Information_Sharing', 'Reminder']),
         duration_minutes: faker.number.int({ min: 5, max: 30 }),
         order_index: overrides.order_index ?? faker.number.int({ min: 1, max: 10 }),
-        item_type: faker.helpers.arrayElement(['DISCUSSION', 'PRESENTATION', 'DECISION', 'INFORMATION']),
         status: 'Pending',
         ...overrides,
       },
@@ -201,7 +203,15 @@ export class TestFactory {
   }
 
   private async getOrCreateDepartment(): Promise<Department & { School: School & { District: District } }> {
-    let department = await this.prisma.department.findFirst()
+    let department = await this.prisma.department.findFirst({
+      include: {
+        School: {
+          include: {
+            District: true,
+          },
+        },
+      },
+    })
     
     if (!department) {
       const school = await this.getOrCreateSchool()
@@ -225,7 +235,11 @@ export class TestFactory {
   }
 
   private async getOrCreateSchool(): Promise<School & { District: District }> {
-    let school = await this.prisma.school.findFirst()
+    let school = await this.prisma.school.findFirst({
+      include: {
+        District: true,
+      },
+    })
     
     if (!school) {
       const district = await this.getOrCreateDistrict()

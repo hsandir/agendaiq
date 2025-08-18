@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
       where: meetingWhereClause
     });
 
-    // Fetch meetings based on permission level with optimized query and pagination
+    // Fetch meetings with minimal data for list view
     const meetings = await prisma.meeting.findMany({
       where: meetingWhereClause,
       skip,
@@ -113,83 +113,42 @@ export async function GET(request: NextRequest) {
         start_time: true,
         end_time: true,
         zoom_join_url: true,
-        zoom_meeting_id: true,
         status: true,
-        repeat_pattern: true,
-        is_continuation: true,
-        created_at: true,
         organizer_id: true,
+        // Only get organizer name for display
         Staff: {
           select: {
-            id: true,
             User: {
               select: {
-                id: true,
                 name: true,
                 email: true,
               },
             },
-            Role: {
-              select: {
-                id: true,
-                title: true,
-                is_leadership: true
-              }
-            }
           },
         },
-        MeetingAttendee: {
+        // Only count attendees, don't fetch all data
+        _count: {
           select: {
-            id: true,
-            status: true,
-            Staff: {
-              select: {
-                id: true,
-                User: {
-                  select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                  },
-                },
-                Role: {
-                  select: {
-                    id: true,
-                    title: true
-                  }
-                }
-              },
-            },
-          },
-        },
+            MeetingAttendee: true
+          }
+        }
       },
       orderBy: {
         start_time: "desc",
       },
     });
 
-    // Format the response with proper types
-    const formattedMeetings: MeetingResponse[] = meetings.map((meeting) => ({
+    // Format the response with minimal data for performance
+    const formattedMeetings = meetings.map((meeting) => ({
       id: meeting.id,
       title: meeting.title,
       description: meeting.description,
       startTime: meeting.start_time?.toISOString() || new Date().toISOString(),
       endTime: meeting.end_time?.toISOString() || new Date().toISOString(),
-      zoomLink: meeting.zoom_join_url || meeting.zoom_meeting_id ? `/api/meetings/${meeting.id}/zoom` : null,
+      zoomLink: meeting.zoom_join_url || null,
       status: meeting.status,
-      organizer: {
-        id: meeting.Staff.id,
-        name: meeting.Staff.User.name,
-        email: meeting.Staff.User.email,
-        role: meeting.Staff.Role.title,
-      },
-      attendees: meeting.MeetingAttendee.map((attendee) => ({
-        id: attendee.Staff.id,
-        name: attendee.Staff.User.name,
-        email: attendee.Staff.User.email,
-        role: attendee.Staff.Role.title,
-        status: attendee.status || 'PENDING',
-      })),
+      organizerName: meeting.Staff.User.name || meeting.Staff.User.email || 'Unknown',
+      attendeeCount: meeting._count.MeetingAttendee
     }));
 
     const responseData = { 

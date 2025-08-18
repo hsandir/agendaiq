@@ -139,31 +139,59 @@ export async function POST(request: NextRequest, props: Props) {
       );
     }
 
-    // Delete existing agenda items for fresh update
-    await prisma.meetingAgendaItem.deleteMany({
-      where: { meeting_id: meetingId }
-    });
+    // Check if this is a single item addition (typical case) or bulk update
+    const isSingleAddition = result.data.items.length === 1 && 
+                            result.data.items[0].topic === 'New Agenda Item';
 
-    // Create new agenda items
-    const createdItems = await Promise.all(
-      result.data.items.map(async (item) => {
-        return await prisma.meetingAgendaItem.create({
-          data: {
-            meeting_id: meetingId,
-            ...item
+    let createdItems = [];
+    
+    if (isSingleAddition) {
+      // For single item addition, just add it without deleting existing items
+      const newItem = await prisma.meetingAgendaItem.create({
+        data: {
+          meeting_id: meetingId,
+          ...result.data.items[0]
+        },
+        include: {
+          ResponsibleStaff: {
+            include: {
+              User: true
+            }
           },
-          include: {
-            ResponsibleStaff: {
-              include: {
-                User: true
-              }
-            },
-            Comments: true,
-            ActionItems: true
-          }
-        });
-      })
-    );
+          Comments: true,
+          ActionItems: true
+        }
+      });
+      createdItems = [newItem];
+    } else {
+      // For bulk update, delete existing and create new
+      await prisma.meetingAgendaItem.deleteMany({
+        where: { meeting_id: meetingId }
+      });
+
+      // Create new agenda items using createMany for better performance
+      await prisma.meetingAgendaItem.createMany({
+        data: result.data.items.map(item => ({
+          meeting_id: meetingId,
+          ...item
+        }))
+      });
+
+      // Fetch the created items
+      createdItems = await prisma.meetingAgendaItem.findMany({
+        where: { meeting_id: meetingId },
+        include: {
+          ResponsibleStaff: {
+            include: {
+              User: true
+            }
+          },
+          Comments: true,
+          ActionItems: true
+        },
+        orderBy: { order_index: 'asc' }
+      });
+    }
 
     // Log the action
     await AuditLogger.logFromRequest(request, {
@@ -176,13 +204,29 @@ export async function POST(request: NextRequest, props: Props) {
       description: `Created ${createdItems.length} agenda items for meeting ${meeting.title}`
     });
 
-    // Trigger Pusher event for real-time update
-    for (const item of createdItems) {
+    // Trigger Pusher event for real-time update (batch for performance)
+    if (createdItems.length === 1) {
+      // Single item - send individual event
       await pusherServer.trigger(
         CHANNELS.meeting(meetingId),
         EVENTS.AGENDA_ITEM_ADDED,
         {
-          item,
+          item: createdItems[0],
+          addedBy: {
+            id: user.id,
+            name: user.name,
+            email: user.email
+          },
+          timestamp: new Date().toISOString()
+        }
+      );
+    } else if (createdItems.length > 1) {
+      // Multiple items - send batch event
+      await pusherServer.trigger(
+        CHANNELS.meeting(meetingId),
+        'agenda-items-bulk-added',
+        {
+          items: createdItems,
           addedBy: {
             id: user.id,
             name: user.name,

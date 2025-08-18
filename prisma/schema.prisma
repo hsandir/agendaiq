@@ -251,6 +251,14 @@ model Meeting {
   MeetingNote          MeetingNote[]
   MeetingSearches      MeetingSearch[]
   MeetingTranscript    MeetingTranscript?
+  location             String?
+  zoom_link            String?
+
+  @@index([organizer_id, start_time])
+  @@index([school_id, start_time])
+  @@index([department_id, start_time])
+  @@index([status, start_time])
+  @@index([start_time])
 }
 
 model MeetingAttendee {
@@ -261,6 +269,10 @@ model MeetingAttendee {
   id         Int      @id @default(autoincrement())
   Meeting    Meeting  @relation(fields: [meeting_id], references: [id])
   Staff      Staff    @relation(fields: [staff_id], references: [id])
+  attended   Boolean  @default(false)
+
+  @@index([meeting_id, staff_id])
+  @@index([staff_id])
 }
 
 model MeetingNote {

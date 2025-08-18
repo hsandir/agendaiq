@@ -233,11 +233,12 @@ async function sendCriticalErrorNotification(error: StoredError) {
 function generatePageAnalytics() {
   const analytics: Record<string, PageAnalytics> = {};
   
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+  
   for (const [page, errors] of errorStore.entries()) {
     const recentErrors = errors.filter(err => {
       const errorTime = new Date(err.receivedAt).getTime();
-      const oneHourAgo = Date.now() - 60 * 60 * 1000;
-      return errorTime > oneHourAgo;
+      return errorTime > oneHourAgo.getTime();
     });
 
     analytics[page] = {
@@ -248,7 +249,14 @@ function generatePageAnalytics() {
       mostCommonCategory: getMostCommonCategory(errors),
       averagePriority: errors.reduce((sum, e) => sum + e.priority, 0) / errors.length,
       lastErrorTime: errors.length > 0 ? errors[0].receivedAt : null,
-      healthScore: calculatePageHealthScore(errors)
+      healthScore: calculatePageHealthScore(errors),
+      severityBreakdown: {
+        critical: errors.filter(e => e.analysis.severity === 'critical').length,
+        high: errors.filter(e => e.analysis.severity === 'high').length,
+        medium: errors.filter(e => e.analysis.severity === 'medium').length,
+        low: errors.filter(e => e.analysis.severity === 'low').length
+      },
+      errorRate: errors.length / Math.max(1, (Date.now() - oneHourAgo.getTime()) / (1000 * 60 * 60)) // errors per hour
     };
   }
 

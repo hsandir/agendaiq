@@ -27,7 +27,12 @@ export default function MeetingsPageClient() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/meetings');
+      const response = await fetch('/api/meetings', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
       
       if (!response.ok) {
         throw new Error('Failed to fetch meetings');
