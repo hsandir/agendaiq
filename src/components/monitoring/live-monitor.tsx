@@ -338,7 +338,7 @@ export default function LiveMonitor() {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Toplam Hata</p>
+              <p className="text-sm text-muted-foreground">Total Errors</p>
               <p className="text-2xl font-bold">{stats.totalErrors}</p>
             </div>
             <Bug className="h-8 w-8 text-muted-foreground" />
@@ -398,15 +398,15 @@ export default function LiveMonitor() {
           </div>
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          Son kontrol: {new Date(systemHealth.lastCheck).toLocaleTimeString('tr-TR')}
+          Last check: {new Date(systemHealth.lastCheck).toLocaleTimeString('en-US')}
         </p>
       </Card>
 
       {/* Live Error Feed */}
       <Card className="p-4">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Canlı Hata Akışı</h3>
-          <Badge variant="outline">{errors.length} hata</Badge>
+          <h3 className="text-lg font-semibold">Live Error Stream</h3>
+          <Badge variant="outline">{errors.length} errors</Badge>
         </div>
 
         <ScrollArea className="h-96">

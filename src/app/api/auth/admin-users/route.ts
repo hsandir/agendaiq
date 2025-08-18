@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Find all users who have admin role
-    const adminUsers = await prisma.(user as Record<string, unknown>).findMany({
+    const adminUsers = await prisma.user.findMany({
       where: {
         Staff: {
           some: {

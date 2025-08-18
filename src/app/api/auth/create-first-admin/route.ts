@@ -12,7 +12,7 @@ const createAdminSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Check if there are any users in the system first
-    const userCount = await prisma.(user as Record<string, unknown>).count();
+    const userCount = await prisma.user.count();
     
     // If users exist, require authentication
     if (userCount > 0) {

@@ -51,8 +51,8 @@ export async function POST(request: Request) {
 
     // Update or create staff record
     if ((user as Record<string, unknown>).Staff?.[0]) {
-      await prisma.staff.update{
-        where: { id: ((user as Record<string, unknown>).Staff[0].id },
+      await prisma.staff.update({
+        where: { id: (user as Record<string, unknown>).Staff[0].id },
         data: { role_id: parseInt(roleId) },
       });
     } else {
