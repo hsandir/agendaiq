@@ -118,7 +118,7 @@ export function hasResourcePermission(
 ): boolean {
   
   // Admin can do everything - use capability-based check
-  if user.is_system_admin || (user as Record<string, unknown>.is_school_admin) {
+  if (user.is_system_admin || user.is_school_admin) {
     return true;
   }
 

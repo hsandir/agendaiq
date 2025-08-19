@@ -32,12 +32,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json{
+    return NextResponse.json({
       id: userProfile.id,
       email: userProfile.email,
       name: userProfile.name,
       staff_id: userProfile.staff_id,
-      staff: (userProfile.Staff?.[0] ? {
+      staff: userProfile.Staff?.[0] ? {
         id: userProfile.Staff[0].id,
         role: userProfile.Staff[0].Role,
         department: userProfile.Staff[0].Department,
@@ -84,12 +84,12 @@ export async function PUT(request: NextRequest) {
       }
     });
 
-    return NextResponse.json{
+    return NextResponse.json({
       id: updatedUser.id,
       email: updatedUser.email,
       name: updatedUser.name,
       staff_id: updatedUser.staff_id,
-      staff: (updatedUser.Staff?.[0] ? {
+      staff: updatedUser.Staff?.[0] ? {
         id: updatedUser.Staff[0].id,
         role: updatedUser.Staff[0].Role,
         department: updatedUser.Staff[0].Department,

@@ -44,7 +44,7 @@ export default async function DashboardLayout({
   });
 
   const currentRole = userWithStaff?.Staff?.[0]?.Role || null;
-  const isAdmin = isUserAdminuserWithStaff;
+  const isAdmin = isUserAdmin(userWithStaff);
 
   return (
     <>

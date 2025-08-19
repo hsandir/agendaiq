@@ -133,8 +133,8 @@ export const authOptions: NextAuthOptions = {
             }
 
             // Verify the 2FA code
-            const isValidToken = speakeasy.totp.verify{
-              secret: (user as Record<string, unknown>.two_factor_secret!,
+            const isValidToken = speakeasy.totp.verify({
+              secret: (user as Record<string, unknown>).two_factor_secret!,
               encoding: 'base32',
               token: credentials.twoFactorCode,
               window: 2
@@ -274,7 +274,7 @@ export const authOptions: NextAuthOptions = {
         }
         
         // Handle rememberMe and trustDevice flags
-        if (user as Record<string, unknown>.rememberMe) {
+        if ((user as Record<string, unknown>).rememberMe) {
           token.rememberMe = true;
           // Set longer expiry for remember me (7 days)
           const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
@@ -285,7 +285,7 @@ export const authOptions: NextAuthOptions = {
           token.exp = Math.floor(Date.now() / 1000) + maxAge;
         }
         
-        if (user as Record<string, unknown>.trustDevice) {
+        if ((user as Record<string, unknown>).trustDevice) {
           token.trustDevice = true;
         }
       }

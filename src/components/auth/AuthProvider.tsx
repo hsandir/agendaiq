@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { setSentryUser, clearSentryUser } from "@/lib/sentry/sentry-utils";
 
 function SentryUserSync() {
-  const { data: __session, __status  } = useSession();
+  const { data: session, status } = useSession();
   
   useEffect(() => {
     if (status === "loading") return;

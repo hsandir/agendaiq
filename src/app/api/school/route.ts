@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = (await request.json()) as Record<string, unknown>;
-    const { __name, __code, __address, ___phone, __email, __district_id  } = body;
+    const { name, code, address, phone, email, district_id } = body;
 
     if (!name || !code || !district_id) {
       return NextResponse.json(
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     // Check if school code already exists
     const existingSchool = await prisma.school.findFirst({
-      where: { code },
+      where: { code: code as string },
     });
 
     if (existingSchool) {
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
 
     // Verify district exists
     const district = await prisma.district.findUnique({
-      where: { id: district_id },
+      where: { id: district_id as number },
     });
 
     if (!district) {
@@ -110,13 +110,13 @@ export async function POST(request: NextRequest) {
 
     const school = await prisma.school.create({
       data: {
-        name,
-        code,
-        address,
+        name: name as string,
+        code: code as string,
+        address: address as string | undefined,
         // TODO: Add phone and email fields to School model in schema
         // phone,
         // email,
-        district_id,
+        district_id: district_id as number,
       },
       include: {
         District: true,
@@ -142,7 +142,7 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = (await request.json()) as Record<string, unknown>;
-    const { __id, __name, __code, __address, ___phone, __email, __district_id  } = body;
+    const { id, name, code, address, phone, email, district_id } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -153,7 +153,7 @@ export async function PUT(request: NextRequest) {
 
     // Check if school exists
     const existingSchool = await prisma.school.findUnique({
-      where: { id },
+      where: { id: id as number },
     });
 
     if (!existingSchool) {
@@ -166,7 +166,7 @@ export async function PUT(request: NextRequest) {
     // If code is being changed, check for conflicts
     if (code && code !== existingSchool.code) {
       const codeConflict = await prisma.school.findFirst({
-        where: { code },
+        where: { code: code as string },
       });
 
       if (codeConflict) {
@@ -180,7 +180,7 @@ export async function PUT(request: NextRequest) {
     // If district is being changed, verify it exists
     if (district_id && district_id !== existingSchool.district_id) {
       const district = await prisma.district.findUnique({
-        where: { id: district_id },
+        where: { id: district_id as number },
       });
 
       if (!district) {
@@ -200,7 +200,7 @@ export async function PUT(request: NextRequest) {
     if (district_id !== undefined) updateData.district_id = district_id;
 
     const school = await prisma.school.update({
-      where: { id },
+      where: { id: id as number },
       data: updateData,
       include: {
         District: true,

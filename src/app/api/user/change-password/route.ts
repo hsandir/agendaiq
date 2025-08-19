@@ -13,13 +13,13 @@ export async function POST(request: Request) {
     }
 
     const data = (await request.json()) as Record<string, unknown>;
-    const { __currentPassword, __newPassword, __confirmPassword  } = data;
+    const { currentPassword, newPassword, confirmPassword } = data;
 
-    if (newPassword !== confirmPassword) {
+    if ((newPassword as string) !== (confirmPassword as string)) {
       return new NextResponse("Passwords do not match", { status: 400 });
     }
 
-    if (newPassword.length < 8) {
+    if ((newPassword as string).length < 8) {
       return new NextResponse("Password must be at least 8 characters long", { status: 400 });
     }
 
@@ -32,12 +32,12 @@ export async function POST(request: Request) {
       return new NextResponse("No password set", { status: 400 });
     }
 
-    const isValid = await comparecurrentPassword, (user as Record<string, unknown>.hashedPassword);
+    const isValid = await compare(currentPassword as string, user.hashedPassword);
     if (!isValid) {
       return new NextResponse("Current password is incorrect", { status: 400 });
     }
 
-    const hashedPassword = await hash(newPassword, 12);
+    const hashedPassword = await hash(newPassword as string, 12);
     await prisma.user.update({
       where: { email: session.user?.email! },
       data: { hashedPassword },

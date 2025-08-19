@@ -301,7 +301,7 @@ export default function PermissionsCheckPage() {
   useEffect(() => {
     if (session?.user) {
       // Get user capabilities from session
-      setUserCapabilitiessession.(user.capabilities || []);
+      setUserCapabilities(session.user.capabilities || []);
       setLoading(false);
     } else if (status !== 'loading') {
       setLoading(false);

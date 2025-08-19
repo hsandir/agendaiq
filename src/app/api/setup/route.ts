@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     }
 
     const body = (await request.json()) as Record<string, unknown>;
-    const { __districtName, __schoolName, __address  } = body;
+    const { districtName, schoolName, address } = body;
 
     if (!districtName || !schoolName) {
       return NextResponse.json(
@@ -63,7 +63,7 @@ export async function POST(request: Request) {
     if (!district) {
       district = await prisma.district.create({
         data: {
-          name: districtName?.trim(),
+          name: (districtName as string)?.trim(),
         },
       });
     }
@@ -71,8 +71,8 @@ export async function POST(request: Request) {
     // Create school
     const school = await prisma.school.create({
       data: {
-        name: schoolName?.trim(),
-        address: address?.trim(),
+        name: (schoolName as string)?.trim(),
+        address: (address as string | undefined)?.trim(),
         code: `SCH${Date.now().toString().slice(-6)}`, // Generate unique code
         district_id: parseInt(district.id),
       },
@@ -106,7 +106,7 @@ export async function PUT(request: Request) {
     }
 
     const body = (await request.json()) as Record<string, unknown>;
-    const { __districtName, __schoolName, __address  } = body;
+    const { districtName, schoolName, address } = body;
 
     if (!districtName || !schoolName) {
       return NextResponse.json(
@@ -130,7 +130,7 @@ export async function PUT(request: Request) {
     const updatedDistrict = await prisma.district.update({
       where: { id: district.id },
       data: {
-        name: districtName?.trim(),
+        name: (districtName as string)?.trim(),
       },
     });
 

@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 // Temporary endpoint for debugging - no auth required
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = (await request.json()) as Record<__string, unknown>;
+    const { email, password } = (await request.json()) as Record<string, unknown>;
     
     console.log('Test login attempt for:', email);
     
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       }, { status: 404 });
     }
     
-    if (!(user as Record<string, unknown>.hashedPassword) {
+    if (!user.hashedPassword) {
       return NextResponse.json({ 
         error: 'User has no password',
         email,
@@ -42,16 +42,16 @@ export async function POST(request: NextRequest) {
     }
     
     // Test password
-    const isValid = await bcrypt.comparepassword, (user as Record<string, unknown>.hashedPassword);
+    const isValid = await bcrypt.compare(password as string, user.hashedPassword);
     
-    return NextResponse.json{
+    return NextResponse.json({
       success: isValid,
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
-        hasPassword: !!user as Record<string, unknown>.hashedPassword,
-        emailVerified: !!(user.emailVerified,
+        hasPassword: !!user.hashedPassword,
+        emailVerified: !!user.emailVerified,
         role: user.Staff?.[0]?.Role?.title
       },
       passwordCheck: {

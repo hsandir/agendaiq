@@ -154,3 +154,8 @@ src/app/dashboard/teams-v2/
 src/components/teams-v2/
 src/lib/prisma-v2.ts
 *.backup-*
+# Exclude v2 files from build
+src/app/api/teams-v2/**
+src/app/dashboard/teams-v2/**
+src/components/teams-v2/**
+src/lib/prisma-v2.ts
