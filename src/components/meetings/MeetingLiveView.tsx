@@ -334,7 +334,7 @@ export function MeetingLiveView({
                   )}
                 </div>
                 
-                {(isOrganizer ?? isAdmin) && (
+                {(isOrganizer || isAdmin) && (
                   <Link href={`/dashboard/meetings/${meeting.id}/edit`}>
                     <Button
                       variant="default"
@@ -400,7 +400,7 @@ export function MeetingLiveView({
                     </button>
                   </div>
                   
-                  {(isOrganizer ?? isAdmin) && (
+                  {(isOrganizer || isAdmin) && (
                     <Button 
                       onClick={(e) => {
                         e.preventDefault();
@@ -456,7 +456,7 @@ export function MeetingLiveView({
                         isExpanded={expandedItems.has(item.id)}
                         onToggleExpand={() => toggleItemExpanded(item.id)}
                         onUpdate={(updates) => handleItemUpdate(item.id, updates)}
-                        canEdit={isOrganizer ?? isAdmin || item.responsible_staff_id === currentUser.staff?.id}
+                        canEdit={isOrganizer || isAdmin || item.responsible_staff_id === currentUser.staff?.id}
                         currentUserId={currentUser.id}
                         currentUserName={currentUser.name ?? ''}
                         meetingId={meeting.id}

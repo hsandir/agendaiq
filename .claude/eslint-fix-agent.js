@@ -225,10 +225,11 @@ class ESLintFixAgent {
     this.log('Running ESLint auto-fix on all files...', 'INFO');
     
     try {
-      // First, try ESLint's built-in autofix
-      execSync('npx eslint src --fix --max-warnings 0', {
+      // First, try ESLint's built-in autofix with nice priority to reduce CPU usage
+      execSync('nice -n 19 npx eslint src --fix --max-warnings 0', {
         encoding: 'utf-8',
-        stdio: 'pipe'
+        stdio: 'pipe',
+        maxBuffer: 1024 * 1024 * 10 // 10MB buffer limit
       });
       
       this.log('ESLint auto-fix completed successfully', 'SUCCESS');

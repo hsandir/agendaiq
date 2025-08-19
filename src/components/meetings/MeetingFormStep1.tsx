@@ -115,6 +115,8 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
 
   // Auto-set end time when start time changes
   const handleStartTimeChange = (newStartTime: string) => {
+    console.log("Start time changed to:", newStartTime);
+    
     // Validate the new start time
     if (!newStartTime) {
       setStartTime("");
@@ -135,6 +137,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
         const endDate = addMinutes(startDate, 60);
         const formattedEndTime = endDate.toISOString().slice(0, 16);
         setEndTime(formattedEndTime);
+        console.log("Auto-set end time to:", formattedEndTime);
       }
     } catch (error: unknown) {
       console.error("Error handling start time change:", error);
@@ -214,7 +217,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     e.preventDefault();
     
     // Validate required fields
-    if (!title || !startTime || (!endTime ?? (selectedAttendees.length === 0))) {
+    if (!title || !startTime || !endTime || selectedAttendees.length === 0) {
       alert("Please fill in all required fields and select at least one attendee.");
       return;
     }
@@ -269,7 +272,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       
       if (result?.success && result?.meetingId) {
         // Client-side redirect to Step 2 (agenda items)
-        router.push`/dashboard/meetings/${result.meetingId}/agenda`;
+        router.push(`/dashboard/meetings/${result.meetingId}/agenda`);
       } else if (result?.message) {
         alert(result.message);
       }
