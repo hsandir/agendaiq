@@ -31,8 +31,8 @@ export function createCachedFunction<T extends (...args: unknown[]) => Promise<u
     fn,
     tags,
     {
-      revalidate: options?.revalidate || CACHE_DURATIONS.medium,
-      tags: options?.tags || tags
+      revalidate: options?.revalidate ?? CACHE_DURATIONS.medium,
+      tags: options?.tags ?? tags
     }
   ) as T;
 }

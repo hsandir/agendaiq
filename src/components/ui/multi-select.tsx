@@ -61,18 +61,15 @@ export function MultiSelect({
   const filteredOptions = React.useMemo(() => {
     return options.filter((option) => {
       const matchesSearch = 
-        !searchQuery ||
-        option.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        !searchQuery ?? option.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (option.email && option.email.toLowerCase().includes(searchQuery.toLowerCase()));
       
       const matchesDepartment = 
-        !showDepartmentFilter ||
-        departmentFilter === "all" ||
+        !showDepartmentFilter ?? departmentFilter === "all" ||
         option.department === departmentFilter;
       
       const matchesRole = 
-        !showRoleFilter ||
-        roleFilter === "all" ||
+        !showRoleFilter ?? roleFilter === "all" ||
         option.role === roleFilter;
       
       return matchesSearch && matchesDepartment && matchesRole;
@@ -180,7 +177,7 @@ export function MultiSelect({
             )}
 
             {/* Filters */}
-            {(showDepartmentFilter || showRoleFilter) && (
+            {(showDepartmentFilter ?? showRoleFilter) && (
               <div className="flex gap-2">
                 {showDepartmentFilter && departments.length > 0 && (
                   <select
@@ -264,7 +261,7 @@ export function MultiSelect({
                     {option.email && (
                       <div className="text-xs text-muted-foreground">{option.email}</div>
                     )}
-                    {(option.department || option.role) && (
+                    {(option.department ?? option.role) && (
                       <div className="flex gap-2 mt-1">
                         {option.department && (
                           <Badge variant="outline" className="text-xs">

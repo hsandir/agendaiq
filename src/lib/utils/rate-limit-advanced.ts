@@ -145,8 +145,8 @@ export class AdvancedRateLimiter {
       ttl: this.options.interval!,
     });
 
-    this.blacklistedIPs = new Set(this.options.ipBlacklist || []);
-    this.whitelistedIPs = new Set(this.options.ipWhitelist || []);
+    this.blacklistedIPs = new Set(this.options.ipBlacklist ?? []);
+    this.whitelistedIPs = new Set(this.options.ipWhitelist ?? []);
   }
 
   async check(
@@ -342,7 +342,7 @@ export class AdvancedRateLimiter {
   private extractClientIP(request: Request): string {
     const forwarded = request.headers.get('x-forwarded-for');
     const realIp = request.headers.get('x-real-ip');
-    return forwarded?.split(',')[0] || realIp || 'unknown';
+    return (forwarded?.split(',')[0] || realIp) ?? 'unknown';
   }
 
   private createBlockedResult(limit: number, error: string): EnhancedRateLimitResult {
@@ -505,8 +505,8 @@ export function getEnhancedClientIdentifier(
 ): string {
   const forwarded = request.headers.get('x-forwarded-for');
   const realIp = request.headers.get('x-real-ip');
-  const clientIp = forwarded?.split(',')[0] || realIp || 'unknown';
-  const userAgent = request.headers.get('user-agent') || 'unknown';
+  const clientIp = (forwarded?.split(',')[0] || realIp) ?? 'unknown';
+  const userAgent = request.headers.get('user-agent') ?? 'unknown';
   
   // Include user ID if available for more accurate rate limiting
   const identifier = userId 

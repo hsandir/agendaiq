@@ -101,7 +101,7 @@ export class DatabaseTransport implements LogTransport {
     }
 
     // Filter by date range
-    if (query.startDate || query.endDate) {
+    if (query.startDate ?? query.endDate) {
       where.timestamp = {};
       if (query.startDate) where.timestamp.gte = query.startDate;
       if (query.endDate) where.timestamp.lte = query.endDate;
@@ -118,7 +118,7 @@ export class DatabaseTransport implements LogTransport {
     }
 
     const orderBy = {
-      [query.orderBy || 'timestamp']: query.orderDirection || 'desc'
+      [query.orderBy ?? 'timestamp']: query.orderDirection ?? 'desc'
     };
 
     try {
@@ -131,8 +131,8 @@ export class DatabaseTransport implements LogTransport {
             ...(query.category ? { category: { in: query.category } } : {})
           },
           orderBy,
-          take: query.limit || 100,
-          skip: query.offset || 0
+          take: query.limit ?? 100,
+          skip: query.offset ?? 0
         }),
         // Query audit logs
         prisma.securityLog.findMany({
@@ -141,8 +141,8 @@ export class DatabaseTransport implements LogTransport {
             ...(query.category ? { category: { in: query.category } } : {})
           },
           orderBy,
-          take: query.limit || 100,
-          skip: query.offset || 0
+          take: query.limit ?? 100,
+          skip: query.offset ?? 0
         })
       ]);
 
@@ -163,7 +163,7 @@ export class DatabaseTransport implements LogTransport {
           stack: log.stack,
           environment: log.environment,
           performance: log.performance ? JSON.parse(log.performance) : undefined
-        } as DevLogEntry)),
+        } satisfies DevLogEntry)),
         ...auditLogs.map(log => ({
           id: log.id,
           timestamp: log.timestamp.toISOString(),
@@ -179,7 +179,7 @@ export class DatabaseTransport implements LogTransport {
           target: log.target ? JSON.parse(log.target) : undefined,
           compliance: log.compliance ? JSON.parse(log.compliance) : undefined,
           location: log.location ? JSON.parse(log.location) : undefined
-        } as AuditLogEntry))
+        } satisfies AuditLogEntry))
       ];
 
       // Sort combined results by timestamp
@@ -189,7 +189,7 @@ export class DatabaseTransport implements LogTransport {
         return query.orderDirection === 'asc' ? aTime - bTime : bTime - aTime;
       });
 
-      return entries.slice(0, query.limit || 100);
+      return entries.slice(0, query.limit ?? 100);
     } catch (error: unknown) {
       console.error('Failed to query logs from database:', error);
       return [];

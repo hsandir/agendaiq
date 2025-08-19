@@ -4,9 +4,9 @@ import { Capability } from '@/lib/auth/policy';
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability.USER_MANAGE });
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability?.USER_MANAGE });
+  if (!authResult?.success) {
+    return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
   }
   try {
     // Get all roles from the database
@@ -35,9 +35,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability.USER_MANAGE });
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability?.USER_MANAGE });
+  if (!authResult?.success) {
+    return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
   }
   try {
     const body = await request.json();
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     const newRole = await prisma.role.create({
       data: {
         title,
-        priority: priority || 10,
+        priority: priority ?? 10,
         category,
         department_id
       },

@@ -32,11 +32,11 @@ export function MeetingForm({ users, onSubmit, initialData }: MeetingFormProps) 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
-    title: initialData?.title || "",
-    description: initialData?.description || "",
-    startTime: initialData?.startTime || "",
-    endTime: initialData?.endTime || "",
-    attendeeIds: initialData?.attendeeIds || [],
+    title: initialData?.title ?? "",
+    description: initialData?.description ?? "",
+    startTime: initialData?.startTime ?? "",
+    endTime: initialData?.endTime ?? "",
+    attendeeIds: initialData?.attendeeIds ?? [],
   });
 
   const handleSubmit = async (e: React.FormEvent) => {

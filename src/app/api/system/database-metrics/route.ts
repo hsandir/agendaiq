@@ -105,9 +105,9 @@ export async function GET() {
     
     const databaseMetrics: DatabaseMetrics = {
       connection: {
-        url: `postgresql://${url.username}:****@${url.hostname}:${url.port || '5432'}/${url.pathname.substring(1)}`,
+        url: `postgresql://${url.username}:****@${url.hostname}:${url.port ?? '5432'}/${url.pathname.substring(1)}`,
         host: url.hostname,
-        port: url.port || '5432',
+        port: url.port ?? '5432',
         database: url.pathname.substring(1),
         username: url.username,
         connected: true, // If we can query, we're connected

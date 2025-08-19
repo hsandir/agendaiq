@@ -95,7 +95,7 @@ export class RealtimeTransport implements LogTransport {
 
   private generateCorrelationId(entry: BaseLogEntry): string {
     // Generate correlation ID based on user session and timestamp
-    const userId = entry.context?.userId || 'anonymous';
+    const userId = entry.context?.userId ?? 'anonymous';
     const sessionId = entry.context?.sessionId || 'no-session';
     const timestamp = Math.floor(new Date(entry.timestamp).getTime() / 1000 / 60); // Per minute
     
@@ -166,9 +166,9 @@ export class RealtimeTransport implements LogTransport {
   }> {
     const stats = {
       total: this.memoryBuffer.length,
-      bySeverity: {} as Record<string, number>,
-      bySource: {} as Record<string, number>,
-      byCategory: {} as Record<string, number>
+      bySeverity: {} satisfies Record<string, number>,
+      bySource: {} satisfies Record<string, number>,
+      byCategory: {} satisfies Record<string, number>
     };
 
     this.memoryBuffer.forEach(event => {

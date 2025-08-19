@@ -45,7 +45,7 @@ export function CreateMeetingModal({
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: `Follow-up: ${agendaItem.topic}`,
-    description: agendaItem.problem_statement || '',
+    description: agendaItem.problem_statement ?? '',
     date: new Date(),
     startTime: '09:00',
     endTime: '10:00',
@@ -75,7 +75,7 @@ export function CreateMeetingModal({
           description: formData.description,
           startTime: startDateTime.toISOString(),
           endTime: endDateTime.toISOString(),
-          zoomLink: formData.zoomLink || undefined,
+          zoomLink: formData.zoomLink ?? undefined,
           attendeeIds: formData.attendees
         })
       });
@@ -95,8 +95,8 @@ export function CreateMeetingModal({
             topic: agendaItem.topic,
             problem_statement: agendaItem.problem_statement,
             responsible_staff_id: agendaItem.responsible_staff_id,
-            priority: agendaItem.priority || 'Medium',
-            purpose: agendaItem.purpose || 'Discussion',
+            priority: agendaItem.priority ?? 'Medium',
+            purpose: agendaItem.purpose ?? 'Discussion',
             status: 'Pending',
             order_index: 0,
             parent_item_id: agendaItem.id // Link to original item

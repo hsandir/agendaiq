@@ -13,7 +13,7 @@ export default async function DistrictSetupPage() {
   }
 
   const user = session.user as SessionUser;
-  if (!user.staff?.Role || user.staff.Role.title !== "Administrator") {
+  if (!user.staff?.Role ?? user.staff.Role.title !== "Administrator") {
     redirect("/dashboard");
   }
 

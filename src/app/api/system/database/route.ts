@@ -5,18 +5,18 @@ import { can, Capability } from '@/lib/auth/policy';
 export async function GET(request: NextRequest) {
   // CRITICAL SECURITY FIX: Add authentication for sensitive database info
   const authResult = await withAuth(request);
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  if (!authResult?.success) {
+    return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
   }
 
   const user = authResult.user!;
 
   // Check database read capability
-  if (!can(user, Capability.OPS_DB_READ)) {
+  if (!can(user, Capability?.OPS_DB_READ)) {
     return NextResponse.json({ error: 'Database read access required' }, { status: 403 });
   }
   try {
-    const databaseUrl = process.env.DATABASE_URL;
+    const databaseUrl = process.env?.DATABASE_URL;
     
     if (!databaseUrl) {
       return NextResponse.json({ 
@@ -30,13 +30,13 @@ export async function GET(request: NextRequest) {
     
     const databaseInfo = {
       type: 'PostgreSQL',
-      host: url.hostname,
-      port: url.port || '5432',
+      host: url?.hostname,
+      port: url.port ?? '5432',
       database: url.pathname.substring(1), // Remove leading slash
-      username: url.username,
+      username: url?.username,
       // Don't expose password for security
-      ssl: url.searchParams.get('sslmode') || 'prefer',
-      connection_string_template: `postgresql://[username]:[password]@${url.hostname}:${url.port || '5432'}/${url.pathname.substring(1)}`,
+      ssl: url.searchParams.get('sslmode') ?? 'prefer',
+      connection_string_template: `postgresql://[username]:[password]@${url?.hostname}:${url.port ?? '5432'}/${url.pathname.substring(1)}`,
       prisma_schema: 'Located at: prisma/schema.prisma',
       tables: [
         'User', 'District', 'School', 'Department', 'Role', 'Staff',

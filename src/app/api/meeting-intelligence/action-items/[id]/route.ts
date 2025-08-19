@@ -7,8 +7,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const authResult = await withAuth(request);
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  if (!authResult?.success) {
+    return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
   }
 
   try {

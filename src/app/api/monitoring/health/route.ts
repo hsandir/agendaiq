@@ -8,8 +8,8 @@ export async function GET() {
   const health = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '1.0.0',
-    environment: process.env.NODE_ENV,
+    version: process.env?.npm_package_version || '1.0.0',
+    environment: process.env?.NODE_ENV,
     uptime: process.uptime(),
     error: null as string | null,
     checks: {
@@ -36,7 +36,7 @@ export async function GET() {
     const dbTime = Date.now() - dbStart;
 
     // 2. Auth check (NextAuth readiness)
-    health.checks.auth = !!process.env.NEXTAUTH_SECRET;
+    health.checks.auth = !!process.env?.NEXTAUTH_SECRET;
 
     // 3. Storage check (if using cloud storage)
     health.checks.storage = true; // Placeholder
@@ -48,23 +48,23 @@ export async function GET() {
     health.metrics.responseTime = Date.now() - startTime;
 
     // Determine overall health
-    const allChecksPass = Object.values(health.checks).every(check => check);
+    const allChecksPass = Object.values(health?.checks).every(check => check);
     
     if (!allChecksPass) {
       health.status = 'degraded';
       
       // Critical service down
-      if (!health.checks.database) {
+      if (!health.checks?.database) {
         health.status = 'unhealthy';
       }
     }
 
     // Add performance metrics
     health.metrics = {
-      ...health.metrics,
+      ...health?.metrics,
       dbLatency: dbTime,
-      totalChecks: Object.keys(health.checks).length,
-      passedChecks: Object.values(health.checks).filter(c => c).length,
+      totalChecks: Object.keys(health?.checks).length,
+      passedChecks: Object.values(health?.checks).filter(c => c).length,
     };
 
     const statusCode = health.status === 'healthy' ? 200 : 

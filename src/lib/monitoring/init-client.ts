@@ -82,7 +82,7 @@ export function useMonitoringUser() {
       // Set user context for monitoring
       setMonitoringUser({
         id: session.user.id as string,
-        username: session.user.name || undefined,
+        username: session.user.name ?? undefined,
         // Never send email directly
         tenant_id: session.user.staff?.school_id,
         role: session.user.staff?.role?.title,

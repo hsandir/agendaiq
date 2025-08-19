@@ -205,7 +205,7 @@ export default function TestDashboard() {
                     </div>
                     {suite.duration && (
                       <p className="text-sm text-muted-foreground mt-1">
-                        {suite.passed || 0} passed, {suite.failed || 0} failed • {suite.duration}ms
+                        {suite.passed ?? 0} passed, {suite.failed ?? 0} failed • {suite.duration}ms
                       </p>
                     )}
                     <Button

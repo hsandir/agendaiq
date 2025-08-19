@@ -14,8 +14,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const { searchParams } = new URL(request.url);
-    const limit = searchParams.get('limit') || '50';
+    const { searchParams } = new URL(request?.url);
+    const limit = searchParams.get('limit') ?? '50';
     
     // Get commit history with stats
     const { stdout } = await execAsync(
@@ -67,9 +67,9 @@ export async function GET(request: NextRequest) {
         // This is a stat line
         const match = line.match(/(\d+) files? changed(?:, (\d+) insertions?\(\+\))?(?:, (\d+) deletions?\(-\))?/);
         if (match) {
-          currentCommit.files = parseInt(match[1]) || 0;
-          currentCommit.insertions = parseInt(match[2]) || 0;
-          currentCommit.deletions = parseInt(match[3]) || 0;
+          currentCommit.files = parseInt(match[1]) ?? 0;
+          currentCommit.insertions = parseInt(match[2]) ?? 0;
+          currentCommit.deletions = parseInt(match[3]) ?? 0;
         }
       }
     }
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       commits,
-      total: commits.length,
+      total: commits?.length,
       timestamp: new Date().toISOString()
     });
   } catch (error: unknown) {

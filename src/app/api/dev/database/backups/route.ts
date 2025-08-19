@@ -6,9 +6,9 @@ import fs from 'fs/promises';
 import path from 'path';
 
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability?.DEV_DEBUG });
+  if (!authResult?.success) {
+    return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
   }
 
   try {
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       );
       
       // Sort by date descending
-      backupFiles.sort((a, b) => b.date.localeCompare(a.date));
+      backupFiles.sort((a, b) => b.date.localeCompare(a?.date));
       
     } catch {
       // Backups directory doesn't exist or can't be accessed

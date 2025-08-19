@@ -101,17 +101,17 @@ export function CICDMonitor() {
 
       if (pipelineRes.ok) {
         const data = await pipelineRes.json();
-        setPipelineRuns(data.runs || []);
+        setPipelineRuns(data.runs ?? []);
       }
 
       if (deploymentRes.ok) {
         const data = await deploymentRes.json();
-        setDeployments(data.deployments || []);
+        setDeployments(data.deployments ?? []);
       }
 
       if (metricsRes.ok) {
         const data = await metricsRes.json();
-        setMetrics(data.metrics || null);
+        setMetrics(data.metrics ?? null);
       }
     } catch (error: unknown) {
       console.error('Failed to fetch CI/CD data:', error);
@@ -147,7 +147,7 @@ export function CICDMonitor() {
     };
 
     return (
-      <Badge variant={variants[status] || "outline"}>
+      <Badge variant={variants[status] ?? "outline"}>
         {status.toUpperCase()}
       </Badge>
     );
@@ -155,9 +155,9 @@ export function CICDMonitor() {
 
   const formatDuration = (ms?: number) => {
     if (!ms) return '-';
-    const seconds = Math.floor(ms / 1000));
-    const minutes = Math.floor(seconds / 60));
-    const hours = Math.floor(minutes / 60));
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
     
     if (hours > 0) {
       return `${hours}h ${minutes % 60}m`;

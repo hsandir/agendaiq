@@ -144,7 +144,7 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
   // Transform staff data to match the component's expected format
   const staffForAgenda = (allStaff.map(staff => ({
     id: staff.id,
-    name: staff.User.name || staff.User.email || 'Unknown',
+    name: staff.User.name ?? staff.User.email ?? 'Unknown',
     initials: staff.User.name?.split(' ').map(n => n[0]).join('').toUpperCase()
   })));
 
@@ -155,7 +155,7 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
         currentUser={user}
         allStaff={staffForAgenda}
         pastMeetings={pastMeetings}
-        canEdit={hasAdminAccess || isOrganizer}
+        canEdit={hasAdminAccess ?? isOrganizer}
       />
     </div>
   );

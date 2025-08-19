@@ -24,7 +24,7 @@ export class MeetingAnalyticsService {
       where.school_id = options.schoolId;
     }
 
-    if (options?.dateFrom || options?.dateTo) {
+    if (options?.dateFrom ?? options?.dateTo) {
       where.start_time = {};
       if (options.dateFrom) {
         where.start_time.gte = options.dateFrom;
@@ -215,7 +215,7 @@ export class MeetingAnalyticsService {
     });
 
     // Group by period
-    const trends: Record<string, any> = {};
+    const trends: Record<string, unknown> = {};
 
     meetings.forEach(meeting => {
       if (!meeting.start_time) return;
@@ -274,7 +274,7 @@ export class MeetingAnalyticsService {
       where.staff_id = staffId;
     }
 
-    if (options?.dateFrom || options?.dateTo) {
+    if (options?.dateFrom ?? options?.dateTo) {
       where.Meeting = {
         start_time: {}
       };
@@ -362,7 +362,7 @@ export class MeetingAnalyticsService {
       };
     }
 
-    if (options?.dateFrom || options?.dateTo) {
+    if (options?.dateFrom ?? options?.dateTo) {
       where.created_at = {};
       if (options.dateFrom) {
         where.created_at.gte = options.dateFrom;

@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
     const pageContext = searchParams.get('page');
     const severity = searchParams.get('severity');
     const category = searchParams.get('category');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const limit = parseInt(searchParams.get('limit') ?? '50');
     const resolved = searchParams.get('resolved') === 'true';
 
     let allErrors: StoredError[] = [];

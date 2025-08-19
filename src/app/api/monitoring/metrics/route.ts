@@ -95,7 +95,7 @@ export async function GET() {
 function calculatePercentiles(metricName: string) {
   const values = (webVitalsBuffer
     .filter(m => m.name === metricName)
-    .map(m => m.value)
+    .map(m => m?.value)
     .sort((a, b) => a - b));
 
   if (values.length === 0) {

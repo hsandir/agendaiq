@@ -11,9 +11,9 @@ export async function GET(request: NextRequest) {
     
     if (!isFirstTimeSetup) {
       // Normal auth required if users already exist - operations admin for user management
-      const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE });
-      if (!authResult.success) {
-        return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+      const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability?.USER_MANAGE });
+      if (!authResult?.success) {
+        return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
       }
     }
   } catch (error: unknown) {
@@ -72,8 +72,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       adminUsers: filteredAdminUsers.map(user => ({
-        email: user.email,
-        name: user.name
+        email: user?.email,
+        name: user?.name
       })),
       isFirstTimeSetup: false
     });

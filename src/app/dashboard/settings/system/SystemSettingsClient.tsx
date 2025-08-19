@@ -30,18 +30,18 @@ interface SystemSettings {
 
 export default function SystemSettingsClient({ initialSettings }: SystemSettingsClientProps) {
   const [settings, setSettings] = useState<SystemSettings>({
-    school_name: initialSettings.school_name || '',
+    school_name: initialSettings.school_name ?? '',
     academic_year: initialSettings.academic_year || '2024-2025',
-    timezone: initialSettings.timezone || 'UTC',
-    two_factor_required: initialSettings.two_factor_required || false,
-    password_policy_enabled: initialSettings.password_policy_enabled || false,
-    session_timeout_minutes: initialSettings.session_timeout_minutes || 30,
-    smtp_server: initialSettings.smtp_server || '',
-    smtp_port: initialSettings.smtp_port || 587,
-    sender_email: initialSettings.sender_email || '',
-    automatic_backups_enabled: initialSettings.automatic_backups_enabled || false,
-    backup_frequency: initialSettings.backup_frequency || 'daily',
-    backup_retention_days: initialSettings.backup_retention_days || 30,
+    timezone: initialSettings.timezone ?? 'UTC',
+    two_factor_required: initialSettings.two_factor_required ?? false,
+    password_policy_enabled: initialSettings.password_policy_enabled ?? false,
+    session_timeout_minutes: initialSettings.session_timeout_minutes ?? 30,
+    smtp_server: initialSettings.smtp_server ?? '',
+    smtp_port: initialSettings.smtp_port ?? 587,
+    sender_email: initialSettings.sender_email ?? '',
+    automatic_backups_enabled: initialSettings.automatic_backups_enabled ?? false,
+    backup_frequency: initialSettings.backup_frequency ?? 'daily',
+    backup_retention_days: initialSettings.backup_retention_days ?? 30,
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -115,7 +115,7 @@ export default function SystemSettingsClient({ initialSettings }: SystemSettings
         </div>
         <Button 
           onClick={handleSave} 
-          disabled={!hasChanges || isLoading}
+          disabled={!hasChanges ?? isLoading}
           className="ml-auto"
         >
           {isLoading ? "Saving..." : "Save Changes"}

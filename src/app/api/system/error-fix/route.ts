@@ -37,7 +37,7 @@ async function fixReactVersionMismatch() {
 
     // Create auto-backup first
     try {
-      await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/system/backup`, {
+      await fetch(`${process.env?.NEXTAUTH_URL || 'http://localhost:3000'}/api/system/backup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -286,7 +286,7 @@ async function autoFixAllErrors() {
 
     // Create backup first
     try {
-      await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/system/backup`, {
+      await fetch(`${process.env?.NEXTAUTH_URL || 'http://localhost:3000'}/api/system/backup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -353,10 +353,10 @@ async function autoFixAllErrors() {
       message: 'Comprehensive auto-fix completed',
       results: fixResults,
       summary: {
-        reactFixed: fixResults.reactFix?.success || false,
-        nodeFixed: fixResults.nodeFix?.success || false,
-        tailwindFixed: fixResults.tailwindFix?.success || false,
-        cacheCleared: fixResults.cacheFix?.success || false
+        reactFixed: fixResults.reactFix?.success ?? false,
+        nodeFixed: fixResults.nodeFix?.success ?? false,
+        tailwindFixed: fixResults.tailwindFix?.success ?? false,
+        cacheCleared: fixResults.cacheFix?.success ?? false
       },
       recommendation: 'Restart the development server and run health check again'
     });

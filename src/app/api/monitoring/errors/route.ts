@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams;
-    const level = searchParams.get('level') || 'all';
+    const level = searchParams.get('level') ?? 'all';
 
     // Get Sentry configuration
     const sentryToken = process.env.SENTRY_AUTH_TOKEN;
@@ -82,16 +82,16 @@ export async function GET(request: NextRequest) {
         id: issue.id,
         title: issue.title || 'Unknown Error',
         culprit: issue.culprit || 'Unknown location',
-        level: issue.level || 'error',
-        count: issue.count || 0,
-        userCount: issue.userCount || 0,
+        level: issue.level ?? 'error',
+        count: issue.count ?? 0,
+        userCount: issue.userCount ?? 0,
         firstSeen: issue.firstSeen,
         lastSeen: issue.lastSeen,
-        status: issue.status || 'unresolved',
-        isRegression: issue.isRegression || false,
+        status: issue.status ?? 'unresolved',
+        isRegression: issue.isRegression ?? false,
         platform: issue.platform,
         release: issue.lastRelease?.version,
-        assignedTo: issue.assignedTo?.name || issue.assignedTo?.email
+        assignedTo: issue.assignedTo?.name ?? issue.assignedTo?.email
       })) : [];
 
       return NextResponse.json({ issues });

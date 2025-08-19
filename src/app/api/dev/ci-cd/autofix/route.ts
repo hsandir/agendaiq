@@ -41,8 +41,8 @@ export async function GET(request: NextRequest) {
     console.log('Autofix API called');
 
     const { searchParams } = new URL(request.url);
-    const errorType = searchParams.get('errorType') || '';
-    const errorMessage = searchParams.get('errorMessage') || '';
+    const errorType = searchParams.get('errorType') ?? '';
+    const errorMessage = searchParams.get('errorMessage') ?? '';
 
     const suggestions = await generateAutofixSuggestions(errorType, errorMessage);
 
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       console.log('Using custom suggestion:', suggestion.title);
     } else {
       // Generate suggestions and find the one to apply
-      const suggestions = await generateAutofixSuggestions(errorType || '', errorMessage || '');
+      const suggestions = await generateAutofixSuggestions(errorType ?? '', errorMessage ?? '');
       const found = suggestions.find(s => s.id === suggestionId);
       
       if (!found) {
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
           const { stdout, stderr } = await execAsync(__command, {
             cwd: process.cwd(),
           });
-          results.applied.push(`Command: ${command}\nOutput: ${stdout || stderr}`);
+          results.applied.push(`Command: ${command}\nOutput: ${stdout ?? stderr}`);
         } else {
           results.applied.push(`[DRY RUN] Would execute: ${command}`);
         }
@@ -202,7 +202,7 @@ async function generateAutofixSuggestions(
       description: 'Remove node_modules and package-lock.json, then reinstall',
       confidence: 'high',
       commands: [
-        'mv node_modules trash/node_modules-$(date +%s) 2>/dev/null || true && mv package-lock.json trash/ 2>/dev/null || true',
+        'mv node_modules trash/node_modules-$(date +%s) 2>/dev/null ?? true && mv package-lock.json trash/ 2>/dev/null ?? true',
         'npm cache clean --force',
         'npm install',
       ],
@@ -338,8 +338,8 @@ async function generateAutofixSuggestions(
       description: 'Remove build artifacts and rebuild',
       confidence: 'high',
       commands: [
-        'mv .next trash/.next-$(date +%s) 2>/dev/null || true',
-        'mv dist trash/dist-$(date +%s) 2>/dev/null || true',
+        'mv .next trash/.next-$(date +%s) 2>/dev/null ?? true',
+        'mv dist trash/dist-$(date +%s) 2>/dev/null ?? true',
         'npm run build',
       ],
       files: [],
@@ -438,7 +438,7 @@ JWT_SECRET=your-jwt-secret`,
       description: 'Perform a complete cleanup and rebuild',
       confidence: 'low',
       commands: [
-        'mv node_modules trash/node_modules-$(date +%s) 2>/dev/null || true && mv .next trash/.next-$(date +%s) 2>/dev/null || true && mv package-lock.json trash/ 2>/dev/null || true',
+        'mv node_modules trash/node_modules-$(date +%s) 2>/dev/null ?? true && mv .next trash/.next-$(date +%s) 2>/dev/null ?? true && mv package-lock.json trash/ 2>/dev/null ?? true',
         'npm cache clean --force',
         'npm install',
         'npm run build',

@@ -29,7 +29,7 @@ export default function LoginForm() {
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React?.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -83,7 +83,7 @@ export default function LoginForm() {
           id="email"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target?.value)}
           className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-blue-500"
         />
       </div>
@@ -96,7 +96,7 @@ export default function LoginForm() {
           id="password"
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target?.value)}
           className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-blue-500"
         />
       </div>
@@ -107,7 +107,7 @@ export default function LoginForm() {
           name="remember-me"
           type="checkbox"
           checked={rememberMe}
-          onChange={(e) => setRememberMe(e.target.checked)}
+          onChange={(e) => setRememberMe(e.target?.checked)}
           className="h-4 w-4 text-primary focus:ring-ring border-border rounded"
         />
         <label htmlFor="remember-me" className="ml-2 block text-sm text-foreground">

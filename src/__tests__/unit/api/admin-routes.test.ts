@@ -21,7 +21,7 @@ jest.mock('next/server', () => ({
   NextRequest: jest.fn(),
   NextResponse: {
     json: jest.fn().mockImplementation((body: unknown, init?: { status?: number; headers?: Record<string, string> }) => ({
-      status: init?.status || 200,
+      status: init?.status ?? 200,
       headers: new Headers(init?.headers),
       json: async () => body,
       body: JSON.stringify(body)

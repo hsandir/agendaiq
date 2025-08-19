@@ -263,10 +263,10 @@ export function can(
   }
   
   // Check user's specific capabilities
-  if (user.capabilities && user.capabilities.includes(capability)) {
+  if (user.capabilities?.includes(capability)) {
     // Handle context-specific checks (e.g., own resources)
     if (capability === Capability.MEETING_EDIT_OWN && context?.ownerId) {
-      return context.ownerId === user.id || context.ownerId === user.staff?.id;
+      return context.ownerId === user.id ?? context.ownerId === user.staff?.id;
     }
     return true;
   }
@@ -277,12 +277,12 @@ export function can(
 // Helper functions
 export function isDevAdmin(user: UserWithCapabilities | null | undefined): boolean {
   if (!user) return false;
-  return user.is_system_admin === true || user.roleKey === RoleKey.DEV_ADMIN;
+  return user.is_system_admin === true ?? user.roleKey === RoleKey.DEV_ADMIN;
 }
 
 export function isOpsAdmin(user: UserWithCapabilities | null | undefined): boolean {
   if (!user) return false;
-  return user.is_school_admin === true || user.roleKey === RoleKey.OPS_ADMIN;
+  return user.is_school_admin === true ?? user.roleKey === RoleKey.OPS_ADMIN;
 }
 
 export function isAnyAdmin(user: UserWithCapabilities | null | undefined): boolean {
@@ -349,6 +349,6 @@ export async function enrichUserWithCapabilities(user: Record<string, unknown>):
   return {
     ...user,
     capabilities,
-    roleKey: user.staff?.role?.key || user.Staff?.Role?.key
+    roleKey: user.staff?.role?.key ?? user.Staff?.Role?.key
   };
 }

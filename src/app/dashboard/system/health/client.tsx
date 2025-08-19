@@ -28,7 +28,7 @@ import {
 import { AuthenticatedUser } from '@/lib/auth/auth-utils'
 
 interface HealthClientProps {
-  user: AuthenticatedUser
+  user: _AuthenticatedUser
 }
 
 interface HealthMetric {
@@ -173,7 +173,7 @@ export default function HealthClient({ user }: HealthClientProps) {
   }
 
   const formatUptime = (uptime: string) => {
-    return uptime || '0s'
+    return uptime ?? '0s'
   }
 
   return (

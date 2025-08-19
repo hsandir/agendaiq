@@ -61,7 +61,7 @@ export default function ApiTester() {
         headers: {
           ...headers,
           // Add auth token if available
-          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`,
+          'Authorization': `Bearer ${localStorage.getItem('token') ?? ''}`,
         },
       }
 
@@ -123,7 +123,7 @@ export default function ApiTester() {
     setMethod(request.method)
     setUrl(request.url)
     setHeaders(request.headers)
-    setBody(request.body || '')
+    setBody(request.body ?? '')
   }
 
   const addHeader = () => {
@@ -266,7 +266,7 @@ export default function ApiTester() {
                 <TabsContent value="body">
                   <ScrollArea className="h-[300px] border rounded-lg p-4">
                     <pre className="text-xs font-mono">
-                      {JSON.stringify(response.data || response.error, null, 2)}
+                      {JSON.stringify(response.data ?? response.error, null, 2)}
                     </pre>
                   </ScrollArea>
                 </TabsContent>

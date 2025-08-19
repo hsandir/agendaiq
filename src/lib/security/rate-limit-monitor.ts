@@ -116,7 +116,7 @@ export class RateLimitMonitor {
     const routeCounts = new Map<string, number>();
 
     this.violations.forEach(v => {
-      routeCounts.set(v.route, (routeCounts.get(v.route) || 0) + 1);
+      routeCounts.set(v.route, (routeCounts.get(v.route) ?? 0) + 1);
     });
 
     return Array.from(routeCounts.entries())

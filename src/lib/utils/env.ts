@@ -1,7 +1,7 @@
 // Environment utilities for AgendaIQ
 
 export const ENV = {
-  NODE_ENV: process.env.NODE_ENV || 'development',
+  NODE_ENV: process.env.NODE_ENV ?? 'development',
   NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
   DATABASE_URL: process.env.DATABASE_URL,
   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,

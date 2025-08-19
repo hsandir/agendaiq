@@ -10,8 +10,8 @@ export async function GET(request: NextRequest) {
 
   try {
     const searchParams = request.nextUrl.searchParams;
-    const query = searchParams.get('q') || '';
-    const type = searchParams.get('type') || 'all';
+    const query = searchParams.get('q') ?? '';
+    const type = searchParams.get('type') ?? 'all';
     
     if (query.length < 2) {
       return NextResponse.json({ 
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       searchResults.meetings = meetings.map(m => ({
         meetingId: m.id,
         title: m.title,
-        excerpt: m.description || '',
+        excerpt: m.description ?? '',
         relevance: 1,
         date: m.start_time?.toISOString() || new Date().toISOString(),
         matchedIn: 'title'
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
         id: item.id,
         topic: item.topic,
         problemStatement: item.problem_statement,
-        status: item.status || 'Pending',
+        status: item.status ?? 'Pending',
         meeting: item.Meeting ? {
           id: item.Meeting.id,
           title: item.Meeting.title,
@@ -120,14 +120,14 @@ export async function GET(request: NextRequest) {
         id: item.id,
         title: item.title,
         description: item.description,
-        status: item.status || 'pending',
+        status: item.status ?? 'pending',
         dueDate: item.due_date?.toISOString(),
         meeting: item.Meeting ? {
           id: item.Meeting.id,
           title: item.Meeting.title
         } : undefined,
         assignedTo: item.AssignedTo ? {
-          name: item.AssignedTo.User.name || 'Unknown'
+          name: item.AssignedTo.User.name ?? 'Unknown'
         } : {
           name: 'Unassigned'
         }

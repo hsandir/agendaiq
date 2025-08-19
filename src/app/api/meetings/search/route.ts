@@ -5,14 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { isAnyAdmin } from '@/lib/auth/policy';
 
 // GET /api/meetings/search - Search meetings for continuation feature
-export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: AuthenticatedUser) => {
+export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: _AuthenticatedUser) => {
   try {
     if (!user.staff) {
       return NextResponse.json({ error: "Staff record not found" }, { status: 404 });
     }
 
     const { searchParams } = new URL(request.url);
-    const query = searchParams.get('q') || '';
+    const query = searchParams.get('q') ?? '';
 
     if (query.length < 2) {
       return NextResponse.json({ meetings: [] });

@@ -159,7 +159,7 @@ export default async function ZoomUserPreferences() {
                   <div>
                     <p className="text-sm font-medium text-green-800">Zoom Account Connected</p>
                     <p className="text-xs text-green-600">
-                      Account: {zoomIntegration.accountEmail || 'Unknown'}
+                      Account: {zoomIntegration.accountEmail ?? 'Unknown'}
                     </p>
                   </div>
                 </div>
@@ -340,8 +340,8 @@ export default async function ZoomUserPreferences() {
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2">
                       <h3 className="text-sm font-medium">{meeting.title}</h3>
-                      <Badge variant={new Date(meeting.start_time || '') > new Date() ? "default" : "secondary"} className="text-xs">
-                        {new Date(meeting.start_time || '') > new Date() ? "Upcoming" : "Past"}
+                      <Badge variant={new Date(meeting.start_time ?? '') > new Date() ? "default" : "secondary"} className="text-xs">
+                        {new Date(meeting.start_time ?? '') > new Date() ? "Upcoming" : "Past"}
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">

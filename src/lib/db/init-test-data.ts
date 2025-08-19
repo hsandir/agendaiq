@@ -24,7 +24,7 @@ export async function initializeTestData() {
       }
     });
 
-    const school = existingSchool || await prisma.school.create({
+    const school = existingSchool ?? await prisma.school.create({
       data: {
         name: 'Central Jersey College Prep Charter School',
         address: '101 Mettlers Road',

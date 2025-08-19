@@ -46,7 +46,7 @@ export function RoleSwitch({ staff }: RoleSwitchProps) {
       console.error('Error switching role:', error);
       setError(error instanceof Error ? error.message : 'Failed to switch role');
       // Reset the select to the original value on error
-      e.target.value = staff?.Role?.id?.toString() || '';
+      e.target.value = staff?.Role?.id?.toString() ?? '';
     } finally {
       setIsLoading(false);
     }
@@ -59,13 +59,13 @@ export function RoleSwitch({ staff }: RoleSwitchProps) {
     <div className="flex items-center space-x-2">
       <select 
         name="role"
-        value={staff?.Role?.id?.toString() || ''}
+        value={staff?.Role?.id?.toString() ?? ''}
         onChange={handleRoleChange}
         disabled={isLoading}
         className="ml-2 text-sm border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
       >
         <option value="">Select role</option>
-        <option value={staff?.Role?.id?.toString() || ''}>{staff?.Role?.title || 'Current Role'}</option>
+        <option value={staff?.Role?.id?.toString() ?? ''}>{staff?.Role?.title || 'Current Role'}</option>
       </select>
       {isLoading && (
         <span className="text-xs text-muted-foreground">Switching...</span>

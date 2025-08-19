@@ -5,8 +5,8 @@ import { can, Capability } from '@/lib/auth/policy';
 // Calculate build metrics from GitHub Actions
 async function calculateBuildMetrics() {
   const token = process.env.GITHUB_TOKEN;
-  const owner = process.env.GITHUB_OWNER || 'anthropics';
-  const repo = process.env.GITHUB_REPO || 'agendaiq';
+  const owner = process.env.GITHUB_OWNER ?? 'anthropics';
+  const repo = process.env.GITHUB_REPO ?? 'agendaiq';
 
   if (!token) {
     // Return default metrics if GitHub token not configured
@@ -40,7 +40,7 @@ async function calculateBuildMetrics() {
     }
 
     const data = await response.json();
-    const runs = data.workflow_runs || [];
+    const runs = data.workflow_runs ?? [];
 
     // Calculate metrics
     const totalBuilds = runs.length;

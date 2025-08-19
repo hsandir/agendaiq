@@ -52,15 +52,15 @@ export async function POST(request: NextRequest) {
         path,
         metadata?.userId,
         metadata?.staffId,
-        metadata?.duration || 0,
+        metadata?.duration ?? 0,
         { request: auditEvent }
       );
     } else {
       // General API calls
       await auditSystem.logApiCall(
-        path || action,
-        method || 'GET',
-        metadata?.duration || 0,
+        path ?? action,
+        method ?? 'GET',
+        metadata?.duration ?? 0,
         metadata?.userId,
         metadata?.staffId,
         { request: auditEvent }

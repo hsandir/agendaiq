@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const settingsObject = settings.reduce((acc, setting) => {
       acc[(setting.key)] = setting.value;
       return acc;
-    }, {} as Record<string, any>);
+    }, {} satisfies Record<string, unknown>);
 
     return NextResponse.json({
       success: true,
@@ -51,7 +51,7 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
     const { settings } = body;
 
-    if (!settings || typeof settings !== 'object') {
+    if (!settings ?? typeof settings !== 'object') {
       return NextResponse.json(
         { error: 'Invalid settings data provided' },
         { status: 400 }

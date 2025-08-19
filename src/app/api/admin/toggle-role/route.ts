@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 
     // Get updated user with staff
     const updatedUser = await prisma.user.findUnique({
-      where: { id: user.id },
+      where: { id: user?.id },
       include: { Staff: { include: { Role: true, Department: true } } },
     });
 

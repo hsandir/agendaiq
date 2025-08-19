@@ -70,12 +70,12 @@ class HybridAuditSystem {
 
     const forwarded = request.headers.get('x-forwarded-for');
     const realIp = request.headers.get('x-real-ip');
-    const ipAddress = forwarded?.split(',')[0] || realIp || 'unknown';
+    const ipAddress = (forwarded?.split(',')[0] || realIp) ?? 'unknown';
     
     return {
       ipAddress,
       metadata: {
-        userAgent: request.headers.get('user-agent') || 'unknown',
+        userAgent: request.headers.get('user-agent') ?? 'unknown',
         method: request.method,
         url: request.url
       }
@@ -104,7 +104,7 @@ class HybridAuditSystem {
     if (event.targetUserId && event.targetUserId !== event.userId) score += 15;
 
     // Unknown IP addresses are suspicious
-    if (!event.ipAddress || event.ipAddress === 'unknown') score += 10;
+    if (!event.ipAddress ?? event.ipAddress === 'unknown') score += 10;
 
     // Error messages indicate problems
     if (event.errorMessage) score += 10;
@@ -122,9 +122,9 @@ class HybridAuditSystem {
       const mergedEvent = {
         ...event,
         ...requestContext,
-        userId: event.userId || context?.userId,
-        staffId: event.staffId || context?.staffId,
-        sessionId: event.sessionId || context?.sessionId,
+        userId: event.userId ?? context?.userId,
+        staffId: event.staffId ?? context?.staffId,
+        sessionId: event.sessionId ?? context?.sessionId,
         success: event.success ?? true
       };
 
@@ -184,7 +184,7 @@ class HybridAuditSystem {
    */
   async logOperational(event: OperationalEvent): Promise<void> {
     try {
-      const timestamp = event.timestamp || new Date();
+      const timestamp = event.timestamp ?? new Date();
       const logEntry = {
         timestamp: timestamp.toISOString(),
         userId: event.userId,

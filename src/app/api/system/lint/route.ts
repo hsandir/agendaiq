@@ -8,13 +8,13 @@ export async function GET(request: NextRequest) {
     // REQUIRED: Auth check - Developer admin for system lint
     const authResult = await withAuth(request, { 
       requireAuth: true, 
-      requireCapability: Capability.DEV_DEBUG
+      requireCapability: Capability?.DEV_DEBUG
     });
     
-    if (!authResult.success) {
+    if (!authResult?.success) {
       return NextResponse.json(
-        { error: authResult.error }, 
-        { status: authResult.statusCode }
+        { error: authResult?.error }, 
+        { status: authResult?.statusCode }
       );
     }
 
@@ -57,13 +57,13 @@ export async function POST(request: NextRequest) {
     // REQUIRED: Auth check
     const authResult = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.DEV_DEBUG
+      requireCapability: Capability?.DEV_DEBUG
     });
     
-    if (!authResult.success) {
+    if (!authResult?.success) {
       return NextResponse.json(
-        { error: authResult.error }, 
-        { status: authResult.statusCode }
+        { error: authResult?.error }, 
+        { status: authResult?.statusCode }
       );
     }
 

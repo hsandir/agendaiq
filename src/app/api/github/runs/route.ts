@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const workflow_id = searchParams.get('workflow_id');
     const status = searchParams.get('status'); // queued, in_progress, completed
-    const per_page = searchParams.get('per_page') || '10';
+    const per_page = searchParams.get('per_page') ?? '10';
     
     let url = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/actions/runs?per_page=${per_page}`;
     

@@ -5,7 +5,7 @@ export function getDatabaseUrl(): string {
   // Production (Vercel) - Use Supabase
   if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
     console.log('Using Supabase database (Production)');
-    return process.env.DATABASE_URL || '';
+    return process.env.DATABASE_URL ?? '';
   }
   
   // Development (Local) - Use local PostgreSQL
@@ -22,7 +22,7 @@ export function getDatabaseUrl(): string {
 export function getDirectUrl(): string {
   // Production - Supabase direct connection for migrations
   if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
-    return process.env.DIRECT_URL || process.env.DATABASE_URL || '';
+    return process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? '';
   }
   
   // Development - Same as regular URL for local
@@ -39,7 +39,7 @@ export const isProduction = process.env.NODE_ENV === 'production';
 export const isVercel = !!process.env.VERCEL;
 
 // Database type detection
-export const isSupabase = isProduction || isVercel;
+export const isSupabase = isProduction ?? isVercel;
 export const isLocalDb = !isSupabase;
 
 // Log current environment (only in development)

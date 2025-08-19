@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
         created_by: template.created_by,
         created_at: template.created_at,
         updated_at: template.updated_at,
-        creator: template.Staff.User.name || template.Staff.User.email
+        creator: template.Staff.User.name ?? template.Staff.User.email
       })),
       count: templates.length
     });
@@ -87,10 +87,10 @@ export async function POST(request: NextRequest) {
     const template = await prisma.meetingTemplate.create({
       data: {
         name,
-        description: description || null,
+        description: description ?? null,
         duration: parseInt(duration),
-        agenda: agenda || null,
-        attendees: attendees || [],
+        agenda: agenda ?? null,
+        attendees: attendees ?? [],
         created_by: staff.id
       },
       include: {
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
         created_by: template.created_by,
         created_at: template.created_at,
         updated_at: template.updated_at,
-        creator: template.Staff.User.name || template.Staff.User.email
+        creator: template.Staff.User.name ?? template.Staff.User.email
       }
     });
 

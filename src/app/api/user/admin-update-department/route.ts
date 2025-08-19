@@ -4,9 +4,9 @@ import { Capability } from '@/lib/auth/policy';
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability.USER_MANAGE });
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability?.USER_MANAGE });
+  if (!authResult?.success) {
+    return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
   }
   const user = authResult.user!;
 
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     // Update the staff record's department
     await prisma.staff.update({
-      where: { id: userStaff.id },
+      where: { id: userStaff?.id },
       data: { department_id: parseInt(departmentId) },
     });
 

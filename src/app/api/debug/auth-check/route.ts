@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 export async function GET() {
   const debugInfo = {
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
+    environment: process.env?.NODE_ENV,
     database: {
       connected: false,
       userCount: 0,
@@ -45,14 +45,14 @@ export async function GET() {
   }
 
   // 2. Check NextAuth configuration
-  debugInfo.auth.secretSet = !!process.env.NEXTAUTH_SECRET;
-  debugInfo.auth.urlSet = !!process.env.NEXTAUTH_URL;
-  debugInfo.auth.nextAuthConfigured = debugInfo.auth.secretSet && debugInfo.auth.urlSet;
+  debugInfo.auth.secretSet = !!process.env?.NEXTAUTH_SECRET;
+  debugInfo.auth.urlSet = !!process.env?.NEXTAUTH_URL;
+  debugInfo.auth.nextAuthConfigured = debugInfo.auth?.secretSet && debugInfo.auth?.urlSet;
 
   // 3. Add recommendations
   const issues = [];
   
-  if (!debugInfo.database.connected) {
+  if (!debugInfo.database?.connected) {
     issues.push({
       type: 'CRITICAL',
       message: 'Database not connected',
@@ -68,7 +68,7 @@ export async function GET() {
     });
   }
   
-  if (!debugInfo.auth.nextAuthConfigured) {
+  if (!debugInfo.auth?.nextAuthConfigured) {
     issues.push({
       type: 'HIGH',
       message: 'NextAuth not fully configured',

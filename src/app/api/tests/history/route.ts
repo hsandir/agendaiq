@@ -28,10 +28,10 @@ export async function GET(request: NextRequest) {
       const changes = log.field_changes as Record<string, unknown> || {};
       return {
         date: log.created_at.toISOString().split('T')[0],
-        passed: changes.passed || 0,
-        failed: changes.failed || 0,
-        coverage: changes.coverage || 0,
-        duration: changes.duration || 0
+        passed: changes.passed ?? 0,
+        failed: changes.failed ?? 0,
+        coverage: changes.coverage ?? 0,
+        duration: changes.duration ?? 0
       };
     });
 
@@ -98,8 +98,8 @@ export async function POST(request: NextRequest) {
           coverage,
           duration
         },
-        ip_address: request.headers.get('x-forwarded-for') || 'unknown',
-        user_agent: request.headers.get('user-agent') || 'unknown',
+        ip_address: request.headers.get('x-forwarded-for') ?? 'unknown',
+        user_agent: request.headers.get('user-agent') ?? 'unknown',
         description: `Test run completed: ${passed} passed, ${failed} failed`
       }
     });

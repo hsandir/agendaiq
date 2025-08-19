@@ -81,7 +81,7 @@ export function createAuthEvent(
   userId?: number,
   staffId?: number,
   errorMessage?: string
-): Record<string, any> {
+): Record<string, unknown> {
   return EdgeAuditLogger.createAuditEvent(
     `auth_${action}`,
     request,
@@ -100,7 +100,7 @@ export function createSecurityEvent(
   userId?: number,
   staffId?: number,
   errorMessage?: string
-): Record<string, any> {
+): Record<string, unknown> {
   return EdgeAuditLogger.createAuditEvent(
     `security_${action}`,
     request,

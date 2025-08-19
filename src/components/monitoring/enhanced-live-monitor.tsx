@@ -75,7 +75,7 @@ export default function EnhancedLiveMonitor({
               const newLogs = [...data.logs, ...prev];
               return newLogs.slice(0, 1000); // Keep last 1000 logs
             });
-            setStats(data.stats || stats);
+            setStats(data.stats ?? stats);
           }
         }
       } catch (error: unknown) {
@@ -255,7 +255,7 @@ export default function EnhancedLiveMonitor({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Critical</p>
-              <p className="text-2xl font-bold text-red-600">{stats.bySeverity.critical || 0}</p>
+              <p className="text-2xl font-bold text-red-600">{stats.bySeverity.critical ?? 0}</p>
             </div>
             <XCircle className="h-8 w-8 text-red-500" />
           </div>
@@ -265,7 +265,7 @@ export default function EnhancedLiveMonitor({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Dev Logs</p>
-              <p className="text-2xl font-bold text-blue-600">{stats.bySource.dev || 0}</p>
+              <p className="text-2xl font-bold text-blue-600">{stats.bySource.dev ?? 0}</p>
             </div>
             <Terminal className="h-8 w-8 text-blue-500" />
           </div>
@@ -275,7 +275,7 @@ export default function EnhancedLiveMonitor({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Audit Logs</p>
-              <p className="text-2xl font-bold text-green-600">{stats.bySource.audit || 0}</p>
+              <p className="text-2xl font-bold text-green-600">{stats.bySource.audit ?? 0}</p>
             </div>
             <Shield className="h-8 w-8 text-green-500" />
           </div>

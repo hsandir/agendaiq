@@ -145,7 +145,7 @@ class GlobalErrorTracker {
     window.fetch = async (...args) => {
       const url = typeof args[0] === 'string' ? args[0] : 
                    (args[0] instanceof Request ? args[0].url : 
-                   (args[0] as { url?: string })?.url || 'unknown');
+                   (args[0] as { url?: string })?.url ?? 'unknown');
       const startTime = Date.now();
       
       try {
@@ -206,7 +206,7 @@ class GlobalErrorTracker {
       const tagName = target.tagName.toLowerCase();
       const id = target.id;
       const className = target.className;
-      const textContent = target.textContent?.slice(0, 50) || '';
+      const textContent = target.textContent?.slice(0, 50) ?? '';
 
       this.addBreadcrumb('user-interaction', 'Click', {
         element: tagName,
@@ -313,7 +313,7 @@ class GlobalErrorTracker {
       },
       pageLoadTime: performance?.timing ? 
         performance.timing.loadEventEnd - performance.timing.navigationStart : undefined,
-      networkSpeed: (navigator as Navigator & { connection?: { effectiveType?: string } })?.connection?.effectiveType || 'unknown'
+      networkSpeed: (navigator as Navigator & { connection?: { effectiveType?: string } })?.connection?.effectiveType ?? 'unknown'
     };
   }
 

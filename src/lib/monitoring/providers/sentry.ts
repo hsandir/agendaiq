@@ -42,11 +42,11 @@ class SentryProvider implements MonitoringProvider {
       enabled: config.enabled,
       
       // Sample rates
-      sampleRate: config.sampleRates?.error || 1.0,
-      tracesSampleRate: config.sampleRates?.trace || 0,
-      replaysOnErrorSampleRate: config.sampleRates?.replay || 0,
-      replaysSessionSampleRate: config.sampleRates?.session || 0,
-      profilesSampleRate: config.sampleRates?.profile || 0,
+      sampleRate: config.sampleRates?.error ?? 1.0,
+      tracesSampleRate: config.sampleRates?.trace ?? 0,
+      replaysOnErrorSampleRate: config.sampleRates?.replay ?? 0,
+      replaysSessionSampleRate: config.sampleRates?.session ?? 0,
+      profilesSampleRate: config.sampleRates?.profile ?? 0,
       
       // Error filtering
       ignoreErrors: IGNORE_ERRORS,
@@ -349,7 +349,7 @@ class SentryProvider implements MonitoringProvider {
     
     const transaction = (Sentry as unknown as { startTransaction: (config: { name: string; op?: string }) => unknown }).startTransaction({
       name,
-      op: op || 'custom',
+      op: op ?? 'custom',
     });
     
     const transactionObj: Transaction = {
@@ -472,7 +472,7 @@ class SentryProvider implements MonitoringProvider {
     if (!this.initialized) return true;
     
     try {
-      return await Sentry.close(timeout || 2000);
+      return await Sentry.close(timeout ?? 2000);
     } catch (error: unknown) {
       console.error('Error closing Sentry:', error);
       return false;

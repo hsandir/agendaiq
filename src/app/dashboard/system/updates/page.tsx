@@ -199,8 +199,8 @@ export default function UpdatesPage() {
       const response = await fetch('/api/system/status');
       if (response.ok) {
         const data = await response.json();
-        setUpdates(data.packages.outdated || []);
-        setVulnerabilities(data.packages.vulnerabilities || 0);
+        setUpdates(data.packages.outdated ?? []);
+        setVulnerabilities(data.packages.vulnerabilities ?? 0);
         setLastCheck(new Date().toLocaleString());
         
         // Check system health for cache issues
@@ -279,7 +279,7 @@ export default function UpdatesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           type: 'packages',
-          packages: packages || Array.from(selectedUpdates)
+          packages: packages ?? Array.from(selectedUpdates)
         })
       });
       
@@ -428,7 +428,7 @@ export default function UpdatesPage() {
             variant="outline" 
             size="sm" 
             onClick={fetchUpdates}
-            disabled={isLoading || isUpdating}
+            disabled={isLoading ?? isUpdating}
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
@@ -708,7 +708,7 @@ export default function UpdatesPage() {
                         size="sm" 
                         variant={compatibility.recommendation === 'avoid' ? 'outline' : 'default'}
                         onClick={() => performUpdate(update.name)}
-                        disabled={isUpdating || compatibility.recommendation === 'avoid'}
+                        disabled={isUpdating ?? compatibility.recommendation === 'avoid'}
                         className={compatibility.recommendation === 'avoid' ? 'opacity-50' : ''}
                       >
                         {isUpdating ? (
@@ -730,7 +730,7 @@ export default function UpdatesPage() {
       <div className="flex gap-4 flex-wrap">
         <Button 
           className="flex items-center" 
-          disabled={securityPackages === 0 || isUpdating}
+          disabled={securityPackages === 0 ?? isUpdating}
           onClick={updateSecurityPackages}
         >
           {isUpdating ? (
@@ -743,7 +743,7 @@ export default function UpdatesPage() {
         <Button 
           variant="outline" 
           className="flex items-center"
-          disabled={patchPackages === 0 || isUpdating}
+          disabled={patchPackages === 0 ?? isUpdating}
           onClick={updateAllPatches}
         >
           {isUpdating ? (
@@ -756,7 +756,7 @@ export default function UpdatesPage() {
         <Button 
           variant="outline" 
           className="flex items-center"
-          disabled={safePackages === 0 || isUpdating}
+          disabled={safePackages === 0 ?? isUpdating}
           onClick={updateSafePackages}
         >
           {isUpdating ? (
@@ -769,7 +769,7 @@ export default function UpdatesPage() {
         <Button 
           variant="outline" 
           className="flex items-center"
-          disabled={updates.length === 0 || isUpdating}
+          disabled={updates.length === 0 ?? isUpdating}
           onClick={() => performUpdate(updates.map(u => u.name))}
         >
           {isUpdating ? (
@@ -802,7 +802,7 @@ export default function UpdatesPage() {
               <Progress value={updates.length === 0 ? 100 : Math.max(0, 100 - updates.length * 5)} className="h-2" />
             </div>
             <div className="text-sm text-muted-foreground">
-              Last update check: {lastCheck || 'Never'}
+              Last update check: {lastCheck ?? 'Never'}
             </div>
             {vulnerabilities > 0 && (
               <div className="text-sm text-destructive">

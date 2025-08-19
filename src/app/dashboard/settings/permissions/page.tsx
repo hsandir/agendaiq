@@ -50,7 +50,7 @@ export default async function PermissionsPage() {
         "View user details",
         "Deactivate user accounts"
       ],
-      roles: roles.filter(role => role.is_leadership || role.key === RoleKey.OPS_ADMIN)
+      roles: roles.filter(role => role.is_leadership ?? role.key === RoleKey.OPS_ADMIN)
     },
     {
       name: "Role Management",
@@ -63,7 +63,7 @@ export default async function PermissionsPage() {
         "Manage role hierarchy",
         "Assign department permissions"
       ],
-      roles: roles.filter(role => role.key === RoleKey.OPS_ADMIN || role.key === RoleKey.DEV_ADMIN)
+      roles: roles.filter(role => role.key === RoleKey.OPS_ADMIN ?? role.key === RoleKey.DEV_ADMIN)
     },
     {
       name: "Department Management",
@@ -89,7 +89,7 @@ export default async function PermissionsPage() {
         "View system logs",
         "Manage integrations"
       ],
-      roles: roles.filter(role => role.key === RoleKey.OPS_ADMIN || role.key === RoleKey.DEV_ADMIN)
+      roles: roles.filter(role => role.key === RoleKey.OPS_ADMIN ?? role.key === RoleKey.DEV_ADMIN)
     }
   ];
 

@@ -180,7 +180,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
     const errorTypes = new Set<string>();
     
     items.forEach(item => {
-      const errorMessage = item.error || item.logs || '';
+      const errorMessage = item.error ?? item.logs ?? '';
       
       if (errorMessage.includes('npm') || errorMessage.includes('node_modules')) {
         errorTypes.add('dependency');
@@ -298,7 +298,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
     const startTime = Date.now();
     
     // Add output in real-time
-    setCurrentOutput(prev => [...prev, `$ ${step.command || step.name}`]);
+    setCurrentOutput(prev => [...prev, `$ ${step.command ?? step.name}`]);
     
     try {
       if (!step.command) {
@@ -326,12 +326,11 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
       }
       
       const suggestionsData = await suggestionsResponse.json();
-      const suggestions = suggestionsData.suggestions || [];
+      const suggestions = suggestionsData.suggestions ?? [];
       
       // Find matching suggestion for this step
       const matchingSuggestion = suggestions.find((s: Record<string, unknown>) => 
-        s.id === step.id || 
-        s.commands.some((cmd: string) => cmd.includes(step.command!.split(' ')[0]))
+        s.id === step.id ?? s.commands.some((cmd: string) => cmd.includes(step.command!.split(' ')[0]))
       );
       
       if (!matchingSuggestion) {
@@ -365,13 +364,13 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
         const data = await response.json();
         
         // Process results
-        if (data.results && data.results.applied) {
+        if (data.results?.applied) {
           data.results.applied.forEach((line: string) => {
             setCurrentOutput(prev => [...prev, line]);
           });
         }
         
-        if (data.results && data.results.failed && data.results.failed.length > 0) {
+        if (data.results?.failed && data.results.failed.length > 0) {
           data.results.failed.forEach((fail: Record<string, unknown>) => {
             setCurrentOutput(prev => [...prev, `❌ ${fail.action}: ${fail.error}`]);
           });
@@ -400,13 +399,13 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
       const data = await response.json();
       
       // Process results
-      if (data.results && data.results.applied) {
+      if (data.results?.applied) {
         data.results.applied.forEach((line: string) => {
           setCurrentOutput(prev => [...prev, line]);
         });
       }
       
-      if (data.results && data.results.failed && data.results.failed.length > 0) {
+      if (data.results?.failed && data.results.failed.length > 0) {
         data.results.failed.forEach((fail: Record<string, unknown>) => {
           setCurrentOutput(prev => [...prev, `❌ ${fail.action}: ${fail.error}`]);
         });
@@ -433,7 +432,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
     if (failedItems.length === 0) return 'Unknown Error';
     
     const errorMessages = (failedItems.map(item => 
-      item.error || item.logs || item.conclusion || ''
+      (item.error ?? item.logs) || (item.conclusion ?? '')
     ).join(' '));
     
     if (errorMessages.includes('npm') || errorMessages.includes('node_modules')) return 'NPM Error';
@@ -451,7 +450,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
     if (failedItems.length === 0) return '';
     
     return failedItems.slice(0, 3).map(item => 
-      item.error || item.logs || `${item.suite || item.name} failed`
+      (item.error ?? item.logs) || `${item.suite ?? item.name} failed`
     ).join('\n');
   };
 
@@ -506,7 +505,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
           )}
 
           {/* Progress Bar */}
-          {(isFixing || result) && (
+          {(isFixing ?? result) && (
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Progress: {Math.round(progress)}%</span>
@@ -553,7 +552,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
           </Card>
 
           {/* Command Output */}
-          {(isFixing || currentOutput.length > 0) && (
+          {(isFixing ?? currentOutput.length > 0) && (
             <Card className="p-4">
               <h3 className="font-semibold mb-3 flex items-center gap-2">
                 <Terminal className="h-4 w-4" />

@@ -69,8 +69,8 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   // Basic Info
   const [title, setTitle] = useState(meeting.title);
   const [description, setDescription] = useState(meeting.description);
-  const [meetingType, setMeetingType] = useState(meeting.type || 'regular');
-  const [location, setLocation] = useState(meeting.location || '');
+  const [meetingType, setMeetingType] = useState(meeting.type ?? 'regular');
+  const [location, setLocation] = useState(meeting.location ?? '');
   
   // Date and Time
   const [startDate, setStartDate] = useState(() => {
@@ -107,7 +107,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   const [notes, setNotes] = useState(meeting.notes);
   
   // Agenda Items
-  const [agendaItems, setAgendaItems] = useState<AgendaItem[]>(meeting.agendaItems || []);
+  const [agendaItems, setAgendaItems] = useState<AgendaItem[]>(meeting.agendaItems ?? []);
   
   // Agenda Item functions
   const addAgendaItem = () => {
@@ -154,9 +154,9 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   };
   
   // Integrations
-  const [zoomMeetingId, setZoomMeetingId] = useState(meeting.zoomMeetingId || '');
-  const [zoomLink, setZoomLink] = useState(meeting.zoomLink || '');
-  const [calendarIntegration, setCalendarIntegration] = useState(meeting.calendarIntegration || 'none');
+  const [zoomMeetingId, setZoomMeetingId] = useState(meeting.zoomMeetingId ?? '');
+  const [zoomLink, setZoomLink] = useState(meeting.zoomLink ?? '');
+  const [calendarIntegration, setCalendarIntegration] = useState(meeting.calendarIntegration ?? 'none');
   
   // Attendees - ensure we have valid string array
   const [selectedAttendees, setSelectedAttendees] = useState<string[]>(() => {
@@ -194,8 +194,8 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
           end_time: endDateTime.toISOString(),
           meeting_type: meetingType,
           location,
-          zoom_meeting_id: zoomMeetingId || null,
-          zoom_link: zoomLink || null,
+          zoom_meeting_id: zoomMeetingId ?? null,
+          zoom_link: zoomLink ?? null,
           calendar_integration: calendarIntegration !== 'none' ? calendarIntegration : null,
           agenda,
           notes,
@@ -377,12 +377,12 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
             <Label>Select Attendees</Label>
             <MultiSelect
               options={attendeeOptions}
-              selected={selectedAttendees || []}
-              onChange={(value) => setSelectedAttendees(value || [])}
+              selected={selectedAttendees ?? []}
+              onChange={(value) => setSelectedAttendees(value ?? [])}
               placeholder="Search and select attendees..."
             />
             <p className="text-sm text-muted-foreground mt-1">
-              {(selectedAttendees || []).length} attendee{(selectedAttendees || []).length !== 1 ? 's' : ''} selected
+              {(selectedAttendees ?? []).length} attendee{(selectedAttendees ?? []).length !== 1 ? 's' : ''} selected
             </p>
           </div>
 
@@ -415,7 +415,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
             <div>
               <CardTitle>Agenda Items</CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                {agendaItems.length} items • Total duration: {agendaItems.reduce((sum, item) => sum + (item.duration_minutes || 0), 0)} minutes
+                {agendaItems.length} items • Total duration: {agendaItems.reduce((sum, item) => sum + (item.duration_minutes ?? 0), 0)} minutes
               </p>
             </div>
             <div className="flex gap-2">
@@ -537,7 +537,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
                       <Input
                         type="number"
                         value={item.duration_minutes}
-                        onChange={(e) => updateAgendaItem(item.id, 'duration_minutes', parseInt(e.target.value) || 15)}
+                        onChange={(e) => updateAgendaItem(item.id, 'duration_minutes', parseInt(e.target.value) ?? 15)}
                         min="1"
                       />
                     </div>
@@ -574,8 +574,8 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
                   <div>
                     <Label>Responsible Person</Label>
                     <Select 
-                      value={item.responsible_staff_id || ''} 
-                      onValueChange={(value) => updateAgendaItem(item.id, 'responsible_staff_id', value || null)}
+                      value={item.responsible_staff_id ?? ''} 
+                      onValueChange={(value) => updateAgendaItem(item.id, 'responsible_staff_id', value ?? null)}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select responsible person" />

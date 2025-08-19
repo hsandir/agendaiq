@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
         requireAdminRole: true
       });
 
-      if (!authResult.success) {
+      if (!authResult?.success) {
         return NextResponse.json(
           { error: 'Authentication required' },
           { status: 401 }
@@ -31,14 +31,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validation = createAdminSchema.safeParse(body);
 
-    if (!validation.success) {
+    if (!validation?.success) {
       return NextResponse.json(
-        { error: 'Invalid input', details: validation.error.errors },
+        { error: 'Invalid input', details: validation.error?.errors },
         { status: 400 }
       );
     }
 
-    const { userId, password } = validation.data;
+    const { userId, password } = validation?.data;
 
     // Check if user exists and doesn't have a password
     const user = await prisma.user.findUnique({
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (user.hashedPassword) {
+    if (user?.hashedPassword) {
       return NextResponse.json(
         { error: 'User already has a password set' },
         { status: 400 }
@@ -93,15 +93,15 @@ export async function POST(request: NextRequest) {
     });
 
     // Log the admin creation
-    console.log(`First admin account created for: ${updatedUser.email}`);
+    console.log(`First admin account created for: ${updatedUser?.email}`);
 
     return NextResponse.json({
       success: true,
       message: 'Admin account created successfully',
       user: {
-        id: updatedUser.id,
-        email: updatedUser.email,
-        name: updatedUser.name
+        id: updatedUser?.id,
+        email: updatedUser?.email,
+        name: updatedUser?.name
       }
     });
 

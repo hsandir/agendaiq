@@ -90,7 +90,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
 
         if (agendaResponse.ok) {
           const agendaData = await agendaResponse.json();
-          setAgendaItems(agendaData.items || []);
+          setAgendaItems(agendaData.items ?? []);
         } else {
           // Fallback to default agenda items if API fails
           setAgendaItems([
@@ -102,7 +102,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
 
         if (notesResponse.ok) {
           const notesData = await notesResponse.json();
-          setNotes(notesData.notes || []);
+          setNotes(notesData.notes ?? []);
         } else {
           // Fallback to default notes if API fails
           setNotes([

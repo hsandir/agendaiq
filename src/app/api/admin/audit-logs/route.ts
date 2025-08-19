@@ -7,15 +7,15 @@ import { AuditCategory } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability.USER_MANAGE });
-    if (!authResult.success) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability?.USER_MANAGE });
+    if (!authResult?.success) {
+      return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request?.url);
     
     // Parse query parameters for hybrid system
-    const logType = searchParams.get('type') || 'critical'; // 'critical' | 'legacy' | 'both'
+    const logType = searchParams.get('type') ?? 'critical'; // 'critical' | 'legacy' | 'both'
     const category = searchParams.get('category') as AuditCategory | null;
     // Additional parameters for future filtering capability
     // const action = searchParams.get('action');
@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
     // const successOnly = searchParams.get('success');
     
     // Parse pagination
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '50')));
+    const page = Math.max(1, parseInt(searchParams.get('page') ?? '1'));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') ?? '50')));
     
     // Parse and validate user/staff IDs
     const userIdParam = searchParams.get('userId');
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
 
     if (logType === 'critical') {
       // Get critical audit logs from hybrid system
-      const criticalLogs = await auditSystem.getRecentCriticalEvents(limit, category || undefined, userId);
+      const criticalLogs = await auditSystem.getRecentCriticalEvents(limit, category ?? undefined, userId);
       
       response = {
         success: true,
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
         pagination: {
           page,
           limit,
-          total: criticalLogs.length,
+          total: criticalLogs?.length,
           hasMore: criticalLogs.length === limit
         }
       };
@@ -79,8 +79,8 @@ export async function GET(request: NextRequest) {
       const offset = (page - 1) * limit;
 
       const filters = {
-        tableName: tableName || undefined,
-        operation: operation || undefined,
+        tableName: tableName ?? undefined,
+        operation: operation ?? undefined,
         userId,
         staffId,
         startDate,
@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
     } else {
       // Get both types (default for admin dashboard)
       const [criticalLogs, legacyLogs] = await Promise.all([
-        auditSystem.getRecentCriticalEvents(Math.floor(limit / 2), category || undefined, userId),
+        auditSystem.getRecentCriticalEvents(Math.floor(limit / 2), category ?? undefined, userId),
         AuditLogger.getAuditLogs({
           userId,
           staffId,
@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
         pagination: {
           page,
           limit,
-          total: criticalLogs.length + legacyLogs.length,
+          total: criticalLogs.length + legacyLogs?.length,
           hasMore: criticalLogs.length + legacyLogs.length === limit
         }
       };

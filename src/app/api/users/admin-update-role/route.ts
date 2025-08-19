@@ -43,7 +43,7 @@ export async function PUT(request: Request) {
 
     // Update the staff's role
     const updatedStaff = await prisma.staff.update({
-      where: { id: staff.id },
+      where: { id: staff?.id },
       data: { role_id: parseInt(roleId) },
       include: { Role: true, Department: true },
     });

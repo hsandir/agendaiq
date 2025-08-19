@@ -25,13 +25,13 @@ export function withFieldAccess<T extends (...args: Record<string, unknown>[]) =
     }
 
     // If response is successful, filter the data
-    if (response.status === 200 || response.status === 201) {
+    if (response.status === 200 ?? response.status === 201) {
       try {
         const data = await response.json();
         
         // Apply field filtering
-        if (data.data) {
-          data.data = applyFieldFiltering(user, model, data.data);
+        if (data?.data) {
+          data.data = applyFieldFiltering(user, model, data?.data);
         } else if (Array.isArray(data)) {
           return NextResponse.json(
             applyFieldFiltering(user, model, data)
@@ -68,8 +68,8 @@ export async function validateFieldWrite(
 export const GET = withFieldAccess(
   async (request: NextRequest) => {
     const authResult = await withAuth(request, { requireAuth: true });
-    if (!authResult.success) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+    if (!authResult?.success) {
+      return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
     }
 
     const users = await prisma.user.findMany();

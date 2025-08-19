@@ -25,10 +25,10 @@ export function isUserAdmin(user: UserWithStaff | null | undefined): boolean {
   if (!user) return false;
   
   // Check new admin flags first - these are the primary indicators
-  if (user.is_system_admin || user.is_school_admin) return true;
+  if (user.is_system_admin ?? user?.is_school_admin) return true;
   
   // Legacy check for backward compatibility
-  if (user.is_admin) return true;
+  if (user?.is_admin) return true;
   
   // Check role properties
   const role = user.Staff?.[0]?.Role;
@@ -40,7 +40,7 @@ export function isUserAdmin(user: UserWithStaff | null | undefined): boolean {
   }
   
   // Admin roles have priority 0 or 1 and level 0
-  return (role.priority === 0 || role.priority === 1) && role.level === 0;
+  return (role.priority === 0 ?? role.priority === 1) && role.level === 0;
 }
 
 export function isUserLeadership(user: UserWithStaff | null | undefined): boolean {
@@ -65,5 +65,5 @@ export function isUserLeadership(user: UserWithStaff | null | undefined): boolea
     "Director of Special Education"
   ];
   
-  return leadershipRoles.includes(roleTitle || "");
+  return leadershipRoles.includes(roleTitle ?? "");
 }

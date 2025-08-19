@@ -83,9 +83,9 @@ export function RoleManagementForm() {
       ]);
 
       // Handle APIResponse format for each endpoint
-      setDepartments(Array.isArray(deptData) ? deptData : (deptData.data || deptData.departments || []));
-      setRoles(Array.isArray(rolesData) ? rolesData : (rolesData.data || rolesData.roles || []));
-      setUsers(Array.isArray(usersData) ? usersData : (usersData.data || usersData.users || []));
+      setDepartments(Array.isArray(deptData) ? deptData : (deptData.data ?? deptData.departments ?? []));
+      setRoles(Array.isArray(rolesData) ? rolesData : (rolesData.data ?? rolesData.roles ?? []));
+      setUsers(Array.isArray(usersData) ? usersData : (usersData.data ?? usersData.users ?? []));
     } catch (error: unknown) {
       toast({
         title: 'Error',
@@ -103,7 +103,7 @@ export function RoleManagementForm() {
     const userId = formData.get('userId') as string;
     const roleId = formData.get('role') as string;
     const departmentId = formData.get('department') as string;
-    const managerId = formData.get('manager') as string || undefined;
+    const managerId = formData.get('manager') as string ?? undefined;
     const loginNotifications = formData.get('loginNotifications') === 'true';
     const rememberDevices = formData.get('rememberDevices') === 'true';
     const suspiciousAlerts = formData.get('suspiciousAlerts') === 'true';
@@ -165,7 +165,7 @@ export function RoleManagementForm() {
                 className="mt-1 block w-full rounded-md border border-border py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
                 onChange={(e) => {
                   const user = users.find(u => u.id === e.target.value);
-                  setSelectedUser(user || null);
+                  setSelectedUser(user ?? null);
                 }}
               >
                 <option value="">Select a user</option>

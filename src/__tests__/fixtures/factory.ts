@@ -37,7 +37,7 @@ export class TestFactory {
 
   // User factory
   async createUser(overrides: UserOverrides = {}): Promise<User> {
-    const password = overrides.password || 'password123'
+    const password = overrides.password ?? 'password123'
     const hashedPassword = await bcrypt.hash(password, 10)
 
     return this.prisma.user.create({
@@ -54,11 +54,11 @@ export class TestFactory {
 
   // Staff factory
   async createStaff(overrides: StaffOverrides = {}): Promise<StaffWithRelations> {
-    const user = overrides.user || await this.createUser()
-    const role = overrides.role || await this.getOrCreateRole('Teacher')
-    const department = overrides.department || await this.getOrCreateDepartment()
-    const school = overrides.school || department.School
-    const district = overrides.district || school.District
+    const user = overrides.user ?? await this.createUser()
+    const role = overrides.role ?? await this.getOrCreateRole('Teacher')
+    const department = overrides.department ?? await this.getOrCreateDepartment()
+    const school = overrides.school ?? department.School
+    const district = overrides.district ?? school.District
 
     return this.prisma.staff.create({
       data: {
@@ -99,9 +99,9 @@ export class TestFactory {
 
   // Meeting factory
   async createMeeting(overrides: MeetingOverrides = {}): Promise<Meeting> {
-    const organizer = overrides.organizer || await this.createStaff()
-    const startTime = overrides.start_time || faker.date.future()
-    const endTime = overrides.end_time || new Date(startTime.getTime() + 60 * 60 * 1000) // 1 hour later
+    const organizer = overrides.organizer ?? await this.createStaff()
+    const startTime = overrides.start_time ?? faker.date.future()
+    const endTime = overrides.end_time ?? new Date(startTime.getTime() + 60 * 60 * 1000) // 1 hour later
 
     return this.prisma.meeting.create({
       data: {
@@ -168,7 +168,7 @@ export class TestFactory {
 
   // Agenda item factory
   async createAgendaItem(meeting: { id: number }, overrides: Partial<MeetingAgendaItem> & { presenter?: StaffWithRelations } = {}): Promise<MeetingAgendaItem> {
-    const presenter = overrides.presenter || await this.createStaff()
+    const presenter = overrides.presenter ?? await this.createStaff()
 
     return this.prisma.meetingAgendaItem.create({
       data: {
@@ -285,7 +285,7 @@ export class TestFactory {
       'Teacher': 6,
       'Staff': 7,
     }
-    return priorities[title] || 10
+    return priorities[title] ?? 10
   }
 
   // Bulk creation methods

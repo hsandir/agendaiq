@@ -28,7 +28,7 @@ export const devLogger = new DevLogger({
   context: {
     service: 'AgendaIQ',
     version: process.env.npm_package_version || '1.0.0',
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV ?? 'development'
   },
   enablePerformanceTracking: true
 });
@@ -46,7 +46,7 @@ export const auditLogger = new AuditLogger({
   context: {
     service: 'AgendaIQ-Audit',
     version: process.env.npm_package_version || '1.0.0',
-    environment: process.env.NODE_ENV || 'development',
+    environment: process.env.NODE_ENV ?? 'development',
     compliance: {
       regulations: ['GDPR', 'SOX', 'FERPA'],
       retention: '7years'
@@ -57,7 +57,7 @@ export const auditLogger = new AuditLogger({
 /**
  * Create a child logger for specific components
  */
-export function createDevLogger(component: string, metadata?: Record<string, any>) {
+export function createDevLogger(component: string, metadata?: Record<string, unknown>) {
   return devLogger.child({
     component,
     ...metadata

@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
         title: role.title,
         level: role.level,
         is_leadership: role.is_leadership,
-        category: role.category || '',
+        category: role.category ?? '',
         parent_id: role.parent_id,
         Department: role.Department ? {
           id: role.Department.id.toString(),

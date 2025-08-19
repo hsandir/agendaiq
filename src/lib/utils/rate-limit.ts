@@ -151,10 +151,10 @@ export function getClientIdentifier(request: Request): string {
   // Try to get real IP from various headers (reverse proxy support)
   const forwarded = request.headers.get('x-forwarded-for');
   const realIp = request.headers.get('x-real-ip');
-  const clientIp = forwarded?.split(',')[0] || realIp || 'unknown';
+  const clientIp = (forwarded?.split(',')[0] || realIp) ?? 'unknown';
   
   // You might want to combine with user agent for better identification
-  const userAgent = request.headers.get('user-agent') || 'unknown';
+  const userAgent = request.headers.get('user-agent') ?? 'unknown';
   
   return `${clientIp}:${userAgent.slice(0, 50)}`;
 } 

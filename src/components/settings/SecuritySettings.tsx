@@ -30,7 +30,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
     try {
       const response = await fetch("/api/devices");
       const data = await response.json();
-      setDevices(data.devices || []);
+      setDevices(data.devices ?? []);
     } catch (error: unknown) {
       console.error("Failed to fetch devices:", error);
     } finally {
@@ -130,7 +130,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
                 />
                 <button
                   onClick={disable2FA}
-                  disabled={isDisabling2FA || twoFactorCode.length !== 6}
+                  disabled={isDisabling2FA ?? twoFactorCode.length !== 6}
                   className="bg-destructive/10 text-foreground px-4 py-2 rounded-md hover:bg-destructive/10 disabled:opacity-50"
                 >
                   {isDisabling2FA ? "Disabling..." : "Disable 2FA"}

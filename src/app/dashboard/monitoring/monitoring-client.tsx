@@ -10,7 +10,7 @@ import CICDMonitor from '@/components/development/ci-cd-monitor';
 import { AuthenticatedUser } from '@/lib/auth/auth-utils';
 
 interface MonitoringClientProps {
-  user: AuthenticatedUser
+  user: _AuthenticatedUser
 }
 
 export default function MonitoringClient({ user }: MonitoringClientProps) {

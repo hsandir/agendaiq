@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
         const data = await crashFreeUsersRes.json();
         if (data.data && data.data.length > 0) {
           const latestPoint = data.data[data.data.length - 1];
-          if (latestPoint && latestPoint[1] && latestPoint[1][0]) {
+          if (latestPoint?.[1]?.[0]) {
             stats.crashFreeUsers = latestPoint[1][0].count * 100;
           }
         }
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
         const data = await crashFreeSessionsRes.json();
         if (data.data && data.data.length > 0) {
           const latestPoint = data.data[data.data.length - 1];
-          if (latestPoint && latestPoint[1] && latestPoint[1][0]) {
+          if (latestPoint?.[1]?.[0]) {
             stats.crashFreeSessions = latestPoint[1][0].count * 100;
           }
         }
@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
         const data = await transactionRes.json();
         if (data.data && data.data.length > 0) {
           const latestPoint = data.data[data.data.length - 1];
-          if (latestPoint && latestPoint[1] && latestPoint[1][0]) {
+          if (latestPoint?.[1]?.[0]) {
             stats.p95ResponseTime = Math.round(latestPoint[1][0].count);
           }
         }

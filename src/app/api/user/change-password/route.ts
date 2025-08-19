@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       return new NextResponse("No password set", { status: 400 });
     }
 
-    const isValid = await compare(currentPassword as string, user.hashedPassword);
+    const isValid = await compare(currentPassword as string, user?.hashedPassword);
     if (!isValid) {
       return new NextResponse("Current password is incorrect", { status: 400 });
     }

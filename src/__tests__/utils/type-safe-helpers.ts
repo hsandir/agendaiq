@@ -175,9 +175,9 @@ export class TypeSafeMockFactory {
   static role: MockFactory<Role> = {
     create: (overrides: Partial<Role> = {}): Role => ({
       id: 'role-' + Math.random().toString(36).substring(7),
-      title: overrides.title || 'Teacher',
-      is_leadership: overrides.is_leadership || false,
-      priority: overrides.priority || 6,
+      title: overrides.title ?? 'Teacher',
+      is_leadership: overrides.is_leadership ?? false,
+      priority: overrides.priority ?? 6,
       description: null,
       permissions: null,
       created_at: new Date(),
@@ -198,7 +198,7 @@ export class TypeSafeMockFactory {
     create: (overrides: Partial<Department> = {}): Department => ({
       id: 'dept-' + Math.random().toString(36).substring(7),
       name: overrides.name || 'Mathematics Department',
-      code: overrides.code || 'MATH',
+      code: overrides.code ?? 'MATH',
       school_id: overrides.school_id || 'school-' + Math.random().toString(36).substring(7),
       description: null,
       head_staff_id: null,
@@ -221,7 +221,7 @@ export class TypeSafeMockFactory {
     create: (overrides: Partial<School> = {}): School => ({
       id: 'school-' + Math.random().toString(36).substring(7),
       name: overrides.name || 'Test High School',
-      code: overrides.code || 'THS',
+      code: overrides.code ?? 'THS',
       district_id: overrides.district_id || 'district-' + Math.random().toString(36).substring(7),
       address: '123 Test Street',
       phone: '555-0123',
@@ -248,7 +248,7 @@ export class TypeSafeMockFactory {
     create: (overrides: Partial<District> = {}): District => ({
       id: 'district-' + Math.random().toString(36).substring(7),
       name: overrides.name || 'Test School District',
-      code: overrides.code || 'TSD',
+      code: overrides.code ?? 'TSD',
       address: '456 District Avenue',
       phone: '555-0456',
       email: 'admin@testdistrict.edu',
@@ -407,7 +407,7 @@ export class TypeSafeTestDB {
     });
 
     // Create test users
-    const adminUser = await this.prisma.user.create{
+    const _adminUser = await this.prisma.user.create{
       data: TypeSafeMockFactory.(user.create({
         email: 'admin@test.com',
         name: 'Test Admin',
@@ -422,9 +422,9 @@ export class TypeSafeTestDB {
     });
 
     // Create test staff
-    const adminStaff = await this.prisma.staff.create({
+    const _adminStaff = await this.prisma.staff.create({
       data: TypeSafeMockFactory.staff.create({
-        user_id: adminUser.id,
+        user_id: _adminUser.id,
         role_id: adminRole.id,
         department_id: department.id,
         school_id: school.id,

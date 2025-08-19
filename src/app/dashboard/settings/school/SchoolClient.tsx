@@ -124,7 +124,7 @@ export default function SchoolClient({ initialSchool }: SchoolClientProps) {
                   type="text"
                   name="name"
                   id="name"
-                  defaultValue={school?.name || ''}
+                  defaultValue={school?.name ?? ''}
                   required
                   className="block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
                 />
@@ -140,7 +140,7 @@ export default function SchoolClient({ initialSchool }: SchoolClientProps) {
                   type="text"
                   name="address"
                   id="address"
-                  defaultValue={school?.address || ''}
+                  defaultValue={school?.address ?? ''}
                   className="block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
                 />
               </div>
@@ -155,7 +155,7 @@ export default function SchoolClient({ initialSchool }: SchoolClientProps) {
                   type="text"
                   name="city"
                   id="city"
-                  defaultValue={school?.city || ''}
+                  defaultValue={school?.city ?? ''}
                   className="block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
                 />
               </div>
@@ -170,7 +170,7 @@ export default function SchoolClient({ initialSchool }: SchoolClientProps) {
                   type="text"
                   name="state"
                   id="state"
-                  defaultValue={school?.state || ''}
+                  defaultValue={school?.state ?? ''}
                   className="block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
                 />
               </div>
@@ -185,7 +185,7 @@ export default function SchoolClient({ initialSchool }: SchoolClientProps) {
                   type="text"
                   name="zipCode"
                   id="zipCode"
-                  defaultValue={school?.zipCode || ''}
+                  defaultValue={school?.zipCode ?? ''}
                   className="block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
                 />
               </div>
@@ -200,7 +200,7 @@ export default function SchoolClient({ initialSchool }: SchoolClientProps) {
                   type="tel"
                   name="phone"
                   id="phone"
-                  defaultValue={school?.phone || ''}
+                  defaultValue={school?.phone ?? ''}
                   className="block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
                 />
               </div>
@@ -215,7 +215,7 @@ export default function SchoolClient({ initialSchool }: SchoolClientProps) {
                   type="url"
                   name="website"
                   id="website"
-                  defaultValue={school?.website || ''}
+                  defaultValue={school?.website ?? ''}
                   className="block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
                 />
               </div>

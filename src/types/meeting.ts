@@ -24,12 +24,12 @@ export interface StaffWithRelations extends Staff {
 
 // Type for meeting attendee with relations
 export interface AttendeeWithRelations extends MeetingAttendee {
-  Staff: StaffWithRelations;
+  Staff: _StaffWithRelations;
 }
 
 // Type for meeting with all relations
 export interface MeetingWithRelations extends Meeting {
-  Staff: StaffWithRelations;
+  Staff: _StaffWithRelations;
   MeetingAttendee: AttendeeWithRelations[];
   MeetingAgendaItems?: AgendaItemWithRelations[];
   MeetingActionItems?: ActionItemWithRelations[];
@@ -40,18 +40,18 @@ export interface MeetingWithRelations extends Meeting {
 
 // Type for agenda item comment with relations
 export interface CommentWithRelations extends AgendaItemComment {
-  Staff: StaffWithRelations;
+  Staff: _StaffWithRelations;
 }
 
 // Type for action item with relations
 export interface ActionItemWithRelations extends MeetingActionItem {
-  AssignedTo: StaffWithRelations | null;
+  AssignedTo: _StaffWithRelations | null;
 }
 
 // Type for agenda item with all relations
 export interface AgendaItemWithRelations extends MeetingAgendaItem {
   Meeting: MeetingWithRelations;
-  ResponsibleStaff: StaffWithRelations | null;
+  ResponsibleStaff: _StaffWithRelations | null;
   Comments: CommentWithRelations[];
   ActionItems: ActionItemWithRelations[];
   Attachments: AgendaItemAttachment[];

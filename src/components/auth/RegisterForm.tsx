@@ -29,8 +29,8 @@ export function RegisterForm() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Something went wrong');
+      if (!response?.ok) {
+        throw new Error(data?.message || 'Something went wrong');
       }
 
       // Redirect to sign in page after successful registration
@@ -43,7 +43,7 @@ export function RegisterForm() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name, value } = e?.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -61,7 +61,7 @@ export function RegisterForm() {
               type="text"
               autoComplete="name"
               required
-              value={formData.name}
+              value={formData?.name}
               onChange={handleChange}
               className="block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
               placeholder="Enter your name"
@@ -80,7 +80,7 @@ export function RegisterForm() {
               type="email"
               autoComplete="email"
               required
-              value={formData.email}
+              value={formData?.email}
               onChange={handleChange}
               className="block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
               placeholder="Enter your email"
@@ -99,7 +99,7 @@ export function RegisterForm() {
               type="password"
               autoComplete="new-password"
               required
-              value={formData.password}
+              value={formData?.password}
               onChange={handleChange}
               className="block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
               placeholder="Create a password"

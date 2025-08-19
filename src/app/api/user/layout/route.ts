@@ -10,7 +10,7 @@ import { RateLimiters, getClientIdentifier } from '@/lib/utils/rate-limit';
 const layoutSchema = z.object({
   layoutId: z.string().optional(),
   layout: z.string().optional(),
-}).refine(data => data.layoutId || data.layout, {
+}).refine(data => data.layoutId ?? data.layout, {
   message: "Either layoutId or layout must be provided"
 });
 
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       SELECT layout_preference FROM "User" WHERE id = ${user.id} LIMIT 1
     `;
     
-    const layout = userData?.[0]?.layout_preference || 'modern';
+    const layout = userData?.[0]?.layout_preference ?? 'modern';
     
     // Cache the result
     preferenceCache.set(user.id, { layout });
@@ -85,7 +85,7 @@ export async function PUT(request: NextRequest) {
     const validatedData = layoutSchema.parse(body);
     
     // Use layoutId if provided, otherwise use layout
-    const layoutToSave = validatedData.layoutId || validatedData.layout || 'modern';
+    const layoutToSave = validatedData.layoutId ?? validatedData.layout ?? 'modern';
 
     // Update user's layout preference (optimized query)
     await prisma.user.update({
@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest) {
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: user.staff?.id || undefined,
+      staffId: user.staff?.id ?? undefined,
       source: 'WEB_UI',
       description: `Layout changed to ${layoutToSave}`,
     }).catch(err => console.error('Audit log failed:', err));

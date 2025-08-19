@@ -11,7 +11,7 @@ async function verifyAdmin() {
   }
 
   const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
+    where: { email: session.user?.email },
     include: {
       Staff: {
         include: {
@@ -57,8 +57,8 @@ export async function PUT(
       where: { id: parseInt(id) },
       data: {
         title,
-        priority: priority || undefined,
-        category: category || undefined,
+        priority: priority ?? undefined,
+        category: category ?? undefined,
         department_id: parseInt(department_id) || undefined,
       },
       include: {

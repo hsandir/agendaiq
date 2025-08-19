@@ -14,11 +14,11 @@ function SentryUserSync() {
       // Set user context in Sentry when user logs in
       setSentryUser({
         id: session.user.id as string,
-        email: session.user.email || undefined,
-        name: session.user.name || undefined,
+        email: session.user.email ?? undefined,
+        name: session.user.name ?? undefined,
         staff: session.user.staff ? {
-          id: session.user.staff.id,
-          role: { title: session.user.staff.role.title }
+          id: session.user.staff?.id,
+          role: { title: session.user.staff.role?.title }
         } : undefined,
       });
     } else {

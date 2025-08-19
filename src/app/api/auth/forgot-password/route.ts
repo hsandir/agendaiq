@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const clientId = getClientIdentifier(request);
     const rateLimitResult = await RateLimiters.passwordReset.check(request, 5, clientId); // 5 attempts per hour
     
-    if (!rateLimitResult.success) {
+    if (!rateLimitResult?.success) {
       return RateLimiters.passwordReset.createErrorResponse(rateLimitResult);
     }
 
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     // TODO: Add resetToken and resetTokenExpiry fields to User model in schema
     // For now, we'll skip saving the token to the database
     // await prisma.user.update({
-    //   where: { id: user.id },
+    //   where: { id: user?.id },
     //   data: {
     //     resetToken: hashedToken,
     //     resetTokenExpiry: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
@@ -45,22 +45,22 @@ export async function POST(request: Request) {
     // });
 
     // Send reset email
-    const resetUrl = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${resetToken}`;
+    const resetUrl = `${process.env?.NEXTAUTH_URL}/auth/reset-password?token=${resetToken}`;
     
     // Import email service
     const { sendEmail, getPasswordResetHtml } = await import('@/lib/email/email-service');
     
     // Send password reset email
     const emailResult = await sendEmail({
-      to: user.email,
+      to: user?.email,
       subject: "AgendaIQ - Password Reset Request",
       html: getPasswordResetHtml(resetUrl)
     });
 
-    if (!emailResult.success) {
+    if (!emailResult?.success) {
       Logger.warn("Failed to send password reset email", { 
-        error: String(emailResult.error), 
-        email: user.email 
+        error: String(emailResult?.error), 
+        email: user?.email 
       }, 'auth');
     }
 

@@ -68,7 +68,7 @@ export default function BackupManagementPage() {
       const response = await fetch('/api/system/backup?action=list');
       if (response.ok) {
         const data = await response.json();
-        setBackups(data.backups || []);
+        setBackups(data.backups ?? []);
       }
     } catch (error: unknown) {
       console.error('Failed to fetch backups:', error);
@@ -370,7 +370,7 @@ export default function BackupManagementPage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <div className="text-sm text-muted-foreground">
-                Status: {getStatusBadge(status?.githubStatus || 'unknown')}
+                Status: {getStatusBadge(status?.githubStatus ?? 'unknown')}
               </div>
               {status?.hasUncommittedChanges && (
                 <p className="text-sm text-orange-600">
@@ -437,7 +437,7 @@ export default function BackupManagementPage() {
                       </div>
                       {backup.changes && (
                         <div className="text-xs text-muted-foreground">
-                          {backup.changes} changes • {backup.files || 0} files
+                          {backup.changes} changes • {backup.files ?? 0} files
                         </div>
                       )}
                     </div>

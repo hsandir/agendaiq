@@ -76,9 +76,9 @@ export async function seedTestDatabase() {
   })
   
   if (users.length >= 2) {
-    const adminUser = users.find(u => u.Staff?.[0]?.Role?.is_leadership) || users[0]
+    const _adminUser = users.find(u => u.Staff?.[0]?.Role?.is_leadership) || users[0]
     const teacherUser = users.find(u => !u.Staff?.[0]?.Role?.is_leadership) || users[1]
-    const adminStaff = adminUser.Staff?.[0]
+    const _adminStaff = adminUser.Staff?.[0]
     const teacherStaff = teacherUser.Staff?.[0]
     
     if (adminStaff && teacherStaff) {

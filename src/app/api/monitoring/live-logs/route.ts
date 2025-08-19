@@ -7,14 +7,14 @@ import { LogLevel } from '@/lib/logging/types';
 export async function GET(request: NextRequest) {
   // Require operations logs capability for live monitoring
   const authResult = await withAuth(request);
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  if (!authResult?.success) {
+    return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
   }
 
   const user = authResult.user!;
 
   // Check operations logs capability
-  if (!can(user, Capability.OPS_LOGS)) {
+  if (!can(user, Capability?.OPS_LOGS)) {
     return NextResponse.json({ error: 'Operations logs access required' }, { status: 403 });
   }
 
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     
     // Create a temporary transport instance to access the buffer
     // In a real implementation, you'd want to maintain a singleton
-    const realtimeTransport = new RealtimeTransport(LogLevel.DEBUG);
+    const realtimeTransport = new RealtimeTransport(LogLevel?.DEBUG);
     
     // Get recent events and stats
     const [logs, stats] = await Promise.all([

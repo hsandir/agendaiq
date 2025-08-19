@@ -31,8 +31,8 @@ export async function GET(request: NextRequest) {
   
   // Add pagination parameters
   const searchParams = request.nextUrl.searchParams;
-  const page = parseInt(searchParams.get('page') || '1');
-  const limit = parseInt(searchParams.get('limit') || '20');
+  const page = parseInt(searchParams.get('page') ?? '1');
+  const limit = parseInt(searchParams.get('limit') ?? '20');
   const skip = (page - 1) * limit;
 
   try {
@@ -145,9 +145,9 @@ export async function GET(request: NextRequest) {
       description: meeting.description,
       startTime: meeting.start_time?.toISOString() || new Date().toISOString(),
       endTime: meeting.end_time?.toISOString() || new Date().toISOString(),
-      zoomLink: meeting.zoom_join_url || null,
+      zoomLink: meeting.zoom_join_url ?? null,
       status: meeting.status,
-      organizerName: meeting.Staff.User.name || meeting.Staff.User.email || 'Unknown',
+      organizerName: meeting.Staff.User.name ?? meeting.Staff.User.email ?? 'Unknown',
       attendeeCount: meeting._count.MeetingAttendee
     })));
 
@@ -325,7 +325,7 @@ export async function POST(request: NextRequest) {
       description: completeeMeeting!.description,
       startTime: completeeMeeting!.start_time?.toISOString() || new Date().toISOString(),
       endTime: completeeMeeting!.end_time?.toISOString() || new Date().toISOString(),
-      zoomLink: completeeMeeting!.zoom_join_url || null,
+      zoomLink: completeeMeeting!.zoom_join_url ?? null,
       status: completeeMeeting!.status,
       organizer: {
         id: completeeMeeting!.Staff.id,
@@ -338,7 +338,7 @@ export async function POST(request: NextRequest) {
         name: attendee.Staff.User.name,
         email: attendee.Staff.User.email,
         role: attendee.Staff.Role.title,
-        status: attendee.status || 'PENDING',
+        status: attendee.status ?? 'PENDING',
       })),
     };
 

@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const clientId = getClientIdentifier(request);
     const rateLimitResult = await RateLimiters.registration.check(request, 3, clientId); // 3 registrations per hour
     
-    if (!rateLimitResult.success) {
+    if (!rateLimitResult?.success) {
       return RateLimiters.registration.createErrorResponse(rateLimitResult);
     }
 
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     });
 
     const validationResult = registerSchema.safeParse(body);
-    if (!validationResult.success) {
+    if (!validationResult?.success) {
       return NextResponse.json(
         { 
           error: "Invalid input", 
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { __email, __password, __name  } = validationResult.data;
+    const { __email, __password, __name  } = validationResult?.data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -58,9 +58,9 @@ export async function POST(request: Request) {
     });
 
     return new NextResponse(JSON.stringify({
-      id: user.id,
-      email: user.email,
-      name: user.name,
+      id: user?.id,
+      email: user?.email,
+      name: user?.name,
     }), {
       status: 201,
       headers: { "Content-Type": "application/json" },

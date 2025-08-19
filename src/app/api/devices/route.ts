@@ -49,10 +49,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Get device info from request
-    const userAgent = request.headers.get('user-agent') || 'Unknown';
-    const ipAddress = request.headers.get('x-forwarded-for') || 
-                     request.headers.get('x-real-ip') || 
-                     'Unknown';
+    const userAgent = request.headers.get('user-agent') ?? 'Unknown';
+    const ipAddress = (request.headers.get('x-forwarded-for') || 
+                     request.headers.get('x-real-ip')) ?? 'Unknown';
 
     // Parse user agent for device info
     const deviceInfo = parseUserAgent(userAgent);

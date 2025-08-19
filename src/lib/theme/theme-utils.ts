@@ -42,7 +42,7 @@ export function generateCSSVariables(theme: Theme): Record<string, string> {
 }
 
 // Generate Tailwind CSS custom properties
-export function generateTailwindConfig(theme: Theme): Record<string, any> {
+export function generateTailwindConfig(theme: Theme): Record<string, unknown> {
   return {
     colors: {
       primary: {

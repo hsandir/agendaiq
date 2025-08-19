@@ -42,7 +42,7 @@ class LayoutStore {
   
   needsSync(): boolean {
     const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
-    return !this.initialized || this.lastSyncTime < fiveMinutesAgo;
+    return !this.initialized ?? this.lastSyncTime < fiveMinutesAgo;
   }
   
   reset(): void {

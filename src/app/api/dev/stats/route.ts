@@ -5,14 +5,14 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   const authResult = await withAuth(request);
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  if (!authResult?.success) {
+    return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
   }
 
   const user = authResult.user!;
 
   // Check development capability
-  if (!can(user, Capability.DEV_DEBUG)) {
+  if (!can(user, Capability?.DEV_DEBUG)) {
     return NextResponse.json({ error: 'Development access required' }, { status: 403 });
   }
 
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
       }
     });
     
-    const testCoverage = latestTestRun?.field_changes?.coverage as number || 0;
+    const testCoverage = latestTestRun?.field_changes?.coverage as number ?? 0;
     
     // Get previous coverage for comparison
     const previousTestRun = await prisma.auditLog.findFirst({
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
         table_name: 'test_run',
         operation: 'CREATE',
         created_at: {
-          lt: latestTestRun?.created_at || new Date()
+          lt: latestTestRun?.created_at ?? new Date()
         }
       },
       orderBy: { created_at: 'desc' },
@@ -48,13 +48,13 @@ export async function GET(request: NextRequest) {
       }
     });
     
-    const previousCoverage = previousTestRun?.field_changes?.coverage as number || 0;
+    const previousCoverage = previousTestRun?.field_changes?.coverage as number ?? 0;
     const coverageChange = testCoverage - previousCoverage;
     
     // Check build status (simulated for now)
     const buildStatus = 'passing';
     const buildTime = latestTestRun ? 
-      (latestTestRun.field_changes?.duration as number || 0) : 
+      (latestTestRun.field_changes?.duration as number ?? 0) : 
       0;
     
     // Check API health by counting recent errors

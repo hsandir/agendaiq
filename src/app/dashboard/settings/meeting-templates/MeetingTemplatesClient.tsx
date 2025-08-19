@@ -172,9 +172,9 @@ export default function MeetingTemplatesClient({
     setEditingTemplate(template);
     setFormData({
       name: template.name,
-      description: template.description || '',
+      description: template.description ?? '',
       duration: template.duration,
-      agenda: template.agenda || '',
+      agenda: template.agenda ?? '',
       attendees: template.attendees,
       is_active: template.is_active
     });

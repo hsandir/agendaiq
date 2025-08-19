@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     });
     
     const response = NextResponse.json({
-      customTheme: userData?.custom_theme || null,
+      customTheme: userData?.custom_theme ?? null,
     });
     
     response.headers.set('Cache-Control', 'private, max-age=3600'); // 1 hour

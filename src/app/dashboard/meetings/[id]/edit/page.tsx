@@ -104,8 +104,8 @@ export default async function EditMeetingPage({ params }: PageProps) {
 
   const transformedUsers = (allStaff.map(staff => ({
     id: staff.id.toString(),
-    name: staff.User.name || staff.User.email || '',
-    email: staff.User.email || '',
+    name: staff.User.name ?? staff.User.email ?? '',
+    email: staff.User.email ?? '',
     role: staff.Role.title,
     department: staff.Department.name
   })));
@@ -117,32 +117,32 @@ export default async function EditMeetingPage({ params }: PageProps) {
   const transformedMeeting = {
     id: meeting.id.toString(),
     title: meeting.title,
-    description: meeting.description || '',
-    startTime: meeting.start_time?.toISOString() || '',
-    endTime: meeting.end_time?.toISOString() || '',
-    agenda: meeting.agenda || '',
-    notes: meeting.notes || '',
-    status: meeting.status || 'draft',
-    type: meeting.meeting_type || 'regular',
+    description: meeting.description ?? '',
+    startTime: meeting.start_time?.toISOString() ?? '',
+    endTime: meeting.end_time?.toISOString() ?? '',
+    agenda: meeting.agenda ?? '',
+    notes: meeting.notes ?? '',
+    status: meeting.status ?? 'draft',
+    type: meeting.meeting_type ?? 'regular',
     location: '', // Meeting model doesn't have location field
-    zoomLink: meeting.zoom_join_url || '',
-    zoomMeetingId: meeting.zoom_meeting_id || '',
-    calendarIntegration: meeting.calendar_integration || 'none',
+    zoomLink: meeting.zoom_join_url ?? '',
+    zoomMeetingId: meeting.zoom_meeting_id ?? '',
+    calendarIntegration: meeting.calendar_integration ?? 'none',
     attendees: meeting.MeetingAttendee.map(attendee => ({
       id: attendee.Staff.id.toString(),
-      name: attendee.Staff.User.name || attendee.Staff.User.email || '',
-      email: attendee.Staff.User.email || '',
-      status: attendee.status || 'pending'
+      name: attendee.Staff.User.name ?? attendee.Staff.User.email ?? '',
+      email: attendee.Staff.User.email ?? '',
+      status: attendee.status ?? 'pending'
     })),
     agendaItems: meeting.MeetingAgendaItems.map(item => ({
       id: item.id.toString(),
       topic: item.topic,
-      description: item.problem_statement || '',
-      purpose: item.purpose || 'Discussion',
-      priority: item.priority || 'Medium',
-      duration_minutes: item.duration_minutes || 15,
+      description: item.problem_statement ?? '',
+      purpose: item.purpose ?? 'Discussion',
+      priority: item.priority ?? 'Medium',
+      duration_minutes: item.duration_minutes ?? 15,
       responsible_staff_id: item.responsible_staff_id?.toString() || null,
-      status: item.status || 'Pending',
+      status: item.status ?? 'Pending',
       order_index: item.order_index
     }))
   };

@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 
     // Update staff record's school
     await prisma.staff.update({
-      where: { id: userStaff.id },
+      where: { id: userStaff?.id },
       data: { school_id: parseInt(schoolId) },
     });
 

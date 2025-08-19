@@ -13,8 +13,8 @@ export class MeetingSearchService {
     total: number;
   }> {
     const searchTerm = query.query.toLowerCase();
-    const limit = query.limit || 20;
-    const offset = query.offset || 0;
+    const limit = query.limit ?? 20;
+    const offset = query.offset ?? 0;
 
     // Build where clause
     const whereConditions: Record<string, unknown>[] = [];
@@ -52,7 +52,7 @@ export class MeetingSearchService {
         });
       }
 
-      if (query.filters.dateFrom || query.filters.dateTo) {
+      if (query.filters.dateFrom ?? query.filters.dateTo) {
         const dateFilter: Record<string, unknown> = {};
         if (query.filters.dateFrom) {
           dateFilter.gte = query.filters.dateFrom;
@@ -163,7 +163,7 @@ export class MeetingSearchService {
           excerpt = meeting.MeetingActionItems[0].title;
         }
       } else {
-        excerpt = meeting.description || meeting.title;
+        excerpt = meeting.description ?? meeting.title;
       }
 
       return {
@@ -171,7 +171,7 @@ export class MeetingSearchService {
         title: meeting.title,
         excerpt: excerpt.substring(0, 200) + (excerpt.length > 200 ? '...' : ''),
         relevance,
-        date: meeting.start_time || meeting.created_at,
+        date: meeting.start_time ?? meeting.created_at,
         matchedIn
       };
     });

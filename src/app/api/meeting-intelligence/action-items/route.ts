@@ -12,9 +12,9 @@ export async function GET(request: NextRequest) {
   
   try {
     const searchParams = request.nextUrl.searchParams;
-    const filter = searchParams.get('filter') || 'all';
-    const status = searchParams.get('status') || 'all';
-    const priority = searchParams.get('priority') || 'all';
+    const filter = searchParams.get('filter') ?? 'all';
+    const status = searchParams.get('status') ?? 'all';
+    const priority = searchParams.get('priority') ?? 'all';
     
     // Build query conditions
     const whereConditions: Record<string, unknown> = {};
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     // Filter by ownership
     if (filter === 'my' && user.staff) {
       whereConditions.assigned_to_id = user.staff.id;
-    } else if (filter === 'team' && user.staff && user.staff.department) {
+    } else if (filter === 'team' && user.staff?.department) {
       // Get team members
       const teamMembers = await prisma.staff.findMany({
         where: {
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
         title: item.title,
         description: item.description,
         status: isOverdue ? 'overdue' : item.status,
-        priority: item.priority || 'Medium',
+        priority: item.priority ?? 'Medium',
         dueDate: item.due_date?.toISOString(),
         createdAt: item.created_at.toISOString(),
         completedAt: item.completed_at?.toISOString(),
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
         },
         assignedStaff: item.AssignedTo ? {
           id: item.AssignedTo.id,
-          name: item.AssignedTo.User.name || 'Unknown',
+          name: item.AssignedTo.User.name ?? 'Unknown',
           email: item.AssignedTo.User.email
         } : undefined,
         meeting: item.Meeting ? {
@@ -123,7 +123,7 @@ export async function GET(request: NextRequest) {
           title: item.Meeting.title,
           date: item.Meeting.start_time?.toISOString() || new Date().toISOString()
         } : undefined,
-        carriedForwardCount: item.carry_forward_count || 0,
+        carriedForwardCount: item.carry_forward_count ?? 0,
         parentItemId: item.parent_action_id
       };
     });

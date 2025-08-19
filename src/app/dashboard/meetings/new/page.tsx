@@ -72,8 +72,8 @@ export default async function NewMeetingPage() {
   // Transform staff data to match MeetingFormStep1 interface
   const users = (staff.map(s => ({
     id: s.id.toString(), // Use staff ID, not user ID
-    name: s.User.name || s.User.email || "Unknown User",
-    email: s.User.email || "",
+    name: (s.User.name ?? s.User.email) || "Unknown User",
+    email: s.User.email ?? "",
     department: s.Department.name,
     role: s.Role.title,
   })));
@@ -89,7 +89,7 @@ export default async function NewMeetingPage() {
   const transformedRoles = (roles.map(r => ({
     id: r.id,
     title: r.title,
-    category: r.category || undefined
+    category: r.category ?? undefined
   })));
 
   async function createMeeting(data: {
@@ -189,7 +189,7 @@ export default async function NewMeetingPage() {
         
         const currentDate = new Date(startDate);
         const maxOccurrences = data.repeatConfig.endType === 'after' ? 
-          (data.repeatConfig.occurrences || 10) : 52;
+          (data.repeatConfig.occurrences ?? 10) : 52;
         const endLimit = data.repeatConfig.endType === 'by' && data.repeatConfig.endDate ? 
           new Date(data.repeatConfig.endDate) : null;
         
@@ -197,7 +197,7 @@ export default async function NewMeetingPage() {
           // Calculate next date based on pattern
           switch (data.repeatConfig.pattern) {
             case 'daily':
-              currentDate.setDate(currentDate.getDate() + (data.repeatConfig.interval || 1));
+              currentDate.setDate(currentDate.getDate() + (data.repeatConfig.interval ?? 1));
               break;
             case 'weekly':
               currentDate.setDate(currentDate.getDate() + 7);
@@ -240,18 +240,18 @@ export default async function NewMeetingPage() {
         const meeting = (await prisma.meeting.create({
           data: {
             title: data.title + (datesToCreate.length > 1 ? ` (${i + 1}/${datesToCreate.length})` : ''),
-            description: data.description || "",
+            description: data.description ?? "",
             start_time: meetingDate,
             end_time: endTime,
             repeat_type: data.repeatType !== "none" ? data.repeatType : null,
-            repeat_pattern: data.repeatConfig?.pattern || null,
-            repeat_interval: data.repeatConfig?.interval || null,
+            repeat_pattern: data.repeatConfig?.pattern ?? null,
+            repeat_interval: data.repeatConfig?.interval ?? null,
             repeat_weekdays: data.repeatConfig?.weekDays?.map(day => parseInt(day)) || [],
-            repeat_month_day: data.repeatConfig?.monthDay || null,
-            repeat_month_week: data.repeatConfig?.monthWeek || null,
-            repeat_month_weekday: data.repeatConfig?.monthWeekDay || null,
-            repeat_end_type: data.repeatConfig?.endType || null,
-            repeat_occurrences: data.repeatConfig?.occurrences || null,
+            repeat_month_day: data.repeatConfig?.monthDay ?? null,
+            repeat_month_week: data.repeatConfig?.monthWeek ?? null,
+            repeat_month_weekday: data.repeatConfig?.monthWeekDay ?? null,
+            repeat_end_type: data.repeatConfig?.endType ?? null,
+            repeat_occurrences: data.repeatConfig?.occurrences ?? null,
             repeat_end_date: data.repeatConfig?.endDate ? new Date(data.repeatConfig.endDate) : null,
             repeat_exceptions: data.repeatConfig?.exceptions?.map((d: string) => new Date(d)) || [],
             series_id: seriesId,
@@ -259,9 +259,9 @@ export default async function NewMeetingPage() {
             is_series_master: i === 0,
             calendar_integration: data.calendarIntegration !== "none" ? data.calendarIntegration : null,
             meeting_type: data.meetingType,
-            zoom_meeting_id: data.zoomMeetingId || null,
+            zoom_meeting_id: data.zoomMeetingId ?? null,
             is_continuation: data.isContinuation,
-            parent_meeting_id: data.parentMeetingId || null,
+            parent_meeting_id: data.parentMeetingId ?? null,
             status: "draft", // Start as draft, will be scheduled in step 2
             organizer_id: staffWithRelations.id,
             department_id: parseInt(staffWithRelations).department_id,

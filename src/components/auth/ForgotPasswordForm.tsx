@@ -24,8 +24,8 @@ export function ForgotPasswordForm() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Something went wrong');
+      if (!response?.ok) {
+        throw new Error(data?.message || 'Something went wrong');
       }
 
       setSuccess(true);
@@ -73,7 +73,7 @@ export function ForgotPasswordForm() {
               autoComplete="email"
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target?.value)}
               className="block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-ring sm:text-sm"
               placeholder="Enter your email"
             />

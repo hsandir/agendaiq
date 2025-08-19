@@ -618,7 +618,7 @@ describe('Comprehensive Component Tests', () => {
 
     describe('Search Component', () => {
       it('should render search input and button', () => {
-        const mockSearch = jest.fn();
+        const _mockSearch = jest.fn();
         render(<MockSearchComponent onSearch={mockSearch} />);
 
         expect(screen.getByTestId('search-input')).toBeInTheDocument();
@@ -627,7 +627,7 @@ describe('Comprehensive Component Tests', () => {
 
       it('should handle search submission', async () => {
         const user = userEvent.setup();
-        const mockSearch = jest.fn();
+        const _mockSearch = jest.fn();
         
         render(<MockSearchComponent onSearch={mockSearch} />);
 
@@ -642,7 +642,7 @@ describe('Comprehensive Component Tests', () => {
 
       it('should handle Enter key submission', async () => {
         const user = userEvent.setup();
-        const mockSearch = jest.fn();
+        const _mockSearch = jest.fn();
         
         render(<MockSearchComponent onSearch={mockSearch} />);
 
@@ -653,7 +653,7 @@ describe('Comprehensive Component Tests', () => {
       });
 
       it('should show loading state', () => {
-        const mockSearch = jest.fn();
+        const _mockSearch = jest.fn();
         render(<MockSearchComponent onSearch={mockSearch} loading={true} />);
 
         const searchInput = screen.getByTestId('search-input');
@@ -665,7 +665,7 @@ describe('Comprehensive Component Tests', () => {
       });
 
       it('should display search results', () => {
-        const mockSearch = jest.fn();
+        const _mockSearch = jest.fn();
         const mockResults = [
           { id: 1, title: 'Meeting 1', type: 'Meeting' },
           { id: 2, title: 'User 1', type: 'User' },
@@ -679,14 +679,14 @@ describe('Comprehensive Component Tests', () => {
       });
 
       it('should show no results message', () => {
-        const mockSearch = jest.fn();
+        const _mockSearch = jest.fn();
         render(<MockSearchComponent onSearch={mockSearch} value="no results query" results={[]} />);
 
         expect(screen.getByTestId('no-results')).toHaveTextContent('No results found');
       });
 
       it('should be accessible', async () => {
-        const mockSearch = jest.fn();
+        const _mockSearch = jest.fn();
         const { container } = render(<MockSearchComponent onSearch={jest.fn()} />);
 
         const results = await axe(container as Element);
@@ -726,7 +726,7 @@ describe('Comprehensive Component Tests', () => {
         dispatchEvent: jest.fn(),
       }));
 
-      const mockSearch = jest.fn();
+      const _mockSearch = jest.fn();
       render(<MockSearchComponent onSearch={mockSearch} />);
 
       // Component should render appropriately for mobile
@@ -745,7 +745,7 @@ describe('Comprehensive Component Tests', () => {
         dispatchEvent: jest.fn(),
       }));
 
-      const mockSearch = jest.fn();
+      const _mockSearch = jest.fn();
       render(<MockSearchComponent onSearch={mockSearch} />);
 
       expect(screen.getByTestId('search-component')).toBeInTheDocument();
@@ -762,7 +762,7 @@ describe('Comprehensive Component Tests', () => {
         type: 'Test'
       }));
 
-      const mockSearch = jest.fn();
+      const _mockSearch = jest.fn();
       render(<MockSearchComponent onSearch={mockSearch} results={largeResults} />);
 
       const endTime = performance.now();
@@ -777,7 +777,7 @@ describe('Comprehensive Component Tests', () => {
 
     it('should handle rapid state changes', async () => {
       const user = userEvent.setup();
-      const mockSearch = jest.fn();
+      const _mockSearch = jest.fn();
       
       render(<MockSearchComponent onSearch={mockSearch} />);
 

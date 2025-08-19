@@ -101,7 +101,7 @@ export default function TestDashboard() {
     try {
       const response = await fetch('/api/tests/suites')
       const data = await response.json()
-      setTestSuites(data.suites || [])
+      setTestSuites(data.suites ?? [])
     } catch (error: unknown) {
       console.error('Failed to load test suites:', error)
     }
@@ -113,7 +113,7 @@ export default function TestDashboard() {
       if (!response.ok) throw new Error('Failed to fetch test history')
       
       const data = await response.json()
-      setTestHistory(data.history || [])
+      setTestHistory(data.history ?? [])
     } catch (error: unknown) {
       console.error('Failed to load test history:', error)
       setTestHistory([])

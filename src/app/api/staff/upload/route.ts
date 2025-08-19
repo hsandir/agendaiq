@@ -21,7 +21,7 @@ function parseCSV(content: string): CSVRecord[] {
     const values = (lines[i].split(',').map(v => String(v).trim().replace(/^"|"$/g, '')));
     const record: CSVRecord = {};
     headers.forEach((header, index) => {
-      record[header] = values[index] || '';
+      record[header] = values[index] ?? '';
     });
     records.push(record);
   }
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    if (!records || records.length === 0) {
+    if (!records ?? records.length === 0) {
       return NextResponse.json({ 
         error: 'CSV file is empty or has no valid data rows.',
         hint: 'Please ensure your file contains data rows below the header row'
@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
     const validDepartments = (existingDepartments.map((d) => d.name));
 
     // Get the admin's school and district for creating staff records
-    const adminStaff = user.staff!;
+    const _adminStaff = user.staff!;
 
     // Process records for preview or upload
     const processedRecords: ProcessedRecord[] = [];
@@ -208,16 +208,16 @@ export async function POST(request: NextRequest) {
         if (!record.Email || !emailSchema.safeParse(record.Email).success) {
           recordErrors.push('Invalid email format');
         }
-        if (!record.Name || record.String(Name).trim().length === 0) {
+        if (!record.Name ?? record.String(Name).trim().length === 0) {
           recordErrors.push('Name is required');
         }
         if (!record.StaffId || !staffIdSchema.safeParse(record.StaffId).success) {
           recordErrors.push('Staff ID must be 3-15 characters');
         }
-        if (!record.Role || record.String(Role).trim().length === 0) {
+        if (!record.Role ?? record.String(Role).trim().length === 0) {
           recordErrors.push('Role is required');
         }
-        if (!record.Department || record.String(Department).trim().length === 0) {
+        if (!record.Department ?? record.String(Department).trim().length === 0) {
           recordErrors.push('Department is required');
         }
 
@@ -296,8 +296,8 @@ export async function POST(request: NextRequest) {
           
           if (existingStaff) {
             processedRecord.existingData = {
-              name: existingUser.name || '',
-              staffId: existingUser.staff_id || '',
+              name: existingUser.name ?? '',
+              staffId: existingUser.staff_id ?? '',
               role: existingStaff.Role.title,
               department: existingStaff.Department.name
             };
@@ -307,7 +307,7 @@ export async function POST(request: NextRequest) {
             if (record.Name !== existingUser.name) {
               conflicts.push({
                 field: 'name',
-                existing: existingUser.name || '',
+                existing: existingUser.name ?? '',
                 new: record.Name,
                 action: 'update_name'
               });
@@ -538,7 +538,7 @@ export async function POST(request: NextRequest) {
           created_count: created,
           updated_count: updated,
           error_count: uploadErrors.length,
-          file_name: file.name || 'unknown',
+          file_name: file.name ?? 'unknown',
           selected_records: selectedRows.length > 0 ? selectedRows.length : 'all'
         }
       });

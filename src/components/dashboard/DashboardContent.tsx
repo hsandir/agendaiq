@@ -87,13 +87,13 @@ export function DashboardContent({
   const renderWelcomeHeader = () => (
     <div className="mb-8">
       <h1 className="text-2xl font-bold text-foreground mb-2">Welcome back, {user.name}</h1>
-      {(userWithStaff?.staff?.school || userWithStaff?.Staff?.[0]?.School) && (
+      {(userWithStaff?.staff?.school ?? userWithStaff?.Staff?.[0]?.School) && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>{(userWithStaff as any).staff?.school?.name || userWithStaff.Staff?.[0]?.School?.name}</span>
-          {((userWithStaff as any).staff?.school?.code || userWithStaff.Staff?.[0]?.School?.address) && (
+          <span>{(userWithStaff as any).staff?.school?.name ?? userWithStaff.Staff?.[0]?.School?.name}</span>
+          {((userWithStaff as any).staff?.school?.code ?? userWithStaff.Staff?.[0]?.School?.address) && (
             <>
               <span>•</span>
-              <span>{(userWithStaff as any).staff?.school?.code || userWithStaff.Staff?.[0]?.School?.address}</span>
+              <span>{(userWithStaff as any).staff?.school?.code ?? userWithStaff.Staff?.[0]?.School?.address}</span>
             </>
           )}
         </div>

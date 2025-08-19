@@ -71,7 +71,7 @@ export default async function AgendaItemPage(props: Props) {
     }
   });
 
-  if (!agendaItem || agendaItem.meeting_id !== meetingId) {
+  if (!agendaItem ?? agendaItem.meeting_id !== meetingId) {
     notFound();
   }
 
@@ -100,7 +100,7 @@ export default async function AgendaItemPage(props: Props) {
       meeting={agendaItem.Meeting as Record<string, unknown>}
       currentUser={user}
       allStaff={allStaff as Record<string, unknown>}
-      canEdit={isOrganizer || hasAdminAccess || isResponsible}
+      canEdit={isOrganizer ?? hasAdminAccess || isResponsible}
     />
   );
 }

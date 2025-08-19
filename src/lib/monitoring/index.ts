@@ -152,7 +152,7 @@ class MonitoringManager {
    * Monitor a cron job
    */
   captureCheckIn(checkIn: CronJob): void {
-    if (!this.provider || !this.provider.captureCheckIn) return;
+    if (!this.provider?.captureCheckIn) return;
     this.provider.captureCheckIn(checkIn);
   }
 
@@ -160,7 +160,7 @@ class MonitoringManager {
    * Start session replay
    */
   startReplay(): void {
-    if (!this.provider || !this.provider.startReplay) return;
+    if (!this.provider?.startReplay) return;
     this.provider.startReplay();
   }
 
@@ -168,7 +168,7 @@ class MonitoringManager {
    * Stop session replay
    */
   stopReplay(): void {
-    if (!this.provider || !this.provider.stopReplay) return;
+    if (!this.provider?.stopReplay) return;
     this.provider.stopReplay();
   }
 
@@ -176,7 +176,7 @@ class MonitoringManager {
    * Capture a custom event
    */
   captureEvent(event: ErrorEvent): void {
-    if (!this.provider || !this.provider.captureEvent) return;
+    if (!this.provider?.captureEvent) return;
     this.provider.captureEvent(event);
   }
 
@@ -231,7 +231,7 @@ class MonitoringManager {
       data?: Record<string, unknown>;
     }
   ): Promise<T> {
-    const transaction = this.startTransaction(name, options?.op || 'function');
+    const transaction = this.startTransaction(name, options?.op ?? 'function');
     
     if (options?.tags) {
       transaction.tags = options.tags;
@@ -304,7 +304,7 @@ class MonitoringManager {
    * Close and flush monitoring
    */
   async close(timeout?: number): Promise<boolean> {
-    if (!this.provider || !this.provider.close) return true;
+    if (!this.provider?.close) return true;
     return this.provider.close(timeout);
   }
 

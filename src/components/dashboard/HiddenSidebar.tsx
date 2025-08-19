@@ -119,7 +119,7 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
 
   // Use external control if provided, otherwise use internal state
   const isOpen = externalIsOpen !== undefined ? externalIsOpen : internalIsOpen;
-  const setIsOpen = onToggle || setInternalIsOpen;
+  const setIsOpen = onToggle ?? setInternalIsOpen;
 
   const isActive = (href: string) => pathname === href;
 
@@ -218,7 +218,7 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
         >
           <nav className="px-6 space-y-8" aria-label="Settings navigation">
             {validNavigation.map((section) => {
-              if (!section || section.adminOnly && !isAdmin) return null;
+              if (!section ?? section.adminOnly && !isAdmin) return null;
 
               return (
                 <div key={section.title}>

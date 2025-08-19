@@ -95,17 +95,17 @@ export function ErrorMonitor() {
 
       if (issuesRes.ok) {
         const data = await issuesRes.json();
-        setErrorIssues(data.issues || []);
+        setErrorIssues(data.issues ?? []);
       }
 
       if (statsRes.ok) {
         const data = await statsRes.json();
-        setErrorStats(data.stats || null);
+        setErrorStats(data.stats ?? null);
       }
 
       if (releaseRes.ok) {
         const data = await releaseRes.json();
-        setReleaseHealth(data.release || null);
+        setReleaseHealth(data.release ?? null);
       }
     } catch (error: unknown) {
       console.error('Failed to fetch error data:', error);
@@ -135,7 +135,7 @@ export function ErrorMonitor() {
     };
 
     return (
-      <Badge variant={variants[level] || "outline"}>
+      <Badge variant={variants[level] ?? "outline"}>
         {level.toUpperCase()}
       </Badge>
     );
@@ -155,14 +155,14 @@ export function ErrorMonitor() {
   };
 
   const formatTimeAgo = (date: Date) => {
-    const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000));
+    const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
     
     if (seconds < 60) return `${seconds}s ago`;
-    const minutes = Math.floor(seconds / 60));
+    const minutes = Math.floor(seconds / 60);
     if (minutes < 60) return `${minutes}m ago`;
-    const hours = Math.floor(minutes / 60));
+    const hours = Math.floor(minutes / 60);
     if (hours < 24) return `${hours}h ago`;
-    const days = Math.floor(hours / 24));
+    const days = Math.floor(hours / 24);
     return `${days}d ago`;
   };
 

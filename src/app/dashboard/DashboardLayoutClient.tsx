@@ -35,7 +35,7 @@ export function DashboardLayoutClient({
       return storeLayout;
     }
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('agendaiq-layout') || 'modern';
+      return localStorage.getItem('agendaiq-layout') ?? 'modern';
     }
     return 'modern';
   });

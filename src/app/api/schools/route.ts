@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { __name, __address, ___city, ___state, ___zipCode, ___phone, ___website, __logo  } = body;
 
-    if (!name || typeof name !== "string" || String(name).trim().length === 0) {
+    if ((!name ?? (typeof name !== "string")) || String(name).trim().length === 0) {
       return new NextResponse("School name is required", { status: 400 });
     }
 
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     });
   } catch (error: unknown) {
     console.error("Error in POST /api/schools:", error);
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error instanceof Prisma?.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return new NextResponse("School with this name already exists", {
           status: 409,

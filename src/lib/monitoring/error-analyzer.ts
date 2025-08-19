@@ -315,7 +315,7 @@ export class ErrorAnalyzer {
   }
 
   private static determineSeverityByKeywords(error: string, stack?: string): 'low' | 'medium' | 'high' | 'critical' {
-    const fullText = (error + ' ' + (stack || '')).toLowerCase();
+    const fullText = (error + ' ' + (stack ?? '')).toLowerCase();
     
     if (fullText.includes('critical') || fullText.includes('fatal') || fullText.includes('crash')) {
       return 'critical';
@@ -342,7 +342,7 @@ export class ErrorAnalyzer {
     topAffectedPages: string[];
     recommendations: string[];
   } {
-    const analyses = errors.map(err => this.analyzeError(err.message, err.url || '', err.stack));
+    const analyses = errors.map(err => this.analyzeError(err.message, err.url ?? '', err.stack));
     
     const summary = this.generateSummary(analyses);
     const totalErrors = errors.length;

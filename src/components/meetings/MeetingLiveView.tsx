@@ -69,7 +69,7 @@ interface ExtendedStaff extends Staff {
 
 interface Props {
   meeting: ExtendedMeeting;
-  currentUser: AuthenticatedUser;
+  currentUser: _AuthenticatedUser;
   allStaff: ExtendedStaff[];
   isOrganizer: boolean;
   isAdmin: boolean;
@@ -145,7 +145,7 @@ export function MeetingLiveView({
       if (typeof typedData.itemId === 'number' && typedData.comment && typeof typedData.comment === 'object') {
         setAgendaItems(prev => prev.map(item => 
           item.id === typedData.itemId 
-            ? { ...item, Comments: [...(item.Comments || []), typedData.comment as Record<string, unknown>] }
+            ? { ...item, Comments: [...(item.Comments ?? []), typedData.comment as Record<string, unknown>] }
             : item
         ));
       }
@@ -334,7 +334,7 @@ export function MeetingLiveView({
                   )}
                 </div>
                 
-                {(isOrganizer || isAdmin) && (
+                {(isOrganizer ?? isAdmin) && (
                   <Link href={`/dashboard/meetings/${meeting.id}/edit`}>
                     <Button
                       variant="default"
@@ -400,7 +400,7 @@ export function MeetingLiveView({
                     </button>
                   </div>
                   
-                  {(isOrganizer || isAdmin) && (
+                  {(isOrganizer ?? isAdmin) && (
                     <Button 
                       onClick={(e) => {
                         e.preventDefault();
@@ -429,7 +429,7 @@ export function MeetingLiveView({
                     </div>
                     <h3 className="text-lg font-medium text-foreground mb-2">No agenda items yet</h3>
                     <p className="text-muted-foreground mb-4">Get started by adding your first agenda item</p>
-                    {(isOrganizer || isAdmin) && (
+                    {(isOrganizer ?? isAdmin) && (
                       <Button 
                         onClick={(e) => {
                           e.preventDefault();
@@ -456,9 +456,9 @@ export function MeetingLiveView({
                         isExpanded={expandedItems.has(item.id)}
                         onToggleExpand={() => toggleItemExpanded(item.id)}
                         onUpdate={(updates) => handleItemUpdate(item.id, updates)}
-                        canEdit={isOrganizer || isAdmin || item.responsible_staff_id === currentUser.staff?.id}
+                        canEdit={isOrganizer ?? isAdmin || item.responsible_staff_id === currentUser.staff?.id}
                         currentUserId={currentUser.id}
-                        currentUserName={currentUser.name || ''}
+                        currentUserName={currentUser.name ?? ''}
                         meetingId={meeting.id}
                       />
                       {typingUser && typingUser.userId !== currentUser.id && (
@@ -486,7 +486,7 @@ export function MeetingLiveView({
                   <div key={attendee.id} className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-foreground text-sm font-medium">
-                        {attendee.Staff.User.name?.charAt(0) || 'U'}
+                        {attendee.Staff.User.name?.charAt(0) ?? 'U'}
                       </div>
                       <div>
                         <p className="text-sm font-medium text-foreground">{attendee.Staff.User.name}</p>
@@ -522,8 +522,8 @@ export function MeetingLiveView({
                         <div className="w-2 h-2 bg-green-500 rounded-full" />
                       </div>
                       <div>
-                        <span className="text-foreground">{member.info?.name || 'Anonymous'}</span>
-                        <span className="text-muted-foreground text-xs ml-1">• {member.info?.role || 'User'}</span>
+                        <span className="text-foreground">{member.info?.name ?? 'Anonymous'}</span>
+                        <span className="text-muted-foreground text-xs ml-1">• {member.info?.role ?? 'User'}</span>
                       </div>
                     </div>
                   ))}

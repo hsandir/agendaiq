@@ -12,9 +12,9 @@ export async function GET(request: NextRequest) {
   const apiKey = authHeader?.replace('Bearer ', '');
   
   // Verify API key
-  const validApiKey = process.env.MONITORING_API_KEY;
+  const validApiKey = process.env?.MONITORING_API_KEY;
   
-  if (!validApiKey || apiKey !== validApiKey) {
+  if (!validApiKey ?? apiKey !== validApiKey) {
     return NextResponse.json(
       { error: 'Unauthorized - Invalid or missing API key' },
       { status: 401 }
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     status: 'ok',
     timestamp: new Date().toISOString(),
     service: 'agendaiq',
-    version: process.env.npm_package_version || '1.0.0',
+    version: process.env?.npm_package_version || '1.0.0',
     responseTime: 0
   };
 

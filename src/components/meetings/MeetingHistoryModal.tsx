@@ -120,7 +120,7 @@ export function MeetingHistoryModal({
       const response = await fetch(`/api/meetings/history?${params}`);
       if (response.ok) {
         const data = await response.json();
-        setMeetings(data.meetings || []);
+        setMeetings(data.meetings ?? []);
       }
     } catch (error: unknown) {
       console.error("Error fetching meetings:", error);
@@ -193,7 +193,7 @@ export function MeetingHistoryModal({
       if (searchQuery && !meeting.title.toLowerCase().includes(searchQuery.toLowerCase())) {
         return false;
       }
-      if (onlyWithActionItems && (!meeting.actionItems || meeting.actionItems === 0)) {
+      if (onlyWithActionItems && (!meeting.actionItems ?? meeting.actionItems === 0)) {
         return false;
       }
       return true;
@@ -394,7 +394,7 @@ export function MeetingHistoryModal({
                               <div className="flex items-center gap-1">
                                 <Hash className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm">
-                                  {meeting.completedActions || 0}/{meeting.actionItems} actions completed
+                                  {meeting.completedActions ?? 0}/{meeting.actionItems} actions completed
                                 </span>
                               </div>
                             )}

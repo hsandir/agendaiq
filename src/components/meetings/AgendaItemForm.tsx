@@ -175,7 +175,7 @@ export function AgendaItemForm({
             <Label htmlFor={`problem-${index}`}>Problem/Need Statement</Label>
             <Textarea
               id={`problem-${index}`}
-              value={item.problem_statement || ''}
+              value={item.problem_statement ?? ''}
               onChange={(e) => handleChange('problem_statement', e.target.value)}
               placeholder="Describe the problem or need"
               rows={2}
@@ -226,7 +226,7 @@ export function AgendaItemForm({
             <div>
               <Label htmlFor={`responsible-${index}`}>Responsible Staff</Label>
               <Select
-                value={item.responsible_staff_id?.toString() || ''}
+                value={item.responsible_staff_id?.toString() ?? ''}
                 onValueChange={(value) => handleChange('responsible_staff_id', value ? parseInt(value) : undefined)}
               >
                 <SelectTrigger>
@@ -246,7 +246,7 @@ export function AgendaItemForm({
               <Label htmlFor={`initials-${index}`}>Staff Initials</Label>
               <Input
                 id={`initials-${index}`}
-                value={item.staff_initials || selectedStaff?.initials || ''}
+                value={item.staff_initials ?? selectedStaff?.initials ?? ''}
                 onChange={(e) => handleChange('staff_initials', e.target.value)}
                 placeholder="e.g., NS"
                 maxLength={5}
@@ -259,7 +259,7 @@ export function AgendaItemForm({
                 <Input
                   id={`duration-${index}`}
                   type="number"
-                  value={item.duration_minutes || ''}
+                  value={item.duration_minutes ?? ''}
                   onChange={(e) => handleChange('duration_minutes', e.target.value ? parseInt(e.target.value) : undefined)}
                   placeholder="15"
                   min="1"
@@ -274,7 +274,7 @@ export function AgendaItemForm({
             <Label htmlFor={`solution-${index}`}>Proposed Solution(s)</Label>
             <Textarea
               id={`solution-${index}`}
-              value={item.proposed_solution || ''}
+              value={item.proposed_solution ?? ''}
               onChange={(e) => handleChange('proposed_solution', e.target.value)}
               placeholder="Describe proposed solutions"
               rows={2}
@@ -286,8 +286,8 @@ export function AgendaItemForm({
             <div>
               <Label htmlFor={`solution-type-${index}`}>Type of Solution</Label>
               <Select
-                value={item.solution_type || ''}
-                onValueChange={(value) => handleChange('solution_type', value as SolutionType || undefined)}
+                value={item.solution_type ?? ''}
+                onValueChange={(value) => handleChange('solution_type', value as SolutionType ?? undefined)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select solution type" />
@@ -307,7 +307,7 @@ export function AgendaItemForm({
             <Label htmlFor={`decisions-${index}`}>Decision(s) & Action(s)</Label>
             <Textarea
               id={`decisions-${index}`}
-              value={item.decisions_actions || ''}
+              value={item.decisions_actions ?? ''}
               onChange={(e) => handleChange('decisions_actions', e.target.value)}
               placeholder="Document decisions made and actions to be taken"
               rows={3}
@@ -319,8 +319,8 @@ export function AgendaItemForm({
             <div>
               <Label htmlFor={`decision-type-${index}`}>Type of Decision</Label>
               <Select
-                value={item.decision_type || ''}
-                onValueChange={(value) => handleChange('decision_type', value as DecisionType || undefined)}
+                value={item.decision_type ?? ''}
+                onValueChange={(value) => handleChange('decision_type', value as DecisionType ?? undefined)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select decision type" />
@@ -340,7 +340,7 @@ export function AgendaItemForm({
             <AlertCircle className="h-5 w-5 text-yellow-600" />
             <Switch
               id={`implications-${index}`}
-              checked={item.future_implications || false}
+              checked={item.future_implications ?? false}
               onCheckedChange={(checked) => handleChange('future_implications', checked)}
             />
             <Label htmlFor={`implications-${index}`} className="cursor-pointer">

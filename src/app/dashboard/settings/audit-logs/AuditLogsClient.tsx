@@ -405,19 +405,19 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
     if (user.staff?.Role?.is_leadership) {
       // Can view logs from same user or their own staff actions
       if (isCriticalLog(log)) {
-        return log.user_id === user.id || log.staff_id === user.staff.id;
+        return log.user_id === user.id ?? log.staff_id === user.staff.id;
       } else {
         // For legacy logs, check the User/Staff relations
-        return log.User?.id === user.id || log.Staff?.id === user.staff.id;
+        return log.User?.id === user.id ?? log.Staff?.id === user.staff.id;
       }
     }
 
     // Regular staff can only view their own audit logs
     if (isCriticalLog(log)) {
-      return log.user_id === user.id || log.staff_id === user.staff?.id;
+      return log.user_id === user.id ?? log.staff_id === user.staff?.id;
     } else {
       // For legacy logs, check the User/Staff relations
-      return log.User?.id === user.id || log.Staff?.id === user.staff?.id;
+      return log.User?.id === user.id ?? log.Staff?.id === user.staff?.id;
     }
   }, [user]);
 
@@ -787,7 +787,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                       {log.User ? (
                         <div>
-                          <div className="font-medium">{log.User.name || log.User.email}</div>
+                          <div className="font-medium">{log.User.name ?? log.User.email}</div>
                           {log.Staff && (
                             <div className="text-muted-foreground text-xs">
                               {log.Staff.Role.title} - {log.Staff.Department.name}
@@ -819,7 +819,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                     <td className="px-6 py-4 text-sm text-foreground">
                       <div className="max-w-xs truncate">
                         {isCritical ? (
-                          log.error_message || log.description || 'No description'
+                          log.error_message ?? log.description || 'No description'
                         ) : (
                           log.description || 'No description'
                         )}

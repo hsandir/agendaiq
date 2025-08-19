@@ -30,7 +30,7 @@ const CACHE_DURATION = 1000; // 1 second cache
 export async function getUltraFastUser(): Promise<UltraFastUser | null> {
   // Return cached user if still valid
   if (cachedUser && (Date.now() - cachedUser.timestamp < CACHE_DURATION)) {
-    return cachedUser.user;
+    return cachedUser?.user;
   }
   
   try {
@@ -44,7 +44,7 @@ export async function getUltraFastUser(): Promise<UltraFastUser | null> {
     }
 
     // Decode JWT without verification for speed (only for non-critical operations)
-    const decoded = jwt.decode(token.value) as Record<string, unknown>;
+    const decoded = jwt.decode(token?.value) as Record<string, unknown>;
     
     if (!decoded?.id || !decoded?.email) {
       cachedUser = { user: null, timestamp: Date.now() };
@@ -52,9 +52,9 @@ export async function getUltraFastUser(): Promise<UltraFastUser | null> {
     }
 
     const user: UltraFastUser = {
-      id: parseInt(decoded.id),
-      email: decoded.email,
-      staff: decoded.staff || null
+      id: parseInt(decoded?.id),
+      email: decoded?.email,
+      staff: decoded.staff ?? null
     };
     
     cachedUser = { user, timestamp: Date.now() };
@@ -77,12 +77,12 @@ class PreferenceCache {
     const entry = this.cache.get(userId);
     if (!entry) return null;
     
-    if (Date.now() - entry.timestamp > this.TTL) {
+    if (Date.now() - entry.timestamp > this?.TTL) {
       this.cache.delete(userId);
       return null;
     }
     
-    return { theme: entry.theme, layout: entry.layout };
+    return { theme: entry?.theme, layout: entry?.layout };
   }
 
   set(userId: number, preferences: { theme?: string; layout?: string }) {
@@ -112,12 +112,12 @@ class UserStaffCache {
     const entry = this.cache.get(userId);
     if (!entry) return null;
     
-    if (Date.now() - entry.timestamp > this.TTL) {
+    if (Date.now() - entry.timestamp > this?.TTL) {
       this.cache.delete(userId);
       return null;
     }
     
-    return entry.data;
+    return entry?.data;
   }
 
   set(userId: number, data: Record<string, unknown>) {

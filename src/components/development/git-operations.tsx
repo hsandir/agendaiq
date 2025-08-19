@@ -97,7 +97,7 @@ export default function GitOperations() {
       const response = await fetch('/api/dev/git/status');
       const data = await response.json();
       setGitStatus(data.status);
-      setFileChanges(data.changes || []);
+      setFileChanges(data.changes ?? []);
     } catch (error: unknown) {
       console.error('Failed to load git status:', error);
     } finally {
@@ -109,7 +109,7 @@ export default function GitOperations() {
     try {
       const response = await fetch('/api/dev/git/commits?limit=50');
       const data = await response.json();
-      setCommits(data.commits || []);
+      setCommits(data.commits ?? []);
     } catch (error: unknown) {
       console.error('Failed to load commit history:', error);
     }
@@ -119,7 +119,7 @@ export default function GitOperations() {
     try {
       const response = await fetch('/api/dev/git/branches');
       const data = await response.json();
-      setBranches(data.branches || []);
+      setBranches(data.branches ?? []);
     } catch (error: unknown) {
       console.error('Failed to load branches:', error);
     }
@@ -201,7 +201,7 @@ export default function GitOperations() {
   const handlePush = async () => {
     setIsPushing(true);
     try {
-      const result = await executeGitCommand('push', ['origin', gitStatus?.branch || 'main']);
+      const result = await executeGitCommand('push', ['origin', gitStatus?.branch ?? 'main']);
       if (result.success) {
         await loadGitStatus();
         alert('Changes pushed successfully!');
@@ -214,7 +214,7 @@ export default function GitOperations() {
   const handlePull = async () => {
     setIsPulling(true);
     try {
-      const result = await executeGitCommand('pull', ['origin', gitStatus?.branch || 'main']);
+      const result = await executeGitCommand('pull', ['origin', gitStatus?.branch ?? 'main']);
       if (result.success) {
         await loadGitStatus();
         await loadCommitHistory();
@@ -313,7 +313,7 @@ export default function GitOperations() {
             variant="outline"
             size="sm"
             onClick={handlePush}
-            disabled={isPushing || (gitStatus?.ahead || 0) === 0}
+            disabled={isPushing || (gitStatus?.ahead ?? 0) === 0}
           >
             {isPushing ? (
               <RefreshCw className="h-4 w-4 animate-spin" />
@@ -410,7 +410,7 @@ export default function GitOperations() {
                 />
                 <Button
                   onClick={handleCommit}
-                  disabled={isCommitting || selectedFiles.size === 0}
+                  disabled={isCommitting ?? selectedFiles.size === 0}
                 >
                   {isCommitting ? (
                     <RefreshCw className="h-4 w-4 animate-spin" />

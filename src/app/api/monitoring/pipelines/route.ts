@@ -29,8 +29,8 @@ interface PipelineStage {
 
 // GitHub Actions API integration for real pipeline data
 async function fetchGitHubPipelines() {
-  const owner = process.env.GITHUB_OWNER || 'anthropics';
-  const repo = process.env.GITHUB_REPO || 'agendaiq';
+  const owner = process.env.GITHUB_OWNER ?? 'anthropics';
+  const repo = process.env.GITHUB_REPO ?? 'agendaiq';
   const token = process.env.GITHUB_TOKEN;
 
   if (!token) {
@@ -62,8 +62,8 @@ async function fetchGitHubPipelines() {
       id: run.id.toString(),
       branch: run.head_branch,
       commit: run.head_sha,
-      author: run.actor?.login || 'unknown',
-      message: run.head_commit?.message || run.display_title,
+      author: run.actor?.login ?? 'unknown',
+      message: run.head_commit?.message ?? run.display_title,
       status: mapGitHubStatus(run.status, run.conclusion),
       startTime: run.created_at,
       endTime: run.updated_at,

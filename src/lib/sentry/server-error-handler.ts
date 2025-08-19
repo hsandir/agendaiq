@@ -11,7 +11,7 @@ export interface ErrorHandlerOptions {
   /**
    * Additional context to attach to the error
    */
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   
   /**
    * User information to attach to the error
@@ -91,11 +91,11 @@ export function handleServerError(
       
       // Add user context if provided
       if (user) {
-        scope.setUser{
+        scope.setUser({
           id: user.id,
           email: user.email,
           username: user.username,
-          staffId: (user.staffId,
+          staffId: user.staffId,
           role: user.role,
         });
       }
@@ -155,7 +155,7 @@ export class ApiError extends Error {
   constructor(
     message: string,
     public statusCode: number = 500,
-    public context?: Record<string, any>
+    public context?: Record<string, unknown>
   ) {
     super(message);
     this.name = 'ApiError';

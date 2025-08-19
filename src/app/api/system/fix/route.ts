@@ -74,7 +74,7 @@ async function checkSystemHealth() {
 
       if (problematicFolders.length > 0) {
         health.nodeModulesStatus = 'corrupted';
-        health.suggestion = `Found ${problematicFolders.length} problematic folders in node_modules`;
+        health.suggestion = `Found ${problematicFolders?.length} problematic folders in node_modules`;
       } else {
         health.nodeModulesStatus = 'clean';
       }
@@ -133,7 +133,7 @@ async function fixSystemIssues() {
       );
 
       if (problematicFolders.length > 0) {
-        results.details.push(`Found ${problematicFolders.length} problematic folders`);
+        results.details.push(`Found ${problematicFolders?.length} problematic folders`);
         
         // Remove problematic folders
         for (const folder of problematicFolders) {
@@ -161,7 +161,7 @@ async function fixSystemIssues() {
     }
 
     // Step 3: Reinstall dependencies if needed
-    if (results.nodeModulesFixed) {
+    if (results?.nodeModulesFixed) {
       try {
         results.details.push('Reinstalling dependencies...');
         await execAsync('npm install', { cwd: process.cwd() });
@@ -172,7 +172,7 @@ async function fixSystemIssues() {
     }
 
     // Generate summary message
-    if (results.cacheFixed || results.nodeModulesFixed) {
+    if (results.cacheFixed ?? results?.nodeModulesFixed) {
       results.message = `System fixed: ${results.cacheFixed ? 'cache cleaned' : ''} ${results.nodeModulesFixed ? 'node_modules repaired' : ''}`.trim();
     } else {
       results.message = 'No issues found to fix';
@@ -180,10 +180,10 @@ async function fixSystemIssues() {
 
     return NextResponse.json({
       success: true,
-      message: results.message,
-      details: results.details,
-      cacheFixed: results.cacheFixed,
-      nodeModulesFixed: results.nodeModulesFixed
+      message: results?.message,
+      details: results?.details,
+      cacheFixed: results?.cacheFixed,
+      nodeModulesFixed: results?.nodeModulesFixed
     });
 
   } catch (error: unknown) {

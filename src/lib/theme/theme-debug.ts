@@ -23,7 +23,7 @@ export function getThemeDebugInfo(): ThemeDebugInfo {
   }
 
   return {
-    currentTheme: document.documentElement.getAttribute('data-theme') || 'none',
+    currentTheme: document.documentElement.getAttribute('data-theme') ?? 'none',
     localStorage: localStorage.getItem('agendaiq-theme'),
     sessionStorage: {
       themeSynced: sessionStorage.getItem('agendaiq-theme-synced'),

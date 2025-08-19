@@ -14,16 +14,16 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     
     // Parse query parameters
-    const minRiskScore = parseInt(searchParams.get('minRiskScore') || '50');
-    const hoursBack = parseInt(searchParams.get('hoursBack') || '24');
-    const limit = Math.min(100, parseInt(searchParams.get('limit') || '50'));
+    const minRiskScore = parseInt(searchParams.get('minRiskScore') ?? '50');
+    const hoursBack = parseInt(searchParams.get('hoursBack') ?? '24');
+    const limit = Math.min(100, parseInt(searchParams.get('limit') ?? '50'));
 
     // Validate parameters
-    if (minRiskScore < 0 || minRiskScore > 100) {
+    if (minRiskScore < 0 ?? minRiskScore > 100) {
       return NextResponse.json({ error: 'minRiskScore must be between 0 and 100' }, { status: 400 });
     }
 
-    if (hoursBack < 1 || hoursBack > 720) { // Max 30 days
+    if (hoursBack < 1 ?? hoursBack > 720) { // Max 30 days
       return NextResponse.json({ error: 'hoursBack must be between 1 and 720' }, { status: 400 });
     }
 
@@ -33,10 +33,10 @@ export async function GET(request: NextRequest) {
     // Calculate statistics
     const stats = {
       total: highRiskEvents.length,
-      riskScoreDistribution: {} as Record<string, number>,
-      categoryDistribution: {} as Record<string, number>,
-      userDistribution: {} as Record<string, number>,
-      ipDistribution: {} as Record<string, number>,
+      riskScoreDistribution: {} satisfies Record<string, number>,
+      categoryDistribution: {} satisfies Record<string, number>,
+      userDistribution: {} satisfies Record<string, number>,
+      ipDistribution: {} satisfies Record<string, number>,
       timeRange: {
         from: new Date(Date.now() - hoursBack * 60 * 60 * 1000).toISOString(),
         to: new Date().toISOString()
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       // Risk score distribution
       const riskRange = Math.floor((event.risk_score / 10)) * 10;
       const riskKey = `${riskRange}-${riskRange + 9}`;
-      stats.riskScoreDistribution[riskKey] = (stats.riskScoreDistribution[riskKey] || 0) + 1;
+      stats.riskScoreDistribution[riskKey] = (stats.riskScoreDistribution[riskKey] ?? 0) + 1;
 
       // Category distribution
       stats.categoryDistribution[event.category] = (stats.categoryDistribution[event.category] || 0) + 1;

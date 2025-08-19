@@ -73,7 +73,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
             ) : (
               <div className="h-full w-full bg-muted flex items-center justify-center">
                 <span className="text-muted-foreground text-xl">
-                  {user.name?.[0]?.toUpperCase() || 'U'}
+                  {user.name?.[0]?.toUpperCase() ?? 'U'}
                 </span>
               </div>
             )}
@@ -98,7 +98,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
           type="text"
           name="name"
           id="name"
-          defaultValue={user.name || ''}
+          defaultValue={user.name ?? ''}
           className="mt-1 block w-full rounded-md border border-border py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
         />
       </div>
@@ -114,7 +114,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
           type="email"
           name="email"
           id="email"
-          value={user.email || ''}
+          value={user.email ?? ''}
           disabled
           className="mt-1 block w-full rounded-md border border-border bg-muted py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
         />
@@ -131,7 +131,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
           type="text"
           name="role"
           id="role"
-          value={user.role || 'USER'}
+          value={user.role ?? 'USER'}
           disabled
           className="mt-1 block w-full rounded-md border border-border bg-muted py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
         />

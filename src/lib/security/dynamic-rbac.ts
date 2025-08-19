@@ -25,7 +25,7 @@ export interface RolePermission {
 }
 
 export interface AccessContext {
-  user: AuthenticatedUser;
+  user: _AuthenticatedUser;
   resource: string;
   action: string;
   targetId?: string;
@@ -142,7 +142,7 @@ export class DynamicRBAC {
   }
 
   // Get all permissions for a user
-  async getUserPermissions(user: AuthenticatedUser): Promise<RolePermission[]> {
+  async getUserPermissions(user: _AuthenticatedUser): Promise<RolePermission[]> {
     const cacheKey = `user_permissions_${user.id}`;
     
     // Check cache first
@@ -210,7 +210,7 @@ export class DynamicRBAC {
 
   // Check inherited permissions from role hierarchy
   private async checkInheritedPermissions(
-    user: AuthenticatedUser,
+    user: _AuthenticatedUser,
     resource: string,
     action: string
   ): Promise<{ granted: boolean; reason?: string }> {
@@ -400,7 +400,7 @@ export class DynamicRBAC {
 
   // Helper method to check if user has specific permission
   async hasPermission(
-    user: AuthenticatedUser,
+    user: _AuthenticatedUser,
     resource: string,
     action: string,
     targetId?: string
@@ -417,12 +417,12 @@ export class DynamicRBAC {
   }
 
   // Helper method to check if user is admin
-  async isAdmin(user: AuthenticatedUser): Promise<boolean> {
+  async isAdmin(user: _AuthenticatedUser): Promise<boolean> {
     return await this.hasPermission(user, '*', '*');
   }
 
   // Helper method to check if user is staff
-  async isStaff(user: AuthenticatedUser): Promise<boolean> {
+  async isStaff(user: _AuthenticatedUser): Promise<boolean> {
     try {
       const staff = await prisma.staff.findFirst({
         where: { user_id: user.id }

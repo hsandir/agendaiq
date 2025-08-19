@@ -62,7 +62,7 @@ export default function MeetingAnalyticsPage() {
       const data = await response.json();
       
       setMetrics(data.metrics);
-      setDepartmentPerformance(data.departmentPerformance || []);
+      setDepartmentPerformance(data.departmentPerformance ?? []);
     } catch (error: unknown) {
       console.error('Failed to fetch analytics:', error);
     } finally {

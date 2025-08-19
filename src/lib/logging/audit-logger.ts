@@ -15,18 +15,18 @@ import { v4 as uuidv4 } from 'uuid';
 
 export class AuditLogger {
   private transports: LogTransport[];
-  private context: Record<string, any>;
+  private context: Record<string, unknown>;
 
   constructor(config: Omit<LoggerConfig, 'level'>) {
     // Audit logs always capture everything (TRACE level)
     this.transports = config.transports;
-    this.context = config.context || {};
+    this.context = config.context ?? {};
   }
 
   private async writeToTransports(entry: AuditLogEntry): Promise<void> {
-    const writePromises = (this.transports.map(transport => {
+    const writePromises = this.transports.map(transport => {
       try {
-        return transport.write(entry));
+        return transport.write(entry);
       } catch (error: unknown) {
         console.error(`Audit transport ${transport.name} failed:`, error);
         return Promise.resolve();
@@ -46,8 +46,8 @@ export class AuditLogger {
       level?: LogLevel;
       target?: AuditLogEntry['target'];
       riskLevel?: 'low' | 'medium' | 'high' | 'critical';
-      metadata?: Record<string, any>;
-      context?: Record<string, any>;
+      metadata?: Record<string, unknown>;
+      context?: Record<string, unknown>;
       compliance?: AuditLogEntry['compliance'];
       location?: AuditLogEntry['location'];
     }
@@ -55,13 +55,13 @@ export class AuditLogger {
     return {
       id: uuidv4(),
       timestamp: new Date().toISOString(),
-      level: options?.level || LogLevel.INFO,
+      level: options?.level ?? LogLevel.INFO,
       category,
       action,
       actor,
       target: options?.target,
       result,
-      riskLevel: options?.riskLevel || this.calculateRiskLevel(category, action, result),
+      riskLevel: options?.riskLevel ?? this.calculateRiskLevel(category, action, result),
       message,
       metadata: { ...this.context, ...options?.metadata },
       context: options?.context,
@@ -111,8 +111,8 @@ export class AuditLogger {
     result: 'success' | 'failure' | 'blocked',
     options?: {
       target?: AuditLogEntry['target'];
-      metadata?: Record<string, any>;
-      context?: Record<string, any>;
+      metadata?: Record<string, unknown>;
+      context?: Record<string, unknown>;
       riskLevel?: 'low' | 'medium' | 'high' | 'critical';
     }
   ): Promise<void> {
@@ -138,7 +138,7 @@ export class AuditLogger {
       role?: string;
       department?: string;
       reason?: string;
-      context?: Record<string, any>;
+      context?: Record<string, unknown>;
       location?: AuditLogEntry['location'];
     }
   ): Promise<void> {
@@ -146,7 +146,7 @@ export class AuditLogger {
       AuditLogCategory.LOGIN_ATTEMPT,
       'login',
       {
-        userId: options?.userId || 'unknown',
+        userId: options?.userId ?? 'unknown',
         staffId: options?.staffId,
         email,
         role: options?.role,
@@ -172,7 +172,7 @@ export class AuditLogger {
     permission: string,
     target: AuditLogEntry['target'],
     result: 'success' | 'failure' | 'blocked',
-    context?: Record<string, any>
+    context?: Record<string, unknown>
   ): Promise<void> {
     const entry = this.createEntry(
       AuditLogCategory.PERMISSION_CHECK,
@@ -200,17 +200,17 @@ export class AuditLogger {
     options?: {
       recordCount?: number;
       query?: string;
-      filters?: Record<string, any>;
-      context?: Record<string, any>;
+      filters?: Record<string, unknown>;
+      context?: Record<string, unknown>;
       compliance?: AuditLogEntry['compliance'];
     }
   ): Promise<void> {
     const entry = this.createEntry(
       AuditLogCategory.DATA_ACCESS,
-      `${action}_${target?.type || 'unknown'}`,
+      `${action}_${target?.type ?? 'unknown'}`,
       actor,
       result,
-      `Data access: ${action} ${target?.type || 'unknown'}${options?.recordCount ? ` (${options.recordCount} records)` : ''}: ${result}`,
+      `Data access: ${action} ${target?.type ?? 'unknown'}${options?.recordCount ? ` (${options.recordCount} records)` : ''}: ${result}`,
       {
         level: result === 'blocked' ? LogLevel.WARN : LogLevel.INFO,
         target,
@@ -237,16 +237,16 @@ export class AuditLogger {
     options?: {
       changes?: Record<string, { old?: Record<string, unknown>; new?: Record<string, unknown> }>;
       recordCount?: number;
-      context?: Record<string, any>;
+      context?: Record<string, unknown>;
       compliance?: AuditLogEntry['compliance'];
     }
   ): Promise<void> {
     const entry = this.createEntry(
       AuditLogCategory.DATA_MODIFICATION,
-      `${action}_${target?.type || 'unknown'}`,
+      `${action}_${target?.type ?? 'unknown'}`,
       actor,
       result,
-      `Data modification: ${action} ${target?.type || 'unknown'}${target?.name ? ` "${target.name}"` : ''}: ${result}`,
+      `Data modification: ${action} ${target?.type ?? 'unknown'}${target?.name ? ` "${target.name}"` : ''}: ${result}`,
       {
         level: result === 'blocked' ? LogLevel.WARN : LogLevel.INFO,
         target,
@@ -270,8 +270,8 @@ export class AuditLogger {
     target: AuditLogEntry['target'],
     result: 'success' | 'failure' | 'blocked',
     options?: {
-      metadata?: Record<string, any>;
-      context?: Record<string, any>;
+      metadata?: Record<string, unknown>;
+      context?: Record<string, unknown>;
       compliance?: AuditLogEntry['compliance'];
     }
   ): Promise<void> {
@@ -301,8 +301,8 @@ export class AuditLogger {
     severity: 'low' | 'medium' | 'high' | 'critical',
     options?: {
       target?: AuditLogEntry['target'];
-      metadata?: Record<string, any>;
-      context?: Record<string, any>;
+      metadata?: Record<string, unknown>;
+      context?: Record<string, unknown>;
       location?: AuditLogEntry['location'];
     }
   ): Promise<void> {
@@ -335,8 +335,8 @@ export class AuditLogger {
     dataClassification: string,
     options?: {
       target?: AuditLogEntry['target'];
-      metadata?: Record<string, any>;
-      context?: Record<string, any>;
+      metadata?: Record<string, unknown>;
+      context?: Record<string, unknown>;
       retention?: string;
     }
   ): Promise<void> {
@@ -354,7 +354,7 @@ export class AuditLogger {
         compliance: {
           regulation,
           dataClassification,
-          retention: options?.retention || '7years'
+          retention: options?.retention ?? '7years'
         },
         riskLevel: 'medium'
       }
@@ -396,13 +396,13 @@ export class AuditLogger {
   }> {
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     
-    const violations = await this.query{
-      category: [((AuditLogCategory.SECURITY_VIOLATION)],
+    const violations = await this.query({
+      category: [AuditLogCategory.SECURITY_VIOLATION],
       startDate: oneDayAgo
     });
 
-    const failedLogins = await this.query{
-      category: [((AuditLogCategory.LOGIN_ATTEMPT)],
+    const failedLogins = await this.query({
+      category: [AuditLogCategory.LOGIN_ATTEMPT],
       startDate: oneDayAgo
     });
 
@@ -412,7 +412,7 @@ export class AuditLogger {
 
     const violationsByRisk: Record<string, number> = {};
     violations.forEach(v => {
-      violationsByRisk[v.riskLevel] = violationsByRisk[v.riskLevel] || 0) + 1;
+      violationsByRisk[v.riskLevel] = (violationsByRisk[v.riskLevel] || 0) + 1;
     });
 
     return {

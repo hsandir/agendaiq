@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || !user.Staff?.[0]?.Role?.title || user.Staff[0].Role.title !== "Administrator") {
+    if (!user?.Staff?.[0]?.Role?.title ?? user.Staff[0].Role.title !== "Administrator") {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }

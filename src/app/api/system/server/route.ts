@@ -9,13 +9,13 @@ export async function GET(request: NextRequest) {
     // REQUIRED: Auth check - Operations admin for server metrics
     const authResult = await withAuth(request, { 
       requireAuth: true, 
-      requireCapability: Capability.OPS_HEALTH 
+      requireCapability: Capability?.OPS_HEALTH 
     });
     
-    if (!authResult.success) {
+    if (!authResult?.success) {
       return NextResponse.json(
-        { error: authResult.error }, 
-        { status: authResult.statusCode }
+        { error: authResult?.error }, 
+        { status: authResult?.statusCode }
       );
     }
 
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       for (const type in cpu.times) {
         totalTick += cpu.times[type as keyof typeof cpu.times];
       }
-      totalIdle += cpu.times.idle;
+      totalIdle += cpu.times?.idle;
     });
     
     const cpuUsagePercent = Math.round(100 - ((totalIdle / totalTick) * 100));
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
         release: os.release(),
         arch: os.arch(),
         hostname: os.hostname(),
-        cpuCount: cpus.length,
+        cpuCount: cpus?.length,
         architecture: os.arch(),
         nodeVersion: process.version.replace('v', ''),
         nextVersion: "15.3.3",
@@ -83,8 +83,8 @@ export async function GET(request: NextRequest) {
       performance: {
         cpu: {
           usage: cpuUsagePercent,
-          cores: cpus.length,
-          model: cpus[0]?.model || 'Unknown'
+          cores: cpus?.length,
+          model: cpus[0]?.model ?? 'Unknown'
         },
         memory: {
           usage: memoryUsagePercent,

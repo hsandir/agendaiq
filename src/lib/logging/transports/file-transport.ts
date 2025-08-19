@@ -156,8 +156,8 @@ export class FileTransport implements LogTransport {
     
     try {
       // Determine which files to read based on date range
-      const startDate = query.startDate || new Date(Date.now() - 24 * 60 * 60 * 1000);
-      const endDate = query.endDate || new Date();
+      const startDate = query.startDate ?? new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const endDate = query.endDate ?? new Date();
       
       const filesToRead: string[] = [];
       
@@ -215,8 +215,8 @@ export class FileTransport implements LogTransport {
       });
 
       // Apply pagination
-      const start = query.offset || 0;
-      const end = start + (query.limit || 100);
+      const start = query.offset ?? 0;
+      const end = start + (query.limit ?? 100);
       return results.slice(start, end);
     } catch (error: unknown) {
       console.error('Failed to query logs from files:', error);

@@ -11,11 +11,11 @@ export async function GET(request: NextRequest) {
   const user = authResult.user!;
   const searchParams = request.nextUrl.searchParams;
   
-  const tab = searchParams.get('tab') || 'recent';
-  const department = searchParams.get('department') || 'all';
-  const timeRange = searchParams.get('timeRange') || 'all';
-  const status = searchParams.get('status') || 'all';
-  const search = searchParams.get('search') || '';
+  const tab = searchParams.get('tab') ?? 'recent';
+  const department = searchParams.get('department') ?? 'all';
+  const timeRange = searchParams.get('timeRange') ?? 'all';
+  const status = searchParams.get('status') ?? 'all';
+  const search = searchParams.get('search') ?? '';
   const includeSubDepartments = searchParams.get('includeSubDepartments') === 'true';
   const onlyWithActionItems = searchParams.get('onlyWithActionItems') === 'true';
 
@@ -151,9 +151,9 @@ export async function GET(request: NextRequest) {
       status: meeting.status,
       meeting_type: meeting.meeting_type,
       organizer: {
-        name: meeting.Staff?.User?.name || 'Unknown',
-        role: meeting.Staff?.Role?.title || 'Unknown',
-        department: meeting.Staff?.Department?.name || 'Unknown'
+        name: meeting.Staff?.User?.name ?? 'Unknown',
+        role: meeting.Staff?.Role?.title ?? 'Unknown',
+        department: meeting.Staff?.Department?.name ?? 'Unknown'
       },
       attendees: meeting.MeetingAttendee.length,
       agendaItems: meeting.MeetingAgendaItems.length,

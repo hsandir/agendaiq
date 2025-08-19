@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
     // Find the user and their staff record
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: session.user?.email },
       include: {
         Staff: {
           include: {
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       }
     });
 
-    if (!user || !(user.Staff || user.Staff.length === 0)) {
+    if (!user || !(user.Staff ?? user.Staff.length === 0)) {
       return NextResponse.json(
         { error: "User staff record not found" },
         { status: 404 }
@@ -78,18 +78,18 @@ export async function POST(request: Request) {
 
     // Update the staff record with the new role
     await prisma.staff.update({
-      where: { id: staffRecord.id },
+      where: { id: staffRecord?.id },
       data: { 
-        role_id: parseInt(targetRole.id)
+        role_id: parseInt(targetRole?.id)
       }
     });
 
     return NextResponse.json({ 
       success: true, 
-      message: `Role switched to ${targetRole.title}`,
+      message: `Role switched to ${targetRole?.title}`,
       newRole: {
-        id: targetRole.id,
-        title: targetRole.title
+        id: targetRole?.id,
+        title: targetRole?.title
       }
     });
   } catch (error: unknown) {

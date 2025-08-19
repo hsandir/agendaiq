@@ -18,7 +18,7 @@ export function LayoutProvider({ children }: { children: React.ReactNode }) {
     const storeLayout = layoutStore.getCurrentLayout();
     if (storeLayout) return storeLayout;
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('agendaiq-layout') || 'modern';
+      return localStorage.getItem('agendaiq-layout') ?? 'modern';
     }
     return 'modern';
   });

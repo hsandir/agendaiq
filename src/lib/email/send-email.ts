@@ -23,6 +23,6 @@ export async function sendEmail({ to, subject, text, html }: EmailOptions) {
     to,
     subject,
     text,
-    html: html || text,
+    html: html ?? text,
   });
 } 

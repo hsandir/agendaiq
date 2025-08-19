@@ -160,7 +160,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
         name: customTheme.name || "Custom Theme",
         description: "Your personalized theme",
         ...customTheme,
-      } as Theme;
+      } satisfies Theme;
     } else {
       theme = themes.find((t) => t.id === currentThemeId) || themes[0];
     }
@@ -220,21 +220,19 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     setVar("primary", theme.colors.primary);
     setVar(
       "primary-foreground",
-      theme.colors.primaryForeground || getContrastColor(theme.colors.primary),
+      theme.colors.primaryForeground ?? getContrastColor(theme.colors.primary),
     );
     setVar("secondary", theme.colors.secondary);
     setVar(
       "secondary-foreground",
-      theme.colors.secondaryForeground ||
-        getContrastColor(theme.colors.secondary),
+      theme.colors.secondaryForeground ?? getContrastColor(theme.colors.secondary),
     );
     setVar("muted", theme.colors.backgroundSecondary);
     setVar("muted-foreground", theme.colors.textMuted);
-    setVar("accent", theme.colors.secondaryLight || theme.colors.secondary);
+    setVar("accent", theme.colors.secondaryLight ?? theme.colors.secondary);
     setVar(
       "accent-foreground",
-      theme.colors.secondaryForeground ||
-        getContrastColor(theme.colors.secondary),
+      theme.colors.secondaryForeground ?? getContrastColor(theme.colors.secondary),
     );
     setVar("destructive", theme.colors.error);
     setVar("destructive-foreground", getContrastColor(theme.colors.error));
@@ -316,7 +314,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
           name: customTheme.name || "Custom Theme",
           description: "Your personalized theme",
           ...customTheme,
-        } as Theme)
+        } satisfies Theme)
       : themes.find((t) => t.id === currentThemeId) || themes[0];
 
   // Don't render anything until mounted to prevent hydration mismatch

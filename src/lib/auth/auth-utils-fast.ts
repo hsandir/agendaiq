@@ -30,9 +30,9 @@ export async function getFastUser(): Promise<FastUser | null> {
     // Return user data directly from session
     return {
       id: parseInt(session.user.id as string),
-      email: session.user.email,
-      name: session.user.name,
-      staff: session.user.staff ? { id: parseInt(session.user.staff.id) } : undefined
+      email: session.user?.email,
+      name: session.user?.name,
+      staff: session.user.staff ? { id: parseInt(session.user.staff?.id) } : undefined
     };
   } catch (error: unknown) {
     console.error('Fast auth error:', error);

@@ -6,7 +6,7 @@
 import { MonitoringConfig, SampleRates } from './types';
 
 // Environment detection
-const ENV = process.env.NODE_ENV || 'development';
+const ENV = process.env.NODE_ENV ?? 'development';
 const IS_PRODUCTION = ENV === 'production';
 const IS_STAGING = process.env.VERCEL_ENV === 'preview';
 const IS_DEVELOPMENT = ENV === 'development';
@@ -14,7 +14,7 @@ const IS_SERVER = typeof window === 'undefined';
 
 // Version and release information
 const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0';
-const GIT_COMMIT = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || 'unknown';
+const GIT_COMMIT = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? 'unknown';
 const RELEASE_NAME = `agendaiq@${IS_SERVER ? 'api' : 'web'}@${APP_VERSION}+${GIT_COMMIT}`;
 
 // DSN Configuration (Sentry specific but abstracted)
@@ -189,9 +189,9 @@ export const DEFAULT_TAGS: Record<string, string> = {
   service: IS_SERVER ? 'api' : 'web',
   environment: ENV,
   region: process.env.VERCEL_REGION || 'eu-west-1',
-  deployment_id: process.env.VERCEL_DEPLOYMENT_ID || 'local',
-  commit: process.env.VERCEL_GIT_COMMIT_SHA || 'unknown',
-  branch: process.env.VERCEL_GIT_COMMIT_REF || 'unknown',
+  deployment_id: process.env.VERCEL_DEPLOYMENT_ID ?? 'local',
+  commit: process.env.VERCEL_GIT_COMMIT_SHA ?? 'unknown',
+  branch: process.env.VERCEL_GIT_COMMIT_REF ?? 'unknown',
   runtime: IS_SERVER ? 'node' : 'browser',
   ...(IS_SERVER && process.version ? { node_version: process.version } : {}),
 };
@@ -240,7 +240,7 @@ export function getMonitoringConfig(): MonitoringConfig {
   
   return {
     provider: 'sentry', // Can be changed to 'datadog', 'newrelic', etc.
-    enabled: IS_PRODUCTION || IS_STAGING || (IS_DEVELOPMENT && process.env.ENABLE_MONITORING === 'true'),
+    enabled: IS_PRODUCTION ?? IS_STAGING || (IS_DEVELOPMENT && process.env.ENABLE_MONITORING === 'true'),
     environment: ENV as 'development' | 'staging' | 'production',
     debug: IS_DEVELOPMENT && process.env.DEBUG_MONITORING === 'true',
     dsn: DSN,
@@ -258,7 +258,7 @@ export function getMonitoringConfig(): MonitoringConfig {
       },
       {
         name: 'Replay',
-        enabled: !IS_SERVER && (IS_PRODUCTION || IS_STAGING),
+        enabled: !IS_SERVER && (IS_PRODUCTION ?? IS_STAGING),
         options: {
           maskAllText: true,
           maskAllInputs: true,
@@ -271,7 +271,7 @@ export function getMonitoringConfig(): MonitoringConfig {
       },
       {
         name: 'ProfileIntegration',
-        enabled: IS_SERVER && (IS_PRODUCTION || IS_STAGING),
+        enabled: IS_SERVER && (IS_PRODUCTION ?? IS_STAGING),
         options: {
           profilesSampleRate: sampleRates.profile,
         },
@@ -310,7 +310,7 @@ export function getDynamicSampleRate(context: {
   }
   
   // Default sampling
-  return SAMPLE_RATES[ENV]?.trace || 0.1;
+  return SAMPLE_RATES[ENV]?.trace ?? 0.1;
 }
 
 // Helper to mask sensitive data
@@ -326,7 +326,7 @@ export function maskSensitiveData(str: string): string {
 
 // Helper to remove sensitive fields from objects
 export function removeSensitiveFields<T>(obj: T): T {
-  if (!obj || typeof obj !== 'object') return obj;
+  if (!obj ?? typeof obj !== 'object') return obj;
   
   const cleaned = Array.isArray(obj) ? [...obj] : { ...obj };
   

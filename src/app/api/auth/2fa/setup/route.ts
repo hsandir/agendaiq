@@ -7,10 +7,10 @@ export async function GET(request: NextRequest) {
   try {
     const authResult = await withAuth(request, { requireAuth: true });
     
-    if (!authResult.success) {
+    if (!authResult?.success) {
       return NextResponse.json(
-        { error: authResult.error }, 
-        { status: authResult.statusCode }
+        { error: authResult?.error }, 
+        { status: authResult?.statusCode }
       );
     }
 
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     
     // Check if 2FA is already enabled
     const dbUser = await prisma.user.findUnique({
-      where: { id: user.id }
+      where: { id: user?.id }
     });
     
     if (dbUser?.two_factor_enabled) {
@@ -30,24 +30,24 @@ export async function GET(request: NextRequest) {
 
     // Generate secret
     const secret = speakeasy.generateSecret({
-      name: `AgendaIQ (${user.email})`,
+      name: `AgendaIQ (${user?.email})`,
       issuer: 'AgendaIQ',
       length: 32
     });
 
     // Save the secret temporarily (not enabled yet)
     await prisma.user.update({
-      where: { id: user.id },
+      where: { id: user?.id },
       data: {
-        two_factor_secret: secret.base32
+        two_factor_secret: secret?.base32
       }
     });
 
     // Return the OTP URL directly instead of generating QR code
     return NextResponse.json({
-      secret: secret.base32,
-      qrCode: secret.otpauth_url || '',
-      manualEntryKey: secret.base32
+      secret: secret?.base32,
+      qrCode: secret.otpauth_url ?? '',
+      manualEntryKey: secret?.base32
     });
 
   } catch (error: unknown) {

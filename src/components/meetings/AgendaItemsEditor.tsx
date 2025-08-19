@@ -118,7 +118,7 @@ interface PastMeeting {
 
 interface AgendaItemsEditorProps {
   meeting: Meeting
-  currentUser: AuthenticatedUser
+  currentUser: _AuthenticatedUser
   allStaff: StaffForAgenda[]
   pastMeetings: PastMeeting[]
   canEdit: boolean
@@ -149,18 +149,18 @@ export function AgendaItemsEditor({
     const items: AgendaItemFormData[] = meeting.MeetingAgendaItems.map(item => ({
       id: item.id,
       topic: item.topic,
-      problem_statement: item.problem_statement || undefined,
-      staff_initials: item.staff_initials || undefined,
-      responsible_staff_id: item.responsible_staff_id || undefined,
+      problem_statement: item.problem_statement ?? undefined,
+      staff_initials: item.staff_initials ?? undefined,
+      responsible_staff_id: item.responsible_staff_id ?? undefined,
       priority: item.priority as Record<string, unknown>,
       purpose: item.purpose as Record<string, unknown>,
-      proposed_solution: item.proposed_solution || undefined,
+      proposed_solution: item.proposed_solution ?? undefined,
       solution_type: item.solution_type as Record<string, unknown> || undefined,
-      decisions_actions: item.decisions_actions || undefined,
+      decisions_actions: item.decisions_actions ?? undefined,
       decision_type: item.decision_type as Record<string, unknown> || undefined,
       status: item.status as Record<string, unknown>,
-      future_implications: item.future_implications || false,
-      duration_minutes: item.duration_minutes || 15,
+      future_implications: item.future_implications ?? false,
+      duration_minutes: item.duration_minutes ?? 15,
       carried_forward: item.carried_forward,
       carry_forward_count: item.carry_forward_count,
       order_index: item.order_index
@@ -223,20 +223,20 @@ export function AgendaItemsEditor({
       if (data.success && data.items) {
         const imported: AgendaItemFormData[] = data.items.map((item: Record<string, unknown>, index: number) => ({
           topic: item.topic,
-          problem_statement: item.problem_statement || undefined,
-          staff_initials: item.staff_initials || undefined,
-          responsible_staff_id: item.responsible_staff_id || undefined,
+          problem_statement: item.problem_statement ?? undefined,
+          staff_initials: item.staff_initials ?? undefined,
+          responsible_staff_id: item.responsible_staff_id ?? undefined,
           priority: item.priority,
           purpose: item.purpose,
-          proposed_solution: item.proposed_solution || undefined,
-          solution_type: item.solution_type || undefined,
-          decisions_actions: item.decisions_actions || undefined,
-          decision_type: item.decision_type || undefined,
+          proposed_solution: item.proposed_solution ?? undefined,
+          solution_type: item.solution_type ?? undefined,
+          decisions_actions: item.decisions_actions ?? undefined,
+          decision_type: item.decision_type ?? undefined,
           status: 'Pending', // Reset status for new meeting
-          future_implications: item.future_implications || false,
-          duration_minutes: item.duration_minutes || 15,
+          future_implications: item.future_implications ?? false,
+          duration_minutes: item.duration_minutes ?? 15,
           carried_forward: true,
-          carry_forward_count: (item.carry_forward_count || 0) + 1,
+          carry_forward_count: (item.carry_forward_count ?? 0) + 1,
           order_index: agendaItems.length + index,
           parent_item_id: item.id // Link to original item
         }))
@@ -324,7 +324,7 @@ export function AgendaItemsEditor({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <p className="text-sm text-muted-foreground">Organizer</p>
-              <p className="font-medium">{meeting.Staff.User.name || meeting.Staff.User.email}</p>
+              <p className="font-medium">{meeting.Staff.User.name ?? meeting.Staff.User.email}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Department</p>

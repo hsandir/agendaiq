@@ -17,12 +17,12 @@ export async function POST(request: NextRequest) {
     const errorData = await request.json();
     
     const capturedError: ErrorData = {
-      message: errorData.message || 'Unknown error',
-      stack: errorData.stack,
-      url: errorData.url || request.url,
-      userAgent: request.headers.get('user-agent') || 'Unknown',
+      message: errorData?.message || 'Unknown error',
+      stack: errorData?.stack,
+      url: errorData.url ?? request?.url,
+      userAgent: request.headers.get('user-agent') ?? 'Unknown',
       timestamp: new Date().toISOString(),
-      userId: errorData.userId
+      userId: errorData?.userId
     };
     
     errors.push(capturedError);
@@ -46,17 +46,17 @@ export async function GET() {
   if (process.env.NODE_ENV === 'development') {
     return NextResponse.json({ 
       success: true,
-      totalErrors: errors.length,
+      totalErrors: errors?.length,
       errors 
     });
   } else {
     return NextResponse.json({ 
       success: true,
-      totalErrors: errors.length, 
+      totalErrors: errors?.length, 
       recentErrors: errors.slice(-5).map(e => ({
         message: (e instanceof Error ? e.message : String(e)),
-        timestamp: e.timestamp,
-        url: e.url
+        timestamp: e?.timestamp,
+        url: e?.url
       }))
     });
   }

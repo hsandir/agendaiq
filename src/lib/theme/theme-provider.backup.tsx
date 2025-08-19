@@ -29,7 +29,7 @@ function getInitialTheme(): string {
   }
   
   try {
-    return localStorage.getItem('agendaiq-theme') || 'standard';
+    return localStorage.getItem('agendaiq-theme') ?? 'standard';
   } catch {
     return 'standard';
   }
@@ -49,7 +49,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     // Get theme from store or localStorage after mount
     const storeTheme = themeStore.getCurrentTheme();
     const savedTheme = localStorage.getItem('agendaiq-theme');
-    const themeToUse = storeTheme || savedTheme || initialTheme || 'standard';
+    const themeToUse = storeTheme ?? savedTheme || initialTheme ?? 'standard';
     
     // Use singleton store to prevent re-initialization on every navigation
     if (themeStore.isInitialized()) {
@@ -144,13 +144,13 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
         name: customTheme.name || 'Custom Theme',
         description: 'Your personalized theme',
         ...customTheme
-      } as Theme;
+      } satisfies Theme;
     } else {
       theme = themes.find(t => t.id === currentThemeId) || themes.find(t => t.id === 'standard') || themes[0]; // Default to standard
     }
     
     // Ensure CSS variables are supported (cross-browser compatibility)
-    if (!CSS || !CSS.supports || !CSS.supports('color', 'var(--test)')) {
+    if (!CSS?.supports?.('color', 'var(--test)')) {
       console.warn('CSS variables not fully supported in this browser');
     }
 
@@ -202,13 +202,13 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     setVar('popover', theme.colors.card);
     setVar('popover-foreground', theme.colors.text);
     setVar('primary', theme.colors.primary);
-    setVar('primary-foreground', theme.colors.primaryForeground || getContrastColor(theme.colors.primary));
+    setVar('primary-foreground', theme.colors.primaryForeground ?? getContrastColor(theme.colors.primary));
     setVar('secondary', theme.colors.secondary);
-    setVar('secondary-foreground', theme.colors.secondaryForeground || getContrastColor(theme.colors.secondary));
+    setVar('secondary-foreground', theme.colors.secondaryForeground ?? getContrastColor(theme.colors.secondary));
     setVar('muted', theme.colors.backgroundSecondary);
     setVar('muted-foreground', theme.colors.textMuted);
-    setVar('accent', theme.colors.secondaryLight || theme.colors.secondary);
-    setVar('accent-foreground', theme.colors.secondaryForeground || getContrastColor(theme.colors.secondary));
+    setVar('accent', theme.colors.secondaryLight ?? theme.colors.secondary);
+    setVar('accent-foreground', theme.colors.secondaryForeground ?? getContrastColor(theme.colors.secondary));
     setVar('destructive', theme.colors.error);
     setVar('destructive-foreground', getContrastColor(theme.colors.error));
     setVar('border', theme.colors.border);
@@ -282,7 +282,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
       name: customTheme.name || 'Custom Theme',
       description: 'Your personalized theme',
       ...customTheme
-    } as Theme;
+    } satisfies Theme;
   } else {
     currentTheme = themes.find(t => t.id === currentThemeId) || themes.find(t => t.id === 'standard') || themes[0];
   }

@@ -271,35 +271,35 @@ export default function SetupPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium">School Name</label>
-                <input type="text" required className="mt-1 block w-full rounded-md border-border" value={form.name || ""} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+                <input type="text" required className="mt-1 block w-full rounded-md border-border" value={form.name ?? ""} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
               </div>
               <div>
                 <label className="block text-sm font-medium">Address</label>
-                <input type="text" className="mt-1 block w-full rounded-md border-border" value={form.address || ""} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} />
+                <input type="text" className="mt-1 block w-full rounded-md border-border" value={form.address ?? ""} onChange={e => setForm(f => ({ ...f, address: e.target.value }))} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium">City</label>
-                  <input type="text" className="mt-1 block w-full rounded-md border-border" value={form.city || ""} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} />
+                  <input type="text" className="mt-1 block w-full rounded-md border-border" value={form.city ?? ""} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium">State</label>
-                  <input type="text" className="mt-1 block w-full rounded-md border-border" value={form.state || ""} onChange={e => setForm(f => ({ ...f, state: e.target.value }))} />
+                  <input type="text" className="mt-1 block w-full rounded-md border-border" value={form.state ?? ""} onChange={e => setForm(f => ({ ...f, state: e.target.value }))} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium">ZIP Code</label>
-                  <input type="text" className="mt-1 block w-full rounded-md border-border" value={form.zipCode || ""} onChange={e => setForm(f => ({ ...f, zipCode: e.target.value }))} />
+                  <input type="text" className="mt-1 block w-full rounded-md border-border" value={form.zipCode ?? ""} onChange={e => setForm(f => ({ ...f, zipCode: e.target.value }))} />
                 </div>
                 <div>
                   <label className="block text-sm font-medium">Phone</label>
-                  <input type="tel" className="mt-1 block w-full rounded-md border-border" value={form.phone || ""} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
+                  <input type="tel" className="mt-1 block w-full rounded-md border-border" value={form.phone ?? ""} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium">Website</label>
-                <input type="url" className="mt-1 block w-full rounded-md border-border" value={form.website || ""} onChange={e => setForm(f => ({ ...f, website: e.target.value }))} />
+                <input type="url" className="mt-1 block w-full rounded-md border-border" value={form.website ?? ""} onChange={e => setForm(f => ({ ...f, website: e.target.value }))} />
               </div>
               <div className="flex justify-end gap-2 mt-4">
                 <Button type="button" variant="outline" onClick={closeModal}>Cancel</Button>

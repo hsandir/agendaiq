@@ -32,22 +32,22 @@ interface SortableAuditRecord {
 export async function GET(request: NextRequest) {
   try {
     // Require operations admin access
-    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability.USER_MANAGE });
-    if (!authResult.success) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability?.USER_MANAGE });
+    if (!authResult?.success) {
+      return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request?.url);
     
     // Parse parameters
-    const format = searchParams.get('format') || 'csv'; // 'csv' | 'json'
-    const logType = searchParams.get('type') || 'critical'; // 'critical' | 'legacy' | 'both'
+    const format = searchParams.get('format') ?? 'csv'; // 'csv' | 'json'
+    const logType = searchParams.get('type') ?? 'critical'; // 'critical' | 'legacy' | 'both'
     const category = searchParams.get('category') as AuditCategory | null;
     const userId = searchParams.get('userId') ? Number(searchParams.get('userId')) : undefined;
     const staffId = searchParams.get('staffId') ? Number(searchParams.get('staffId')) : undefined;
     const startDate = searchParams.get('startDate') ? new Date(searchParams.get('startDate')!) : undefined;
     const endDate = searchParams.get('endDate') ? new Date(searchParams.get('endDate')!) : undefined;
-    const maxRecords = Math.min(10000, parseInt(searchParams.get('maxRecords') || '1000'));
+    const maxRecords = Math.min(10000, parseInt(searchParams.get('maxRecords') ?? '1000'));
 
     if (!['csv', 'json'].includes(format)) {
       return NextResponse.json({ error: 'Invalid format. Use csv or json' }, { status: 400 });
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     let data: SortableAuditRecord[] = [];
 
     if (logType === 'critical' || logType === 'both') {
-      const criticalLogs = await auditSystem.getRecentCriticalEvents(maxRecords, category || undefined, userId);
+      const criticalLogs = await auditSystem.getRecentCriticalEvents(maxRecords, category ?? undefined, userId);
       
       if (logType === 'critical') {
         data = criticalLogs;
@@ -77,9 +77,9 @@ export async function GET(request: NextRequest) {
 
       const processedLegacyLogs = legacyLogs.map(log => ({
         ...log,
-        created_at: log.created_at instanceof Date ? log.created_at.toISOString() : log.created_at,
-        User: log.User || undefined,
-        Staff: log.Staff || undefined
+        created_at: log.created_at instanceof Date ? log.created_at.toISOString() : log?.created_at,
+        User: log.User ?? undefined,
+        Staff: log.Staff ?? undefined
       })) as SortableAuditRecord[];
 
       if (logType === 'legacy') {
@@ -91,8 +91,8 @@ export async function GET(request: NextRequest) {
 
     // Sort by timestamp descending  
     data.sort((a: SortableAuditRecord, b: SortableAuditRecord) => {
-      const timeA = new Date(a.timestamp || a.created_at || '').getTime();
-      const timeB = new Date(b.timestamp || b.created_at || '').getTime();
+      const timeA = new Date(a.timestamp ?? a.created_at ?? '').getTime();
+      const timeB = new Date(b.timestamp ?? b.created_at ?? '').getTime();
       return timeB - timeA;
     });
 
@@ -129,17 +129,17 @@ export async function GET(request: NextRequest) {
       ];
 
       const csvRows = data.map((log: SortableAuditRecord) => {
-        const timestamp = new Date(log.timestamp || log.created_at || '').toISOString();
-        const type = log.source || (log.category ? 'critical' : 'legacy');
-        const categoryOrTable = log.category || log.table_name || '';
-        const actionOrOperation = log.action || log.operation || '';
-        const userEmail = log.User?.email || '';
-        const staffRole = log.Staff?.Role?.title || '';
-        const ipAddress = log.ip_address || '';
-        const riskScore = log.risk_score?.toString() || '';
+        const timestamp = new Date(log.timestamp ?? log.created_at ?? '').toISOString();
+        const type = log?.source || (log.category ? 'critical' : 'legacy');
+        const categoryOrTable = log.category ?? log.table_name ?? '';
+        const actionOrOperation = log.action ?? log.operation ?? '';
+        const userEmail = log.User?.email ?? '';
+        const staffRole = log.Staff?.Role?.title ?? '';
+        const ipAddress = log.ip_address ?? '';
+        const riskScore = log.risk_score?.toString() ?? '';
         const success = log.success !== undefined ? log.success.toString() : '';
-        const errorMessage = log.error_message || '';
-        const description = log.description || '';
+        const errorMessage = log.error_message ?? '';
+        const description = log.description ?? '';
 
         return [
           escape(timestamp),

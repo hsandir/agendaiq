@@ -60,7 +60,7 @@ export default function LocalMonitor() {
     const analysis = ErrorAnalyzer.analyzeError(rawError.message, rawError.url, rawError.stack);
     
     return {
-      id: rawError.id || Date.now().toString(),
+      id: rawError.id ?? Date.now().toString(),
       timestamp: rawError.timestamp,
       message: rawError.message,
       stack: rawError.stack,
@@ -84,7 +84,7 @@ export default function LocalMonitor() {
         timestamp: new Date().toISOString(),
         message: typeof message === 'string' ? message : 'Unknown error',
         stack: error?.stack,
-        url: source || window.location.href,
+        url: source ?? window.location.href,
         userAgent: navigator.userAgent
       };
 

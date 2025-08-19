@@ -110,16 +110,16 @@ export default function StaffUploadClient() {
         throw new Error(errorMessage);
       }
 
-      setPreviewData(data.preview || []);
-      setPreviewSummary(data.summary || null);
-      setValidationErrors(data.validationErrors || []);
+      setPreviewData(data.preview ?? []);
+      setPreviewSummary(data.summary ?? null);
+      setValidationErrors(data.validationErrors ?? []);
       setShowPreview(true);
       
       // Auto-select all valid records
       const validRowNumbers = (data.preview.filter((r: ProcessedRecord) => r.canUpload).map((r: ProcessedRecord) => r.rowNumber));
       setSelectedRecords(new Set(validRowNumbers));
 
-      setSuccess(`Preview completed! Found ${data.summary?.total || 0} records - ${data.summary?.valid || 0} valid, ${data.summary?.conflicts || 0} with issues.`);
+      setSuccess(`Preview completed! Found ${data.summary?.total ?? 0} records - ${data.summary?.valid ?? 0} valid, ${data.summary?.conflicts ?? 0} with issues.`);
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Preview failed');
     } finally {
@@ -128,7 +128,7 @@ export default function StaffUploadClient() {
   };
 
   const handleUpload = async () => {
-    if (!file || previewData.length === 0) {
+    if (!file ?? previewData.length === 0) {
       setError('Please preview the file first');
       return;
     }
@@ -161,7 +161,7 @@ export default function StaffUploadClient() {
         throw new Error(data.error || 'Upload failed');
       }
 
-      setSuccess(`Upload completed successfully! ${data.created || 0} staff created, ${data.updated || 0} staff updated.`);
+      setSuccess(`Upload completed successfully! ${data.created ?? 0} staff created, ${data.updated ?? 0} staff updated.`);
       setFile(null);
       setPreviewData([]);
       setPreviewSummary(null);
@@ -355,7 +355,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
             <div className="flex space-x-4">
               <button
                 onClick={handlePreview}
-                disabled={!file || isLoading}
+                disabled={!file ?? isLoading}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-foreground bg-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
@@ -368,7 +368,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
 
               <button
                 onClick={handleUpload}
-                disabled={!showPreview || selectedRecords.size === 0 || isLoading}
+                disabled={!showPreview ?? selectedRecords.size === 0 ?? isLoading}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-foreground bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
@@ -575,7 +575,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
                           {record.actions.length > 0 && (
                             <div className="space-y-2">
                               <select
-                                value={recordActions.get(record.rowNumber) || record.actions[0]?.id || ''}
+                                value={recordActions.get(record.rowNumber) || record.actions[0]?.id ?? ''}
                                 onChange={(e) => {
                                   const action = e.target.value;
                                   if (action === 'partial') {
@@ -602,7 +602,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
                                     <label key={conflict.field} className="flex items-center space-x-2">
                                       <input
                                         type="checkbox"
-                                        checked={selectedChanges.get(record.rowNumber)?.has(conflict.field) || false}
+                                        checked={selectedChanges.get(record.rowNumber)?.has(conflict.field) ?? false}
                                         onChange={() => toggleChangeSelection(record.rowNumber, conflict.field)}
                                         className="h-3 w-3 text-primary focus:ring-ring border-border rounded"
                                       />

@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || user.Staff?.[0]?.Role?.title !== 'Administrator') {
+    if (!user ?? user.Staff?.[0]?.Role?.title !== 'Administrator') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
         name: (schoolName as string)?.trim(),
         address: (address as string | undefined)?.trim(),
         code: `SCH${Date.now().toString().slice(-6)}`, // Generate unique code
-        district_id: parseInt(district.id),
+        district_id: parseInt(district?.id),
       },
     });
 
@@ -101,7 +101,7 @@ export async function PUT(request: Request) {
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || user.Staff?.[0]?.Role?.title !== 'Administrator') {
+    if (!user ?? user.Staff?.[0]?.Role?.title !== 'Administrator') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -128,19 +128,19 @@ export async function PUT(request: Request) {
     }
 
     const updatedDistrict = await prisma.district.update({
-      where: { id: district.id },
+      where: { id: district?.id },
       data: {
         name: (districtName as string)?.trim(),
       },
     });
 
     const school = await prisma.school.findFirst({
-      where: { district_id: parseInt(district.id) },
+      where: { district_id: parseInt(district?.id) },
     });
 
     if (school) {
       const updatedSchool = await prisma.school.update({
-        where: { id: school.id },
+        where: { id: school?.id },
         data: {
           name: schoolName?.trim(),
           address: address?.trim(),

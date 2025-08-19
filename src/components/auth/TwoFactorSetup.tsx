@@ -22,12 +22,12 @@ export function TwoFactorSetup() {
       const response = await fetch("/api/auth/2fa/setup");
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to setup 2FA");
+      if (!response?.ok) {
+        throw new Error(data?.error || "Failed to setup 2FA");
       }
 
-      setQrCode(data.qrCode);
-      setManualKey(data.manualEntryKey);
+      setQrCode(data?.qrCode);
+      setManualKey(data?.manualEntryKey);
       setStep('verify');
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
@@ -49,11 +49,11 @@ export function TwoFactorSetup() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to verify code");
+      if (!response?.ok) {
+        throw new Error(data?.error || "Failed to verify code");
       }
 
-      setBackupCodes(data.backupCodes);
+      setBackupCodes(data?.backupCodes);
       setStep('complete');
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
@@ -131,7 +131,7 @@ export function TwoFactorSetup() {
           <input
             type="text"
             value={verificationCode}
-            onChange={(e) => setVerificationCode(e.target.value)}
+            onChange={(e) => setVerificationCode(e.target?.value)}
             placeholder="000000"
             maxLength={6}
             className="mt-1 w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
@@ -147,7 +147,7 @@ export function TwoFactorSetup() {
         <div className="flex space-x-3">
           <button
             onClick={verifyCode}
-            disabled={isLoading || verificationCode.length !== 6}
+            disabled={isLoading ?? verificationCode.length !== 6}
             className="bg-primary text-foreground px-4 py-2 rounded-md hover:bg-primary disabled:opacity-50"
           >
             {isLoading ? "Verifying..." : "Verify and Enable"}

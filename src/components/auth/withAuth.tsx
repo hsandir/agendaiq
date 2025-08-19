@@ -34,19 +34,19 @@ export function withAuth<P extends object>(
       }
       
       // Check staff requirement
-      if (requirements.requireStaff && !session.user?.staff) {
+      if (requirements?.requireStaff && !session.user?.staff) {
         router.push('/dashboard');
         return;
       }
       
       // Check admin requirement (using RoleKey enum)
-      if (requirements.requireAdmin && session.user?.staff?.role?.key !== RoleKey.OPS_ADMIN) {
+      if (requirements?.requireAdmin && session.user?.staff?.role?.key !== RoleKey?.OPS_ADMIN) {
         router.push('/dashboard');
         return;
       }
       
       // Check allowed roles (should use RoleKey values)
-      if (requirements.allowedRoles && requirements.allowedRoles.length > 0) {
+      if (requirements?.allowedRoles && requirements.allowedRoles.length > 0) {
         const userRoleKey = session.user?.staff?.role?.key;
         if (!userRoleKey || !requirements.allowedRoles.includes(userRoleKey)) {
           router.push('/dashboard');
@@ -69,15 +69,15 @@ export function withAuth<P extends object>(
       return null;
     }
     
-    if (requirements.requireStaff && !session.user?.staff) {
+    if (requirements?.requireStaff && !session.user?.staff) {
       return null;
     }
     
-    if (requirements.requireAdmin && session.user?.staff?.role?.key !== RoleKey.OPS_ADMIN) {
+    if (requirements?.requireAdmin && session.user?.staff?.role?.key !== RoleKey?.OPS_ADMIN) {
       return null;
     }
     
-    if (requirements.allowedRoles && requirements.allowedRoles.length > 0) {
+    if (requirements?.allowedRoles && requirements.allowedRoles.length > 0) {
       const userRoleKey = session.user?.staff?.role?.key;
       if (!userRoleKey || !requirements.allowedRoles.includes(userRoleKey)) {
         return null;

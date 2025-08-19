@@ -4,8 +4,8 @@ import { can, Capability } from '@/lib/auth/policy';
 
 // Vercel API integration for real deployment data
 async function fetchVercelDeployments() {
-  const token = process.env.VERCEL_TOKEN;
-  const projectId = process.env.VERCEL_PROJECT_ID;
+  const token = process.env?.VERCEL_TOKEN;
+  const projectId = process.env?.VERCEL_PROJECT_ID;
 
   if (!token || !projectId) {
     console.warn('VERCEL_TOKEN or VERCEL_PROJECT_ID not configured');
@@ -23,8 +23,8 @@ async function fetchVercelDeployments() {
       }
     );
 
-    if (!response.ok) {
-      console.error('Vercel API error:', response.status);
+    if (!response?.ok) {
+      console.error('Vercel API error:', response?.status);
       return [];
     }
 
@@ -40,12 +40,12 @@ async function fetchVercelDeployments() {
       creator?: { username?: string; email?: string };
       url?: string;
     }) => ({
-      environment: deployment.target || 'production',
+      environment: deployment.target ?? 'production',
       version: deployment.meta?.githubCommitSha?.substring(0, 7) || deployment.uid.substring(0, 7),
-      status: mapVercelStatus(deployment.state),
-      deployedAt: new Date(deployment.created),
-      deployedBy: deployment.creator?.username || deployment.creator?.email || 'unknown',
-      url: deployment.url ? `https://${deployment.url}` : undefined,
+      status: mapVercelStatus(deployment?.state),
+      deployedAt: new Date(deployment?.created),
+      deployedBy: deployment.creator?.username ?? deployment.creator?.email ?? 'unknown',
+      url: deployment.url ? `https://${deployment?.url}` : undefined,
       rollbackAvailable: deployment.state === 'READY'
     })) || [];
   } catch (error: unknown) {
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Check for CI/CD monitoring capability
-    if (!can(user, Capability.DEV_CI)) {
+    if (!can(user, Capability?.DEV_CI)) {
       return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
     }
 

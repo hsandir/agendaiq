@@ -44,7 +44,7 @@ export class PerformanceMonitor {
         const duration = Date.now() - startTime;
         const endMemory = process.memoryUsage();
         
-        const metrics: PerformanceMetrics = {
+        const metrics: _PerformanceMetrics = {
           route,
           method,
           duration,
@@ -65,7 +65,7 @@ export class PerformanceMonitor {
       .catch((error) => {
         const duration = Date.now() - startTime;
         
-        const metrics: PerformanceMetrics = {
+        const metrics: _PerformanceMetrics = {
           route,
           method,
           duration,
@@ -119,7 +119,7 @@ export class PerformanceMonitor {
   }
 
   // Log performance metrics
-  private static logPerformanceMetrics(metrics: PerformanceMetrics, error?: unknown) {
+  private static logPerformanceMetrics(metrics: _PerformanceMetrics, error?: unknown) {
     const logData = {
       ...metrics,
       ...(error ? { error: String(error) } : {})
@@ -142,7 +142,7 @@ export class PerformanceMonitor {
     if (metrics.duration > this.slowQueryThreshold) {
       Logger.warn(`Slow database query detected`, logData, 'database-performance');
     } else {
-      Logger.database(`${metrics.operation} ${metrics.table || 'unknown'}`, metrics.table, metrics.duration, logData);
+      Logger.database(`${metrics.operation} ${metrics.table ?? 'unknown'}`, metrics.table, metrics.duration, logData);
     }
   }
 

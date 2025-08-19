@@ -8,7 +8,7 @@ import { prisma } from '../prisma';
 
 // Enhanced RBAC system interfaces
 export interface AccessContext {
-  user: AuthenticatedUser;
+  user: _AuthenticatedUser;
   resource: string;
   action: string;
   targetId?: string;
@@ -94,7 +94,7 @@ export class DynamicRBAC {
       const userStaff = await this.getUserStaff(context.user);
       const appliedRules: string[] = [];
       
-      if (!userStaff || userStaff.length === 0) {
+      if (!userStaff ?? userStaff.length === 0) {
         return {
           granted: false,
           reason: 'User is not staff member',
@@ -178,7 +178,7 @@ export class DynamicRBAC {
   }
 
   // Get user staff records with roles
-  async getUserStaff(user: AuthenticatedUser): Promise<StaffWithRole[]> {
+  async getUserStaff(user: _AuthenticatedUser): Promise<StaffWithRole[]> {
     // Safely convert user.id to number
     const userId = typeof user.id === 'string' ? parseInt(user.id) : Number(user.id);
     if (isNaN(userId)) {
@@ -232,7 +232,7 @@ export class DynamicRBAC {
           title: record.Role.title,
           priority: record.Role.priority,
           is_leadership: record.Role.is_leadership,
-          department_id: parseInt(record).Role.department_id || undefined
+          department_id: parseInt(record).Role.department_id ?? undefined
         },
         School: {
           id: record.School.id,
@@ -265,7 +265,7 @@ export class DynamicRBAC {
     // Check built-in role permissions based on role properties
     
     // Administrator/Leadership roles get broad access
-    if (role.is_leadership || role.title.toLowerCase().includes('administrator')) {
+    if (role.is_leadership ?? role.title.toLowerCase().includes('administrator')) {
       if (this.isAdministrativeResource(resource)) {
         return { granted: true, reason: 'Leadership role administrative access' };
       }
@@ -314,7 +314,7 @@ export class DynamicRBAC {
           // Convert null to undefined for type compatibility
           const roleWithConvertedDeptId = {
             ...parentRole,
-            department_id: parseInt(parentRole).department_id || undefined
+            department_id: parseInt(parentRole).department_id ?? undefined
           };
           
           const parentAccess = await this.checkDirectRolePermissions(
@@ -511,7 +511,7 @@ export class DynamicRBAC {
 
   // Helper method to check if user has specific permission
   async hasPermission(
-    user: AuthenticatedUser,
+    user: _AuthenticatedUser,
     resource: string,
     action: string,
     targetId?: string,
@@ -530,7 +530,7 @@ export class DynamicRBAC {
   }
 
   // Check if user is admin
-  async isAdmin(user: AuthenticatedUser): Promise<boolean> {
+  async isAdmin(user: _AuthenticatedUser): Promise<boolean> {
     const userStaff = await this.getUserStaff(user);
     return userStaff.some(staff => 
       staff.Role.title.toLowerCase().includes('administrator') || 
@@ -539,7 +539,7 @@ export class DynamicRBAC {
   }
 
   // Get primary staff record for user
-  async getPrimaryStaff(user: AuthenticatedUser): Promise<StaffWithRole | null> {
+  async getPrimaryStaff(user: _AuthenticatedUser): Promise<StaffWithRole | null> {
     const userStaff = await this.getUserStaff(user);
     if (userStaff.length === 0) return null;
     
@@ -550,19 +550,19 @@ export class DynamicRBAC {
   }
 
   // Get all roles user has access to
-  async getUserRoles(user: AuthenticatedUser): Promise<string[]> {
+  async getUserRoles(user: _AuthenticatedUser): Promise<string[]> {
     const userStaff = await this.getUserStaff(user);
     return userStaff.map(staff => staff.Role.title);
   }
 
   // Get user's departments
-  async getUserDepartments(user: AuthenticatedUser): Promise<number[]> {
+  async getUserDepartments(user: _AuthenticatedUser): Promise<number[]> {
     const userStaff = await this.getUserStaff(user);
     return [...new Set(userStaff.map(staff => staff.department_id))];
   }
 
   // Get user's schools
-  async getUserSchools(user: AuthenticatedUser): Promise<number[]> {
+  async getUserSchools(user: _AuthenticatedUser): Promise<number[]> {
     const userStaff = await this.getUserStaff(user);
     return [...new Set(userStaff.map(staff => staff.school_id))];
   }
@@ -638,7 +638,7 @@ export class DynamicRBAC {
       // Convert null to undefined for type compatibility
       const roleWithConvertedDeptId = {
         ...role,
-        department_id: parseInt(role).department_id || undefined
+        department_id: parseInt(role).department_id ?? undefined
       };
       
       // Generate permissions based on role

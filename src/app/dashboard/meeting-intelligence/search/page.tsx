@@ -62,7 +62,7 @@ export default function MeetingSearchPage() {
       fetch(`/api/meetings/search/suggestions?q=${encodeURIComponent(searchQuery)}&type=${searchType}`)
         .then(res => res.json())
         .then(data => {
-          setSuggestions(data.suggestions || []);
+          setSuggestions(data.suggestions ?? []);
           setShowSuggestions(true);
         })
         .catch(console.error);
@@ -74,7 +74,7 @@ export default function MeetingSearchPage() {
   
   // Perform search
   const performSearch = useCallback(async () => {
-    if (!debouncedQuery || debouncedQuery.length < 2) {
+    if (!debouncedQuery ?? debouncedQuery.length < 2) {
       setMeetings([]);
       setAgendaItems([]);
       setActionItems([]);
@@ -93,17 +93,17 @@ export default function MeetingSearchPage() {
       const data = await response.json();
       
       if (searchType === 'all' || searchType === 'meetings') {
-        setMeetings(data.meetings || []);
+        setMeetings(data.meetings ?? []);
       }
       if (searchType === 'all' || searchType === 'agenda') {
-        const safeAgendaItems = (data.agendaItems || []).map((item: { meeting?: { id: number; title: string; startTime: string }; [key: string]: unknown }) => ({
+        const safeAgendaItems = (data.agendaItems ?? []).map((item: { meeting?: { id: number; title: string; startTime: string }; [key: string]: unknown }) => ({
           ...item,
           meeting: item.meeting || { id: 0, title: 'Unknown', startTime: new Date().toISOString() }
         }));
         setAgendaItems(safeAgendaItems);
       }
       if (searchType === 'all' || searchType === 'actions') {
-        const safeActionItems = (data.actionItems || []).map((item: { meeting?: { id: number; title: string }; assignedTo?: { name: string }; [key: string]: unknown }) => ({
+        const safeActionItems = (data.actionItems ?? []).map((item: { meeting?: { id: number; title: string }; assignedTo?: { name: string }; [key: string]: unknown }) => ({
           ...item,
           meeting: item.meeting || { id: 0, title: 'Unknown' },
           assignedTo: item.assignedTo || { name: 'Unassigned' }
@@ -265,7 +265,7 @@ export default function MeetingSearchPage() {
                         </p>
                       )}
                       <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
-                        <span>Meeting: {item.meeting?.title || 'Unknown'}</span>
+                        <span>Meeting: {item.meeting?.title ?? 'Unknown'}</span>
                         <span className={`px-2 py-1 rounded ${
                           item.status === 'Resolved' ? 'bg-green-100 text-green-700' :
                           item.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :

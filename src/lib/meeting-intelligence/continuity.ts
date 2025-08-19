@@ -44,21 +44,21 @@ export class MeetingContinuityService {
       carriedItems: agendaItems.map(item => ({
         parentItemId: item.id,
         topic: item.topic,
-        problemStatement: item.problem_statement || undefined,
-        responsibleRoleId: item.responsible_role_id || undefined,
-        responsibleStaffId: item.responsible_staff_id || undefined,
+        problemStatement: item.problem_statement ?? undefined,
+        responsibleRoleId: item.responsible_role_id ?? undefined,
+        responsibleStaffId: item.responsible_staff_id ?? undefined,
         priority: item.priority,
         status: 'CarriedForward' as const,
         carryForwardCount: item.carry_forward_count + 1,
-        notes: item.decisions_actions || undefined
+        notes: item.decisions_actions ?? undefined
       })),
       pendingActions: actionItems.map(item => ({
         parentActionId: item.id,
         title: item.title,
-        description: item.description || undefined,
-        assignedToRoleId: item.assigned_to_role || undefined,
+        description: item.description ?? undefined,
+        assignedToRoleId: item.assigned_to_role ?? undefined,
         assignedToStaffId: item.assigned_to,
-        dueDate: item.due_date || undefined,
+        dueDate: item.due_date ?? undefined,
         priority: item.priority,
         status: item.status as Record<string, unknown>,
         carryForwardCount: item.carry_forward_count + 1
@@ -214,13 +214,13 @@ export class MeetingContinuityService {
     const countMeetings = (meetings: Record<string, unknown>[]): void => {
       for (const meeting of meetings) {
         stats.totalMeetingsInChain++;
-        stats.totalCarriedItems += meeting.MeetingAgendaItems?.length || 0;
+        stats.totalCarriedItems += meeting.MeetingAgendaItems?.length ?? 0;
         stats.resolvedItems += meeting.MeetingAgendaItems?.filter(
           (i: Record<string, unknown>) => i.status === 'Resolved'
-        ).length || 0;
+        ).length ?? 0;
         stats.pendingItems += meeting.MeetingAgendaItems?.filter(
           (i: Record<string, unknown>) => i.status !== 'Resolved'
-        ).length || 0;
+        ).length ?? 0;
         
         if (meeting.children) {
           countMeetings(meeting.children);

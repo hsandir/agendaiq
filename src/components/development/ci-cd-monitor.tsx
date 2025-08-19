@@ -127,8 +127,8 @@ export default function CICDMonitor() {
       setUsingMockData(false);
       setError(null);
       
-      setRuns(data.runs || []);
-      setStats(data.stats || null);
+      setRuns(data.runs ?? []);
+      setStats(data.stats ?? null);
       
       // Auto-expand failed runs
       if (data.runs && data.runs.length > 0) {
@@ -149,7 +149,7 @@ export default function CICDMonitor() {
   };
 
   const fetchAutofixSuggestions = async (run: WorkflowRun) => {
-    if (!run.failedJobs || run.failedJobs.length === 0) return;
+    if (!run.failedJobs ?? run.failedJobs.length === 0) return;
 
     try {
       const errorType = detectErrorType(run.failedJobs[0]);
@@ -260,7 +260,7 @@ export default function CICDMonitor() {
   const detectErrorType = (job: Record<string, unknown>): string => {
     if (!job) return 'Unknown Error';
     
-    const logs = job.logs || '';
+    const logs = job.logs ?? '';
     const name = job.name.toLowerCase();
     
     if (logs.includes('npm ERR!') || name.includes('install')) return 'NPM Error';
@@ -276,7 +276,7 @@ export default function CICDMonitor() {
   };
 
   const extractErrorMessage = (job: Record<string, unknown>): string => {
-    if (!job || !job.logs) return '';
+    if (!job?.logs) return '';
     
     const lines = job.logs.split('\n');
     const errorLines = lines.filter((line: string) => 

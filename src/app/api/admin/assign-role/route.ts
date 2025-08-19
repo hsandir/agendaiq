@@ -58,7 +58,7 @@ export async function POST(request: Request) {
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!currentUser || currentUser.Staff?.[0]?.Role?.title !== 'Administrator') {
+    if (!currentUser ?? currentUser.Staff?.[0]?.Role?.title !== 'Administrator') {
       return NextResponse.json(
         { error: "Not authorized" },
         { status: 403 }
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     });
 
     // Find or determine manager ID
-    const autoAssignedManagerId = role ? await findManagerId(role.title, parseInt(departmentId)) : null;
+    const autoAssignedManagerId = role ? await findManagerId(role?.title, parseInt(departmentId)) : null;
     const finalManagerId = managerId ? parseInt(managerId) : autoAssignedManagerId;
 
     // Update or create staff record
@@ -121,11 +121,11 @@ export async function POST(request: Request) {
 
       await prisma.staff.create({
         data: {
-          user_id: parseInt(user.id),
+          user_id: parseInt(user?.id),
           role_id: parseInt(roleId),
           department_id: parseInt(departmentId),
-          school_id: parseInt(defaultSchool.id),
-          district_id: parseInt(defaultDistrict.id),
+          school_id: parseInt(defaultSchool?.id),
+          district_id: parseInt(defaultDistrict?.id),
           manager_id: parseInt(finalManagerId),
         },
       });
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
 
     // Get updated user with staff
     const updatedUser = await prisma.user.findUnique({
-      where: { id: user.id },
+      where: { id: user?.id },
       include: { Staff: { include: { Role: true, Department: true } } },
     });
 

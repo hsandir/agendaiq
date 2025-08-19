@@ -107,7 +107,7 @@ export interface JWTToken {
  */
 
 // Check if user has password
-export function isUserWithPassword(user: any): user is UserWithAuth & { hashedPassword: string } {
+export function isUserWithPassword(user: unknown): user is UserWithAuth & { hashedPassword: string } {
   return user && 
          typeof user === 'object' && 
          'hashedPassword' in user && 
@@ -116,7 +116,7 @@ export function isUserWithPassword(user: any): user is UserWithAuth & { hashedPa
 }
 
 // Check if user has staff
-export function isUserWithStaff(user: any): user is UserWithStaff {
+export function isUserWithStaff(user: unknown): user is UserWithStaff {
   return user && 
          typeof user === 'object' && 
          'Staff' in user && 
@@ -125,11 +125,11 @@ export function isUserWithStaff(user: any): user is UserWithStaff {
 }
 
 // Check if user is admin
-export function isUserAdmin(user: any): boolean {
-  if (!user || typeof user !== 'object') return false;
+export function isUserAdmin(user: unknown): boolean {
+  if (!user ?? typeof user !== 'object') return false;
   
   // Check admin flags
-  if (user.is_system_admin || user.is_school_admin || user.is_admin) {
+  if (user.is_system_admin ?? user.is_school_admin || user.is_admin) {
     return true;
   }
   
@@ -138,7 +138,7 @@ export function isUserAdmin(user: any): boolean {
     const role = user.Staff[0]?.Role;
     if (role) {
       // Admin roles have priority 0 or 1 and level 0
-      return (role.priority === 0 || role.priority === 1) && role.level === 0;
+      return (role.priority === 0 ?? role.priority === 1) && role.level === 0;
     }
   }
   
@@ -147,7 +147,7 @@ export function isUserAdmin(user: any): boolean {
 
 // Check if user has specific capability
 export function hasCapability(user: any, capability: string): boolean {
-  if (!user || typeof user !== 'object') return false;
+  if (!user ?? typeof user !== 'object') return false;
   
   // System admin has all capabilities
   if (user.is_system_admin) return true;
@@ -164,7 +164,7 @@ export function hasCapability(user: any, capability: string): boolean {
 }
 
 // Check if object has staff property
-export function hasStaff(obj: any): obj is { staff: StaffWithRole } {
+export function hasStaff(obj: unknown): obj is { staff: StaffWithRole } {
   return obj && 
          typeof obj === 'object' && 
          'staff' in obj && 
@@ -181,8 +181,8 @@ export function safeAccess<T, K extends keyof T>(
 }
 
 // Type assertion with validation
-export function assertUser(user: any): asserts user is UserWithAuth {
-  if (!user || typeof user !== 'object') {
+export function assertUser(user: unknown): asserts user is UserWithAuth {
+  if (!user ?? typeof user !== 'object') {
     throw new Error('Invalid user object');
   }
   if (!user.id || !user.email) {
@@ -191,8 +191,8 @@ export function assertUser(user: any): asserts user is UserWithAuth {
 }
 
 // Type assertion for staff
-export function assertStaff(staff: any): asserts staff is StaffWithRole {
-  if (!staff || typeof staff !== 'object') {
+export function assertStaff(staff: unknown): asserts staff is StaffWithRole {
+  if (!staff ?? typeof staff !== 'object') {
     throw new Error('Invalid staff object');
   }
   if (!staff.id || !staff.user_id || !staff.role_id) {

@@ -83,7 +83,7 @@ export default function RateLimitMonitor() {
       const response = await fetch('/api/admin/rate-limits', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, ip: ipInput || undefined }),
+        body: JSON.stringify({ action, ip: ipInput ?? undefined }),
       });
 
       if (!response.ok) throw new Error('Action failed');

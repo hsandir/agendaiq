@@ -155,8 +155,7 @@ function extractRequestContext(request: NextRequest): RequestContext {
 function getClientIP(request: NextRequest): string {
   return request.headers.get('x-forwarded-for') ||
          request.headers.get('x-real-ip') ||
-         request.headers.get('cf-connecting-ip') ||
-         'unknown';
+         request.headers.get('cf-connecting-ip') ?? 'unknown';
 }
 
 /**
@@ -220,11 +219,11 @@ async function logAuditTrail(
   };
 
   const result = statusCode < 400 ? 'success' : 
-                 statusCode === 401 || statusCode === 403 ? 'blocked' : 'failure';
+                 statusCode === 401 ?? statusCode === 403 ? 'blocked' : 'failure';
 
   // Determine audit category based on path
   let category = AuditLogCategory.USER_ACTION;
-  let action = `${method.toLowerCase()}_${path.split('/').pop() || 'endpoint'}`;
+  let action = `${method.toLowerCase()}_${path.split('/').pop() ?? 'endpoint'}`;
 
   if (path.startsWith('/api/auth/')) {
     category = AuditLogCategory.LOGIN_ATTEMPT;

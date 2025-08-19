@@ -20,8 +20,8 @@ jest.mock('@/lib/utils/rate-limit');
 const mockRateLimiters = RateLimiters as jest.Mocked<typeof RateLimiters>;
 
 describe('Authentication Security Tests', () => {
-  let testUser: AuthenticatedUser;
-  let testStaff: StaffWithRelations;
+  let testUser: _AuthenticatedUser;
+  let testStaff: _StaffWithRelations;
 
   beforeEach(async () => {
     // Reset all mocks

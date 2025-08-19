@@ -58,7 +58,7 @@ function AuthErrorContent() {
   const searchParams = useSearchParams();
   const error = searchParams?.get('error') || null;
   
-  const errorInfo = errorMessages[error || 'Default'] || errorMessages.Default;
+  const errorInfo = errorMessages[error ?? 'Default'] || errorMessages?.Default;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -68,10 +68,10 @@ function AuthErrorContent() {
             <AlertCircle className="h-6 w-6 text-red-600" />
           </div>
           <CardTitle className="text-2xl font-bold text-gray-900">
-            {errorInfo.title}
+            {errorInfo?.title}
           </CardTitle>
           <CardDescription className="mt-2 text-gray-600">
-            {errorInfo.description}
+            {errorInfo?.description}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

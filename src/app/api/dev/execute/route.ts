@@ -39,13 +39,13 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    const output = stdout || stderr || 'Command executed successfully with no output';
+    const output = stdout ?? (stderr || 'Command executed successfully with no output');
     
     return NextResponse.json({
-      success: !stderr || stderr.length === 0,
+      success: (!stderr) ?? (stderr.length === 0),
       command,
       output,
-      error: stderr || undefined,
+      error: stderr ?? undefined,
       timestamp: new Date().toISOString(),
     });
   } catch (error: unknown) {

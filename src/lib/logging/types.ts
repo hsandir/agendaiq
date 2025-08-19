@@ -49,7 +49,7 @@ export interface BaseLogEntry {
   timestamp: string;
   level: LogLevel;
   message: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   context?: {
     userId?: string;
     staffId?: string;
@@ -161,7 +161,7 @@ export interface LogTransport {
 export interface LoggerConfig {
   level: LogLevel;
   transports: LogTransport[];
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   enablePerformanceTracking?: boolean;
   enableErrorTracking?: boolean;
   bufferSize?: number;
@@ -192,7 +192,7 @@ export interface LogAlert {
   };
   actions: Array<{
     type: 'email' | 'webhook' | 'notification';
-    config: Record<string, any>;
+    config: Record<string, unknown>;
   }>;
   enabled: boolean;
 }

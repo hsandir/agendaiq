@@ -133,7 +133,7 @@ export async function GET() {
       system: {
         platform: os.platform(),
         architecture: os.arch(),
-        nodeVersion: process.version,
+        nodeVersion: process?.version,
         nextVersion: "14.2.5", // Would need to get from package.json
         uptime: uptimeString,
         hostname: os.hostname()
@@ -147,8 +147,8 @@ export async function GET() {
         },
         cpu: {
           usage: avgCpuUsage,
-          cores: cpus.length,
-          model: cpus[0]?.model || 'Unknown'
+          cores: cpus?.length,
+          model: cpus[0]?.model ?? 'Unknown'
         },
         disk: {
           total: diskTotal,
@@ -188,7 +188,7 @@ export async function GET() {
     }
 
     Logger.info('Server metrics fetched successfully', { 
-      healthStatus: serverMetrics.health.overall,
+      healthStatus: serverMetrics.health?.overall,
       metricsCount: Object.keys(serverMetrics).length,
       userId: session.user.id as string
     }, 'system-metrics');

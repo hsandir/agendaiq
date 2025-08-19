@@ -12,8 +12,8 @@ export function setSentryUser(user: Partial<User> & {
 }) {
   Sentry.setUser({
     id: user.id,
-    email: user.email || undefined,
-    username: user.name || undefined,
+    email: user.email ?? undefined,
+    username: user.name ?? undefined,
     staffId: user.staff?.id,
     role: user.staff?.role.title,
   });
@@ -32,7 +32,7 @@ export function clearSentryUser() {
 export function addBreadcrumb(
   message: string,
   category: string,
-  data?: Record<string, any>,
+  data?: Record<string, unknown>,
   level: Sentry.SeverityLevel = 'info'
 ) {
   Sentry.addBreadcrumb({
@@ -50,7 +50,7 @@ export function addBreadcrumb(
 export function captureMessage(
   message: string,
   level: Sentry.SeverityLevel = 'info',
-  context?: Record<string, any>
+  context?: Record<string, unknown>
 ) {
   if (context) {
     Sentry.withScope((scope) => {
@@ -67,7 +67,7 @@ export function captureMessage(
  */
 export function captureException(
   error: Error,
-  context?: Record<string, any>,
+  context?: Record<string, unknown>,
   user?: { id?: string; email?: string; staffId?: string }
 ) {
   Sentry.withScope((scope) => {
@@ -116,7 +116,7 @@ export function withSentry<T extends (...args: Record<string, unknown>[]) => any
 ): T {
   return ((...args: Parameters<T>) => {
     const transaction = options?.name 
-      ? startTransaction(options.name, options.op || 'function')
+      ? startTransaction(options.name, options.op ?? 'function')
       : undefined;
     
     try {
@@ -128,7 +128,7 @@ export function withSentry<T extends (...args: Record<string, unknown>[]) => any
           .catch((error) => {
             if (options?.captureError !== false) {
               captureException(error, {
-                function: options?.name || fn.name,
+                function: options?.name ?? fn.name,
                 args: args.length <= 3 ? args : 'Too many args to log',
               });
             }
@@ -146,7 +146,7 @@ export function withSentry<T extends (...args: Record<string, unknown>[]) => any
       
       if (options?.captureError !== false) {
         captureException(error as Error, {
-          function: options?.name || fn.name,
+          function: options?.name ?? fn.name,
           args: args.length <= 3 ? args : 'Too many args to log',
         });
       }

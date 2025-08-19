@@ -214,8 +214,8 @@ export default function DependenciesPage() {
     const bParts = b.replace(/[^\d.]/g, '').split('.').map(Number);
     
     for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
-      const aPart = aParts[i] || 0;
-      const bPart = bParts[i] || 0;
+      const aPart = aParts[i] ?? 0;
+      const bPart = bParts[i] ?? 0;
       
       if (aPart > bPart) return 1;
       if (aPart < bPart) return -1;
@@ -372,7 +372,7 @@ export default function DependenciesPage() {
       if (result.success) {
         setUpdateResult({
           success: true,
-          message: `Bulk update completed: ${result.summary?.successful || 0} successful, ${result.summary?.failed || 0} failed`,
+          message: `Bulk update completed: ${result.summary?.successful ?? 0} successful, ${result.summary?.failed ?? 0} failed`,
           details: result.summary
         });
         
@@ -656,7 +656,7 @@ export default function DependenciesPage() {
             <AlertTriangle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-destructive">{statusCounts.missing || 0}</div>
+            <div className="text-2xl font-bold text-destructive">{statusCounts.missing ?? 0}</div>
             <p className="text-xs text-muted-foreground">Need installation</p>
           </CardContent>
         </Card>
@@ -667,7 +667,7 @@ export default function DependenciesPage() {
             <Download className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{statusCounts.outdated || 0}</div>
+            <div className="text-2xl font-bold text-yellow-600">{statusCounts.outdated ?? 0}</div>
             <p className="text-xs text-muted-foreground">Available updates</p>
           </CardContent>
         </Card>
@@ -678,7 +678,7 @@ export default function DependenciesPage() {
             <AlertTriangle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-destructive">{statusCounts.vulnerable || 0}</div>
+            <div className="text-2xl font-bold text-destructive">{statusCounts.vulnerable ?? 0}</div>
             <p className="text-xs text-muted-foreground">Security issues</p>
           </CardContent>
         </Card>
@@ -856,7 +856,7 @@ export default function DependenciesPage() {
           variant="outline" 
           className="flex items-center"
           onClick={() => handleBulkUpdate('outdated')}
-          disabled={isUpdating || dependencies.filter(d => d.status === 'outdated').length === 0}
+          disabled={isUpdating ?? dependencies.filter(d => d.status === 'outdated').length === 0}
         >
           {isUpdating ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -869,7 +869,7 @@ export default function DependenciesPage() {
           variant="outline" 
           className="flex items-center text-green-600 border-green-600 hover:bg-green-50"
           onClick={() => handleBulkUpdate('safe')}
-          disabled={isUpdating || dependencies.filter(d => d.compatibility.recommendation === 'safe' && d.status !== 'ok').length === 0}
+          disabled={isUpdating ?? dependencies.filter(d => d.compatibility.recommendation === 'safe' && d.status !== 'ok').length === 0}
         >
           {isUpdating ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />

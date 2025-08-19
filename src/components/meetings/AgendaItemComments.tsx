@@ -95,7 +95,7 @@ export function AgendaItemComments({ itemId, comments, onAddComment, canComment 
                 <div className="flex-1">
                   <div className="flex items-baseline gap-2">
                     <span className="font-medium text-sm">
-                      {comment.Staff.User.name || comment.Staff.User.email}
+                      {comment.Staff.User.name ?? comment.Staff.User.email}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       {(() => {

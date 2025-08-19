@@ -2,7 +2,7 @@
 import { NextRequest } from 'next/server';
 
 export class AuditClient {
-  private static async sendToAuditAPI(event: Record<string, any>): Promise<void> {
+  private static async sendToAuditAPI(event: Record<string, unknown>): Promise<void> {
     try {
       // Only send to API in server environments
       if (typeof window === 'undefined') {
@@ -33,7 +33,7 @@ export class AuditClient {
     const event = {
       action: `auth_${action}`,
       path: request?.nextUrl?.pathname || '/auth',
-      method: request?.method || 'POST',
+      method: request?.method ?? 'POST',
       ipAddress: this.getClientIP(request),
       userAgent: request?.headers.get('user-agent'),
       success: !action.includes('failure') && !errorMessage,
@@ -56,7 +56,7 @@ export class AuditClient {
     const event = {
       action: `security_${action}`,
       path: request?.nextUrl?.pathname || '/unknown',
-      method: request?.method || 'POST',
+      method: request?.method ?? 'POST',
       ipAddress: this.getClientIP(request),
       userAgent: request?.headers.get('user-agent'),
       success: !errorMessage,

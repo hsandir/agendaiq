@@ -10,7 +10,7 @@ import { RateLimiters, getClientIdentifier } from '@/lib/utils/rate-limit';
 const themeSchema = z.object({
   themeId: z.string().optional(), // Accept themeId from new interface
   theme: z.string().optional(), // Accept theme for backward compatibility
-}).refine(data => data.themeId || data.theme, {
+}).refine(data => data.themeId ?? data.theme, {
   message: "Either themeId or theme must be provided"
 });
 
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       SELECT theme_preference FROM "User" WHERE id = ${user.id} LIMIT 1
     `;
     
-    const theme = userData?.[0]?.theme_preference || 'standard';
+    const theme = userData?.[0]?.theme_preference ?? 'standard';
     
     // Cache the result
     preferenceCache.set(user.id, { theme });
@@ -85,7 +85,7 @@ export async function PUT(request: NextRequest) {
     const validatedData = themeSchema.parse(body);
     
     // Use themeId if provided, otherwise use theme
-    const themeToSave = validatedData.themeId || validatedData.theme || 'standard';
+    const themeToSave = validatedData.themeId ?? validatedData.theme ?? 'standard';
 
     // Update user's theme preference (optimized query)
     await prisma.user.update({
@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest) {
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: user.staff?.id || undefined,
+      staffId: user.staff?.id ?? undefined,
       source: 'WEB_UI',
       description: `Theme changed to ${themeToSave}`,
     }).catch(err => console.error('Audit log failed:', err));

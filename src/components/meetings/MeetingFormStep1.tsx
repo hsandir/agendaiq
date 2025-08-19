@@ -146,7 +146,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     try {
       const response = await fetch(`/api/meetings/search?q=${encodeURIComponent(searchQuery)}`);
       const data = await response.json();
-      setSearchResults(data.meetings || []);
+      setSearchResults(data.meetings ?? []);
     } catch (error: unknown) {
       console.error("Error searching meetings:", error);
       setSearchResults([]);
@@ -159,12 +159,12 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     setSelectedPreviousMeeting(meeting);
     setParentMeetingId(meeting.id);
     setTitle(`${meeting.title} (Continuation)`);
-    setDescription(meeting.description || "");
-    setMeetingType(meeting.meeting_type || "regular");
+    setDescription(meeting.description ?? "");
+    setMeetingType(meeting.meeting_type ?? "regular");
     
     // Set attendees if available
     if (meeting.attendees && Array.isArray(meeting.attendees)) {
-      const attendeeIds = (meeting.attendees.map((a: Record<string, unknown>) => a.id || a.staff_id).filter(Boolean));
+      const attendeeIds = (meeting.attendees.map((a: Record<string, unknown>) => a.id ?? a.staff_id).filter(Boolean));
       setSelectedAttendees(attendeeIds);
     }
     
@@ -194,7 +194,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       meetings.forEach(meeting => {
         if (meeting.attendees && Array.isArray(meeting.attendees)) {
           meeting.attendees.forEach((a: Record<string, unknown>) => {
-            const id = a.id || a.staff_id;
+            const id = a.id ?? a.staff_id;
             if (id) allAttendees.add(id);
           });
         }
@@ -214,7 +214,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     e.preventDefault();
     
     // Validate required fields
-    if (!title || !startTime || !endTime || selectedAttendees.length === 0) {
+    if (!title || !startTime || (!endTime ?? (selectedAttendees.length === 0))) {
       alert("Please fill in all required fields and select at least one attendee.");
       return;
     }

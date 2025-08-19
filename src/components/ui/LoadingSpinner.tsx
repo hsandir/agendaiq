@@ -107,7 +107,7 @@ export function LoadingButton({
   return (
     <button
       {...props}
-      disabled={disabled || isLoading}
+      disabled={disabled ?? isLoading}
       className={cn(
         'inline-flex items-center justify-center gap-2 transition-all',
         'disabled:opacity-50 disabled:cursor-not-allowed',

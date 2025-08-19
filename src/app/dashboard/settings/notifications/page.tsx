@@ -281,7 +281,7 @@ export default async function NotificationsPage() {
                       {safeFormatDate(meeting.start_time)} at {safeFormatTime(meeting.start_time)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Organized by: {userWithSettings?.name || 'Unknown'}
+                      Organized by: {userWithSettings?.name ?? 'Unknown'}
                     </p>
                   </div>
                   <div className="text-right">

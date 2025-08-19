@@ -419,7 +419,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
             <Button 
               onClick={createFullSystemBackup}
               className="w-full"
-              disabled={creating || selectedComponents.length === 0}
+              disabled={creating ?? selectedComponents.length === 0}
             >
               {creating ? (
                 <>

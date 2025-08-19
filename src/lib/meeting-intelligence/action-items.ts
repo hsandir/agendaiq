@@ -38,7 +38,7 @@ export class ActionItemsService {
         assigned_to: data.assignedToStaffId,
         assigned_to_role: data.assignedToRoleId,
         due_date: data.dueDate,
-        priority: data.priority || 'Medium',
+        priority: data.priority ?? 'Medium',
         status: 'Pending'
       },
       include: {
@@ -232,7 +232,7 @@ export class ActionItemsService {
       };
     }
 
-    if (filterOptions?.dateFrom || filterOptions?.dateTo) {
+    if (filterOptions?.dateFrom ?? filterOptions?.dateTo) {
       where.created_at = {};
       if (filterOptions.dateFrom) {
         where.created_at.gte = filterOptions.dateFrom;

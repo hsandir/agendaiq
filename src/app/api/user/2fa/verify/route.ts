@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     // Verify code
     // const isValid = authenticator.verify{
     //   token: code,
-    //   secret: user.twoFactorSecret,
+    //   secret: user?.twoFactorSecret,
     // });
 
     // if (!isValid) {

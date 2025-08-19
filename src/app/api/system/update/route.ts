@@ -103,7 +103,7 @@ async function updatePackages(specificPackages?: string[]) {
       }
 
       // Skip same versions
-      if (pkg.current === pkg.latest || pkg.current === pkg.wanted) {
+      if (pkg.current === pkg.latest ?? pkg.current === pkg.wanted) {
         updateReport.details.push({
           package: pkg.name,
           status: 'skipped',
@@ -167,7 +167,7 @@ async function updatePackages(specificPackages?: string[]) {
     for (const pkg of packagesToUpdate) {
       try {
         // Use wanted version (compatible) rather than latest
-        const targetVersion = pkg.wanted || pkg.latest;
+        const targetVersion = pkg.wanted ?? pkg.latest;
         
         await execAsync(
           `npm install ${pkg.name}@${targetVersion} --save --legacy-peer-deps --no-audit`,
@@ -192,7 +192,7 @@ async function updatePackages(specificPackages?: string[]) {
           package: pkg.name,
           status: 'failed',
           from: pkg.current,
-          to: pkg.wanted || pkg.latest,
+          to: pkg.wanted ?? pkg.latest,
           error: error instanceof Error ? error.message : String(error).split('\n')[0] // First line of error
         });
         updateReport.failed++;
@@ -271,8 +271,8 @@ function isActualDowngrade(current: string, latest: string): boolean {
     
     // Compare major.minor.patch
     for (let i = 0; i < Math.max(currentNumbers.length, latestNumbers.length); i++) {
-      const curr = currentNumbers[i] || 0;
-      const lat = latestNumbers[i] || 0;
+      const curr = currentNumbers[i] ?? 0;
+      const lat = latestNumbers[i] ?? 0;
       
       if (lat < curr) return true;  // Latest is lower = downgrade
       if (lat > curr) return false; // Latest is higher = upgrade

@@ -6,9 +6,9 @@ import { prisma } from "@/lib/prisma";
 export async function POST(request: NextRequest) {
   try {
     // Setup initialization requires DEV_ADMIN capabilities
-    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_UPDATE });
-    if (!authResult.success) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability?.DEV_UPDATE });
+    if (!authResult?.success) {
+      return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
     }
     const user = authResult.user!;
 

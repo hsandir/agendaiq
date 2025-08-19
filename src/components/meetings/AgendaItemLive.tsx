@@ -70,16 +70,16 @@ export function AgendaItemLive({
   const [showCreateMeetingModal, setShowCreateMeetingModal] = useState(false);
   const [editData, setEditData] = useState({
     topic: item.topic,
-    problem_statement: item.problem_statement || '',
-    proposed_solution: item.proposed_solution || '',
-    decisions_actions: item.decisions_actions || '',
+    problem_statement: item.problem_statement ?? '',
+    proposed_solution: item.proposed_solution ?? '',
+    decisions_actions: item.decisions_actions ?? '',
     status: item.status,
     priority: item.priority,
     responsible_staff_id: item.responsible_staff_id,
-    purpose: item.purpose || 'Discussion',
-    solution_type: item.solution_type || null,
-    decision_type: item.decision_type || null,
-    future_implications: item.future_implications || false
+    purpose: item.purpose ?? 'Discussion',
+    solution_type: item.solution_type ?? null,
+    decision_type: item.decision_type ?? null,
+    future_implications: item.future_implications ?? false
   });
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
   const channel = usePusherChannel(meetingId ? CHANNELS.meeting(meetingId) : null);
@@ -127,16 +127,16 @@ export function AgendaItemLive({
   const handleCancel = () => {
     setEditData({
       topic: item.topic,
-      problem_statement: item.problem_statement || '',
-      proposed_solution: item.proposed_solution || '',
-      decisions_actions: item.decisions_actions || '',
+      problem_statement: item.problem_statement ?? '',
+      proposed_solution: item.proposed_solution ?? '',
+      decisions_actions: item.decisions_actions ?? '',
       status: item.status,
       priority: item.priority,
       responsible_staff_id: item.responsible_staff_id,
-      purpose: item.purpose || 'Discussion',
-      solution_type: item.solution_type || null,
-      decision_type: item.decision_type || null,
-      future_implications: item.future_implications || false
+      purpose: item.purpose ?? 'Discussion',
+      solution_type: item.solution_type ?? null,
+      decision_type: item.decision_type ?? null,
+      future_implications: item.future_implications ?? false
     });
     setIsEditing(false);
     emitStoppedTyping();
@@ -338,7 +338,7 @@ export function AgendaItemLive({
       {isExpanded && (
         <div className="px-5 pb-5 space-y-4 border-t border-border pt-4">
           {/* Problem Statement */}
-          {(item.problem_statement || isEditing) && (
+          {(item.problem_statement ?? isEditing) && (
             <div>
               <label className="text-sm font-medium text-foreground">Problem/Need Statement</label>
               {isEditing ? (
@@ -359,7 +359,7 @@ export function AgendaItemLive({
             <label className="text-sm font-medium text-foreground">Responsible Staff</label>
             {isEditing ? (
               <Select
-                value={editData.responsible_staff_id?.toString() || 'none'}
+                value={editData.responsible_staff_id?.toString() ?? 'none'}
                 onValueChange={(value) => setEditData({ 
                   ...editData, 
                   responsible_staff_id: value === 'none' ? null : parseInt(value) 
@@ -389,7 +389,7 @@ export function AgendaItemLive({
           </div>
 
           {/* Proposed Solution */}
-          {(item.proposed_solution || isEditing) && (
+          {(item.proposed_solution ?? isEditing) && (
             <div>
               <label className="text-sm font-medium text-foreground">Proposed Solution</label>
               {isEditing ? (
@@ -444,7 +444,7 @@ export function AgendaItemLive({
               <div>
                 <label className="text-sm font-medium text-foreground">Solution Type</label>
                 <Select
-                  value={editData.solution_type || 'none'}
+                  value={editData.solution_type ?? 'none'}
                   onValueChange={(value) => setEditData({ 
                     ...editData, 
                     solution_type: value === 'none' ? null : value as Record<string, unknown>
@@ -465,7 +465,7 @@ export function AgendaItemLive({
               <div>
                 <label className="text-sm font-medium text-foreground">Decision Type</label>
                 <Select
-                  value={editData.decision_type || 'none'}
+                  value={editData.decision_type ?? 'none'}
                   onValueChange={(value) => setEditData({ 
                     ...editData, 
                     decision_type: value === 'none' ? null : value as Record<string, unknown>
@@ -575,11 +575,11 @@ export function AgendaItemLive({
                   onClick={() => setShowComments(!showComments)}
                 >
                   <MessageSquare className="h-4 w-4" />
-                  <span>{item.Comments?.length || 0} Comments</span>
+                  <span>{item.Comments?.length ?? 0} Comments</span>
                 </button>
                 <div className="flex items-center space-x-1">
                   <Paperclip className="h-4 w-4" />
-                  <span>{item.ActionItems?.length || 0}</span>
+                  <span>{item.ActionItems?.length ?? 0}</span>
                 </div>
                 {item.future_implications && !isEditing && (
                   <div className="flex items-center space-x-1 text-yellow-600">
@@ -608,7 +608,7 @@ export function AgendaItemLive({
               <div className="mt-4 pt-4 border-t">
                 <AgendaItemComments
                   itemId={item.id}
-                  comments={item.Comments || []}
+                  comments={item.Comments ?? []}
                   onAddComment={handleAddComment}
                   canComment={canEdit}
                 />

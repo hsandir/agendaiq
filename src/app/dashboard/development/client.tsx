@@ -60,7 +60,7 @@ const GitOperations = dynamic(() => import('@/components/development/git-operati
 })
 
 interface DevelopmentClientProps {
-  user: AuthenticatedUser
+  user: _AuthenticatedUser
 }
 
 export default function DevelopmentClient({ user }: DevelopmentClientProps) {

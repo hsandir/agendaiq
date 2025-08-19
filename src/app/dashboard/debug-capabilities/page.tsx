@@ -37,8 +37,8 @@ export default async function DebugCapabilitiesPage() {
     // User info
     userId: user.id,
     email: user.email,
-    is_system_admin: user.is_system_admin || false,
-    is_school_admin: user.is_school_admin || false,
+    is_system_admin: user.is_system_admin ?? false,
+    is_school_admin: user.is_school_admin ?? false,
     
     // Role info
     role: userWithRole?.Staff?.[0]?.Role?.title || 'No Role',
@@ -46,7 +46,7 @@ export default async function DebugCapabilitiesPage() {
     roleId: userWithRole?.Staff?.[0]?.Role?.id,
     
     // Permissions from database
-    permissionCount: userWithRole?.Staff?.[0]?.Role?.Permissions?.length || 0,
+    permissionCount: userWithRole?.Staff?.[0]?.Role?.Permissions?.length ?? 0,
     permissions: userWithRole?.Staff?.[0]?.Role?.Permissions?.map(p => ({
       id: p.id,
       capability: p.capability,

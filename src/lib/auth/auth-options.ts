@@ -35,8 +35,8 @@ export const authOptions: NextAuthOptions = {
   },
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
       authorization: {
         params: {
           prompt: "consent",
@@ -164,7 +164,7 @@ export const authOptions: NextAuthOptions = {
           const userData = {
             id: String(user.id), // Ensure string conversion for NextAuth
             email: user.email,
-            name: user.name || user.email,
+            name: user.name ?? user.email,
             ...(staff && { 
               staff: {
                 id: staff.id,
@@ -349,7 +349,7 @@ export const authOptions: NextAuthOptions = {
                   name: staff.District.name,
                   code: staff.District.code
                 }
-              } as Record<string, unknown>;
+              } satisfies Record<string, unknown>;
             }
           }
         } catch (error: unknown) {

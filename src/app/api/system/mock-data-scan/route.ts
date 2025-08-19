@@ -149,7 +149,7 @@ export async function GET() {
           }
 
           // Create description
-          const mockCount = foundMockLines.length;
+          const mockCount = foundMockLines?.length;
           const description = `${fileType === 'page' ? 'Page' : fileType === 'api' ? 'API endpoint' : 'Component'} contains ${mockCount} mock data ${mockCount === 1 ? 'reference' : 'references'}${hasApiCall ? ' with API integration' : ''}`;
 
           mockDataUsages.push({
@@ -159,7 +159,7 @@ export async function GET() {
             status,
             description,
             mockDataLines: foundMockLines.slice(0, 5), // Limit to first 5 matches
-            apiEndpoint: hasApiEndpoint || undefined,
+            apiEndpoint: hasApiEndpoint ?? undefined,
             lastChecked: new Date().toISOString(),
             priority
           });
@@ -173,7 +173,7 @@ export async function GET() {
     scanDirectory(srcPath);
 
     // Calculate summary
-    const totalFiles = mockDataUsages.length;
+    const totalFiles = mockDataUsages?.length;
     const mockOnlyFiles = mockDataUsages.filter(usage => usage.status === 'mock_only').length;
     const apiFallbackFiles = mockDataUsages.filter(usage => usage.status === 'api_fallback').length;
     const mixedFiles = mockDataUsages.filter(usage => usage.status === 'mixed').length;
@@ -188,10 +188,10 @@ export async function GET() {
         const priorityOrder = { 'high': 0, 'medium': 1, 'low': 2 };
         const statusOrder = { 'mock_only': 0, 'api_fallback': 1, 'mixed': 2 };
         
-        if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
-          return priorityOrder[a.priority] - priorityOrder[b.priority];
+        if (priorityOrder[a?.priority] !== priorityOrder[b?.priority]) {
+          return priorityOrder[a?.priority] - priorityOrder[b?.priority];
         }
-        return statusOrder[a.status] - statusOrder[b.status];
+        return statusOrder[a?.status] - statusOrder[b?.status];
       }),
       timestamp: new Date().toISOString()
     };

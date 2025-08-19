@@ -267,7 +267,7 @@ export default function SystemManagementPage() {
                 <Package className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-destructive">{status.dependencies?.total || 0}</div>
+                <div className="text-2xl font-bold text-destructive">{status.dependencies?.total ?? 0}</div>
                 <p className="text-xs text-muted-foreground">
                   {status.dependencies?.total > 0 ? 'Need immediate attention' : 'All dependencies available'}
                 </p>
@@ -403,7 +403,7 @@ export default function SystemManagementPage() {
                 <div className="flex gap-2 text-sm">
                   <Link href={"/dashboard/system/logs" as Route} className="text-primary hover:underline flex items-center">
                     <FileText className="w-4 h-4 mr-1" />
-                    View Error Logs ({status.linting?.errors || 0})
+                    View Error Logs ({status.linting?.errors ?? 0})
                   </Link>
                 </div>
                 <div className="flex gap-2 text-sm">

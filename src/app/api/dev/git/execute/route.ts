@@ -64,10 +64,10 @@ export async function POST(request: NextRequest) {
       maxBuffer: 1024 * 1024 * 10 // 10MB __buffer
     });
 
-    const output = stdout || stderr;
+    const output = stdout ?? stderr;
 
     return NextResponse.json({
-      success: !stderr || command === 'diff', // diff uses stderr for output
+      success: !stderr ?? command === 'diff', // diff uses stderr for output
       command: gitCommand,
       output,
       timestamp: new Date().toISOString()
@@ -79,10 +79,10 @@ export async function POST(request: NextRequest) {
     let errorMessage = 'Git command failed';
     if (error && typeof error === 'object') {
       const err = error as { stderr?: string; message?: string };
-      if (err.stderr) {
-        errorMessage = err.stderr;
-      } else if (err.message) {
-        errorMessage = err.message;
+      if (err?.stderr) {
+        errorMessage = err?.stderr;
+      } else if (err?.message) {
+        errorMessage = err?.message;
       }
     }
 
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         error: errorMessage,
-        command: body.command,
+        command: body?.command,
         timestamp: new Date().toISOString()
       },
       { status: 500 }

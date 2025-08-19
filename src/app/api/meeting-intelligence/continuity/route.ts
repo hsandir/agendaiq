@@ -144,7 +144,7 @@ export async function GET(request: NextRequest) {
       totalCarriedItems: meetings.reduce((sum, m) => 
         sum + m.MeetingAgendaItems.filter((i: { carried_forward: boolean }) => i.carried_forward).length, 0
       ),
-      resolutionRate: chains.reduce((sum, c) => sum + c.efficiency, 0) / (chains.length || 1),
+      resolutionRate: chains.reduce((sum, c) => sum + c.efficiency, 0) / (chains.length ?? 1),
       averageResolutionTime: 7 // Simplified - would need more complex calculation
     };
     

@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         staffId: user.staff?.id,
         source: 'SYSTEM', 
-        description: `Role "${role.title}" assigned to department: ${role.Department?.name || 'Unassigned'}`
+        description: `Role "${role.title}" assigned to department: ${role.Department?.name ?? 'Unassigned'}`
       });
 
       return role;

@@ -24,14 +24,14 @@ async function getFastUser(req: NextRequest) {
     const decoded = jwt.decode(tokenMatch[1]) as Record<string, unknown>;
     
     // NextAuth stores user data differently - check various fields
-    const userId = decoded?.id || decoded?.sub || decoded?.userId;
-    const userEmail = decoded?.email || decoded?.userEmail;
+    const userId = decoded?.id ?? decoded?.sub ?? decoded?.userId;
+    const userEmail = decoded?.email ?? decoded?.userEmail;
     
     if (!userId) return null;
     
     return { 
       id: typeof userId === 'string' ? parseInt(userId) : userId, 
-      email: userEmail || 'unknown'
+      email: userEmail ?? 'unknown'
     };
   } catch (error: unknown) {
     console.error('Fast auth error:', error);
@@ -50,9 +50,9 @@ export async function GET(request: NextRequest) {
     }
     
     // Check cache
-    const cached = layoutCache.get(user.id);
+    const cached = layoutCache.get(user?.id);
     if (cached && cached.expires > Date.now()) {
-      const res = NextResponse.json({ layout: cached.layout });
+      const res = NextResponse.json({ layout: cached?.layout });
       res.headers.set('X-Time', `${Date.now() - start}ms`);
       res.headers.set('X-Cache', 'HIT');
       return res;
@@ -60,13 +60,13 @@ export async function GET(request: NextRequest) {
     
     // Get from DB (optimized query)
     const result = await prisma.$queryRaw<{layout_preference: string}[]>`
-      SELECT layout_preference FROM "User" WHERE id = ${user.id} LIMIT 1
+      SELECT layout_preference FROM "User" WHERE id = ${user?.id} LIMIT 1
     `;
     
-    const layout = result[0]?.layout_preference || 'modern';
+    const layout = result[0]?.layout_preference ?? 'modern';
     
     // Cache for 5 minutes
-    layoutCache.set(user.id, {
+    layoutCache.set(user?.id, {
       layout,
       expires: Date.now() + 300000
     });
@@ -98,11 +98,11 @@ export async function PUT(request: NextRequest) {
     
     // Update DB
     await prisma.$executeRaw`
-      UPDATE "User" SET layout_preference = ${layout} WHERE id = ${user.id}
+      UPDATE "User" SET layout_preference = ${layout} WHERE id = ${user?.id}
     `;
     
     // Clear cache
-    layoutCache.delete(user.id);
+    layoutCache.delete(user?.id);
     
     const res = NextResponse.json({ success: true, layout });
     res.headers.set('X-Time', `${Date.now() - start}ms`);

@@ -17,7 +17,7 @@ function SignInContent() {
     if (searchParams && (searchParams.get('password') || searchParams.get('email'))) {
       setSecurityWarning(true);
       // Clear the URL to remove credentials
-      window.history.replaceState({}, document.title, '/auth/signin');
+      window.history.replaceState({}, document?.title, '/auth/signin');
     }
   }, [searchParams]);
 

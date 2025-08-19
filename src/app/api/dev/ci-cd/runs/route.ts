@@ -10,9 +10,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // GitHub API configuration
 const GITHUB_API_BASE = 'https://api.github.com';
-const GITHUB_OWNER = process.env.GITHUB_OWNER || 'hsandir';
-const GITHUB_REPO = process.env.GITHUB_REPO || 'agendaiq';
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+const GITHUB_OWNER = process.env.GITHUB_OWNER ?? 'hsandir';
+const GITHUB_REPO = process.env.GITHUB_REPO ?? 'agendaiq';
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN ?? '';
 
 interface WorkflowRun {
   id: number;
@@ -171,8 +171,8 @@ export async function GET(request: NextRequest) {
     // Parse query parameters
     const { searchParams } = new URL(request.url);
     const params = {
-      limit: parseInt(searchParams.get('limit') || '30'),
-      status: searchParams.get('status') || 'all',
+      limit: parseInt(searchParams.get('limit') ?? '30'),
+      status: searchParams.get('status') ?? 'all',
       branch: searchParams.get('branch') || undefined,
     };
 
@@ -319,7 +319,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       runs: runs.map(run => ({
         ...run,
-        failedJobs: failedRunsWithDetails.find(fr => fr.id === run.id)?.failedJobs || [],
+        failedJobs: failedRunsWithDetails.find(fr => fr.id === run.id)?.failedJobs ?? [],
       })),
       stats,
       timestamp: new Date().toISOString(),
@@ -429,7 +429,7 @@ function analyzeErrorPatterns(failedRuns: Array<{ failedJobs?: Array<{ logs?: st
 
   failedRuns.forEach(run => {
     run.failedJobs?.forEach((job) => {
-      const logs = job.logs || '';
+      const logs = job.logs ?? '';
       
       // Common error patterns
       const errorTypes = [
@@ -449,7 +449,7 @@ function analyzeErrorPatterns(failedRuns: Array<{ failedJobs?: Array<{ logs?: st
 
       errorTypes.forEach(({ pattern, type }) => {
         if (pattern.test(logs)) {
-          patterns[type] = (patterns[type] || 0) + 1;
+          patterns[type] = (patterns[type] ?? 0) + 1;
         }
       });
 

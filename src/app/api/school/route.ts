@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    if (!userRecord || !userRecord.Staff || userRecord.Staff.length === 0) {
+    if (!userRecord || (!userRecord.Staff ?? (userRecord.Staff.length === 0))) {
       return NextResponse.json({ error: "User staff record not found" }, { status: 404 });
     }
 

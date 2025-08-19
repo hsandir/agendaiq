@@ -109,7 +109,7 @@ export default async function MeetingManagementDashboard() {
                       {safeFormatDateTime(meeting.start_time, undefined, 'TBD')}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-foreground">
-                      {meeting.Staff.User.name || meeting.Staff.User.email}
+                      {meeting.Staff.User.name ?? meeting.Staff.User.email}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-foreground">
                       {meeting.MeetingAttendee.length} attendees
@@ -167,7 +167,7 @@ export default async function MeetingManagementDashboard() {
                       {safeFormatDateTime(meeting.start_time, undefined, 'TBD')}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-foreground">
-                      {meeting.Staff.User.name || meeting.Staff.User.email}
+                      {meeting.Staff.User.name ?? meeting.Staff.User.email}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-foreground">
                       {meeting.MeetingAttendee.length} attendees

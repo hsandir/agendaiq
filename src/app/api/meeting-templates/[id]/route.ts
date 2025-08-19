@@ -55,7 +55,7 @@ export async function GET(
         created_by: template.created_by,
         created_at: template.created_at,
         updated_at: template.updated_at,
-        creator: template.Staff.User.name || template.Staff.User.email
+        creator: template.Staff.User.name ?? template.Staff.User.email
       }
     });
 
@@ -95,11 +95,11 @@ export async function PUT(
     const template = await prisma.meetingTemplate.update({
       where: { id: templateId },
       data: {
-        name: name || undefined,
+        name: name ?? undefined,
         description: description !== undefined ? description : undefined,
         duration: duration ? parseInt(duration) : undefined,
         agenda: agenda !== undefined ? agenda : undefined,
-        attendees: attendees || undefined,
+        attendees: attendees ?? undefined,
         is_active: is_active !== undefined ? is_active : undefined
       },
       include: {
@@ -124,7 +124,7 @@ export async function PUT(
         created_by: template.created_by,
         created_at: template.created_at,
         updated_at: template.updated_at,
-        creator: template.Staff.User.name || template.Staff.User.email
+        creator: template.Staff.User.name ?? template.Staff.User.email
       }
     });
 

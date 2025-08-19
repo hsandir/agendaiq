@@ -17,21 +17,21 @@ import { v4 as uuidv4 } from 'uuid';
 export class DevLogger {
   private level: LogLevel;
   private transports: LogTransport[];
-  private context: Record<string, any>;
+  private context: Record<string, unknown>;
   private enablePerformanceTracking: boolean;
   private performanceMarks: Map<string, number> = new Map();
 
   constructor(config: LoggerConfig) {
     this.level = config.level;
     this.transports = config.transports;
-    this.context = config.context || {};
-    this.enablePerformanceTracking = config.enablePerformanceTracking || false;
+    this.context = config.context ?? {};
+    this.enablePerformanceTracking = config.enablePerformanceTracking ?? false;
   }
 
   private async writeToTransports(entry: DevLogEntry): Promise<void> {
-    const writePromises = (this.transports.map(transport => {
+    const writePromises = this.transports.map(transport => {
       try {
-        return transport.write(entry));
+        return transport.write(entry);
       } catch (error: unknown) {
         console.error(`Transport ${transport.name} failed:`, error);
         return Promise.resolve();
@@ -45,8 +45,8 @@ export class DevLogger {
     level: LogLevel,
     category: DevLogCategory,
     message: string,
-    metadata?: Record<string, any>,
-    context?: Record<string, any>
+    metadata?: Record<string, unknown>,
+    context?: Record<string, unknown>
   ): DevLogEntry {
     // Get call stack information
     const stack = new Error().stack;
@@ -103,35 +103,35 @@ export class DevLogger {
   }
 
   // Log level methods
-  async trace(category: DevLogCategory, message: string, metadata?: Record<string, any>, context?: Record<string, any>): Promise<void> {
+  async trace(category: DevLogCategory, message: string, metadata?: Record<string, unknown>, context?: Record<string, unknown>): Promise<void> {
     if (this.level <= LogLevel.TRACE) {
       const entry = this.createEntry(LogLevel.TRACE, category, message, metadata, context);
       await this.writeToTransports(entry);
     }
   }
 
-  async debug(category: DevLogCategory, message: string, metadata?: Record<string, any>, context?: Record<string, any>): Promise<void> {
+  async debug(category: DevLogCategory, message: string, metadata?: Record<string, unknown>, context?: Record<string, unknown>): Promise<void> {
     if (this.level <= LogLevel.DEBUG) {
       const entry = this.createEntry(LogLevel.DEBUG, category, message, metadata, context);
       await this.writeToTransports(entry);
     }
   }
 
-  async info(category: DevLogCategory, message: string, metadata?: Record<string, any>, context?: Record<string, any>): Promise<void> {
+  async info(category: DevLogCategory, message: string, metadata?: Record<string, unknown>, context?: Record<string, unknown>): Promise<void> {
     if (this.level <= LogLevel.INFO) {
       const entry = this.createEntry(LogLevel.INFO, category, message, metadata, context);
       await this.writeToTransports(entry);
     }
   }
 
-  async warn(category: DevLogCategory, message: string, metadata?: Record<string, any>, context?: Record<string, any>): Promise<void> {
+  async warn(category: DevLogCategory, message: string, metadata?: Record<string, unknown>, context?: Record<string, unknown>): Promise<void> {
     if (this.level <= LogLevel.WARN) {
       const entry = this.createEntry(LogLevel.WARN, category, message, metadata, context);
       await this.writeToTransports(entry);
     }
   }
 
-  async error(category: DevLogCategory, message: string, error?: Error, metadata?: Record<string, any>, context?: Record<string, any>): Promise<void> {
+  async error(category: DevLogCategory, message: string, error?: Error, metadata?: Record<string, unknown>, context?: Record<string, unknown>): Promise<void> {
     if (this.level <= LogLevel.ERROR) {
       const entry = this.createEntry(LogLevel.ERROR, category, message, {
         ...metadata,
@@ -145,7 +145,7 @@ export class DevLogger {
     }
   }
 
-  async fatal(category: DevLogCategory, message: string, error?: Error, metadata?: Record<string, any>, context?: Record<string, any>): Promise<void> {
+  async fatal(category: DevLogCategory, message: string, error?: Error, metadata?: Record<string, unknown>, context?: Record<string, unknown>): Promise<void> {
     const entry = this.createEntry(LogLevel.FATAL, category, message, {
       ...metadata,
       error: error ? {
@@ -164,7 +164,7 @@ export class DevLogger {
     statusCode: number,
     duration: number,
     userId?: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     const level = statusCode >= 500 ? LogLevel.ERROR : 
                   statusCode >= 400 ? LogLevel.WARN : LogLevel.INFO;
@@ -211,7 +211,7 @@ export class DevLogger {
   async logPerformanceMetric(
     operation: string,
     duration: number,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     const level = duration > 5000 ? LogLevel.WARN : LogLevel.INFO;
 
@@ -233,7 +233,7 @@ export class DevLogger {
   async logAuthEvent(
     event: 'login_attempt' | 'login_success' | 'login_failure' | 'logout' | 'permission_check',
     userId?: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     const level = event.includes('failure') ? LogLevel.WARN : LogLevel.INFO;
 
@@ -328,7 +328,7 @@ export class DevLogger {
       });
 
       Object.entries(stats.logsByCategory).forEach(([category, count]) => {
-        combinedStats.logsByCategory[category] = (combinedStats.logsByCategory[category] || 0) + count;
+        combinedStats.logsByCategory[category] = (combinedStats.logsByCategory[category] ?? 0) + count;
       });
     });
 
@@ -336,7 +336,7 @@ export class DevLogger {
   }
 
   // Child logger for components
-  child(context: Record<string, any>): DevLogger {
+  child(context: Record<string, unknown>): DevLogger {
     return new DevLogger({
       level: this.level,
       transports: this.transports,

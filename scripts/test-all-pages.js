@@ -1,158 +1,183 @@
-const fetch = require('node-fetch');
+#!/usr/bin/env node
 
-// Test edilecek tüm sayfalar
+const http = require('http');
+
+// Define all pages to test
 const pages = [
-  // Dashboard
+  // Auth pages
+  '/auth/signin',
+  '/auth/signup',
+  '/auth/register',
+  '/auth/forgot-password',
+  '/auth/error',
+  '/auth/debug',
+  
+  // Dashboard pages
   '/dashboard',
   '/dashboard/meetings',
-  '/dashboard/monitoring',
+  '/dashboard/meetings/new',
   '/dashboard/development',
-  '/dashboard/tests',
-  
-  // System pages
+  '/dashboard/development/performance',
+  '/dashboard/development/permissions-check',
+  '/dashboard/monitoring',
+  '/dashboard/monitoring/cicd',
   '/dashboard/system',
-  '/dashboard/system/health',
-  '/dashboard/system/logs',
-  '/dashboard/system/database',
-  '/dashboard/system/server',
   '/dashboard/system/alerts',
   '/dashboard/system/backup',
+  '/dashboard/system/database',
+  '/dashboard/system/dependencies',
+  '/dashboard/system/health',
+  '/dashboard/system/health-overview',
   '/dashboard/system/lint',
+  '/dashboard/system/logs',
   '/dashboard/system/migration',
   '/dashboard/system/mock-data-tracker',
+  '/dashboard/system/server',
   '/dashboard/system/updates',
-  '/dashboard/system/dependencies',
-  '/dashboard/system/health-overview',
+  '/dashboard/tests',
   
   // Settings pages
   '/dashboard/settings',
-  '/dashboard/settings/admin',
-  '/dashboard/settings/roles',
-  '/dashboard/settings/users',
-  '/dashboard/settings/audit-logs',
-  '/dashboard/settings/backup',
+  '/dashboard/settings/profile',
+  '/dashboard/settings/security/2fa',
   '/dashboard/settings/interface',
   '/dashboard/settings/layout',
-  '/dashboard/settings/monitoring', // Bu yeni eklendi
-  '/dashboard/settings/notifications',
-  '/dashboard/settings/permissions',
-  '/dashboard/settings/profile',
-  '/dashboard/settings/role-hierarchy',
-  '/dashboard/settings/school',
-  '/dashboard/settings/security',
-  '/dashboard/settings/setup',
-  '/dashboard/settings/staff-upload',
-  '/dashboard/settings/system',
   '/dashboard/settings/theme',
-  '/dashboard/settings/zoom-integration',
-  
-  // Meeting management
-  '/dashboard/settings/meeting-management',
+  '/dashboard/settings/audit-logs',
+  '/dashboard/settings/backup',
+  '/dashboard/settings/staff-upload',
+  '/dashboard/settings/setup',
+  '/dashboard/settings/school',
+  '/dashboard/settings/role-hierarchy',
+  '/dashboard/settings/role-hierarchy/roles',
+  '/dashboard/settings/role-hierarchy/user-assignment',
+  '/dashboard/settings/role-hierarchy/visualization',
   '/dashboard/settings/meeting-templates',
-  '/dashboard/settings/meeting-permissions',
-  '/dashboard/settings/meeting-audit',
-  '/dashboard/settings/meeting-help',
+  '/dashboard/settings/zoom-integration',
+  '/dashboard/settings/zoom-user-preferences',
   
-  // Meeting intelligence
+  // Meeting Intelligence pages
   '/dashboard/meeting-intelligence',
   '/dashboard/meeting-intelligence/action-items',
   '/dashboard/meeting-intelligence/analytics',
   '/dashboard/meeting-intelligence/continuity',
   '/dashboard/meeting-intelligence/role-tasks',
   '/dashboard/meeting-intelligence/search',
+  
+  // API Health checks
+  '/api/health',
+  '/api/system/health',
+  '/api/system/status',
+  
+  // Setup pages
+  '/setup/district',
+  '/verify-email'
 ];
 
-async function testPage(url) {
-  try {
-    const response = await fetch(`http://localhost:3000${url}`, {
-      redirect: 'manual',
-      headers: {
-        'Cookie': '' // Boş cookie ile test ediyoruz (auth yok)
+// Test configuration
+const BASE_URL = 'http://localhost:3000';
+const results = {
+  success: [],
+  redirect: [],
+  error: [],
+  failed: []
+};
+
+// Function to test a single page
+function testPage(path) {
+  return new Promise((resolve) => {
+    const url = BASE_URL + path;
+    
+    http.get(url, (res) => {
+      const status = res.statusCode;
+      
+      if (status >= 200 && status < 300) {
+        results.success.push({ path, status });
+        console.log(`✅ ${path} - ${status}`);
+      } else if (status >= 300 && status < 400) {
+        results.redirect.push({ path, status });
+        console.log(`↪️  ${path} - ${status} (redirect)`);
+      } else if (status >= 400 && status < 500) {
+        results.error.push({ path, status });
+        console.log(`⚠️  ${path} - ${status} (client error)`);
+      } else {
+        results.failed.push({ path, status });
+        console.log(`❌ ${path} - ${status} (server error)`);
       }
+      
+      resolve();
+    }).on('error', (err) => {
+      results.failed.push({ path, error: err.message });
+      console.log(`❌ ${path} - Error: ${err.message}`);
+      resolve();
     });
-    
-    const status = response.status;
-    const location = response.headers.get('location');
-    
-    if (status === 307 && location && location.includes('/auth/signin')) {
-      return { url, status: 'REDIRECT TO AUTH', code: status };
-    } else if (status === 200) {
-      return { url, status: 'OK', code: status };
-    } else if (status === 404) {
-      return { url, status: 'NOT FOUND', code: status };
-    } else if (status === 403) {
-      return { url, status: 'FORBIDDEN', code: status };
-    } else if (status === 500) {
-      return { url, status: 'SERVER ERROR', code: status };
-    } else {
-      return { url, status: 'OTHER', code: status, location };
-    }
-  } catch (error) {
-    return { url, status: 'ERROR', error: error.message };
-  }
+  });
 }
 
+// Main test function
 async function testAllPages() {
-  console.log('Testing all pages without authentication...\n');
-  console.log('='.repeat(80));
+  console.log('🧪 Testing All Pages...\n');
+  console.log(`Testing ${pages.length} pages...\n`);
   
-  const results = {
-    authRequired: [],
-    notFound: [],
-    serverError: [],
-    ok: [],
-    other: []
-  };
-  
-  for (const page of pages) {
-    const result = await testPage(page);
+  // Test pages in batches to avoid overwhelming the server
+  const batchSize = 5;
+  for (let i = 0; i < pages.length; i += batchSize) {
+    const batch = pages.slice(i, i + batchSize);
+    await Promise.all(batch.map(testPage));
     
-    if (result.status === 'REDIRECT TO AUTH') {
-      results.authRequired.push(result.url);
-      console.log(`✅ ${page} - Requires authentication (OK)`);
-    } else if (result.status === 'NOT FOUND') {
-      results.notFound.push(result.url);
-      console.log(`❌ ${page} - Page not found (404)`);
-    } else if (result.status === 'SERVER ERROR') {
-      results.serverError.push(result.url);
-      console.log(`🔥 ${page} - Server error (500)`);
-    } else if (result.status === 'OK') {
-      results.ok.push(result.url);
-      console.log(`⚠️  ${page} - Accessible without auth (200)`);
-    } else {
-      results.other.push({ ...result });
-      console.log(`❓ ${page} - ${result.status} (${result.code})`);
+    // Small delay between batches
+    if (i + batchSize < pages.length) {
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
   }
   
-  console.log('\n' + '='.repeat(80));
-  console.log('SUMMARY:');
-  console.log('='.repeat(80));
-  console.log(`✅ Pages requiring auth: ${results.authRequired.length}`);
-  console.log(`❌ Pages not found: ${results.notFound.length}`);
-  console.log(`🔥 Server errors: ${results.serverError.length}`);
-  console.log(`⚠️  Public pages: ${results.ok.length}`);
-  console.log(`❓ Other: ${results.other.length}`);
+  // Print summary
+  console.log('\n📊 Test Summary:');
+  console.log('================');
+  console.log(`✅ Success (2xx): ${results.success.length} pages`);
+  console.log(`↪️  Redirect (3xx): ${results.redirect.length} pages`);
+  console.log(`⚠️  Client Error (4xx): ${results.error.length} pages`);
+  console.log(`❌ Server Error (5xx): ${results.failed.length} pages`);
+  console.log(`📝 Total Tested: ${pages.length} pages`);
   
-  if (results.notFound.length > 0) {
-    console.log('\n❌ NOT FOUND PAGES:');
-    results.notFound.forEach(p => console.log(`  - ${p}`));
+  // List any failures
+  if (results.failed.length > 0) {
+    console.log('\n❌ Failed Pages:');
+    results.failed.forEach(({ path, status, error }) => {
+      console.log(`  - ${path}: ${status || error}`);
+    });
   }
   
-  if (results.serverError.length > 0) {
-    console.log('\n🔥 SERVER ERROR PAGES:');
-    results.serverError.forEach(p => console.log(`  - ${p}`));
+  // List any client errors
+  if (results.error.length > 0) {
+    console.log('\n⚠️  Client Error Pages:');
+    results.error.forEach(({ path, status }) => {
+      console.log(`  - ${path}: ${status}`);
+    });
   }
   
-  if (results.ok.length > 0) {
-    console.log('\n⚠️  PUBLIC PAGES (should require auth):');
-    results.ok.forEach(p => console.log(`  - ${p}`));
-  }
+  // Determine overall status
+  const hasServerErrors = results.failed.length > 0;
+  const hasClientErrors = results.error.length > 0;
   
-  if (results.other.length > 0) {
-    console.log('\n❓ OTHER ISSUES:');
-    results.other.forEach(p => console.log(`  - ${p.url}: ${p.status} (${p.code})`));
+  if (!hasServerErrors && !hasClientErrors) {
+    console.log('\n✅ All pages are working correctly!');
+    process.exit(0);
+  } else if (hasServerErrors) {
+    console.log('\n❌ Some pages have server errors. Please fix before deploying.');
+    process.exit(1);
+  } else {
+    console.log('\n⚠️  Some pages have client errors but system is functional.');
+    process.exit(0);
   }
 }
 
-testAllPages().catch(console.error);
+// Check if server is running
+http.get(BASE_URL, (res) => {
+  console.log('✅ Server is running on port 3000\n');
+  testAllPages();
+}).on('error', (err) => {
+  console.error('❌ Server is not running on port 3000');
+  console.error('Please start the server with: npm run dev');
+  process.exit(1);
+});

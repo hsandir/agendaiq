@@ -338,14 +338,14 @@ async function listBackups() {
         // Convert to expected format
         backups.push({
           id: backupData.branch || `backup-${Date.now()}`,
-          type: backupData.type || 'manual',
+          type: backupData.type ?? 'manual',
           status: 'completed',
           size: '~2.5 MB',
-          timestamp: backupData.timestamp || new Date().toISOString(),
-          filename: `${backupData.branch || 'backup'}.zip`,
+          timestamp: backupData.timestamp ?? new Date().toISOString(),
+          filename: `${backupData.branch ?? 'backup'}.zip`,
           duration: '~30s',
           components: ['Database', 'Settings', 'Files', 'Schema'],
-          downloadUrl: `/api/system/backup/download/${backupData.branch || 'backup'}.zip`
+          downloadUrl: `/api/system/backup/download/${backupData.branch ?? 'backup'}.zip`
         });
       }
     } catch {

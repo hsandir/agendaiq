@@ -107,7 +107,7 @@ export function SignInForm() {
           router.push('/dashboard');
           router.refresh();
         } else {
-          const errorInfo = parseError(result?.error || undefined);
+          const errorInfo = parseError(result?.error ?? undefined);
           setErrorDetails(errorInfo);
           setError(errorInfo.message);
         }
@@ -145,7 +145,7 @@ export function SignInForm() {
           setError('');
           setErrorDetails(null);
         } else if (result?.error) {
-          const errorInfo = parseError(result?.error || undefined);
+          const errorInfo = parseError(result?.error ?? undefined);
           setErrorDetails(errorInfo);
           setError(errorInfo.message);
         } else if (result?.ok) {

@@ -18,9 +18,9 @@ export default function TwoFactorForm({ userId, onSuccess }: TwoFactorFormProps)
   const [showBackupOption, setShowBackupOption] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const email = searchParams?.get('email') || '';
+  const email = searchParams?.get('email') ?? '';
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React?.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccessMessage('');
@@ -86,11 +86,11 @@ export default function TwoFactorForm({ userId, onSuccess }: TwoFactorFormProps)
       
       const data = await response.json();
       
-      if (!response.ok) {
+      if (!response?.ok) {
         if (response.status === 429) {
           setError('Please wait before requesting another code');
         } else {
-          setError(data.error || 'Failed to resend code');
+          setError(data?.error || 'Failed to resend code');
         }
       } else {
         setResendCount(resendCount + 1);
@@ -148,7 +148,7 @@ export default function TwoFactorForm({ userId, onSuccess }: TwoFactorFormProps)
         <button
           type="button"
           onClick={handleResendCode}
-          disabled={isResending || resendCount >= 3}
+          disabled={isResending ?? resendCount >= 3}
           className="text-primary hover:text-primary disabled:text-muted-foreground"
         >
           {isResending ? 'Resending...' : 'Resend code'}

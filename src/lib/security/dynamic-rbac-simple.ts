@@ -16,7 +16,7 @@ export interface RolePermission {
 }
 
 export interface AccessContext {
-  user: AuthenticatedUser;
+  user: _AuthenticatedUser;
   resource: string;
   action: string;
   targetId?: string;
@@ -77,7 +77,7 @@ export class DynamicRBAC {
   }
 
   // Get all permissions for a user
-  async getUserPermissions(user: AuthenticatedUser): Promise<RolePermission[]> {
+  async getUserPermissions(user: _AuthenticatedUser): Promise<RolePermission[]> {
     // Simple mock permissions
     const basePermissions: RolePermission[] = [
       {
@@ -108,7 +108,7 @@ export class DynamicRBAC {
 
   // Helper method to check if user has specific permission
   async hasPermission(
-    user: AuthenticatedUser,
+    user: _AuthenticatedUser,
     resource: string,
     action: string,
     targetId?: string
@@ -125,12 +125,12 @@ export class DynamicRBAC {
   }
 
   // Helper method to check if user is admin
-  async isAdmin(user: AuthenticatedUser): Promise<boolean> {
-    return user.email?.includes('admin') || false;
+  async isAdmin(user: _AuthenticatedUser): Promise<boolean> {
+    return user.email?.includes('admin') ?? false;
   }
 
   // Helper method to check if user is staff
-  async isStaff(_user: AuthenticatedUser): Promise<boolean> {
+  async isStaff(_user: _AuthenticatedUser): Promise<boolean> {
     // For now, assume all users are staff
     return true;
   }

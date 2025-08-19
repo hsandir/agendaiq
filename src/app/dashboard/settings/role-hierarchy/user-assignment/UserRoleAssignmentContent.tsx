@@ -77,17 +77,17 @@ export default function UserRoleAssignmentContent() {
 
       if (usersRes.ok) {
         const usersResponse = await usersRes.json();
-        setUsers(usersResponse.data || []);
+        setUsers(usersResponse.data ?? []);
       }
 
       if (rolesRes.ok) {
         const rolesResponse = await rolesRes.json();
-        setRoles(rolesResponse.data || []);
+        setRoles(rolesResponse.data ?? []);
       }
 
       if (departmentsRes.ok) {
         const departmentsResponse = await departmentsRes.json();
-        setDepartments(departmentsResponse.data || []);
+        setDepartments(departmentsResponse.data ?? []);
       }
     } catch (error: unknown) {
       console.error('Error loading data:', error);
@@ -140,7 +140,7 @@ export default function UserRoleAssignmentContent() {
         body: JSON.stringify({
           userId: selectedUser,
           roleId: selectedRole,
-          departmentId: selectedDepartment || null
+          departmentId: selectedDepartment ?? null
         })
       });
 
@@ -222,7 +222,7 @@ export default function UserRoleAssignmentContent() {
               <option value="">Choose a user...</option>
               {users.map(user => (
                 <option key={user.id} value={user.id}>
-                  {user.name || user.email} - {user.email}
+                  {user.name ?? user.email} - {user.email}
                 </option>
               ))}
             </select>
@@ -364,10 +364,10 @@ export default function UserRoleAssignmentContent() {
                 </div>
                 
                 <div className="flex items-center space-x-4">
-                  {(user.Staff && user.Staff.length > 0 && 
+                  {user.Staff && user.Staff.length > 0 && (
                     <div className="text-right">
                       <div className="text-sm font-medium text-foreground">
-                        {(user.Staff[0].Role?.title || 'No Role'}
+                        {user.Staff[0].Role?.title || 'No Role'}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         {user.Staff[0].Department?.name || 'No Department'}

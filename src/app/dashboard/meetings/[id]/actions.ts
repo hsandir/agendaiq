@@ -28,7 +28,7 @@ export async function respondToMeeting(
     }
   });
 
-  if (!currentUser || !currentUser.Staff || currentUser.Staff.length === 0) {
+  if (!currentUser || !currentUser.Staff ?? currentUser.Staff.length === 0) {
     throw new Error("User staff record not found");
   }
 
@@ -62,7 +62,7 @@ export async function respondToMeeting(
   //     user_id: currentUser.id,
   //     action: status === "ACCEPTED" ? "joined" : "declined",
   //     details: {
-  //       attendee_name: currentUser.name || currentUser.email,
+  //       attendee_name: currentUser.name ?? currentUser.email,
   //       response: status
   //     }
   //   }

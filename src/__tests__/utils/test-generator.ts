@@ -61,8 +61,8 @@ export class TestGenerator {
       ...options,
     };
     
-    this.templateDir = options.templateDir || join(__dirname, '../templates');
-    this.outputDir = options.outputDir || join(__dirname, '../generated');
+    this.templateDir = options.templateDir ?? join(__dirname, '../templates');
+    this.outputDir = options.outputDir ?? join(__dirname, '../generated');
   }
 
   // ============================================================================
@@ -83,7 +83,7 @@ export class TestGenerator {
       '[INPUT_TYPE]': this.generateInputType(routeInfo.inputSchema),
       '[OUTPUT_TYPE]': this.generateOutputType(routeInfo.outputSchema),
       '[AUTH_REQUIRED]': routeInfo.authRequired.toString(),
-      '[ROLE_REQUIRED]': JSON.stringify(routeInfo.roleRequired || []),
+      '[ROLE_REQUIRED]': JSON.stringify(routeInfo.roleRequired ?? []),
       '[HTTP_METHODS]': routeInfo.methods.join(', '),
     };
 

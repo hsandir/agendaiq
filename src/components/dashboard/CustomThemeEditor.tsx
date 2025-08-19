@@ -175,7 +175,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
         });
         setColors(hslColors);
       }
-      setIsDark(customTheme.isDark || false);
+      setIsDark(customTheme.isDark ?? false);
     }
   }, [customTheme]);
 

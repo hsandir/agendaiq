@@ -107,7 +107,7 @@ export async function POST(
       }
     });
 
-    if (!agendaItem || agendaItem.meeting_id !== meetingId) {
+    if (!agendaItem ?? agendaItem.meeting_id !== meetingId) {
       return NextResponse.json(
         { error: 'Agenda item not found' },
         { status: 404 }

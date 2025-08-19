@@ -16,7 +16,7 @@ export async function withApiErrorHandling<T>(fn: () => Promise<T | Response>) {
     return await fn();
   } catch (error: unknown) {
     if (error instanceof Error) {
-      return apiError(error.message, 500);
+      return apiError(error?.message, 500);
     }
     return apiError('Unknown error', 500);
   }

@@ -7,18 +7,18 @@ export async function POST(request: NextRequest) {
   try {
     // Authenticate the user
     const authResult = await withAuth(request);
-    if (!authResult.success) {
+    if (!authResult?.success) {
       return NextResponse.json(
-        { error: authResult.error },
-        { status: authResult.statusCode }
+        { error: authResult?.error },
+        { status: authResult?.statusCode }
       );
     }
     const user = authResult.user!;
 
     // Get the request body
     const body = await request.json();
-    const socketId = body.socket_id;
-    const channel = body.channel_name;
+    const socketId = body?.socket_id;
+    const channel = body?.channel_name;
 
     if (!socketId || !channel) {
       return NextResponse.json(
@@ -73,10 +73,10 @@ export async function POST(request: NextRequest) {
     if (channel.startsWith('presence-')) {
       // For presence channels, include user data
       const presenceData = {
-        user_id: parseInt(user.id).toString(),
+        user_id: parseInt(user?.id).toString(),
         user_info: {
-          name: user.name,
-          email: user.email,
+          name: user?.name,
+          email: user?.email,
           staff_id: user.staff?.id,
           role: user.staff?.role?.title,
         }

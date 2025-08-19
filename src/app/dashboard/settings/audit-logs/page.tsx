@@ -22,17 +22,17 @@ export default async function AuditLogsPage() {
       <AuditLogsClient user={{
         id: user.id,
         email: user.email,
-        name: user.name || undefined,
+        name: user.name ?? undefined,
         staff: user.staff ? {
           id: user.staff.id,
           role: {
-            key: user.staff.role?.key || '',
-            title: user.staff.role?.title || 'Unknown',
-            priority: user.staff.role?.priority || 0,
-            is_leadership: user.staff.role?.is_leadership || false
+            key: user.staff.role?.key ?? '',
+            title: user.staff.role?.title ?? 'Unknown',
+            priority: user.staff.role?.priority ?? 0,
+            is_leadership: user.staff.role?.is_leadership ?? false
           },
           department: {
-            name: user.staff.department?.name || 'Unknown'
+            name: user.staff.department?.name ?? 'Unknown'
           }
         } : undefined
       }} />

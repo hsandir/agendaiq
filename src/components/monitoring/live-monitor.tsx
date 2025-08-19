@@ -79,7 +79,7 @@ export default function LiveMonitor() {
       const response = await fetch('/api/monitoring/production-errors');
       if (response.ok) {
         const data = await response.json();
-        return data.errors || [];
+        return data.errors ?? [];
       }
     } catch (error: unknown) {
       console.error('Failed to fetch production errors:', error);
@@ -120,7 +120,7 @@ export default function LiveMonitor() {
         timestamp: new Date().toISOString(),
         message: typeof message === 'string' ? message : 'Unknown error',
         stack: error?.stack,
-        url: source || window.location.href,
+        url: source ?? window.location.href,
         userAgent: navigator.userAgent,
         source: 'local',
         severity: 'high'

@@ -31,7 +31,7 @@ export function Header() {
               {session?.user?.image ? (
                 <Image
                   src={session.(user.image}
-                  alt={session.user.name || "User"}
+                  alt={session.user.name ?? "User"}
                   width={32}
                   height={32}
                   className="rounded-full"

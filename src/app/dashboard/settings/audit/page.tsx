@@ -138,7 +138,7 @@ export default async function AuditPage() {
                           Meeting: {log.Meeting.title}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          By: {log.User.name || log.User.email}
+                          By: {log.User.name ?? log.User.email}
                         </p>
                         {log.details && typeof log.details === 'object' && (
                           <p className="text-sm text-muted-foreground">

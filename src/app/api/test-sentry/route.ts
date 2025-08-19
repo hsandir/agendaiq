@@ -10,7 +10,7 @@ import { addBreadcrumb, Performance } from '@/lib/sentry/sentry-utils';
  */
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const type = searchParams.get('type') || 'simple';
+  const type = searchParams.get('type') ?? 'simple';
   
   // Add breadcrumb for tracking
   addBreadcrumb('Test Sentry endpoint accessed', 'test', { type });

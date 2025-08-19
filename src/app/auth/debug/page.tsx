@@ -66,10 +66,10 @@ export default function AuthDebugPage() {
     try {
       const response = await fetch('/api/auth/debug-logs', { cache: 'no-store' });
       const data = await response.json();
-      setLogs(data.logs || []);
-      setAuthFlow(data.authFlow || []);
-      setSystemStatus(data.systemStatus || null);
-      setProcessInfo(data.processInfo || null);
+      setLogs(data.logs ?? []);
+      setAuthFlow(data.authFlow ?? []);
+      setSystemStatus(data.systemStatus ?? null);
+      setProcessInfo(data.processInfo ?? null);
       
       // Save to localStorage as backup
       if (data.logs && data.logs.length > 0) {
@@ -253,7 +253,7 @@ export default function AuthDebugPage() {
     };
 
     return (
-      <Badge variant={variants[level] || "outline"} className={colors[level]}>
+      <Badge variant={variants[level] ?? "outline"} className={colors[level]}>
         {level.toUpperCase()}
       </Badge>
     );
@@ -343,7 +343,7 @@ export default function AuthDebugPage() {
                       }
                     </td>
                     <td className="py-2 text-gray-600">
-                      {String(systemStatus.database.details?.userCount || 0)} users in database
+                      {String(systemStatus.database.details?.userCount ?? 0)} users in database
                     </td>
                   </tr>
 

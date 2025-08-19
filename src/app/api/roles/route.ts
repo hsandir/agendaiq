@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { __title, __priority, __is_leadership, __category, __description  } = body;
 
-    if (!title || priority === undefined) {
+    if (!title ?? priority === undefined) {
       return NextResponse.json(
         { error: 'Title and priority are required' },
         { status: 400 }
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       data: {
         title,
         priority,
-        is_leadership: is_leadership || false,
+        is_leadership: is_leadership ?? false,
         category,
         // TODO: Add description field to Role model in schema
         // description

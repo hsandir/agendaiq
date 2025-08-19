@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const dbResult = await prisma.$queryRaw<{count: bigint}[]>`
       SELECT count(*) as count FROM pg_stat_activity WHERE state = 'active'
     `;
-    const dbConnectionCount = Number(dbResult[0]?.count || 0);
+    const dbConnectionCount = Number(dbResult[0]?.count ?? 0);
     
     // Get application metrics from recent audit logs
     const recentLogs = await prisma.auditLog.findMany({
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     const metrics = [
       { 
         name: 'CPU Usage', 
-        value: Math.round(cpuUsage) || 0, 
+        value: Math.round(cpuUsage) ?? 0, 
         unit: '%', 
         threshold: 80, 
         trend: cpuUsage > 50 ? 'up' : cpuUsage < 30 ? 'down' : 'stable' 

@@ -368,8 +368,8 @@ export default function PerformanceMonitor() {
                 <CardTitle className="text-sm">Current Theme</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-lg font-semibold">{theme?.name || 'Standard'}</div>
-                <p className="text-sm text-muted-foreground">ID: {theme?.id || 'standard'}</p>
+                <div className="text-lg font-semibold">{theme?.name ?? 'Standard'}</div>
+                <p className="text-sm text-muted-foreground">ID: {theme?.id ?? 'standard'}</p>
               </CardContent>
             </Card>
 

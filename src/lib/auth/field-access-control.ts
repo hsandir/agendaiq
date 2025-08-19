@@ -128,7 +128,7 @@ export function canReadField(
 
   // Find specific field rule
   const fieldRule = modelRules.fields.find(f => f.field === field);
-  const allowedRoles = fieldRule?.read || modelRules.defaults?.read || [];
+  const allowedRoles = fieldRule?.read ?? modelRules.defaults?.read ?? [];
 
   return checkAccess(user, allowedRoles, record);
 }
@@ -145,7 +145,7 @@ export function canWriteField(
 
   // Find specific field rule
   const fieldRule = modelRules.fields.find(f => f.field === field);
-  const allowedRoles = fieldRule?.write || modelRules.defaults?.write || [];
+  const allowedRoles = fieldRule?.write ?? modelRules.defaults?.write ?? [];
 
   return checkAccess(user, allowedRoles, record);
 }
@@ -159,7 +159,7 @@ function checkAccess(
   // Check special keywords
   if (allowedRoles.includes('all')) return true;
   
-  if (allowedRoles.includes('self') && record?.user_id === user.id) {
+  if (allowedRoles.includes('self') && record?.user_id === user?.id) {
     return true;
   }
 
@@ -171,7 +171,7 @@ function checkAccess(
     return true;
   }
 
-  if (allowedRoles.includes('organizer') && record?.organizer_id === user.id) {
+  if (allowedRoles.includes('organizer') && record?.organizer_id === user?.id) {
     return true;
   }
 
@@ -187,8 +187,8 @@ function checkAccess(
 
   // Check role categories
   const userRole = user.staff?.role;
-  if (userRole && 'category' in userRole && userRole.category) {
-    if (allowedRoles.includes(userRole.category)) {
+  if (userRole && 'category' in userRole && userRole?.category) {
+    if (allowedRoles.includes(userRole?.category)) {
       return true;
     }
   }
@@ -197,7 +197,7 @@ function checkAccess(
 }
 
 // Filter object fields based on read access
-export function filterFields<T extends Record<string, any>>(
+export function filterFields<T extends Record<string, unknown>>(
   user: User | AuthenticatedUser,
   model: string,
   data: T,
@@ -215,7 +215,7 @@ export function filterFields<T extends Record<string, any>>(
 }
 
 // Validate write operation
-export function validateWrite<T extends Record<string, any>>(
+export function validateWrite<T extends Record<string, unknown>>(
   user: User | AuthenticatedUser,
   model: string,
   data: T,
@@ -236,7 +236,7 @@ export function validateWrite<T extends Record<string, any>>(
 }
 
 // Apply field-level filtering to Prisma query results
-export function applyFieldFiltering<T extends Record<string, any>>(
+export function applyFieldFiltering<T extends Record<string, unknown>>(
   user: User | AuthenticatedUser,
   model: string,
   data: T | T[]

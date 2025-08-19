@@ -114,7 +114,7 @@ describe('Meetings CRUD API', () => {
           school_id: context.adminStaff.school_id,
           district_id: context.adminStaff.district_id,
           status: 'draft',
-          meeting_type: meetingData.meeting_type || 'REGULAR',
+          meeting_type: meetingData.meeting_type ?? 'REGULAR',
           location: meetingData.location,
           max_attendees: meetingData.max_attendees,
         },
@@ -248,7 +248,7 @@ describe('Meetings CRUD API', () => {
           start_time: new Date(meetingData.start_time),
           end_time: new Date(meetingData.end_time),
           organizer_id: context.adminStaff.id,
-          department_id: meetingData.department_id || context.adminStaff.department_id,
+          department_id: meetingData.department_id ?? context.adminStaff.department_id,
           school_id: context.adminStaff.school_id,
           district_id: context.adminStaff.district_id,
           status: 'draft',
@@ -606,8 +606,7 @@ describe('Meetings CRUD API', () => {
       });
 
       const hasAccess = 
-        privateMeeting.organizer_id === teacherStaff?.id ||
-        privateMeeting.department_id === teacherStaff?.department_id; // Or other access rules
+        privateMeeting.organizer_id === teacherStaff?.id ?? privateMeeting.department_id === teacherStaff?.department_id; // Or other access rules
 
       // Access control would be implemented in the actual route handler
       expect(hasAccess).toBeDefined();
@@ -887,8 +886,7 @@ describe('Meetings CRUD API', () => {
       });
 
       const canDelete = 
-        meeting.organizer_id === teacherStaff?.id ||
-        teacherStaff?.Role?.is_leadership === true;
+        meeting.organizer_id === teacherStaff?.id ?? teacherStaff?.Role?.is_leadership === true;
 
       expect(canDelete).toBe(false); // Teacher cannot delete admin's meeting
     });

@@ -8,7 +8,7 @@ const isDebugEnabled = process.env.DEBUG === 'true';
 
 export const DebugLogger = {
   log: (...args: unknown[]) => {
-    if (isDevelopment || isDebugEnabled) {
+    if (isDevelopment ?? isDebugEnabled) {
       console.log(...args);
     }
   },
@@ -19,13 +19,13 @@ export const DebugLogger = {
   },
   
   warn: (...args: unknown[]) => {
-    if (isDevelopment || isDebugEnabled) {
+    if (isDevelopment ?? isDebugEnabled) {
       console.warn(...args);
     }
   },
   
   info: (...args: unknown[]) => {
-    if (isDevelopment || isDebugEnabled) {
+    if (isDevelopment ?? isDebugEnabled) {
       console.info(...args);
     }
   },
@@ -37,19 +37,19 @@ export const DebugLogger = {
   },
   
   table: (data: unknown) => {
-    if (isDevelopment || isDebugEnabled) {
+    if (isDevelopment ?? isDebugEnabled) {
       console.table(data);
     }
   },
   
   group: (label: string) => {
-    if (isDevelopment || isDebugEnabled) {
+    if (isDevelopment ?? isDebugEnabled) {
       console.group(label);
     }
   },
   
   groupEnd: () => {
-    if (isDevelopment || isDebugEnabled) {
+    if (isDevelopment ?? isDebugEnabled) {
       console.groupEnd();
     }
   }

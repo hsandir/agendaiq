@@ -11,8 +11,8 @@ export async function GET(request: NextRequest) {
   
   try {
     const searchParams = request.nextUrl.searchParams;
-    const timeRange = searchParams.get('timeRange') || 'month';
-    const department = searchParams.get('department') || 'all';
+    const timeRange = searchParams.get('timeRange') ?? 'month';
+    const department = searchParams.get('department') ?? 'all';
     
     // Calculate date range
     const now = new Date();
@@ -98,11 +98,11 @@ export async function GET(request: NextRequest) {
     
     // Meeting types distribution
     const meetingsByType = meetings.reduce((acc: Array<{ type: string; count: number }>, m) => {
-      const existing = acc.find(t => t.type === (m.meeting_type || 'general'));
+      const existing = acc.find(t => t.type === (m.meeting_type ?? 'general'));
       if (existing) {
         existing.count++;
       } else {
-        acc.push({ type: m.meeting_type || 'general', count: 1 });
+        acc.push({ type: m.meeting_type ?? 'general', count: 1 });
       }
       return acc;
     }, []);
@@ -167,8 +167,8 @@ export async function GET(request: NextRequest) {
         const key = m.Staff.User.id;
         if (!contributorMap.has(key)) {
           contributorMap.set(key, {
-            name: m.Staff.User.name || 'Unknown',
-            role: m.Staff.Role?.title || 'Staff',
+            name: m.Staff.User.name ?? 'Unknown',
+            role: m.Staff.Role?.title ?? 'Staff',
             contributions: 0
           });
         }

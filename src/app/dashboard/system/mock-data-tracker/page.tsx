@@ -301,7 +301,7 @@ export default function MockDataTrackerPage() {
           </div>
 
           {/* Status Alert */}
-          {(report.mockOnlyFiles > 0 || report.apiFallbackFiles > 0) && (
+          {(report.mockOnlyFiles > 0 ?? report.apiFallbackFiles > 0) && (
             <Alert className="mb-6">
               <Zap className="h-4 w-4" />
               <AlertDescription>

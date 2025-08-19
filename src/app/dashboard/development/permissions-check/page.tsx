@@ -301,7 +301,7 @@ export default function PermissionsCheckPage() {
   useEffect(() => {
     if (session?.user) {
       // Get user capabilities from session
-      setUserCapabilities(session.user.capabilities || []);
+      setUserCapabilities(session.user.capabilities ?? []);
       setLoading(false);
     } else if (status !== 'loading') {
       setLoading(false);
@@ -323,7 +323,7 @@ export default function PermissionsCheckPage() {
     if (authType === 'requireOpsAdmin' && session.user?.is_school_admin) return true;
     
     // If no capabilities required, access is granted
-    if (!capabilities || capabilities.length === 0) return true;
+    if (!capabilities ?? capabilities.length === 0) return true;
     
     // Check if user has ALL required capabilities
     const hasAllCapabilities = capabilities.every(cap => {

@@ -100,13 +100,13 @@ export class ErrorHandler {
     if (error instanceof Error) {
       valError = createValidationError(
         error.message,
-        validationErrors || [],
+        validationErrors ?? [],
         { originalError: error.message }
       );
     } else {
       valError = createValidationError(
         'Validation failed',
-        validationErrors || [],
+        validationErrors ?? [],
         { originalError: String(error) }
       );
     }

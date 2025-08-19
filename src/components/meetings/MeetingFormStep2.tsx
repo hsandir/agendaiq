@@ -148,7 +148,7 @@ export function MeetingFormStep2({
   };
 
   // Transform attendees for presenter selection
-  const presenters = (attendees || []).map(a => ({
+  const presenters = (attendees ?? []).map(a => ({
     id: parseInt(a.id),
     name: a.name,
     role: a.role
@@ -272,14 +272,14 @@ export function MeetingFormStep2({
                         min="5"
                         max="180"
                         value={item.duration}
-                        onChange={(e) => updateAgendaItem(index, { duration: parseInt(e.target.value) || 15 })}
+                        onChange={(e) => updateAgendaItem(index, { duration: parseInt(e.target.value) ?? 15 })}
                       />
                     </div>
                     
                     <div>
                       <Label htmlFor={`presenter-${index}`}>Presenter</Label>
                       <Select 
-                        value={item.presenter_id?.toString() || ""}
+                        value={item.presenter_id?.toString() ?? ""}
                         onValueChange={(value) => updateAgendaItem(index, { 
                           presenter_id: value ? parseInt(value) : undefined 
                         })}
@@ -321,7 +321,7 @@ export function MeetingFormStep2({
           >
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={isSaving || agendaItems.length === 0}>
+          <Button onClick={handleSave} disabled={isSaving ?? agendaItems.length === 0}>
             {isSaving ? (
               "Saving..."
             ) : (

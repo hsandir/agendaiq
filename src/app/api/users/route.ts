@@ -10,14 +10,14 @@ import { Logger } from '@/lib/utils/logger';
 export async function GET(request: NextRequest) {
   try {
     const authResult = await withAuth(request);
-    if (!authResult.success) {
-      return createErrorNextResponse(authResult.error || 'Authentication failed', authResult.statusCode || 401);
+    if (!authResult?.success) {
+      return createErrorNextResponse(authResult?.error || 'Authentication failed', authResult.statusCode ?? 401);
     }
 
     const user = authResult.user!;
 
     // Check user management capability
-    if (!can(user, Capability.USER_MANAGE)) {
+    if (!can(user, Capability?.USER_MANAGE)) {
       return createErrorNextResponse("User management access required", 403);
     }
 
@@ -37,8 +37,8 @@ export async function GET(request: NextRequest) {
     });
 
     Logger.info('All users retrieved successfully', { 
-      userCount: users.length,
-      adminUserId: user.id 
+      userCount: users?.length,
+      adminUserId: user?.id 
     }, 'api-users');
 
     return createSuccessNextResponse(users, 'Users retrieved successfully');

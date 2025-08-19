@@ -287,7 +287,7 @@ export default async function DashboardPage() {
                   <ul className="text-sm text-muted-foreground space-y-1 pl-4">
                     <li>• {meeting._count.MeetingAgendaItems} agenda items</li>
                     <li>• {meeting._count.MeetingAttendee} attendees</li>
-                    <li>• Organized by {meeting.Staff.User.name || meeting.Staff.User.email}</li>
+                    <li>• Organized by {meeting.Staff.User.name ?? meeting.Staff.User.email}</li>
                   </ul>
                   <div className="text-xs text-muted-foreground mt-3 text-right">
                     {meeting.created_at ? new Date(meeting.created_at).toLocaleString() : 'Recently'}

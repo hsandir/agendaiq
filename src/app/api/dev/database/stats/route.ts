@@ -4,9 +4,9 @@ import { Capability } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability?.DEV_DEBUG });
+  if (!authResult?.success) {
+    return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
   }
 
   try {
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       AND table_type = 'BASE TABLE'
     `;
     
-    const tableCount = Number(tableCountResult[0]?.count || 0);
+    const tableCount = Number(tableCountResult[0]?.count ?? 0);
     
     // Get total record counts with error handling
     let totalRecords = 0;
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({
-      tables: tableCount || 24, // Fallback to known table count
+      tables: tableCount ?? 24, // Fallback to known table count
       records: totalRecords
     });
   } catch (error: unknown) {

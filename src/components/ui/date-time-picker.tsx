@@ -36,7 +36,7 @@ const quickDateOptions = [
   { label: "Tomorrow", getValue: () => startOfDay(addDays(new Date(), 1)) },
   { label: "Next Monday", getValue: () => {
     const today = new Date();
-    const daysUntilMonday = (8 - today.getDay()) % 7 || 7;
+    const daysUntilMonday = (8 - today.getDay()) % 7 ?? 7;
     return startOfDay(addDays(today, daysUntilMonday));
   }},
   { label: "Next Week", getValue: () => startOfDay(addDays(new Date(), 7)) },
@@ -81,14 +81,14 @@ export function DateTimePicker({
   const handleTimeSelect = (time: string) => {
     setSelectedTime(time);
     setCustomTime(time);
-    updateDateTime(selectedDate || format(new Date(), "yyyy-MM-dd"), time);
+    updateDateTime(selectedDate ?? format(new Date(), "yyyy-MM-dd"), time);
   };
 
   const handleCustomTimeChange = (time: string) => {
     setCustomTime(time);
     if (/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(time)) {
       setSelectedTime(time);
-      updateDateTime(selectedDate || format(new Date(), "yyyy-MM-dd"), time);
+      updateDateTime(selectedDate ?? format(new Date(), "yyyy-MM-dd"), time);
     }
   };
 

@@ -56,10 +56,10 @@ export default function HealthOverviewPage() {
       if (healthResponse.ok) {
         const healthData = await healthResponse.json();
         setHealthChecks({
-          total: healthData.results?.length || 0,
-          passing: healthData.results?.filter((r: Record<string, unknown>) => r.status === 'success').length || 0,
-          warning: healthData.results?.filter((r: Record<string, unknown>) => r.status === 'warning').length || 0,
-          failed: healthData.results?.filter((r: Record<string, unknown>) => r.status === 'error').length || 0,
+          total: healthData.results?.length ?? 0,
+          passing: healthData.results?.filter((r: Record<string, unknown>) => r.status === 'success').length ?? 0,
+          warning: healthData.results?.filter((r: Record<string, unknown>) => r.status === 'warning').length ?? 0,
+          failed: healthData.results?.filter((r: Record<string, unknown>) => r.status === 'error').length ?? 0,
           checks: healthData.results?.map((result: Record<string, unknown>) => ({
             name: result.name,
             status: result.status === 'success' ? 'pass' as const : 
@@ -126,21 +126,21 @@ export default function HealthOverviewPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">{healthChecks?.total || 0}</div>
+                    <div className="text-2xl font-bold text-primary">{healthChecks?.total ?? 0}</div>
                     <div className="text-sm text-muted-foreground">Total Checks</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">{healthChecks?.passing || 0}</div>
+                    <div className="text-2xl font-bold text-green-600">{healthChecks?.passing ?? 0}</div>
                     <div className="text-sm text-muted-foreground">Passing</div>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-yellow-600">{healthChecks?.warning || 0}</div>
+                    <div className="text-2xl font-bold text-yellow-600">{healthChecks?.warning ?? 0}</div>
                     <div className="text-sm text-muted-foreground">Warning</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-destructive">{healthChecks?.failed || 0}</div>
+                    <div className="text-2xl font-bold text-destructive">{healthChecks?.failed ?? 0}</div>
                     <div className="text-sm text-muted-foreground">Failed</div>
                   </div>
                 </div>
@@ -181,17 +181,17 @@ export default function HealthOverviewPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-destructive">{status?.linting.errors || 0}</div>
+                    <div className="text-2xl font-bold text-destructive">{status?.linting.errors ?? 0}</div>
                     <div className="text-sm text-muted-foreground">Errors</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-yellow-600">{status?.linting.warnings || 0}</div>
+                    <div className="text-2xl font-bold text-yellow-600">{status?.linting.warnings ?? 0}</div>
                     <div className="text-sm text-muted-foreground">Warnings</div>
                   </div>
                 </div>
                 <div className="text-center">
                   <div className="text-sm text-muted-foreground">
-                    {(status?.linting?.errors || 0) > 0 ? `${status?.linting?.files?.length || 0} files affected` : 'No errors found'}
+                    {(status?.linting?.errors ?? 0) > 0 ? `${status?.linting?.files?.length ?? 0} files affected` : 'No errors found'}
                   </div>
                 </div>
                 <div className="space-y-1 max-h-20 overflow-y-auto">

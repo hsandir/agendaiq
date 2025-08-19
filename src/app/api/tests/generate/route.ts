@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
     })
 
     const untestedApis = apiFiles.filter(file => {
-      const dirName = path.dirname(file).split('/').pop() || ''
+      const dirName = path.dirname(file).split('/').pop() ?? ''
       return !testedFiles.has(dirName) && !testedFiles.has('route')
     })
 

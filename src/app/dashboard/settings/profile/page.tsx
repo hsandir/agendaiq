@@ -35,11 +35,11 @@ export default function ProfilePage() {
         }
 
         setFormData({
-          name: data.name || '',
-          email: data.email || '',
-          department: data.department || '',
-          role: data.role || '',
-          schoolId: data.school?.id || '',
+          name: data.name ?? '',
+          email: data.email ?? '',
+          department: data.department ?? '',
+          role: data.role ?? '',
+          schoolId: data.school?.id ?? '',
         });
       } catch (error: unknown) {
         setError('Failed to load profile');

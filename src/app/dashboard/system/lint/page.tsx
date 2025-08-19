@@ -246,7 +246,7 @@ export default function LintErrorManagementPage() {
       const result = await response.json();
       
       setFixProgress(100);
-      showNotification(`Type casting auto-fix completed! Fixed ${result.fixedCount || 0} issues.`);
+      showNotification(`Type casting auto-fix completed! Fixed ${result.fixedCount ?? 0} issues.`);
       
       // Refresh all status
       await fetchTypeCastingViolations();
@@ -292,7 +292,7 @@ export default function LintErrorManagementPage() {
       }
       
       const result = await response.json();
-      const fixedCount = result.data?.fixed || 0;
+      const fixedCount = result.data?.fixed ?? 0;
       
       setFixProgress(100);
       showNotification(`Auto-fix completed! Fixed ${fixedCount} issues automatically.`);
@@ -367,7 +367,7 @@ export default function LintErrorManagementPage() {
             onClick={handleAutoFix}
             variant="outline"
             size="sm"
-            disabled={fixing || !lintStatus || lintStatus.summary.totalErrors === 0}
+            disabled={fixing || !lintStatus ?? lintStatus.summary.totalErrors === 0}
           >
             {fixing ? (
               <>
@@ -748,7 +748,7 @@ export default function LintErrorManagementPage() {
             <Button 
               size="lg"
               onClick={handleAutoFix}
-              disabled={fixing || lintStatus.summary.totalErrors === 0}
+              disabled={fixing ?? lintStatus.summary.totalErrors === 0}
             >
               <Wrench className="w-4 h-4 mr-2" />
               Auto-fix All Issues

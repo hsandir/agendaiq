@@ -44,9 +44,9 @@ export async function GET(request: NextRequest) {
   try {
     const url = new URL(request.url);
     const action = url.searchParams.get('action');
-    const severity = url.searchParams.get('severity') || 'all'; // all, errors, warnings
-    const limit = parseInt(url.searchParams.get('limit') || '100');
-    const offset = parseInt(url.searchParams.get('offset') || '0');
+    const severity = url.searchParams.get('severity') ?? 'all'; // all, errors, warnings
+    const limit = parseInt(url.searchParams.get('limit') ?? '100');
+    const offset = parseInt(url.searchParams.get('offset') ?? '0');
 
     if (action === 'summary') {
       return await getLintSummary();
@@ -110,7 +110,7 @@ async function getLintSummary() {
       acc.fixableErrors += result.fixableErrorCount;
       acc.fixableWarnings += result.fixableWarningCount;
       
-      if (result.errorCount > 0 || result.warningCount > 0) {
+      if (result.errorCount > 0 ?? result.warningCount > 0) {
         acc.filesWithIssues++;
       }
       
@@ -129,7 +129,7 @@ async function getLintSummary() {
     results.forEach(result => {
       result.messages.forEach(msg => {
         if (msg.severity === 2) { // Error
-          const count = errorTypes.get(msg.ruleId) || 0;
+          const count = errorTypes.get(msg.ruleId) ?? 0;
           errorTypes.set(msg.ruleId, count + 1);
         }
       });
@@ -159,7 +159,7 @@ async function getLintSummary() {
         acc.fixableErrors += result.fixableErrorCount;
         acc.fixableWarnings += result.fixableWarningCount;
         
-        if (result.errorCount > 0 || result.warningCount > 0) {
+        if (result.errorCount > 0 ?? result.warningCount > 0) {
           acc.filesWithIssues++;
         }
         
@@ -547,7 +547,7 @@ async function getDangerousPatterns() {
 
     for (const pattern of patterns) {
       const { stdout } = await execAsync(
-        `grep -rn "${pattern.pattern}" src/ --include="*.ts" --include="*.tsx" | wc -l || echo 0`,
+        `grep -rn "${pattern.pattern}" src/ --include="*.ts" --include="*.tsx" | wc -l ?? echo 0`,
         { cwd: process.cwd() }
       );
       

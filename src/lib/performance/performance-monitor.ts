@@ -73,8 +73,8 @@ class PerformanceMonitor {
         }
         
         // Track API call performance
-        if (url && url.includes('/api/user/')) {
-          const endpoint = url.split('/').pop() || 'unknown';
+        if (url?.includes('/api/user/')) {
+          const endpoint = url.split('/').pop() ?? 'unknown';
           this.addMetric(`api_${endpoint}`, endTime - startTime, url);
         }
         
@@ -92,7 +92,7 @@ class PerformanceMonitor {
         }
         
         if (url) {
-          const endpoint = url.split('/').pop() || 'unknown';
+          const endpoint = url.split('/').pop() ?? 'unknown';
           this.addMetric(`api_error_${endpoint}`, endTime - startTime, url);
         }
         throw error;
@@ -212,7 +212,7 @@ export function usePerformanceMetrics() {
   const monitor = getMonitor();
   return {
     getMetrics: () => monitor?.getMetrics() || [],
-    getAveragePageLoadTime: () => monitor?.getAveragePageLoadTime() || 0,
+    getAveragePageLoadTime: () => monitor?.getAveragePageLoadTime() ?? 0,
     getAPIPerformance: () => monitor?.getAPIPerformance() || {},
     clearMetrics: () => monitor?.clearMetrics(),
   };

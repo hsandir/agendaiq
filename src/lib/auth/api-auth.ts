@@ -30,17 +30,17 @@ export async function withAuth(
     // For client-side API calls, use the standard auth flow
     const result = await checkAuthRequirements(requirements);
     
-    if (!result.authorized) {
+    if (!result?.authorized) {
       return {
         success: false,
-        error: result.error || 'Access denied',
+        error: result?.error || 'Access denied',
         statusCode: result.user ? 403 : 401
       };
     }
 
     // Cache the user data for subsequent requests
-    if (result.user) {
-      userStaffCache.set(result.user.id, result.user);
+    if (result?.user) {
+      userStaffCache.set(result.user?.id, result?.user);
     }
 
     return {
@@ -78,13 +78,13 @@ export function createAuthErrorResponse(
  * Wrapper for API route handlers with authentication
  */
 export function withAPIAuth(
-  handler: (request: NextRequest, user: AuthenticatedUser) => Promise<NextResponse>,
+  handler: (request: NextRequest, user: _AuthenticatedUser) => Promise<NextResponse>,
   requirements: AuthRequirements = {}
 ) {
   return async (request: NextRequest): Promise<NextResponse> => {
     const authResult = await withAuth(request, requirements);
     
-    if (!authResult.success) {
+    if (!authResult?.success) {
       return createAuthErrorResponse(
         authResult.error!,
         authResult.statusCode!
@@ -111,19 +111,19 @@ export function withAPIAuth(
  * Check if user has permission for specific resource
  */
 export function hasResourcePermission(
-  user: AuthenticatedUser,
+  user: _AuthenticatedUser,
   resourceType: 'meeting' | 'user' | 'school' | 'department' | 'district',
   resourceId: number,
   action: 'read' | 'write' | 'delete' | 'admin'
 ): boolean {
   
   // Admin can do everything - use capability-based check
-  if (user.is_system_admin || user.is_school_admin) {
+  if (user.is_system_admin ?? user?.is_school_admin) {
     return true;
   }
 
   // No staff record = no permissions
-  if (!user.staff) {
+  if (!user?.staff) {
     return false;
   }
 
@@ -136,15 +136,15 @@ export function hasResourcePermission(
         return true; // For now, allow all staff to read meetings
       }
       // Leadership can write/delete in their scope
-      return staff.role?.is_leadership || false;
+      return staff.role?.is_leadership ?? false;
       
     case 'user':
       // Users can read their own profile
-      if (action === 'read' && resourceId === user.id) {
+      if (action === 'read' && resourceId === user?.id) {
         return true;
       }
       // Leadership can manage users in their scope
-      return staff.role?.is_leadership || false;
+      return staff.role?.is_leadership ?? false;
       
     case 'department':
       // Users can read their own department
@@ -152,7 +152,7 @@ export function hasResourcePermission(
         return true;
       }
       // High priority roles can manage departments
-      return (staff.role?.priority || 0) >= 80;
+      return (staff.role?.priority ?? 0) >= 80;
       
     case 'school':
       // Users can read their own school
@@ -160,7 +160,7 @@ export function hasResourcePermission(
         return true;
       }
       // Principals and above can manage schools
-      return ['Principal', 'Superintendent', 'Administrator'].includes(staff.role?.title || '');
+      return ['Principal', 'Superintendent', 'Administrator'].includes(staff.role?.title ?? '');
       
     case 'district':
       // Users can read their own district
@@ -168,7 +168,7 @@ export function hasResourcePermission(
         return true;
       }
       // Superintendents and admins can manage districts
-      return ['Superintendent', 'Administrator'].includes(staff.role?.title || '');
+      return ['Superintendent', 'Administrator'].includes(staff.role?.title ?? '');
       
     default:
       return false;
@@ -183,7 +183,7 @@ export const APIAuthPatterns = {
    * Public endpoint - no auth required
    */
   public: () => withAPIAuth(
-    async (request: NextRequest, user: AuthenticatedUser) => {
+    async (request: NextRequest, user: _AuthenticatedUser) => {
       // This should not be reached as no auth is required
       throw new Error('Invalid usage of public pattern');
     },
@@ -193,31 +193,31 @@ export const APIAuthPatterns = {
   /**
    * Basic authenticated endpoint
    */
-  authenticated: (handler: (request: NextRequest, user: AuthenticatedUser) => Promise<NextResponse>) =>
+  authenticated: (handler: (request: NextRequest, user: _AuthenticatedUser) => Promise<NextResponse>) =>
     withAPIAuth(handler, { requireAuth: true }),
 
   /**
    * Staff-only endpoint
    */
-  staffOnly: (handler: (request: NextRequest, user: AuthenticatedUser) => Promise<NextResponse>) =>
+  staffOnly: (handler: (request: NextRequest, user: _AuthenticatedUser) => Promise<NextResponse>) =>
     withAPIAuth(handler, { requireAuth: true, requireStaff: true }),
 
   /**
    * Admin-only endpoint
    */
-  adminOnly: (handler: (request: NextRequest, user: AuthenticatedUser) => Promise<NextResponse>) =>
+  adminOnly: (handler: (request: NextRequest, user: _AuthenticatedUser) => Promise<NextResponse>) =>
     withAPIAuth(handler, { requireAuth: true, requireStaff: true, requireAdminRole: true }),
 
   /**
    * Leadership-only endpoint
    */
-  leadershipOnly: (handler: (request: NextRequest, user: AuthenticatedUser) => Promise<NextResponse>) =>
+  leadershipOnly: (handler: (request: NextRequest, user: _AuthenticatedUser) => Promise<NextResponse>) =>
     withAPIAuth(handler, { requireAuth: true, requireStaff: true, requireLeadership: true }),
 
   /**
    * Management-only endpoint (Principal, Superintendent, Admin)
    */
-  managementOnly: (handler: (request: NextRequest, user: AuthenticatedUser) => Promise<NextResponse>) =>
+  managementOnly: (handler: (request: NextRequest, user: _AuthenticatedUser) => Promise<NextResponse>) =>
     withAPIAuth(handler, { 
       requireAuth: true, 
       requireStaff: true,
@@ -229,14 +229,12 @@ export const APIAuthPatterns = {
  * Helper to validate request parameters
  */
 export function validateParams(
-  params: Record<string, any>,
+  params: Record<string, unknown>,
   required: string[]
 ): { valid: boolean; missing?: string[] } {
   
   const missing = required.filter(key => 
-    params[key] === undefined || 
-    params[key] === null || 
-    params[key] === ''
+    params[key] === undefined ?? params[key] === null ?? params[key] === ''
   );
 
   return {

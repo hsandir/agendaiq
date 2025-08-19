@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
     let databaseStatus = { connected: false, message: 'Not tested', details: undefined as Record<string, unknown> | undefined };
     try {
       const userCount = await prisma.user.count();
-      const dbUrl = process.env.DATABASE_URL || '';
+      const dbUrl = process.env.DATABASE_URL ?? '';
       const urlParts = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^:\/]+):?(\d+)?\/(.+)/);
       
       // Get more database info
@@ -159,8 +159,8 @@ export async function GET(request: NextRequest) {
     try {
       const hasSecret = !!process.env.NEXTAUTH_SECRET;
       const hasUrl = !!process.env.NEXTAUTH_URL;
-      const url = process.env.NEXTAUTH_URL || '';
-      const secret = process.env.NEXTAUTH_SECRET || '';
+      const url = process.env.NEXTAUTH_URL ?? '';
+      const secret = process.env.NEXTAUTH_SECRET ?? '';
       
       // Get all NextAuth-related environment variables
       const nextAuthEnv = {
@@ -225,14 +225,14 @@ export async function GET(request: NextRequest) {
     // Session status
     const sessionStatus = {
       active: !!session,
-      user: session?.user || null,
+      user: session?.user ?? null,
       token: token ? {
         email: token.email,
         id: token.id,
         exp: token.exp,
         iat: token.iat,
-        staff: token.staff || null,
-        capabilities: token.capabilities || [],
+        staff: token.staff ?? null,
+        capabilities: token.capabilities ?? [],
         is_system_admin: token.is_system_admin,
         is_school_admin: token.is_school_admin,
         raw: token // Full token for debugging
@@ -312,8 +312,8 @@ export async function POST(request: NextRequest) {
     
     // Get request metadata (await headers in Next.js 15)
     const headersList = await headers();
-    const ip = headersList.get('x-forwarded-for') || headersList.get('x-real-ip') || 'unknown';
-    const userAgent = headersList.get('user-agent') || 'unknown';
+    const ip = (headersList.get('x-forwarded-for') || headersList.get('x-real-ip')) ?? 'unknown';
+    const userAgent = headersList.get('user-agent') ?? 'unknown';
     
     // Enhanced logging for sign-in attempts
     if (body.type === 'signin_attempt' && body.details?.email && body.details?.password) {

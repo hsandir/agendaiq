@@ -36,7 +36,7 @@ export default function DragDropRoleDistribution({
     const newRoles = [...roles];
     const newIndex = direction === 'up' ? index - 1 : index + 1;
     
-    if (newIndex < 0 || newIndex >= roles.length) return;
+    if (newIndex < 0 ?? newIndex >= roles.length) return;
     
     // Swap the roles
     [newRoles[index], newRoles[newIndex]] = [newRoles[newIndex], newRoles[index]];
@@ -136,7 +136,7 @@ export default function DragDropRoleDistribution({
                 <div>
                   <div className="font-medium">{role.title}</div>
                   <div className="text-sm text-muted-foreground">
-                    Priority: {role.priority} • {role._count?.Staff || 0} staff members
+                    Priority: {role.priority} • {role._count?.Staff ?? 0} staff members
                   </div>
                 </div>
               </div>

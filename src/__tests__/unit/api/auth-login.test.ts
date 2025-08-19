@@ -72,7 +72,7 @@ describe('Authentication Login API', () => {
       const testPassword = 'TestPassword123!';
       const hashedPassword = await bcrypt.hash(testPassword, 10);
       
-      const testUser = await context.prisma.user.create({
+      const _testUser = await context.prisma.user.create({
         data: {
           email: 'test@example.com',
           name: 'Test User',
@@ -108,9 +108,9 @@ describe('Authentication Login API', () => {
       const expectedResponse: LoginOutput = {
         success: true,
         user: {
-          id: testUser.id,
-          email: testUser.email,
-          name: testUser.name || '',
+          id: _testUser.id,
+          email: _testUser.email,
+          name: _testUser.name ?? '',
           role: 'User', // Default role
         },
       };
@@ -123,7 +123,7 @@ describe('Authentication Login API', () => {
       expect(user).toBeDefined();
       expect(user?.is_active).toBe(true);
       
-      const passwordValid = await bcrypt.compare(loginData.password, user?.hashedPassword || '');
+      const passwordValid = await bcrypt.compare(loginData.password, user?.hashedPassword ?? '');
       expect(passwordValid).toBe(true);
     });
 
@@ -146,7 +146,7 @@ describe('Authentication Login API', () => {
 
     it('should reject invalid passwords', async () => {
       // Create test user
-      const testUser = await context.prisma.user.create({
+      const _testUser = await context.prisma.user.create({
         data: {
           email: 'test@example.com',
           name: 'Test User',
@@ -166,7 +166,7 @@ describe('Authentication Login API', () => {
         where: { email: loginData.email },
       });
 
-      const passwordValid = await bcrypt.compare(loginData.password, user?.hashedPassword || '');
+      const passwordValid = await bcrypt.compare(loginData.password, user?.hashedPassword ?? '');
       expect(passwordValid).toBe(false);
     });
 
@@ -185,7 +185,7 @@ describe('Authentication Login API', () => {
 
     it('should reject inactive user accounts', async () => {
       // Create inactive test user
-      const testUser = await context.prisma.user.create({
+      const _testUser = await context.prisma.user.create({
         data: {
           email: 'inactive@example.com',
           name: 'Inactive User',
@@ -216,7 +216,7 @@ describe('Authentication Login API', () => {
   describe('Two-Factor Authentication', () => {
     it('should require 2FA for enabled users', async () => {
       // Create user with 2FA enabled
-      const testUser = await context.prisma.user.create({
+      const _testUser = await context.prisma.user.create({
         data: {
           email: '2fa@example.com',
           name: '2FA User',
@@ -240,7 +240,7 @@ describe('Authentication Login API', () => {
       expect(user?.two_factor_enabled).toBe(true);
       
       // First step should succeed but require 2FA
-      const passwordValid = await bcrypt.compare(loginData.password, user?.hashedPassword || '');
+      const passwordValid = await bcrypt.compare(loginData.password, user?.hashedPassword ?? '');
       expect(passwordValid).toBe(true);
       
       // Should indicate 2FA is required
@@ -280,7 +280,7 @@ describe('Authentication Login API', () => {
   describe('Account Security', () => {
     it('should handle account lockout after failed attempts', async () => {
       // Create test user
-      const testUser = await context.prisma.user.create({
+      const _testUser = await context.prisma.user.create({
         data: {
           email: 'lockout@example.com',
           name: 'Lockout User',
@@ -304,7 +304,7 @@ describe('Authentication Login API', () => {
 
     it('should increment failed login attempts', async () => {
       // Create test user
-      const testUser = await context.prisma.user.create({
+      const _testUser = await context.prisma.user.create({
         data: {
           email: 'failcount@example.com',
           name: 'Fail Count User',
@@ -318,7 +318,7 @@ describe('Authentication Login API', () => {
 
       // Simulate failed login attempt
       const updatedUser = await context.prisma.user.update({
-        where: { id: testUser.id },
+        where: { id: _testUser.id },
         data: {
           failed_login_attempts: { increment: 1 },
           last_failed_login: new Date(),
@@ -332,7 +332,7 @@ describe('Authentication Login API', () => {
     it('should reset failed attempts on successful login', async () => {
       // Create test user with failed attempts
       const testPassword = 'TestPassword123!';
-      const testUser = await context.prisma.user.create({
+      const _testUser = await context.prisma.user.create({
         data: {
           email: 'reset@example.com',
           name: 'Reset User',
@@ -350,7 +350,7 @@ describe('Authentication Login API', () => {
 
       // Reset failed attempts
       const updatedUser = await context.prisma.user.update({
-        where: { id: testUser.id },
+        where: { id: _testUser.id },
         data: {
           failed_login_attempts: 0,
           last_failed_login: null,
@@ -375,7 +375,7 @@ describe('Authentication Login API', () => {
       ];
 
       invalidInputs.forEach(input => {
-        expect(input.email || input.password).toBeTruthy();
+        expect(input.email ?? input.password).toBeTruthy();
       });
     });
 

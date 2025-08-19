@@ -5,12 +5,12 @@ import { AuditLogger } from '@/lib/audit/audit-logger';
 
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability.USER_MANAGE });
-    if (!authResult.success) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability?.USER_MANAGE });
+    if (!authResult?.success) {
+      return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request?.url);
     const days = searchParams.get('days') ? parseInt(searchParams.get('days')!) : 30;
 
     const summary = await AuditLogger.getAuditSummary(days);

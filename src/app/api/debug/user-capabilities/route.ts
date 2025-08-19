@@ -12,11 +12,11 @@ export async function GET() {
     }
 
     // Get capabilities from database
-    const capabilities = await getUserCapabilities(user.id);
+    const capabilities = await getUserCapabilities(user?.id);
     
     // Get user's role permissions
     const userWithRole = await prisma.user.findUnique({
-      where: { id: user.id },
+      where: { id: user?.id },
       include: {
         Staff: {
           include: {
@@ -31,19 +31,19 @@ export async function GET() {
     });
 
     return NextResponse.json({
-      userId: user.id,
-      email: user.email,
-      is_system_admin: user.is_system_admin,
-      is_school_admin: user.is_school_admin,
+      userId: user?.id,
+      email: user?.email,
+      is_system_admin: user?.is_system_admin,
+      is_school_admin: user?.is_school_admin,
       
       // From getUserCapabilities
       capabilities: capabilities,
-      capabilityCount: capabilities.length,
+      capabilityCount: capabilities?.length,
       
       // Direct from database
       role: userWithRole?.Staff?.[0]?.Role?.title,
       roleKey: userWithRole?.Staff?.[0]?.Role?.key,
-      permissions: userWithRole?.Staff?.[0]?.Role?.Permissions || [],
+      permissions: userWithRole?.Staff?.[0]?.Role?.Permissions ?? [],
       
       // Check specific capabilities
       hasOpsBackup: capabilities.includes('ops:backup'),
@@ -53,9 +53,9 @@ export async function GET() {
       
       // Debug info
       debugInfo: {
-        sessionCapabilities: user.capabilities || [],
+        sessionCapabilities: user.capabilities ?? [],
         computedCapabilities: capabilities,
-        match: JSON.stringify(user.capabilities) === JSON.stringify(capabilities)
+        match: JSON.stringify(user?.capabilities) === JSON.stringify(capabilities)
       }
     }, { status: 200 });
   } catch (error: unknown) {

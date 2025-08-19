@@ -82,7 +82,7 @@ interface ErrorBoundaryProps {
 export function ErrorBoundary({ children, fallback }: ErrorBoundaryProps) {
   return (
     <ReactErrorBoundary
-      FallbackComponent={fallback || ErrorFallback}
+      FallbackComponent={fallback ?? ErrorFallback}
       onError={(error, errorInfo) => {
         // Send error to Sentry
         Sentry.withScope((scope) => {

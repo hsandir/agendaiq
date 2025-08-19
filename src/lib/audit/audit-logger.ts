@@ -32,16 +32,16 @@ export class AuditLogger {
           table_name: data.tableName,
           record_id: data.recordId,
           operation: data.operation,
-          field_changes: data.fieldChanges || undefined,
-          old_values: data.oldValues || undefined,
-          new_values: data.newValues || undefined,
-          user_id: data.userId || null,
-          staff_id: data.staffId || null,
+          field_changes: data.fieldChanges ?? undefined,
+          old_values: data.oldValues ?? undefined,
+          new_values: data.newValues ?? undefined,
+          user_id: data.userId ?? null,
+          staff_id: data.staffId ?? null,
           source: data.source,
-          description: data.description || null,
-          ip_address: data.ipAddress || null,
-          user_agent: data.userAgent || null,
-          metadata: data.metadata || undefined,
+          description: data.description ?? null,
+          ip_address: data.ipAddress ?? null,
+          user_agent: data.userAgent ?? null,
+          metadata: data.metadata ?? undefined,
         }
       });
     } catch (error: unknown) {
@@ -55,11 +55,10 @@ export class AuditLogger {
   }
 
   static async logFromRequest(request: NextRequest, data: Omit<AuditLogData, 'ipAddress' | 'userAgent'>) {
-    const ip = request.headers.get('x-forwarded-for') || 
-               request.headers.get('x-real-ip') || 
-               'unknown';
+    const ip = (request.headers.get('x-forwarded-for') || 
+               request.headers.get('x-real-ip')) ?? 'unknown';
     
-    const userAgent = request.headers.get('user-agent') || 'unknown';
+    const userAgent = request.headers.get('user-agent') ?? 'unknown';
 
     return this.log({
       ...data,
@@ -174,7 +173,7 @@ export class AuditLogger {
     if (filters.userId) where.user_id = filters.userId;
     if (filters.staffId) where.staff_id = filters.staffId;
     
-    if (filters.startDate || filters.endDate) {
+    if (filters.startDate ?? filters.endDate) {
       where.created_at = {};
       if (filters.startDate) where.created_at.gte = filters.startDate;
       if (filters.endDate) where.created_at.lte = filters.endDate;
@@ -195,8 +194,8 @@ export class AuditLogger {
         }
       },
       orderBy: { created_at: 'desc' },
-      take: filters.limit || 50,
-      skip: filters.offset || 0
+      take: filters.limit ?? 50,
+      skip: filters.offset ?? 0
     });
   }
 

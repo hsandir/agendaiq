@@ -6,9 +6,9 @@ import { AuditLogger } from '@/lib/audit/audit-logger';
 
 export async function POST(request: NextRequest) {
   // Seed operation requires DEV_ADMIN (system admin) capabilities
-  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
-  if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability?.DEV_DEBUG });
+  if (!authResult?.success) {
+    return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
   }
 
   try {
@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
     // const levels = ['info', 'warn', 'error', 'debug'];
     
     for (let i = 0; i < 50; i++) {
-      const operation = operations[Math.floor(Math.random() * operations.length)];
-      const tableName = tables[Math.floor(Math.random() * tables.length)];
+      const operation = operations[Math.floor(Math.random() * operations?.length)];
+      const tableName = tables[Math.floor(Math.random() * tables?.length)];
       
       auditLogs.push({
         table_name: tableName,
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
         auditLogs: logCount,
         users: userCount,
         staff: staffCount,
-        newLogs: auditLogs.length + testRuns.length
+        newLogs: auditLogs.length + testRuns?.length
       }
     });
   } catch (error: unknown) {

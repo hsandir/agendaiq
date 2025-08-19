@@ -90,14 +90,14 @@ export default function ActionItemsTrackingPage() {
       const data = await response.json();
       
       // Ensure all items have proper structure
-      const safeItems = (data.items || []).map((item: { meeting?: unknown; assignedRole?: { id: number; title: string }; assignedStaff?: unknown; [key: string]: unknown }) => ({
+      const safeItems = (data.items ?? []).map((item: { meeting?: unknown; assignedRole?: { id: number; title: string }; assignedStaff?: unknown; [key: string]: unknown }) => ({
         ...item,
-        meeting: item.meeting || undefined,
+        meeting: item.meeting ?? undefined,
         assignedRole: item.assignedRole || { id: 0, title: 'Unassigned' },
-        assignedStaff: item.assignedStaff || undefined
+        assignedStaff: item.assignedStaff ?? undefined
       }));
       setActionItems(safeItems);
-      setStats(data.stats || null);
+      setStats(data.stats ?? null);
     } catch (error: unknown) {
       console.error('Failed to fetch action items:', error);
     } finally {

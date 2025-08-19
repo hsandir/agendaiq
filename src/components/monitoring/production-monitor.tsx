@@ -64,7 +64,7 @@ export default function ProductionMonitor() {
     const analysis = ErrorAnalyzer.analyzeError(rawError.message, rawError.url, rawError.stack);
     
     return {
-      id: rawError.id || Date.now().toString(),
+      id: rawError.id ?? Date.now().toString(),
       timestamp: rawError.timestamp,
       message: rawError.message,
       stack: rawError.stack,
@@ -84,8 +84,8 @@ export default function ProductionMonitor() {
       if (adminResponse.ok) {
         const data = await adminResponse.json();
         setIsAdmin(true);
-        return data.errors || [];
-      } else if (adminResponse.status === 401 || adminResponse.status === 403) {
+        return data.errors ?? [];
+      } else if (adminResponse.status === 401 ?? adminResponse.status === 403) {
         // User is not admin
         setIsAdmin(false);
         return [{

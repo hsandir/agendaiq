@@ -6,12 +6,12 @@ import { Capability } from '@/lib/auth/policy';
 export async function GET(request: NextRequest) {
   try {
     // REQUIRED: Auth check - Developer admin for diagnostics
-    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability.USER_MANAGE });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability?.USER_MANAGE });
     
-    if (!authResult.success) {
+    if (!authResult?.success) {
       return NextResponse.json(
-        { error: authResult.error }, 
-        { status: authResult.statusCode }
+        { error: authResult?.error }, 
+        { status: authResult?.statusCode }
       );
     }
 
@@ -53,12 +53,12 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // REQUIRED: Auth check - Developer admin only
-    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability.USER_MANAGE });
+    const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability?.USER_MANAGE });
     
-    if (!authResult.success) {
+    if (!authResult?.success) {
       return NextResponse.json(
-        { error: authResult.error }, 
-        { status: authResult.statusCode }
+        { error: authResult?.error }, 
+        { status: authResult?.statusCode }
       );
     }
 

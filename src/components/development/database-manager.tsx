@@ -50,7 +50,7 @@ export default function DatabaseManager() {
       const response = await fetch('/api/dev/database/backups')
       if (response.ok) {
         const data = await response.json()
-        setBackups(data.backups || [])
+        setBackups(data.backups ?? [])
       }
     } catch (error: unknown) {
       console.error('Failed to load backups:', error)
@@ -168,7 +168,7 @@ export default function DatabaseManager() {
             <CardTitle className="text-sm font-medium">Tables</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.tables || 0}</div>
+            <div className="text-2xl font-bold">{stats.tables ?? 0}</div>
             <p className="text-xs text-muted-foreground">Active tables</p>
           </CardContent>
         </Card>
@@ -178,7 +178,7 @@ export default function DatabaseManager() {
             <CardTitle className="text-sm font-medium">Records</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.records?.toLocaleString() || '0'}</div>
+            <div className="text-2xl font-bold">{stats.records?.toLocaleString() ?? '0'}</div>
             <p className="text-xs text-muted-foreground">Total records</p>
           </CardContent>
         </Card>

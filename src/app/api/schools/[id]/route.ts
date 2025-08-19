@@ -29,7 +29,7 @@ export async function PUT(
     const body = await request.json();
     const { __name, __address, ___city, ___state, ___zipCode, ___phone, ___website, __logo  } = body;
 
-    if (!name || typeof name !== "string" || String(name).trim().length === 0) {
+    if ((!name ?? (typeof name !== "string")) || String(name).trim().length === 0) {
       return new NextResponse("School name is required", { status: 400 });
     }
 
@@ -54,7 +54,7 @@ export async function PUT(
     });
   } catch (error: unknown) {
     console.error("Error in PUT /api/schools:", error);
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error instanceof Prisma?.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return new NextResponse("School with this name already exists", {
           status: 409,
@@ -97,7 +97,7 @@ export async function DELETE(
     return new NextResponse("School deleted successfully", { status: 200 });
   } catch (error: unknown) {
     console.error("Error in DELETE /api/schools:", error);
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error instanceof Prisma?.PrismaClientKnownRequestError) {
       if (error.code === "P2025") {
         return new NextResponse("School not found", { status: 404 });
       }

@@ -44,7 +44,7 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
         throw new Error('Failed to fetch role hierarchy');
       }
       const data = await response.json();
-      setRoles(data.roles || []);
+      setRoles(data.roles ?? []);
       
       // Auto-expand top level roles
       const topLevelIds = data.roles?.filter((r: Role) => r.level <= 1).map((r: Role) => r.id) || [];
@@ -70,7 +70,7 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
     const hasChildren = role.Children && role.Children.length > 0;
     const hasStaff = role.Staff && role.Staff.length > 0;
     const isExpanded = expandedRoles.has(role.id);
-    const staffCount = role.Staff?.length || 0;
+    const staffCount = role.Staff?.length ?? 0;
     
     return (
       <div key={role.id} className="role-item">
@@ -82,7 +82,7 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
           onClick={() => onRoleSelect?.(role)}
         >
           <div className="flex items-center flex-1">
-            {(hasChildren || hasStaff) ? (
+            {(hasChildren ?? hasStaff) ? (
               <button
                 onClick={(e) => {
                   e.stopPropagation();

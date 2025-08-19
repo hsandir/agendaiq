@@ -60,15 +60,15 @@ export async function GET() {
     }
     
     // Get ahead/behind for current branch
-    const current = branches.find(b => b.current);
+    const current = branches.find(b => b?.current);
     if (current) {
       try {
-        const { stdout: __revList  } = await execAsync(
-          `git rev-list --left-right --count origin/${current.__name}...HEAD`
+        const { stdout: ___revList  } = await execAsync(
+          `git rev-list --left-right --count origin/${current?.__name}...HEAD`
         );
         const [behind, ahead] = String(revList).trim().split('\t');
-        current.behind = parseInt(behind) || 0;
-        current.ahead = parseInt(ahead) || 0;
+        current.behind = parseInt(behind) ?? 0;
+        current.ahead = parseInt(ahead) ?? 0;
       } catch {
         // Remote might not exist
       }
@@ -77,7 +77,7 @@ export async function GET() {
     return NextResponse.json({
       branches,
       current: String(currentBranch).trim(),
-      total: branches.length,
+      total: branches?.length,
       timestamp: new Date().toISOString()
     });
   } catch (error: unknown) {

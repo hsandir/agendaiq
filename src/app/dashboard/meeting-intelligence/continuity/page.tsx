@@ -86,8 +86,8 @@ export default function MeetingContinuityPage() {
       const response = await fetch('/api/meeting-intelligence/continuity');
       const data = await response.json();
       
-      setChains(data.chains || []);
-      setStats(data.stats || null);
+      setChains(data.chains ?? []);
+      setStats(data.stats ?? null);
       
       // Auto-expand first chain
       if (data.chains && data.chains.length > 0) {

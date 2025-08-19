@@ -28,13 +28,13 @@ export async function POST() {
 
     // Generate verification token
     const token = createHash('sha256')
-      .update(`${user.email}-${Date.now()}`)
+      .update(`${user?.email}-${Date.now()}`)
       .digest('hex');
 
     // Store token with expiry
     await prisma.verificationToken.create({
       data: {
-        identifier: user.email,
+        identifier: user?.email,
         token,
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       },
@@ -42,8 +42,8 @@ export async function POST() {
 
     // Send verification email
     await sendVerificationEmail(
-      user.email,
-      `${process.env.NEXTAUTH_URL}/verify-email?token=${token}`
+      user?.email,
+      `${process.env?.NEXTAUTH_URL}/verify-email?token=${token}`
     );
 
     return new NextResponse("Verification email sent", { status: 200 });

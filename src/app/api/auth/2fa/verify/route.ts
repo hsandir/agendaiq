@@ -18,17 +18,17 @@ export async function POST(request: NextRequest) {
   try {
     const authResult = await withAuth(request, { requireAuth: true });
     
-    if (!authResult.success) {
+    if (!authResult?.success) {
       return NextResponse.json(
-        { error: authResult.error }, 
-        { status: authResult.statusCode }
+        { error: authResult?.error }, 
+        { status: authResult?.statusCode }
       );
     }
 
     const user = authResult.user!;
     const body = await request.json();
     
-    if (!body.token) {
+    if (!body?.token) {
       return NextResponse.json(
         { error: "Verification token required" }, 
         { status: 400 }
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     // Get user with secret
     const dbUser = await prisma.user.findUnique({
-      where: { id: user.id }
+      where: { id: user?.id }
     });
 
     if (!dbUser?.two_factor_secret) {
@@ -49,9 +49,9 @@ export async function POST(request: NextRequest) {
 
     // Verify the token
     const verified = speakeasy.totp.verify({
-      secret: dbUser.two_factor_secret,
+      secret: dbUser?.two_factor_secret,
       encoding: 'base32',
-      token: body.token,
+      token: body?.token,
       window: 2
     });
 
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     // Enable 2FA and save backup codes
     await prisma.user.update({
-      where: { id: user.id },
+      where: { id: user?.id },
       data: {
         two_factor_enabled: true,
         backup_codes: backupCodes

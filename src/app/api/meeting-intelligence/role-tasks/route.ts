@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const searchParams = request.nextUrl.searchParams;
-    const filter = searchParams.get('filter') || 'all';
+    const filter = searchParams.get('filter') ?? 'all';
     
     // Build role query conditions
     const roleWhereConditions: Record<string, unknown> = {};
@@ -106,9 +106,9 @@ export async function GET(request: NextRequest) {
         return {
           id: item.id,
           title: item.title,
-          description: item.description || undefined,
-          status: isOverdue ? 'overdue' : (item.status || 'pending'),
-          priority: item.priority || 'Medium',
+          description: item.description ?? undefined,
+          status: isOverdue ? 'overdue' : (item.status ?? 'pending'),
+          priority: item.priority ?? 'Medium',
           dueDate: item.due_date?.toISOString(),
           assignedAt: item.created_at.toISOString(),
           meeting: item.Meeting ? {
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
       // Get current holder
       const currentHolder = role.Staff.length > 0 ? {
         id: role.Staff[0].id,
-        name: role.Staff[0].User.name || 'Unknown',
+        name: role.Staff[0].User.name ?? 'Unknown',
         email: role.Staff[0].User.email
       } : undefined;
       

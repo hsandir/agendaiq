@@ -189,13 +189,13 @@ export async function POST(request: NextRequest) {
             if (line.includes('PASS') || line.includes('FAIL')) {
               const passMatch = line.match(/PASS\s+(.+?)\s/)
               const failMatch = line.match(/FAIL\s+(.+?)\s/)
-              if (passMatch || failMatch) {
+              if (passMatch ?? failMatch) {
                 const isPass = !!passMatch
-                const path = (passMatch || failMatch)?.[1]
+                const path = (passMatch ?? failMatch)?.[1]
                 sendMessage({
                   type: 'suite-update',
                   suite: {
-                    path: path || 'unknown',
+                    path: path ?? 'unknown',
                     status: isPass ? 'passed' : 'failed'
                   }
                 })

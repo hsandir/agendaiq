@@ -15,7 +15,7 @@ export default function SignUpPage() {
     setError("");
     setIsLoading(true);
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(e?.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
@@ -33,9 +33,9 @@ export default function SignUpPage() {
         body: JSON.stringify({ email, password }),
       });
 
-      if (!response.ok) {
+      if (!response?.ok) {
         const data = await response.json();
-        throw new Error(data.message || "Failed to sign up");
+        throw new Error(data?.message || "Failed to sign up");
       }
 
       router.push("/auth/signin?registered=true");

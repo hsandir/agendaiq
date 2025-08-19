@@ -256,7 +256,7 @@ export function MeetingActionItems({
               <div>
                 <Label>Title *</Label>
                 <Input
-                  value={newItem.title || ""}
+                  value={newItem.title ?? ""}
                   onChange={(e) => setNewItem({ ...newItem, title: e.target.value })}
                   placeholder="Enter action item title"
                 />
@@ -264,7 +264,7 @@ export function MeetingActionItems({
               <div>
                 <Label>Assign To *</Label>
                 <Select
-                  value={newItem.assignedTo || ""}
+                  value={newItem.assignedTo ?? ""}
                   onValueChange={(value) => setNewItem({ ...newItem, assignedTo: value })}
                 >
                   <SelectTrigger>
@@ -284,7 +284,7 @@ export function MeetingActionItems({
             <div>
               <Label>Description</Label>
               <Textarea
-                value={newItem.description || ""}
+                value={newItem.description ?? ""}
                 onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
                 placeholder="Enter detailed description"
                 rows={3}
@@ -296,14 +296,14 @@ export function MeetingActionItems({
                 <Label>Due Date *</Label>
                 <Input
                   type="date"
-                  value={newItem.dueDate || ""}
+                  value={newItem.dueDate ?? ""}
                   onChange={(e) => setNewItem({ ...newItem, dueDate: e.target.value })}
                 />
               </div>
               <div>
                 <Label>Priority</Label>
                 <Select
-                  value={newItem.priority || "medium"}
+                  value={newItem.priority ?? "medium"}
                   onValueChange={(value: Record<string, unknown>) => setNewItem({ ...newItem, priority: value })}
                 >
                   <SelectTrigger>
@@ -320,7 +320,7 @@ export function MeetingActionItems({
               <div>
                 <Label>Link to Agenda Item</Label>
                 <Select
-                  value={newItem.fromAgendaItem?.toString() || ""}
+                  value={newItem.fromAgendaItem?.toString() ?? ""}
                   onValueChange={(value) => setNewItem({ ...newItem, fromAgendaItem: parseInt(value) || undefined })}
                 >
                   <SelectTrigger>
@@ -357,7 +357,7 @@ export function MeetingActionItems({
                   <div className="flex items-center gap-3">
                     <User className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <h3 className="font-semibold">{assignee?.name || "Unknown"}</h3>
+                      <h3 className="font-semibold">{assignee?.name ?? "Unknown"}</h3>
                       <p className="text-sm text-muted-foreground">
                         {assignee?.role} • {assignee?.department} • {items.length} action items
                       </p>
@@ -465,7 +465,7 @@ export function MeetingActionItems({
                                   <div>
                                     <Label className="text-xs">Notes</Label>
                                     <Textarea
-                                      value={item.notes || ""}
+                                      value={item.notes ?? ""}
                                       onChange={(e) => 
                                         updateActionItem(item.originalIndex, { notes: e.target.value })
                                       }

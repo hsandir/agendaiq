@@ -113,7 +113,7 @@ export function RepeatMeetingModal({
       return dates;
     }
     
-    const maxDates = conf.endType === 'after' ? (conf.occurrences || 10) : 52; // Max 52 for preview
+    const maxDates = conf.endType === 'after' ? (conf.occurrences ?? 10) : 52; // Max 52 for preview
     let endDateLimit: Date | null = null;
     
     if (conf.endType === 'by' && conf.endDate) {
@@ -147,7 +147,7 @@ export function RepeatMeetingModal({
       // Calculate next date based on pattern
       switch (conf.pattern) {
         case 'daily':
-          currentDate = addDays(currentDate, conf.interval || 1);
+          currentDate = addDays(currentDate, conf.interval ?? 1);
           break;
         case 'weekly':
           currentDate = addWeeks(currentDate, 1);
@@ -179,7 +179,7 @@ export function RepeatMeetingModal({
             }
             if (!found) currentDate = addWeeks(currentDate, 1);
           } else {
-            currentDate = addDays(currentDate, conf.interval || 1);
+            currentDate = addDays(currentDate, conf.interval ?? 1);
           }
           break;
       }
@@ -294,7 +294,7 @@ export function RepeatMeetingModal({
                       min="1"
                       max="99"
                       value={config.interval}
-                      onChange={(e) => setConfig({ ...config, interval: parseInt(e.target.value) || 1 })}
+                      onChange={(e) => setConfig({ ...config, interval: parseInt(e.target.value) ?? 1 })}
                       className="w-20"
                     />
                     <span>day(s)</span>
@@ -308,9 +308,9 @@ export function RepeatMeetingModal({
                       <div key={day.value} className="flex items-center space-x-2">
                         <Checkbox
                           id={`day-${day.value}`}
-                          checked={config.weekDays?.includes(day.value) || false}
+                          checked={config.weekDays?.includes(day.value) ?? false}
                           onCheckedChange={(checked) => {
-                            const days = config.weekDays || [];
+                            const days = config.weekDays ?? [];
                             setConfig({
                               ...config,
                               weekDays: checked
@@ -357,7 +357,7 @@ export function RepeatMeetingModal({
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="day" id="month-day" />
                       <Label htmlFor="month-day" className="cursor-pointer">
-                        On day {config.monthDay || new Date(startDate).getDate()} of every month
+                        On day {config.monthDay ?? new Date(startDate).getDate()} of every month
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -366,7 +366,7 @@ export function RepeatMeetingModal({
                         On the
                         <select
                           className="border rounded px-2 py-1 text-sm"
-                          value={config.monthWeek || 1}
+                          value={config.monthWeek ?? 1}
                           onChange={(e) => setConfig({ ...config, monthWeek: parseInt(e.target.value) })}
                         >
                           {MONTH_WEEKS.map(week => (
@@ -375,7 +375,7 @@ export function RepeatMeetingModal({
                         </select>
                         <select
                           className="border rounded px-2 py-1 text-sm"
-                          value={config.monthWeekDay || 0}
+                          value={config.monthWeekDay ?? 0}
                           onChange={(e) => setConfig({ ...config, monthWeekDay: parseInt(e.target.value) })}
                         >
                           {WEEKDAYS.map(day => (
@@ -409,8 +409,8 @@ export function RepeatMeetingModal({
                         type="number"
                         min="1"
                         max="365"
-                        value={config.occurrences || 10}
-                        onChange={(e) => setConfig({ ...config, occurrences: parseInt(e.target.value) || 10 })}
+                        value={config.occurrences ?? 10}
+                        onChange={(e) => setConfig({ ...config, occurrences: parseInt(e.target.value) ?? 10 })}
                         className="w-20"
                         disabled={config.endType !== 'after'}
                       />
@@ -423,7 +423,7 @@ export function RepeatMeetingModal({
                       By
                       <Input
                         type="date"
-                        value={config.endDate || ''}
+                        value={config.endDate ?? ''}
                         onChange={(e) => setConfig({ ...config, endDate: e.target.value })}
                         className="w-40"
                         disabled={config.endType !== 'by'}

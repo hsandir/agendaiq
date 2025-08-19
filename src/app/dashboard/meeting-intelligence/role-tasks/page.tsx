@@ -93,15 +93,15 @@ export default function RoleTasksPage() {
       const data = await response.json();
       
       // Ensure all tasks have proper structure
-      const safeRoles = (data.roles || []).map((roleData: Record<string, unknown>) => ({
+      const safeRoles = (data.roles ?? []).map((roleData: Record<string, unknown>) => ({
         ...roleData,
-        tasks: (roleData.tasks || []).map((task: Record<string, unknown>) => ({
+        tasks: (roleData.tasks ?? []).map((task: Record<string, unknown>) => ({
           ...task,
           meeting: task.meeting || { id: 0, title: 'Unknown', date: new Date().toISOString() }
         }))
       }));
       setRolesWithTasks(safeRoles);
-      setTransitionHistory(data.transitions || []);
+      setTransitionHistory(data.transitions ?? []);
       
       // Auto-expand roles with overdue tasks
       const rolesWithOverdue = data.roles

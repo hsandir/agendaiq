@@ -111,7 +111,7 @@ export function usePresenceChannel(
 
     // Handle presence events
     channelRef.current.bind('pusher:subscription_succeeded', () => {
-      const membersList = Object.values(channelRef.current?.members.members || {}) as PresenceMember[];
+      const membersList = Object.values(channelRef.current?.members.members ?? {}) as PresenceMember[];
       setMembers(membersList.filter((member): member is PresenceMember => 
         typeof member === 'object' && member !== null && 'id' in member
       ));

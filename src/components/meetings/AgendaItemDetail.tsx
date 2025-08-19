@@ -46,7 +46,7 @@ import { AgendaItemStatus, Purpose, SolutionType, DecisionType } from '@prisma/c
 interface Props {
   item: AgendaItemWithRelations;
   meeting: MeetingWithRelations;
-  currentUser: AuthenticatedUser;
+  currentUser: _AuthenticatedUser;
   allStaff: StaffForAssignment[];
   canEdit: boolean;
 }
@@ -57,18 +57,18 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
   const [isSaving, setIsSaving] = useState(false);
   const [editData, setEditData] = useState({
     topic: item.topic,
-    problem_statement: item.problem_statement || '',
-    proposed_solution: item.proposed_solution || '',
-    decisions_actions: item.decisions_actions || '',
+    problem_statement: item.problem_statement ?? '',
+    proposed_solution: item.proposed_solution ?? '',
+    decisions_actions: item.decisions_actions ?? '',
     status: item.status,
     priority: item.priority,
     responsible_staff_id: item.responsible_staff_id,
-    staff_initials: item.staff_initials || '',
+    staff_initials: item.staff_initials ?? '',
     purpose: item.purpose,
     solution_type: item.solution_type,
     decision_type: item.decision_type,
-    future_implications: item.future_implications || false,
-    duration_minutes: item.duration_minutes || null
+    future_implications: item.future_implications ?? false,
+    duration_minutes: item.duration_minutes ?? null
   });
 
   const [showOngoingDialog, setShowOngoingDialog] = useState(false);
@@ -140,18 +140,18 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
   const handleCancel = () => {
     setEditData({
       topic: item.topic,
-      problem_statement: item.problem_statement || '',
-      proposed_solution: item.proposed_solution || '',
-      decisions_actions: item.decisions_actions || '',
+      problem_statement: item.problem_statement ?? '',
+      proposed_solution: item.proposed_solution ?? '',
+      decisions_actions: item.decisions_actions ?? '',
       status: item.status,
       priority: item.priority,
       responsible_staff_id: item.responsible_staff_id,
-      staff_initials: item.staff_initials || '',
+      staff_initials: item.staff_initials ?? '',
       purpose: item.purpose,
       solution_type: item.solution_type,
       decision_type: item.decision_type,
-      future_implications: item.future_implications || false,
-      duration_minutes: item.duration_minutes || null
+      future_implications: item.future_implications ?? false,
+      duration_minutes: item.duration_minutes ?? null
     });
     setIsEditing(false);
   };
@@ -274,7 +274,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
               </div>
 
               {/* Problem Statement */}
-              {(item.problem_statement || isEditing) && (
+              {(item.problem_statement ?? isEditing) && (
                 <div className="mb-6">
                   <h3 className="text-sm font-semibold text-foreground mb-2">Problem/Need Statement</h3>
                   {isEditing ? (
@@ -291,7 +291,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
               )}
 
               {/* Proposed Solution */}
-              {(item.proposed_solution || isEditing) && (
+              {(item.proposed_solution ?? isEditing) && (
                 <div className="mb-6">
                   <h3 className="text-sm font-semibold text-foreground mb-2">Proposed Solution</h3>
                   {isEditing ? (
@@ -351,7 +351,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
             <div className="bg-card rounded-xl shadow-sm border border-border p-6">
               <AgendaItemComments
                 itemId={item.id}
-                comments={item.Comments || []}
+                comments={item.Comments ?? []}
                 onAddComment={handleAddComment}
                 canComment={true}
               />
@@ -415,12 +415,12 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                 </div>
 
                 {/* Type of Solution */}
-                {(item.solution_type || isEditing) && (
+                {(item.solution_type ?? isEditing) && (
                   <div>
                     <label className="text-sm text-muted-foreground">Type of Solution</label>
                     {isEditing ? (
                       <Select
-                        value={editData.solution_type || ''}
+                        value={editData.solution_type ?? ''}
                         onValueChange={(value) => setEditData({ ...editData, solution_type: value as SolutionType })}
                       >
                         <SelectTrigger className="mt-1">
@@ -441,12 +441,12 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                 )}
 
                 {/* Type of Decision */}
-                {(item.decision_type || isEditing) && (
+                {(item.decision_type ?? isEditing) && (
                   <div>
                     <label className="text-sm text-muted-foreground">Type of Decision</label>
                     {isEditing ? (
                       <Select
-                        value={editData.decision_type || ''}
+                        value={editData.decision_type ?? ''}
                         onValueChange={(value) => setEditData({ ...editData, decision_type: value as DecisionType })}
                       >
                         <SelectTrigger className="mt-1">
@@ -471,7 +471,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                   <label className="text-sm text-muted-foreground">Responsible Staff</label>
                   {isEditing ? (
                     <Select
-                      value={editData.responsible_staff_id?.toString() || 'none'}
+                      value={editData.responsible_staff_id?.toString() ?? 'none'}
                       onValueChange={(value) => setEditData({ 
                         ...editData, 
                         responsible_staff_id: value === 'none' ? null : parseInt(value) 
@@ -484,7 +484,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                         <SelectItem value="none">None</SelectItem>
                         {allStaff.map((s) => (
                           <SelectItem key={s.id} value={s.id.toString()}>
-                            {s.User.name || s.User.email}
+                            {s.User.name ?? s.User.email}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -497,7 +497,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                             <User className="h-4 w-4 text-primary" />
                           </div>
                           <div>
-                            <p className="font-medium text-foreground">{item.ResponsibleStaff.User.name || item.ResponsibleStaff.User.email}</p>
+                            <p className="font-medium text-foreground">{item.ResponsibleStaff.User.name ?? item.ResponsibleStaff.User.email}</p>
                             <p className="text-xs text-muted-foreground">{item.ResponsibleStaff.Role.title}</p>
                           </div>
                         </div>
@@ -620,7 +620,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
             </Button>
             <Button 
               onClick={saveChanges}
-              disabled={!ongoingChoice || isSaving}
+              disabled={!ongoingChoice ?? isSaving}
               className="bg-primary hover:bg-primary"
             >
               {isSaving ? 'Saving...' : 'Continue'}

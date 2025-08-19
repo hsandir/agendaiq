@@ -16,10 +16,10 @@ interface PerformanceMetrics {
 }
 
 describe('Comprehensive API Route Tests', () => {
-  let testUser: AuthenticatedUser;
-  let testStaff: StaffWithRelations;
-  let adminUser: AuthenticatedUser;
-  let adminStaff: StaffWithRelations;
+  let testUser: _AuthenticatedUser;
+  let testStaff: _StaffWithRelations;
+  let adminUser: _AuthenticatedUser;
+  let adminStaff: _StaffWithRelations;
 
   beforeAll(async () => {
     // Create test users
@@ -254,7 +254,7 @@ describe('Comprehensive API Route Tests', () => {
           data.users.forEach(user => {
             const nameMatch = user.name?.toLowerCase().includes(searchTerm.toLowerCase());
             const emailMatch = user.email.toLowerCase().includes(searchTerm.toLowerCase());
-            expect(nameMatch || emailMatch).toBe(true);
+            expect(nameMatch ?? emailMatch).toBe(true);
           });
         }
       });
@@ -522,7 +522,7 @@ describe('Comprehensive API Route Tests', () => {
           method: 'GET',
         });
         
-        const module = await import('@/app/api/users/route');
+        const _module = await import('@/app/api/users/route');
         return GET(request);
       });
 

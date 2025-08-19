@@ -92,7 +92,7 @@ export function useAuth(options: UseAuthOptions = {}): UseAuthReturn {
       return;
     }
     
-    if (allowedRoles.length > 0 && !allowedRoles.includes(user?.staff?.role?.title || '')) {
+    if (allowedRoles.length > 0 && !allowedRoles.includes(user?.staff?.role?.title ?? '')) {
       setError(new Error(`Required role: ${allowedRoles.join(' or ')}`));
       router.push'/dashboard';
       return;

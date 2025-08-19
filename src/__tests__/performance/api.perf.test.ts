@@ -131,13 +131,13 @@ test.describe('Page Load Performance', () => {
         loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
         
         // Paint timing
-        fcp: paint.find(p => p.name === 'first-contentful-paint')?.startTime || 0,
+        fcp: paint.find(p => p.name === 'first-contentful-paint')?.startTime ?? 0,
         lcp: 0, // Will be measured separately
         
         // Resource timing
         resources: performance.getEntriesByType('resource').length,
         totalResourceSize: performance.getEntriesByType('resource').reduce((total, resource) => 
-          total + ((resource as PerformanceResourceTiming).transferSize || 0), 0
+          total + ((resource as PerformanceResourceTiming).transferSize ?? 0), 0
         ),
       }
     })
@@ -213,7 +213,7 @@ test.describe('Page Load Performance', () => {
       
       // Get memory usage
       const metrics = await page.evaluate(() => {
-        return (performance as Performance & { memory?: { usedJSHeapSize?: number } }).memory?.usedJSHeapSize || 0
+        return (performance as Performance & { memory?: { usedJSHeapSize?: number } }).memory?.usedJSHeapSize ?? 0
       })
       
       memorySnapshots.push(metrics)

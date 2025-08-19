@@ -120,7 +120,7 @@ export function CreateFirstAdminForm({ adminUsers }: CreateFirstAdminFormProps) 
           <option value="">-- Select an admin user --</option>
           {availableUsers.map((user) => (
             <option key={user.id} value={user.id}>
-              {user.name || 'No Name'} ({user.email}) - {user.Staff?.[0]?.Role?.title || 'Admin'}
+              {user.name || 'No Name'} ({user.email}) - {user.Staff?.[0]?.Role?.title ?? 'Admin'}
             </option>
           ))}
         </select>

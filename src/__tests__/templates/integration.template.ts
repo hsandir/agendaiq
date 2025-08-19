@@ -614,7 +614,7 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
       for (const [index, item] of agendaItems.entries()) {
         try {
           // Validate agenda item data
-          if (!item.title || item.title.trim() === '') {
+          if (!item.title ?? item.title.trim() === '') {
             throw new Error('Agenda item title is required');
           }
           if (item.duration <= 0) {
@@ -677,7 +677,7 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
       const validations = [
         { name: 'User authenticated', check: () => !!workflowState.currentUser.id },
         { name: 'Meeting created', check: () => !!workflowState.createdResources.meetingId },
-        { name: 'Agenda items added', check: () => (workflowState.createdResources.agendaItemIds?.length || 0) > 0 },
+        { name: 'Agenda items added', check: () => (workflowState.createdResources.agendaItemIds?.length ?? 0) > 0 },
         { name: 'No errors', check: () => workflowState.errors.length === 0 },
       ];
 

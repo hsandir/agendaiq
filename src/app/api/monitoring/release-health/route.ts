@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 
     // Get current version info
     const currentVersion = process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0';
-    const commitSha = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || 'unknown';
+    const commitSha = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? 'unknown';
     const releaseVersion = `${currentVersion}+${commitSha}`;
 
     // Initialize release health data
@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
           const data = await crashFreeRes.json();
           if (data.data && data.data.length > 0) {
             const latestPoint = data.data[data.data.length - 1];
-            if (latestPoint && latestPoint[1] && latestPoint[1][0]) {
+            if (latestPoint?.[1]?.[0]) {
               release.crashFreeRate = latestPoint[1][0].count * 100;
             }
           }
@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
       // Determine release health status based on metrics
       if (release.crashFreeRate < 95) {
         release.status = 'critical';
-      } else if (release.crashFreeRate < 99 || release.newIssues > 5 || release.errorCount > 1000) {
+      } else if (release.crashFreeRate < 99 ?? release.newIssues > 5 ?? release.errorCount > 1000) {
         release.status = 'degraded';
       } else {
         release.status = 'healthy';

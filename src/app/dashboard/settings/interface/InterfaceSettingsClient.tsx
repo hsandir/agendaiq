@@ -374,7 +374,7 @@ export function InterfaceSettingsClient() {
         
         <div className="mt-6 p-4 bg-accent/10 border border-accent/20 rounded-lg">
           <h4 className="font-semibold text-foreground mb-1">
-            Current Theme: {currentTheme?.name || 'Standard'}
+            Current Theme: {currentTheme?.name ?? 'Standard'}
           </h4>
           <p className="text-sm text-muted-foreground">
             {currentTheme?.description || 'Default theme'}

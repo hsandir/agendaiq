@@ -55,7 +55,7 @@ export const createErrorResponse = (
       code: 'GEN_001',
       timestamp: new Date().toISOString()
     };
-  } else if ('type' in error && ['DATABASE_ERROR', 'AUTH_ERROR', 'VALIDATION_ERROR', 'NETWORK_ERROR', 'UNKNOWN_ERROR'].includes(error.type)) {
+  } else if ('type' in error && ['DATABASE_ERROR', 'AUTH_ERROR', 'VALIDATION_ERROR', 'NETWORK_ERROR', 'UNKNOWN_ERROR'].includes(error?.type)) {
     // It's a SystemError, convert to APIError
     apiError = ErrorHandler.systemErrorToAPIError(error as SystemError);
   } else {
@@ -131,8 +131,8 @@ export function validatePaginationParams(
   page?: string | null, 
   limit?: string | null
 ): { page: number; limit: number; offset: number } {
-  const validatedPage = Math.max(1, parseInt(page || '1') || 1);
-  const validatedLimit = Math.min(Math.max(1, parseInt(limit || '10') || 10), 100);
+  const validatedPage = Math.max(1, parseInt(page ?? '1') ?? 1);
+  const validatedLimit = Math.min(Math.max(1, parseInt(limit ?? '10') ?? 10), 100);
   const offset = (validatedPage - 1) * validatedLimit;
 
   return {
@@ -149,7 +149,7 @@ export function validateRequiredFields<T extends Record<string, unknown>>(
   const errors: ValidationError[] = [];
   
   for (const field of requiredFields) {
-    if (data[field] === undefined || data[field] === null || data[field] === '') {
+    if (data[field] === undefined ?? data[field] === null ?? data[field] === '') {
       errors.push({
         field: String(field),
         message: `${String(field)} is required`,
@@ -172,7 +172,7 @@ export const categorizeAPIError = (error: unknown): APIError => {
         type: 'INTERNAL_ERROR',
         message: 'Database operation failed',
         code: 'DB_001',
-        details: { originalError: error.message },
+        details: { originalError: error?.message },
         timestamp: new Date().toISOString()
       };
     }
@@ -183,7 +183,7 @@ export const categorizeAPIError = (error: unknown): APIError => {
         type: 'UNAUTHORIZED',
         message: 'Authentication required',
         code: 'AUTH_001',
-        details: { originalError: error.message },
+        details: { originalError: error?.message },
         timestamp: new Date().toISOString()
       };
     }
@@ -194,7 +194,7 @@ export const categorizeAPIError = (error: unknown): APIError => {
         type: 'VALIDATION_ERROR',
         message: 'Invalid request data',
         code: 'VAL_001',
-        details: { originalError: error.message },
+        details: { originalError: error?.message },
         timestamp: new Date().toISOString()
       };
     }
@@ -205,7 +205,7 @@ export const categorizeAPIError = (error: unknown): APIError => {
         type: 'INTERNAL_ERROR',
         message: 'Network operation failed',
         code: 'NET_001',
-        details: { originalError: error.message },
+        details: { originalError: error?.message },
         timestamp: new Date().toISOString()
       };
     }
@@ -215,7 +215,7 @@ export const categorizeAPIError = (error: unknown): APIError => {
       type: 'INTERNAL_ERROR',
       message: 'Internal server error',
       code: 'SYS_001',
-      details: { originalError: error.message },
+      details: { originalError: error?.message },
       timestamp: new Date().toISOString()
     };
   }

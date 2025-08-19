@@ -219,7 +219,7 @@ async function checkPage(url: string, name: string) {
     });
 
     const responseTime = Date.now() - startTime;
-    const contentType = response.headers.get('content-type') || '';
+    const contentType = response.headers.get('content-type') ?? '';
     
     // Determine status based on response
     let status: 'success' | 'warning' | 'error' = 'success';
@@ -254,7 +254,7 @@ async function checkPage(url: string, name: string) {
         const isReal404 = response.status === 404 || 
           (text.includes('404') && text.includes('This page could not be found') && !text.includes('AgendaIQ'));
 
-        if (hasRealError || isReal404) {
+        if (hasRealError ?? isReal404) {
           status = 'error';
           message = isReal404 ? 'Page not found (404)' : 'Page contains error indicators';
         } else if (text.length < 100) {
@@ -280,7 +280,7 @@ async function checkPage(url: string, name: string) {
         
         if (json.error) {
           // 401 Unauthorized is expected for protected endpoints without auth
-          if (response.status === 401 || json.error === 'Unauthorized') {
+          if (response.status === 401 ?? json.error === 'Unauthorized') {
             status = 'warning';
             message = `API returned expected auth error: ${json.error}`;
           } else {

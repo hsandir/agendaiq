@@ -39,7 +39,7 @@ export default function MeetingsPageClient() {
       }
       
       const data = await response.json();
-      setMeetings(data.meetings || []);
+      setMeetings(data.meetings ?? []);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to fetch meetings');
     } finally {
