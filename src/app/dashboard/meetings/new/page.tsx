@@ -85,7 +85,11 @@ export default async function NewMeetingPage() {
     role: s.Role?.title ?? "No Role",
   })));
   
-  console.log("Found staff members:", users.length, "Current user staff:", !!currentStaff);
+  console.log("Server: Found staff members:", users.length, "Current user staff:", !!currentStaff);
+  
+  if (users.length === 0) {
+    console.warn("Server: No users found! Check database query");
+  }
 
   // Transform departments
   const transformedDepartments = (departments.map(d => ({

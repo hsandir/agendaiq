@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,6 +77,8 @@ interface MeetingFormStep1Props {
 }
 
 export function MeetingFormStep1({ users, departments, roles, onSubmit }: MeetingFormStep1Props) {
+  console.log("MeetingFormStep1 - users received:", users?.length ?? 0, "users");
+  
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -108,6 +110,13 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     department: 'department' in user ? user.department : null,
     role: 'role' in user ? user.role : null
   }));
+  
+  console.log("Attendee options created:", attendeeOptions.length, "options");
+  
+  useEffect(() => {
+    console.log("Component mounted/updated - users:", users?.length ?? 0);
+    console.log("First few users:", users?.slice(0, 3));
+  }, [users]);
 
   // Get unique departments and roles for filters
   const uniqueDepartments = (Array.from(new Set(users.map(u => u.department))));

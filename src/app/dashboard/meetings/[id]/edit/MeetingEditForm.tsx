@@ -70,7 +70,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   const [title, setTitle] = useState(meeting.title);
   const [description, setDescription] = useState(meeting.description);
   const [meetingType, setMeetingType] = useState(meeting.type ?? 'regular');
-  const [location, setLocation] = useState(meeting.location ?? '');
+  // location field removed - not in database schema
   
   // Date and Time
   const [startDate, setStartDate] = useState(() => {
@@ -193,7 +193,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
           start_time: startDateTime.toISOString(),
           end_time: endDateTime.toISOString(),
           meeting_type: meetingType,
-          location,
+          // location field removed - not in database schema
           zoom_meeting_id: zoomMeetingId ?? null,
           zoom_link: zoomLink ?? null,
           calendar_integration: calendarIntegration !== 'none' ? calendarIntegration : null,
