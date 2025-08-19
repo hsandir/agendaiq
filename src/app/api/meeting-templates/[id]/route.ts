@@ -90,7 +90,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { __name, __description, __duration, __agenda, __attendees, __is_active  } = body;
+    const { name, description, duration, agenda, attendees, is_active  } = body;
 
     const template = await prisma.meetingTemplate.update({
       where: { id: templateId },

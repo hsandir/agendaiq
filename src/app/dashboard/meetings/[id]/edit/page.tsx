@@ -56,7 +56,7 @@ export default async function EditMeetingPage({ params }: PageProps) {
 
   // Check if user has permission to edit this meeting
   const hasAdminAccess = isAnyAdmin(user);
-  const isOrganizer = meeting.organizer_id === userWithStaff?.Staff?.[0]?.id;
+  const isOrganizer = meeting.organizer_id === user.staff?.id;
 
   if (!hasAdminAccess && !isOrganizer) {
     redirect("/dashboard/meetings");
@@ -70,10 +70,10 @@ export default async function EditMeetingPage({ params }: PageProps) {
       },
       OR: [
         // Same department
-        { department_id: parseInt(user).staff?.department?.id },
+        { department_id: user.staff?.department?.id },
         // Leadership roles from same school
         { 
-          school_id: parseInt(user).staff?.school?.id,
+          school_id: user.staff?.school?.id,
           Role: {
             is_leadership: true
           }

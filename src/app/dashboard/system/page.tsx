@@ -92,7 +92,7 @@ interface HealthChecks {
 }
 
 export default function SystemManagementPage() {
-  const { data: __session  } = useSession();
+  const { data: session  } = useSession();
   const router = useRouter();
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [healthChecks, setHealthChecks] = useState<HealthChecks | null>(null);

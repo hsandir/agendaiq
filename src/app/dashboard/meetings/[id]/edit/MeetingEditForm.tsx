@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MultiSelectV2 as MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select-v2";
+import { MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select";
 import { safeFormatDateTime, safeFormatDate, safeFormatTime } from '@/lib/utils/safe-date';
 import { Calendar, Clock, Users, Video, ArrowLeft, Save, X, Plus, Trash2, GripVertical, ChevronUp, ChevronDown, FileText } from "lucide-react";
 import { format } from "date-fns";
@@ -70,7 +70,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   const [title, setTitle] = useState(meeting.title);
   const [description, setDescription] = useState(meeting.description);
   const [meetingType, setMeetingType] = useState(meeting.type ?? 'regular');
-  // location field removed - not in database schema
+  const [location, setLocation] = useState(meeting.location ?? '');
   
   // Date and Time
   const [startDate, setStartDate] = useState(() => {
@@ -193,7 +193,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
           start_time: startDateTime.toISOString(),
           end_time: endDateTime.toISOString(),
           meeting_type: meetingType,
-          // location field removed - not in database schema
+          location,
           zoom_meeting_id: zoomMeetingId ?? null,
           zoom_link: zoomLink ?? null,
           calendar_integration: calendarIntegration !== 'none' ? calendarIntegration : null,
@@ -581,7 +581,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
                         <SelectValue placeholder="Select responsible person" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">None</SelectItem>
+                        <SelectItem value="none">None</SelectItem>
                         {users.map(user => (
                           <SelectItem key={user.id} value={user.id}>
                             {user.name} ({user.Staff?.[0]?.Role?.title || "No role"})

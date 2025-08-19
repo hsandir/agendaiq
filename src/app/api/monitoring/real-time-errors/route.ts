@@ -193,7 +193,7 @@ export async function GET(request: NextRequest) {
 // Mark error as resolved
 export async function PATCH(request: NextRequest) {
   try {
-    const { errorId, resolved } = (await request.json()) as Record<__string, unknown>;
+    const { errorId, resolved } = (await request.json()) as Record<string, unknown>;
     
     // Find and update error in all pages
     for (const [page, errors] of errorStore.entries()) {

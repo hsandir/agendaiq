@@ -6,7 +6,7 @@ const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
   try {
-    const { type, packages } = (await request.json()) as Record<__string, unknown>;
+    const { type, packages } = (await request.json()) as Record<string, unknown>;
 
     if (type === 'packages') {
       return await updatePackages(packages);

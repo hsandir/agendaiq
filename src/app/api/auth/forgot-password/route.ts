@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return RateLimiters.passwordReset.createErrorResponse(rateLimitResult);
     }
 
-    const { email } = (await request.json()) as Record<__string, unknown>;
+    const { email } = (await request.json()) as Record<string, unknown>;
 
     if (!email) {
       return new NextResponse("Email is required", { status: 400 });

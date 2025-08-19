@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export function Header() {
-  const { data: __session  } = useSession();
+  const { data: session  } = useSession();
 
   return 
     <header className="bg-card text-card-foreground border-b border-border">

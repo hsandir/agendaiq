@@ -8,13 +8,13 @@ export async function POST(request: NextRequest) {
   console.log('Test run API called')
 
   try {
-    const { __suite, coverage = __false  } = await request.json()
+    const { suite, coverage = false  } = await request.json()
 
     // Create a stream response
     const encoder = new TextEncoder()
     const stream = new ReadableStream({
       async start(controller) {
-        const sendMessage = (data: Record<__string, unknown>) => {
+        const sendMessage = (data: Record<string, unknown>) => {
           controller.enqueue(encoder.encode(JSON.stringify(data) + '\n'))
         }
 

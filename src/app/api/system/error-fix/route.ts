@@ -7,7 +7,7 @@ const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
   try {
-    const { type } = (await request.json()) as Record<__string, unknown>;
+    const { type } = (await request.json()) as Record<string, unknown>;
 
     if (type === 'react-version-mismatch') {
       return await fixReactVersionMismatch();

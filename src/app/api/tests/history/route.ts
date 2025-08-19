@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { __passed, __failed, __coverage, __duration  } = body;
+    const { passed, failed, coverage, duration  } = body;
 
     // Log test run in audit log
     await prisma.auditLog.create({

@@ -61,15 +61,15 @@ export function MultiSelect({
   const filteredOptions = React.useMemo(() => {
     return options.filter((option) => {
       const matchesSearch = 
-        !searchQuery ?? option.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (option.email && option.email.toLowerCase().includes(searchQuery.toLowerCase()));
+        (!searchQuery || option.label.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (option.email?.toLowerCase().includes(searchQuery.toLowerCase()));
       
       const matchesDepartment = 
-        !showDepartmentFilter ?? departmentFilter === "all" ||
+        (!showDepartmentFilter || (departmentFilter === "all")) ||
         option.department === departmentFilter;
       
       const matchesRole = 
-        !showRoleFilter ?? roleFilter === "all" ||
+        (!showRoleFilter || (roleFilter === "all")) ||
         option.role === roleFilter;
       
       return matchesSearch && matchesDepartment && matchesRole;
@@ -88,8 +88,16 @@ export function MultiSelect({
     setRoleFilter("all");
   };
 
+  const handleRemove = (value: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    onChange(selected.filter((item) => item !== value));
+  };
+
   const handleSelectAll = () => {
-    const allValues = filteredOptions.map((option) => option.value));
+    const allValues = filteredOptions.map((option) => option.value);
     onChange(allValues);
     
     // Reset filters after selecting all
@@ -121,43 +129,40 @@ export function MultiSelect({
         </Label>
       )}
       
+      {/* Selected items display - Outside the popover trigger */}
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-2">
+          {selectedOptions.map((option) => (
+            <Badge key={option.value} variant="secondary" className="gap-1">
+              {option.label}
+              <button
+                type="button"
+                onClick={(e) => handleRemove(option.value, e)}
+                className="ml-1 rounded-full outline-none hover:bg-secondary-foreground/20"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
+
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between min-h-[(2.5rem)] h-auto"
+            className="w-full justify-between"
           >
-            <div className="flex flex-wrap gap-1 flex-1 text-left">
-              {selected.length === 0 ? (
-                <span className="text-muted-foreground">{placeholder}</span>
-              ) : selected.length <= 3 ? (
-                selectedOptions.map((option) => (
-                  <span key={option.value} className="inline-flex items-center gap-1 px-2 py-0.5 bg-secondary text-secondary-foreground rounded-md text-xs font-medium mr-1">
-                    {option.label}
-                    <span
-                      className="ml-1 cursor-pointer hover:text-destructive"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleSelect(option.value);
-                      }}
-                    >
-                      <X className="h-3 w-3" />
-                    </span>
-                  </span>
-                ))
-              ) : (
-                <Badge variant="secondary">
-                  {selected.length} selected
-                </Badge>
-              )}
-            </div>
+            <span className={cn(
+              "text-left",
+              selected.length === 0 && "text-muted-foreground"
+            )}>
+              {selected.length === 0
+                ? placeholder
+                : `${selected.length} selected`}
+            </span>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>

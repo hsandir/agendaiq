@@ -43,7 +43,7 @@ export async function PUT(
 
   try {
     const body = await request.json();
-    const { __title, __priority, __category, __department_id  } = body;
+    const { __title, __priority, category, __department_id  } = body;
 
     if (!title) {
       return NextResponse.json(

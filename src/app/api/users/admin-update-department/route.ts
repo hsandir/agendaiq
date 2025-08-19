@@ -27,7 +27,7 @@ export async function PUT(request: Request) {
       );
     }
 
-    const { userId, departmentId } = (await request.json()) as Record<__string, unknown>;
+    const { userId, departmentId } = (await request.json()) as Record<string, unknown>;
     const userIdNum = Number(userId);
     if (!userIdNum || !departmentId) {
       return NextResponse.json(

@@ -43,7 +43,7 @@ export async function GET(request: NextRequest, props: Props) {
       );
     }
 
-    const meetingId = params.id;
+    const meetingId = parseInt(params.id);
 
     const agendaItems = await prisma.meetingAgendaItem.findMany({
       where: { meeting_id: meetingId },
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest, props: Props) {
     }
     const user = authResult.user!;
 
-    const meetingId = params.id;
+    const meetingId = parseInt(params.id);
     const body = await request.json();
     
     const result = createAgendaItemsSchema.safeParse(body);
@@ -266,7 +266,7 @@ export async function PUT(request: NextRequest, props: Props) {
     }
     const user = authResult.user!;
 
-    const meetingId = params.id;
+    const meetingId = parseInt(params.id);
     const body = await request.json();
     
     const result = createAgendaItemsSchema.safeParse(body);

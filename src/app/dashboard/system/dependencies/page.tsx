@@ -94,7 +94,7 @@ export default function DependenciesPage() {
 
   // Uyumluluk değerlendirmesi
   const assessCompatibility = (pkg: Record<string, unknown>): CompatibilityInfo => {
-    const { __name, __current, __latest, __type  } = pkg;
+    const { name, current, latest, type  } = pkg;
     
     // Kritik paketler
     const criticalPackages = [

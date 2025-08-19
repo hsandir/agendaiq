@@ -78,20 +78,45 @@ export default async function DashboardPage() {
         gte: new Date(),
       },
     },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      start_time: true,
+      end_time: true,
+      status: true,
+      organizer_id: true,
+      created_at: true,
       Staff: {
-        include: {
-          User: true
+        select: {
+          id: true,
+          User: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          }
         }
       },
       MeetingAttendee: {
-        include: {
+        select: {
+          id: true,
+          staff_id: true,
+          status: true,
           Staff: {
-            include: {
-              User: true
+            select: {
+              id: true,
+              User: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true
+                }
+              }
             }
           }
-        },
+        }
       },
     },
     orderBy: {

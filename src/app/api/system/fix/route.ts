@@ -8,7 +8,7 @@ const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
   try {
-    const { action } = (await request.json()) as Record<__string, unknown>;
+    const { action } = (await request.json()) as Record<string, unknown>;
 
     if (action === 'check') {
       return await checkSystemHealth();

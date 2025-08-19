@@ -84,7 +84,7 @@ export default function UpdatesPage() {
 
   // Compatibility assessment function
   const assessCompatibility = (pkg: PackageUpdate): CompatibilityInfo => {
-    const { __name, __type, __current, __latest  } = pkg;
+    const { name, type, current, latest  } = pkg;
     
     // Critical packages that need special attention
     const criticalPackages = [
@@ -428,7 +428,7 @@ export default function UpdatesPage() {
             variant="outline" 
             size="sm" 
             onClick={fetchUpdates}
-            disabled={isLoading ?? isUpdating}
+            disabled={isLoading || isUpdating}
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
@@ -708,7 +708,7 @@ export default function UpdatesPage() {
                         size="sm" 
                         variant={compatibility.recommendation === 'avoid' ? 'outline' : 'default'}
                         onClick={() => performUpdate(update.name)}
-                        disabled={isUpdating ?? compatibility.recommendation === 'avoid'}
+                        disabled={isUpdating || compatibility.recommendation === 'avoid'}
                         className={compatibility.recommendation === 'avoid' ? 'opacity-50' : ''}
                       >
                         {isUpdating ? (
@@ -730,7 +730,7 @@ export default function UpdatesPage() {
       <div className="flex gap-4 flex-wrap">
         <Button 
           className="flex items-center" 
-          disabled={securityPackages === 0 ?? isUpdating}
+          disabled={securityPackages === 0 || isUpdating}
           onClick={updateSecurityPackages}
         >
           {isUpdating ? (
@@ -743,7 +743,7 @@ export default function UpdatesPage() {
         <Button 
           variant="outline" 
           className="flex items-center"
-          disabled={patchPackages === 0 ?? isUpdating}
+          disabled={patchPackages === 0 || isUpdating}
           onClick={updateAllPatches}
         >
           {isUpdating ? (
@@ -756,7 +756,7 @@ export default function UpdatesPage() {
         <Button 
           variant="outline" 
           className="flex items-center"
-          disabled={safePackages === 0 ?? isUpdating}
+          disabled={safePackages === 0 || isUpdating}
           onClick={updateSafePackages}
         >
           {isUpdating ? (
@@ -769,7 +769,7 @@ export default function UpdatesPage() {
         <Button 
           variant="outline" 
           className="flex items-center"
-          disabled={updates.length === 0 ?? isUpdating}
+          disabled={updates.length === 0 || isUpdating}
           onClick={() => performUpdate(updates.map(u => u.name))}
         >
           {isUpdating ? (

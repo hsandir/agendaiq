@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const { __type, __message, __restore, __components  } = (await request.json()) as Record<__string, unknown>;
+    const { type, message, restore, components  } = (await request.json()) as Record<string, unknown>;
 
     if (type === 'create') {
       return await createBackup(message);
@@ -81,7 +81,7 @@ async function createBackup(message: string = 'Manual backup') {
     const branchName = `backup/manual-${timestamp}`;
     
     // Get current branch and status
-    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
     const { stdout: __status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
     
     // Create backup info
@@ -136,7 +136,7 @@ async function pushToGitHub(message: string = 'Automated backup') {
     const timestamp = new Date().toISOString();
     
     // Get current branch
-    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
     
     // Stage and commit all changes
     await execAsync('git add -A', { cwd: process.cwd() });
@@ -225,7 +225,7 @@ async function autoBackup(triggerReason: string = 'System update') {
     await execAsync(`git commit -m "Auto-backup: ${sanitizedReason} - ${timestamp}"`, { cwd: process.cwd() });
     
     // Create backup branch
-    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
     await execAsync(`git branch ${branchName}`, { cwd: process.cwd() });
 
     const backupInfo: Record<string, unknown> = {
@@ -269,7 +269,7 @@ async function autoBackup(triggerReason: string = 'System update') {
 async function restoreBackup(backupBranch: string) {
   try {
     // Get current status
-    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
     
     // Checkout to backup branch
     await execAsync(`git checkout ${backupBranch}`, { cwd: process.cwd() });
@@ -385,7 +385,7 @@ async function listBackups() {
 
 async function getBackupStatus() {
   try {
-    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
     const { stdout: __status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
     const { stdout: __lastCommit  } = await execAsync('git log -1 --format="%H %s %ad" --date=iso', { cwd: process.cwd() });
     

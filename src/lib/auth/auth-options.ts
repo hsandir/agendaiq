@@ -125,6 +125,8 @@ export const authOptions: NextAuthOptions = {
             // // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, 'Password mismatch');
             return null; // Return null for invalid password
           }
+          
+          console.log('✅ Password verified successfully for:', user.email);
 
           // Check 2FA if enabled
           if (user.two_factor_enabled) {
@@ -205,6 +207,14 @@ export const authOptions: NextAuthOptions = {
             userData.trustDevice = true;
           }
           
+          console.log('✅ Returning user data:', {
+            id: userData.id,
+            email: userData.email,
+            hasStaff: !!userData.staff,
+            rememberMe: userData.rememberMe,
+            trustDevice: userData.trustDevice
+          });
+          
           return userData;
         } catch (error: unknown) {
           console.error('❌ Authorization error:', error instanceof Error ? error.message : String(error));
@@ -266,8 +276,11 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async jwt({ token, user, trigger }) {
+      console.log('🔐 JWT callback - trigger:', trigger, 'user:', !!user, 'token.id:', token.id);
+      
       // When user signs in (initial JWT creation)
       if (user) {
+        console.log('🔐 Creating JWT for user:', user.id, user.email);
         token.id = user.id.toString(); // Convert to string for JWT
         if (hasStaff(user)) {
           token.staff = user.staff;
@@ -360,6 +373,8 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
+      console.log('🔐 Session callback - token.id:', token.id, 'token.email:', token.email);
+      
       if (token.id) {
         session.user.id = token.id as string; // Keep as string
       }

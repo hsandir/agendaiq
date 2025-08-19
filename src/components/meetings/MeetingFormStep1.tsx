@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
-import { MultiSelectV2 as MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select-v2";
+import { MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select";
 import dynamic from 'next/dynamic';
 import type { RepeatConfig } from "@/components/meetings/RepeatMeetingModal";
 
@@ -78,6 +78,7 @@ interface MeetingFormStep1Props {
 
 export function MeetingFormStep1({ users, departments, roles, onSubmit }: MeetingFormStep1Props) {
   console.log("MeetingFormStep1 - users received:", users?.length ?? 0, "users");
+  console.log("Sample users:", users?.slice(0, 3));
   
   const router = useRouter();
   const [title, setTitle] = useState("");
@@ -225,8 +226,23 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Debug logging
+    console.log("Form submission - values:", {
+      title,
+      startTime,
+      endTime,
+      selectedAttendees,
+      attendeeCount: selectedAttendees.length
+    });
+    
     // Validate required fields
     if (!title || !startTime || !endTime || selectedAttendees.length === 0) {
+      console.error("Validation failed:", {
+        hasTitle: !!title,
+        hasStartTime: !!startTime,
+        hasEndTime: !!endTime,
+        attendeeCount: selectedAttendees.length
+      });
       alert("Please fill in all required fields and select at least one attendee.");
       return;
     }
@@ -552,7 +568,10 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
           <MultiSelect
             options={attendeeOptions}
             selected={selectedAttendees}
-            onChange={setSelectedAttendees}
+            onChange={(newSelection) => {
+              console.log("Attendees selected:", newSelection);
+              setSelectedAttendees(newSelection);
+            }}
             placeholder="Click to select attendees..."
             label="Meeting Attendees"
             required

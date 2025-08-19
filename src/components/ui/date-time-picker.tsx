@@ -102,7 +102,9 @@ export function DateTimePicker({
   const updateDateTime = (date: string, time: string) => {
     if (date && time) {
       const dateTimeString = `${date}T${time}`;
+      console.log("DateTimePicker updating value to:", dateTimeString);
       onChange(dateTimeString);
+      setIsOpen(false); // Close popover after selection
     }
   };
 

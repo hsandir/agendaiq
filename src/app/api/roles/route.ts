@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { __title, __priority, __is_leadership, __category, __description  } = body;
+    const { __title, __priority, __is_leadership, category, description  } = body;
 
     if (!title ?? priority === undefined) {
       return NextResponse.json(
@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { __id, __title, __priority, __is_leadership, __category, __description  } = body;
+    const { __id, __title, __priority, __is_leadership, category, description  } = body;
 
     if (!id) {
       return NextResponse.json(

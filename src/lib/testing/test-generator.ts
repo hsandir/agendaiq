@@ -153,14 +153,14 @@ describe('${info.name}', () => {
 
   it('applies custom className', () => {
     const { container } = renderWithProviders(
-      <${info.__name} ${info.props.length > 0 ? '{...__defaultProps} ' : ''}className="custom-class" />
+      <${info.name} ${info.props.length > 0 ? '{...__defaultProps} ' : ''}className="custom-class" />
     )
     
     expect(container.firstChild).toHaveClass('custom-class')
   })
 
   it('is accessible', () => {
-    const { container } = renderWithProviders(<${info.__name} ${info.props.length > 0 ? '{...__defaultProps}' : ''} />)
+    const { container } = renderWithProviders(<${info.name} ${info.props.length > 0 ? '{...__defaultProps}' : ''} />)
     
     // Basic accessibility checks
     expect(container.firstChild).toHaveAttribute('role')

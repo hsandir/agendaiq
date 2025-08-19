@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     }
 
     const body = (await request.json()) as AssignRoleRequest;
-    const { __email, __roleId, __departmentId, __managerId  } = body;
+    const { email, __roleId, __departmentId, __managerId  } = body;
 
     if (!email || !roleId || !departmentId) {
       return NextResponse.json(

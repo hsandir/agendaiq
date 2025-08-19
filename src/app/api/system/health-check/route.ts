@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { pages, type } = (await request.json()) as Record<__string, unknown>;
+    const { pages, type } = (await request.json()) as Record<string, unknown>;
 
     if (type === 'custom' && pages) {
       return await customHealthCheck(pages);

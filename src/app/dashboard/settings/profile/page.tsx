@@ -11,7 +11,7 @@ interface School {
 }
 
 export default function ProfilePage() {
-  const { data: __session  } = useSession();
+  const { data: session  } = useSession();
   const [formData, setFormData] = useState({
     name: '',
     email: '',

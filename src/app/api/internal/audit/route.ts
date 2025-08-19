@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       __success,
       __errorMessage,
       __metadata,
-      __category
+      category
      } = auditEvent;
 
     // Determine category and log appropriately

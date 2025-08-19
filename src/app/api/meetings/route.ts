@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
       // Admins can see all meetings in their district
       meetingWhereClause = {
         Staff: {
-          school_id: parseInt(staffRecord).school?.id
+          school_id: staffRecord.school?.id
         }
       };
     } else if (staffRecord.role?.is_leadership) {
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
           { organizer_id: staffRecord.id },
           {
             Staff: {
-              school_id: parseInt(staffRecord).school?.id
+              school_id: staffRecord.school?.id
             }
           },
           {
@@ -112,7 +112,9 @@ export async function GET(request: NextRequest) {
         description: true,
         start_time: true,
         end_time: true,
+        location: true,
         zoom_join_url: true,
+        zoom_link: true,
         status: true,
         organizer_id: true,
         // Only get organizer name for display
@@ -211,7 +213,7 @@ export async function POST(request: NextRequest) {
     
     // Sanitize input data
     const sanitizedData = sanitizeMeetingData(validationResult.data);
-    const { __title, __description, __startTime, __endTime, __zoomLink, __attendeeIds  } = sanitizedData as CreateMeetingRequest;
+    const { title, description, startTime, endTime, zoomLink, attendeeIds  } = sanitizedData as CreateMeetingRequest;
 
     // Validate date/time
     const start = new Date(startTime);
@@ -249,9 +251,9 @@ export async function POST(request: NextRequest) {
         zoom_join_url: zoomLink,
         organizer_id: staffRecord.id,
         status: "SCHEDULED",
-        department_id: parseInt(staffRecord).department.id,
-        district_id: parseInt(staffRecord).district.id,
-        school_id: parseInt(staffRecord).school.id,
+        department_id: staffRecord.department.id,
+        district_id: staffRecord.district.id,
+        school_id: staffRecord.school.id,
       },
       include: {
         Staff: {
@@ -346,7 +348,7 @@ export async function POST(request: NextRequest) {
     await prisma.meetingAuditLog.create({
       data: {
         meeting_id: completeeMeeting!.id,
-        user_id: parseInt(user.id),
+        user_id: user.id,
         staff_id: user.staff?.id,
         action: 'CREATE',
         details: `Created meeting: ${title}`,
