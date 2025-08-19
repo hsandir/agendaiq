@@ -152,9 +152,9 @@ export async function GET(request: NextRequest, props: Props) {
 
     // Check if user is authorized to view this meeting
     const hasAdminAccess = isAnyAdmin(user);
-    const isOrganizer = meeting.organizer_id === (user as any).staff?.id;
-    const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === (user as any).staff?.id);
-    const isSameDepartment = meeting.department_id === (user as any).staff?.department?.id;
+    const isOrganizer = meeting.organizer_id === user.staff?.id;
+    const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
+    const isSameDepartment = meeting.department_id === user.staff?.department?.id;
 
     if (!hasAdminAccess && !isOrganizer && !isAttendee && !isSameDepartment) {
       return NextResponse.json({ error: "Not authorized to view this meeting" }, { status: 403 });
@@ -165,7 +165,7 @@ export async function GET(request: NextRequest, props: Props) {
       data: {
         meeting_id: meetingId,
         user_id: parseInt(user.id),
-        staff_id: (user as any).staff?.id,
+        staff_id: user.staff?.id,
         action: 'VIEW',
         details: 'Viewed meeting details',
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
@@ -213,7 +213,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid meeting ID" }, { status: 400 });
     }
 
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     
     // Validate request data
     const validationResult = updateMeetingSchema.safeParse(body);
@@ -238,7 +238,7 @@ export async function PATCH(
     }
 
     const hasAdminAccess = isAnyAdmin(user);
-    const isOrganizer = existingMeeting.organizer_id === (user as any).staff?.id;
+    const isOrganizer = existingMeeting.organizer_id === user.staff?.id;
 
     if (!hasAdminAccess && !isOrganizer) {
       return NextResponse.json({ error: "Not authorized to edit this meeting" }, { status: 403 });
@@ -302,7 +302,7 @@ export async function PATCH(
       data: {
         meeting_id: updatedMeeting.id,
         user_id: parseInt(user.id),
-        staff_id: (user as any).staff?.id,
+        staff_id: user.staff?.id,
         action: 'UPDATE',
         details: `Updated meeting: ${updatedMeeting.title}`,
         changes: {

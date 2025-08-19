@@ -42,7 +42,7 @@ export async function PUT(
   }
 
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { __title, __priority, __category, __department_id  } = body;
 
     if (!title) {

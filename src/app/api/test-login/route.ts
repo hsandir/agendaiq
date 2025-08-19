@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt';
 // Temporary endpoint for debugging - no auth required
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = (await request.json()) as Record<string, unknown>;
+    const { email, password } = await request.json();
     
     console.log('Test login attempt for:', email);
     

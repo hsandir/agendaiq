@@ -22,7 +22,7 @@ export function InterfaceSettingsClient() {
   const [showCustomEditor, setShowCustomEditor] = useState(false);
   
   // Use centralized theme from ThemeProvider
-  const { theme: __currentTheme, __setTheme  } = useTheme();
+  const { theme: currentTheme, setTheme } = useTheme();
 
   // Load preferences from database and localStorage
   useEffect(() => {

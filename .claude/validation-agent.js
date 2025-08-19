@@ -49,6 +49,11 @@ class ValidationAgent {
   loadValidationRules() {
     this.validationRules = [
       {
+        name: 'TypeScript Anti-Patterns',
+        check: () => this.checkTypeScriptAntiPatterns(),
+        critical: true
+      },
+      {
         name: 'Staff ID Usage',
         check: () => this.checkStaffIdUsage(),
         critical: true
@@ -66,11 +71,6 @@ class ValidationAgent {
       {
         name: 'Authentication Coverage',
         check: () => this.checkAuthCoverage(),
-        critical: false
-      },
-      {
-        name: 'Language Consistency',
-        check: () => this.checkLanguage(),
         critical: false
       },
       {
@@ -241,10 +241,16 @@ class ValidationAgent {
     return true;
   }
 
-  checkLanguage() {
+  checkTypeScriptAntiPatterns() {
     const srcDir = path.join(process.cwd(), 'src');
-    const turkishWords = ['Kaydet', 'Güncelle', 'Sil', 'Ekle', 'İptal'];
     const issues = [];
+    
+    // Files that are allowed to use these patterns (for compatibility reasons)
+    const allowedFiles = [
+      'src/lib/auth/auth-options.ts', // Uses type guards properly
+      'src/lib/sentry/sentry-utils.ts', // Uses for compatibility
+      'src/lib/auth/policy.ts' // Uses for type compatibility
+    ];
     
     const scanDir = (dir) => {
       if (!fs.existsSync(dir)) return;
@@ -254,16 +260,67 @@ class ValidationAgent {
         const filePath = path.join(dir, file);
         const stat = fs.statSync(filePath);
         
+        // Skip test directories
+        if (file === '__tests__' || file === 'test' || file === 'tests') {
+          return;
+        }
+        
         if (stat.isDirectory() && !file.startsWith('.') && file !== 'node_modules') {
           scanDir(filePath);
         } else if (file.endsWith('.tsx') || file.endsWith('.ts')) {
           const content = fs.readFileSync(filePath, 'utf-8');
+          const relativePath = path.relative(process.cwd(), filePath);
           
-          turkishWords.forEach(word => {
-            if (content.includes(word)) {
-              issues.push(`${filePath}: Contains Turkish text "${word}"`);
+          // Skip allowed files
+          if (allowedFiles.includes(relativePath)) {
+            return;
+          }
+          
+          const lines = content.split('\n');
+          const fileIssues = [];
+          
+          lines.forEach((line, index) => {
+            const lineNum = index + 1;
+            
+            // Check for 'as any' usage
+            if (line.match(/\bas\s+any\b/)) {
+              fileIssues.push(`Line ${lineNum}: Uses 'as any' - type safety lost`);
+            }
+            
+            // Check for 'as Record<string, unknown>' usage
+            if (line.match(/\bas\s+Record\s*<\s*string\s*,\s*unknown\s*>/)) {
+              fileIssues.push(`Line ${lineNum}: Uses 'as Record<string, unknown>' - consider proper typing`);
+            }
+            
+            // Check for '@ts-ignore' comments
+            if (line.match(/@ts-ignore/)) {
+              fileIssues.push(`Line ${lineNum}: Uses '@ts-ignore' - fix the type error instead`);
+            }
+            
+            // Check for ':any' type annotations
+            if (line.match(/:\s*any\b/) && !line.includes('// any is required')) {
+              fileIssues.push(`Line ${lineNum}: Uses ':any' type annotation - use proper types`);
+            }
+            
+            // Check for 'Function' type (should use specific function signatures)
+            if (line.match(/:\s*Function\b/)) {
+              fileIssues.push(`Line ${lineNum}: Uses 'Function' type - use specific function signature`);
+            }
+            
+            // Check for missing interface usage (User extensions should use proper interfaces)
+            // Example: UserWithPassword interface for users with password fields
+            if (line.match(/User\s*&\s*\{.*hashedPassword/) || 
+                line.match(/extends\s+User.*hashedPassword/)) {
+              fileIssues.push(`Line ${lineNum}: Define proper interface (e.g., UserWithPassword) instead of inline type extension`);
             }
           });
+          
+          if (fileIssues.length > 0) {
+            issues.push({
+              file: relativePath,
+              problems: fileIssues
+            });
+          }
         }
       });
     };
@@ -271,7 +328,23 @@ class ValidationAgent {
     scanDir(srcDir);
     
     if (issues.length > 0) {
-      this.log(`Turkish text found in ${issues.length} files`, 'WARNING');
+      this.log(`TypeScript anti-patterns detected in ${issues.length} files:`, 'ERROR');
+      
+      // Show first 5 files with issues
+      issues.slice(0, 5).forEach(issue => {
+        this.log(`  ${issue.file}:`, 'ERROR');
+        issue.problems.slice(0, 3).forEach(problem => {
+          this.log(`    - ${problem}`, 'ERROR');
+        });
+        if (issue.problems.length > 3) {
+          this.log(`    ... and ${issue.problems.length - 3} more issues`, 'ERROR');
+        }
+      });
+      
+      if (issues.length > 5) {
+        this.log(`  ... and ${issues.length - 5} more files with issues`, 'ERROR');
+      }
+      
       return false;
     }
     

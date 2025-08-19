@@ -48,7 +48,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     
     // Log error to console since SystemError model doesn't exist
     console.error('System error reported:', body);

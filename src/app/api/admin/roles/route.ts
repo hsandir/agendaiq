@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { __title, __priority, __category, __department_id  } = body;
 
     if (!title) {

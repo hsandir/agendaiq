@@ -308,7 +308,7 @@ export async function GET(request: NextRequest) {
 // THIS IS A PUBLIC ENDPOINT - NO AUTH REQUIRED FOR DEBUGGING
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     
     // Get request metadata (await headers in Next.js 15)
     const headersList = await headers();

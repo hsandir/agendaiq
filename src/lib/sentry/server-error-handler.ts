@@ -94,7 +94,7 @@ export function handleServerError(
         scope.setUser{
           id: user.id,
           email: user.email,
-          username: user as Record<string, unknown>.username,
+          username: user.username,
           staffId: (user.staffId,
           role: user.role,
         });

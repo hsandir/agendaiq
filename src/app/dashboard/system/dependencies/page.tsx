@@ -210,8 +210,8 @@ export default function DependenciesPage() {
   };
 
   const compareVersions = (a: string, b: string): number => {
-    const aParts = a.replace(/[^\d.]/g, '').split('.').map(Number));
-    const bParts = (b.replace(/[^\d.]/g, '').split('.').map(Number));
+    const aParts = a.replace(/[^\d.]/g, '').split('.').map(Number);
+    const bParts = b.replace(/[^\d.]/g, '').split('.').map(Number);
     
     for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
       const aPart = aParts[i] || 0;
@@ -270,7 +270,7 @@ export default function DependenciesPage() {
       
       setOperations(prev => [...prev, operation]);
       
-      const response = await fetch'/api/system/update', {
+      const response = await fetch('/api/system/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -422,7 +422,7 @@ export default function DependenciesPage() {
       
       setOperations(prev => [...prev, rollbackOperation]);
       
-      const response = await fetch'/api/system/update', {
+      const response = await fetch('/api/system/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -604,7 +604,7 @@ export default function DependenciesPage() {
   });
 
   const statusCounts = dependencies.reduce((acc, dep) => {
-    acc[(dep.status)] = acc[dep.status] || 0) + 1;
+    acc[dep.status] = (acc[dep.status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 

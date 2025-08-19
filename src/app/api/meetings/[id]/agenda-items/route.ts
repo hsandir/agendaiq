@@ -104,7 +104,7 @@ export async function POST(request: NextRequest, props: Props) {
     const user = authResult.user!;
 
     const meetingId = params.id;
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     
     const result = createAgendaItemsSchema.safeParse(body);
     if (!result.success) {
@@ -129,8 +129,8 @@ export async function POST(request: NextRequest, props: Props) {
       );
     }
 
-    const isOrganizer = meeting.organizer_id === (user as any).staff?.id;
-    const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === (user as any).staff?.id);
+    const isOrganizer = meeting.organizer_id === user.staff?.id;
+    const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
 
     if (!isOrganizer && !isAttendee) {
       return NextResponse.json(
@@ -199,7 +199,7 @@ export async function POST(request: NextRequest, props: Props) {
       recordId: meetingId.toString(),
       operation: 'BULK_CREATE',
       userId: user.id,
-      staffId: (user as any).staff?.id,
+      staffId: user.staff?.id,
       source: 'WEB_UI',
       description: `Created ${createdItems.length} agenda items for meeting ${meeting.title}`
     });
@@ -267,7 +267,7 @@ export async function PUT(request: NextRequest, props: Props) {
     const user = authResult.user!;
 
     const meetingId = params.id;
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     
     const result = createAgendaItemsSchema.safeParse(body);
     if (!result.success) {

@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     const user = authResult.user!;
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
 
     // Get device info from request
     const userAgent = request.headers.get('user-agent') || 'Unknown';

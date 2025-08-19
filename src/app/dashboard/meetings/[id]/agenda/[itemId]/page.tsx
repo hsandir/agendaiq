@@ -33,7 +33,7 @@ export default async function AgendaItemPage(props: Props) {
             }
           },
           MeetingAttendee: {
-            where: { staff_id: (user as any).staff?.id || -1 }
+            where: { staff_id: user.staff?.id || -1 }
           }
         }
       },
@@ -76,10 +76,10 @@ export default async function AgendaItemPage(props: Props) {
   }
 
   // Check permissions
-  const isOrganizer = agendaItem.Meeting.organizer_id === (user as any).staff?.id;
+  const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
   const isAttendee = agendaItem.Meeting.MeetingAttendee.length > 0;
   const hasAdminAccess = isAnyAdmin(user);
-  const isResponsible = agendaItem.responsible_staff_id === (user as any).staff?.id;
+  const isResponsible = agendaItem.responsible_staff_id === user.staff?.id;
 
   if (!isOrganizer && !isAttendee && !hasAdminAccess) {
     notFound();

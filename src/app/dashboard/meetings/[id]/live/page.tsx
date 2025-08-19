@@ -1,4 +1,5 @@
 import { requireAuth, AuthPresets } from "@/lib/auth/auth-utils";
+import type { UserWithStaff, SessionUser } from '@/types/auth';
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { MeetingLiveView } from "@/components/meetings/MeetingLiveView";
@@ -41,11 +42,11 @@ export default async function MeetingLivePage(props: Props) {
   const attendeeCheck = await prisma.meetingAttendee.findFirst({
     where: {
       meeting_id: meetingId,
-      staff_id: (user as any).staff?.id || -1
+      staff_id: user.staff?.id || -1
     }
   });
 
-  const isOrganizer = meeting.organizer_id === (user as any).staff?.id;
+  const isOrganizer = meeting.organizer_id === user.staff?.id;
   const isAttendee = !!attendeeCheck;
   const hasAdminAccess = isAnyAdmin(user);
 
@@ -124,10 +125,10 @@ export default async function MeetingLivePage(props: Props) {
     where: {
       OR: [
         // Same department
-        { department_id: parseInt(user).staff?.department?.id },
+        { department_id: user.staff?.department?.id },
         // Leadership roles from same school
         { 
-          school_id: parseInt(user).staff?.school?.id,
+          school_id: user.staff?.school?.id,
           Role: {
             is_leadership: true
           }
@@ -162,9 +163,9 @@ export default async function MeetingLivePage(props: Props) {
   return (
     <div className="min-h-screen bg-muted">
       <MeetingLiveView
-        meeting={fullMeeting as Record<string, unknown>}
+        meeting={fullMeeting}
         currentUser={user}
-        allStaff={allStaff as Record<string, unknown>}
+        allStaff={allStaff}
         isOrganizer={isOrganizer}
         isAdmin={hasAdminAccess}
       />

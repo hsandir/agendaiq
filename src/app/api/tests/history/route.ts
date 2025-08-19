@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { __passed, __failed, __coverage, __duration  } = body;
 
     // Log test run in audit log
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
         operation: 'CREATE',
         source: 'SYSTEM',
         user_id: parseInt(user.id),
-        staff_id: (user as any).staff?.id,
+        staff_id: user.staff?.id,
         field_changes: {
           passed,
           failed,

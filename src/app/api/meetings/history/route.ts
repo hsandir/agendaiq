@@ -33,10 +33,10 @@ export async function GET(request: NextRequest) {
     // Tab-based filtering
     switch (tab) {
       case 'my_meetings':
-        whereClause.organizer_id = (user as any).staff?.id;
+        whereClause.organizer_id = user.staff?.id;
         break;
       case 'department':
-        if ((user as any).staff?.department?.id) {
+        if (user.staff?.department?.id) {
           if (includeSubDepartments) {
             // Get all departments in hierarchy
             const departments = await prisma.department.findMany({
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
         }
         break;
       case 'attended':
-        if ((user as any).staff?.id) {
+        if (user.staff?.id) {
           whereClause.OR = [
             { organizer_id: user.staff.id },
             { MeetingAttendee: { some: { staff_id: user.staff.id } } }

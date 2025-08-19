@@ -216,7 +216,7 @@ export async function checkAuthRequirements(requirements: AuthRequirements = {})
     }
 
     // Check leadership requirement (legacy)
-    if (requirements.requireLeadership && !(user as any).staff?.role?.is_leadership) {
+    if (requirements.requireLeadership && !user.staff?.role?.is_leadership) {
       // Leadership access required but user is not leadership
       return { 
         authorized: false, 

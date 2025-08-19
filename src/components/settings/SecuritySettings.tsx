@@ -104,7 +104,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
           <h2 className="text-lg font-semibold">Two-Factor Authentication</h2>
         </div>
 
-        {(user as Record<string, unknown>.two_factor_enabled ? (
+        {user.two_factor_enabled ? (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>

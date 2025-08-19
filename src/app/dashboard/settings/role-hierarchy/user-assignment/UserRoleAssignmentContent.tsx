@@ -111,14 +111,14 @@ export default function UserRoleAssignmentContent() {
     // Filter by role
     if (roleFilter) {
       filtered = filtered.filter(user => 
-        (user.Staff?.some(staff => staff.Role?.title === roleFilter)
+        user.Staff?.some(staff => staff.Role?.title === roleFilter)
       );
     }
 
     // Filter by department
     if (departmentFilter) {
       filtered = filtered.filter(user => 
-        (user.Staff?.some(staff => staff.Department?.name === departmentFilter)
+        user.Staff?.some(staff => staff.Department?.name === departmentFilter)
       );
     }
 

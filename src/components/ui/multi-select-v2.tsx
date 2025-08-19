@@ -100,7 +100,7 @@ export function MultiSelectV2({
   };
 
   const handleSelectAll = () => {
-    const allValues = filteredOptions.map((option) => option.value));
+    const allValues = filteredOptions.map((option) => option.value);
     onChange(allValues);
     
     // Reset filters after selecting all

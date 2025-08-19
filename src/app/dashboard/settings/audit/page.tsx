@@ -29,7 +29,7 @@ export default async function AuditPage() {
     }
   });
 
-  if (!userDetails || (userDetails.Staff?.[0]?.Role?.title !== "Administrator") {
+  if (!userDetails || (userDetails.Staff?.[0]?.Role?.title !== "Administrator")) {
     redirect("/dashboard");
   }
 

@@ -68,8 +68,8 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
 
   // Check if user has permission to edit this meeting's agenda
   const hasAdminAccess = isAnyAdmin(user);
-  const isOrganizer = meeting.organizer_id === (user as any).staff?.id;
-  const isAttendee = meeting.MeetingAttendee.some(a => a.staff_id === (user as any).staff?.id);
+  const isOrganizer = meeting.organizer_id === user.staff?.id;
+  const isAttendee = meeting.MeetingAttendee.some(a => a.staff_id === user.staff?.id);
 
   if (!hasAdminAccess && !isOrganizer && !isAttendee) {
     redirect("/dashboard/meetings");
@@ -111,12 +111,12 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
         not: meetingId
       },
       OR: [
-        { organizer_id: (user as any).staff?.id },
+        { organizer_id: user.staff?.id },
         { department_id: parseInt(user).staff?.department?.id },
         {
           MeetingAttendee: {
             some: {
-              staff_id: (user as any).staff?.id
+              staff_id: user.staff?.id
             }
           }
         }

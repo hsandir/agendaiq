@@ -84,9 +84,9 @@ export function useMonitoringUser() {
         id: session.user.id as string,
         username: session.user.name || undefined,
         // Never send email directly
-        tenant_id: session.(user as any).staff?.school_id,
-        role: session.(user as any).staff?.role?.title,
-        segment: session.(user as any).staff?.role?.is_leadership ? 'vip' : 'standard',
+        tenant_id: session.user.staff?.school_id,
+        role: session.user.staff?.role?.title,
+        segment: session.user.staff?.role?.is_leadership ? 'vip' : 'standard',
       });
 
       // Add breadcrumb for login

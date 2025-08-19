@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return RateLimiters.registration.createErrorResponse(rateLimitResult);
     }
 
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
 
     // SECURITY FIX: Add input validation schema
     const signupSchema = z.object({

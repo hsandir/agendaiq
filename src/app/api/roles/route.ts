@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { __title, __priority, __is_leadership, __category, __description  } = body;
 
     if (!title || priority === undefined) {
@@ -86,7 +86,7 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { __id, __title, __priority, __is_leadership, __category, __description  } = body;
 
     if (!id) {

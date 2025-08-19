@@ -23,7 +23,7 @@ export default async function MeetingPage({ params }: PageProps) {
     where: { id: meetingId },
     include: {
       MeetingAttendee: {
-        where: { staff_id: (user as any).staff?.id || -1 }
+        where: { staff_id: user.staff?.id || -1 }
       }
     }
   });
@@ -33,7 +33,7 @@ export default async function MeetingPage({ params }: PageProps) {
   }
 
   // Check permissions
-  const isOrganizer = meeting.organizer_id === (user as any).staff?.id;
+  const isOrganizer = meeting.organizer_id === user.staff?.id;
   const isAttendee = meeting.MeetingAttendee.length > 0;
   const hasAdminAccess = isAnyAdmin(user);
 

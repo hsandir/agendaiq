@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Download as FiDownload, Eye as FiEye, Trash2 as FiTrash2, Edit as FiEdit, RefreshCw as FiRefreshCw, User as FiUser, Database as FiDatabase, Activity as FiActivity, Shield as FiShield, AlertTriangle as FiAlertTriangle } from 'lucide-react';
 import { RoleKey } from '@/lib/auth/policy';
+import type { UserWithStaff, SessionUser } from '@/types/auth';
 
 // User interface for authentication context
 interface AuthUser {
@@ -396,12 +397,12 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
   // Permission validation helper
   const canViewAuditDetails = useCallback((log: AuditLog): boolean => {
     // Ops Admin can view all logs
-    if ((user as any).staff?.role.key === RoleKey.OPS_ADMIN) {
+    if (user.staff?.Role?.key === RoleKey.OPS_ADMIN) {
       return true;
     }
 
     // Leadership can view logs from their own organization
-    if ((user as any).staff?.role.is_leadership) {
+    if (user.staff?.Role?.is_leadership) {
       // Can view logs from same user or their own staff actions
       if (isCriticalLog(log)) {
         return log.user_id === user.id || log.staff_id === user.staff.id;
@@ -413,10 +414,10 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
 
     // Regular staff can only view their own audit logs
     if (isCriticalLog(log)) {
-      return log.user_id === user.id || log.staff_id === (user as any).staff?.id;
+      return log.user_id === user.id || log.staff_id === user.staff?.id;
     } else {
       // For legacy logs, check the User/Staff relations
-      return log.User?.id === user.id || log.Staff?.id === (user as any).staff?.id;
+      return log.User?.id === user.id || log.Staff?.id === user.staff?.id;
     }
   }, [user]);
 

@@ -99,7 +99,7 @@ export default function RoleTasksPage() {
           ...task,
           meeting: task.meeting || { id: 0, title: 'Unknown', date: new Date().toISOString() }
         }))
-      })));
+      }));
       setRolesWithTasks(safeRoles);
       setTransitionHistory(data.transitions || []);
       

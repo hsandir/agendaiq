@@ -122,7 +122,7 @@ export const authOptions: NextAuthOptions = {
           
           if (!isValid) {
             console.error('Invalid password for user:', user.email);
-            // await AuditClient.logAuthEvent'login_failure', user.id, (user.Staff[0]?.id, req, 'Password mismatch');
+            // // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, 'Password mismatch');
             return null; // Return null for invalid password
           }
 
@@ -134,7 +134,7 @@ export const authOptions: NextAuthOptions = {
 
             // Verify the 2FA code
             const isValidToken = speakeasy.totp.verify({
-              secret: (user as Record<string, unknown>).two_factor_secret!,
+              secret: user.two_factor_secret!,
               encoding: 'base32',
               token: credentials.twoFactorCode,
               window: 2
@@ -145,7 +145,7 @@ export const authOptions: NextAuthOptions = {
               const isBackupCode = user.backup_codes.includes(credentials.twoFactorCode);
               
               if (!isBackupCode) {
-                // await AuditClient.logAuthEvent'login_failure', user.id, (user.Staff[0]?.id, req, '2FA code invalid');
+                // // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, '2FA code invalid');
                 console.error('Invalid 2FA code and not a backup code');
                 return null; // Return null for invalid 2FA
               }
@@ -274,7 +274,7 @@ export const authOptions: NextAuthOptions = {
         }
         
         // Handle rememberMe and trustDevice flags
-        if ((user as Record<string, unknown>).rememberMe) {
+        if ('rememberMe' in user && user.rememberMe) {
           token.rememberMe = true;
           // Set longer expiry for remember me (7 days)
           const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
@@ -285,7 +285,7 @@ export const authOptions: NextAuthOptions = {
           token.exp = Math.floor(Date.now() / 1000) + maxAge;
         }
         
-        if ((user as Record<string, unknown>).trustDevice) {
+        if ('trustDevice' in user && user.trustDevice) {
           token.trustDevice = true;
         }
       }
@@ -361,7 +361,7 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token.id) {
-        session.user.id as string = token.id; // Keep as string
+        session.user.id = token.id as string; // Keep as string
       }
       if (hasStaffToken(token)) {
         session.user.staff = token.staff;

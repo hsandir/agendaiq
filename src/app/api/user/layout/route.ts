@@ -81,7 +81,7 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const validatedData = layoutSchema.parse(body);
     
     // Use layoutId if provided, otherwise use layout
@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest) {
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: (user as any).staff?.id || undefined,
+      staffId: user.staff?.id || undefined,
       source: 'WEB_UI',
       description: `Layout changed to ${layoutToSave}`,
     }).catch(err => console.error('Audit log failed:', err));

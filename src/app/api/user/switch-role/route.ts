@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { role } = body;
 
     if (!role || !['admin', 'user'].includes(role)) {
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       }
     });
 
-    if (!user || !(user.Staff || user.Staff.length === 0) {
+    if (!user || !(user.Staff || user.Staff.length === 0)) {
       return NextResponse.json(
         { error: "User staff record not found" },
         { status: 404 }

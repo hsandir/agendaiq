@@ -54,7 +54,7 @@ export default async function DashboardLayout({
         user={{
           email: user.email,
           name: user.name || undefined,
-          staff_id: (user as any).staff?.id || null,
+          staff_id: userWithStaff?.Staff?.[0]?.id || null,
         }}
         currentRole={currentRole}
         userWithStaff={userWithStaff}

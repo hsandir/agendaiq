@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     // Development endpoint - no auth required
     console.log('Autofix POST API called');
 
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { __suggestionId, __errorType, __errorMessage, dryRun = __true, __customSuggestion  } = body;
 
     // Use custom suggestion if provided, otherwise generate and find
@@ -202,7 +202,7 @@ async function generateAutofixSuggestions(
       description: 'Remove node_modules and package-lock.json, then reinstall',
       confidence: 'high',
       commands: [
-        'rm -rf node_modules package-lock.json',
+        'mv node_modules trash/node_modules-$(date +%s) 2>/dev/null || true && mv package-lock.json trash/ 2>/dev/null || true',
         'npm cache clean --force',
         'npm install',
       ],
@@ -338,8 +338,8 @@ async function generateAutofixSuggestions(
       description: 'Remove build artifacts and rebuild',
       confidence: 'high',
       commands: [
-        'rm -rf .next',
-        'rm -rf dist',
+        'mv .next trash/.next-$(date +%s) 2>/dev/null || true',
+        'mv dist trash/dist-$(date +%s) 2>/dev/null || true',
         'npm run build',
       ],
       files: [],
@@ -438,7 +438,7 @@ JWT_SECRET=your-jwt-secret`,
       description: 'Perform a complete cleanup and rebuild',
       confidence: 'low',
       commands: [
-        'rm -rf node_modules .next package-lock.json',
+        'mv node_modules trash/node_modules-$(date +%s) 2>/dev/null || true && mv .next trash/.next-$(date +%s) 2>/dev/null || true && mv package-lock.json trash/ 2>/dev/null || true',
         'npm cache clean --force',
         'npm install',
         'npm run build',

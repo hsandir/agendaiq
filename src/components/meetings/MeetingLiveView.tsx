@@ -96,8 +96,8 @@ export function MeetingLiveView({
   }, []);
 
   // Set up real-time updates with Pusher
-  const eventHandlers = useMemo(() => {
-    [((EVENTS.AGENDA_ITEM_UPDATED)]: (data: unknown) => {
+  const eventHandlers = useMemo(() => ({
+    [EVENTS.AGENDA_ITEM_UPDATED]: (data: unknown) => {
       const typedData = data as Record<string, unknown>;
       if (typeof typedData.itemId === 'number' && typedData.updates && typeof typedData.updates === 'object') {
         setAgendaItems(prev => prev.map(item => 
@@ -183,11 +183,11 @@ export function MeetingLiveView({
     }
   };
 
-  const handleItemUpdate = (async (itemId: number, updates: Record<string, unknown>) => {
+  const handleItemUpdate = async (itemId: number, updates: Record<string, unknown>) => {
     // Optimistic update
     setAgendaItems(prev => prev.map(item => 
       item.id === itemId ? { ...item, ...updates } : item
-    )));
+    ));
 
     try {
       const response = await fetch(`/api/meetings/${meeting.id}/agenda-items/${itemId}`, {
@@ -456,7 +456,7 @@ export function MeetingLiveView({
                         isExpanded={expandedItems.has(item.id)}
                         onToggleExpand={() => toggleItemExpanded(item.id)}
                         onUpdate={(updates) => handleItemUpdate(item.id, updates)}
-                        canEdit={isOrganizer || isAdmin || item.responsible_staff_id === (currentUser as any).staff?.id}
+                        canEdit={isOrganizer || isAdmin || item.responsible_staff_id === currentUser.staff?.id}
                         currentUserId={currentUser.id}
                         currentUserName={currentUser.name || ''}
                         meetingId={meeting.id}

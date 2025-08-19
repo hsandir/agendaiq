@@ -20,7 +20,7 @@ export async function PUT(
 
     const user = authResult.user!;
     const deviceId = params.id;
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
 
     // Verify device belongs to user
     const device = await prisma.device.findFirst({

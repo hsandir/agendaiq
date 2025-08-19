@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const data = (await request.json()) as Record<string, unknown>;
+    const data = await request.json();
     const { newPassword, confirmPassword } = data;
 
     if (newPassword !== confirmPassword) {

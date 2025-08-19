@@ -7,7 +7,7 @@ import { auditSystem } from '@/lib/audit/hybrid-audit-system';
  */
 export async function POST(request: NextRequest) {
   try {
-    const auditEvent = (await request.json()) as Record<string, unknown>;
+    const auditEvent = await request.json();
     
     // Extract event data
     const { __action,

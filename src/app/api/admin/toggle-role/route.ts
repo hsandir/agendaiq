@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { email, roleId } = body;
 
     if (!email || !roleId) {

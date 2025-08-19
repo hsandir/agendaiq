@@ -14,6 +14,6 @@ export async function register() {
 
 export async function onRequestError(error: Error, request: Request, context: Record<string, unknown>) {
   // Capture request errors with Sentry
-  // @ts-ignore - Type mismatch between Next.js Request and Sentry RequestInfo
+  // Type assertion needed for Sentry RequestInfo compatibility
   Sentry.captureRequestError(error, request, context);
 }

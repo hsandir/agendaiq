@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { name, code, address, phone, email, district_id } = body;
 
     if (!name || !code || !district_id) {
@@ -141,7 +141,7 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { id, name, code, address, phone, email, district_id } = body;
 
     if (!id) {

@@ -1,0 +1,223 @@
+{
+  "name": "AgendaIQ Validation Agent",
+  "version": "1.0.0",
+  "description": "Local validation rules for preventing syntax and type errors",
+  
+  "forbiddenPatterns": [
+    {
+      "pattern": "(user as Record<string, unknown>",
+      "reason": "Causes syntax errors and type unsafety",
+      "suggestion": "Use proper interface: UserWithAuth, UserWithStaff, etc."
+    },
+    {
+      "pattern": "as any",
+      "reason": "Loses type safety, causes ESLint errors",
+      "suggestion": "Define proper interfaces or use type guards"
+    },
+    {
+      "pattern": "@ts-ignore",
+      "reason": "Hides problems instead of solving them",
+      "suggestion": "Fix the actual type issue"
+    },
+    {
+      "pattern": "@ts-nocheck",
+      "reason": "Disables all type checking",
+      "suggestion": "Fix specific type issues instead"
+    },
+    {
+      "pattern": "Math.floor(.*)))",
+      "reason": "Extra parentheses cause syntax errors",
+      "suggestion": "Check parenthesis matching: Math.floor(value)"
+    },
+    {
+      "pattern": "return NextResponse.json{",
+      "reason": "Missing parentheses",
+      "suggestion": "Use: return NextResponse.json({"
+    },
+    {
+      "pattern": "if !(condition)",
+      "reason": "Missing parentheses around negation",
+      "suggestion": "Use: if (!condition)"
+    },
+    {
+      "pattern": "session.(user",
+      "reason": "Invalid property access",
+      "suggestion": "Use: session.user"
+    },
+    {
+      "pattern": "__[a-zA-Z]+",
+      "reason": "Double underscore indicates incomplete destructuring",
+      "suggestion": "Remove underscores from variable names"
+    },
+    {
+      "pattern": "rm -rf",
+      "reason": "Dangerous command - can delete important files",
+      "suggestion": "Move to trash folder first, then delete if needed"
+    },
+    {
+      "pattern": "prisma migrate reset",
+      "reason": "Deletes all data in database",
+      "suggestion": "Ask for 4 confirmations before database reset"
+    },
+    {
+      "pattern": "prisma db push --force-reset",
+      "reason": "Deletes all data in database",
+      "suggestion": "Never use force-reset in production"
+    }
+  ],
+  
+  "requiredInterfaces": [
+    {
+      "name": "UserWithAuth",
+      "location": "src/types/auth.ts",
+      "definition": {
+        "id": "string",
+        "email": "string",
+        "name": "string | null",
+        "hashedPassword": "string | null",
+        "emailVerified": "Date | null",
+        "two_factor_enabled": "boolean",
+        "two_factor_secret": "string | null",
+        "backup_codes": "string[]",
+        "is_admin": "boolean",
+        "is_system_admin": "boolean",
+        "is_school_admin": "boolean",
+        "staff_id": "number | null"
+      }
+    },
+    {
+      "name": "UserWithStaff",
+      "location": "src/types/auth.ts",
+      "definition": {
+        "extends": "UserWithAuth",
+        "Staff": "StaffWithRole[] | null"
+      }
+    },
+    {
+      "name": "StaffWithRole",
+      "location": "src/types/auth.ts",
+      "definition": {
+        "id": "number",
+        "user_id": "number",
+        "role_id": "number",
+        "department_id": "number | null",
+        "school_id": "number | null",
+        "Role": "RoleInfo",
+        "Department": "DepartmentInfo | null",
+        "School": "SchoolInfo | null"
+      }
+    },
+    {
+      "name": "AuthenticatedUser",
+      "location": "src/types/auth.ts",
+      "definition": {
+        "id": "string",
+        "email": "string",
+        "name": "string | null",
+        "is_system_admin": "boolean",
+        "is_school_admin": "boolean",
+        "capabilities": "string[]",
+        "staff": "StaffWithRole | null"
+      }
+    }
+  ],
+  
+  "typeGuards": [
+    {
+      "name": "isUserWithPassword",
+      "checks": "hashedPassword",
+      "usage": "if (isUserWithPassword(user)) { /* user.hashedPassword is safe */ }"
+    },
+    {
+      "name": "isUserWithStaff",
+      "checks": "Staff array",
+      "usage": "if (isUserWithStaff(user)) { /* user.Staff is safe */ }"
+    },
+    {
+      "name": "isUserAdmin",
+      "checks": "admin privileges",
+      "usage": "if (isUserAdmin(user)) { /* user has admin rights */ }"
+    },
+    {
+      "name": "hasCapability",
+      "checks": "specific capability",
+      "usage": "if (hasCapability(user, 'ops:backup')) { /* user can backup */ }"
+    }
+  ],
+  
+  "validationChecks": [
+    {
+      "before": "git commit",
+      "run": [
+        "Check for forbidden patterns",
+        "Verify interfaces are imported",
+        "Ensure no 'as any' usage",
+        "Validate parentheses matching"
+      ]
+    },
+    {
+      "before": "npm run build",
+      "run": [
+        "Run TypeScript compiler check: npx tsc --noEmit",
+        "Check for syntax errors",
+        "Verify all imports exist"
+      ]
+    },
+    {
+      "before": "database operations",
+      "run": [
+        "Confirm no reset commands",
+        "Backup data if migration",
+        "Check for DROP or TRUNCATE"
+      ]
+    }
+  ],
+  
+  "correctPatterns": [
+    {
+      "name": "Type-safe user access",
+      "example": "const user = await prisma.user.findUnique({ ... }) as UserWithAuth;"
+    },
+    {
+      "name": "Safe password check",
+      "example": "if (user?.hashedPassword) { await bcrypt.compare(password, user.hashedPassword) }"
+    },
+    {
+      "name": "Safe staff access",
+      "example": "const role = user.Staff?.[0]?.Role?.title"
+    },
+    {
+      "name": "Safe capability check",
+      "example": "if (user.capabilities?.includes('ops:backup')) { ... }"
+    }
+  ],
+  
+  "autoFixSuggestions": [
+    {
+      "detect": "(user as Record<string, unknown>).hashedPassword",
+      "replace": "user?.hashedPassword",
+      "requireImport": "UserWithAuth from '@/types/auth'"
+    },
+    {
+      "detect": "session.(user as Record<string, unknown>)",
+      "replace": "session.user",
+      "requireImport": null
+    },
+    {
+      "detect": "Math.floor(...)))",
+      "replace": "Math.floor(...)",
+      "requireImport": null
+    }
+  ],
+  
+  "criticalRules": [
+    "NEVER use 'rm -rf' directly - always move to trash first",
+    "NEVER reset database without 4 explicit confirmations",
+    "NEVER use 'as any' - define proper interfaces",
+    "NEVER skip type checking - fix the root cause",
+    "NEVER use force push without backup",
+    "ALWAYS check syntax before committing",
+    "ALWAYS use type guards for runtime checks",
+    "ALWAYS backup before migrations"
+  ]
+}

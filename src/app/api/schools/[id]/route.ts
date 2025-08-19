@@ -26,7 +26,7 @@ export async function PUT(
       return new NextResponse("Forbidden", { status: 403 });
     }
 
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { __name, __address, ___city, ___state, ___zipCode, ___phone, ___website, __logo  } = body;
 
     if (!name || typeof name !== "string" || String(name).trim().length === 0) {

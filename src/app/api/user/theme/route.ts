@@ -81,7 +81,7 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const validatedData = themeSchema.parse(body);
     
     // Use themeId if provided, otherwise use theme
@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest) {
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: (user as any).staff?.id || undefined,
+      staffId: user.staff?.id || undefined,
       source: 'WEB_UI',
       description: `Theme changed to ${themeToSave}`,
     }).catch(err => console.error('Audit log failed:', err));

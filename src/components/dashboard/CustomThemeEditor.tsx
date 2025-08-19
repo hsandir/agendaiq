@@ -227,7 +227,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
   };
 
   const hslToHex = (hsl: string) => {
-    const [h, s, l] = hsl.split(' ').map(Number));
+    const [h, s, l] = hsl.split(' ').map(Number);
     const hNorm = h / 360;
     const sNorm = s / 100;
     const lNorm = l / 100;

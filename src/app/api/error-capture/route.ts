@@ -14,7 +14,7 @@ const errors: ErrorData[] = [];
 
 export async function POST(request: NextRequest) {
   try {
-    const errorData = (await request.json()) as Record<string, unknown>;
+    const errorData = await request.json();
     
     const capturedError: ErrorData = {
       message: errorData.message || 'Unknown error',

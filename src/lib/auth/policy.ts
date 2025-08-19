@@ -66,7 +66,6 @@ export const RoutePolicy: Record<string, Capability | Capability[]> = {
   // Development pages
   '/dashboard/development': Capability.DEV_DEBUG,
   '/dashboard/tests': Capability.DEV_DEBUG,
-  '/dashboard/design-system-demo': Capability.DEV_DEBUG,
   '/dashboard/theme-debug': Capability.DEV_DEBUG,
   '/dashboard/theme-demo': Capability.DEV_DEBUG,
   '/dashboard/theme-test': Capability.DEV_DEBUG,
@@ -250,7 +249,7 @@ export function can(
   }
   
   // School admin special permissions
-  if ((user as any).is_school_admin) {
+  if (user.is_school_admin) {
     // School admin cannot access dev capabilities
     if (capability.startsWith('dev:')) return false;
     
@@ -267,7 +266,7 @@ export function can(
   if (user.capabilities && user.capabilities.includes(capability)) {
     // Handle context-specific checks (e.g., own resources)
     if (capability === Capability.MEETING_EDIT_OWN && context?.ownerId) {
-      return context.ownerId === user.id || context.ownerId === (user as any).staff?.id;
+      return context.ownerId === user.id || context.ownerId === user.staff?.id;
     }
     return true;
   }
@@ -350,6 +349,6 @@ export async function enrichUserWithCapabilities(user: Record<string, unknown>):
   return {
     ...user,
     capabilities,
-    roleKey: (user as any).staff?.role?.key || user.Staff?.Role?.key
+    roleKey: user.staff?.role?.key || user.Staff?.Role?.key
   };
 }

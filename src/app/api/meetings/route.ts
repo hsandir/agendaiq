@@ -169,7 +169,7 @@ export async function GET(request: NextRequest) {
     response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
     return response;
   } catch (error: unknown) {
-    await Logger.error("Failed to fetch meetings", { error: String(error), userId: user.id, staffId: (user as any).staff?.id }, "meetings");
+    await Logger.error("Failed to fetch meetings", { error: String(error), userId: user.id, staffId: user.staff?.id }, "meetings");
     return NextResponse.json({ error: "Failed to fetch meetings" }, { status: 500 });
   }
 }
@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
 
     const staffRecord = user.staff;
 
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     
     // Validate request data
     const validationResult = createMeetingSchema.safeParse(body);
@@ -347,7 +347,7 @@ export async function POST(request: NextRequest) {
       data: {
         meeting_id: completeeMeeting!.id,
         user_id: parseInt(user.id),
-        staff_id: (user as any).staff?.id,
+        staff_id: user.staff?.id,
         action: 'CREATE',
         details: `Created meeting: ${title}`,
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
@@ -359,7 +359,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ meeting: formattedMeeting }, { status: 201 });
   } catch (error: unknown) {
-    await Logger.error("Failed to create meeting", { error: String(error), userId: user.id, staffId: (user as any).staff?.id }, "meetings");
+    await Logger.error("Failed to create meeting", { error: String(error), userId: user.id, staffId: user.staff?.id }, "meetings");
     return NextResponse.json({ error: "Failed to create meeting" }, { status: 500 });
   }
 } 

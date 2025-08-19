@@ -210,7 +210,7 @@ export default function ProductionMonitor() {
   const markAsResolved = (errorId: string) => {
     setErrors(prev => prev.map(err => 
       err.id === errorId ? { ...err, resolved: true } : err
-    )));
+    ));
   };
 
   const getSeverityIcon = (severity: string) => {

@@ -1,4 +1,5 @@
 import { requireAuth, AuthPresets } from "@/lib/auth/auth-utils";
+import type { UserWithStaff, SessionUser } from '@/types/auth';
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { MeetingEditForm } from "./MeetingEditForm";
@@ -55,7 +56,7 @@ export default async function EditMeetingPage({ params }: PageProps) {
 
   // Check if user has permission to edit this meeting
   const hasAdminAccess = isAnyAdmin(user);
-  const isOrganizer = meeting.organizer_id === (user as any).staff?.id;
+  const isOrganizer = meeting.organizer_id === userWithStaff?.Staff?.[0]?.id;
 
   if (!hasAdminAccess && !isOrganizer) {
     redirect("/dashboard/meetings");

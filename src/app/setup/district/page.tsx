@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/auth-options";
+import type { UserWithStaff, SessionUser } from '@/types/auth';
 import { prisma } from "@/lib/prisma";
 import { DistrictSetup } from "@/components/setup/DistrictSetup";
 
@@ -11,7 +12,8 @@ export default async function DistrictSetupPage() {
     redirect("/auth/signin");
   }
 
-  if (session.(user as any).staff?.role?.title !== "Administrator") {
+  const user = session.user as SessionUser;
+  if (!user.staff?.Role || user.staff.Role.title !== "Administrator") {
     redirect("/dashboard");
   }
 

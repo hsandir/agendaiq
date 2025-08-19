@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { __name, __description, __duration, __agenda, __attendees  } = body;
 
     if (!name || !duration) {

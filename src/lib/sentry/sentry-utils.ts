@@ -14,8 +14,8 @@ export function setSentryUser(user: Partial<User> & {
     id: user.id,
     email: user.email || undefined,
     username: user.name || undefined,
-    staffId: (user as any).staff?.id,
-    role: (user as any).staff?.role.title,
+    staffId: user.staff?.id,
+    role: user.staff?.role.title,
   });
 }
 

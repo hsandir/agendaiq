@@ -530,7 +530,7 @@ export async function POST(request: NextRequest) {
         recordId: 'bulk',
         operation: 'BULK_CREATE',
         userId: user.id,
-        staffId: (user as any).staff?.id,
+        staffId: user.staff?.id,
         source: 'BULK_UPLOAD',
         description: `Staff bulk upload: ${created + updated} records processed (${created} created, ${updated} updated)`,
         metadata: {

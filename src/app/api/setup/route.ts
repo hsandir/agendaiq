@@ -41,11 +41,11 @@ export async function POST(request: Request) {
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || (user.Staff?.[0]?.Role?.title !== 'Administrator')) {
+    if (!user || user.Staff?.[0]?.Role?.title !== 'Administrator') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { districtName, schoolName, address } = body;
 
     if (!districtName || !schoolName) {
@@ -101,11 +101,11 @@ export async function PUT(request: Request) {
       include: { Staff: { include: { Role: true } } },
     });
 
-    if (!user || (user.Staff?.[0]?.Role?.title !== 'Administrator')) {
+    if (!user || user.Staff?.[0]?.Role?.title !== 'Administrator') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { districtName, schoolName, address } = body;
 
     if (!districtName || !schoolName) {

@@ -27,7 +27,7 @@ export async function POST() {
     // TODO: Toggle the setting once suspiciousAlerts field is added
     // await prisma.user.update({
     //   where: { email: session.user?.email! },
-    //   data: { suspiciousAlerts: !(user as Record<string, unknown>.suspiciousAlerts },
+    //   data: { suspiciousAlerts: !user.suspiciousAlerts },
     // });
 
     // For now, return error since suspiciousAlerts field doesn't exist

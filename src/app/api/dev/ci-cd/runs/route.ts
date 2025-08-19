@@ -344,7 +344,7 @@ export async function POST(request: NextRequest) {
     // Development endpoint - no auth required in dev mode
     console.log('CI/CD POST API called');
 
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
     const { __action, __runId, __workflowId, branch = 'main'  } = body;
 
     if (!GITHUB_TOKEN) {

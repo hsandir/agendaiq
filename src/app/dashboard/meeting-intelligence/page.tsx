@@ -1,4 +1,5 @@
 import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
+import type { UserWithStaff, SessionUser } from '@/types/auth';
 import { MeetingAnalyticsService, ActionItemsService, MeetingContinuityService } from '@/lib/meeting-intelligence';
 import Link from 'next/link';
 import { Calendar, Search, TrendingUp, CheckCircle, AlertCircle, Users, FileText, BarChart } from 'lucide-react';
@@ -13,7 +14,7 @@ export default async function MeetingIntelligenceDashboard() {
   
   // Get overdue action items
   const overdueItems = await ActionItemsService.getOverdueActionItems({
-    staffId: (user as any).staff?.id
+    staffId: user.staff?.id
   });
   
   // Get action items stats
@@ -113,7 +114,7 @@ export default async function MeetingIntelligenceDashboard() {
           return (
             <Link
               key={index}
-              href={stat.href as Record<string, unknown>}
+              href={stat.href}
               className="bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <div className="flex items-center justify-between">
@@ -139,7 +140,7 @@ export default async function MeetingIntelligenceDashboard() {
           return (
             <Link
               key={index}
-              href={feature.href as Record<string, unknown>}
+              href={feature.href}
               className="bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-all hover:scale-105"
             >
               <div className="flex items-start space-x-4">

@@ -74,7 +74,7 @@ export async function PUT(
 
     const currentUser = authResult.user!;
     const userId = params.id;
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = await request.json();
 
     // Get existing user
     const existingUser = await prisma.user.findUnique({

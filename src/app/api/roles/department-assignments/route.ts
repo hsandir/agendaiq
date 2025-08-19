@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         recordId: roleId.toString(),
         operation: 'UPDATE',
         userId: user.id,
-        staffId: (user as any).staff?.id,
+        staffId: user.staff?.id,
         source: 'SYSTEM', 
         description: `Role "${role.title}" assigned to department: ${role.Department?.name || 'Unassigned'}`
       });

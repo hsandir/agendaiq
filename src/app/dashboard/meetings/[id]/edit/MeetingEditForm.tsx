@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import type { UserWithStaff, SessionUser } from '@/types/auth';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -164,12 +165,12 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   });
 
   // Convert users to MultiSelect options
-  const attendeeOptions: MultiSelectOption[] = users.mapuser => ({
+  const attendeeOptions: MultiSelectOption[] = users.map(user => ({
     value: user.id,
     label: user.name,
     email: user.email,
-    role: (user as Record<string, unknown>.role,
-    department: (user.department
+    role: user.Staff?.[0]?.Role?.title,
+    department: 'department' in user ? user.department : null
   }));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -583,7 +584,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
                         <SelectItem value="">None</SelectItem>
                         {users.map(user => (
                           <SelectItem key={user.id} value={user.id}>
-                            {user.name} ({(user as Record<string, unknown>.role})
+                            {user.name} ({user.Staff?.[0]?.Role?.title || "No role"})
                           </SelectItem>
                         ))}
                       </SelectContent>

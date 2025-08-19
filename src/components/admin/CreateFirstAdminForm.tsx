@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import type { UserWithAuth } from '@/types/auth';
+
 import { useRouter } from 'next/navigation';
 import { Lock, Mail, User, AlertCircle, CheckCircle } from 'lucide-react';
 
@@ -81,7 +83,7 @@ export function CreateFirstAdminForm({ adminUsers }: CreateFirstAdminFormProps) 
   };
 
   // Filter out users that already have passwords
-  const availableUsers = adminUsers.filter(user => !(user as Record<string, unknown>.hashedPassword);
+  const availableUsers = adminUsers.filter(user => !user.hashedPassword);
 
   if (availableUsers.length === 0) {
     return (
