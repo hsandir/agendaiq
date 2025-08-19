@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -82,6 +83,7 @@ export function MeetingLiveView({
   isOrganizer,
   isAdmin
 }: Props) {
+  const router = useRouter();
   const [agendaItems, setAgendaItems] = useState(meeting.MeetingAgendaItems);
   const [activeTab, setActiveTab] = useState("agenda");
   const [isConnected, setIsConnected] = useState(false);
@@ -207,36 +209,9 @@ export function MeetingLiveView({
     }
   };
 
-  const addNewAgendaItem = async () => {
-    console.log('Adding new agenda item...');
-    try {
-      const response = await fetch(`/api/meetings/${meeting.id}/agenda-items`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          items: [{
-            topic: 'New Agenda Item',
-            priority: 'Medium',
-            purpose: 'Discussion',
-            status: 'Pending',
-            order_index: agendaItems.length
-          }]
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Failed to add agenda item:', errorData);
-        alert(`Failed to add agenda item: ${errorData.error || 'Unknown error'}`);
-      } else {
-        console.log('Agenda item added successfully');
-        await refreshMeeting();
-      }
-    } catch (error: unknown) {
-      console.error("Error adding agenda item:", error);
-      alert('Failed to add agenda item. Please try again.');
-    }
+  const handleAddAgendaItem = () => {
+    // Navigate to the agenda editing page instead of auto-adding
+    router.push(`/dashboard/meetings/${meeting.id}/agenda`);
   };
 
   const toggleItemExpanded = (itemId: number) => {
@@ -402,14 +377,9 @@ export function MeetingLiveView({
                   
                   {(isOrganizer || isAdmin) && (
                     <Button 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        addNewAgendaItem();
-                      }} 
-                      className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 z-10 relative"
+                      onClick={handleAddAgendaItem} 
+                      className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2"
                       type="button"
-                      style={{ zIndex: 10, position: 'relative' }}
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Add Item
@@ -429,13 +399,9 @@ export function MeetingLiveView({
                     </div>
                     <h3 className="text-lg font-medium text-foreground mb-2">No agenda items yet</h3>
                     <p className="text-muted-foreground mb-4">Get started by adding your first agenda item</p>
-                    {(isOrganizer ?? isAdmin) && (
+                    {(isOrganizer || isAdmin) && (
                       <Button 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          addNewAgendaItem();
-                        }} 
+                        onClick={handleAddAgendaItem} 
                         className="rounded-full"
                         type="button"
                       >

@@ -91,6 +91,11 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
   const [meetingType, setMeetingType] = useState("regular");
   const [zoomMeetingId, setZoomMeetingId] = useState("");
   const [selectedAttendees, setSelectedAttendees] = useState<string[]>([]);
+  
+  // Debug state changes
+  useEffect(() => {
+    console.log("State updated - startTime:", startTime, "endTime:", endTime, "attendees:", selectedAttendees);
+  }, [startTime, endTime, selectedAttendees]);
   const [isContinuation, setIsContinuation] = useState(false);
   const [parentMeetingId, setParentMeetingId] = useState<number | undefined>();
   const [showContinuationSearch, setShowContinuationSearch] = useState(false);
@@ -125,10 +130,11 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
 
   // Auto-set end time when start time changes
   const handleStartTimeChange = (newStartTime: string) => {
-    console.log("Start time changed to:", newStartTime);
+    console.log("handleStartTimeChange called with:", newStartTime);
     
     // Validate the new start time
     if (!newStartTime) {
+      console.log("No start time provided, clearing");
       setStartTime("");
       return;
     }
@@ -142,13 +148,11 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       
       setStartTime(newStartTime);
       
-      // Auto-set end time to 1 hour after start time if not set
-      if (!endTime) {
-        const endDate = addMinutes(startDate, 60);
-        const formattedEndTime = endDate.toISOString().slice(0, 16);
-        setEndTime(formattedEndTime);
-        console.log("Auto-set end time to:", formattedEndTime);
-      }
+      // Always auto-set end time to 1 hour after start time
+      const endDate = addMinutes(startDate, 60);
+      const formattedEndTime = endDate.toISOString().slice(0, 16);
+      setEndTime(formattedEndTime);
+      console.log("Auto-set end time to:", formattedEndTime);
     } catch (error: unknown) {
       console.error("Error handling start time change:", error);
     }
@@ -237,11 +241,21 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     
     // Validate required fields
     if (!title || !startTime || !endTime || selectedAttendees.length === 0) {
-      console.error("Validation failed:", {
+      console.error("Validation failed - Raw values:", 
+        "title:", title,
+        "startTime:", startTime, 
+        "endTime:", endTime,
+        "selectedAttendees:", selectedAttendees
+      );
+      console.error("Validation failed - Checks:", {
         hasTitle: !!title,
+        titleValue: title,
         hasStartTime: !!startTime,
+        startTimeValue: startTime,
         hasEndTime: !!endTime,
-        attendeeCount: selectedAttendees.length
+        endTimeValue: endTime,
+        attendeeCount: selectedAttendees.length,
+        attendees: selectedAttendees
       });
       alert("Please fill in all required fields and select at least one attendee.");
       return;
@@ -372,7 +386,10 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
               id="endTime"
               label="End Date & Time"
               value={endTime}
-              onChange={setEndTime}
+              onChange={(newEndTime) => {
+                console.log("End time changed to:", newEndTime);
+                setEndTime(newEndTime);
+              }}
               minDate={startTime ? new Date(startTime) : undefined}
               required
             />

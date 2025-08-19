@@ -147,10 +147,12 @@ export async function POST(request: NextRequest, props: Props) {
     
     if (isSingleAddition) {
       // For single item addition, just add it without deleting existing items
+      // Remove id field if it exists to avoid unique constraint error
+      const { id, ...itemData } = result.data.items[0];
       const newItem = await prisma.meetingAgendaItem.create({
         data: {
           meeting_id: meetingId,
-          ...result.data.items[0]
+          ...itemData
         },
         include: {
           ResponsibleStaff: {
@@ -170,11 +172,15 @@ export async function POST(request: NextRequest, props: Props) {
       });
 
       // Create new agenda items using createMany for better performance
+      // Remove id field from each item to avoid unique constraint errors
       await prisma.meetingAgendaItem.createMany({
-        data: result.data.items.map(item => ({
-          meeting_id: meetingId,
-          ...item
-        }))
+        data: result.data.items.map(item => {
+          const { id, ...itemData } = item;
+          return {
+            meeting_id: meetingId,
+            ...itemData
+          };
+        })
       });
 
       // Fetch the created items
@@ -277,11 +283,90 @@ export async function PUT(request: NextRequest, props: Props) {
       );
     }
 
-    // Similar authorization and update logic as POST
-    // This endpoint would handle updates to existing items
+    // Check if user is the organizer or an attendee
+    const meeting = await prisma.meeting.findUnique({
+      where: { id: meetingId },
+      include: {
+        MeetingAttendee: true
+      }
+    });
+
+    if (!meeting) {
+      return NextResponse.json(
+        { error: "Meeting not found" },
+        { status: 404 }
+      );
+    }
+
+    const isOrganizer = meeting.organizer_id === user.staff?.id;
+    const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
+
+    if (!isOrganizer && !isAttendee) {
+      return NextResponse.json(
+        { error: "You are not authorized to manage this meeting's agenda" },
+        { status: 403 }
+      );
+    }
+
+    // Delete all existing agenda items for this meeting
+    await prisma.meetingAgendaItem.deleteMany({
+      where: { meeting_id: meetingId }
+    });
+
+    // Create new agenda items
+    const createdItems = await Promise.all(
+      result.data.items.map(async (item, index) => {
+        // Remove id field if it exists to avoid unique constraint error
+        const { id, ...itemData } = item as any;
+        
+        return prisma.meetingAgendaItem.create({
+          data: {
+            meeting_id: meetingId,
+            ...itemData,
+            order_index: index
+          },
+          include: {
+            ResponsibleStaff: {
+              include: {
+                User: true
+              }
+            },
+            Comments: true,
+            ActionItems: true
+          }
+        });
+      })
+    );
+
+    // Log the action
+    await AuditLogger.logFromRequest(request, {
+      tableName: 'meeting_agenda_items',
+      recordId: meetingId.toString(),
+      operation: 'BULK_UPDATE',
+      userId: user.id,
+      staffId: user.staff?.id,
+      source: 'WEB_UI',
+      description: `Updated agenda items for meeting ${meeting.title}`
+    });
+
+    // Trigger Pusher event for real-time update
+    await pusherServer.trigger(
+      CHANNELS.meeting(meetingId),
+      'agenda-items-updated',
+      {
+        items: createdItems,
+        updatedBy: {
+          id: user.id,
+          name: user.name,
+          email: user.email
+        },
+        timestamp: new Date().toISOString()
+      }
+    );
     
     return NextResponse.json({
       success: true,
+      data: createdItems,
       message: "Agenda items updated successfully"
     });
 

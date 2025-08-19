@@ -57,7 +57,7 @@ export async function GET(request: NextRequest, props: Props) {
     }
     const user = authResult.user!;
 
-    const meetingId = params.id;
+    const meetingId = parseInt(params.id);
     if (isNaN(meetingId)) {
       return NextResponse.json({ error: "Invalid meeting ID" }, { status: 400 });
     }

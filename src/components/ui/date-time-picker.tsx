@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { format, parse, isValid, addMinutes, setHours, setMinutes, startOfDay, addDays } from "date-fns";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,9 +26,9 @@ interface DateTimePickerProps {
 }
 
 const popularTimes = [
-  "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-  "12:00", "13:00", "13:30", "14:00", "14:30", "15:00",
-  "15:30", "16:00", "16:30", "17:00"
+  "08:00", "08:30", "09:00", "09:30", "10:00", "10:30",
+  "11:00", "11:30", "12:00", "13:00", "13:30", "14:00",
+  "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"
 ];
 
 const quickDateOptions = [
@@ -36,7 +36,7 @@ const quickDateOptions = [
   { label: "Tomorrow", getValue: () => startOfDay(addDays(new Date(), 1)) },
   { label: "Next Monday", getValue: () => {
     const today = new Date();
-    const daysUntilMonday = (8 - today.getDay()) % 7 ?? 7;
+    const daysUntilMonday = (8 - today.getDay()) % 7 || 7;
     return startOfDay(addDays(today, daysUntilMonday));
   }},
   { label: "Next Week", getValue: () => startOfDay(addDays(new Date(), 7)) },
@@ -54,69 +54,118 @@ export function DateTimePicker({
   id
 }: DateTimePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [selectedTime, setSelectedTime] = useState("");
-  const [customTime, setCustomTime] = useState("");
+  
+  // Default values: today's date and 08:00 AM
+  const getDefaultDate = () => format(new Date(), "yyyy-MM-dd");
+  const getDefaultTime = () => "08:00";
+  
+  const [selectedDate, setSelectedDate] = useState(getDefaultDate());
+  const [selectedTime, setSelectedTime] = useState(getDefaultTime());
+  const [customTime, setCustomTime] = useState(getDefaultTime());
+  
+  // Temp states - used while popover is open
+  const [tempDate, setTempDate] = useState(selectedDate);
+  const [tempTime, setTempTime] = useState(selectedTime);
 
+  // Set default value on initial load
   useEffect(() => {
-    if (value) {
+    if (!value) {
+      // If no value, send default to parent
+      const defaultDateTime = `${getDefaultDate()}T${getDefaultTime()}`;
+      console.log("Setting default date/time:", defaultDateTime);
+      onChange(defaultDateTime);
+    } else {
       try {
         const dateTime = new Date(value);
         if (isValid(dateTime)) {
-          setSelectedDate(format(dateTime, "yyyy-MM-dd"));
-          setSelectedTime(format(dateTime, "HH:mm"));
-          setCustomTime(format(dateTime, "HH:mm"));
+          const dateStr = format(dateTime, "yyyy-MM-dd");
+          const timeStr = format(dateTime, "HH:mm");
+          setSelectedDate(dateStr);
+          setSelectedTime(timeStr);
+          setCustomTime(timeStr);
+          setTempDate(dateStr);
+          setTempTime(timeStr);
         }
       } catch (e: unknown) {
         console.error("Invalid date value:", value);
+        // Use default if value is invalid
+        const defaultDateTime = `${getDefaultDate()}T${getDefaultTime()}`;
+        onChange(defaultDateTime);
       }
     }
-  }, [value]);
+  }, []);
 
+  // When popover opens, update temp values
+  const handlePopoverOpenChange = (open: boolean) => {
+    if (open) {
+      // Popover is opening, copy current values to temp
+      setTempDate(selectedDate);
+      setTempTime(selectedTime);
+    }
+    setIsOpen(open);
+  };
+
+  // When date changes (inside popover)
   const handleDateChange = (date: string) => {
-    setSelectedDate(date);
-    updateDateTime(date, selectedTime || "09:00");
+    setTempDate(date);
   };
 
+  // When time is selected (inside popover)
   const handleTimeSelect = (time: string) => {
-    setSelectedTime(time);
+    setTempTime(time);
     setCustomTime(time);
-    updateDateTime(selectedDate ?? format(new Date(), "yyyy-MM-dd"), time);
   };
 
+  // When manual time is entered (inside popover)
   const handleCustomTimeChange = (time: string) => {
     setCustomTime(time);
     if (/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(time)) {
-      setSelectedTime(time);
-      updateDateTime(selectedDate ?? format(new Date(), "yyyy-MM-dd"), time);
+      setTempTime(time);
     }
   };
 
+  // Quick date selection (inside popover)
   const handleQuickDateSelect = (getValue: () => Date) => {
     const date = getValue();
     const dateStr = format(date, "yyyy-MM-dd");
-    setSelectedDate(dateStr);
-    updateDateTime(dateStr, selectedTime || "09:00");
+    setTempDate(dateStr);
   };
 
-  const updateDateTime = (date: string, time: string) => {
-    if (date && time) {
-      const dateTimeString = `${date}T${time}`;
+  // When Done button is clicked or popover closes
+  const applyDateTime = () => {
+    console.log("Applying date/time - Date:", tempDate, "Time:", tempTime);
+    
+    if (tempDate && tempTime) {
+      setSelectedDate(tempDate);
+      setSelectedTime(tempTime);
+      
+      const dateTimeString = `${tempDate}T${tempTime}`;
       console.log("DateTimePicker updating value to:", dateTimeString);
       onChange(dateTimeString);
-      setIsOpen(false); // Close popover after selection
+      setIsOpen(false);
     }
   };
 
+  // When Cancel button is clicked
+  const cancelSelection = () => {
+    // Restore temp values to previous state
+    setTempDate(selectedDate);
+    setTempTime(selectedTime);
+    setCustomTime(selectedTime);
+    setIsOpen(false);
+  };
+
   const getDisplayValue = () => {
-    if (!value) return "";
-    try {
-      const dateTime = new Date(value);
-      if (isValid(dateTime)) {
-        return format(dateTime, "MMM dd, yyyy 'at' HH:mm");
+    // Always show selected date and time, even if not in value prop yet
+    if (selectedDate && selectedTime) {
+      try {
+        const dateTime = new Date(`${selectedDate}T${selectedTime}`);
+        if (isValid(dateTime)) {
+          return format(dateTime, "MMM dd, yyyy 'at' HH:mm");
+        }
+      } catch (e: unknown) {
+        return "";
       }
-    } catch (e: unknown) {
-      return "";
     }
     return "";
   };
@@ -131,14 +180,14 @@ export function DateTimePicker({
         </Label>
       )}
       
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <Popover open={isOpen} onOpenChange={handlePopoverOpenChange}>
         <PopoverTrigger asChild>
           <Button
             id={id}
             variant="outline"
             className={cn(
               "w-full justify-start text-left font-normal",
-              !value && "text-muted-foreground"
+              !selectedDate && !selectedTime && "text-muted-foreground"
             )}
           >
             <Calendar className="mr-2 h-4 w-4" />
@@ -173,7 +222,7 @@ export function DateTimePicker({
               <Input
                 id="date-input"
                 type="date"
-                value={selectedDate}
+                value={tempDate}
                 onChange={(e) => handleDateChange(e.target.value)}
                 min={minDate ? format(minDate, "yyyy-MM-dd") : undefined}
                 max={maxDate ? format(maxDate, "yyyy-MM-dd") : undefined}
@@ -191,7 +240,7 @@ export function DateTimePicker({
                 {popularTimes.map((time) => (
                   <Button
                     key={time}
-                    variant={selectedTime === time ? "default" : "ghost"}
+                    variant={tempTime === time ? "default" : "ghost"}
                     size="sm"
                     className="text-xs"
                     onClick={() => handleTimeSelect(time)}
@@ -217,13 +266,32 @@ export function DateTimePicker({
             </div>
 
             {/* Current Selection Display */}
-            {selectedDate && selectedTime && (
+            {tempDate && tempTime && (
               <div className="pt-2 border-t">
                 <div className="text-sm font-medium">
-                  Selected: {format(new Date(`${selectedDate}T${selectedTime}`), "MMM dd, yyyy 'at' HH:mm")}
+                  Selected: {format(new Date(`${tempDate}T${tempTime}`), "MMM dd, yyyy 'at' HH:mm")}
                 </div>
               </div>
             )}
+            
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-2 pt-2 border-t">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={cancelSelection}
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={applyDateTime}
+                disabled={!tempDate || !tempTime}
+              >
+                <Check className="h-4 w-4 mr-1" />
+                Done
+              </Button>
+            </div>
           </div>
         </PopoverContent>
       </Popover>
