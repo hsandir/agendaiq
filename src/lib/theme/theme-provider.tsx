@@ -10,27 +10,11 @@ import React, {
 import { themes, Theme } from "./themes";
 import { getContrastColor } from "./theme-utils";
 
-interface CustomTheme {
+// CustomTheme extends Theme interface for full compatibility
+interface CustomTheme extends Omit<Theme, 'id' | 'name' | 'description'> {
   name?: string;
+  description?: string;
   isDark?: boolean;
-  colors: {
-    background: string;
-    text: string;
-    card: string;
-    primary: string;
-    secondary: string;
-    primaryForeground?: string;
-    secondaryForeground?: string;
-    backgroundSecondary: string;
-    textMuted: string;
-    secondaryLight?: string;
-    error: string;
-    border: string;
-    inputBorder: string;
-  };
-  borderRadius?: {
-    md: string;
-  };
 }
 
 interface ThemeContextValue {
