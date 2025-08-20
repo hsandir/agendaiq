@@ -126,25 +126,60 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
     fetchMeetingData();
   }, [(meeting.id)]);
 
-  const addNote = () => {
-    if (String(newNote).trim()) {
-      const note: Note = {
-        id: Date.now().toString(),
-        content: String(newNote).trim(),
-        author: 'Current User', // This would be the current user's name
-        timestamp: new Date().toISOString(),
-      };
-      setNotes([...notes, note]);
-      setNewNote('');
+  const addNote = async () => {
+    if (newNote.trim()) {
+      try {
+        const response = await fetch(`/api/meetings/${meeting.id}/notes`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            content: newNote.trim()
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const note: Note = {
+            id: data.note.id.toString(),
+            content: data.note.content,
+            author: data.note.author.name || 'Unknown',
+            timestamp: data.note.created_at,
+          };
+          setNotes([note, ...notes]); // Add new note at the beginning
+          setNewNote('');
+        } else {
+          console.error('Failed to add note');
+        }
+      } catch (error: unknown) {
+        console.error('Error adding note:', error);
+      }
+    }
+  };
+
+  const deleteNote = async (noteId: string) => {
+    try {
+      const response = await fetch(`/api/meetings/${meeting.id}/notes?noteId=${noteId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setNotes(notes.filter(note => note.id !== noteId));
+      } else {
+        console.error('Failed to delete note');
+      }
+    } catch (error: unknown) {
+      console.error('Error deleting note:', error);
     }
   };
 
   const addAgendaItem = () => {
-    if (newAgendaItem.String(title).trim()) {
+    if (newAgendaItem.title.trim()) {
       const item: AgendaItem = {
         id: Date.now().toString(),
-        title: newAgendaItem.String(title).trim(),
-        description: newAgendaItem.String(description).trim(),
+        title: newAgendaItem.title.trim(),
+        description: newAgendaItem.description?.trim(),
         completed: false,
         order: agendaItems.length + 1,
       };
@@ -158,7 +193,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
       items.map(item =>
         item.id === id ? { ...item, completed: !item.completed } : item
       )
-    ));
+    );
   };
 
   const deleteAgendaItem = (id: string) => {
@@ -380,6 +415,16 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
                             {note.content}
                           </p>
                         </div>
+                        {isOrganizer && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteNote(note.id)}
+                            className="ml-2"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                       <div className="mt-2 text-xs text-muted-foreground">
                         By {note.author} • {safeFormatDateTime(note.timestamp, undefined, 'Unknown time')}

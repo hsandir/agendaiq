@@ -2,13 +2,13 @@
 
 import posthog from 'posthog-js';
 import { PostHogProvider as PHProvider } from 'posthog-js/react';
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 // PostHog is already initialized in instrumentation-client.ts
 // This provider just wraps the app with PostHog context
 
-export function PostHogPageView() {
+function PostHogPageViewContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -27,13 +27,18 @@ export function PostHogPageView() {
   return null;
 }
 
+export function PostHogPageView() {
+  return (
+    <Suspense fallback={null}>
+      <PostHogPageViewContent />
+    </Suspense>
+  );
+}
+
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   return (
-    <>
-      <PHProvider client={posthog}>
-        {children}
-      </PHProvider>
-      <PostHogPageView />
-    </>
+    <PHProvider client={posthog}>
+      {children}
+    </PHProvider>
   );
 }

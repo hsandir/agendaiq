@@ -7,6 +7,7 @@ import LocalMonitor from '@/components/monitoring/local-monitor';
 import ProductionMonitor from '@/components/monitoring/production-monitor';
 import EnhancedLiveMonitor from '@/components/monitoring/enhanced-live-monitor';
 import CICDMonitor from '@/components/development/ci-cd-monitor';
+import PostHogAnalytics from '@/components/monitoring/PostHogAnalytics';
 import { AuthenticatedUser } from '@/lib/auth/auth-utils';
 
 interface MonitoringClientProps {
@@ -14,7 +15,7 @@ interface MonitoringClientProps {
 }
 
 export default function MonitoringClient({ user }: MonitoringClientProps) {
-  const [activeTab, setActiveTab] = useState("enhanced");
+  const [activeTab, setActiveTab] = useState("posthog");
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -49,12 +50,17 @@ export default function MonitoringClient({ user }: MonitoringClientProps) {
 
       {/* Monitoring Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="posthog">PostHog Analytics</TabsTrigger>
           <TabsTrigger value="enhanced">Professional Logging</TabsTrigger>
           <TabsTrigger value="local">Local Monitoring</TabsTrigger>
           <TabsTrigger value="production">Production Monitoring</TabsTrigger>
           <TabsTrigger value="cicd">CI/CD Pipeline</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="posthog">
+          <PostHogAnalytics />
+        </TabsContent>
 
         <TabsContent value="enhanced">
           <EnhancedLiveMonitor showDevLogs={true} showAuditLogs={true} />

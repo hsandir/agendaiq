@@ -85,10 +85,12 @@ function SignInContent() {
   );
 }
 
-export default function SignInPage() {
+function SignInPageWrapper() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
       <SignInContent />
     </Suspense>
   );
-} 
+}
+
+export default SignInPageWrapper; 

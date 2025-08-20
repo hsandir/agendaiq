@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 interface TwoFactorFormProps {
@@ -8,7 +8,7 @@ interface TwoFactorFormProps {
   onSuccess?: () => void;
 }
 
-export default function TwoFactorForm({ userId, onSuccess }: TwoFactorFormProps) {
+function TwoFactorFormContent({ userId, onSuccess }: TwoFactorFormProps) {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -175,5 +175,13 @@ export default function TwoFactorForm({ userId, onSuccess }: TwoFactorFormProps)
         {isLoading ? 'Verifying...' : 'Verify'}
       </button>
     </form>
+  );
+}
+
+export default function TwoFactorForm({ userId, onSuccess }: TwoFactorFormProps) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TwoFactorFormContent userId={userId} onSuccess={onSuccess} />
+    </Suspense>
   );
 }
