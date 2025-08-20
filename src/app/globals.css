@@ -1,3 +1,4 @@
+/* Tailwind CSS Directives - Required for production */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
