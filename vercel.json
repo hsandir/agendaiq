@@ -5,8 +5,7 @@
   "installCommand": "npm install",
   "regions": ["iad1"],
   "env": {
-    "NODE_ENV": "production",
-    "TAILWIND_MODE": "build"
+    "NODE_ENV": "production"
   },
   
   "functions": {

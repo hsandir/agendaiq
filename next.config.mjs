@@ -1,4 +1,5 @@
-import { withSentryConfig } from '@sentry/nextjs';
+// TEMPORARILY DISABLED: Sentry subscription expired
+// import { withSentryConfig } from '@sentry/nextjs';
 import withBundleAnalyzer from '@next/bundle-analyzer';
 
 const bundleAnalyzer = withBundleAnalyzer({
@@ -170,4 +171,6 @@ const sentryWebpackPluginOptions = {
 };
 
 // Export the config wrapped with Sentry and Bundle Analyzer
-export default withSentryConfig(bundleAnalyzer(nextConfig), sentryWebpackPluginOptions);
+// TEMPORARILY DISABLED: Sentry subscription expired
+// export default withSentryConfig(bundleAnalyzer(nextConfig), sentryWebpackPluginOptions);
+export default bundleAnalyzer(nextConfig);
