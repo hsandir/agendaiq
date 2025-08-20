@@ -239,8 +239,8 @@ export function getMonitoringConfig(): MonitoringConfig {
   const sampleRates = SAMPLE_RATES[ENV] || SAMPLE_RATES.development;
   
   return {
-    provider: 'sentry', // Can be changed to 'datadog', 'newrelic', etc.
-    enabled: IS_PRODUCTION ?? IS_STAGING || (IS_DEVELOPMENT && process.env.ENABLE_MONITORING === 'true'),
+    provider: 'disabled', // Monitoring disabled - Sentry subscription expired
+    enabled: false, // Always disabled
     environment: ENV as 'development' | 'staging' | 'production',
     debug: IS_DEVELOPMENT && process.env.DEBUG_MONITORING === 'true',
     dsn: DSN,

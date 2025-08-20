@@ -41,13 +41,17 @@ class MonitoringManager {
       case 'sentry':
         this.provider = sentryProvider;
         break;
+      case 'disabled':
+        this.provider = sentryProvider; // Uses disabled implementation
+        break;
       // Add more providers here as needed
       // case 'datadog':
       //   this.provider = datadogProvider;
       //   break;
       default:
-        console.error(`Unknown monitoring provider: ${this.config.provider}`);
-        return;
+        console.log(`Monitoring provider '${this.config.provider}' disabled or unknown`);
+        this.provider = sentryProvider; // Fallback to disabled implementation
+        break;
     }
 
     // Initialize the selected provider

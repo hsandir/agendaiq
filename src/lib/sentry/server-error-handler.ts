@@ -1,9 +1,9 @@
-import * as Sentry from '@sentry/nextjs';
+// Sentry disabled - subscription expired
 import { NextRequest, NextResponse } from 'next/server';
 
 export interface ErrorHandlerOptions {
   /**
-   * Whether to send the error to Sentry
+   * Whether to log the error to console
    * @default true
    */
   captureError?: boolean;
@@ -43,7 +43,7 @@ export interface ErrorHandlerOptions {
 }
 
 /**
- * Handles server-side errors with Sentry integration
+ * Handles server-side errors (Sentry disabled - console logging only)
  */
 export function handleServerError(
   error: unknown,
@@ -70,50 +70,18 @@ export function handleServerError(
     stack: undefined,
   };
   
-  // Log error in development
-  if (process.env.NODE_ENV === 'development') {
-    console.error('Server Error:', errorDetails);
-  }
-  
-  // Send to Sentry if enabled
+  // Log error to console (Sentry disabled)
   if (captureError) {
-    Sentry.withScope((scope) => {
-      // Add request context
-      scope.setContext('request', {
+    console.error('Server Error:', {
+      error: errorDetails,
+      request: {
         url: request.url,
         method: request.method,
-        headers: Object.fromEntries(request.headers.entries()),
         userAgent: request.headers.get('user-agent'),
-      });
-      
-      // Add custom context
-      scope.setContext('custom', context);
-      
-      // Add user context if provided
-      if (user) {
-        scope.setUser({
-          id: user.id,
-          email: user.email,
-          username: user.username,
-          staffId: user.staffId,
-          role: user.role,
-        });
-      }
-      
-      // Add breadcrumb
-      scope.addBreadcrumb({
-        category: 'server-error',
-        message: `Error in ${request.method} ${request.url}`,
-        level: 'error',
-        data: errorDetails,
-      });
-      
-      // Capture the exception
-      if (error instanceof Error) {
-        Sentry.captureException(error);
-      } else {
-        Sentry.captureMessage(errorDetails.message, 'error');
-      }
+      },
+      context,
+      user,
+      timestamp: new Date().toISOString(),
     });
   }
   

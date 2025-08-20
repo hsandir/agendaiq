@@ -83,13 +83,12 @@ export function ErrorBoundary({ children, fallback }: ErrorBoundaryProps) {
     <ReactErrorBoundary
       FallbackComponent={fallback ?? ErrorFallback}
       onError={(error, errorInfo) => {
-        // Send error to Sentry
-        Sentry.withScope((scope) => {
-          scope.setContext('errorBoundary', {
-            errorInfo,
-            componentStack: errorInfo.componentStack,
-          });
-          Sentry.captureException(error);
+        // Log error to console (Sentry disabled)
+        console.error('Error boundary caught:', {
+          error: error.message,
+          stack: error.stack,
+          errorInfo,
+          componentStack: errorInfo.componentStack,
         });
       }}
       onReset={() => {

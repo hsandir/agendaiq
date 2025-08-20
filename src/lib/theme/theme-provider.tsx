@@ -136,6 +136,16 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
   useEffect(() => {
     if (!mounted || typeof window === 'undefined') return;
 
+    // Get current theme object
+    const theme = currentThemeId === "custom" && customTheme
+      ? ({
+          id: "custom",
+          name: customTheme.name || "Custom Theme",
+          description: "Your personalized theme",
+          ...customTheme,
+        } satisfies Theme)
+      : themes.find((t) => t.id === currentThemeId) || themes[0];
+
     const root = document.documentElement;
     
     // Helper function to convert hex to HSL for CSS variables

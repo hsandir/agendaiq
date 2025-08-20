@@ -56,7 +56,7 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'date-fns'],
     typedRoutes: true,
-    clientTraceMetadata: ["baggage", "sentry-trace", "sentry-environment", "sentry-public_key", "sentry-release", "sentry-user_segment"],
+    // clientTraceMetadata disabled - Sentry subscription expired
   },
   
   // Temporarily disable ESLint during build
@@ -125,7 +125,8 @@ const nextConfig = {
   },
 };
 
-// Sentry configuration wrapper
+// DISABLED: Sentry configuration (subscription expired)
+/*
 const sentryWebpackPluginOptions = {
   // Organization and project from your Sentry account
   org: process.env.SENTRY_ORG,
@@ -169,6 +170,7 @@ const sentryWebpackPluginOptions = {
   // Disable automatic error capture in development
   automaticVercelMonitors: false,
 };
+*/
 
 // Export the config wrapped with Sentry and Bundle Analyzer
 // TEMPORARILY DISABLED: Sentry subscription expired
