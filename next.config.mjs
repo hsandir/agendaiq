@@ -10,6 +10,8 @@ const nextConfig = {
   // Compiler optimizations
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
+    // Ensure CSS is not removed
+    styledComponents: false,
   },
   
   // Modularize imports for better tree-shaking
@@ -168,6 +170,4 @@ const sentryWebpackPluginOptions = {
 };
 
 // Export the config wrapped with Sentry and Bundle Analyzer
-// TEMPORARILY DISABLED SENTRY TO FIX CSS ISSUE
-// export default withSentryConfig(bundleAnalyzer(nextConfig), sentryWebpackPluginOptions);
-export default bundleAnalyzer(nextConfig);
+export default withSentryConfig(bundleAnalyzer(nextConfig), sentryWebpackPluginOptions);
