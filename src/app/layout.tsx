@@ -4,6 +4,7 @@ import { AuthProvider } from "@/components/auth/AuthProvider";
 import { ThemeProvider } from "@/lib/theme/theme-provider";
 import { LayoutProvider } from "@/lib/layout/layout-provider";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { PostHogProvider } from "@/lib/posthog/posthog-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -49,10 +50,11 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={`${inter.className} bg-background text-foreground`}>
-        <ErrorBoundary>
-          <AuthProvider>
-            <ThemeProvider>
-              <LayoutProvider>
+        <PostHogProvider>
+          <ErrorBoundary>
+            <AuthProvider>
+              <ThemeProvider>
+                <LayoutProvider>
                 <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded-md">
                   Skip to main content
                 </a>
@@ -63,6 +65,7 @@ export default function RootLayout({
             </ThemeProvider>
           </AuthProvider>
         </ErrorBoundary>
+        </PostHogProvider>
       </body>
     </html>
   );

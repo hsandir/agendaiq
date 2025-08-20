@@ -99,7 +99,27 @@ const nextConfig = {
       },
     ];
   },
-  
+
+  // PostHog rewrites for API and static assets
+  async rewrites() {
+    return [
+      {
+        source: '/ingest/static/:path*',
+        destination: 'https://us-assets.i.posthog.com/static/:path*',
+      },
+      {
+        source: '/ingest/:path*',
+        destination: 'https://us.i.posthog.com/:path*',
+      },
+      {
+        source: '/ingest/flags',
+        destination: 'https://us.i.posthog.com/flags',
+      },
+    ];
+  },
+  // Required to support PostHog trailing slash API requests
+  skipTrailingSlashRedirect: true,
+
   // Bundle analyzer for production builds
   bundlePagesRouterDependencies: true,
   

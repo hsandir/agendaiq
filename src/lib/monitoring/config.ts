@@ -239,8 +239,8 @@ export function getMonitoringConfig(): MonitoringConfig {
   const sampleRates = SAMPLE_RATES[ENV] || SAMPLE_RATES.development;
   
   return {
-    provider: 'disabled', // Monitoring disabled - Sentry subscription expired
-    enabled: false, // Always disabled
+    provider: 'posthog' as const, // Now using PostHog for monitoring
+    enabled: true, // Enable PostHog monitoring
     environment: ENV as 'development' | 'staging' | 'production',
     debug: IS_DEVELOPMENT && process.env.DEBUG_MONITORING === 'true',
     dsn: DSN,

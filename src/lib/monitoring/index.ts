@@ -15,6 +15,7 @@ import type {
 } from './types';
 import { MONITORING_CONFIG } from './config';
 import { sentryProvider } from './providers/sentry';
+import { posthogProvider } from './providers/posthog';
 
 class MonitoringManager {
   private provider: MonitoringProvider | null = null;
@@ -38,6 +39,9 @@ class MonitoringManager {
 
     // Select provider based on config
     switch (this.config.provider) {
+      case 'posthog':
+        this.provider = posthogProvider;
+        break;
       case 'sentry':
         this.provider = sentryProvider;
         break;

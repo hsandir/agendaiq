@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { captureException } from '@/lib/posthog/posthog-utils';
 
 export default function GlobalError({
   error,
@@ -10,8 +11,12 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log error to console (Sentry disabled - subscription expired)
-    console.error('Global error:', error);
+    // Log error to PostHog
+    captureException(error, {
+      digest: error.digest,
+      location: 'global-error',
+      severity: 'critical',
+    });
   }, [error]);
 
   return (

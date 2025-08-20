@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { captureException } from '@/lib/posthog/posthog-utils';
 
 export default function Error({
   error,
@@ -11,8 +12,11 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log error to console (Sentry disabled - subscription expired)
-    console.error('Application error:', error);
+    // Log error to PostHog
+    captureException(error, {
+      digest: error.digest,
+      location: 'error-boundary',
+    });
     
     // Also capture to our local error API for debugging
     try {

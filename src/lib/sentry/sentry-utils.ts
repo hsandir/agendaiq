@@ -1,8 +1,14 @@
-// Sentry disabled - subscription expired
+// Redirect to PostHog implementation
 import { User } from '@prisma/client';
+import { 
+  setPostHogUser, 
+  clearPostHogUser, 
+  captureException as posthogCaptureException,
+  addPostHogBreadcrumb 
+} from '@/lib/posthog/posthog-utils';
 
 /**
- * Sets user context (Sentry disabled - no-op)
+ * Sets user context (now using PostHog)
  */
 export function setSentryUser(user: Partial<User> & { 
   staff?: { 
@@ -10,19 +16,18 @@ export function setSentryUser(user: Partial<User> & {
     role: { title: string } 
   } 
 }) {
-  // No-op - Sentry disabled
-  console.log('User context:', user.email);
+  setPostHogUser(user);
 }
 
 /**
- * Clears user context (Sentry disabled - no-op)
+ * Clears user context (now using PostHog)
  */
 export function clearSentryUser() {
-  // No-op - Sentry disabled
+  clearPostHogUser();
 }
 
 /**
- * Adds a breadcrumb (Sentry disabled - no-op)
+ * Adds a breadcrumb (now using PostHog)
  */
 export function addSentryBreadcrumb(
   message: string,
@@ -30,13 +35,12 @@ export function addSentryBreadcrumb(
   level: 'debug' | 'info' | 'warning' | 'error' = 'info',
   data?: Record<string, any>
 ) {
-  // No-op - Sentry disabled
-  console.log(`[${category}] ${message}`, data);
+  addPostHogBreadcrumb(message, category, level, data);
 }
 
 /**
- * Captures an exception (Sentry disabled - logs to console)
+ * Captures an exception (now using PostHog)
  */
 export function captureException(error: Error, context?: Record<string, any>) {
-  console.error('Exception captured:', error, context);
+  posthogCaptureException(error, context);
 }

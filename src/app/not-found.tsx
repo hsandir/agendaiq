@@ -1,12 +1,17 @@
 "use client";
 
 import Link from 'next/link';
+import { useEffect } from 'react';
+import { trackEvent } from '@/lib/posthog/posthog-utils';
 
 export default function NotFound() {
-  // Log 404 errors to console (Sentry disabled - subscription expired)
-  if (typeof window === 'undefined') {
-    console.log('404 Page Not Found');
-  }
+  useEffect(() => {
+    // Track 404 errors in PostHog
+    trackEvent('404_error', {
+      url: window.location.pathname,
+      referrer: document.referrer,
+    });
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted px-4">
