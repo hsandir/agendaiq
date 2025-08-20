@@ -1,6 +1,5 @@
 'use client';
 
-import * as Sentry from '@sentry/nextjs';
 import { useEffect } from 'react';
 
 export default function GlobalError({
@@ -11,12 +10,8 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log error to Sentry
-    Sentry.captureException(error, {
-      tags: {
-        location: 'global-error',
-      },
-    });
+    // Log error to console (Sentry disabled - subscription expired)
+    console.error('Global error:', error);
   }, [error]);
 
   return (

@@ -1,16 +1,11 @@
 "use client";
 
 import Link from 'next/link';
-import * as Sentry from '@sentry/nextjs';
 
 export default function NotFound() {
-  // Log 404 errors to Sentry (as breadcrumb, not exception)
+  // Log 404 errors to console (Sentry disabled - subscription expired)
   if (typeof window === 'undefined') {
-    Sentry.addBreadcrumb({
-      category: 'navigation',
-      message: '404 Page Not Found',
-      level: 'info',
-    });
+    console.log('404 Page Not Found');
   }
 
   return (

@@ -132,40 +132,32 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     }
   }, []); // Empty deps - only run once
 
-  // Apply theme CSS variables
+  // Apply theme to CSS variables - ONLY on client side to prevent hydration mismatch
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || typeof window === 'undefined') return;
 
-    let theme: Theme;
-
-    if (currentThemeId === "custom" && customTheme) {
-      theme = {
-        id: "custom",
-        name: customTheme.name || "Custom Theme",
-        description: "Your personalized theme",
-        ...customTheme,
-      } satisfies Theme;
-    } else {
-      theme = themes.find((t) => t.id === currentThemeId) || themes[0];
-    }
-
-    // Apply CSS variables
     const root = document.documentElement;
-
-    // Helper to convert hex to HSL format that Tailwind expects
+    
+    // Helper function to convert hex to HSL for CSS variables
     const hexToHslVar = (hex: string): string => {
-      const h = hex.replace("#", "");
-      const r = parseInt(h.substring(0, 2), 16) / 255;
-      const g = parseInt(h.substring(2, 4), 16) / 255;
-      const b = parseInt(h.substring(4, 6), 16) / 255;
-      const max = Math.max(r, g, b),
-        min = Math.min(r, g, b);
+      // Remove # if present
+      hex = hex.replace('#', '');
+      
+      // Convert hex to RGB
+      const r = parseInt(hex.substr(0, 2), 16) / 255;
+      const g = parseInt(hex.substr(2, 2), 16) / 255;
+      const b = parseInt(hex.substr(4, 2), 16) / 255;
+      
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
       let hDeg = 0;
       let s = 0;
       const l = (max + min) / 2;
+      
       if (max !== min) {
         const d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        
         switch (max) {
           case r:
             hDeg = (g - b) / d + (g < b ? 6 : 0);
