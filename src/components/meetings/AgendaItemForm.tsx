@@ -70,7 +70,8 @@ export function AgendaItemForm({
   isFirst,
   isLast
 }: AgendaItemFormProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  // Default to expanded for new items (empty topic), collapsed for existing items
+  const [isExpanded, setIsExpanded] = useState(!item.topic || item.topic === '');
 
   const handleChange = (field: keyof AgendaItemFormData, value: Record<string, unknown>) => {
     onUpdate(index, { ...item, [field]: value });

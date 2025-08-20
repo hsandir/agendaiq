@@ -144,6 +144,9 @@ export function AgendaItemsEditor({
   const [importedMeetingId, setImportedMeetingId] = useState<number | null>(null)
   const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false)
 
+  // State to track if we should auto-add a new item
+  const [hasAutoAddedNewItem, setHasAutoAddedNewItem] = useState(false);
+
   // Initialize agenda items from meeting data
   useEffect(() => {
     const items: AgendaItemFormData[] = meeting.MeetingAgendaItems.map(item => ({
@@ -165,8 +168,28 @@ export function AgendaItemsEditor({
       carry_forward_count: item.carry_forward_count,
       order_index: item.order_index
     }))
-    setAgendaItems(items)
-  }, [meeting])
+    
+    // Sort items by order_index in descending order (newest first)
+    const sortedItems = items.sort((a, b) => b.order_index - a.order_index);
+    setAgendaItems(sortedItems);
+    
+    // Auto-add a new item if the list is empty or if we haven't auto-added yet
+    if (!hasAutoAddedNewItem && canEdit) {
+      const newItem: AgendaItemFormData = {
+        topic: '',
+        priority: 'Medium',
+        purpose: 'Discussion',
+        status: 'Pending',
+        duration_minutes: 15,
+        future_implications: false,
+        carried_forward: false,
+        carry_forward_count: 0,
+        order_index: sortedItems.length
+      };
+      setAgendaItems([newItem, ...sortedItems]);
+      setHasAutoAddedNewItem(true);
+    }
+  }, [meeting, hasAutoAddedNewItem, canEdit])
 
   const addAgendaItem = () => {
     const newItem: AgendaItemFormData = {
@@ -180,7 +203,8 @@ export function AgendaItemsEditor({
       carry_forward_count: 0,
       order_index: agendaItems.length
     }
-    setAgendaItems([...agendaItems, newItem])
+    // Add new item at the beginning (newest first)
+    setAgendaItems([newItem, ...agendaItems])
   }
 
   const updateAgendaItem = (index: number, item: AgendaItemFormData) => {
@@ -276,7 +300,8 @@ export function AgendaItemsEditor({
         body: JSON.stringify({
           items: agendaItems.map((item, index) => ({
             ...item,
-            order_index: index
+            // Reverse the order index so newest items get higher indices
+            order_index: agendaItems.length - 1 - index
           }))
         }),
       })
