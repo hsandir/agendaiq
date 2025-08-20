@@ -603,7 +603,7 @@ export default function AuthDebugPage() {
                       {expandedLogs.has(log.id) && log.details && (
                         <tr>
                           <td colSpan={5} className="py-2 px-4 bg-gray-50">
-                            <pre className="text-xs overflow-x-auto">
+                            <pre className="text-xs overflow-x-auto text-gray-800 dark:text-gray-200">
                               {JSON.stringify(log.details, null, 2)}
                             </pre>
                             {log.errorStack && (
@@ -663,7 +663,7 @@ export default function AuthDebugPage() {
                           {flow.step.replace(/_/g, ' ').toUpperCase()}
                         </td>
                         <td className="py-2">
-                          <pre className="text-xs overflow-x-auto">
+                          <pre className="text-xs overflow-x-auto text-gray-800 dark:text-gray-200">
                             {JSON.stringify(flow.details, null, 2)}
                           </pre>
                         </td>
@@ -689,25 +689,25 @@ export default function AuthDebugPage() {
             <div className="space-y-4">
               <div>
                 <h3 className="font-medium mb-2">Headers ({Object.keys(systemStatus.headers).length})</h3>
-                <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto">
+                <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto text-gray-800">
                   {JSON.stringify(systemStatus.headers, null, 2)}
                 </pre>
               </div>
               <div>
                 <h3 className="font-medium mb-2">Cookies ({Object.keys(systemStatus.cookies).length})</h3>
-                <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto">
+                <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto text-gray-800">
                   {JSON.stringify(systemStatus.cookies, null, 2)}
                 </pre>
               </div>
               <div>
                 <h3 className="font-medium mb-2">NextAuth Configuration</h3>
-                <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto">
+                <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto text-gray-800">
                   {JSON.stringify(systemStatus.nextAuth.details, null, 2)}
                 </pre>
               </div>
               <div>
                 <h3 className="font-medium mb-2">Database Configuration</h3>
-                <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto">
+                <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto text-gray-800">
                   {JSON.stringify(systemStatus.database.details, null, 2)}
                 </pre>
               </div>
@@ -742,13 +742,13 @@ export default function AuthDebugPage() {
               </div>
               <div>
                 <h3 className="font-medium mb-2">Memory Usage</h3>
-                <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto">
+                <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto text-gray-800">
                   {JSON.stringify(processInfo.memoryUsage, null, 2)}
                 </pre>
               </div>
               <div>
                 <h3 className="font-medium mb-2">Environment</h3>
-                <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto">
+                <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto text-gray-800">
                   {JSON.stringify(processInfo.env, null, 2)}
                 </pre>
               </div>
@@ -768,7 +768,7 @@ export default function AuthDebugPage() {
               <CardTitle className="text-lg">Raw Data</CardTitle>
             </CardHeader>
             <CardContent>
-              <pre className="bg-gray-100 p-4 rounded text-xs overflow-x-auto">
+              <pre className="bg-gray-100 p-4 rounded text-xs overflow-x-auto text-gray-800">
                 {JSON.stringify({ logs, authFlow, systemStatus, processInfo }, null, 2)}
               </pre>
             </CardContent>
