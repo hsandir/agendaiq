@@ -168,4 +168,6 @@ const sentryWebpackPluginOptions = {
 };
 
 // Export the config wrapped with Sentry and Bundle Analyzer
-export default withSentryConfig(bundleAnalyzer(nextConfig), sentryWebpackPluginOptions);
+// TEMPORARILY DISABLED SENTRY TO FIX CSS ISSUE
+// export default withSentryConfig(bundleAnalyzer(nextConfig), sentryWebpackPluginOptions);
+export default bundleAnalyzer(nextConfig);
