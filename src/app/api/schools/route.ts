@@ -1,15 +1,15 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
-import { authOptions } from "@/lib/auth/auth-options";
+import { withAuth } from "@/lib/auth/api-auth";
+import { Capability } from "@/lib/auth/policy";
 import { Prisma } from "@prisma/client";
 
 // GET /api/schools - List all schools
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id as string) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.SCHOOL_VIEW });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
     const schools = await prisma.school.findMany({
@@ -40,21 +40,11 @@ export async function GET(request: Request) {
 }
 
 // POST /api/schools - Create a new school
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id as string) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    // Check if user is admin
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id as string },
-      include: { Staff: { include: { Role: true } } },
-    });
-
-    if (user?.Staff?.[0]?.Role?.title !== "Administrator") {
-      return new NextResponse("Forbidden", { status: 403 });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.SCHOOL_MANAGE });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
     const body = await request.json();

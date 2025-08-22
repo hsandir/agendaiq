@@ -1,29 +1,13 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth/auth-options";
+import { withAuth } from "@/lib/auth/api-auth";
+import { Capability } from "@/lib/auth/policy";
 
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
-
-    // Check if the current user is an administrator via staff relation
-    const currentUser = await prisma.user.findUnique({
-      where: { id: session.user.id as string },
-      include: { Staff: { include: { Role: true } } },
-    });
-    const isAdmin = currentUser?.Staff?.[0]?.Role?.title === 'Administrator';
-    if (!isAdmin) {
-      return NextResponse.json(
-        { error: 'Forbidden' },
-        { status: 403 }
-      );
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
     const { userId, roleId } = (await request.json()) as Record<string, unknown>;
