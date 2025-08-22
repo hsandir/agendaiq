@@ -5,6 +5,7 @@
 
 import { AuthenticatedUser } from '../auth/auth-utils';
 import { prisma } from '../prisma';
+import { Capability, RoleKey, can, isRole } from '@/lib/auth/policy';
 
 // Enhanced RBAC system interfaces
 export interface AccessContext {
@@ -258,28 +259,27 @@ export class DynamicRBAC {
 
   // Check direct role permissions
   private async checkDirectRolePermissions(
+    user: _AuthenticatedUser,
     role: StaffWithRole['Role'],
     resource: string,
     action: string
   ): Promise<{ granted: boolean; reason?: string }> {
     // Check built-in role permissions based on role properties
     
-    // Administrator/Leadership roles get broad access
-    if (role.is_leadership ?? role.title.toLowerCase().includes('administrator')) {
+    // Administrator access via canonical RoleKey/capabilities
+    if (user && (isRole(user as any, RoleKey.OPS_ADMIN) || isRole(user as any, RoleKey.DEV_ADMIN))) {
       if (this.isAdministrativeResource(resource)) {
-        return { granted: true, reason: 'Leadership role administrative access' };
+        return { granted: true, reason: 'Admin access via RoleKey' };
       }
     }
 
-    // High priority roles get elevated access
-    if (role.priority >= 8) {
-      if (this.isHighPriorityResource(resource, action)) {
-        return { granted: true, reason: 'High priority role access' };
-      }
+    // Capability-based elevation
+    if (this.isHighPriorityResource(resource, action) && can(user as any, Capability.USER_MANAGE)) {
+      return { granted: true, reason: 'Capability USER_MANAGE access' };
     }
 
-    // Role-specific permissions
-    const rolePermissions = this.getRoleBasedPermissions(role.title, resource, action);
+    // Role-specific permissions replaced with capability mapping
+    const rolePermissions = this.getRoleBasedPermissions(user, resource, action);
     if (rolePermissions.granted) {
       return rolePermissions;
     }
@@ -318,6 +318,7 @@ export class DynamicRBAC {
           };
           
           const parentAccess = await this.checkDirectRolePermissions(
+            ({} as any),
             roleWithConvertedDeptId, 
             resource, 
             action
@@ -439,74 +440,25 @@ export class DynamicRBAC {
 
   // Get role-based permissions
   private getRoleBasedPermissions(
-    roleTitle: string, 
+    user: _AuthenticatedUser,
     resource: string, 
     action: string
   ): { granted: boolean; reason?: string } {
-    const roleLower = roleTitle.toLowerCase();
-
-    // Superintendent permissions
-    if (roleLower.includes('superintendent')) {
-      return { granted: true, reason: 'Superintendent full access' };
+    // Map resource/action to capability checks
+    const checks: Array<{ when: boolean; cap: Capability; reason: string }> = [
+      { when: resource === 'user' && action === 'manage', cap: Capability.USER_MANAGE, reason: 'USER_MANAGE' },
+      { when: resource === 'role' && action === 'manage', cap: Capability.ROLE_MANAGE, reason: 'ROLE_MANAGE' },
+      { when: resource === 'school' && action === 'manage', cap: Capability.SCHOOL_MANAGE, reason: 'SCHOOL_MANAGE' },
+      { when: resource === 'staff' && action === 'manage', cap: Capability.STAFF_MANAGE, reason: 'STAFF_MANAGE' },
+      { when: resource === 'meeting' && action === 'read', cap: Capability.MEETING_VIEW, reason: 'MEETING_VIEW' },
+      { when: resource === 'meeting' && action === 'create', cap: Capability.MEETING_CREATE, reason: 'MEETING_CREATE' },
+      { when: resource === 'system' && action === 'configure', cap: Capability.OPS_HEALTH, reason: 'OPS_HEALTH' },
+      { when: resource === 'security' && action === 'read', cap: Capability.OPS_LOGS, reason: 'OPS_LOGS' }
+    ];
+    for (const c of checks) {
+      if (c.when && can(user as any, c.cap)) return { granted: true, reason: `Capability ${c.reason}` };
     }
-
-    // Principal permissions
-    if (roleLower.includes('principal')) {
-      const principalResources = [
-        'school', 'staff', 'student', 'meeting', 'curriculum', 
-        'budget', 'discipline', 'parent_communication'
-      ];
-      if (principalResources.includes(resource)) {
-        return { granted: true, reason: 'Principal school-level access' };
-      }
-    }
-
-    // Department Head permissions
-    if (roleLower.includes('department') && roleLower.includes('head')) {
-      const deptResources = ['department', 'curriculum', 'staff', 'meeting', 'budget'];
-      if (deptResources.includes(resource)) {
-        return { granted: true, reason: 'Department Head access' };
-      }
-    }
-
-    // Teacher permissions
-    if (roleLower.includes('teacher')) {
-      const teacherResources = ['meeting', 'student', 'curriculum', 'assessment'];
-      const teacherActions = ['read', 'create', 'update'];
-      if (teacherResources.includes(resource) && teacherActions.includes(action)) {
-        return { granted: true, reason: 'Teacher classroom access' };
-      }
-    }
-
-    // IT Staff permissions
-    if (roleLower.includes('it')) {
-      const itResources = ['system', 'technology', 'user_management', 'security', 'workflow_management', 'code_modification'];
-      if (itResources.includes(resource)) {
-        return { granted: true, reason: 'IT staff technical access' };
-      }
-    }
-
-    // Administrator permissions (complete system access)
-    if (roleLower.includes('administrator')) {
-      const adminResources = [
-        'system', 'user_management', 'security', 'workflow_management', 
-        'code_modification', 'code_generation', 'database', 'backup',
-        'school', 'staff', 'student', 'meeting', 'department', 'district'
-      ];
-      if (adminResources.includes(resource)) {
-        return { granted: true, reason: 'Administrator full system access' };
-      }
-    }
-
-    // Project Management permissions for development roles
-    if (roleLower.includes('developer') || roleLower.includes('tech') || roleLower.includes('admin')) {
-      const projectResources = ['workflow_management', 'code_modification', 'code_generation'];
-      if (projectResources.includes(resource)) {
-        return { granted: true, reason: 'Development role project management access' };
-      }
-    }
-
-    return { granted: false, reason: 'No role-based permissions match' };
+    return { granted: false, reason: 'No capability match' };
   }
 
   // Helper method to check if user has specific permission
@@ -531,11 +483,7 @@ export class DynamicRBAC {
 
   // Check if user is admin
   async isAdmin(user: _AuthenticatedUser): Promise<boolean> {
-    const userStaff = await this.getUserStaff(user);
-    return userStaff.some(staff => 
-      staff.Role.title.toLowerCase().includes('administrator') || 
-      staff.Role.is_leadership
-    );
+    return isRole(user as any, RoleKey.DEV_ADMIN) || isRole(user as any, RoleKey.OPS_ADMIN) || can(user as any, Capability.USER_MANAGE);
   }
 
   // Get primary staff record for user
