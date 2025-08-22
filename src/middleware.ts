@@ -87,7 +87,8 @@ export async function middleware(request: NextRequest) {
       // to the route so they can return 401 with richer context instead of
       // being blocked here.
       '/api/user',
-      // REMOVED: /api/test-sentry, /api/dev, /api/tests - These require authentication
+      '/api/tests', // Test runner API endpoints (development only)
+      // REMOVED: /api/test-sentry, /api/dev - These require authentication
     ];
     const isPublic = publicEndpoints.some(endpoint => path.startsWith(endpoint));
     

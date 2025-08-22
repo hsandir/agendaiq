@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { RefreshCw, Trash2, Download, CheckCircle, XCircle, AlertCircle, Shield, Database, Server, Key, User, Activity, Bug, Code, Terminal, Eye, EyeOff } from 'lucide-react';
+import { RefreshCw, Trash2, Download, CheckCircle, XCircle, AlertCircle, Shield, Database, Server, Key, User, Activity, Bug, Code, Terminal, Eye, EyeOff, PlayIcon, TestTube2Icon } from 'lucide-react';
 
 interface AuthLog {
   id: string;
@@ -60,7 +60,9 @@ export default function AuthDebugPage() {
   const [testEmail, setTestEmail] = useState('admin@school.edu');
   const [testPassword, setTestPassword] = useState('1234');
   const [expandedLogs, setExpandedLogs] = useState<Set<string>>(new Set());
-  const [activeTab, setActiveTab] = useState<'logs' | 'flow' | 'system' | 'process'>('logs');
+  const [activeTab, setActiveTab] = useState<'logs' | 'flow' | 'system' | 'process' | 'tests'>('logs');
+  const [testResults, setTestResults] = useState<any>(null);
+  const [testLoading, setTestLoading] = useState(false);
 
   const fetchLogs = useCallback(async () => {
     try {
@@ -225,6 +227,81 @@ export default function AuthDebugPage() {
       newExpanded.add(logId);
     }
     setExpandedLogs(newExpanded);
+  };
+
+  const runJestTest = async () => {
+    setTestLoading(true);
+    setTestResults(null);
+    
+    try {
+      const response = await fetch('/api/tests/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          suite: 'src/__tests__/unit/components/tabs.test.tsx',
+          coverage: false 
+        })
+      });
+      
+      const data = await response.json();
+      setTestResults(data);
+    } catch (err) {
+      console.error('Test run failed:', err);
+      setTestResults({ error: String(err) });
+    } finally {
+      setTestLoading(false);
+    }
+  };
+
+  const testApiEndpoints = async () => {
+    setTestLoading(true);
+    setTestResults(null);
+    
+    try {
+      const tests = [];
+      
+      // Test multiple endpoints
+      const endpoints = [
+        { name: 'Health Check', url: '/api/health' },
+        { name: 'Debug Capabilities', url: '/api/debug/user-capabilities' },
+        { name: 'Auth Session', url: '/api/auth/session' },
+        { name: 'Theme API', url: '/api/user/theme' },
+        { name: 'Layout API', url: '/api/user/layout' }
+      ];
+      
+      for (const endpoint of endpoints) {
+        try {
+          const response = await fetch(endpoint.url);
+          const contentType = response.headers.get('content-type');
+          let data;
+          
+          if (contentType && contentType.includes('application/json')) {
+            data = await response.json();
+          } else {
+            data = await response.text();
+          }
+          
+          tests.push({
+            ...endpoint,
+            status: response.status,
+            statusText: response.statusText,
+            data
+          });
+        } catch (err) {
+          tests.push({
+            ...endpoint,
+            status: 'error',
+            error: String(err)
+          });
+        }
+      }
+      
+      setTestResults({ tests, timestamp: new Date().toISOString() });
+    } catch (err) {
+      setTestResults({ error: String(err) });
+    } finally {
+      setTestLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -523,6 +600,14 @@ export default function AuthDebugPage() {
               >
                 Process Info
               </Button>
+              <Button
+                variant={activeTab === 'tests' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActiveTab('tests')}
+              >
+                <TestTube2Icon className="h-4 w-4 mr-1" />
+                API Tests
+              </Button>
             </div>
           </CardHeader>
         </Card>
@@ -756,6 +841,146 @@ export default function AuthDebugPage() {
                 <h3 className="font-medium mb-2">Working Directory</h3>
                 <p className="text-sm text-gray-600">{processInfo.cwd}</p>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+        )}
+
+        {/* Tests Tab */}
+        {activeTab === 'tests' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <TestTube2Icon className="h-5 w-5" />
+              API & Test Runner
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Test Controls */}
+              <div className="flex gap-2">
+                <Button 
+                  onClick={testApiEndpoints}
+                  disabled={testLoading}
+                  variant="default"
+                >
+                  {testLoading ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      Testing...
+                    </>
+                  ) : (
+                    <>
+                      <PlayIcon className="h-4 w-4 mr-2" />
+                      Test API Endpoints
+                    </>
+                  )}
+                </Button>
+                
+                <Button 
+                  onClick={runJestTest}
+                  disabled={testLoading}
+                  variant="outline"
+                >
+                  {testLoading ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      Running...
+                    </>
+                  ) : (
+                    <>
+                      <TestTube2Icon className="h-4 w-4 mr-2" />
+                      Run Jest Test
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Test Results */}
+              {testResults && (
+                <div className="space-y-4">
+                  {testResults.error && (
+                    <Alert variant="destructive">
+                      <XCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        {testResults.error}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  
+                  {testResults.tests && (
+                    <div>
+                      <h3 className="font-medium mb-2">API Endpoint Tests</h3>
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left py-2">Endpoint</th>
+                            <th className="text-left py-2">Status</th>
+                            <th className="text-left py-2">Response</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {testResults.tests.map((test: any, index: number) => (
+                            <tr key={index} className="border-b">
+                              <td className="py-2">
+                                <span className="font-mono text-xs">{test.name}</span>
+                                <br />
+                                <span className="text-xs text-gray-500">{test.url}</span>
+                              </td>
+                              <td className="py-2">
+                                {test.status === 'error' ? (
+                                  <Badge variant="destructive">ERROR</Badge>
+                                ) : test.status === 200 ? (
+                                  <Badge variant="default">200 OK</Badge>
+                                ) : test.status === 401 ? (
+                                  <Badge variant="secondary">401 Unauthorized</Badge>
+                                ) : (
+                                  <Badge variant="outline">{test.status} {test.statusText}</Badge>
+                                )}
+                              </td>
+                              <td className="py-2">
+                                <details>
+                                  <summary className="cursor-pointer text-xs text-blue-600">View Response</summary>
+                                  <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-x-auto text-gray-800">
+                                    {JSON.stringify(test.data || test.error, null, 2)}
+                                  </pre>
+                                </details>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                  
+                  {testResults.output && (
+                    <div>
+                      <h3 className="font-medium mb-2">Jest Test Output</h3>
+                      <pre className="bg-gray-900 text-green-400 p-4 rounded text-xs overflow-x-auto font-mono">
+                        {testResults.output.join('\n')}
+                      </pre>
+                    </div>
+                  )}
+                  
+                  {testResults.success !== undefined && (
+                    <div className="flex items-center gap-2">
+                      {testResults.success ? (
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-red-600" />
+                      )}
+                      <span className="font-medium">
+                        Tests {testResults.success ? 'Passed' : 'Failed'}
+                      </span>
+                      {testResults.results && (
+                        <span className="text-sm text-gray-600">
+                          ({testResults.results.passed} passed, {testResults.results.failed} failed)
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

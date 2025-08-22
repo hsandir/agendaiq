@@ -1,55 +1,145 @@
+import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { Tabs } from '/Users/hs/Project/agendaiq/src/components/ui/tabs'
-import { renderWithProviders } from '@/__tests__/utils/test-utils'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 
-describe('Tabs', () => {
-  const defaultProps = {
-    value: 'test-value',
-    defaultValue: 'test-value',
-    onValueChange: 'test-value',
-    children: 'test-value',
-    className: 'test-value'
-  }
-
+describe('Tabs Component', () => {
   it('renders without crashing', () => {
-    renderWithProviders(<Tabs {...defaultProps} />)
-    
-    // Add specific assertions based on component content
-    expect(screen.getByRole('region')).toBeInTheDocument()
-  })
-
-  
-
-  
-
-  it('updates state correctly', async () => {
-    const user = userEvent.setup()
-    renderWithProviders(<Tabs {...defaultProps} />)
-    
-    // Add state change interaction test
-    const input = screen.getByRole('textbox')
-    await user.type(input, 'New Value')
-    
-    expect(input).toHaveValue('New Value')
-  })
-
-  
-
-  
-
-  it('applies custom className', () => {
-    const { container } = renderWithProviders(
-      <Tabs {...__defaultProps} className="custom-class" />
+    render(
+      <Tabs defaultValue="tab1">
+        <TabsList>
+          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1">Content 1</TabsContent>
+        <TabsContent value="tab2">Content 2</TabsContent>
+      </Tabs>
     )
     
-    expect(container.firstChild).toHaveClass('custom-class')
+    expect(screen.getByText('Tab 1')).toBeInTheDocument()
+    expect(screen.getByText('Tab 2')).toBeInTheDocument()
+    expect(screen.getByText('Content 1')).toBeInTheDocument()
   })
 
-  it('is accessible', () => {
-    const { container } = renderWithProviders(<Tabs {...__defaultProps} />)
+  it('switches tabs when clicked', async () => {
+    const user = userEvent.setup()
     
-    // Basic accessibility checks
-    expect(container.firstChild).toHaveAttribute('role')
+    render(
+      <Tabs defaultValue="tab1">
+        <TabsList>
+          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1">Content 1</TabsContent>
+        <TabsContent value="tab2">Content 2</TabsContent>
+      </Tabs>
+    )
+    
+    // Initially tab1 content should be visible
+    expect(screen.getByText('Content 1')).toBeInTheDocument()
+    expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
+    
+    // Click on tab2
+    await user.click(screen.getByText('Tab 2'))
+    
+    // Now tab2 content should be visible
+    await waitFor(() => {
+      expect(screen.queryByText('Content 1')).not.toBeInTheDocument()
+      expect(screen.getByText('Content 2')).toBeInTheDocument()
+    })
+  })
+
+  it('calls onValueChange when tab changes', async () => {
+    const user = userEvent.setup()
+    const handleValueChange = jest.fn()
+    
+    render(
+      <Tabs defaultValue="tab1" onValueChange={handleValueChange}>
+        <TabsList>
+          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1">Content 1</TabsContent>
+        <TabsContent value="tab2">Content 2</TabsContent>
+      </Tabs>
+    )
+    
+    await user.click(screen.getByText('Tab 2'))
+    
+    expect(handleValueChange).toHaveBeenCalledWith('tab2')
+  })
+
+  it('controlled mode works correctly', () => {
+    const { rerender } = render(
+      <Tabs value="tab1">
+        <TabsList>
+          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1">Content 1</TabsContent>
+        <TabsContent value="tab2">Content 2</TabsContent>
+      </Tabs>
+    )
+    
+    expect(screen.getByText('Content 1')).toBeInTheDocument()
+    expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
+    
+    // Change controlled value
+    rerender(
+      <Tabs value="tab2">
+        <TabsList>
+          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1">Content 1</TabsContent>
+        <TabsContent value="tab2">Content 2</TabsContent>
+      </Tabs>
+    )
+    
+    expect(screen.queryByText('Content 1')).not.toBeInTheDocument()
+    expect(screen.getByText('Content 2')).toBeInTheDocument()
+  })
+
+  it('applies custom className', () => {
+    const { container } = render(
+      <Tabs defaultValue="tab1" className="custom-tabs-class">
+        <TabsList className="custom-list-class">
+          <TabsTrigger value="tab1" className="custom-trigger-class">Tab 1</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1" className="custom-content-class">Content 1</TabsContent>
+      </Tabs>
+    )
+    
+    expect(container.querySelector('.custom-tabs-class')).toBeInTheDocument()
+    expect(container.querySelector('.custom-list-class')).toBeInTheDocument()
+    expect(container.querySelector('.custom-trigger-class')).toBeInTheDocument()
+    expect(container.querySelector('.custom-content-class')).toBeInTheDocument()
+  })
+
+  it('handles multiple tabs correctly', async () => {
+    const user = userEvent.setup()
+    
+    render(
+      <Tabs defaultValue="tab1">
+        <TabsList>
+          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+          <TabsTrigger value="tab3">Tab 3</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tab1">Content 1</TabsContent>
+        <TabsContent value="tab2">Content 2</TabsContent>
+        <TabsContent value="tab3">Content 3</TabsContent>
+      </Tabs>
+    )
+    
+    // Click through all tabs
+    await user.click(screen.getByText('Tab 2'))
+    expect(screen.getByText('Content 2')).toBeInTheDocument()
+    
+    await user.click(screen.getByText('Tab 3'))
+    expect(screen.getByText('Content 3')).toBeInTheDocument()
+    
+    await user.click(screen.getByText('Tab 1'))
+    expect(screen.getByText('Content 1')).toBeInTheDocument()
   })
 })
