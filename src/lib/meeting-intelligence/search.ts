@@ -419,7 +419,7 @@ export class MeetingSearchService {
     }
 
     // Remove duplicates and limit
-    return [...new Set(suggestions)].slice(0, limit);
+    return Array.from(new Set(suggestions)).slice(0, limit);
   }
 
   /**

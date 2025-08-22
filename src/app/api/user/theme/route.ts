@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/auth/auth-utils';
-import { getFastUser } from '@/lib/auth/auth-utils-fast';
-import { getUltraFastUser, preferenceCache } from '@/lib/auth/auth-utils-ultra-fast';
+import { withAuth } from '@/lib/auth/api-auth';
+import { preferenceCache } from '@/lib/auth/auth-utils-ultra-fast';
 import { prisma } from '@/lib/prisma';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { z } from 'zod';
@@ -17,11 +16,12 @@ const themeSchema = z.object({
 // GET /api/user/theme - Get user's theme preference
 export async function GET(request: NextRequest) {
   try {
-    // Use ultra-fast auth for better performance
-    const user = await getUltraFastUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    // Standardized auth - capability-based and session-aware
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return NextResponse.json({ error: auth.error || 'Authentication required' }, { status: auth.statusCode || 401 });
     }
+    const user = auth.user;
 
     // Check cache first
     const cached = preferenceCache.get(user.id);
@@ -34,12 +34,12 @@ export async function GET(request: NextRequest) {
       return response;
     }
 
-    // Get theme preference from database (optimized query)
-    const userData = await prisma.$queryRaw<{theme_preference: string | null}[]>`
-      SELECT theme_preference FROM "User" WHERE id = ${user.id} LIMIT 1
-    `;
-    
-    const theme = userData?.[0]?.theme_preference ?? 'standard';
+    // Get theme preference using Prisma client (avoids case/permission issues)
+    const userData = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { theme_preference: true },
+    });
+    const theme = userData?.theme_preference ?? 'standard';
     
     // Cache the result
     preferenceCache.set(user.id, { theme });
@@ -75,10 +75,11 @@ export async function PUT(request: NextRequest) {
     }
   }
 
-  const user = await getUltraFastUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const auth = await withAuth(request, { requireAuth: true });
+  if (!auth.success || !auth.user) {
+    return NextResponse.json({ error: auth.error || 'Authentication required' }, { status: auth.statusCode || 401 });
   }
+  const user = auth.user;
 
   try {
     const body = await request.json();

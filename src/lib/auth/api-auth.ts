@@ -78,7 +78,7 @@ export function createAuthErrorResponse(
  * Wrapper for API route handlers with authentication
  */
 export function withAPIAuth(
-  handler: (request: NextRequest, user: _AuthenticatedUser) => Promise<NextResponse>,
+  handler: (request: NextRequest, user: AuthenticatedUser) => Promise<NextResponse>,
   requirements: AuthRequirements = {}
 ) {
   return async (request: NextRequest): Promise<NextResponse> => {
@@ -111,7 +111,7 @@ export function withAPIAuth(
  * Check if user has permission for specific resource
  */
 export function hasResourcePermission(
-  user: _AuthenticatedUser,
+  user: AuthenticatedUser,
   resourceType: 'meeting' | 'user' | 'school' | 'department' | 'district',
   resourceId: number,
   action: 'read' | 'write' | 'delete' | 'admin'
@@ -183,7 +183,7 @@ export const APIAuthPatterns = {
    * Public endpoint - no auth required
    */
   public: () => withAPIAuth(
-    async (request: NextRequest, user: _AuthenticatedUser) => {
+    async (request: NextRequest, user: AuthenticatedUser) => {
       // This should not be reached as no auth is required
       throw new Error('Invalid usage of public pattern');
     },
@@ -193,31 +193,31 @@ export const APIAuthPatterns = {
   /**
    * Basic authenticated endpoint
    */
-  authenticated: (handler: (request: NextRequest, user: _AuthenticatedUser) => Promise<NextResponse>) =>
+  authenticated: (handler: (request: NextRequest, user: AuthenticatedUser) => Promise<NextResponse>) =>
     withAPIAuth(handler, { requireAuth: true }),
 
   /**
    * Staff-only endpoint
    */
-  staffOnly: (handler: (request: NextRequest, user: _AuthenticatedUser) => Promise<NextResponse>) =>
+  staffOnly: (handler: (request: NextRequest, user: AuthenticatedUser) => Promise<NextResponse>) =>
     withAPIAuth(handler, { requireAuth: true, requireStaff: true }),
 
   /**
    * Admin-only endpoint
    */
-  adminOnly: (handler: (request: NextRequest, user: _AuthenticatedUser) => Promise<NextResponse>) =>
+  adminOnly: (handler: (request: NextRequest, user: AuthenticatedUser) => Promise<NextResponse>) =>
     withAPIAuth(handler, { requireAuth: true, requireStaff: true, requireAdminRole: true }),
 
   /**
    * Leadership-only endpoint
    */
-  leadershipOnly: (handler: (request: NextRequest, user: _AuthenticatedUser) => Promise<NextResponse>) =>
+  leadershipOnly: (handler: (request: NextRequest, user: AuthenticatedUser) => Promise<NextResponse>) =>
     withAPIAuth(handler, { requireAuth: true, requireStaff: true, requireLeadership: true }),
 
   /**
    * Management-only endpoint (Principal, Superintendent, Admin)
    */
-  managementOnly: (handler: (request: NextRequest, user: _AuthenticatedUser) => Promise<NextResponse>) =>
+  managementOnly: (handler: (request: NextRequest, user: AuthenticatedUser) => Promise<NextResponse>) =>
     withAPIAuth(handler, { 
       requireAuth: true, 
       requireStaff: true,

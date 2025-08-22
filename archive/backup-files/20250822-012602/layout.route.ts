@@ -33,12 +33,12 @@ export async function GET(request: NextRequest) {
       return response;
     }
 
-    // Get layout preference using Prisma client (avoids case/permission issues)
-    const userData = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { layout_preference: true },
-    });
-    const layout = userData?.layout_preference ?? 'modern';
+    // Get layout preference from database (optimized query)
+    const userData = await prisma.$queryRaw<{layout_preference: string | null}[]>`
+      SELECT layout_preference FROM "User" WHERE id = ${user.id} LIMIT 1
+    `;
+    
+    const layout = userData?.[0]?.layout_preference ?? 'modern';
     
     // Cache the result
     preferenceCache.set(user.id, { layout });

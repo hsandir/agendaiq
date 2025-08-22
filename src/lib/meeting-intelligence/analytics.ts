@@ -24,13 +24,13 @@ export class MeetingAnalyticsService {
       where.school_id = options.schoolId;
     }
 
-    if (options?.dateFrom ?? options?.dateTo) {
+    if (options?.dateFrom || options?.dateTo) {
       where.start_time = {};
       if (options.dateFrom) {
-        where.start_time.gte = options.dateFrom;
+        (where.start_time as Record<string, unknown>).gte = options.dateFrom;
       }
       if (options.dateTo) {
-        where.start_time.lte = options.dateTo;
+        (where.start_time as Record<string, unknown>).lte = options.dateTo;
       }
     }
 

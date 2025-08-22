@@ -20,7 +20,7 @@ function TwoFactorFormContent({ userId, onSuccess }: TwoFactorFormProps) {
   const searchParams = useSearchParams();
   const email = searchParams?.get('email') ?? '';
 
-  const handleSubmit = async (e: React?.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccessMessage('');

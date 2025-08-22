@@ -2,7 +2,7 @@ import { requireAuth, AuthRequirements, AuthenticatedUser } from '@/lib/auth/aut
 import { redirect } from 'next/navigation';
 
 interface ServerAuthWrapperProps {
-  children: React.ReactNode | ((user: _AuthenticatedUser) => React?.ReactNode);
+  children: React.ReactNode | ((user: AuthenticatedUser) => React.ReactNode);
   requirements?: AuthRequirements;
   fallbackUrl?: string;
 }

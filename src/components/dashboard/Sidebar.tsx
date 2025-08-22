@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import clsx from "clsx";
 import { sidebarItems } from "@/components/layout/SidebarItems";
@@ -12,9 +12,90 @@ interface SidebarProps {
   onSettingsClick?: () => void;
 }
 
+const EXPANDED_ITEMS_KEY = 'sidebar-expanded-items';
+
 export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Load expanded items from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const stored = localStorage.getItem(EXPANDED_ITEMS_KEY);
+        if (stored) {
+          const items = JSON.parse(stored);
+          // Validate that items is an array
+          if (Array.isArray(items)) {
+            setExpandedItems(new Set(items));
+          } else {
+            // Reset if invalid data
+            localStorage.removeItem(EXPANDED_ITEMS_KEY);
+            setExpandedItems(new Set());
+          }
+        } else {
+          // Initialize with empty set
+          setExpandedItems(new Set());
+        }
+      } catch (error) {
+        console.error('Failed to load expanded items from localStorage:', error);
+        // Reset on error
+        localStorage.removeItem(EXPANDED_ITEMS_KEY);
+        setExpandedItems(new Set());
+      }
+      setIsInitialized(true);
+    }
+  }, []);
+
+  // Auto-expand parent items based on current path
+  useEffect(() => {
+    if (pathname && isInitialized) {
+      const pathSegments = pathname.split('/').filter(Boolean);
+      const newExpanded = new Set(expandedItems);
+      let hasChanges = false;
+      
+      // Check each section for active children
+      sidebarItems.forEach(section => {
+        section.items.forEach(item => {
+          // Only auto-expand if the current path is a child of this item
+          if (item.children && item.children.length > 0) {
+            const isChildActive = item.children.some(child => 
+              pathname === child.href || pathname.startsWith(child.href + '/')
+            );
+            
+            if (isChildActive && !newExpanded.has(item.href)) {
+              newExpanded.add(item.href);
+              hasChanges = true;
+              
+              // Check for nested children
+              item.children.forEach(child => {
+                if (child.children && child.children.length > 0) {
+                  const isNestedChildActive = child.children.some(nested => 
+                    pathname === nested.href || pathname.startsWith(nested.href + '/')
+                  );
+                  if (isNestedChildActive && !newExpanded.has(child.href)) {
+                    newExpanded.add(child.href);
+                    hasChanges = true;
+                  }
+                }
+              });
+            }
+          }
+        });
+      });
+      
+      if (hasChanges) {
+        setExpandedItems(newExpanded);
+        // Save to localStorage
+        try {
+          localStorage.setItem(EXPANDED_ITEMS_KEY, JSON.stringify(Array.from(newExpanded)));
+        } catch (error) {
+          console.error('Failed to save expanded items:', error);
+        }
+      }
+    }
+  }, [pathname, isInitialized, expandedItems]);
 
   const isActive = (path: string) => {
     return pathname === path ?? pathname?.startsWith(path + "/");
@@ -28,6 +109,14 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
       newExpanded.add(href);
     }
     setExpandedItems(newExpanded);
+    // Save to localStorage
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(EXPANDED_ITEMS_KEY, JSON.stringify(Array.from(newExpanded)));
+      } catch (error) {
+        console.error('Failed to save expanded items:', error);
+      }
+    }
   };
 
   const renderNavItem = (item: any, depth = 0) => {
@@ -113,6 +202,42 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
       </div>
     );
   };
+
+  // Don't render until initialized to prevent hydration mismatch
+  if (!isInitialized) {
+    return (
+      <div className="flex flex-col h-full" role="navigation" aria-label="Main sidebar">
+        <div className="px-4 py-6 ml-12">
+          <h2 className="text-2xl font-bold text-foreground" role="banner">AgendaIQ</h2>
+        </div>
+        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto" role="navigation" aria-label="Main navigation">
+          {/* Show actual menu structure immediately, just without expand state */}
+          {sidebarItems.map((section) => (
+            <div key={section.title} className="mb-6">
+              <h3 className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                {section.title}
+              </h3>
+              <ul className="space-y-1" role="list">
+                {section.items.map((item) => (
+                  <li key={item.href} role="none">
+                    <div className="opacity-50">
+                      <Link
+                        href={item.href}
+                        className="flex items-center px-4 py-2 text-sm font-medium rounded-md text-muted-foreground"
+                      >
+                        {item.icon && <item.icon className="mr-3 h-5 w-5" />}
+                        {item.label}
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full" role="navigation" aria-label="Main sidebar">

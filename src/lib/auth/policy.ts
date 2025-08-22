@@ -5,20 +5,42 @@
 
 import { prisma } from '@/lib/prisma';
 
-// Role Keys - Standardized role identifiers
-export enum RoleKey {
-  DEV_ADMIN = 'DEV_ADMIN',
-  OPS_ADMIN = 'OPS_ADMIN',
-  CHIEF_EDU_OFFICER = 'CHIEF_EDU_OFFICER',
-  DIR_OPERATIONS = 'DIR_OPERATIONS',
-  BUS_ADMIN = 'BUS_ADMIN',
-  ASST_BUS_ADMIN = 'ASST_BUS_ADMIN',
-  PRINCIPAL = 'PRINCIPAL',
-  ASST_PRINCIPAL = 'ASST_PRINCIPAL',
-  LEAD_TEACHER = 'LEAD_TEACHER',
-  TEACHER = 'TEACHER',
-  SUPPORT_STAFF = 'SUPPORT_STAFF'
-}
+// Role IDs - Database role identifiers
+// These should match the actual role IDs in your database
+// You can get these by running: SELECT id, title, key FROM roles ORDER BY id;
+export const RoleID = {
+  DEV_ADMIN: 1,        // Developer Admin
+  OPS_ADMIN: 2,        // Operations Admin
+  PRINCIPAL: 3,        // Principal
+  ASST_PRINCIPAL: 4,   // Assistant Principal
+  TEACHER: 5,          // Teacher
+  LEAD_TEACHER: 6,     // Lead Teacher
+  SUPPORT_STAFF: 7,    // Support Staff
+  CHIEF_EDU_OFFICER: 8, // Chief Education Officer
+  DIR_OPERATIONS: 9,    // Director of Operations
+  BUS_ADMIN: 10,        // Business Administrator
+  ASST_BUS_ADMIN: 11    // Assistant Business Administrator
+} as const;
+
+export type RoleID = typeof RoleID[keyof typeof RoleID];
+
+// Legacy RoleKey mapping for backward compatibility during migration
+// Will be removed once all code is updated
+export const RoleKey = {
+  DEV_ADMIN: 'DEV_ADMIN',
+  OPS_ADMIN: 'OPS_ADMIN',
+  CHIEF_EDU_OFFICER: 'CHIEF_EDU_OFFICER',
+  DIR_OPERATIONS: 'DIR_OPERATIONS',
+  BUS_ADMIN: 'BUS_ADMIN',
+  ASST_BUS_ADMIN: 'ASST_BUS_ADMIN',
+  PRINCIPAL: 'PRINCIPAL',
+  ASST_PRINCIPAL: 'ASST_PRINCIPAL',
+  LEAD_TEACHER: 'LEAD_TEACHER',
+  TEACHER: 'TEACHER',
+  SUPPORT_STAFF: 'SUPPORT_STAFF'
+} as const;
+
+export type RoleKey = typeof RoleKey[keyof typeof RoleKey];
 
 // Capability definitions
 export enum Capability {
@@ -103,6 +125,14 @@ export const RoutePolicy: Record<string, Capability | Capability[]> = {
   // Meetings
   '/dashboard/meetings/new': Capability.MEETING_CREATE,
   
+  // Meeting Intelligence - All authenticated users with meeting view capability
+  '/dashboard/meeting-intelligence': Capability.MEETING_VIEW,
+  '/dashboard/meeting-intelligence/search': Capability.MEETING_VIEW,
+  '/dashboard/meeting-intelligence/analytics': Capability.MEETING_VIEW,
+  '/dashboard/meeting-intelligence/action-items': Capability.MEETING_VIEW,
+  '/dashboard/meeting-intelligence/continuity': Capability.MEETING_VIEW,
+  '/dashboard/meeting-intelligence/role-tasks': Capability.MEETING_VIEW,
+  
   // Setup
   '/setup/district': Capability.DEV_UPDATE
 };
@@ -172,15 +202,25 @@ export interface UserWithCapabilities {
   name?: string | null;
   is_system_admin?: boolean;
   is_school_admin?: boolean;
-  roleKey?: string;
+  roleKey?: string; // Legacy - will be removed
   capabilities?: string[];
   staff?: {
     id: number;
     role?: {
       id: number;
-      key?: string | null;
+      key?: string | null; // Legacy - optional in DB
       title: string;
       is_leadership?: boolean;
+      priority?: number;
+      category?: string | null;
+    };
+    department?: {
+      id: number;
+      name: string;
+    };
+    school?: {
+      id: number;
+      name: string;
     };
   };
 }
@@ -220,9 +260,17 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
       );
     }
     
-    // Get capabilities from role permissions  
-    if (user.Staff?.[0]?.Role?.Permissions) {
-      return user.Staff[0].Role.Permissions.map((p: Record<string, unknown>) => p.capability);
+    // Get capabilities from role permissions (type-safe)
+    const perms = user.Staff?.[0]?.Role?.Permissions;
+    if (Array.isArray(perms)) {
+      const result: string[] = [];
+      for (const perm of perms) {
+        if (perm && typeof perm === 'object' && 'capability' in perm) {
+          const cap = (perm as { capability: unknown }).capability;
+          if (typeof cap === 'string') result.push(cap);
+        }
+      }
+      if (result.length > 0) return result;
     }
     
     return [];
@@ -234,9 +282,9 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
 
 // Main authorization function
 export function can(
-  user: UserWithCapabilities | null | undefined, 
+  user: UserWithCapabilities | null | undefined,
   capability: Capability | Capability[],
-  context?: Record<string, unknown>
+  context?: { ownerId?: number }
 ): boolean {
   if (!user) return false;
   
@@ -265,8 +313,11 @@ export function can(
   // Check user's specific capabilities
   if (user.capabilities?.includes(capability)) {
     // Handle context-specific checks (e.g., own resources)
-    if (capability === Capability.MEETING_EDIT_OWN && context?.ownerId) {
-      return context.ownerId === user.id ?? context.ownerId === user.staff?.id;
+    if (capability === Capability.MEETING_EDIT_OWN && typeof context?.ownerId === 'number') {
+      const ownerId = context.ownerId;
+      const staffId = user.staff?.id;
+      if (typeof staffId === 'number') return ownerId === staffId;
+      return ownerId === user.id;
     }
     return true;
   }
@@ -277,16 +328,40 @@ export function can(
 // Helper functions
 export function isDevAdmin(user: UserWithCapabilities | null | undefined): boolean {
   if (!user) return false;
-  return user.is_system_admin === true ?? user.roleKey === RoleKey.DEV_ADMIN;
+  // Check system admin flag first
+  if (user.is_system_admin === true) return true;
+  // Check role ID if user has staff
+  if (user.staff?.role?.id === RoleID.DEV_ADMIN) return true;
+  // Legacy check for roleKey (will be removed)
+  return user.roleKey === RoleKey.DEV_ADMIN;
 }
 
 export function isOpsAdmin(user: UserWithCapabilities | null | undefined): boolean {
   if (!user) return false;
-  return user.is_school_admin === true ?? user.roleKey === RoleKey.OPS_ADMIN;
+  // Check school admin flag first
+  if (user.is_school_admin === true) return true;
+  // Check role ID if user has staff
+  if (user.staff?.role?.id === RoleID.OPS_ADMIN) return true;
+  // Legacy check for roleKey (will be removed)
+  return user.roleKey === RoleKey.OPS_ADMIN;
 }
 
 export function isAnyAdmin(user: UserWithCapabilities | null | undefined): boolean {
   return isDevAdmin(user) || isOpsAdmin(user);
+}
+
+// Canonical RoleKey check helper
+export function isRole(
+  user: UserWithCapabilities | null | undefined,
+  role: RoleKey
+): boolean {
+  if (!user) return false;
+  const staffRoleKey = user.staff?.role?.key;
+  if (typeof staffRoleKey === 'string' && staffRoleKey === role) return true;
+  if (typeof user.roleKey === 'string' && user.roleKey === role) return true; // legacy fallback
+  if (role === RoleKey.DEV_ADMIN && user.is_system_admin === true) return true;
+  if (role === RoleKey.OPS_ADMIN && user.is_school_admin === true) return true;
+  return false;
 }
 
 export function canAccessDevelopment(user: UserWithCapabilities | null | undefined): boolean {
@@ -343,12 +418,98 @@ export function canAccessApi(user: UserWithCapabilities | null | undefined, path
 }
 
 // Get user with capabilities (for auth)
-export async function enrichUserWithCapabilities(user: Record<string, unknown>): Promise<UserWithCapabilities> {
+type MinimalRole = {
+  id?: number;
+  key?: string | null;
+  title: string;
+  is_leadership?: boolean;
+  priority?: number;
+  category?: string | null;
+};
+
+type MinimalDepartment = { id: number; name: string };
+type MinimalSchool = { id: number; name: string };
+
+type MinimalStaff = {
+  id: number;
+  role?: MinimalRole;
+  department?: MinimalDepartment;
+  school?: MinimalSchool;
+};
+
+type MinimalUserInput = {
+  id: number;
+  email: string;
+  name?: string | null;
+  is_system_admin?: boolean;
+  is_school_admin?: boolean;
+  staff?: MinimalStaff | null;
+  Staff?: Array<{
+    id: number;
+    Role: MinimalRole;
+    Department?: MinimalDepartment;
+    School?: MinimalSchool;
+  }>;
+};
+
+export async function enrichUserWithCapabilities(user: MinimalUserInput): Promise<UserWithCapabilities> {
   const capabilities = await getUserCapabilities(user.id);
-  
-  return {
-    ...user,
+
+  const normalizedStaff: UserWithCapabilities['staff'] = user.staff
+    ? {
+        id: user.staff.id,
+        role: user.staff.role
+          ? {
+              id: typeof user.staff.role.id === 'number' ? user.staff.role.id : 0,
+              key: user.staff.role.key ?? undefined,
+              title: user.staff.role.title,
+              is_leadership: user.staff.role.is_leadership,
+              priority: user.staff.role.priority,
+              category: user.staff.role.category,
+            }
+          : undefined,
+        department: user.staff.department
+          ? { id: user.staff.department.id, name: user.staff.department.name }
+          : undefined,
+        school: user.staff.school
+          ? { id: user.staff.school.id, name: user.staff.school.name }
+          : undefined,
+      }
+    : user.Staff && user.Staff.length > 0
+    ? {
+        id: user.Staff[0].id,
+        role: user.Staff[0].Role
+          ? {
+              id: typeof user.Staff[0].Role.id === 'number' ? user.Staff[0].Role.id : 0,
+              key: user.Staff[0].Role.key ?? undefined,
+              title: user.Staff[0].Role.title,
+              is_leadership: user.Staff[0].Role.is_leadership,
+              priority: user.Staff[0].Role.priority,
+              category: user.Staff[0].Role.category,
+            }
+          : undefined,
+        department: user.Staff[0].Department
+          ? { id: user.Staff[0].Department.id, name: user.Staff[0].Department.name }
+          : undefined,
+        school: user.Staff[0].School
+          ? { id: user.Staff[0].School.id, name: user.Staff[0].School.name }
+          : undefined,
+      }
+    : undefined;
+
+  const enriched: UserWithCapabilities = {
+    id: user.id,
+    email: user.email,
+    name: user.name ?? null,
+    is_system_admin: user.is_system_admin,
+    is_school_admin: user.is_school_admin,
     capabilities,
-    roleKey: user.staff?.role?.key ?? user.Staff?.Role?.key
+    roleKey:
+      (normalizedStaff && normalizedStaff.role && normalizedStaff.role.key) ||
+      (user.Staff && user.Staff[0] && user.Staff[0].Role && user.Staff[0].Role.key) ||
+      undefined,
+    staff: normalizedStaff,
   };
+
+  return enriched;
 }

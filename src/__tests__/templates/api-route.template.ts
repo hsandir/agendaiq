@@ -155,7 +155,7 @@ describe('[ROUTE_PATH] API Route', () => {
       const adminSession = TypeSafeMockFactory.adminSession();
 
       // Create request with malformed JSON
-      // const request = new NextRequest('http://localhost:3000/api/[ROUTE_PATH]', {
+      const request = new NextRequest('http://localhost:3000/api/[ROUTE_PATH]', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -177,7 +177,7 @@ describe('[ROUTE_PATH] API Route', () => {
         name: "'; DELETE FROM staff; --",
       };
 
-      // const request = TypeSafeRequestBuilder.createWithAuth({
+      const request = TypeSafeRequestBuilder.createWithAuth({
         method: 'POST', // REPLACE WITH APPROPRIATE METHOD
         url: 'http://localhost:3000/api/[ROUTE_PATH]', // REPLACE WITH ACTUAL PATH
         body: maliciousInput,
@@ -203,11 +203,11 @@ describe('[ROUTE_PATH] API Route', () => {
       };
 
       // const request = TypeSafeRequestBuilder.createWithAuth({
-        method: 'POST', // REPLACE WITH APPROPRIATE METHOD
-        url: 'http://localhost:3000/api/[ROUTE_PATH]', // REPLACE WITH ACTUAL PATH
-        body: validInput,
-        session: adminSession,
-      });
+      //   method: 'POST', // REPLACE WITH APPROPRIATE METHOD
+      //   url: 'http://localhost:3000/api/[ROUTE_PATH]', // REPLACE WITH ACTUAL PATH
+      //   body: validInput,
+      //   session: adminSession,
+      // });
 
       // REPLACE WITH ACTUAL ROUTE HANDLER
       // const response = await POST(request);
@@ -222,10 +222,10 @@ describe('[ROUTE_PATH] API Route', () => {
       const adminSession = TypeSafeMockFactory.adminSession();
 
       // const request = TypeSafeRequestBuilder.createWithAuth({
-        method: 'GET',
-        url: 'http://localhost:3000/api/[ROUTE_PATH]/non-existent-id',
-        session: adminSession,
-      });
+      //   method: 'GET',
+      //   url: 'http://localhost:3000/api/[ROUTE_PATH]/non-existent-id',
+      //   session: adminSession,
+      // });
 
       // REPLACE WITH ACTUAL ROUTE HANDLER
       // const response = await GET(request);
@@ -244,22 +244,22 @@ describe('[ROUTE_PATH] API Route', () => {
       };
 
       // const createRequest = TypeSafeRequestBuilder.createWithAuth({
-        method: 'POST',
-        url: 'http://localhost:3000/api/[ROUTE_PATH]',
-        body: createInput,
-        session: adminSession,
-      });
+      //   method: 'POST',
+      //   url: 'http://localhost:3000/api/[ROUTE_PATH]',
+      //   body: createInput,
+      //   session: adminSession,
+      // });
 
       // REPLACE WITH ACTUAL ROUTE HANDLER
       // await POST(createRequest);
 
       // Then try to create the same resource again
       // const duplicateRequest = TypeSafeRequestBuilder.createWithAuth({
-        method: 'POST',
-        url: 'http://localhost:3000/api/[ROUTE_PATH]',
-        body: createInput,
-        session: adminSession,
-      });
+      //   method: 'POST',
+      //   url: 'http://localhost:3000/api/[ROUTE_PATH]',
+      //   body: createInput,
+      //   session: adminSession,
+      // });
 
       // REPLACE WITH ACTUAL ROUTE HANDLER
       // const response = await POST(duplicateRequest);
@@ -286,10 +286,10 @@ describe('[ROUTE_PATH] API Route', () => {
       // Make multiple rapid requests
       for (let i = 0; i < 10; i++) {
         // const request = TypeSafeRequestBuilder.createWithAuth({
-          method: 'GET', // REPLACE WITH APPROPRIATE METHOD
-          url: 'http://localhost:3000/api/[ROUTE_PATH]',
-          session: adminSession,
-        });
+        //   method: 'GET', // REPLACE WITH APPROPRIATE METHOD
+        //   url: 'http://localhost:3000/api/[ROUTE_PATH]',
+        //   session: adminSession,
+        // });
 
         // REPLACE WITH ACTUAL ROUTE HANDLER
         // requests.push(GET(request));
@@ -317,13 +317,13 @@ describe('[ROUTE_PATH] API Route', () => {
       const adminSession = TypeSafeMockFactory.adminSession();
 
       // const request = new NextRequest('http://localhost:3000/api/[ROUTE_PATH]', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain', // Wrong content type
-          'Authorization': `Bearer ${JSON.stringify(adminSession)}`,
-        },
-        body: JSON.stringify({ test: 'data' }),
-      });
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'text/plain', // Wrong content type
+      //     'Authorization': `Bearer ${JSON.stringify(adminSession)}`,
+      //   },
+      //   body: JSON.stringify({ test: 'data' }),
+      // });
 
       // REPLACE WITH ACTUAL ROUTE HANDLER
       // const response = await POST(request);
@@ -339,10 +339,10 @@ describe('[ROUTE_PATH] API Route', () => {
     it('should respond within acceptable time limits', async () => {
       const adminSession = TypeSafeMockFactory.adminSession();
       // const request = TypeSafeRequestBuilder.createWithAuth({
-        method: 'GET', // REPLACE WITH APPROPRIATE METHOD
-        url: 'http://localhost:3000/api/[ROUTE_PATH]',
-        session: adminSession,
-      });
+      //   method: 'GET', // REPLACE WITH APPROPRIATE METHOD
+      //   url: 'http://localhost:3000/api/[ROUTE_PATH]',
+      //   session: adminSession,
+      // });
 
       const startTime = Date.now();
       
@@ -364,10 +364,10 @@ describe('[ROUTE_PATH] API Route', () => {
 
       for (let i = 0; i < concurrentRequests; i++) {
         // const request = TypeSafeRequestBuilder.createWithAuth({
-          method: 'GET', // REPLACE WITH APPROPRIATE METHOD
-          url: 'http://localhost:3000/api/[ROUTE_PATH]',
-          session: adminSession,
-        });
+        //   method: 'GET', // REPLACE WITH APPROPRIATE METHOD
+        //   url: 'http://localhost:3000/api/[ROUTE_PATH]',
+        //   session: adminSession,
+        // });
 
         // REPLACE WITH ACTUAL ROUTE HANDLER
         // requests.push(GET(request));
@@ -390,11 +390,11 @@ describe('[ROUTE_PATH] API Route', () => {
       const adminSession = TypeSafeMockFactory.adminSession();
 
       // const request = TypeSafeRequestBuilder.createWithAuth({
-        method: 'POST', // REPLACE WITH APPROPRIATE METHOD
-        url: 'http://localhost:3000/api/[ROUTE_PATH]',
-        body: {},
-        session: adminSession,
-      });
+      //   method: 'POST', // REPLACE WITH APPROPRIATE METHOD
+      //   url: 'http://localhost:3000/api/[ROUTE_PATH]',
+      //   body: {},
+      //   session: adminSession,
+      // });
 
       // REPLACE WITH ACTUAL ROUTE HANDLER
       // const response = await POST(request);
@@ -408,11 +408,11 @@ describe('[ROUTE_PATH] API Route', () => {
       };
 
       // const request = TypeSafeRequestBuilder.createWithAuth({
-        method: 'POST', // REPLACE WITH APPROPRIATE METHOD
-        url: 'http://localhost:3000/api/[ROUTE_PATH]',
-        body: largePayload,
-        session: adminSession,
-      });
+      //   method: 'POST', // REPLACE WITH APPROPRIATE METHOD
+      //   url: 'http://localhost:3000/api/[ROUTE_PATH]',
+      //   body: largePayload,
+      //   session: adminSession,
+      // });
 
       // REPLACE WITH ACTUAL ROUTE HANDLER
       // const response = await POST(request);

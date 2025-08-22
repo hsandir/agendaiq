@@ -407,24 +407,24 @@ export class TypeSafeTestDB {
     });
 
     // Create test users
-    const _adminUser = await this.prisma.user.create{
-      data: TypeSafeMockFactory.(user.create({
+    const adminUser = await this.prisma.user.create({
+      data: TypeSafeMockFactory.user.create({
         email: 'admin@test.com',
         name: 'Test Admin',
       }),
     });
 
-    const teacherUser = await this.prisma.user.create{
-      data: TypeSafeMockFactory.(user.create({
+    const teacherUser = await this.prisma.user.create({
+      data: TypeSafeMockFactory.user.create({
         email: 'teacher@test.com',
         name: 'Test Teacher',
       }),
     });
 
     // Create test staff
-    const _adminStaff = await this.prisma.staff.create({
+    const adminStaff = await this.prisma.staff.create({
       data: TypeSafeMockFactory.staff.create({
-        user_id: _adminUser.id,
+        user_id: adminUser.id,
         role_id: adminRole.id,
         department_id: department.id,
         school_id: school.id,
@@ -485,14 +485,11 @@ export class TypeSafeTestDB {
         throw new Error('ROLLBACK'); // Force rollback
       });
     } catch (error) {
-    if (error instanceof Error) {
-      if (error instanceof Error) {
-        if (error instanceof Error && error.message === 'ROLLBACK') {
-          // Expected rollback
-          return;
-        }
-        throw error;
+      if (error instanceof Error && error.message === 'ROLLBACK') {
+        // Expected rollback
+        return;
       }
+      throw error;
     }
   }
 }

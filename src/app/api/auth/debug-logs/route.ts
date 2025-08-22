@@ -52,16 +52,22 @@ function addLog(log: Partial<DebugLog>) {
 }
 
 // Helper to track auth flow
-function addAuthFlow(step: string, details: Record<string, unknown>) {
-  authFlowSteps.unshift({
-    id: `flow_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    timestamp: new Date().toISOString(),
-    step,
-    details
-  });
-  
-  if (authFlowSteps.length > MAX_FLOW_STEPS) {
-    authFlowSteps = authFlowSteps.slice(0, MAX_FLOW_STEPS);
+function addAuthFlow(stepName: string, details: Record<string, unknown>) {
+  try {
+    const flowStep: AuthFlowStep = {
+      id: `flow_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: new Date().toISOString(),
+      step: stepName,
+      details: details || {}
+    };
+    
+    authFlowSteps.unshift(flowStep);
+    
+    if (authFlowSteps.length > MAX_FLOW_STEPS) {
+      authFlowSteps = authFlowSteps.slice(0, MAX_FLOW_STEPS);
+    }
+  } catch (err: unknown) {
+    console.error('Error adding auth flow step:', err);
   }
 }
 

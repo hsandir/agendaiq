@@ -1,5 +1,4 @@
 import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
-import type { UserWithStaff, SessionUser } from '@/types/auth';
 import { MeetingAnalyticsService, ActionItemsService, MeetingContinuityService } from '@/lib/meeting-intelligence';
 import Link from 'next/link';
 import { Calendar, Search, TrendingUp, CheckCircle, AlertCircle, Users, FileText, BarChart } from 'lucide-react';
@@ -7,7 +6,7 @@ import { Calendar, Search, TrendingUp, CheckCircle, AlertCircle, Users, FileText
 export default async function MeetingIntelligenceDashboard() {
   const user = await requireAuth(AuthPresets.requireAuth);
   
-  // Get analytics data
+  // Get analytics data directly from services (original approach)
   const analytics = await MeetingAnalyticsService.getMeetingAnalytics({
     dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
   });
@@ -19,7 +18,7 @@ export default async function MeetingIntelligenceDashboard() {
   
   // Get action items stats
   const actionStats = await ActionItemsService.getActionItemsStats();
-  
+
   const quickStats = [
     {
       label: 'Total Meetings',
@@ -178,7 +177,7 @@ export default async function MeetingIntelligenceDashboard() {
                     {item.title}
                   </p>
                   <p className="text-xs text-red-700 dark:text-red-400">
-                    Due: {new Date(item.due_date!).toLocaleDateString()} | 
+                    Due: {new Date(item.due_date).toLocaleDateString()} | 
                     Meeting: {item.Meeting.title}
                   </p>
                 </div>
@@ -230,7 +229,7 @@ export default async function MeetingIntelligenceDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {analytics.departmentBreakdown.map((dept) => (
+                {analytics.departmentBreakdown.map((dept: any) => (
                   <tr key={dept.departmentId} className="border-b border-border">
                     <td className="py-3 text-sm text-foreground">
                       {dept.departmentName}

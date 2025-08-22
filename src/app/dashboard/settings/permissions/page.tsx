@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
-import { Capability, RoleKey } from '@/lib/auth/policy';
+import { Capability, RoleID } from '@/lib/auth/policy';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -50,7 +50,7 @@ export default async function PermissionsPage() {
         "View user details",
         "Deactivate user accounts"
       ],
-      roles: roles.filter(role => role.is_leadership ?? role.key === RoleKey.OPS_ADMIN)
+      roles: roles.filter(role => role.is_leadership || role.id === RoleID.OPS_ADMIN)
     },
     {
       name: "Role Management",
@@ -63,7 +63,7 @@ export default async function PermissionsPage() {
         "Manage role hierarchy",
         "Assign department permissions"
       ],
-      roles: roles.filter(role => role.key === RoleKey.OPS_ADMIN ?? role.key === RoleKey.DEV_ADMIN)
+      roles: roles.filter(role => role.id === RoleID.OPS_ADMIN || role.id === RoleID.DEV_ADMIN)
     },
     {
       name: "Department Management",
@@ -89,7 +89,7 @@ export default async function PermissionsPage() {
         "View system logs",
         "Manage integrations"
       ],
-      roles: roles.filter(role => role.key === RoleKey.OPS_ADMIN ?? role.key === RoleKey.DEV_ADMIN)
+      roles: roles.filter(role => role.id === RoleID.OPS_ADMIN || role.id === RoleID.DEV_ADMIN)
     }
   ];
 
