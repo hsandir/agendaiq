@@ -7,6 +7,7 @@ import {
 } from './auth-utils';
 import { getUltraFastUser, userStaffCache } from './auth-utils-ultra-fast';
 import { prisma } from '@/lib/prisma';
+import { isRole, RoleKey, can, Capability } from './policy';
 
 /**
  * API Response types
@@ -159,16 +160,16 @@ export function hasResourcePermission(
       if (action === 'read' && resourceId === staff.school?.id) {
         return true;
       }
-      // Principals and above can manage schools
-      return ['Principal', 'Superintendent', 'Administrator'].includes(staff.role?.title ?? '');
+      // Leadership roles can manage schools
+      return isRole(user, RoleKey.PRINCIPAL) || can(user, Capability.SCHOOL_MANAGE);
       
     case 'district':
       // Users can read their own district
       if (action === 'read' && resourceId === staff.district?.id) {
         return true;
       }
-      // Superintendents and admins can manage districts
-      return ['Superintendent', 'Administrator'].includes(staff.role?.title ?? '');
+      // High-level leadership can manage districts
+      return can(user, [Capability.DISTRICT_MANAGE, Capability.USER_MANAGE]);
       
     default:
       return false;

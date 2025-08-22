@@ -85,7 +85,7 @@ export function useMonitoringUser() {
         username: session.user.name ?? undefined,
         // Never send email directly
         tenant_id: session.user.staff?.school_id,
-        role: session.user.staff?.role?.title,
+        role: session.user.staff?.role?.key,
         segment: session.user.staff?.role?.is_leadership ? 'vip' : 'standard',
       });
 

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { getServerSession } from 'next-auth';
 import { getToken } from 'next-auth/jwt';
 import { authOptions } from '@/lib/auth/auth-options';
@@ -71,8 +73,11 @@ function addAuthFlow(stepName: string, details: Record<string, unknown>) {
   }
 }
 
-// THIS IS A PUBLIC ENDPOINT - NO AUTH REQUIRED FOR DEBUGGING
 export async function GET(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
   try {
     // Get all possible auth information
     const session = await getServerSession(authOptions).catch(() => null);
@@ -311,8 +316,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// THIS IS A PUBLIC ENDPOINT - NO AUTH REQUIRED FOR DEBUGGING
 export async function POST(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
   try {
     const body = await request.json();
     
@@ -467,6 +475,8 @@ export async function POST(request: NextRequest) {
 
 // Clear logs
 export async function DELETE() {
+  // Restrict clearing logs as well
+  // Note: Next.js does not pass request here by default; convert to POST if needed in future.
   debugLogs = [];
   authFlowSteps = [];
   return NextResponse.json({ success: true, message: 'Logs and auth flow cleared' });

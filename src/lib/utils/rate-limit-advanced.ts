@@ -171,8 +171,8 @@ export class AdvancedRateLimiter {
 
       // Apply role-based multiplier if user is provided
       let effectiveLimit = limit;
-      if (user?.staff?.role?.title && this.options.userRoleMultipliers) {
-        const multiplier = this.options.userRoleMultipliers[user.staff.role.title] || 1;
+      if (user?.staff?.role?.key && this.options.userRoleMultipliers) {
+        const multiplier = this.options.userRoleMultipliers[user.staff.role.key] || 1;
         effectiveLimit = Math.floor(limit * multiplier);
       }
 

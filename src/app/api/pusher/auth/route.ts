@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { pusherServer } from '@/lib/pusher';
 import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from '@/lib/prisma';
+import { isRole, RoleKey } from '@/lib/auth/policy';
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
     // Check if user is authorized
     const isOrganizer = meeting.organizer_id === user.staff?.id;
     const isAttendee = meeting.MeetingAttendee.length > 0;
-    const isAdmin = user.staff?.role?.title === 'Administrator';
+    const isAdmin = isRole(user, RoleKey.OPS_ADMIN);
 
     if (!isOrganizer && !isAttendee && !isAdmin) {
       return NextResponse.json(
@@ -78,7 +79,7 @@ export async function POST(request: NextRequest) {
           name: user?.name,
           email: user?.email,
           staff_id: user.staff?.id,
-          role: user.staff?.role?.title,
+          role: user.staff?.role?.key,
         }
       };
       authResponse = pusherServer.authorizeChannel(socketId, channel, presenceData);

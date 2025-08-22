@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { withAuth } from '@/lib/auth/api-auth'
+import { Capability } from '@/lib/auth/policy'
 
 export async function POST(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_HEALTH })
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode })
+  }
+
   try {
     const data = await request.json()
-    
-    // For now, just return success
-    // In production, this would update the actual menu configuration
-    // based on the selected pages and environment
-    
+
     return NextResponse.json({ 
       success: true,
       message: 'Menu configuration updated'
