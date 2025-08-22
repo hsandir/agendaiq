@@ -474,9 +474,11 @@ export async function POST(request: NextRequest) {
 }
 
 // Clear logs
-export async function DELETE() {
-  // Restrict clearing logs as well
-  // Note: Next.js does not pass request here by default; convert to POST if needed in future.
+export async function DELETE(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
   debugLogs = [];
   authFlowSteps = [];
   return NextResponse.json({ success: true, message: 'Logs and auth flow cleared' });
