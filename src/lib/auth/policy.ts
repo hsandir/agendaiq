@@ -330,8 +330,8 @@ export function isDevAdmin(user: UserWithCapabilities | null | undefined): boole
   if (!user) return false;
   // Check system admin flag first
   if (user.is_system_admin === true) return true;
-  // Check role ID if user has staff
-  if (user.staff?.role?.id === RoleID.DEV_ADMIN) return true;
+  // Prefer canonical RoleKey if available
+  if (user.staff?.role?.key === RoleKey.DEV_ADMIN) return true;
   // Legacy check for roleKey (will be removed)
   return user.roleKey === RoleKey.DEV_ADMIN;
 }
@@ -340,8 +340,8 @@ export function isOpsAdmin(user: UserWithCapabilities | null | undefined): boole
   if (!user) return false;
   // Check school admin flag first
   if (user.is_school_admin === true) return true;
-  // Check role ID if user has staff
-  if (user.staff?.role?.id === RoleID.OPS_ADMIN) return true;
+  // Prefer canonical RoleKey if available
+  if (user.staff?.role?.key === RoleKey.OPS_ADMIN) return true;
   // Legacy check for roleKey (will be removed)
   return user.roleKey === RoleKey.OPS_ADMIN;
 }
