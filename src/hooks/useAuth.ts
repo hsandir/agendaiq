@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { Capability, can, isRole, RoleKey } from '@/lib/auth/policy';
 
 interface UseAuthOptions {
   redirectTo?: string;
@@ -10,18 +11,18 @@ interface UseAuthOptions {
   requireAuth?: boolean;
   requireStaff?: boolean;
   requireAdmin?: boolean;
-  allowedRoles?: string[];
+  allowedRoles?: RoleKey[];
 }
 
 interface UseAuthReturn {
-  user: Record<string, unknown>;
+  user: unknown;
   loading: boolean;
   error: Error | null;
   isAuthenticated: boolean;
   isStaff: boolean;
   isAdmin: boolean;
-  hasRole: (role: string) => boolean;
-  checkPermission: (permission: string) => boolean;
+  hasRole: (role: RoleKey) => boolean;
+  checkPermission: (permission: Capability | Capability[]) => boolean;
 }
 
 /**
@@ -37,7 +38,7 @@ export function useAuth(options: UseAuthOptions = {}): UseAuthReturn {
     allowedRoles = []
    } = options;
   
-  const { data: session, __status  } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const [error, setError] = useState<Error | null>(null);
   
@@ -45,23 +46,18 @@ export function useAuth(options: UseAuthOptions = {}): UseAuthReturn {
   const loading = status === 'loading';
   const isAuthenticated = !!user;
   const isStaff = !!user?.staff;
-  const isAdmin = user?.staff?.role?.title === 'Administrator';
+  const isAdmin = isRole(user as unknown as any, RoleKey.OPS_ADMIN) || isRole(user as unknown as any, RoleKey.DEV_ADMIN);
   
   // Role checking function
-  const hasRole = useCallback((role: string): boolean => {
-    return user?.staff?.role?.title === role;
+  const hasRole = useCallback((roleKey: RoleKey): boolean => {
+    return isRole(user as unknown as any, roleKey);
   }, [user]);
   
   // Permission checking function (placeholder for future implementation)
-  const checkPermission = useCallback((permission: string): boolean => {
-    // Admin has all permissions
+  const checkPermission = useCallback((permission: Capability | Capability[]): boolean => {
     if (isAdmin) return true;
-    
-    // TODO: Implement granular permission checking
-    // This would check against a permissions table or role permissions
-    
-    return false;
-  }, [isAdmin]);
+    return can(user as unknown as any, permission);
+  }, [isAdmin, user]);
   
   // Handle redirects based on auth state
   useEffect(() => {
@@ -69,14 +65,14 @@ export function useAuth(options: UseAuthOptions = {}): UseAuthReturn {
     
     // User found but should redirect if found
     if (redirectIfFound && isAuthenticated) {
-      router.pushredirectTo;
+      router.push(redirectTo);
       return;
     }
     
     // Check auth requirements
     if (requireAuth && !isAuthenticated) {
       setError(new Error('Authentication required'));
-      router.pushredirectTo;
+      router.push(redirectTo);
       return;
     }
     
@@ -92,8 +88,8 @@ export function useAuth(options: UseAuthOptions = {}): UseAuthReturn {
       return;
     }
     
-    if (allowedRoles.length > 0 && !allowedRoles.includes(user?.staff?.role?.title ?? '')) {
-      setError(new Error(`Required role: ${allowedRoles.join(' or ')}`));
+    if (allowedRoles.length > 0 && !allowedRoles.some(roleKey => isRole(user as unknown as any, roleKey))) {
+      setError(new Error('Required role missing'));
       router.push('/dashboard');
       return;
     }

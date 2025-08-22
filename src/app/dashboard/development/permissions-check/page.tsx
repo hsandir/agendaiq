@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { Capability } from '@/lib/auth/policy';
+import { useAuthorization } from '@/hooks/useAuthorization';
+import { Capability, RoleKey } from '@/lib/auth/policy';
 
 // Define all pages and their requirements
 const ALL_PAGES = [
@@ -292,48 +292,43 @@ const API_ROUTES = [
 ];
 
 export default function PermissionsCheckPage() {
-  const { data: session, status } = useSession();
+  const { user, loading: authLoading, can, is } = useAuthorization();
   const [userCapabilities, setUserCapabilities] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    if (session?.user) {
+    if (user) {
       // Get user capabilities from session
-      setUserCapabilities(session.user.capabilities ?? []);
+      setUserCapabilities(user.capabilities ?? []);
       setLoading(false);
-    } else if (status !== 'loading') {
+    } else if (!authLoading) {
       setLoading(false);
     }
-  }, [session, status]);
+  }, [user, authLoading]);
 
   const checkAccess = (authType: string, capabilities: string[]) => {
-    if (!session?.user) return false;
+    if (!user) return false;
     
     // Check basic auth types
     if (authType === 'none' || authType === 'client-side') return true;
     if (authType === 'requireAuth') return true;
     
     // System admin has all access
-    if (session.user.is_system_admin) return true;
+    if (user.is_system_admin) return true;
     
     // Check admin flags for specific auth types
-    if (authType === 'requireDevAdmin' && session.user.is_system_admin) return true;
-    if (authType === 'requireOpsAdmin' && session.user?.is_school_admin) return true;
+    if (authType === 'requireDevAdmin' && is(RoleKey.DEV_ADMIN)) return true;
+    if (authType === 'requireOpsAdmin' && is(RoleKey.OPS_ADMIN)) return true;
     
     // If no capabilities required, access is granted
     if (!capabilities ?? capabilities.length === 0) return true;
     
-    // Check if user has ALL required capabilities
+    // Check if user has ALL required capabilities using can() helper
     const hasAllCapabilities = capabilities.every(cap => {
-      // Check direct capability
-      if (userCapabilities.includes(cap)) return true;
-      
-      // School admin has all ops: capabilities
-      if (session.user?.is_school_admin && cap.startsWith('ops:')) return true;
-      
-      return false;
+      // Use the can() function from useAuthorization
+      return can(cap as Capability);
     });
     
     return hasAllCapabilities;

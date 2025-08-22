@@ -4,6 +4,7 @@ import type { NextRequest } from "next/server";
 import { rateLimitMiddleware } from "@/lib/middleware/rate-limit-middleware";
 import { auditMiddleware } from "@/lib/middleware/audit-middleware";
 import { canAccessRoute, canAccessApi, UserWithCapabilities } from "@/lib/auth/policy";
+import { isPublicRoute, isPublicApiRoute } from "@/lib/auth/public-routes";
 
 interface NextAuthToken {
   id?: string | number;
@@ -56,6 +57,12 @@ export async function middleware(request: NextRequest) {
 
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
+  // Check if route is explicitly public (default-secure posture)
+  if (isPublicRoute(path)) {
+    // Public route - allow access without authentication
+    return NextResponse.next();
+  }
+
   // Protect dashboard routes - require authentication
   if (path.startsWith("/dashboard")) {
     if (!token) {
@@ -76,21 +83,13 @@ export async function middleware(request: NextRequest) {
   if (path.startsWith("/api/")) {
     // Skip auth for public endpoints ONLY
     // SECURITY: Dev/test/debug endpoints require authentication and proper capabilities
-    const publicEndpoints = [
-      '/api/auth', 
-      '/api/health', 
-      '/api/setup/check',
-      '/api/test-login', // Temporary debug endpoint
-      '/api/debug/user-capabilities', // Allow debug endpoint for troubleshooting
-      // User preference endpoints perform their own lightweight auth by decoding
-      // the session cookie directly for performance. We allow them to proceed
-      // to the route so they can return 401 with richer context instead of
-      // being blocked here.
-      '/api/user',
-      '/api/tests', // Test runner API endpoints (development only)
-      // REMOVED: /api/test-sentry, /api/dev - These require authentication
-    ];
-    const isPublic = publicEndpoints.some(endpoint => path.startsWith(endpoint));
+    // Use our centralized public API routes whitelist
+    const isPublic = isPublicApiRoute(path) || 
+                    // Temporary debug endpoints (should be removed in production)
+                    path.startsWith('/api/test-login') ||
+                    path.startsWith('/api/debug/user-capabilities') ||
+                    path.startsWith('/api/user') || // User preference endpoints with lightweight auth
+                    path.startsWith('/api/tests'); // Test runner API endpoints (development only)
     
     if (!isPublic && !token) {
       return NextResponse.json(
