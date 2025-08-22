@@ -40,7 +40,7 @@ export async function GET() {
     // Test 2: Simple user query
     const simpleQueryStart = performance.now();
     await prisma.user.findUnique({
-      where: { id: user?.id },
+      where: { id: typeof user?.id === 'string' ? user?.id : String(user?.id) },
       select: { id: true, email: true }
     });
     const simpleQueryTime = performance.now() - simpleQueryStart;
@@ -101,7 +101,7 @@ export async function GET() {
     // Test 6: Transaction test
     const transactionStart = performance.now();
     await prisma.$transaction(async (tx) => {
-      await tx.user.findUnique({ where: { id: user?.id } });
+      await tx.user.findUnique({ where: { id: typeof user?.id === 'string' ? user?.id : String(user?.id) } });
       await tx.meeting.count();
     });
     const transactionTime = performance.now() - transactionStart;
@@ -131,7 +131,7 @@ export async function GET() {
     const indexStart = performance.now();
     await prisma.meeting.findMany({
       where: {
-        organizer_id: user?.id,
+        organizer_id: typeof user?.staff?.id === 'number' ? user?.staff?.id : Number(user?.staff?.id),
         start_time: {
           gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
         }

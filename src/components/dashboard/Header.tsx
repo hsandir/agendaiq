@@ -1,12 +1,13 @@
 "use client";
 
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import { Plus, Bell } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useAuthorization } from '@/hooks/useAuthorization';
 
 export function Header() {
-  const { data: session  } = useSession();
+  const { user, loading } = useAuthorization();
 
   return 
     <header className="bg-card text-card-foreground border-b border-border">
@@ -28,10 +29,10 @@ export function Header() {
 
           <div className="relative">
             <button className="flex items-center space-x-3 focus:outline-none">
-              {session?.user?.image ? (
+              {user && (user as any)?.image ? (
                 <Image
-                  src={session.user.image}
-                  alt={session.user.name ?? "User"}
+                  src={(user as any).image}
+                  alt={(user as any).name ?? "User"}
                   width={32}
                   height={32}
                   className="rounded-full"
@@ -39,12 +40,12 @@ export function Header() {
               ) : (
                 <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
               <span className="text-muted-foreground text-sm">
-                    {session?.user?.name?.[0] || "U"}
+                    {(user as any)?.name?.[0] || "U"}
                   </span>
                 </div>
               )}
             <span className="text-sm font-medium text-foreground">
-                {session?.user?.name}
+                {(user as any)?.name}
               </span>
             </button>
           </div>

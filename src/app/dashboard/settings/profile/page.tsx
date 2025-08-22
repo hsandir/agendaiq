@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+import { useAuthorization } from '@/hooks/useAuthorization';
 import { User as FiUser, Mail as FiMail, Check as FiCheck, AlertCircle as FiAlertCircle } from 'lucide-react';
 
 interface School {
@@ -11,7 +11,7 @@ interface School {
 }
 
 export default function ProfilePage() {
-  const { data: session  } = useSession();
+  const { user, loading } = useAuthorization();
   const [formData, setFormData] = useState({
     name: '',
     email: '',

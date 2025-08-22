@@ -1,10 +1,11 @@
 import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
 import { MeetingAnalyticsService, ActionItemsService, MeetingContinuityService } from '@/lib/meeting-intelligence';
 import Link from 'next/link';
+import type { Route } from 'next';
 import { Calendar, Search, TrendingUp, CheckCircle, AlertCircle, Users, FileText, BarChart } from 'lucide-react';
 
 export default async function MeetingIntelligenceDashboard() {
-  const user = await requireAuth(AuthPresets.requireAuth);
+  const user = await requireAuth(AuthPresets.requireMeetingView);
   
   // Get analytics data directly from services (original approach)
   const analytics = await MeetingAnalyticsService.getMeetingAnalytics({
@@ -113,7 +114,7 @@ export default async function MeetingIntelligenceDashboard() {
           return (
             <Link
               key={index}
-              href={stat.href}
+              href={stat.href as Route}
               className="bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-shadow"
             >
               <div className="flex items-center justify-between">
@@ -139,7 +140,7 @@ export default async function MeetingIntelligenceDashboard() {
           return (
             <Link
               key={index}
-              href={feature.href}
+              href={feature.href as Route}
               className="bg-card border border-border rounded-lg p-6 hover:shadow-lg transition-all hover:scale-105"
             >
               <div className="flex items-start space-x-4">
@@ -177,7 +178,7 @@ export default async function MeetingIntelligenceDashboard() {
                     {item.title}
                   </p>
                   <p className="text-xs text-red-700 dark:text-red-400">
-                    Due: {new Date(item.due_date).toLocaleDateString()} | 
+                    Due: {item.due_date ? new Date(item.due_date).toLocaleDateString() : ''} | 
                     Meeting: {item.Meeting.title}
                   </p>
                 </div>

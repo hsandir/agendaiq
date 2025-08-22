@@ -6,8 +6,8 @@ import { User } from '@prisma/client';
  */
 export function setPostHogUser(user: Partial<User> & { 
   staff?: { 
-    id: string; 
-    role: { title: string } 
+    id: string | number; 
+    role: { key?: string | null; title?: string | null } 
   } 
 }) {
   if (typeof window !== 'undefined' && posthog) {
@@ -15,8 +15,9 @@ export function setPostHogUser(user: Partial<User> & {
     posthog.identify(user.id, {
       email: user.email,
       name: user.name,
-      staffId: user.staff?.id,
-      role: user.staff?.role.title,
+      staffId: typeof user.staff?.id === 'number' ? user.staff?.id : Number(user.staff?.id),
+      roleKey: user.staff?.role.key ?? 'unknown',
+      roleTitle: user.staff?.role.title ?? 'unknown',
       createdAt: user.createdAt,
     });
 
@@ -24,7 +25,8 @@ export function setPostHogUser(user: Partial<User> & {
     posthog.setPersonProperties({
       email: user.email,
       name: user.name,
-      role: user.staff?.role.title,
+      roleKey: user.staff?.role.key ?? 'unknown',
+      roleTitle: user.staff?.role.title ?? 'unknown',
     });
   }
 }
