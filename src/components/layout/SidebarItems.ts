@@ -25,7 +25,8 @@ import {
   Code,
   Video,
   Briefcase,
-  LogOut
+  LogOut,
+  Bug
 } from "lucide-react";
 
 export interface NavigationItem {
@@ -181,6 +182,11 @@ export const sidebarItems: NavigationSection[] = [
                 href: "/dashboard/monitoring",
                 label: "Live Monitoring",
                 icon: Monitor,
+              },
+              {
+                href: "/dashboard/debug",
+                label: "Debug Dashboard",
+                icon: Bug,
               },
               {
                 href: "/dashboard/development/performance",

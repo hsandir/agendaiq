@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/lib/theme/theme-provider";
 import { LayoutProvider } from "@/lib/layout/layout-provider";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { PostHogProvider } from "@/lib/posthog/posthog-provider";
+import { DebugInitializer } from "@/components/debug/DebugInitializer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -50,6 +51,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={`${inter.className} bg-background text-foreground`}>
+        <DebugInitializer />
         <PostHogProvider>
           <ErrorBoundary>
             <AuthProvider>

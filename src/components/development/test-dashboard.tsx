@@ -146,38 +146,62 @@ export default function TestDashboard() {
         })
       })
       
-      if (!response.ok) throw new Error('Failed to run tests')
+      if (!response.ok) {
+        const error = await response.text()
+        throw new Error(error || 'Failed to run tests')
+      }
       
-      const reader = response.body?.getReader()
-      const decoder = new TextDecoder()
+      // Handle regular JSON response (non-streaming)
+      const data = await response.json()
       
-      while (reader) {
-        const { done, value } = await reader.read()
-        if (done) break
-        
-        const chunk = decoder.decode(value)
-        const lines = chunk.split('\n').filter(Boolean)
-        
-        lines.forEach(line => {
-          try {
-            const data = JSON.parse(line)
-            
-            if (data.type === 'output') {
-              setOutput(prev => [...prev, data.message])
-            } else if (data.type === 'result') {
-              setTestResults(prev => [...prev, data.result])
-            } else if (data.type === 'coverage') {
-              setCoverage(data.coverage)
-            } else if (data.type === 'suite-update') {
-              setTestSuites(prev => prev.map(suite => 
-                suite.path === data.suite.path ? { ...suite, ...data.suite } : suite
-              ))
-            }
-          } catch (e: unknown) {
-            setOutput(prev => [...prev, line])
+      // Update output with test results
+      if (data.output && Array.isArray(data.output)) {
+        setOutput(data.output)
+      }
+      
+      // Parse test results
+      if (data.testResults && Array.isArray(data.testResults)) {
+        const results: TestResult[] = []
+        data.testResults.forEach((suite: any) => {
+          if (suite.tests && Array.isArray(suite.tests)) {
+            suite.tests.forEach((test: any) => {
+              results.push({
+                suite: suite.name || 'Unknown Suite',
+                test: test.title || test.fullName || 'Unknown Test',
+                status: test.status as 'passed' | 'failed' | 'skipped',
+                duration: test.duration || 0,
+                error: test.failureMessages ? test.failureMessages.join('\n') : undefined,
+                file: suite.name,
+                line: 0
+              })
+            })
           }
         })
+        setTestResults(results)
       }
+      
+      // Update coverage if available
+      if (data.coverage) {
+        setCoverage(data.coverage)
+      }
+      
+      // Update suite status
+      if (suitePath && data.success !== undefined) {
+        setTestSuites(prev => prev.map(suite => {
+          if (suite.path === suitePath || suite.files?.includes(suitePath)) {
+            return {
+              ...suite,
+              status: data.success ? 'passed' : 'failed',
+              passed: data.results?.passed || 0,
+              failed: data.results?.failed || 0,
+              skipped: data.results?.skipped || 0,
+              duration: data.results?.duration || 0
+            }
+          }
+          return suite
+        }))
+      }
+      
     } catch (error: unknown) {
       console.error('Test run failed:', error)
       setOutput(prev => [...prev, `Error: ${error}`])

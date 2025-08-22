@@ -81,7 +81,13 @@ export async function middleware(request: NextRequest) {
       '/api/health', 
       '/api/setup/check',
       '/api/test-login', // Temporary debug endpoint
-      // REMOVED: /api/test-sentry, /api/dev, /api/tests, /api/debug - These require authentication
+      '/api/debug/user-capabilities', // Allow debug endpoint for troubleshooting
+      // User preference endpoints perform their own lightweight auth by decoding
+      // the session cookie directly for performance. We allow them to proceed
+      // to the route so they can return 401 with richer context instead of
+      // being blocked here.
+      '/api/user',
+      // REMOVED: /api/test-sentry, /api/dev, /api/tests - These require authentication
     ];
     const isPublic = publicEndpoints.some(endpoint => path.startsWith(endpoint));
     

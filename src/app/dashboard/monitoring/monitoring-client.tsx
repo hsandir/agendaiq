@@ -11,7 +11,7 @@ import PostHogAnalytics from '@/components/monitoring/PostHogAnalytics';
 import { AuthenticatedUser } from '@/lib/auth/auth-utils';
 
 interface MonitoringClientProps {
-  user: _AuthenticatedUser
+  user: AuthenticatedUser
 }
 
 export default function MonitoringClient({ user }: MonitoringClientProps) {

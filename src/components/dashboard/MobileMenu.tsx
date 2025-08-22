@@ -28,8 +28,8 @@ import { signOut } from 'next-auth/react';
 import { cn } from '@/lib/utils';
 
 interface MobileMenuProps {
-  user: Record<string, unknown>;
-  currentRole: Record<string, unknown>;
+  user: Record<string, any>;
+  currentRole: Record<string, any> | null;
   isAdmin: boolean;
 }
 

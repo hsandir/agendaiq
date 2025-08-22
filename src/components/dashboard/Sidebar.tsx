@@ -30,8 +30,8 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
     setExpandedItems(newExpanded);
   };
 
-  const renderNavItem = (item: Record<string, unknown>, depth = 0) => {
-    const hasChildren = item.children && item.children.length > 0;
+  const renderNavItem = (item: any, depth = 0) => {
+    const hasChildren = item.children && Array.isArray(item.children) && item.children.length > 0;
     const isExpanded = expandedItems.has(item.href);
     const isItemActive = isActive(item.href);
     const isSignOut = item.label === "Sign Out";
@@ -54,7 +54,7 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
             className="w-full flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-muted-foreground hover:bg-muted hover:text-foreground"
             aria-label={item.label}
           >
-            <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />
+            {item.icon && <item.icon className="mr-3 h-5 w-5 text-muted-foreground" />}
             {item.label}
           </button>
         </div>
@@ -77,9 +77,11 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
             aria-current={isItemActive ? "page" : undefined}
             aria-label={item.label}
           >
-            <item.icon
-              className={clsx("mr-3 h-5 w-5 text-muted-foreground")}
-            />
+            {item.icon && (
+              <item.icon
+                className={clsx("mr-3 h-5 w-5 text-muted-foreground")}
+              />
+            )}
             {item.label}
           </Link>
           {hasChildren && (

@@ -8,7 +8,15 @@ export async function GET() {
     const user = await getCurrentUser();
     
     if (!user) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+      // Return debug info even when not authenticated
+      return NextResponse.json({ 
+        error: 'Not authenticated',
+        debug: {
+          message: 'No active session found',
+          timestamp: new Date().toISOString(),
+          environment: process.env.NODE_ENV
+        }
+      }, { status: 200 }); // Return 200 for debug purposes
     }
 
     // Get capabilities from database

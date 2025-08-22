@@ -1,135 +1,141 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { withAuth } from '@/lib/auth/api-auth'
-import { glob } from 'glob'
-import path from 'path'
-import fs from 'fs/promises'
+import { NextResponse } from 'next/server';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import fs from 'fs/promises';
+import path from 'path';
 
-export async function GET(request: NextRequest) {
-  // Development endpoint - no auth required
-  console.log('Test suites API called')
+const execAsync = promisify(exec);
 
+export async function GET() {
   try {
-    // Find all test files
-    const testFiles = await glob('src/**/*.test.{ts,tsx,js,jsx}', {
+    // Get list of test files from Jest
+    const { stdout } = await execAsync('npm test -- --listTests', {
       cwd: process.cwd(),
-      ignore: ['**/node_modules/**']
-    })
+      env: { ...process.env, CI: 'true' }
+    });
+
+    // Parse test files from output
+    const testFiles = stdout
+      .split('\n')
+      .filter(line => line.trim() && line.includes('__tests__'))
+      .map(filePath => filePath.trim());
 
     // Group tests by category
-    const suites = await Promise.all(
-      testFiles.map(async (file) => {
-        const content = await fs.readFile(path.join(process.cwd(), file), 'utf-8')
-        const testCount = (content.match(/\bit\s*\(/g) || []).length
-        const describeMatches = content.match(/describe\s*\(\s*['"`]([^'"`]+)['"`]/g) || []
-        const suiteName = describeMatches.length > 0 && describeMatches[0]
-          ? describeMatches[0].replace(/describe\s*\(\s*['"`]([^'"`]+)['"`]/, '$1')
-          : path.basename(file, path.extname(file))
-
-        return {
-          name: suiteName,
-          path: file,
-          tests: testCount,
-          status: 'idle' as const,
-          category: file.includes('unit') ? 'unit' : 
-                   file.includes('integration') ? 'integration' : 
-                   file.includes('e2e') ? 'e2e' : 'other'
-        }
-      })
-    )
-
-    // Return real test suites only
-    if (false) { // Disabled simulation
-      const simulatedSuites = [
-        {
-          path: 'src/components/auth/__tests__',
-          name: 'Authentication Components',
-          tests: 15,
-          passed: 14,
-          failed: 1,
-          duration: 1234,
-          lastRun: new Date(Date.now() - 3600000).toISOString(),
-          status: 'failed' as const,
-          category: 'unit' as const
-        },
-        {
-          path: 'src/components/dashboard/__tests__',
-          name: 'Dashboard Components',
-          tests: 22,
-          passed: 22,
-          failed: 0,
-          duration: 2156,
-          lastRun: new Date(Date.now() - 7200000).toISOString(),
-          status: 'passed' as const,
-          category: 'unit' as const
-        },
-        {
-          path: 'src/app/api/__tests__',
-          name: 'API Routes',
-          tests: 45,
-          passed: 43,
-          failed: 2,
-          duration: 3421,
-          lastRun: new Date(Date.now() - 1800000).toISOString(),
-          status: 'failed' as const,
-          category: 'integration' as const
-        },
-        {
-          path: 'src/lib/auth/__tests__',
-          name: 'Auth Utilities',
-          tests: 18,
-          passed: 18,
-          failed: 0,
-          duration: 876,
-          lastRun: new Date(Date.now() - 5400000).toISOString(),
-          status: 'passed' as const,
-          category: 'unit' as const
-        },
-        {
-          path: 'src/lib/utils/__tests__',
-          name: 'Utility Functions',
-          tests: 32,
-          passed: 32,
-          failed: 0,
-          duration: 543,
-          lastRun: new Date(Date.now() - 10800000).toISOString(),
-          status: 'passed' as const,
-          category: 'unit' as const
-        },
-        {
-          path: 'e2e/__tests__',
-          name: 'End-to-End Tests',
-          tests: 8,
-          passed: 7,
-          failed: 1,
-          duration: 12543,
-          lastRun: new Date(Date.now() - 86400000).toISOString(),
-          status: 'failed' as const,
-          category: 'e2e' as const
-        },
-        {
-          path: 'src/performance/__tests__',
-          name: 'Performance Tests',
-          tests: 5,
-          passed: 5,
-          failed: 0,
-          duration: 8765,
-          lastRun: new Date(Date.now() - 172800000).toISOString(),
-          status: 'passed' as const,
-          category: 'performance' as const
-        }
-      ];
-      
-      return NextResponse.json({ suites: simulatedSuites });
-    }
+    const suiteMap = new Map();
     
+    for (const filePath of testFiles) {
+      // Determine category based on path
+      let category = 'unit';
+      let suiteName = 'Unit Tests';
+      
+      if (filePath.includes('integration')) {
+        category = 'integration';
+        suiteName = 'Integration Tests';
+      } else if (filePath.includes('e2e')) {
+        category = 'e2e';
+        suiteName = 'E2E Tests';
+      } else if (filePath.includes('performance')) {
+        category = 'performance';
+        suiteName = 'Performance Tests';
+      } else if (filePath.includes('security')) {
+        category = 'security';
+        suiteName = 'Security Tests';
+      } else if (filePath.includes('api')) {
+        category = 'api';
+        suiteName = 'API Tests';
+      } else if (filePath.includes('components')) {
+        category = 'component';
+        suiteName = 'Component Tests';
+      } else if (filePath.includes('utils')) {
+        category = 'utils';
+        suiteName = 'Utility Tests';
+      } else if (filePath.includes('middleware')) {
+        category = 'middleware';
+        suiteName = 'Middleware Tests';
+      } else if (filePath.includes('auth')) {
+        category = 'auth';
+        suiteName = 'Auth Tests';
+      } else if (filePath.includes('theme')) {
+        category = 'theme';
+        suiteName = 'Theme Tests';
+      }
+
+      // Extract relative path
+      const relativePath = filePath.replace(process.cwd() + '/', '');
+      const dirPath = path.dirname(relativePath);
+      
+      // Create a unique key for grouping
+      const key = `${category}-${dirPath}`;
+      
+      if (!suiteMap.has(key)) {
+        suiteMap.set(key, {
+          name: suiteName,
+          path: dirPath,
+          category,
+          tests: 0,
+          files: [],
+          status: 'idle',
+          passed: 0,
+          failed: 0,
+          skipped: 0,
+          duration: 0
+        });
+      }
+      
+      const suite = suiteMap.get(key);
+      suite.tests++;
+      suite.files.push(relativePath);
+    }
+
+    // Try to read last test results if available
+    try {
+      const resultsPath = path.join(process.cwd(), 'test-results.json');
+      const resultsContent = await fs.readFile(resultsPath, 'utf-8');
+      const lastResults = JSON.parse(resultsContent);
+      
+      // Update suite stats from last run
+      if (lastResults.testResults) {
+        for (const testResult of lastResults.testResults) {
+          const testPath = testResult.name.replace(process.cwd() + '/', '');
+          const dirPath = path.dirname(testPath);
+          
+          // Find matching suite
+          for (const [key, suite] of suiteMap.entries()) {
+            if (suite.files.includes(testPath)) {
+              suite.passed += testResult.numPassingTests || 0;
+              suite.failed += testResult.numFailingTests || 0;
+              suite.skipped += testResult.numPendingTests || 0;
+              suite.duration += testResult.perfStats?.runtime || 0;
+              suite.status = testResult.numFailingTests > 0 ? 'failed' : 'passed';
+            }
+          }
+        }
+      }
+    } catch (e) {
+      // No previous results available, that's fine
+    }
+
+    const suites = Array.from(suiteMap.values());
+
     return NextResponse.json({ 
-      suites: suites.sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name))
-    })
-  } catch (error: unknown) {
-    console.error('Failed to load test suites:', error)
-    return NextResponse.json(
-      { error: 'Failed to load test suites' },
-      { status: 500 }
-    )
+      success: true,
+      suites,
+      total: suites.length,
+      totalTests: testFiles.length,
+      timestamp: new Date().toISOString()
+    });
+    
+  } catch (error) {
+    console.error('Error discovering test suites:', error);
+    
+    // Return empty array if Jest is not configured or no tests found
+    return NextResponse.json({ 
+      success: false,
+      suites: [],
+      total: 0,
+      totalTests: 0,
+      error: error instanceof Error ? error.message : 'Failed to discover test suites',
+      timestamp: new Date().toISOString()
+    });
   }
 }

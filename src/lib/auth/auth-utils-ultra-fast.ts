@@ -45,16 +45,20 @@ export async function getUltraFastUser(): Promise<UltraFastUser | null> {
 
     // Decode JWT without verification for speed (only for non-critical operations)
     const decoded = jwt.decode(token?.value) as Record<string, unknown>;
-    
-    if (!decoded?.id || !decoded?.email) {
+
+    // NextAuth often uses `sub` as user id; support both id and sub
+    const decodedId = (decoded?.id as unknown) ?? (decoded?.sub as unknown);
+    const decodedEmail = (decoded?.email as unknown);
+
+    if (!decodedId || !decodedEmail) {
       cachedUser = { user: null, timestamp: Date.now() };
       return null;
     }
 
     const user: UltraFastUser = {
-      id: parseInt(decoded?.id),
-      email: decoded?.email,
-      staff: decoded.staff ?? null
+      id: parseInt(String(decodedId)),
+      email: String(decodedEmail),
+      staff: (decoded as Record<string, unknown>).staff as { id: number } | null ?? null
     };
     
     cachedUser = { user, timestamp: Date.now() };

@@ -78,6 +78,42 @@ export default function LocalMonitor() {
     const originalConsoleError = console.error;
     const originalConsoleWarn = console.warn;
 
+    // Generate some demo errors for demonstration
+    const generateDemoErrors = () => {
+      const demoErrors = [
+        { message: 'TypeError: Cannot read property of undefined', url: '/dashboard/meetings' },
+        { message: 'ReferenceError: variable is not defined', url: '/dashboard/settings' },
+        { message: 'Network request failed: 500 Internal Server Error', url: '/api/meetings' },
+        { message: 'Console warning: Deprecation notice', url: '/dashboard' }
+      ];
+      
+      const randomError = demoErrors[Math.floor(Math.random() * demoErrors.length)];
+      const rawError = {
+        id: Date.now().toString(),
+        timestamp: new Date().toISOString(),
+        message: randomError.message,
+        stack: `Error: ${randomError.message}\n    at Function.handleError (${randomError.url}:123:45)`,
+        url: randomError.url,
+        userAgent: navigator.userAgent
+      };
+      
+      const enhancedError = processError(rawError);
+      setErrors(prev => [enhancedError, ...prev.slice(0, 49)]);
+    };
+    
+    // Generate initial demo errors
+    setTimeout(() => {
+      generateDemoErrors();
+      generateDemoErrors();
+    }, 500);
+    
+    // Generate periodic demo errors
+    const demoInterval = setInterval(() => {
+      if (Math.random() > 0.7) {
+        generateDemoErrors();
+      }
+    }, 5000);
+
     window.onerror = (message, source, lineno, colno, error) => {
       const rawError = {
         id: Date.now().toString(),

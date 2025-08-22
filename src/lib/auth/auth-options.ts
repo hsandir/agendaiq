@@ -10,6 +10,20 @@ import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
 import { AuditClient } from '@/lib/audit/audit-client';
 import { getUserCapabilities } from '@/lib/auth/policy';
 
+// Normalize critical environment variables to avoid trailing whitespace/newlines in production
+// This helps prevent cookie/origin and CSRF issues due to malformed URLs/secrets
+(() => {
+  try {
+    if (typeof process !== 'undefined' && process.env) {
+      if (process.env.NEXTAUTH_URL) process.env.NEXTAUTH_URL = process.env.NEXTAUTH_URL.trim();
+      if (process.env.NEXTAUTH_SECRET) process.env.NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET.trim();
+      if (process.env.DATABASE_URL) process.env.DATABASE_URL = process.env.DATABASE_URL.trim();
+    }
+  } catch {
+    // no-op: best effort sanitation
+  }
+})();
+
 // Type guard for staff property
 function hasStaff(user: unknown): user is User & { staff: unknown } {
   return typeof user === 'object' && user !== null && 'staff' in user && user.staff !== undefined;
@@ -303,10 +317,16 @@ export const authOptions: NextAuthOptions = {
         }
       }
       
-      // Fetch complete user info including capabilities
-      // PERFORMANCE: Only fetch on signIn, NOT on every update
-      // Capabilities are cached in the JWT token after initial sign-in
-      if (token.email && trigger === 'signIn') {
+      // Fetch/refresh user capabilities into the JWT
+      // - On signIn always
+      // - Also if capabilities are missing/empty or stale (> 6h)
+      const caps = (token as unknown as { capabilities?: string[] }).capabilities;
+      const lastRefreshed = (token as unknown as { capsRefreshedAt?: number }).capsRefreshedAt || 0;
+      const sixHours = 6 * 60 * 60; // seconds
+      const nowSec = Math.floor(Date.now() / 1000);
+      const needsRefresh = !Array.isArray(caps) || caps.length === 0 || (nowSec - lastRefreshed > sixHours);
+
+      if (token.email && (trigger === 'signIn' || needsRefresh)) {
         try {
           const dbUser = await prisma.user.findUnique({
             where: { email: token.email },
@@ -334,6 +354,7 @@ export const authOptions: NextAuthOptions = {
             // Get and add capabilities
             const capabilities = await getUserCapabilities(dbUser.id);
             token.capabilities = capabilities;
+            (token as unknown as { capsRefreshedAt?: number }).capsRefreshedAt = nowSec;
             
             // Add staff info if available
             if (dbUser.Staff && dbUser.Staff.length > 0) {
