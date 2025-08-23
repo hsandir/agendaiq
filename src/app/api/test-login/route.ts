@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
 
 // Temporary endpoint for debugging - no auth required
 export async function POST(request: NextRequest) {
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     const { email, password } = await request.json();
     
     console.log('Test login attempt for:', email);

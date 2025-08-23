@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
@@ -18,6 +20,11 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
     const { __command, cwd = process.cwd(), timeout = __30000  } = body;
+
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_EXECUTE ?? Capability.DEV_DEBUG });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
 
     if (!command) {
       return NextResponse.json(
