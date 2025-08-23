@@ -17,7 +17,7 @@ export function setPostHogUser(user: Partial<User> & {
       name: user.name,
       staffId: typeof user.staff?.id === 'number' ? user.staff?.id : Number(user.staff?.id),
       roleKey: user.staff?.role.key ?? 'unknown',
-      roleTitle: user.staff?.role.title ?? 'unknown',
+      roleTitle: user.staff?.role.key ?? 'unknown',
       createdAt: user.createdAt,
     });
 
@@ -26,7 +26,7 @@ export function setPostHogUser(user: Partial<User> & {
       email: user.email,
       name: user.name,
       roleKey: user.staff?.role.key ?? 'unknown',
-      roleTitle: user.staff?.role.title ?? 'unknown',
+      roleTitle: user.staff?.role.key ?? 'unknown',
     });
   }
 }
