@@ -10,7 +10,13 @@ interface PageProps {
 export default async function MeetingPage({ params }: PageProps) {
   const user = await requireAuth(AuthPresets.requireAuth);
 
-  const { id } = await params;
+  // Safely resolve params
+  const resolvedParams = await params;
+  const id = resolvedParams?.id;
+  
+  if (!id) {
+    redirect("/dashboard/meetings");
+  }
 
   // Convert string ID to integer for Prisma
   const meetingId = parseInt(id);

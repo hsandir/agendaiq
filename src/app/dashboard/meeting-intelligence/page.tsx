@@ -7,18 +7,37 @@ import { Calendar, Search, TrendingUp, CheckCircle, AlertCircle, Users, FileText
 export default async function MeetingIntelligenceDashboard() {
   const user = await requireAuth(AuthPresets.requireMeetingView);
   
-  // Get analytics data directly from services (original approach)
-  const analytics = await MeetingAnalyticsService.getMeetingAnalytics({
-    dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
-  });
+  // Get analytics data with error handling
+  let analytics;
+  let overdueItems;
+  let actionStats;
   
-  // Get overdue action items
-  const overdueItems = await ActionItemsService.getOverdueActionItems({
-    staffId: user.staff?.id
-  });
+  try {
+    analytics = await MeetingAnalyticsService.getMeetingAnalytics({
+      dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+    });
+  } catch (error) {
+    console.error('Failed to fetch meeting analytics:', error);
+    analytics = { totalMeetings: 0, completedMeetings: 0, upcomingMeetings: 0, averageDuration: 0, averageAttendance: 0, departmentStats: [] };
+  }
   
-  // Get action items stats
-  const actionStats = await ActionItemsService.getActionItemsStats();
+  try {
+    // Get overdue action items - handle undefined staff ID
+    overdueItems = await ActionItemsService.getOverdueActionItems({
+      staffId: user.staff?.id || 0
+    });
+  } catch (error) {
+    console.error('Failed to fetch overdue items:', error);
+    overdueItems = [];
+  }
+  
+  try {
+    // Get action items stats
+    actionStats = await ActionItemsService.getActionItemsStats();
+  } catch (error) {
+    console.error('Failed to fetch action stats:', error);
+    actionStats = { total: 0, completed: 0, overdue: 0, inProgress: 0 };
+  }
 
   const quickStats = [
     {

@@ -134,7 +134,19 @@ export const RoutePolicy: Record<string, Capability | Capability[]> = {
   '/dashboard/meeting-intelligence/role-tasks': Capability.MEETING_VIEW,
   
   // Setup
-  '/setup/district': Capability.DEV_UPDATE
+  '/setup/district': Capability.DEV_UPDATE,
+  
+  // Page Selection Tool
+  '/dashboard/page-selection': Capability.OPS_HEALTH,
+  
+  // Development Tools
+  '/dashboard/development': Capability.DEV_DEBUG,
+  '/dashboard/development/permissions-check': Capability.DEV_DEBUG,
+  '/dashboard/development/performance': Capability.DEV_DEBUG,
+  
+  // Debug Tools
+  '/dashboard/debug': Capability.DEV_DEBUG,
+  '/dashboard/debug-capabilities': Capability.DEV_DEBUG
 };
 
 // API Route Policy - CRITICAL SECURITY ENFORCEMENT

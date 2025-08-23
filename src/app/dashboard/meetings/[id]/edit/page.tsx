@@ -17,7 +17,13 @@ export default async function EditMeetingPage({ params }: PageProps) {
     throw new Error("Staff record not found");
   }
 
-  const { id } = await params;
+  // Safely resolve params
+  const resolvedParams = await params;
+  const id = resolvedParams?.id;
+  
+  if (!id) {
+    redirect("/dashboard/meetings");
+  }
 
   // Convert string ID to integer for Prisma
   const meetingId = parseInt(id);

@@ -16,7 +16,7 @@ interface AuthUser {
     role: {
       id: number;  // Role ID from database
       key?: string;  // Legacy RoleKey - optional
-      title: string;
+      label: string;
       priority: number;
       is_leadership: boolean;
     };
@@ -135,7 +135,7 @@ interface LegacyAuditLog {
   User: { id: number; email: string; name: string | null } | null;
   Staff: { 
     id: number; 
-    Role: { title: string }; 
+    Role: { label: string }; 
     Department: { name: string } 
   } | null;
 }
@@ -158,7 +158,7 @@ interface CriticalAuditLog {
   User: { id: number; email: string; name: string | null } | null;
   Staff: { 
     id: number; 
-    Role: { title: string }; 
+    Role: { label: string }; 
     Department: { name: string } 
   } | null;
 }
