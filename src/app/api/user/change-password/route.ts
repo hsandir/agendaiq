@@ -23,14 +23,14 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email: auth.user.email! },
-      select: { hashedPassword: true },
+      select: { hashed_password: true },
     });
 
-    if (!user?.hashedPassword) {
+    if (!user?.hashed_password) {
       return new NextResponse("No password set", { status: 400 });
     }
 
-    const isValid = await compare(currentPassword as string, user?.hashedPassword);
+    const isValid = await compare(currentPassword as string, user?.hashed_password);
     if (!isValid) {
       return new NextResponse("Current password is incorrect", { status: 400 });
     }

@@ -1,11 +1,11 @@
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
-import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils';
+import { requireAuth, getCurrentusers, AuthPresets } from '@/lib/auth/auth-utils';
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Settings, Lock, UserCheck, Calendar, Users, FileText } from "lucide-react";
+import { users, Settings, Lock, UserCheck, Calendar, Users, FileText } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Meeting Audit Log",
@@ -85,7 +85,7 @@ export default async function AuditPage() {
       case 'attendee_added':
         return { icon: Users, category: 'attendee' };
       case 'attendee_removed':
-        return { icon: User, category: 'attendee' };
+        return { icon: UserPlus, category: 'attendee' };
       case 'note_added':
         return { icon: FileText, category: 'content' };
       default:

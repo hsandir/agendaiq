@@ -14,7 +14,7 @@ import {
   X, 
   GripVertical,
   Clock,
-  User,
+  users,
   AlertCircle
 } from "lucide-react";
 import type { Priority, Purpose, SolutionType, DecisionType, AgendaItemStatus } from "@prisma/client";

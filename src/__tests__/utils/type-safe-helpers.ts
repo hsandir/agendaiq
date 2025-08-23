@@ -5,7 +5,7 @@
 
 import { NextRequest } from 'next/server';
 import type { Session } from 'next-auth';
-import type { PrismaClient, User, Staff, Role, Department, School, District, Meeting } from '@prisma/client';
+import type { PrismaClient, users, staff, role, department, school, district, meeting } from '@prisma/client';
 import type { 
   TypeSafeMock, 
   MockFactory, 
@@ -97,13 +97,13 @@ export class TypeSafeRequestBuilder {
 // ============================================================================
 
 export class TypeSafeMockFactory {
-  static user: MockFactory<User> = {
-    create: (overrides: Partial<User> = {}): User => ({
+  static user: MockFactory<users> = {
+    create: (overrides: Partial<users> = {}): users => ({
       id: 'user-' + Math.random().toString(36).substring(7),
       email: `test-${Math.random().toString(36).substring(7)}@example.com`,
       name: 'Test User',
-      hashedPassword: '$2a$10$hashedpassword',
-      emailVerified: new Date(),
+      hashed_password: '$2a$10$hashedpassword',
+      email_verified: new Date(),
       is_active: true,
       google_id: null,
       preferences: {},
@@ -117,11 +117,11 @@ export class TypeSafeMockFactory {
       ...overrides,
     }),
 
-    createMany: (count: number, overrides: Partial<User> = {}): User[] => {
+    createMany: (count: number, overrides: Partial<users> = {}): users[] => {
       return Array.from({ length: count }, () => TypeSafeMockFactory.user.create(overrides));
     },
 
-    createWithRelations: (relations: { staff?: Partial<Staff> } = {}): User => {
+    createWithRelations: (relations: { staff?: Partial<staff> } = {}): users => {
       const user = TypeSafeMockFactory.user.create();
       if (relations.staff) {
         // This would be implemented with proper relations
@@ -131,8 +131,8 @@ export class TypeSafeMockFactory {
     },
   };
 
-  static staff: MockFactory<Staff> = {
-    create: (overrides: Partial<Staff> = {}): Staff => ({
+  static staff: MockFactory<staff> = {
+    create: (overrides: Partial<staff> = {}): staff => ({
       id: 'staff-' + Math.random().toString(36).substring(7),
       user_id: overrides.user_id || 'user-' + Math.random().toString(36).substring(7),
       role_id: overrides.role_id || 'role-' + Math.random().toString(36).substring(7),
@@ -157,23 +157,23 @@ export class TypeSafeMockFactory {
       ...overrides,
     }),
 
-    createMany: (count: number, overrides: Partial<Staff> = {}): Staff[] => {
+    createMany: (count: number, overrides: Partial<staff> = {}): staff[] => {
       return Array.from({ length: count }, () => TypeSafeMockFactory.staff.create(overrides));
     },
 
     createWithRelations: (relations: { 
-      user?: Partial<User>;
-      role?: Partial<Role>;
-      department?: Partial<Department>;
-    } = {}): Staff => {
+      user?: Partial<users>;
+      role?: Partial<role>;
+      department?: Partial<department>;
+    } = {}): staff => {
       const staff = TypeSafeMockFactory.staff.create();
       // Relations would be properly implemented in a full system
       return staff;
     },
   };
 
-  static role: MockFactory<Role> = {
-    create: (overrides: Partial<Role> = {}): Role => ({
+  static role: MockFactory<role> = {
+    create: (overrides: Partial<role> = {}): role => ({
       id: 'role-' + Math.random().toString(36).substring(7),
       title: overrides.title ?? 'Teacher',
       is_leadership: overrides.is_leadership ?? false,
@@ -185,17 +185,17 @@ export class TypeSafeMockFactory {
       ...overrides,
     }),
 
-    createMany: (count: number, overrides: Partial<Role> = {}): Role[] => {
+    createMany: (count: number, overrides: Partial<role> = {}): role[] => {
       return Array.from({ length: count }, () => TypeSafeMockFactory.role.create(overrides));
     },
 
-    createWithRelations: (): Role => {
+    createWithRelations: (): role => {
       return TypeSafeMockFactory.role.create();
     },
   };
 
-  static department: MockFactory<Department> = {
-    create: (overrides: Partial<Department> = {}): Department => ({
+  static department: MockFactory<department> = {
+    create: (overrides: Partial<department> = {}): department => ({
       id: 'dept-' + Math.random().toString(36).substring(7),
       name: overrides.name || 'Mathematics Department',
       code: overrides.code ?? 'MATH',
@@ -208,17 +208,17 @@ export class TypeSafeMockFactory {
       ...overrides,
     }),
 
-    createMany: (count: number, overrides: Partial<Department> = {}): Department[] => {
+    createMany: (count: number, overrides: Partial<department> = {}): department[] => {
       return Array.from({ length: count }, () => TypeSafeMockFactory.department.create(overrides));
     },
 
-    createWithRelations: (relations: { school?: Partial<School> } = {}): Department => {
+    createWithRelations: (relations: { school?: Partial<school> } = {}): department => {
       return TypeSafeMockFactory.department.create();
     },
   };
 
-  static school: MockFactory<School> = {
-    create: (overrides: Partial<School> = {}): School => ({
+  static school: MockFactory<school> = {
+    create: (overrides: Partial<school> = {}): school => ({
       id: 'school-' + Math.random().toString(36).substring(7),
       name: overrides.name || 'Test High School',
       code: overrides.code ?? 'THS',
@@ -235,17 +235,17 @@ export class TypeSafeMockFactory {
       ...overrides,
     }),
 
-    createMany: (count: number, overrides: Partial<School> = {}): School[] => {
+    createMany: (count: number, overrides: Partial<school> = {}): school[] => {
       return Array.from({ length: count }, () => TypeSafeMockFactory.school.create(overrides));
     },
 
-    createWithRelations: (relations: { district?: Partial<District> } = {}): School => {
+    createWithRelations: (relations: { district?: Partial<district> } = {}): school => {
       return TypeSafeMockFactory.school.create();
     },
   };
 
-  static district: MockFactory<District> = {
-    create: (overrides: Partial<District> = {}): District => ({
+  static district: MockFactory<district> = {
+    create: (overrides: Partial<district> = {}): district => ({
       id: 'district-' + Math.random().toString(36).substring(7),
       name: overrides.name || 'Test School District',
       code: overrides.code ?? 'TSD',
@@ -262,17 +262,17 @@ export class TypeSafeMockFactory {
       ...overrides,
     }),
 
-    createMany: (count: number, overrides: Partial<District> = {}): District[] => {
+    createMany: (count: number, overrides: Partial<district> = {}): district[] => {
       return Array.from({ length: count }, () => TypeSafeMockFactory.district.create(overrides));
     },
 
-    createWithRelations: (): District => {
+    createWithRelations: (): district => {
       return TypeSafeMockFactory.district.create();
     },
   };
 
-  static meeting: MockFactory<Meeting> = {
-    create: (overrides: Partial<Meeting> = {}): Meeting => ({
+  static meeting: MockFactory<meeting> = {
+    create: (overrides: Partial<meeting> = {}): meeting => ({
       id: Math.floor(Math.random() * 1000000),
       title: overrides.title || 'Test Meeting',
       description: 'Test meeting description',
@@ -298,11 +298,11 @@ export class TypeSafeMockFactory {
       ...overrides,
     }),
 
-    createMany: (count: number, overrides: Partial<Meeting> = {}): Meeting[] => {
+    createMany: (count: number, overrides: Partial<meeting> = {}): meeting[] => {
       return Array.from({ length: count }, () => TypeSafeMockFactory.meeting.create(overrides));
     },
 
-    createWithRelations: (relations: { organizer?: Partial<Staff> } = {}): Meeting => {
+    createWithRelations: (relations: { organizer?: Partial<staff> } = {}): meeting => {
       return TypeSafeMockFactory.meeting.create();
     },
   };
@@ -315,7 +315,7 @@ export class TypeSafeMockFactory {
         id: user.id,
         email: user.email,
         name: user.name,
-        emailVerified: user.emailVerified,
+        email_verified: user.email_verified,
         is_active: user.is_active,
         staff: {
           id: 'staff-test',
@@ -407,14 +407,14 @@ export class TypeSafeTestDB {
     });
 
     // Create test users
-    const adminUser = await this.prisma.user.create({
+    const adminUser = await this.prisma.users.create({
       data: TypeSafeMockFactory.user.create({
         email: 'admin@test.com',
         name: 'Test Admin',
       }),
     });
 
-    const teacherUser = await this.prisma.user.create({
+    const teacherUser = await this.prisma.users.create({
       data: TypeSafeMockFactory.user.create({
         email: 'teacher@test.com',
         name: 'Test Teacher',
@@ -457,16 +457,16 @@ export class TypeSafeTestDB {
   async cleanupTestData(): Promise<void> {
     // Clean up in reverse dependency order
     await this.prisma.$transaction([
-      this.prisma.meetingAuditLog.deleteMany(),
-      this.prisma.meetingAttendee.deleteMany(),
-      this.prisma.meetingNote.deleteMany(),
-      this.prisma.meetingActionItem.deleteMany(),
+      this.prisma.meeting_audit_logs.deleteMany(),
+      this.prisma.meeting_attendee.deleteMany(),
+      this.prisma.meeting_notes.deleteMany(),
+      this.prisma.meeting_action_items.deleteMany(),
       this.prisma.agendaItemComment.deleteMany(),
       this.prisma.agendaItemAttachment.deleteMany(),
       this.prisma.meetingAgendaItem.deleteMany(),
       this.prisma.meeting.deleteMany(),
       this.prisma.staff.deleteMany(),
-      this.prisma.user.deleteMany(),
+      this.prisma.users.deleteMany(),
       this.prisma.role.deleteMany(),
       this.prisma.department.deleteMany(),
       this.prisma.school.deleteMany(),

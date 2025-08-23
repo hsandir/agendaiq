@@ -9,7 +9,7 @@ interface Role {
   priority: number;
   is_leadership: boolean;
   _count?: {
-    Staff: number;
+    staff: number;
   };
 }
 

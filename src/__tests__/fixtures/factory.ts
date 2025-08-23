@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { PrismaClient, User, Staff, Role, Department, School, District, Meeting, MeetingAttendee, MeetingAgendaItem } from '@prisma/client'
+import { PrismaClient, users, staff, role, department, school, district, meeting, meeting_attendee, meeting_agenda_items } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
 interface UserOverrides {
@@ -10,20 +10,20 @@ interface UserOverrides {
   two_factor_enabled?: boolean
 }
 
-interface StaffWithRelations extends Staff {
-  User: User
-  Role: Role
-  Department: Department & { School: School & { District: District } }
-  School: School & { District: District }
-  District: District
+interface StaffWithRelations extends staff {
+  users: users
+  role: role
+  department: department & { school: school & { district: district } }
+  school: school & { district: district }
+  district: district
 }
 
 interface StaffOverrides {
-  user?: User
-  role?: Role
-  department?: Department & { School: School & { District: District } }
-  school?: School & { District: District }
-  district?: District
+  user?: users
+  role?: role
+  department?: department & { school: school & { district: district } }
+  school?: school & { district: district }
+  district?: district
 }
 
 interface MeetingOverrides {
@@ -36,17 +36,18 @@ export class TestFactory {
   constructor(private prisma: PrismaClient) {}
 
   // User factory
-  async createUser(overrides: UserOverrides = {}): Promise<User> {
+  async createUser(overrides: UserOverrides = {}): Promise<users> {
     const password = overrides.password ?? 'password123'
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    return this.prisma.user.create({
+    return this.prisma.users.create({
       data: {
         email: faker.internet.email(),
         name: faker.person.fullName(),
-        hashedPassword: hashedPassword,
-        emailVerified: new Date(),
+        hashed_password: hashedPassword,
+        email_verified: new Date(),
         two_factor_enabled: false,
+        updated_at: new Date(),
         ...overrides,
       },
     })
@@ -73,6 +74,7 @@ export class TestFactory {
         endorsements: [],
         extension: null,
         room: null,
+        manager_id: null,
         ...overrides,
       },
       include: {
@@ -98,7 +100,7 @@ export class TestFactory {
   }
 
   // Meeting factory
-  async createMeeting(overrides: MeetingOverrides = {}): Promise<Meeting> {
+  async createMeeting(overrides: MeetingOverrides = {}): Promise<meeting> {
     const organizer = overrides.organizer ?? await this.createStaff()
     const startTime = overrides.start_time ?? faker.date.future()
     const endTime = overrides.end_time ?? new Date(startTime.getTime() + 60 * 60 * 1000) // 1 hour later
@@ -110,9 +112,9 @@ export class TestFactory {
         start_time: startTime,
         end_time: endTime,
         organizer_id: organizer.id,
-        department_id: (organizer as Staff).department_id,
-        school_id: (organizer as Staff).school_id,
-        district_id: (organizer as Staff).district_id,
+        department_id: (organizer as staff).department_id,
+        school_id: (organizer as staff).school_id,
+        district_id: (organizer as staff).district_id,
         status: 'draft',
         meeting_type: 'REGULAR',
         ...overrides,
@@ -133,19 +135,19 @@ export class TestFactory {
             },
           },
         },
-        MeetingAgendaItems: true,
+        meeting_agenda_items: true,
       },
     })
   }
 
   // Meeting with attendees
-  async createMeetingWithAttendees(attendeeCount: number = 3, overrides: MeetingOverrides = {}): Promise<{ meeting: Meeting; attendees: MeetingAttendee[] }> {
+  async createMeetingWithAttendees(attendeeCount: number = 3, overrides: MeetingOverrides = {}): Promise<{ meeting: meeting; attendees: meeting_attendee[] }> {
     const meeting = await this.createMeeting(overrides)
     const attendees = []
 
     for (let i = 0; i < attendeeCount; i++) {
       const staff = await this.createStaff()
-      const attendee = await this.prisma.meetingAttendee.create({
+      const attendee = await this.prisma.meeting_attendee.create({
         data: {
           meeting_id: meeting.id,
           staff_id: staff.id,
@@ -167,10 +169,10 @@ export class TestFactory {
   }
 
   // Agenda item factory
-  async createAgendaItem(meeting: { id: number }, overrides: Partial<MeetingAgendaItem> & { presenter?: StaffWithRelations } = {}): Promise<MeetingAgendaItem> {
+  async createAgendaItem(meeting: { id: number }, overrides: Partial<meeting_agenda_items> & { presenter?: StaffWithRelations } = {}): Promise<meeting_agenda_items> {
     const presenter = overrides.presenter ?? await this.createStaff()
 
-    return this.prisma.meetingAgendaItem.create({
+    return this.prisma.meeting_agenda_items.create({
       data: {
         meeting_id: meeting.id,
         topic: faker.lorem.sentence(),
@@ -180,13 +182,14 @@ export class TestFactory {
         duration_minutes: faker.number.int({ min: 5, max: 30 }),
         order_index: overrides.order_index ?? faker.number.int({ min: 1, max: 10 }),
         status: 'Pending',
+        updated_at: new Date(),
         ...overrides,
       },
     })
   }
 
   // Helper methods
-  private async getOrCreateRole(title: string = 'Teacher'): Promise<Role> {
+  private async getOrCreateRole(title: string = 'Teacher'): Promise<role> {
     let role = await this.prisma.role.findFirst({ where: { title } })
     
     if (!role) {
@@ -202,7 +205,7 @@ export class TestFactory {
     return role
   }
 
-  private async getOrCreateDepartment(): Promise<Department & { School: School & { District: District } }> {
+  private async getOrCreateDepartment(): Promise<department & { school: school & { district: district } }> {
     let department = await this.prisma.department.findFirst({
       include: {
         school: {
@@ -234,7 +237,7 @@ export class TestFactory {
     return department
   }
 
-  private async getOrCreateSchool(): Promise<School & { District: District }> {
+  private async getOrCreateSchool(): Promise<school & { district: district }> {
     let school = await this.prisma.school.findFirst({
       include: {
         district: true,
@@ -259,7 +262,7 @@ export class TestFactory {
     return school
   }
 
-  private async getOrCreateDistrict(): Promise<District> {
+  private async getOrCreateDistrict(): Promise<district> {
     let district = await this.prisma.district.findFirst()
     
     if (!district) {
@@ -289,16 +292,16 @@ export class TestFactory {
   }
 
   // Bulk creation methods
-  async createUsers(count: number): Promise<User[]> {
-    const users: User[] = []
+  async createUsers(count: number): Promise<users[]> {
+    const usersArray: users[] = []
     for (let i = 0; i < count; i++) {
-      users.push(await this.createUser())
+      usersArray.push(await this.createUser())
     }
-    return users
+    return usersArray
   }
 
-  async createMeetings(count: number, organizer?: StaffWithRelations): Promise<Meeting[]> {
-    const meetings: Meeting[] = []
+  async createMeetings(count: number, organizer?: StaffWithRelations): Promise<meeting[]> {
+    const meetings: meeting[] = []
     for (let i = 0; i < count; i++) {
       meetings.push(await this.createMeeting({ organizer }))
     }
@@ -308,18 +311,18 @@ export class TestFactory {
   // Clean up method
   async cleanup() {
     await this.prisma.$transaction([
-      this.prisma.meetingAuditLog.deleteMany(),
-      this.prisma.meetingAttendee.deleteMany(),
-      this.prisma.meetingNote.deleteMany(),
-      this.prisma.meetingActionItem.deleteMany(),
-      this.prisma.agendaItemComment.deleteMany(),
-      this.prisma.agendaItemAttachment.deleteMany(),
-      this.prisma.meetingAgendaItem.deleteMany(),
+      this.prisma.meeting_audit_logs.deleteMany(),
+      this.prisma.meeting_attendee.deleteMany(),
+      this.prisma.meeting_notes.deleteMany(),
+      this.prisma.meeting_action_items.deleteMany(),
+      this.prisma.agenda_item_comments.deleteMany(),
+      this.prisma.agenda_item_attachments.deleteMany(),
+      this.prisma.meeting_agenda_items.deleteMany(),
       this.prisma.meeting.deleteMany(),
       // this.prisma.notification.deleteMany(), // Model doesn't exist
       // this.prisma.activityLog.deleteMany(), // Model doesn't exist
       this.prisma.staff.deleteMany(),
-      this.prisma.user.deleteMany(),
+      this.prisma.users.deleteMany(),
     ])
   }
 }

@@ -8,8 +8,8 @@ export interface User {
   department: string | null;
   school: string | null;
   isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface Meeting {
@@ -21,8 +21,8 @@ export interface Meeting {
   location: string | null;
   status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled';
   organizerId: string;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface Role {
@@ -30,8 +30,8 @@ export interface Role {
   name: string;
   description: string | null;
   permissions: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface Department {
@@ -39,8 +39,8 @@ export interface Department {
   name: string;
   description: string | null;
   school: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface ApiResponse<T = Record<string, unknown>> {
@@ -176,7 +176,7 @@ export interface AuditRecord {
     email: string;
     name?: string;
   };
-  createdAt: Date;
+  created_at: Date;
 }
 
 export interface SortableAuditRecord extends AuditRecord {

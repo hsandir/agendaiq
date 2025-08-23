@@ -43,7 +43,7 @@ export async function GET(
     }
 
     // Apply field-level filtering
-    const filteredUser = filterFields(currentUser, 'User', user, user);
+    const filteredUser = filterFields(currentusers, 'User', user, user);
 
     return NextResponse.json({ user: filteredUser });
 
@@ -89,7 +89,7 @@ export async function PUT(
     }
 
     // Validate field-level write access
-    const validation = validateWrite(currentUser, 'User', body, existingUser);
+    const validation = validateWrite(currentusers, 'User', body, existingUser);
     
     if (!validation.valid) {
       return NextResponse.json(
@@ -121,10 +121,10 @@ export async function PUT(
     });
 
     // Apply field-level filtering to response
-    const filteredUser = filterFields(currentUser, 'User', updatedUser, updatedUser);
+    const filteredUser = filterFields(currentusers, 'User', updatedusers, updatedUser);
 
     return NextResponse.json({ 
-      user: filteredUser,
+      user: filteredusers,
       message: "User updated successfully" 
     });
 

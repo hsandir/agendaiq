@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { Capability, can, isRole, RoleKey } from '@/lib/auth/policy';
+import { Capability, can, isrole, RoleKey } from '@/lib/auth/policy';
 
 interface UseAuthOptions {
   redirectTo?: string;
@@ -99,7 +99,7 @@ export function useAuth(options: UseAuthOptions = {}): UseAuthReturn {
   }, [
     loading,
     isAuthenticated,
-    isStaff,
+    isstaff,
     isAdmin,
     requireAuth,
     requireStaff,
@@ -116,9 +116,9 @@ export function useAuth(options: UseAuthOptions = {}): UseAuthReturn {
     loading,
     error,
     isAuthenticated,
-    isStaff,
+    isstaff,
     isAdmin,
-    hasRole,
+    hasrole,
     checkPermission
   };
 }

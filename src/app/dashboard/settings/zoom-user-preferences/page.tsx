@@ -159,7 +159,7 @@ export default async function ZoomUserPreferences() {
                   <div>
                     <p className="text-sm font-medium text-green-800">Zoom Account Connected</p>
                     <p className="text-xs text-green-600">
-                      Account: {zoomIntegration.accountEmail ?? 'Unknown'}
+                      account: {zoomIntegration.accountEmail ?? 'Unknown'}
                     </p>
                   </div>
                 </div>

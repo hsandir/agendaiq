@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       message: "2FA enabled successfully",
-      backupCodes: backupCodes
+      backup_codes: backupCodes
     });
 
   } catch (error: unknown) {

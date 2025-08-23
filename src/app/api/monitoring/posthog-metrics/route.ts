@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
       sessions: {
         total: 0,
         avgDuration: 0,
-        avgPagesPerSession: 0,
+        avgPagesPersession: 0,
         rageClicks: 0,
         deadClicks: 0,
         recordings: 0,

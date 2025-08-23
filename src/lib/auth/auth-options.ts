@@ -106,7 +106,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           console.log('🔍 Looking up user in database:', credentials.email);
-          const user = await prisma.user.findUnique({
+          const user = await prisma.users.findUnique({
             where: { email: credentials.email },
             include: {
               staff: {
@@ -119,21 +119,21 @@ export const authOptions: NextAuthOptions = {
               }
             }
           });
-          console.log('🔍 User found:', !!user, user ? { id: user.id, email: user.email, hasPassword: !!user.hashedPassword } : null);
+          console.log('🔍 User found:', !!user, user ? { id: user.id, email: user.email, hasPassword: !!user.hashed_password } : null);
 
           if (!user) {
             console.error('User not found:', credentials.email);
             return null; // Return null for security (don't reveal if user exists)
           }
           
-          if (!user.hashedPassword) {
+          if (!user.hashed_password) {
             console.error('User has no password:', credentials.email);
             return null; // Return null instead of throwing
           }
 
           // Check password using bcrypt
           console.log('Checking password for user:', user.email);
-          const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
+          const isValid = await bcrypt.compare(credentials.password, user.hashed_password);
           console.log('Password valid:', isValid);
           
           if (!isValid) {
@@ -169,7 +169,7 @@ export const authOptions: NextAuthOptions = {
               }
 
               // Remove used backup code
-              await prisma.user.update({
+              await prisma.users.update({
                 where: { id: parseInt(user.id) },
                 data: {
                   backup_codes: user.backup_codes.filter(code => code !== credentials.twoFactorCode)
@@ -259,13 +259,13 @@ export const authOptions: NextAuthOptions = {
           return '/auth/signin?error=unauthorized_domain';
         }
 
-        const existingUser = await prisma.user.findUnique({
+        const existingUser = await prisma.users.findUnique({
           where: { email: user.email! }
         });
 
         // If it's the first user ever, make them admin
         if (!existingUser) {
-          const userCount = await prisma.user.count();
+          const userCount = await prisma.users.count();
           if (userCount === 0) {
             // This will be the first user, they'll get admin privileges when created
             return true;
@@ -273,12 +273,12 @@ export const authOptions: NextAuthOptions = {
           
           // Check if there's an existing credentials account
           // This prevents OAuth takeover of credentials accounts
-          const credentialsUser = await prisma.user.findUnique({
+          const credentialsUser = await prisma.users.findUnique({
             where: { email: user.email! },
-            include: { Account: true }
+            include: { account: true }
           });
           
-          if (credentialsUser && !credentialsUser.Account?.some(a => a.provider === 'google')) {
+          if (credentialsUser && !credentialsUser.account?.some(a => a.provider === 'google')) {
             // User exists with credentials, needs to link accounts manually
             return '/auth/signin?error=account_linking_required';
           }
@@ -329,7 +329,7 @@ export const authOptions: NextAuthOptions = {
 
       if (token.email && (trigger === 'signIn' || needsRefresh)) {
         try {
-          const dbUser = await prisma.user.findUnique({
+          const dbUser = await prisma.users.findUnique({
             where: { email: token.email },
             include: {
               staff: {

@@ -5,10 +5,27 @@ import { useParams, useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { AddMemberDialog } from '@/components/teams/AddMemberDialog';
+import { CreateKnowledgeDialog } from '@/components/teams/CreateKnowledgeDialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Users,
   BookOpen,
@@ -22,8 +39,32 @@ import {
   UserPlus,
   Crown,
   Mail,
-  Shield
+  Shield,
+  MoreVertical,
+  UserMinus,
+  ShieldCheck,
+  Download,
+  ExternalLink,
+  Edit2,
+  Trash2,
+  Search,
+  Filter,
+  FolderOpen,
+  Globe,
+  FileCode,
+  FileSpreadsheet,
+  Presentation,
+  Image,
+  Video,
+  Hash,
+  Clock,
+  Eye,
+  Copy,
+  Share2,
+  Lock,
+  Unlock
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { FEATURES } from '@/lib/features/feature-flags';
 
@@ -49,6 +90,30 @@ interface TeamMember {
   };
 }
 
+interface TeamKnowledge {
+  id: number;
+  title: string;
+  description?: string | null;
+  type: string;
+  category?: string | null;
+  url?: string | null;
+  content?: string | null;
+  tags?: string[] | null;
+  is_public: boolean;
+  views_count: number;
+  downloads_count: number;
+  created_at: string;
+  updated_at: string;
+  created_by: {
+    users: {
+      name: string | null;
+      email: string;
+      image?: string | null;
+    };
+  };
+  metadata?: any;
+}
+
 interface Team {
   id: string;
   name: string;
@@ -59,6 +124,7 @@ interface Team {
   updated_at: string;
   metadata?: any;
   team_members: TeamMember[];
+  team_knowledge?: TeamKnowledge[];
   _count: {
     team_members: number;
     team_knowledge: number;
@@ -72,6 +138,11 @@ export default function TeamDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const [showAddMemberDialog, setShowAddMemberDialog] = useState(false);
+  const [showCreateKnowledgeDialog, setShowCreateKnowledgeDialog] = useState(false);
+  const [knowledgeSearchQuery, setKnowledgeSearchQuery] = useState('');
+  const [knowledgeTypeFilter, setKnowledgeTypeFilter] = useState<string>('all');
+  const [knowledgeCategoryFilter, setKnowledgeCategoryFilter] = useState<string>('all');
 
   // Check feature flag
   if (!FEATURES.TEAMS.enabled) {
@@ -86,35 +157,92 @@ export default function TeamDetailPage() {
   const fetchTeam = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/teams/${params.id}/members`);
+      const response = await fetch(`/api/teams/${params.id}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch team');
       }
 
       const data = await response.json();
-      // For now, we'll construct the team from members data
-      // In a real app, we'd have a separate endpoint for team details
-      if (data.members && data.members.length > 0) {
-        setTeam({
-          id: params.id as string,
-          name: 'Team Name', // This would come from a proper endpoint
-          description: 'Team Description',
-          type: 'DEPARTMENT',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          team_members: data.members,
-          _count: {
-            team_members: data.total,
-            team_knowledge: 0
-          }
-        });
+      setTeam(data.team);
+      
+      // Fetch knowledge resources
+      const knowledgeResponse = await fetch(`/api/teams/${params.id}/knowledge`);
+      if (knowledgeResponse.ok) {
+        const knowledgeData = await knowledgeResponse.json();
+        setTeam(prev => prev ? { ...prev, team_knowledge: knowledgeData.knowledge } : null);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleChangeRole = async (memberId: number, newRole: 'LEAD' | 'MEMBER') => {
+    try {
+      const response = await fetch(`/api/teams/${params.id}/members`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          member_id: memberId,
+          role: newRole,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update member role');
+
+      toast.success(`Member role updated to ${newRole === 'LEAD' ? 'Team Lead' : 'Member'}`);
+      fetchTeam();
+    } catch (error) {
+      console.error('Error updating member role:', error);
+      toast.error('Failed to update member role');
+    }
+  };
+
+  const handleRemoveMember = async (memberId: number) => {
+    if (!confirm('Are you sure you want to remove this member from the team?')) return;
+
+    try {
+      const response = await fetch(`/api/teams/${params.id}/members?member_id=${memberId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to remove member');
+
+      toast.success('Member removed from team');
+      fetchTeam();
+    } catch (error) {
+      console.error('Error removing member:', error);
+      toast.error('Failed to remove member');
+    }
+  };
+
+  const getResourceIcon = (type: string) => {
+    switch (type) {
+      case 'DOCUMENT': return <FileText className="h-4 w-4" />;
+      case 'LINK': return <Globe className="h-4 w-4" />;
+      case 'NOTE': return <BookOpen className="h-4 w-4" />;
+      case 'PRESENTATION': return <Presentation className="h-4 w-4" />;
+      case 'SPREADSHEET': return <FileSpreadsheet className="h-4 w-4" />;
+      case 'CODE': return <FileCode className="h-4 w-4" />;
+      case 'IMAGE': return <Image className="h-4 w-4" />;
+      case 'VIDEO': return <Video className="h-4 w-4" />;
+      default: return <FileText className="h-4 w-4" />;
+    }
+  };
+
+  const getResourceColor = (type: string) => {
+    switch (type) {
+      case 'DOCUMENT': return 'blue';
+      case 'LINK': return 'green';
+      case 'NOTE': return 'purple';
+      case 'PRESENTATION': return 'orange';
+      case 'SPREADSHEET': return 'emerald';
+      case 'CODE': return 'pink';
+      case 'IMAGE': return 'yellow';
+      case 'VIDEO': return 'red';
+      default: return 'gray';
     }
   };
 
@@ -172,6 +300,22 @@ export default function TeamDetailPage() {
 
   const teamLeads = team.team_members.filter(m => m.role === 'LEAD');
   const teamMembers = team.team_members.filter(m => m.role === 'MEMBER');
+  
+  // Filter knowledge resources
+  const filteredKnowledge = team.team_knowledge?.filter(item => {
+    const matchesSearch = !knowledgeSearchQuery || 
+      item.title.toLowerCase().includes(knowledgeSearchQuery.toLowerCase()) ||
+      item.description?.toLowerCase().includes(knowledgeSearchQuery.toLowerCase()) ||
+      item.tags?.some(tag => tag.toLowerCase().includes(knowledgeSearchQuery.toLowerCase()));
+    
+    const matchesType = knowledgeTypeFilter === 'all' || item.type === knowledgeTypeFilter;
+    const matchesCategory = knowledgeCategoryFilter === 'all' || item.category === knowledgeCategoryFilter;
+    
+    return matchesSearch && matchesType && matchesCategory;
+  }) || [];
+  
+  const uniqueCategories = [...new Set(team.team_knowledge?.map(k => k.category).filter(Boolean) || [])];
+  const knowledgeTypes = [...new Set(team.team_knowledge?.map(k => k.type) || [])];
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -201,7 +345,7 @@ export default function TeamDetailPage() {
                 <Settings className="mr-2 h-4 w-4" />
                 Settings
               </Button>
-              <Button>
+              <Button onClick={() => setShowAddMemberDialog(true)}>
                 <UserPlus className="mr-2 h-4 w-4" />
                 Add Member
               </Button>
@@ -318,7 +462,7 @@ export default function TeamDetailPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Team Members ({team._count.team_members})</CardTitle>
-                <Button size="sm">
+                <Button size="sm" onClick={() => setShowAddMemberDialog(true)}>
                   <UserPlus className="mr-2 h-4 w-4" />
                   Add Member
                 </Button>
@@ -357,9 +501,39 @@ export default function TeamDetailPage() {
                           Lead
                         </Badge>
                       )}
-                      <Button variant="ghost" size="sm">
-                        <Mail className="h-4 w-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => window.location.href = `mailto:${member.staff.users.email}`}>
+                            <Mail className="mr-2 h-4 w-4" />
+                            Send Email
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {member.role === 'MEMBER' ? (
+                            <DropdownMenuItem onClick={() => handleChangeRole(member.staff_id, 'LEAD')}>
+                              <ShieldCheck className="mr-2 h-4 w-4" />
+                              Make Team Lead
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem onClick={() => handleChangeRole(member.staff_id, 'MEMBER')}>
+                              <Users className="mr-2 h-4 w-4" />
+                              Make Member
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            className="text-destructive"
+                            onClick={() => handleRemoveMember(member.staff_id)}
+                          >
+                            <UserMinus className="mr-2 h-4 w-4" />
+                            Remove from Team
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </div>
                 ))}
@@ -369,13 +543,240 @@ export default function TeamDetailPage() {
         </TabsContent>
 
         <TabsContent value="knowledge" className="space-y-4">
+          {/* Knowledge Header */}
           <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <BookOpen className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Knowledge Base Coming Soon</h3>
-              <p className="text-muted-foreground text-center mb-4">
-                Share documents, resources, and best practices with your team
-              </p>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Knowledge Base</CardTitle>
+                  <CardDescription>
+                    {team._count.team_knowledge} resources shared with the team
+                  </CardDescription>
+                </div>
+                <Button onClick={() => setShowCreateKnowledgeDialog(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Resource
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {/* Search and Filters */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search resources..."
+                    value={knowledgeSearchQuery}
+                    onChange={(e) => setKnowledgeSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+                <Select value={knowledgeTypeFilter} onValueChange={setKnowledgeTypeFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="All Types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Types</SelectItem>
+                    {knowledgeTypes.map(type => (
+                      <SelectItem key={type} value={type}>
+                        <div className="flex items-center gap-2">
+                          {getResourceIcon(type)}
+                          {type}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={knowledgeCategoryFilter} onValueChange={setKnowledgeCategoryFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {uniqueCategories.map(category => (
+                      <SelectItem key={category} value={category || ''}>
+                        <div className="flex items-center gap-2">
+                          <FolderOpen className="h-4 w-4" />
+                          {category}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Knowledge Grid */}
+              {filteredKnowledge.length > 0 ? (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {filteredKnowledge.map((item) => {
+                    const ResourceIcon = getResourceIcon(item.type);
+                    const resourceColor = getResourceColor(item.type);
+                    
+                    return (
+                      <Card key={item.id} className="group hover:shadow-lg transition-all">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between">
+                            <div className={`p-2 rounded-lg bg-${resourceColor}-100 text-${resourceColor}-600`}>
+                              {ResourceIcon}
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                {item.url && (
+                                  <>
+                                    <DropdownMenuItem onClick={() => window.open(item.url, '_blank')}>
+                                      {item.type === 'LINK' ? (
+                                        <>
+                                          <ExternalLink className="mr-2 h-4 w-4" />
+                                          Open Link
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Download className="mr-2 h-4 w-4" />
+                                          Download
+                                        </>
+                                      )}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                      <Copy className="mr-2 h-4 w-4" />
+                                      Copy Link
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                  </>
+                                )}
+                                <DropdownMenuItem>
+                                  <Edit2 className="mr-2 h-4 w-4" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Share2 className="mr-2 h-4 w-4" />
+                                  Share
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive">
+                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                          <div className="mt-3">
+                            <h3 className="font-semibold text-sm line-clamp-1">{item.title}</h3>
+                            {item.description && (
+                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                                {item.description}
+                              </p>
+                            )}
+                          </div>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          {/* Tags */}
+                          {item.tags && item.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              {item.tags.slice(0, 3).map((tag) => (
+                                <Badge key={tag} variant="secondary" className="text-xs">
+                                  <Hash className="h-2 w-2 mr-1" />
+                                  {tag}
+                                </Badge>
+                              ))}
+                              {item.tags.length > 3 && (
+                                <Badge variant="outline" className="text-xs">
+                                  +{item.tags.length - 3}
+                                </Badge>
+                              )}
+                            </div>
+                          )}
+                          
+                          {/* Metadata */}
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <div className="flex items-center gap-3">
+                              <span className="flex items-center gap-1">
+                                <Eye className="h-3 w-3" />
+                                {item.views_count}
+                              </span>
+                              {item.downloads_count > 0 && (
+                                <span className="flex items-center gap-1">
+                                  <Download className="h-3 w-3" />
+                                  {item.downloads_count}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {item.is_public ? (
+                                <Unlock className="h-3 w-3" />
+                              ) : (
+                                <Lock className="h-3 w-3" />
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Footer */}
+                          <div className="flex items-center gap-2 mt-3 pt-3 border-t">
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src={item.created_by.users.image || undefined} />
+                              <AvatarFallback className="text-xs">
+                                {item.created_by.users.name?.charAt(0) || item.created_by.users.email.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-medium truncate">
+                                {item.created_by.users.name || item.created_by.users.email.split('@')[0]}
+                              </p>
+                              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Clock className="h-2 w-2" />
+                                {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
+                              </p>
+                            </div>
+                            {item.category && (
+                              <Badge variant="outline" className="text-xs">
+                                {item.category}
+                              </Badge>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  {knowledgeSearchQuery || knowledgeTypeFilter !== 'all' || knowledgeCategoryFilter !== 'all' ? (
+                    <>
+                      <Search className="h-12 w-12 text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No Results Found</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Try adjusting your search or filters
+                      </p>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setKnowledgeSearchQuery('');
+                          setKnowledgeTypeFilter('all');
+                          setKnowledgeCategoryFilter('all');
+                        }}
+                      >
+                        Clear Filters
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <BookOpen className="h-12 w-12 text-muted-foreground mb-4" />
+                      <h3 className="text-lg font-semibold mb-2">No Resources Yet</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Start building your team's knowledge base
+                      </p>
+                      <Button onClick={() => setShowCreateKnowledgeDialog(true)}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add First Resource
+                      </Button>
+                    </>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -392,6 +793,25 @@ export default function TeamDetailPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Add Member Dialog */}
+      {team && (
+        <>
+          <AddMemberDialog
+            open={showAddMemberDialog}
+            onOpenChange={setShowAddMemberDialog}
+            teamId={team.id}
+            currentMembers={team.team_members.map(m => m.staff_id)}
+            onMembersAdded={fetchTeam}
+          />
+          <CreateKnowledgeDialog
+            open={showCreateKnowledgeDialog}
+            onOpenChange={setShowCreateKnowledgeDialog}
+            teamId={team.id}
+            onKnowledgeCreated={fetchTeam}
+          />
+        </>
+      )}
     </div>
   );
 }

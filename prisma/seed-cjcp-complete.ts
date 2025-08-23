@@ -8,9 +8,9 @@ async function main() {
   
   // Clean existing data in correct order (respecting foreign key constraints)
   console.log('🧹 Cleaning existing data...');
-  await prisma.roleHierarchy.deleteMany({});
+  await prisma.role_hierarchy.deleteMany({});
   await prisma.staff.deleteMany({});
-  await prisma.user.deleteMany({});
+  await prisma.users.deleteMany({});
   await prisma.role.deleteMany({});
   await prisma.department.deleteMany({});
   await prisma.school.deleteMany({});
@@ -556,12 +556,13 @@ async function createUsersAndStaff(roles: any[], departments: any[], schoolId: n
   // Create users
   const users = await Promise.all(
     userData.map(user => 
-      prisma.user.create({
+      prisma.users.create({
         data: {
           email: user.email,
           name: user.name,
-          hashedPassword,
+          hashed_password: hashedPassword,
           is_admin: user.role === 'System Administrator' || user.role === 'Chief Education Officer',
+          updated_at: new Date(),
         },
       })
     )
@@ -619,7 +620,7 @@ async function createRoleHierarchies(roles: any[]) {
       const childRole = roles.find(r => r.title === hierarchy.child);
       
       if (parentRole && childRole) {
-        return prisma.roleHierarchy.create({
+        return prisma.role_hierarchy.create({
           data: {
             parent_role_id: parentRole.id,
             child_role_id: childRole.id,

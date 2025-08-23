@@ -28,7 +28,7 @@ export async function respondToMeeting(
     }
   });
 
-  if (!currentUser || !currentUser.staff ?? currentUser.staff.length === 0) {
+  if (!currentUser?.staff ?? currentUser.staff.length === 0) {
     throw new Error("User staff record not found");
   }
 

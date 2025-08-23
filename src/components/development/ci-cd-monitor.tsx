@@ -15,7 +15,7 @@ import {
   PlayCircle,
   Clock,
   GitBranch,
-  User,
+  users,
   Zap,
   AlertTriangle,
   Settings,

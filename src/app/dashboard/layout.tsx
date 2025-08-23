@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils';
+import { requireAuth, getCurrentusers, AuthPresets } from '@/lib/auth/auth-utils';
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth/auth-options";

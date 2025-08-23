@@ -1,5 +1,5 @@
 import { requireAuth, AuthPresets } from "@/lib/auth/auth-utils";
-import type { UserWithStaff, SessionUser } from '@/types/auth';
+import type { UserWithstaff, SessionUser } from '@/types/auth';
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { MeetingLiveView } from "@/components/meetings/MeetingLiveView";

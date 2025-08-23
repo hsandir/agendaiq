@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 interface RoleSwitchProps {
-  staff?: { Role: { id: number; title: string } | null } | null;
+  staff?: { role: { id: number; title: string } | null } | null;
 }
 
 export function RoleSwitch({ staff }: RoleSwitchProps) {

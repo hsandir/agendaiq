@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import type { UserWithStaff, SessionUser } from '@/types/auth';
+import type { UserWithstaff, SessionUser } from '@/types/auth';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -62,7 +62,7 @@ interface MeetingEditFormProps {
   isStep2: boolean;
 }
 
-export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingEditFormProps) {
+export function MeetingEditForm({ meeting, UserPlus, meetingId, isStep2 }: MeetingEditFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   

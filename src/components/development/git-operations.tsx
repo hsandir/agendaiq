@@ -23,7 +23,7 @@ import {
   Upload,
   Terminal,
   Clock,
-  User,
+  users,
   Hash,
   AlertCircle,
   ChevronRight,

@@ -3,7 +3,7 @@
 
 import { User } from "next-auth";
 import { AuthenticatedUser } from "./auth-utils";
-import { can, isRole, RoleKey, Capability } from "./policy";
+import { can, isrole, RoleKey, Capability } from "./policy";
 
 export interface FieldAccessRule {
   field: string;

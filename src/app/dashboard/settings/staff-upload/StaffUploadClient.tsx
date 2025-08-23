@@ -233,7 +233,7 @@ export default function StaffUploadClient() {
   };
 
   const downloadTemplate = () => {
-    const csvContent = `Email,Name,StaffId,Role,Department
+    const csvContent = `Email,Name,StaffId,role,Department
 new.teacher1@school.edu,John Smith,STAFF001,Mathematics Teacher,Mathematics Department
 new.teacher2@school.edu,Jane Doe,STAFF002,Science Teacher,Science Department
 update.existing@school.edu,Updated Name,STAFF003,English/Language Arts Teacher,Language Arts Department
@@ -302,7 +302,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
               <h3 className="text-sm font-medium text-primary">Upload Instructions</h3>
               <div className="mt-2 text-sm text-primary">
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Use CSV format with columns: Email, Name, StaffId, Role, Department</li>
+                  <li>Use CSV format with columns: Email, Name, StaffId, role, Department</li>
                   <li>Email addresses must be unique and valid</li>
                   <li>Staff IDs must be 3-15 characters and unique</li>
                   <li>Roles and Departments must exist in the system</li>

@@ -11,7 +11,7 @@ export const mockSession: Session = {
     id: '1',
     email: 'test@example.com',
     name: 'Test User',
-    emailVerified: true,
+    email_verified: true,
     is_active: true,
     staff: {
       id: '1',
@@ -128,7 +128,7 @@ export const createTestUser = (overrides?: Record<string, unknown>) => ({
   email: 'test@example.com',
   name: 'Test User',
   password: '$2a$10$hashedpassword',
-  emailVerified: true,
+  email_verified: true,
   is_active: true,
   google_id: null,
   preferences: {},

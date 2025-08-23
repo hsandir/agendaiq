@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     // If users exist, require authentication
     if (userCount > 0) {
       const authResult = await withAuth(request, {
-        requireAdminRole: true
+        requireAdminrole: true
       });
 
       if (!authResult?.success) {
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       select: {
         id: true,
         email: true,
-        hashedPassword: true,
+        hashed_password: true,
         staff: {
           select: {
             role: {
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (user?.hashedPassword) {
+    if (user?.hashed_password) {
       return NextResponse.json(
         { error: 'User already has a password set' },
         { status: 400 }
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
-        hashedPassword: hashedPassword,
+        hashed_password: hashedPassword,
         is_admin: true, // Ensure admin flag is set
         updated_at: new Date()
       },

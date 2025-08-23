@@ -29,7 +29,7 @@ import {
   ChevronRight,
   Filter,
   FolderOpen,
-  User,
+  users,
   Hash,
   CheckCircle,
   XCircle,
@@ -77,21 +77,21 @@ interface MeetingHistoryModalProps {
 export function MeetingHistoryModal({
   isOpen,
   onClose,
-  onSelectMeeting,
+  onSelectmeeting,
   currentUserId,
-  currentDepartment,
-  currentRole,
+  currentdepartment,
+  currentrole,
   multiSelect = false,
   onSelectMultipleMeetings
 }: MeetingHistoryModalProps) {
   const [activeTab, setActiveTab] = useState("recent");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedDepartment, setSelectedDepartment] = useState("all");
+  const [selecteddepartment, setSelectedDepartment] = useState("all");
   const [selectedTimeRange, setSelectedTimeRange] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
+  const [selectedmeeting, setSelectedMeeting] = useState<Meeting | null>(null);
   const [includeSubDepartments, setIncludeSubDepartments] = useState(true);
   const [onlyWithActionItems, setOnlyWithActionItems] = useState(false);
   const [selectedMeetingIds, setSelectedMeetingIds] = useState<Set<number>>(new Set());
@@ -102,14 +102,14 @@ export function MeetingHistoryModal({
     if (isOpen) {
       fetchMeetings();
     }
-  }, [isOpen, activeTab, selectedDepartment, selectedTimeRange, selectedStatus]);
+  }, [isOpen, activeTab, selecteddepartment, selectedTimeRange, selectedStatus]);
 
   const fetchMeetings = async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
         tab: activeTab,
-        department: selectedDepartment,
+        department: selecteddepartment,
         timeRange: selectedTimeRange,
         status: selectedStatus,
         search: searchQuery,

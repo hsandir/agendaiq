@@ -12,7 +12,7 @@ import {
   isOpsAdmin,
   enrichUserWithCapabilities,
   RoleKey,
-  isRole,
+  isrole,
 } from './policy';
 
 // Types for better type safety - extend UserWithCapabilities

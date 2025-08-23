@@ -29,7 +29,7 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  User,
+  users,
   Target,
   Flag,
   Lightbulb,
@@ -118,16 +118,16 @@ interface PastMeeting {
 
 interface AgendaItemsEditorProps {
   meeting: Meeting
-  currentUser: _AuthenticatedUser
-  allStaff: StaffForAgenda[]
+  currentusers: _AuthenticatedUser
+  allstaff: StaffForAgenda[]
   pastMeetings: PastMeeting[]
   canEdit: boolean
 }
 
 export function AgendaItemsEditor({
   meeting,
-  currentUser,
-  allStaff,
+  currentusers,
+  allstaff,
   pastMeetings,
   canEdit
 }: AgendaItemsEditorProps) {
@@ -139,7 +139,7 @@ export function AgendaItemsEditor({
   
   // Import dialog state
   const [showImportDialog, setShowImportDialog] = useState(false)
-  const [selectedPastMeeting, setSelectedPastMeeting] = useState<number | null>(null)
+  const [selectedPastmeeting, setSelectedPastMeeting] = useState<number | null>(null)
   const [importedItems, setImportedItems] = useState<AgendaItemFormData[]>([])
   const [importedMeetingId, setImportedMeetingId] = useState<number | null>(null)
   const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false)

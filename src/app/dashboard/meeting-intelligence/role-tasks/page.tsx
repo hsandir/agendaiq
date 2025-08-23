@@ -13,7 +13,7 @@ import {
   Calendar,
   ChevronRight,
   Filter,
-  User,
+  users,
   Briefcase,
   BarChart3
 } from 'lucide-react';
@@ -75,7 +75,7 @@ interface RoleWithTasks {
 
 export default function RoleTasksPage() {
   const [rolesWithTasks, setRolesWithTasks] = useState<RoleWithTasks[]>([]);
-  const [selectedRole, setSelectedRole] = useState<number | null>(null);
+  const [selectedrole, setSelectedRole] = useState<number | null>(null);
   const [filter, setFilter] = useState<'all' | 'leadership' | 'active' | 'overdue'>('all');
   const [expandedRoles, setExpandedRoles] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(true);

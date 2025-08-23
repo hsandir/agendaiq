@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Download as FiDownload, Eye as FiEye, Trash2 as FiTrash2, Edit as FiEdit, RefreshCw as FiRefreshCw, User as FiUser, Database as FiDatabase, Activity as FiActivity, Shield as FiShield, AlertTriangle as FiAlertTriangle } from 'lucide-react';
-import { isRole, RoleKey } from '@/lib/auth/policy';
-import type { UserWithStaff, SessionUser } from '@/types/auth';
+import { Download as FiDownload, Eye as FiEye, Trash2 as FiTrash2, Edit as FiEdit, RefreshCw as FiRefreshCw, users as Fiusers, Database as FiDatabase, Activity as FiActivity, Shield as FiShield, AlertTriangle as FiAlertTriangle } from 'lucide-react';
+import { isrole, RoleKey } from '@/lib/auth/policy';
+import type { UserWithstaff, SessionUser } from '@/types/auth';
 
 // User interface for authentication context
 interface AuthUser {
@@ -937,7 +937,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                     <div>
                       <label className="text-sm font-medium text-foreground">User/Staff ID</label>
                       <p className="text-sm text-foreground">
-                        users: {selectedLog.user_id || 'N/A'}, Staff: {selectedLog.staff_id || 'N/A'}
+                        users: {selectedLog.user_id || 'N/A'}, staff: {selectedLog.staff_id || 'N/A'}
                       </p>
                     </div>
                   </>

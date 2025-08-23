@@ -42,7 +42,7 @@ interface CustomTheme {
   name: string;
   colors: Record<string, string>;
   isDark: boolean;
-  createdAt: string;
+  created_at: string;
 }
 
 const presetPalettes = [
@@ -316,7 +316,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
       name: themeName,
       colors: colors,
       isDark: isDark,
-      createdAt: new Date().toISOString()
+      created_at: new Date().toISOString()
     };
 
     const updated = [...savedThemes, newTheme];
@@ -354,7 +354,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
         
         // Update theme provider state
         if (setCustomTheme) {
-          setCustomTheme(result.customTheme);
+          setCustomTheme(result.custom_theme);
         }
         
         // Switch to custom theme
@@ -679,7 +679,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
                         <div>
                           <h4 className="font-semibold">{theme.name}</h4>
                           <p className="text-xs text-muted-foreground">
-                            {new Date(theme.createdAt).toLocaleDateString()}
+                            {new Date(theme.created_at).toLocaleDateString()}
                           </p>
                         </div>
                       </div>

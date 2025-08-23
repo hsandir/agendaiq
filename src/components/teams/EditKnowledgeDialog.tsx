@@ -1,0 +1,693 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Switch } from '@/components/ui/switch';
+import {
+  FileText,
+  Link,
+  BookOpen,
+  FileCode,
+  FileSpreadsheet,
+  Presentation,
+  Image,
+  Video,
+  Loader2,
+  Plus,
+  X,
+  Info,
+  Globe,
+  File,
+  Hash,
+  Calendar,
+  User,
+  FolderOpen,
+  AlertCircle,
+  Save,
+  RefreshCw,
+  History,
+  Shield
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { formatDistanceToNow } from 'date-fns';
+
+interface TeamKnowledge {
+  id: number;
+  title: string;
+  description?: string | null;
+  type: string;
+  category?: string | null;
+  url?: string | null;
+  content?: string | null;
+  tags?: string[] | null;
+  is_public: boolean;
+  views_count: number;
+  downloads_count: number;
+  created_at: string;
+  updated_at: string;
+  metadata?: any;
+}
+
+interface EditKnowledgeDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  teamId: string;
+  knowledge: TeamKnowledge;
+  onKnowledgeUpdated: () => void;
+}
+
+const RESOURCE_TYPES = {
+  DOCUMENT: { label: 'Document', icon: FileText, color: 'blue' },
+  LINK: { label: 'Web Link', icon: Globe, color: 'green' },
+  NOTE: { label: 'Note', icon: BookOpen, color: 'purple' },
+  PRESENTATION: { label: 'Presentation', icon: Presentation, color: 'orange' },
+  SPREADSHEET: { label: 'Spreadsheet', icon: FileSpreadsheet, color: 'emerald' },
+  CODE: { label: 'Code/Script', icon: FileCode, color: 'pink' },
+  IMAGE: { label: 'Image', icon: Image, color: 'yellow' },
+  VIDEO: { label: 'Video', icon: Video, color: 'red' },
+  OTHER: { label: 'Other', icon: File, color: 'gray' }
+} as const;
+
+const CATEGORIES = [
+  'Meeting Notes',
+  'Policies & Procedures',
+  'Training Materials',
+  'Project Documents',
+  'Templates',
+  'Reports',
+  'Guidelines',
+  'Best Practices',
+  'Research',
+  'References',
+  'Tools & Resources',
+  'Communications'
+];
+
+export function EditKnowledgeDialog({
+  open,
+  onOpenChange,
+  teamId,
+  knowledge,
+  onKnowledgeUpdated,
+}: EditKnowledgeDialogProps) {
+  const [activeTab, setActiveTab] = useState('details');
+  const [submitting, setSubmitting] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  
+  // Form state
+  const [title, setTitle] = useState(knowledge.title);
+  const [description, setDescription] = useState(knowledge.description || '');
+  const [resourceType, setResourceType] = useState<keyof typeof RESOURCE_TYPES>(
+    knowledge.type as keyof typeof RESOURCE_TYPES
+  );
+  const [category, setCategory] = useState(knowledge.category || '');
+  const [url, setUrl] = useState(knowledge.url || '');
+  const [content, setContent] = useState(knowledge.content || '');
+  const [tags, setTags] = useState<string[]>(knowledge.tags || []);
+  const [tagInput, setTagInput] = useState('');
+  const [isPublic, setIsPublic] = useState(knowledge.is_public);
+  const [metadata, setMetadata] = useState({
+    author: knowledge.metadata?.author || '',
+    version: knowledge.metadata?.version || '1.0',
+    lastReviewed: knowledge.metadata?.lastReviewed || new Date().toISOString().split('T')[0],
+    expiryDate: knowledge.metadata?.expiryDate || '',
+    department: knowledge.metadata?.department || '',
+    relatedMeetings: knowledge.metadata?.relatedMeetings || '',
+    confidentiality: knowledge.metadata?.confidentiality || 'internal',
+    editHistory: knowledge.metadata?.editHistory || []
+  });
+
+  // Reset form when knowledge prop changes
+  useEffect(() => {
+    setTitle(knowledge.title);
+    setDescription(knowledge.description || '');
+    setResourceType(knowledge.type as keyof typeof RESOURCE_TYPES);
+    setCategory(knowledge.category || '');
+    setUrl(knowledge.url || '');
+    setContent(knowledge.content || '');
+    setTags(knowledge.tags || []);
+    setIsPublic(knowledge.is_public);
+    setMetadata({
+      author: knowledge.metadata?.author || '',
+      version: knowledge.metadata?.version || '1.0',
+      lastReviewed: knowledge.metadata?.lastReviewed || new Date().toISOString().split('T')[0],
+      expiryDate: knowledge.metadata?.expiryDate || '',
+      department: knowledge.metadata?.department || '',
+      relatedMeetings: knowledge.metadata?.relatedMeetings || '',
+      confidentiality: knowledge.metadata?.confidentiality || 'internal',
+      editHistory: knowledge.metadata?.editHistory || []
+    });
+    setHasChanges(false);
+    setActiveTab('details');
+  }, [knowledge]);
+
+  // Track changes
+  useEffect(() => {
+    const originalData = JSON.stringify({
+      title: knowledge.title,
+      description: knowledge.description,
+      type: knowledge.type,
+      category: knowledge.category,
+      url: knowledge.url,
+      content: knowledge.content,
+      tags: knowledge.tags,
+      is_public: knowledge.is_public,
+      metadata: knowledge.metadata
+    });
+    
+    const currentData = JSON.stringify({
+      title,
+      description: description || null,
+      type: resourceType,
+      category: category || null,
+      url: url || null,
+      content: content || null,
+      tags: tags.length > 0 ? tags : null,
+      is_public: isPublic,
+      metadata
+    });
+    
+    setHasChanges(originalData !== currentData);
+  }, [title, description, resourceType, category, url, content, tags, isPublic, metadata, knowledge]);
+
+  const handleAddTag = () => {
+    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
+      setTags([...tags, tagInput.trim()]);
+      setTagInput('');
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  const validateForm = (): boolean => {
+    if (!title.trim()) {
+      toast.error('Title is required');
+      setActiveTab('details');
+      return false;
+    }
+    
+    if (!category) {
+      toast.error('Please select a category');
+      setActiveTab('details');
+      return false;
+    }
+    
+    if (resourceType === 'LINK' && !url.trim()) {
+      toast.error('URL is required for web links');
+      setActiveTab('content');
+      return false;
+    }
+    
+    if (resourceType === 'NOTE' && !content.trim()) {
+      toast.error('Content is required for notes');
+      setActiveTab('content');
+      return false;
+    }
+    
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+    
+    setSubmitting(true);
+    
+    try {
+      // Add edit history entry
+      const editEntry = {
+        timestamp: new Date().toISOString(),
+        changes: hasChanges ? 'Content updated' : 'No changes',
+        version: metadata.version
+      };
+      
+      const updatedMetadata = {
+        ...metadata,
+        editHistory: [...(metadata.editHistory || []), editEntry],
+        lastModified: new Date().toISOString()
+      };
+      
+      const updateData = {
+        title: title.trim(),
+        description: description.trim() || null,
+        type: resourceType,
+        category,
+        url: resourceType === 'LINK' ? url.trim() : knowledge.url,
+        content: resourceType === 'NOTE' ? content.trim() : null,
+        tags: tags.length > 0 ? tags : null,
+        is_public: isPublic,
+        metadata: updatedMetadata,
+      };
+      
+      const response = await fetch(`/api/teams/${teamId}/knowledge/${knowledge.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData),
+      });
+      
+      if (!response.ok) throw new Error('Failed to update knowledge entry');
+      
+      toast.success('Knowledge resource updated successfully', {
+        description: `"${title}" has been updated`
+      });
+      
+      onKnowledgeUpdated();
+      onOpenChange(false);
+      
+    } catch (error) {
+      console.error('Error updating knowledge:', error);
+      toast.error('Failed to update knowledge resource');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleReset = () => {
+    setTitle(knowledge.title);
+    setDescription(knowledge.description || '');
+    setResourceType(knowledge.type as keyof typeof RESOURCE_TYPES);
+    setCategory(knowledge.category || '');
+    setUrl(knowledge.url || '');
+    setContent(knowledge.content || '');
+    setTags(knowledge.tags || []);
+    setIsPublic(knowledge.is_public);
+    setMetadata({
+      author: knowledge.metadata?.author || '',
+      version: knowledge.metadata?.version || '1.0',
+      lastReviewed: knowledge.metadata?.lastReviewed || new Date().toISOString().split('T')[0],
+      expiryDate: knowledge.metadata?.expiryDate || '',
+      department: knowledge.metadata?.department || '',
+      relatedMeetings: knowledge.metadata?.relatedMeetings || '',
+      confidentiality: knowledge.metadata?.confidentiality || 'internal',
+      editHistory: knowledge.metadata?.editHistory || []
+    });
+    toast.info('Form reset to original values');
+  };
+
+  const ResourceTypeIcon = RESOURCE_TYPES[resourceType].icon;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader>
+          <DialogTitle className="flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <ResourceTypeIcon className="h-5 w-5 text-primary" />
+              Edit Knowledge Resource
+            </span>
+            {hasChanges && (
+              <Badge variant="secondary" className="ml-2">
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Unsaved Changes
+              </Badge>
+            )}
+          </DialogTitle>
+          <DialogDescription>
+            Update the details of this knowledge resource
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Resource Info Bar */}
+        <div className="flex items-center justify-between p-3 bg-muted rounded-lg text-sm">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1 text-muted-foreground">
+              <Calendar className="h-3 w-3" />
+              Created {formatDistanceToNow(new Date(knowledge.created_at), { addSuffix: true })}
+            </span>
+            {knowledge.updated_at !== knowledge.created_at && (
+              <span className="flex items-center gap-1 text-muted-foreground">
+                <History className="h-3 w-3" />
+                Updated {formatDistanceToNow(new Date(knowledge.updated_at), { addSuffix: true })}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge variant="outline">
+              {knowledge.views_count} views
+            </Badge>
+            {knowledge.downloads_count > 0 && (
+              <Badge variant="outline">
+                {knowledge.downloads_count} downloads
+              </Badge>
+            )}
+          </div>
+        </div>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 overflow-hidden">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="content">Content</TabsTrigger>
+            <TabsTrigger value="metadata">Metadata</TabsTrigger>
+            <TabsTrigger value="history">History</TabsTrigger>
+          </TabsList>
+
+          <div className="overflow-y-auto max-h-[450px] pr-2">
+            <TabsContent value="details" className="space-y-4 mt-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Title *</Label>
+                <Input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter a descriptive title"
+                  disabled={submitting}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Provide a brief description of this resource"
+                  rows={3}
+                  disabled={submitting}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="category">Category *</Label>
+                <Select value={category} onValueChange={setCategory} disabled={submitting}>
+                  <SelectTrigger id="category">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        <div className="flex items-center gap-2">
+                          <FolderOpen className="h-4 w-4" />
+                          {cat}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="tags">Tags</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="tags"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+                    placeholder="Add tags for better searchability"
+                    disabled={submitting}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAddTag}
+                    disabled={submitting || !tagInput.trim()}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {tags.map((tag) => (
+                      <Badge key={tag} variant="secondary" className="pl-2">
+                        <Hash className="h-3 w-3 mr-1" />
+                        {tag}
+                        <button
+                          onClick={() => handleRemoveTag(tag)}
+                          className="ml-2 hover:text-destructive"
+                          disabled={submitting}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="space-y-0.5">
+                  <Label htmlFor="public">Public Access</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Allow this resource to be viewed by anyone in the organization
+                  </p>
+                </div>
+                <Switch
+                  id="public"
+                  checked={isPublic}
+                  onCheckedChange={setIsPublic}
+                  disabled={submitting}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="content" className="space-y-4 mt-4">
+              {resourceType === 'LINK' ? (
+                <div className="space-y-2">
+                  <Label htmlFor="url">Web URL *</Label>
+                  <div className="flex gap-2">
+                    <Globe className="h-5 w-5 text-muted-foreground mt-2" />
+                    <Input
+                      id="url"
+                      type="url"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      placeholder="https://example.com/resource"
+                      disabled={submitting}
+                      className="flex-1"
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Enter the full URL including https://
+                  </p>
+                </div>
+              ) : resourceType === 'NOTE' ? (
+                <div className="space-y-2">
+                  <Label htmlFor="content">Note Content *</Label>
+                  <Textarea
+                    id="content"
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Enter your note content here..."
+                    rows={12}
+                    disabled={submitting}
+                    className="font-mono text-sm"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Supports markdown formatting
+                  </p>
+                </div>
+              ) : (
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertDescription>
+                    File resources cannot be changed after upload. To replace the file, delete this entry and create a new one.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </TabsContent>
+
+            <TabsContent value="metadata" className="space-y-4 mt-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="author">Author</Label>
+                  <div className="flex gap-2">
+                    <User className="h-5 w-5 text-muted-foreground mt-2" />
+                    <Input
+                      id="author"
+                      value={metadata.author}
+                      onChange={(e) => setMetadata({...metadata, author: e.target.value})}
+                      placeholder="Document author"
+                      disabled={submitting}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="version">Version</Label>
+                  <Input
+                    id="version"
+                    value={metadata.version}
+                    onChange={(e) => setMetadata({...metadata, version: e.target.value})}
+                    placeholder="1.0"
+                    disabled={submitting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="lastReviewed">Last Reviewed</Label>
+                  <div className="flex gap-2">
+                    <Calendar className="h-5 w-5 text-muted-foreground mt-2" />
+                    <Input
+                      id="lastReviewed"
+                      type="date"
+                      value={metadata.lastReviewed}
+                      onChange={(e) => setMetadata({...metadata, lastReviewed: e.target.value})}
+                      disabled={submitting}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="expiryDate">Expiry Date</Label>
+                  <div className="flex gap-2">
+                    <AlertCircle className="h-5 w-5 text-muted-foreground mt-2" />
+                    <Input
+                      id="expiryDate"
+                      type="date"
+                      value={metadata.expiryDate}
+                      onChange={(e) => setMetadata({...metadata, expiryDate: e.target.value})}
+                      disabled={submitting}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="department">Department</Label>
+                  <Input
+                    id="department"
+                    value={metadata.department}
+                    onChange={(e) => setMetadata({...metadata, department: e.target.value})}
+                    placeholder="Related department"
+                    disabled={submitting}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confidentiality">Confidentiality</Label>
+                  <Select
+                    value={metadata.confidentiality}
+                    onValueChange={(value) => setMetadata({...metadata, confidentiality: value})}
+                    disabled={submitting}
+                  >
+                    <SelectTrigger id="confidentiality">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="public">
+                        <div className="flex items-center gap-2">
+                          <Globe className="h-4 w-4" />
+                          Public
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="internal">
+                        <div className="flex items-center gap-2">
+                          <Shield className="h-4 w-4" />
+                          Internal
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="confidential">
+                        <div className="flex items-center gap-2">
+                          <Shield className="h-4 w-4 text-orange-500" />
+                          Confidential
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="restricted">
+                        <div className="flex items-center gap-2">
+                          <Shield className="h-4 w-4 text-red-500" />
+                          Restricted
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="relatedMeetings">Related Meetings</Label>
+                <Textarea
+                  id="relatedMeetings"
+                  value={metadata.relatedMeetings}
+                  onChange={(e) => setMetadata({...metadata, relatedMeetings: e.target.value})}
+                  placeholder="Meeting IDs or titles (comma-separated)"
+                  rows={2}
+                  disabled={submitting}
+                />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="history" className="space-y-4 mt-4">
+              {metadata.editHistory && metadata.editHistory.length > 0 ? (
+                <div className="space-y-3">
+                  {metadata.editHistory.slice().reverse().map((entry: any, index: number) => (
+                    <div key={index} className="flex items-start gap-3 p-3 border rounded-lg">
+                      <History className="h-4 w-4 text-muted-foreground mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{entry.changes}</p>
+                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                          <span>Version {entry.version}</span>
+                          <span>{formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>No edit history available</p>
+                </div>
+              )}
+            </TabsContent>
+          </div>
+        </Tabs>
+
+        <DialogFooter className="mt-4">
+          <Button
+            variant="outline"
+            onClick={handleReset}
+            disabled={submitting || !hasChanges}
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Reset
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={submitting}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={submitting || !hasChanges}
+          >
+            {submitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Save Changes
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

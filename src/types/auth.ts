@@ -107,12 +107,12 @@ export interface JWTToken {
  */
 
 // Check if user has password
-export function isUserWithPassword(user: unknown): user is UserWithAuth & { hashedPassword: string } {
+export function isUserWithPassword(user: unknown): user is UserWithAuth & { hashed_password: string } {
   return user !== null && user !== undefined && 
          typeof user === 'object' && 
          'hashedPassword' in user && 
-         typeof (user as any).hashedPassword === 'string' &&
-         (user as any).hashedPassword.length > 0;
+         typeof (user as any).hashed_password === 'string' &&
+         (user as any).hashed_password.length > 0;
 }
 
 // Check if user has staff
@@ -121,7 +121,7 @@ export function isUserWithStaff(user: unknown): user is UserWithStaff {
          typeof user === 'object' && 
          'Staff' in user && 
          Array.isArray((user as any).Staff) &&
-         (user as any).staff.length > 0;
+         (user as any).Staff.length > 0;
 }
 
 // Check if user is admin
@@ -136,7 +136,7 @@ export function isUserAdmin(user: unknown): boolean {
   }
   
   // Check role-based admin
-  if (isUserWithStaff(user) && user.staff?.[0]?.Role) {
+  if (isUserWithStaff(user) && user.Staff?.[0]?.Role) {
     // Do not infer admin via title/priority; rely on flags/capabilities
     return false;
   }

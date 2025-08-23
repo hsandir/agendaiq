@@ -1,12 +1,12 @@
-import { PrismaClient, User, Staff, Role } from '@prisma/client'
+import { PrismaClient, users, staff, role } from '@prisma/client'
 import { TestFactory } from '../fixtures/factory'
 
-type UserWithStaff = User & {
-  Staff: (Staff & {
-    Role: Role;
-    Department: unknown;
-    School: unknown;
-    District: unknown;
+type UserWithStaff = users & {
+  staff: (staff & {
+    role: role;
+    department: unknown;
+    school: unknown;
+    district: unknown;
   })[]
 }
 
@@ -39,18 +39,18 @@ export async function resetTestDatabase() {
   
   // Clear all data in correct order
   await prisma.$transaction([
-    prisma.meetingAuditLog.deleteMany(),
-    prisma.meetingAttendee.deleteMany(),
-    prisma.meetingNote.deleteMany(),
-    prisma.meetingActionItem.deleteMany(),
-    prisma.agendaItemComment.deleteMany(),
-    prisma.agendaItemAttachment.deleteMany(),
-    prisma.meetingAgendaItem.deleteMany(),
+    prisma.meeting_audit_logs.deleteMany(),
+    prisma.meeting_attendee.deleteMany(),
+    prisma.meeting_notes.deleteMany(),
+    prisma.meeting_action_items.deleteMany(),
+    prisma.agenda_item_comments.deleteMany(),
+    prisma.agenda_item_attachments.deleteMany(),
+    prisma.meeting_agenda_items.deleteMany(),
     prisma.meeting.deleteMany(),
     // prisma.notification.deleteMany(), // Model doesn't exist
     // prisma.activityLog.deleteMany(), // Model doesn't exist
     prisma.staff.deleteMany(),
-    prisma.user.deleteMany(),
+    prisma.users.deleteMany(),
     prisma.role.deleteMany(),
     prisma.department.deleteMany(),
     prisma.school.deleteMany(),
@@ -62,7 +62,7 @@ export async function seedTestDatabase() {
   const prisma = getTestPrismaClient()
   
   // Use existing data from copied main database
-  const users: UserWithStaff[] = await prisma.user.findMany({
+  const users: UserWithStaff[] = await prisma.users.findMany({
     include: {
       staff: {
         include: {
@@ -76,9 +76,9 @@ export async function seedTestDatabase() {
   })
   
   if (users.length >= 2) {
-    const _adminUser = users.find(u => u.staff?.[0]?.role?.is_leadership) || users[0]
+    const adminUser = users.find(u => u.staff?.[0]?.role?.is_leadership) || users[0]
     const teacherUser = users.find(u => !u.staff?.[0]?.role?.is_leadership) || users[1]
-    const _adminStaff = adminUser.staff?.[0]
+    const adminStaff = adminUser.staff?.[0]
     const teacherStaff = teacherUser.staff?.[0]
     
     if (adminStaff && teacherStaff) {

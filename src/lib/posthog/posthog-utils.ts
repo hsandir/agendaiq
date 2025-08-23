@@ -18,7 +18,7 @@ export function setPostHogUser(user: Partial<User> & {
       staffId: typeof user.staff?.id === 'number' ? user.staff?.id : Number(user.staff?.id),
       roleKey: user.staff?.role.key ?? 'unknown',
       roleTitle: user.staff?.role.key ?? 'unknown',
-      createdAt: user.createdAt,
+      created_at: user.created_at,
     });
 
     // Set user properties for error tracking

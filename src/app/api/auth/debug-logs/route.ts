@@ -193,7 +193,7 @@ export async function GET(request: NextRequest) {
         providers: ['credentials', 'google'],
         sessionStrategy: 'jwt',
         allEnvVars: nextAuthEnv,
-        currentSession: session ? { 
+        currentsession: session ? { 
           user: session.user?.email,
           expires: session.expires,
           raw: session
@@ -361,7 +361,7 @@ export async function POST(request: NextRequest) {
             ip,
             userAgent
           });
-        } else if (!user.hashedPassword) {
+        } else if (!user.hashed_password) {
           addLog({
             type: 'signin_attempt',
             level: 'error',
@@ -377,7 +377,7 @@ export async function POST(request: NextRequest) {
           });
         } else {
           // Test password
-          const isValidPassword = await bcrypt.compare(body.details.password as string, user.hashedPassword as string);
+          const isValidPassword = await bcrypt.compare(body.details.password as string, user.hashed_password as string);
           
           addLog({
             type: 'signin_attempt',
@@ -390,8 +390,8 @@ export async function POST(request: NextRequest) {
               userId: user.id,
               email: user.email,
               passwordValid: isValidPassword,
-              hasStaff: !!user.staff?.length,
-              staffRole: user.staff?.[0]?.role?.title,
+              hasstaff: !!user.staff?.length,
+              staffrole: user.staff?.[0]?.role?.title,
               timestamp: new Date().toISOString()
             },
             ip,
@@ -411,7 +411,7 @@ export async function POST(request: NextRequest) {
                   id: String(user.id),
                   email: user.email,
                   name: user.name,
-                  hasStaff: !!user.staff?.length,
+                  hasstaff: !!user.staff?.length,
                   staffData: user.staff?.[0] || null
                 }
               }
@@ -421,7 +421,7 @@ export async function POST(request: NextRequest) {
             addAuthFlow('credentials_validated', {
               email: user.email,
               userId: user.id,
-              hasStaff: !!user.staff?.length,
+              hasstaff: !!user.staff?.length,
               role: user.staff?.[0]?.role?.title
             });
           }

@@ -49,7 +49,7 @@ describe('Admin API Routes - Capability Tests', () => {
 
       (withAuth as jest.Mock).mockResolvedValue({
         success: true,
-        user: mockUser,
+        user: mockusers,
       });
 
       (canAccessApi as jest.Mock).mockReturnValue(true);
@@ -152,7 +152,7 @@ describe('Admin API Routes - Capability Tests', () => {
 
       (withAuth as jest.Mock).mockResolvedValue({
         success: true,
-        user: mockUser,
+        user: mockusers,
       });
 
       const request = new NextRequest('http://localhost:3000/api/meetings/1');
@@ -194,7 +194,7 @@ describe('Admin API Routes - Capability Tests', () => {
 
       (withAuth as jest.Mock).mockResolvedValue({
         success: true,
-        user: mockOpsUser,
+        user: mockOpsusers,
       });
 
       const endpoints = [

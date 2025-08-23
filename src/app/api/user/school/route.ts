@@ -16,11 +16,11 @@ export async function GET(request: NextRequest) {
       include: { staff: { include: { school: true } } },
     });
 
-    if (!user?.staff?.[0]?.School) {
+    if (!user?.staff?.[0]?.school) {
       return new NextResponse("School not found", { status: 404 });
     }
 
-    return new NextResponse(JSON.stringify(user.staff[0].School), {
+    return new NextResponse(JSON.stringify(user.staff[0].school), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       include: { staff: { include: { school: true } } },
     });
 
-    return new NextResponse(JSON.stringify(updatedUser?.staff?.[0]?.School), {
+    return new NextResponse(JSON.stringify(updatedUser?.staff?.[0]?.school), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

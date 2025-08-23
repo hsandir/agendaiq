@@ -189,7 +189,7 @@ export class MeetingContinuityService {
     };
 
     return {
-      root: rootMeeting,
+      root: rootmeeting,
       chain: await getAllDescendants(rootMeeting.id),
       currentmeeting: meeting
     };

@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
-import { Users as FiUsers, UserCheck as FiUserCheck, TrendingUp as FiTrendingUp, Eye as FiEye, Edit3 as FiEdit3, Settings as FiSettings, Shield as FiShield, Home as FiHome, User as FiUserPlus } from 'lucide-react';
+import { Users as FiUsers, UserCheck as FiUserCheck, TrendingUp as FiTrendingUp, Eye as FiEye, Edit3 as FiEdit3, Settings as FiSettings, Shield as FiShield, Home as FiHome, UserPlus as FiUserPlus } from 'lucide-react';
 import RolesPageClient from '@/components/settings/RolesPageClient';
 
 export const metadata: Metadata = {
@@ -49,7 +49,7 @@ export default async function RolePage() {
   const totalStaff = roles.reduce((acc, role) => acc + role.staff.length, 0);
   const totalDepartments = departments.length;
   const activeUsers = roles.reduce((acc, role) => 
-    acc + role.staff.filter(staff => staff.users.emailVerified).length, 0
+    acc + role.staff.filter(staff => staff.users.email_verified).length, 0
   );
 
   // Role distribution by department

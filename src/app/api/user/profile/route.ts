@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const userProfile = await prisma.user.findUnique({
+    const userProfile = await prisma.users.findUnique({
       where: { email: user.email },
       include: {
         staff: {
@@ -39,8 +39,8 @@ export async function GET(request: NextRequest) {
       staff_id: userProfile.staff_id,
       staff: userProfile.staff?.[0] ? {
         id: userProfile.staff[0].id,
-        role: userProfile.staff[0].Role,
-        department: userProfile.staff[0].Department,
+        role: userProfile.staff[0].role,
+        department: userProfile.staff[0].department,
         school: userProfile.staff[0].school
       } : null
     });
@@ -66,7 +66,7 @@ export async function PUT(request: NextRequest) {
     if (name !== undefined) updateData.name = name;
     if (phone !== undefined) updateData.phone = phone;
 
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.users.update({
       where: { email: user.email },
       data: updateData,
       include: {
@@ -91,8 +91,8 @@ export async function PUT(request: NextRequest) {
       staff_id: updatedUser.staff_id,
       staff: updatedUser.staff?.[0] ? {
         id: updatedUser.staff[0].id,
-        role: updatedUser.staff[0].Role,
-        department: updatedUser.staff[0].Department,
+        role: updatedUser.staff[0].role,
+        department: updatedUser.staff[0].department,
         school: updatedUser.staff[0].school
       } : null
     });

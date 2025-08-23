@@ -3,7 +3,7 @@
  * This file should be imported in the root layout or _app.tsx
  */
 
-import { initMonitoring, setMonitoringUser, addBreadcrumb } from './index';
+import { initMonitoring, setMonitoringusers, addBreadcrumb } from './index';
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 

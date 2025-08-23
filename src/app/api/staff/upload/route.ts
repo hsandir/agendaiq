@@ -77,8 +77,8 @@ const recordSchema = z.object({
   Email: z.string().email("Invalid email format"),
   Name: z.string().min(1, "Name is required"),
   StaffId: z.string().min(3, "Staff ID must be at least 3 characters").max(15, "Staff ID must be at most 15 characters"),
-  Role: z.string().min(1, "Role is required"),
-  Department: z.string().min(1, "Department is required"),
+  role: z.string().min(1, "Role is required"),
+  department: z.string().min(1, "Department is required"),
 });
 
 // Helper function to validate CSV headers
@@ -102,7 +102,7 @@ function validateCsvHeaders(headers: string[]): { isValid: boolean; errors: stri
   if (headers.length === requiredHeaders.length) {
     const isOrderCorrect = requiredHeaders.every((h, i) => headers[i] === h);
     if (!isOrderCorrect) {
-      errors.push('Column order must be: Email, Name, StaffId, Role, Department');
+      errors.push('Column order must be: Email, Name, StaffId, role, Department');
     }
   }
   
@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ 
         error: 'Invalid CSV format. Please check your file and try again.',
         details: error instanceof Error ? error.message : 'Unknown parsing error',
-        hint: 'Make sure your file uses comma separators and has the correct headers: Email,Name,StaffId,Role,Department'
+        hint: 'Make sure your file uses comma separators and has the correct headers: Email,Name,StaffId,role,Department'
       }, { status: 400 });
     }
 
@@ -229,13 +229,13 @@ export async function POST(request: NextRequest) {
         }
 
         // Validate role exists
-        if (record.role && !validRoles.includes(record.Role)) {
-          recordErrors.push(`Invalid role "${record.Role}". Valid roles: ${validRoles.slice(0, 3).join(', ')}...`);
+        if (record.role && !validRoles.includes(record.role)) {
+          recordErrors.push(`Invalid role "${record.role}". Valid roles: ${validRoles.slice(0, 3).join(', ')}...`);
         }
 
         // Validate department exists
-        if (record.department && !validDepartments.includes(record.Department)) {
-          recordErrors.push(`Invalid department "${record.Department}". Valid departments: ${validDepartments.slice(0, 3).join(', ')}...`);
+        if (record.department && !validDepartments.includes(record.department)) {
+          recordErrors.push(`Invalid department "${record.department}". Valid departments: ${validDepartments.slice(0, 3).join(', ')}...`);
         }
 
         // Check if email already exists in database
@@ -278,8 +278,8 @@ export async function POST(request: NextRequest) {
           email: record.Email,
           name: record.Name,
           staffId: record.StaffId,
-          role: record.Role,
-          department: record.Department,
+          role: record.role,
+          department: record.department,
           errors: recordErrors,
           warnings: recordWarnings,
           status: 'unknown',
@@ -324,7 +324,7 @@ export async function POST(request: NextRequest) {
               conflicts.push({
                 field: 'role',
                 existing: existingStaff.role.key ?? existingStaff.role.id.toString(),
-                new: record.Role,
+                new: record.role,
                 action: 'change_role'
               });
             }
@@ -332,7 +332,7 @@ export async function POST(request: NextRequest) {
               conflicts.push({
                 field: 'department',
                 existing: existingStaff.department.name,
-                new: record.Department,
+                new: record.department,
                 action: 'change_department'
               });
             }
@@ -504,7 +504,7 @@ export async function POST(request: NextRequest) {
                 email: record.email,
                 name: record.name,
                 staff_id: record.staffId,
-                emailVerified: new Date()
+                email_verified: new Date()
               }
             });
 

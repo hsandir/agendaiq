@@ -72,7 +72,7 @@ export const handlers = [
           id: 2,
           ...(body as object),
           status: 'SCHEDULED',
-          createdAt: new Date().toISOString(),
+          created_at: new Date().toISOString(),
         },
       },
       { status: 201 }

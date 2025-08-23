@@ -1,5 +1,5 @@
 import 'next-auth';
-// // import { Role, Department } // Unused imports commented out // Unused imports commented out from '@prisma/client';
+// // import { role, department } // Unused imports commented out // Unused imports commented out from '@prisma/client';
 
 declare module 'next-auth' {
   interface User {

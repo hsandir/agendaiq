@@ -129,7 +129,7 @@ export async function PUT(request: NextRequest) {
         },
       });
 
-      return NextResponse.json({ district: updatedDistrict, school: updatedSchool });
+      return NextResponse.json({ district: updateddistrict, school: updatedSchool });
     }
 
     return NextResponse.json({ district: updatedDistrict });

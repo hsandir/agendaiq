@@ -5,7 +5,7 @@
 
 import type { NextRequest, NextResponse } from 'next/server';
 import type { Session } from 'next-auth';
-import type { PrismaClient, User, Staff, Role, Department, School, District } from '@prisma/client';
+import type { PrismaClient, users, staff, role, department, school, district } from '@prisma/client';
 import type { ComponentType, ReactElement } from 'react';
 
 // ============================================================================
@@ -134,12 +134,12 @@ export interface MockFactory<T> {
 // ============================================================================
 
 export interface TestDataSeed {
-  users: User[];
-  staff: Staff[];
-  roles: Role[];
-  departments: Department[];
-  schools: School[];
-  districts: District[];
+  users: users[];
+  staff: staff[];
+  roles: role[];
+  departments: department[];
+  schools: school[];
+  districts: district[];
 }
 
 export interface DatabaseTestContext {
@@ -151,12 +151,12 @@ export interface DatabaseTestContext {
 }
 
 export interface TestFactory {
-  user: MockFactory<User>;
-  staff: MockFactory<Staff>;
-  role: MockFactory<Role>;
-  department: MockFactory<Department>;
-  school: MockFactory<School>;
-  district: MockFactory<District>;
+  user: MockFactory<users>;
+  staff: MockFactory<staff>;
+  role: MockFactory<role>;
+  department: MockFactory<department>;
+  school: MockFactory<school>;
+  district: MockFactory<district>;
 }
 
 // ============================================================================
@@ -345,8 +345,8 @@ export interface TestMetadata {
   tags: string[];
   priority: 'low' | 'medium' | 'high' | 'critical';
   owner: string;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
   dependencies: string[];
 }
 

@@ -176,7 +176,7 @@ describe('${info.name}', () => {
 ${methods.map(method => `import { ${__method} } from '${__importPath}'`).join('\n')}
 import { __prisma } from '@/lib/prisma'
 import { __withAuth } from '@/lib/auth/api-auth'
-import { __createMockNextRequest, __createTestUser, __createTestStaff } from '@/__tests__/utils/test-utils'
+import { __createMockNextRequest, __createTestusers, __createTestStaff } from '@/__tests__/utils/test-utils'
 
 // Mock modules
 jest.mock('@/lib/prisma', () => ({
@@ -199,8 +199,8 @@ describe('${path.basename(info.__path, '.ts')} API', () => {
     ;(withAuth as jest.Mock).mockResolvedValue({
       success: true,
       user: {
-        ...mockUser,
-        staff: mockStaff,
+        ...mockusers,
+        staff: mockstaff,
       },
     })` : ''}
   })
@@ -226,9 +226,9 @@ describe('${path.basename(info.__path, '.ts')} API', () => {
       ;(withAuth as jest.Mock).mockResolvedValue({
         success: true,
         user: {
-          ...mockUser,
+          ...mockusers,
           staff: {
-            ...mockStaff,
+            ...mockstaff,
             role: { title: 'Teacher', is_leadership: false },
           },
         },

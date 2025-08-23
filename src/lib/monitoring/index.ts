@@ -352,7 +352,7 @@ const monitoring = new MonitoringManager();
 export const { init: __initMonitoring,
   __captureException,
   __captureMessage,
-  setUser: __setMonitoringUser,
+  setUser: __setMonitoringusers,
   setTags: __setMonitoringTags,
   setTag: __setMonitoringTag,
   setContext: __setMonitoringContext,

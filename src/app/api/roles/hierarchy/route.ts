@@ -16,7 +16,7 @@ interface RoleWithRelations {
     id: number;
     name: string;
   } | null;
-  Staff: Array<{
+  staff: Array<{
     id: number;
     users: {
       name: string | null;
@@ -35,7 +35,7 @@ interface HierarchicalRole {
   parent_id: number | null;
   department: { id: string; name: string } | null;
   Children: HierarchicalRole[];
-  Staff: Array<{ id: string; name: string; email: string }>;
+  staff: Array<{ id: string; name: string; email: string }>;
 }
 
 // GET Method - Role hierarchy
@@ -85,12 +85,12 @@ export async function GET(request: NextRequest) {
         is_leadership: role.is_leadership,
         category: role.category ?? '',
         parent_id: role.parent_id,
-        Department: role.department ? {
+        department: role.department ? {
           id: role.department.id.toString(),
           name: role.department.name
         } : null,
         Children: [],
-        Staff: role.staff?.map((staff) => ({
+        staff: role.staff?.map((staff) => ({
           id: staff.id.toString(),
           users: {
             name: staff.users.name,

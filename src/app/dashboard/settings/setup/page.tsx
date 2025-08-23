@@ -22,7 +22,7 @@ export default function SetupPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [editSchool, setEditSchool] = useState<School | null>(null);
+  const [editschool, setEditSchool] = useState<School | null>(null);
   const [form, setForm] = useState<Partial<School>>({});
   const [saving, setSaving] = useState(false);
 

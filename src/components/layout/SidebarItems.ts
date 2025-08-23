@@ -19,7 +19,7 @@ import {
   UserCog,
   Palette,
   Monitor,
-  User,
+  users,
   ShieldCheck,
   Server,
   Code,
@@ -110,12 +110,12 @@ export const sidebarItems: NavigationSection[] = [
           {
             href: "/dashboard/settings/profile",
             label: "Account",
-            icon: User,
+            icon: UserPlus,
             children: [
               {
                 href: "/dashboard/settings/profile",
                 label: "Profile",
-                icon: User,
+                icon: UserPlus,
               },
               {
                 href: "/dashboard/settings/interface",

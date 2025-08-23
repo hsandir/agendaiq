@@ -6,7 +6,7 @@
  * 3. Role level = 0 (system level)
  */
 
-import { isRole, RoleKey } from '@/lib/auth/policy';
+import { isrole, RoleKey } from '@/lib/auth/policy';
 
 interface UserWithStaff {
   is_admin?: boolean;

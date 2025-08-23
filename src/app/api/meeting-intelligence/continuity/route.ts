@@ -54,12 +54,12 @@ export async function GET(request: NextRequest) {
         },
         meeting_agenda_items: {
           include: {
-            ResponsibleRole: true
+            Responsiblerole: true
           }
         },
         meeting_action_items: {
           include: {
-            AssignedToRole: true
+            AssignedTorole: true
           }
         },
         meeting_attendee: true,
@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
     chainsMap.forEach((chain, chainId) => {
       const rootMeeting = meetings.find(m => m.id === chainId);
       if (rootMeeting) {
-        chain.meetings = [buildMeetingNode(rootMeeting, meetings)];
+        chain.meetings = [buildMeetingNode(rootmeeting, meetings)];
         
         // Calculate chain stats
         const allMeetingsInChain = getAllMeetingsInChain(chain.meetings[0]);

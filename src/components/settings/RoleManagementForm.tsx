@@ -32,7 +32,7 @@ interface User {
   loginNotifications: boolean;
   rememberDevices: boolean;
   suspiciousAlerts: boolean;
-  twoFactorEnabled: boolean;
+  two_factor_enabled: boolean;
   schoolId: string | null;
 }
 
@@ -43,7 +43,7 @@ export function RoleManagementForm() {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedusers, setSelectedUser] = useState<User | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -265,7 +265,7 @@ export function RoleManagementForm() {
                     <Switch
                       id="twoFactorEnabled"
                       name="twoFactorEnabled"
-                      defaultChecked={selectedUser.twoFactorEnabled}
+                      defaultChecked={selectedUser.two_factor_enabled}
                     />
                   </div>
                 </div>

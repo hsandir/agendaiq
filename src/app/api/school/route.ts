@@ -55,10 +55,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(schools);
     } else {
       // Non-admin: return only user's school
-      if (!staffRecord.School) {
+      if (!staffRecord.school) {
         return NextResponse.json({ error: "No school assigned" }, { status: 404 });
       }
-      return NextResponse.json(staffRecord.School);
+      return NextResponse.json(staffRecord.school);
     }
   } catch (error: unknown) {
     console.error("Error fetching schools:", error);

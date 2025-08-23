@@ -55,7 +55,7 @@ export function withFieldAccess<T extends (...args: Record<string, unknown>[]) =
 
 // Validate write operations
 export async function validateFieldWrite(
-  user: User,
+  user: users,
   model: string,
   data: Record<string, unknown>,
   existingRecord?: Record<string, unknown>

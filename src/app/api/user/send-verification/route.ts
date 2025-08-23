@@ -13,10 +13,10 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email: auth.user.email! },
-      select: { emailVerified: true, email: true },
+      select: { email_verified: true, email: true },
     });
 
-    if (user?.emailVerified) {
+    if (user?.email_verified) {
       return new NextResponse("Email already verified", { status: 400 });
     }
 

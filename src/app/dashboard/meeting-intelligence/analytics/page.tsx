@@ -25,7 +25,7 @@ interface MeetingMetrics {
   onTimeStartRate: number;
   actionItemCompletionRate: number;
   meetingsByType: { type: string; count: number }[];
-  meetingsByDepartment: { department: string; count: number; efficiency: number }[];
+  meetingsBydepartment: { department: string; count: number; efficiency: number }[];
   trendData: { month: string; meetings: number; efficiency: number }[];
   topContributors: { name: string; role: string; contributions: number }[];
 }
@@ -43,7 +43,7 @@ export default function MeetingAnalyticsPage() {
   const [metrics, setMetrics] = useState<MeetingMetrics | null>(null);
   const [departmentPerformance, setDepartmentPerformance] = useState<DepartmentPerformance[]>([]);
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
-  const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
+  const [selecteddepartment, setSelectedDepartment] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

@@ -9,7 +9,7 @@ export default async function CreateFirstAdminPage() {
   // This page requires system admin or dev admin role
   const user = await requireAuth({
     requireAuth: true,
-    requireAdminRole: true
+    requireAdminrole: true
   });
 
   // Check if there are already users in the system
@@ -61,14 +61,14 @@ export default async function CreateFirstAdminPage() {
       OR: [
         { is_admin: true },
         { is_system_admin: true },
-        { Staff: { some: { Role: { key: { in: ['DEV_ADMIN', 'OPS_ADMIN'] } } } } }
+        { staff: { some: { role: { key: { in: ['DEV_ADMIN', 'OPS_ADMIN'] } } } } }
       ]
     },
     select: {
       id: true,
       email: true,
       name: true,
-      hashedPassword: true,
+      hashed_password: true,
       staff: {
         select: {
           role: {

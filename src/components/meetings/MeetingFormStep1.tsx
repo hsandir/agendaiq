@@ -106,7 +106,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
   const [showRepeatModal, setShowRepeatModal] = useState(false);
   const [repeatConfig, setRepeatConfig] = useState<RepeatConfig | null>(null);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [selectedPreviousMeeting, setSelectedPreviousMeeting] = useState<any>(null);
+  const [selectedPreviousmeeting, setSelectedPreviousMeeting] = useState<any>(null);
 
   // Transform users to MultiSelectOptions
   const attendeeOptions: MultiSelectOption[] = users.map(user => ({

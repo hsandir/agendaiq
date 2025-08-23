@@ -171,7 +171,7 @@ export default async function PermissionsPage() {
             <CardContent className="space-y-4">
               {/* Permissions List */}
               <div className="space-y-3">
-                <h4 className="text-sm font-medium text-foreground">Available Permissions:</h4>
+                <h4 className="text-sm font-medium text-foreground">Available permission:</h4>
                 <div className="grid gap-2">
                   {category.permissions.map((permission, index) => (
                     <div key={index} className="flex items-center space-x-2 text-sm">
@@ -202,12 +202,12 @@ export default async function PermissionsPage() {
               </div>
 
               {/* Department Information */}
-              {category.roles.some(role => role.Department) && (
+              {category.roles.some(role => role.department) && (
                 <div className="space-y-3">
                   <h4 className="text-sm font-medium text-foreground">Department Access:</h4>
                   <div className="flex flex-wrap gap-2">
                     {category.roles
-                      .filter(role => role.Department)
+                      .filter(role => role.department)
                       .map((role) => (
                         <Badge key={role.id} variant="secondary" className="text-xs">
                           {role.department?.name}

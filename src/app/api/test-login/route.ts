@@ -22,8 +22,8 @@ export async function POST(request: NextRequest) {
         id: true,
         email: true,
         name: true,
-        hashedPassword: true,
-        emailVerified: true,
+        hashed_password: true,
+        email_verified: true,
         staff: {
           include: {
             role: true
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       }, { status: 404 });
     }
     
-    if (!user.hashedPassword) {
+    if (!user.hashed_password) {
       return NextResponse.json({ 
         error: 'User has no password',
         email,
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Test password
-    const isValid = await bcrypt.compare(password as string, user.hashedPassword);
+    const isValid = await bcrypt.compare(password as string, user.hashed_password);
     
     return NextResponse.json({
       success: isValid,
@@ -56,14 +56,14 @@ export async function POST(request: NextRequest) {
         id: user.id,
         email: user.email,
         name: user.name,
-        hasPassword: !!user.hashedPassword,
-        emailVerified: !!user.emailVerified,
+        hasPassword: !!user.hashed_password,
+        email_verified: !!user.email_verified,
         role: user.staff?.[0]?.role?.title
       },
       passwordCheck: {
         providedPassword: password,
-        hashExists: !!user.hashedPassword,
-        hashStartsWith: user.hashedPassword?.substring(0, 10),
+        hashExists: !!user.hashed_password,
+        hashStartsWith: user.hashed_password?.substring(0, 10),
         isValid
       }
     });

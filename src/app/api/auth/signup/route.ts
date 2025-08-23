@@ -103,7 +103,7 @@ export async function POST(request: Request) {
       user: {
         id: user.id,
         email: user.email,
-        staff: userWithStaff?.Staff,
+        staff: userWithStaff?.staff,
       },
     });
   } catch (error: unknown) {

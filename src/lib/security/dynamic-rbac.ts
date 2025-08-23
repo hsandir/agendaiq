@@ -20,8 +20,8 @@ export interface RolePermission {
   conditions?: Record<string, unknown>;
   priority: number;
   granted: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface AccessContext {
@@ -210,7 +210,7 @@ export class DynamicRBAC {
 
   // Check inherited permissions from role hierarchy
   private async checkInheritedPermissions(
-    user: _AuthenticatedUser,
+    user: _Authenticatedusers,
     resource: string,
     action: string
   ): Promise<{ granted: boolean; reason?: string }> {
@@ -345,8 +345,8 @@ export class DynamicRBAC {
         scope: 'own',
         priority: 1,
         granted: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       },
       {
         id: `${roleId}_update_own`,
@@ -356,8 +356,8 @@ export class DynamicRBAC {
         scope: 'own',
         priority: 1,
         granted: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       }
     ];
 
@@ -371,8 +371,8 @@ export class DynamicRBAC {
           action: '*',
           priority: 10,
           granted: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          created_at: new Date(),
+          updated_at: new Date()
         }
       );
     }
@@ -400,7 +400,7 @@ export class DynamicRBAC {
 
   // Helper method to check if user has specific permission
   async hasPermission(
-    user: _AuthenticatedUser,
+    user: _Authenticatedusers,
     resource: string,
     action: string,
     targetId?: string

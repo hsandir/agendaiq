@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
     // await prisma.user.update({
     //   where: { email: session.user?.email! },
     //   data: {
-    //     twoFactorSecret: secret,
-    //     twoFactorEnabled: true,
+    //     two_factor_secret: secret,
+    //     two_factor_enabled: true,
     //   },
     // });
 

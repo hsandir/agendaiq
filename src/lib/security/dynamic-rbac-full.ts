@@ -33,8 +33,8 @@ export interface RolePermission {
   priority: number;
   granted: boolean;
   conditions?: Record<string, unknown>;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 // Staff with role relation type
@@ -107,7 +107,7 @@ export class DynamicRBAC {
         // Check direct role permissions
         const directAccess = await this.checkDirectRolePermissions(
           context.user,
-          staff.Role,
+          staff.role,
           context.resource,
           context.action
         );
@@ -125,7 +125,7 @@ export class DynamicRBAC {
 
         // Check inherited permissions from role hierarchy
         const inheritedAccess = await this.checkInheritedPermissions(
-          staff.Role,
+          staff.role,
           context.resource,
           context.action
         );
@@ -251,7 +251,7 @@ export class DynamicRBAC {
 
   // Check direct role permissions
   private async checkDirectRolePermissions(
-    user: _AuthenticatedUser,
+    user: _Authenticatedusers,
     role: StaffWithRole['Role'],
     resource: string,
     action: string
@@ -302,7 +302,7 @@ export class DynamicRBAC {
         if (parentRole) {
           // Convert null to undefined for type compatibility
           const roleWithConvertedDeptId = {
-            ...parentRole,
+            ...parentrole,
             department_id: parentRole.department_id ?? undefined
           };
           
@@ -424,7 +424,7 @@ export class DynamicRBAC {
 
   // Get role-based permissions
   private getRoleBasedPermissions(
-    user: _AuthenticatedUser,
+    user: _Authenticatedusers,
     resource: string, 
     action: string
   ): { granted: boolean; reason?: string } {
@@ -447,7 +447,7 @@ export class DynamicRBAC {
 
   // Helper method to check if user has specific permission
   async hasPermission(
-    user: _AuthenticatedUser,
+    user: _Authenticatedusers,
     resource: string,
     action: string,
     targetId?: string,
@@ -596,8 +596,8 @@ export class DynamicRBAC {
       scope: 'own',
       priority: 1,
       granted: true,
-      createdAt: now,
-      updatedAt: now
+      created_at: now,
+      updated_at: now
     });
 
     return permissions;

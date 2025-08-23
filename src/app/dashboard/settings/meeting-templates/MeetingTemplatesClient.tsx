@@ -219,7 +219,7 @@ export default function MeetingTemplatesClient({
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="e.g., Department Meeting"
+                    placeholder="e.g., department Meeting"
                     required
                   />
                 </div>

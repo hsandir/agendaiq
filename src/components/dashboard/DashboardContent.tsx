@@ -54,7 +54,7 @@ interface QuickStat {
 
 interface DashboardContentProps {
   user: User;
-  userWithStaff: UserWithStaff;
+  userWithstaff: UserWithStaff;
   upcomingMeetings: Meeting[];
   quickStats: QuickStat[];
   safeFormatDateTime: (date: string | Date, format?: string, fallback?: string) => string;
@@ -62,7 +62,7 @@ interface DashboardContentProps {
 
 export function DashboardContent({ 
   user, 
-  userWithStaff, 
+  userWithstaff, 
   upcomingMeetings, 
   quickStats, 
   safeFormatDateTime 
@@ -87,7 +87,7 @@ export function DashboardContent({
   const renderWelcomeHeader = () => (
     <div className="mb-8">
       <h1 className="text-2xl font-bold text-foreground mb-2">Welcome back, {user.name}</h1>
-      {(userWithStaff?.staff?.school ?? userWithStaff?.staff?.[0]?.School) && (
+      {(userWithStaff?.staff?.school ?? userWithStaff?.staff?.[0]?.school) && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span>{(userWithStaff as any).staff?.school?.name ?? userWithStaff.staff?.[0]?.school?.name}</span>
           {((userWithStaff as any).staff?.school?.code ?? userWithStaff.staff?.[0]?.school?.address) && (

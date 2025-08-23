@@ -16,14 +16,14 @@ expect.extend(toHaveNoViolations);
 // import { renderWithProviders } from '../utils/test-utils';
 
 // Types
-import type { AuthenticatedUser, StaffWithRelations } from '@/types';
+import type { Authenticatedusers, StaffWithRelations } from '@/types';
 
 // Mock data factory
 /* const createMockUser = (overrides: Partial<AuthenticatedUser> = {}): AuthenticatedUser => ({
   id: 1,
   email: 'test@agendaiq.com',
   name: 'Test User',
-  hashedPassword: null,
+  hashed_password: null,
   is_admin: false,
   is_system_admin: false,
   created_at: new Date(),
@@ -383,7 +383,7 @@ describe('Comprehensive Component Tests', () => {
 
       it('should handle missing optional fields', () => {
         const minimalMeeting = {
-          ...mockMeeting,
+          ...mockmeeting,
           description: undefined,
           location: undefined
         };
@@ -456,7 +456,7 @@ describe('Comprehensive Component Tests', () => {
 
       it('should handle long text content properly', () => {
         const longMeeting = {
-          ...mockMeeting,
+          ...mockmeeting,
           title: 'A'.repeat(100),
           description: 'B'.repeat(500),
           location: 'C'.repeat(50)

@@ -1,6 +1,6 @@
 import React from 'react';
 import { getServerSession } from "next-auth";
-import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils';
+import { requireAuth, getCurrentusers, AuthPresets } from '@/lib/auth/auth-utils';
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";

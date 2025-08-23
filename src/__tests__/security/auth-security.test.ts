@@ -12,8 +12,8 @@ import bcrypt from 'bcryptjs';
 import { authenticator } from 'otplib';
 
 // Test utilities
-import { createTestUser, cleanupTestData } from '../helpers/test-db';
-import type { AuthenticatedUser, StaffWithRelations } from '@/types';
+import { createTestusers, cleanupTestData } from '../helpers/test-db';
+import type { Authenticatedusers, StaffWithRelations } from '@/types';
 
 // Mock rate limiter
 jest.mock('@/lib/utils/rate-limit');
@@ -103,9 +103,9 @@ describe('Authentication Security Tests', () => {
           where: { email }
         });
 
-        expect(user?.hashedPassword).toBeDefined();
-        expect(user?.hashedPassword).not.toBe(password);
-        expect(user?.hashedPassword?.startsWith('$2')).toBe(true); // bcrypt hash
+        expect(user?.hashed_password).toBeDefined();
+        expect(user?.hashed_password).not.toBe(password);
+        expect(user?.hashed_password?.startsWith('$2')).toBe(true); // bcrypt hash
       }
     });
 

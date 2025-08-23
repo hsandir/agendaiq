@@ -44,11 +44,11 @@ export const authOptions: NextAuthOptions = {
           where: { email: credentials?.email },
         });
 
-        if (!user?.hashedPassword) {
+        if (!user?.hashed_password) {
           return null;
         }
 
-        const isValid = await compare(credentials?.password, user?.hashedPassword);
+        const isValid = await compare(credentials?.password, user?.hashed_password);
         if (!isValid) {
           return null;
         }

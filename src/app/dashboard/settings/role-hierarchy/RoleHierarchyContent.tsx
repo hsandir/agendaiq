@@ -9,7 +9,7 @@ export default function RoleHierarchyContent() {
   const [stats, setStats] = useState({
     totalRoles: 7,
     leadershipRoles: 5,
-    totalStaff: 0,
+    totalstaff: 0,
     departments: 0
   });
   const [loading, setLoading] = useState(true);
@@ -37,7 +37,7 @@ export default function RoleHierarchyContent() {
         setStats({
           totalRoles,
           leadershipRoles,
-          totalStaff,
+          totalstaff,
           departments
         });
       } else {

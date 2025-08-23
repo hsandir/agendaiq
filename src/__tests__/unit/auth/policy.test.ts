@@ -120,12 +120,12 @@ describe('Policy Unit Tests', () => {
       };
 
       // Should deny system pages
-      expect(canAccessRoute(regularUser, '/dashboard/system')).toBe(false);
-      expect(canAccessRoute(regularUser, '/dashboard/monitoring')).toBe(false);
+      expect(canAccessRoute(regularusers, '/dashboard/system')).toBe(false);
+      expect(canAccessRoute(regularusers, '/dashboard/monitoring')).toBe(false);
       
       // Should allow unmapped dashboard routes (default allow)
-      expect(canAccessRoute(regularUser, '/dashboard')).toBe(true);
-      expect(canAccessRoute(regularUser, '/dashboard/profile')).toBe(true);
+      expect(canAccessRoute(regularusers, '/dashboard')).toBe(true);
+      expect(canAccessRoute(regularusers, '/dashboard/profile')).toBe(true);
     });
   });
 
@@ -147,11 +147,11 @@ describe('Policy Unit Tests', () => {
       };
 
       // Should deny dev endpoints
-      expect(canAccessApi(regularUser, '/api/dev/debug')).toBe(false);
-      expect(canAccessApi(regularUser, '/api/system/health')).toBe(false);
+      expect(canAccessApi(regularusers, '/api/dev/debug')).toBe(false);
+      expect(canAccessApi(regularusers, '/api/system/health')).toBe(false);
       
       // Should allow unmapped authenticated endpoints (default allow for authenticated users)
-      expect(canAccessApi(regularUser, '/api/some-random-endpoint')).toBe(true);
+      expect(canAccessApi(regularusers, '/api/some-random-endpoint')).toBe(true);
     });
   });
 
@@ -161,7 +161,7 @@ describe('Policy Unit Tests', () => {
         id: 1,
         is_system_admin: true,
         is_school_admin: false,
-        Staff: [],
+        staff: [],
       });
 
       const capabilities = await getUserCapabilities(1);
@@ -178,7 +178,7 @@ describe('Policy Unit Tests', () => {
         id: 2,
         is_system_admin: false,
         is_school_admin: true,
-        Staff: [],
+        staff: [],
       });
 
       const capabilities = await getUserCapabilities(2);
@@ -197,9 +197,9 @@ describe('Policy Unit Tests', () => {
         id: 3,
         is_system_admin: false,
         is_school_admin: false,
-        Staff: [{
+        staff: [{
           role: {
-            Permissions: [
+            permission: [
               { capability: Capability.MEETING_CREATE },
               { capability: Capability.MEETING_VIEW },
             ],

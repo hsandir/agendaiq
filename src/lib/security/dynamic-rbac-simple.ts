@@ -108,7 +108,7 @@ export class DynamicRBAC {
 
   // Helper method to check if user has specific permission
   async hasPermission(
-    user: _AuthenticatedUser,
+    user: _Authenticatedusers,
     resource: string,
     action: string,
     targetId?: string

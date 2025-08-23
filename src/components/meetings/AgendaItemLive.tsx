@@ -22,13 +22,13 @@ import {
   Edit2, 
   Save, 
   X,
-  User,
+  users,
   AlertCircle,
   Clock,
   MessageSquare,
   Paperclip
 } from "lucide-react";
-import type { MeetingAgendaItem, Staff, User as PrismaUser } from "@prisma/client";
+import type { meeting_agenda_items, staff, users as PrismaUser } from "@prisma/client";
 import { usePusherChannel } from "@/hooks/usePusher";
 import { CHANNELS, EVENTS } from "@/lib/pusher";
 import { AgendaItemComments } from "./AgendaItemComments";
@@ -36,14 +36,14 @@ import { CreateMeetingModal } from "./CreateMeetingModal";
 import Link from "next/link";
 
 interface ExtendedAgendaItem extends MeetingAgendaItem {
-  ResponsibleStaff?: (Staff & { User: PrismaUser }) | null;
+  ResponsibleStaff?: (Staff & { users: PrismaUser }) | null;
   Comments: Record<string, unknown>[];
   ActionItems: Record<string, unknown>[];
 }
 
 interface Props {
   item: ExtendedAgendaItem;
-  staff: (Staff & { User: PrismaUser })[];
+  staff: (Staff & { users: PrismaUser })[];
   isExpanded: boolean;
   onToggleExpand: () => void;
   onUpdate: (updates: Partial<MeetingAgendaItem>) => void;

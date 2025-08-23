@@ -37,7 +37,7 @@ describe('Authentication Integration Tests', () => {
         id: 1,
         email: 'test@school.edu',
         name: 'Test User',
-        hashedPassword: 'hashed_password',
+        hashed_password: 'hashed_password',
         is_system_admin: false,
         is_school_admin: true,
         two_factor_enabled: false,
@@ -83,7 +83,7 @@ describe('Authentication Integration Tests', () => {
       });
 
       // Simulate password check
-      await bcrypt.compare(credentials.password, mockUser.hashedPassword);
+      await bcrypt.compare(credentials.password, mockUser.hashed_password);
       
       // Verify the mocks were called correctly
       expect(prisma.user.findUnique).toHaveBeenCalledWith({
@@ -110,14 +110,14 @@ describe('Authentication Integration Tests', () => {
       const mockUser = {
         id: 1,
         email: 'test@school.edu',
-        hashedPassword: 'hashed_password',
+        hashed_password: 'hashed_password',
       };
 
       (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       // Verify password check fails
-      const passwordValid = await bcrypt.compare('wrong_password', mockUser.hashedPassword);
+      const passwordValid = await bcrypt.compare('wrong_password', mockUser.hashed_password);
       expect(passwordValid).toBe(false);
     });
   });
@@ -127,7 +127,7 @@ describe('Authentication Integration Tests', () => {
       const mockUser = {
         id: 1,
         email: 'test@school.edu',
-        hashedPassword: 'hashed_password',
+        hashed_password: 'hashed_password',
         two_factor_enabled: true,
         two_factor_secret: 'secret',
       };
@@ -146,7 +146,7 @@ describe('Authentication Integration Tests', () => {
       const mockUser = {
         id: 1,
         email: 'test@school.edu',
-        hashedPassword: 'hashed_password',
+        hashed_password: 'hashed_password',
         two_factor_enabled: true,
         backup_codes: ['code1', 'code2', 'code3'],
       };
@@ -184,7 +184,7 @@ describe('Authentication Integration Tests', () => {
       const existingUser = {
         id: 1,
         email: 'user@school.edu',
-        hashedPassword: 'password',
+        hashed_password: 'password',
         Account: [], // No linked OAuth accounts
       };
 
@@ -195,7 +195,7 @@ describe('Authentication Integration Tests', () => {
       expect(hasGoogleAccount).toBe(false);
       
       // Should require manual linking
-      expect(existingUser.hashedPassword).toBeDefined();
+      expect(existingUser.hashed_password).toBeDefined();
       expect(existingUser.Account.length).toBe(0);
     });
   });

@@ -78,8 +78,8 @@ export async function GET(request: NextRequest) {
       const processedLegacyLogs = legacyLogs.map(log => ({
         ...log,
         created_at: log.created_at instanceof Date ? log.created_at.toISOString() : log?.created_at,
-        User: log.users ?? undefined,
-        Staff: log.staff ?? undefined
+        users: log.users ?? undefined,
+        staff: log.staff ?? undefined
       })) as SortableAuditRecord[];
 
       if (logType === 'legacy') {

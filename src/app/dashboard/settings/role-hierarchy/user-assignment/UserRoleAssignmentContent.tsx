@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Users as FiUsers, User as FiUser, Shield as FiShield, Home as FiHome, ArrowLeft as FiArrowLeft } from 'lucide-react';
+import { Users as FiUsers, users as Fiusers, Shield as FiShield, Home as FiHome, ArrowLeft as FiArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface User {
@@ -43,9 +43,9 @@ export default function UserRoleAssignmentContent() {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   
   // Selection states
-  const [selectedUser, setSelectedUser] = useState<string>('');
-  const [selectedRole, setSelectedRole] = useState<string>('');
-  const [selectedDepartment, setSelectedDepartment] = useState<string>('');
+  const [selectedusers, setSelectedUser] = useState<string>('');
+  const [selectedrole, setSelectedRole] = useState<string>('');
+  const [selecteddepartment, setSelectedDepartment] = useState<string>('');
   
   // Search and filter states
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -138,8 +138,8 @@ export default function UserRoleAssignmentContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: selectedUser,
-          roleId: selectedRole,
+          userId: selectedusers,
+          roleId: selectedrole,
           departmentId: selectedDepartment ?? null
         })
       });

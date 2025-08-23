@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
     // Department performance
     const departmentMap = new Map();
     meetings.forEach(m => {
-      if (m.Department) {
+      if (m.department) {
         const key = m.department.name;
         if (!departmentMap.has(key)) {
           departmentMap.set(key, {
@@ -189,7 +189,7 @@ export async function GET(request: NextRequest) {
         onTimeStartRate,
         actionItemCompletionRate,
         meetingsByType,
-        meetingsByDepartment,
+        meetingsBydepartment,
         trendData,
         topContributors
       },

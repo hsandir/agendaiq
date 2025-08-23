@@ -16,15 +16,15 @@ interface DashboardLayoutClientProps {
   children: React.ReactNode;
   isAdmin: boolean;
   user: { email: string; name?: string; staff_id?: number | null; [key: string]: any };
-  currentRole: { title?: string; [key: string]: any } | null;
-  userWithStaff: any;
+  currentrole: { title?: string; [key: string]: any } | null;
+  userWithstaff: any;
 }
 
 export function DashboardLayoutClient({ 
   children, 
   isAdmin, 
   user, 
-  currentRole, 
+  currentrole, 
   userWithStaff 
 }: DashboardLayoutClientProps) {
   // Start with a default layout to avoid hydration mismatch

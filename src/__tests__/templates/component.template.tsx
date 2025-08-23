@@ -579,7 +579,7 @@ TEMPLATE USAGE CHECKLIST:
 
 TESTING BEST PRACTICES:
 - Test behavior, not implementation
-- Use semantic queries (getByRole, getByLabelText)
+- Use semantic queries (getByrole, getByLabelText)
 - Test user interactions with userEvent
 - Include accessibility tests
 - Test error boundaries and edge cases

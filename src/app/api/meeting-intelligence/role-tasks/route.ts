@@ -162,15 +162,15 @@ export async function GET(request: NextRequest) {
     const transitions = [
       {
         role: 'Department Head',
-        fromUser: 'John Smith',
-        toUser: 'Jane Doe',
+        fromusers: 'John Smith',
+        tousers: 'Jane Doe',
         date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
         tasksTransferred: 5
       },
       {
         role: 'Team Lead',
-        fromUser: 'Mike Johnson',
-        toUser: 'Sarah Wilson',
+        fromusers: 'Mike Johnson',
+        tousers: 'Sarah Wilson',
         date: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
         tasksTransferred: 3
       }

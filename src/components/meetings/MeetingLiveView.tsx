@@ -17,7 +17,7 @@ import {
   AlertCircle,
   MessageSquare,
   Paperclip,
-  User,
+  users,
   ChevronDown,
   ChevronRight,
   Wifi,
@@ -34,28 +34,28 @@ import { CHANNELS, EVENTS } from "@/lib/pusher";
 import Link from "next/link";
 import { safeFormatDate, safeFormatTime, getSafeDate } from '@/lib/utils/safe-date';
 import type { 
-  Meeting, 
-  MeetingAgendaItem, 
-  MeetingAttendee, 
-  Staff, 
-  User as PrismaUser,
-  Department,
+  meeting, 
+  meeting_agenda_items, 
+  meeting_attendee, 
+  staff, 
+  User as Prismausers,
+  department,
   Role
 } from "@prisma/client";
 import type { AuthenticatedUser } from '@/lib/auth/auth-utils';
 
 interface ExtendedMeeting extends Meeting {
-  Department: Department;
-  Staff: Staff & { User: PrismaUser; Role: Role };
+  department: Department;
+  staff: Staff & { users: PrismaUser; role: Role };
   MeetingAttendee: (MeetingAttendee & { 
-    Staff: Staff & { 
-      User: PrismaUser; 
-      Role: Role; 
-      Department: Department 
+    staff: Staff & { 
+      users: PrismaUser; 
+      role: Role; 
+      department: Department 
     } 
   })[];
   MeetingAgendaItems: (MeetingAgendaItem & {
-    ResponsibleStaff?: (Staff & { User: PrismaUser }) | null;
+    ResponsibleStaff?: (Staff & { users: PrismaUser }) | null;
     Comments: Array<Record<string, unknown>>;
     ActionItems: Array<Record<string, unknown>>;
   })[];
@@ -63,23 +63,23 @@ interface ExtendedMeeting extends Meeting {
 }
 
 interface ExtendedStaff extends Staff {
-  User: PrismaUser;
-  Role: Role;
-  Department: Department;
+  users: PrismaUser;
+  role: Role;
+  department: Department;
 }
 
 interface Props {
   meeting: ExtendedMeeting;
-  currentUser: _AuthenticatedUser;
-  allStaff: ExtendedStaff[];
+  currentusers: _AuthenticatedUser;
+  allstaff: ExtendedStaff[];
   isOrganizer: boolean;
   isAdmin: boolean;
 }
 
 export function MeetingLiveView({ 
   meeting, 
-  currentUser, 
-  allStaff,
+  currentusers, 
+  allstaff,
   isOrganizer,
   isAdmin
 }: Props) {

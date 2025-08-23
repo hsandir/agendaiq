@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils';
+import { requireAuth, getCurrentusers, AuthPresets } from '@/lib/auth/auth-utils';
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
@@ -12,8 +12,8 @@ export default async function SecuritySettingsPage() {
     select: {
       id: true,
       email: true,
-      hashedPassword: true,
-      emailVerified: true,
+      hashed_password: true,
+      email_verified: true,
       name: true,
     },
   });
@@ -22,8 +22,8 @@ export default async function SecuritySettingsPage() {
     redirect("/auth/signin");
   }
 
-  const hasPassword = !!userDetails?.hashedPassword;
-  const isEmailVerified = !!userDetails?.emailVerified;
+  const hasPassword = !!userDetails?.hashed_password;
+  const isEmailVerified = !!userDetails?.email_verified;
 
   return (
     <div className="space-y-6">

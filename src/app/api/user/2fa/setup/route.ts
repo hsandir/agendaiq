@@ -19,8 +19,8 @@ export async function POST(request: NextRequest) {
     // await prisma.user.update({
     //   where: { id: session.user.id as string },
     //   data: {
-    //     twoFactorSecret: secret,
-    //     twoFactorEnabled: false, // Will be enabled after verification
+    //     two_factor_secret: secret,
+    //     two_factor_enabled: false, // Will be enabled after verification
     //   },
     // });
 

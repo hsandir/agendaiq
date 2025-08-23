@@ -53,7 +53,7 @@ export function TwoFactorSetup() {
         throw new Error(data?.error || "Failed to verify code");
       }
 
-      setBackupCodes(data?.backupCodes);
+      setBackupCodes(data?.backup_codes);
       setStep('complete');
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");

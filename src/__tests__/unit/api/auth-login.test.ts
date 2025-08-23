@@ -19,12 +19,12 @@ import bcrypt from 'bcryptjs';
 jest.mock('next-auth/react', () => ({
   signIn: jest.fn(),
   signOut: jest.fn(),
-  getSession: jest.fn(),
+  getsession: jest.fn(),
 }));
 
 jest.mock('next-auth', () => ({
   default: jest.fn(),
-  getServerSession: jest.fn(),
+  getServersession: jest.fn(),
 }));
 
 // Define input/output types
@@ -77,7 +77,7 @@ describe('Authentication Login API', () => {
           email: 'test@example.com',
           name: 'Test User',
           hashedPassword,
-          emailVerified: new Date(),
+          email_verified: new Date(),
           is_active: true,
           two_factor_enabled: false,
         },
@@ -123,7 +123,7 @@ describe('Authentication Login API', () => {
       expect(user).toBeDefined();
       expect(user?.is_active).toBe(true);
       
-      const passwordValid = await bcrypt.compare(loginData.password, user?.hashedPassword ?? '');
+      const passwordValid = await bcrypt.compare(loginData.password, user?.hashed_password ?? '');
       expect(passwordValid).toBe(true);
     });
 
@@ -150,8 +150,8 @@ describe('Authentication Login API', () => {
         data: {
           email: 'test@example.com',
           name: 'Test User',
-          hashedPassword: await bcrypt.hash('CorrectPassword123!', 10),
-          emailVerified: new Date(),
+          hashed_password: await bcrypt.hash('CorrectPassword123!', 10),
+          email_verified: new Date(),
           is_active: true,
           two_factor_enabled: false,
         },
@@ -166,7 +166,7 @@ describe('Authentication Login API', () => {
         where: { email: loginData.email },
       });
 
-      const passwordValid = await bcrypt.compare(loginData.password, user?.hashedPassword ?? '');
+      const passwordValid = await bcrypt.compare(loginData.password, user?.hashed_password ?? '');
       expect(passwordValid).toBe(false);
     });
 
@@ -189,8 +189,8 @@ describe('Authentication Login API', () => {
         data: {
           email: 'inactive@example.com',
           name: 'Inactive User',
-          hashedPassword: await bcrypt.hash('TestPassword123!', 10),
-          emailVerified: new Date(),
+          hashed_password: await bcrypt.hash('TestPassword123!', 10),
+          email_verified: new Date(),
           is_active: false, // Inactive account
           two_factor_enabled: false,
         },
@@ -220,8 +220,8 @@ describe('Authentication Login API', () => {
         data: {
           email: '2fa@example.com',
           name: '2FA User',
-          hashedPassword: await bcrypt.hash('TestPassword123!', 10),
-          emailVerified: new Date(),
+          hashed_password: await bcrypt.hash('TestPassword123!', 10),
+          email_verified: new Date(),
           is_active: true,
           two_factor_enabled: true,
           two_factor_secret: 'test-2fa-secret',
@@ -240,7 +240,7 @@ describe('Authentication Login API', () => {
       expect(user?.two_factor_enabled).toBe(true);
       
       // First step should succeed but require 2FA
-      const passwordValid = await bcrypt.compare(loginData.password, user?.hashedPassword ?? '');
+      const passwordValid = await bcrypt.compare(loginData.password, user?.hashed_password ?? '');
       expect(passwordValid).toBe(true);
       
       // Should indicate 2FA is required
@@ -284,8 +284,8 @@ describe('Authentication Login API', () => {
         data: {
           email: 'lockout@example.com',
           name: 'Lockout User',
-          hashedPassword: await bcrypt.hash('TestPassword123!', 10),
-          emailVerified: new Date(),
+          hashed_password: await bcrypt.hash('TestPassword123!', 10),
+          email_verified: new Date(),
           is_active: true,
           two_factor_enabled: false,
           failed_login_attempts: 5, // Already at limit
@@ -308,8 +308,8 @@ describe('Authentication Login API', () => {
         data: {
           email: 'failcount@example.com',
           name: 'Fail Count User',
-          hashedPassword: await bcrypt.hash('TestPassword123!', 10),
-          emailVerified: new Date(),
+          hashed_password: await bcrypt.hash('TestPassword123!', 10),
+          email_verified: new Date(),
           is_active: true,
           two_factor_enabled: false,
           failed_login_attempts: 2,
@@ -336,8 +336,8 @@ describe('Authentication Login API', () => {
         data: {
           email: 'reset@example.com',
           name: 'Reset User',
-          hashedPassword: await bcrypt.hash(testPassword, 10),
-          emailVerified: new Date(),
+          hashed_password: await bcrypt.hash(testPassword, 10),
+          email_verified: new Date(),
           is_active: true,
           two_factor_enabled: false,
           failed_login_attempts: 3,
@@ -345,7 +345,7 @@ describe('Authentication Login API', () => {
       });
 
       // Simulate successful login
-      const passwordValid = await bcrypt.compare(testPassword, testUser.hashedPassword);
+      const passwordValid = await bcrypt.compare(testPassword, testUser.hashed_password);
       expect(passwordValid).toBe(true);
 
       // Reset failed attempts

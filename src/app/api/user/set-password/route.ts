@@ -23,10 +23,10 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { email: auth.user.email! },
-      select: { hashedPassword: true },
+      select: { hashed_password: true },
     });
 
-    if (user?.hashedPassword) {
+    if (user?.hashed_password) {
       return new NextResponse("Password already set", { status: 400 });
     }
 

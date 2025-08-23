@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
             role: true
           }
         },
-        AssignedToRole: true
+        AssignedTorole: true
       },
       orderBy: [
         { priority: 'desc' },
@@ -104,16 +104,16 @@ export async function GET(request: NextRequest) {
         status: isOverdue ? 'overdue' : item.status,
         priority: item.priority ?? 'Medium',
         dueDate: item.due_date?.toISOString(),
-        createdAt: item.created_at.toISOString(),
+        created_at: item.created_at.toISOString(),
         completedAt: item.completed_at?.toISOString(),
-        assignedRole: item.AssignedToRole ? {
+        assignedrole: item.AssignedToRole ? {
           id: item.AssignedToRole.id,
           label: item.AssignedToRole.key ?? 'UNASSIGNED'
         } : {
           id: 0,
           label: 'UNASSIGNED'
         },
-        assignedStaff: item.AssignedTo ? {
+        assignedstaff: item.AssignedTo ? {
           id: item.AssignedTo.id,
           name: item.AssignedTo.users.name ?? 'Unknown',
           email: item.AssignedTo.users.email

@@ -14,7 +14,7 @@ import { safeFormat } from "@/lib/utils/safe-format";
 import {
   Plus,
   Trash2,
-  User,
+  users,
   Calendar,
   Clock,
   AlertCircle,
@@ -87,7 +87,7 @@ export function MeetingActionItems({
     const selectedAttendee = attendees.find(a => a.id === newItem.assignedTo);
     const item: ActionItem = {
       ...newItem as ActionItem,
-      assignedToRole: selectedAttendee?.role,
+      assignedTorole: selectedAttendee?.role,
       department: selectedAttendee?.department
     };
 

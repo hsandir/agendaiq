@@ -78,7 +78,7 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
   async function cleanupWorkflowResources(): Promise<void> {
     // Clean up resources created during the workflow
     if (workflowState.createdResources.meetingId) {
-      await context.prisma.meetingAgendaItem.deleteMany({
+      await context.prisma.meeting_agenda_items.deleteMany({
         where: { meeting_id: workflowState.createdResources.meetingId },
       });
       await context.prisma.meeting.delete({
@@ -102,7 +102,7 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
       });
 
       // Validate user exists in database
-      const user = await context.prisma.user.findUnique({
+      const user = await context.prisma.users.findUnique({
         where: { id: workflowState.currentUser.id },
         include: {
           staff: {
@@ -158,10 +158,10 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
           description: meetingData.description,
           start_time: meetingData.startTime,
           end_time: meetingData.endTime,
-          organizer_id: context.adminStaff.id,
-          department_id: context.adminStaff.department_id,
-          school_id: context.adminStaff.school_id,
-          district_id: context.adminStaff.district_id,
+          organizer_id: context.adminstaff.id,
+          department_id: context.adminstaff.department_id,
+          school_id: context.adminstaff.school_id,
+          district_id: context.adminstaff.district_id,
           status: 'draft',
           meeting_type: 'REGULAR',
         },
@@ -206,12 +206,12 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
             throw new Error('Agenda item duration must be positive');
           }
 
-          const agendaItem = await context.prisma.meetingAgendaItem.create({
+          const agendaItem = await context.prisma.meeting_agenda_items.create({
             data: {
               meeting_id: workflowState.createdResources.meetingId,
               topic: item.title,
               problem_statement: item.description,
-              responsible_staff_id: context.adminStaff.id,
+              responsible_staff_id: context.adminstaff.id,
               purpose: 'Discussion',
               duration_minutes: item.duration,
               order_index: index + 1,
@@ -342,12 +342,12 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
       const meeting = await context.prisma.meeting.findUnique({
         where: { id: workflowState.createdResources.meetingId },
         include: {
-          MeetingAgendaItems: true,
+          meeting_agenda_items: true,
         },
       });
 
       expect(meeting).toBeDefined();
-      expect(meeting?.MeetingAgendaItems).toBeDefined();
+      expect(meeting?.meeting_agenda_items).toBeDefined();
     }
   }
 
@@ -385,8 +385,8 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
     // Reset workflow state for each test
     workflowState = {
       currentUser: {
-        id: context.adminUser.id,
-        email: context.adminUser.email || 'admin@test.com',
+        id: context.adminusers.id,
+        email: context.adminusers.email || 'admin@test.com',
         role: 'Administrator',
       },
       createdResources: {},
@@ -414,7 +414,7 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
           startTime: new Date(Date.now() + 60 * 60 * 1000), // 1 hour from now
           endTime: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours from now
         },
-        attendees: [context.teacherUser.id],
+        attendees: [context.teacherusers.id],
         agendaItems: [
           {
             title: 'Opening Discussion',
@@ -456,7 +456,7 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
           startTime: new Date(Date.now() + 60 * 60 * 1000),
           endTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
         },
-        attendees: [context.teacherUser.id],
+        attendees: [context.teacherusers.id],
         agendaItems: [],
       };
 
@@ -484,7 +484,7 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
           startTime: new Date(Date.now() + 60 * 60 * 1000),
           endTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
         },
-        attendees: [context.teacherUser.id],
+        attendees: [context.teacherusers.id],
         agendaItems: [
           {
             title: 'Consistency Test Item',
@@ -656,7 +656,7 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
           startTime: new Date(Date.now() + 60 * 60 * 1000),
           endTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
         },
-        attendees: [context.teacherUser.id],
+        attendees: [context.teacherusers.id],
         agendaItems: Array.from({ length: 10 }, (_, i) => ({
           title: `Performance Item ${i + 1}`,
           description: `Test agenda item ${i + 1} for performance`,

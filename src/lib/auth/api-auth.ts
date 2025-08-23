@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { 
-  getCurrentUser, 
+  getCurrentusers, 
   checkAuthRequirements, 
   AuthRequirements, 
   AuthenticatedUser 
 } from './auth-utils';
-import { getUltraFastUser, userStaffCache } from './auth-utils-ultra-fast';
+import { getUltraFastusers, userStaffCache } from './auth-utils-ultra-fast';
 import { prisma } from '@/lib/prisma';
-import { isRole, RoleKey, can, Capability } from './policy';
+import { isrole, RoleKey, can, Capability } from './policy';
 
 /**
  * API Response types
@@ -112,7 +112,7 @@ export function withAPIAuth(
  * Check if user has permission for specific resource
  */
 export function hasResourcePermission(
-  user: AuthenticatedUser,
+  user: Authenticatedusers,
   resourceType: 'meeting' | 'user' | 'school' | 'department' | 'district',
   resourceId: number,
   action: 'read' | 'write' | 'delete' | 'admin'

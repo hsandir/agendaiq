@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChevronDown as FiChevronDown, ChevronRight as FiChevronRight, Users as FiUsers, User as FiUser, UserCheck as FiUserCheck } from 'lucide-react';
+import { ChevronDown as FiChevronDown, ChevronRight as FiChevronRight, Users as FiUsers, users as Fiusers, UserCheck as FiUserCheck } from 'lucide-react';
 
 interface Role {
   id: string;
@@ -66,7 +66,7 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
     setExpandedRoles(newExpanded);
   };
 
-  const renderRole = (role: Role, depth = 0) => {
+  const renderRole = (role: role, depth = 0) => {
     const hasChildren = role.Children && role.Children.length > 0;
     const hasStaff = role.staff && role.staff.length > 0;
     const isExpanded = expandedRoles.has(role.id);
@@ -121,7 +121,7 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
                 {/* Show staff names in blue boxes for leadership roles */}
                 {role.is_leadership && hasStaff && (
                   <div className="flex flex-wrap gap-1 mt-2">
-                    {role.Staff!.map((staffMember) => (
+                    {role.staff!.map((staffMember) => (
                       <span 
                         key={staffMember.id}
                         className="inline-flex items-center px-2 py-1 rounded bg-primary text-primary-foreground text-xs font-medium"
@@ -154,7 +154,7 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
         {/* Show children roles when expanded */}
         {hasChildren && isExpanded && (
           <div className="mt-1">
-            {role.Children!.map(childRole => renderRole(childRole, depth + 1))}
+            {role.Children!.map(childRole => renderRole(childrole, depth + 1))}
           </div>
         )}
         
@@ -164,7 +164,7 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
             <div className="text-xs font-medium text-foreground uppercase tracking-wider mb-2">
               Staff Members ({staffCount})
             </div>
-            {role.Staff!.map((staffMember) => (
+            {role.staff!.map((staffMember) => (
               <div key={staffMember.id} className="flex items-center text-sm text-muted-foreground py-1 px-3 bg-muted rounded">
                 <FiUserCheck className="h-3 w-3 mr-2 text-green-500" />
                 <span className="font-medium">{staffMember.users.name || 'No Name'}</span>

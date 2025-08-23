@@ -15,7 +15,7 @@ interface School {
 }
 
 interface SchoolClientProps {
-  initialSchool: School | null;
+  initialschool: School | null;
 }
 
 export default function SchoolClient({ initialSchool }: SchoolClientProps) {

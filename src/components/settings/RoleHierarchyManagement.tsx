@@ -27,7 +27,7 @@ export function RoleHierarchyManagement() {
   const router = useRouter();
   const [roles, setRoles] = useState<Role[]>([]);
   const [newRoleName, setNewRoleName] = useState('');
-  const [selectedRole, setSelectedRole] = useState('');
+  const [selectedrole, setSelectedRole] = useState('');
   const [selectedSubordinates, setSelectedSubordinates] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');

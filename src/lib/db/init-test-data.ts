@@ -113,7 +113,7 @@ export async function initializeTestData() {
         create: {
           email: userData.email,
           name: userData.name,
-          hashedPassword: '$2b$10$xvCqgBtCYhHCg1aG7UYu6.6cuzckuI9E0JQH3vMXrH.kLWCVF5/OW', // password: "password"
+          hashed_password: '$2b$10$xvCqgBtCYhHCg1aG7UYu6.6cuzckuI9E0JQH3vMXrH.kLWCVF5/OW', // password: "password"
         },
       });
 

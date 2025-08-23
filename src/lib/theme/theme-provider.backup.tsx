@@ -99,8 +99,8 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
           themeStore.setLastSyncTime(Date.now());
           
           // Handle custom theme
-          if (customThemeResult.status === 'fulfilled' && customThemeResult.value?.customTheme) {
-            const customThemeData = customThemeResult.value.customTheme;
+          if (customThemeResult.status === 'fulfilled' && customThemeResult.value?.custom_theme) {
+            const customThemeData = customThemeResult.value.custom_theme;
             setCustomTheme(customThemeData);
             localStorage.setItem('agendaiq-custom-theme', JSON.stringify(customThemeData));
           }
@@ -109,7 +109,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
           if (themeResult.status === 'fulfilled' && themeResult.value?.theme) {
             const dbTheme = themeResult.value.theme;
             if (dbTheme !== savedTheme) {
-              if (dbTheme === 'custom' && customThemeResult.status === 'fulfilled' && customThemeResult.value?.customTheme) {
+              if (dbTheme === 'custom' && customThemeResult.status === 'fulfilled' && customThemeResult.value?.custom_theme) {
                 setCurrentThemeId('custom');
                 themeStore.setCurrentTheme('custom');
               } else if (themes.find(t => t.id === dbTheme)) {
@@ -143,7 +143,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
         id: 'custom',
         name: customTheme.name || 'Custom Theme',
         description: 'Your personalized theme',
-        ...customTheme
+        ...custom_theme
       } satisfies Theme;
     } else {
       theme = themes.find(t => t.id === currentThemeId) || themes.find(t => t.id === 'standard') || themes[0]; // Default to standard
@@ -281,7 +281,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
       id: 'custom',
       name: customTheme.name || 'Custom Theme',
       description: 'Your personalized theme',
-      ...customTheme
+      ...custom_theme
     } satisfies Theme;
   } else {
     currentTheme = themes.find(t => t.id === currentThemeId) || themes.find(t => t.id === 'standard') || themes[0];

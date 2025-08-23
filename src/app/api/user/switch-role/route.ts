@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true, 
       message: `Role switched to ${targetRole?.title}`,
-      newRole: {
+      newrole: {
         id: targetRole?.id,
         title: targetRole?.title
       }

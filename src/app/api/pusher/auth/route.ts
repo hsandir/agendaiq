@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { pusherServer } from '@/lib/pusher';
 import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from '@/lib/prisma';
-import { isRole, RoleKey } from '@/lib/auth/policy';
+import { isrole, RoleKey } from '@/lib/auth/policy';
 
 export async function POST(request: NextRequest) {
   try {

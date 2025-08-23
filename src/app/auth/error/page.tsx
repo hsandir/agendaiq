@@ -28,11 +28,11 @@ const errorMessages: Record<string, { title: string; description: string }> = {
     title: 'OAuth Callback Error',
     description: 'There was an error processing the OAuth callback. Please try again.'
   },
-  OAuthCreateAccount: {
+  OAuthCreateaccount: {
     title: 'Account Creation Error',
     description: 'Could not create your account. You may already have an account with this email.'
   },
-  EmailCreateAccount: {
+  EmailCreateaccount: {
     title: 'Email Account Error',
     description: 'Could not create an account with this email address.'
   },

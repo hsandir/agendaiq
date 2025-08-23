@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuthorization } from '@/hooks/useAuthorization';
-import { User as FiUser, Mail as FiMail, Check as FiCheck, AlertCircle as FiAlertCircle } from 'lucide-react';
+import { User as Fiusers, Mail as FiMail, Check as FiCheck, AlertCircle as FiAlertCircle } from 'lucide-react';
 
 interface School {
   id: string;

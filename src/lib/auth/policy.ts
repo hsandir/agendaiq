@@ -236,7 +236,7 @@ export interface UserWithCapabilities {
 // Get user's capabilities from database
 export async function getUserCapabilities(userId: number): Promise<string[]> {
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: userId },
       include: {
         staff: {
@@ -265,7 +265,7 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
     }
     
     // Get capabilities from role permissions (type-safe)
-    const perms = user.staff?.[0]?.role?.Permissions;
+    const perms = user.staff?.[0]?.role?.permission;
     if (Array.isArray(perms)) {
       const result: string[] = [];
       for (const perm of perms) {
@@ -500,7 +500,7 @@ export async function enrichUserWithCapabilities(user: MinimalUserInput): Promis
       (normalizedStaff?.role?.key) ||
       (user.staff?.[0]?.role?.key) ||
       undefined,
-    staff: normalizedStaff,
+    staff: normalizedstaff,
   };
 
   return enriched;

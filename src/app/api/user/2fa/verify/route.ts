@@ -20,10 +20,10 @@ export async function POST(request: NextRequest) {
     // Get user's 2FA secret
     // const user = await prisma.user.findUnique({
     //   where: { id: session.user.id as string },
-    //   select: { twoFactorSecret: true },
+    //   select: { two_factor_secret: true },
     // });
 
-    // if (!user?.twoFactorSecret) {
+    // if (!user?.two_factor_secret) {
     //   return new NextResponse("2FA not set up", { status: 400 });
     // }
 
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     // Verify code
     // const isValid = authenticator.verify{
     //   token: code,
-    //   secret: user?.twoFactorSecret,
+    //   secret: user?.two_factor_secret,
     // });
 
     // if (!isValid) {
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     // Enable 2FA
     // await prisma.user.update({
     //   where: { id: session.user.id as string },
-    //   data: { twoFactorEnabled: true },
+    //   data: { two_factor_enabled: true },
     // });
 
     // return new NextResponse(JSON.stringify({ success: true }), {

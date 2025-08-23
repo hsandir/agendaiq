@@ -65,11 +65,11 @@ class ThemeStore {
   }
   
   getCustomTheme(): CustomTheme | null {
-    return this.customTheme;
+    return this.custom_theme;
   }
   
   setCustomTheme(theme: CustomTheme | null): void {
-    this.customTheme = theme;
+    this.custom_theme = theme;
   }
   
   needsSync(): boolean {
@@ -81,7 +81,7 @@ class ThemeStore {
     this.initialized = false;
     this.lastSyncTime = 0;
     this.currentTheme = null;
-    this.customTheme = null;
+    this.custom_theme = null;
   }
 }
 

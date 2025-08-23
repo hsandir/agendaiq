@@ -166,7 +166,7 @@ export async function GET(request: NextRequest) {
       success: true,
       errors: errors.slice(0, 50), // More errors for admin users
       timestamp: new Date().toISOString(),
-      adminUser: authResult.user?.email ?? 'Unknown',
+      adminusers: authResult.user?.email ?? 'Unknown',
       monitoring: {
         level: 'admin',
         authenticated: true,

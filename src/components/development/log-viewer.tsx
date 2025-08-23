@@ -242,7 +242,7 @@ export default function LogViewer() {
                         )}
                       </div>
                       <div className="flex items-center space-x-2 text-muted-foreground">
-                        {log.userId && <span>User: {log.userId}</span>}
+                        {log.userId && <span>users: {log.userId}</span>}
                         {log.requestId && <span>Req: {log.requestId}</span>}
                       </div>
                     </div>

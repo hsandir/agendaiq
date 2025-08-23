@@ -15,7 +15,7 @@ import {
   Users,
   Shield,
   Monitor,
-  User,
+  users,
   Lock,
   Bell,
   Search,
@@ -29,11 +29,11 @@ import { cn } from '@/lib/utils';
 
 interface MobileMenuProps {
   user: Record<string, any>;
-  currentRole: Record<string, any> | null;
+  currentrole: Record<string, any> | null;
   isAdmin: boolean;
 }
 
-export function MobileMenu({ user, currentRole, isAdmin }: MobileMenuProps) {
+export function MobileMenu({ user, currentrole, isAdmin }: MobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const pathname = usePathname();

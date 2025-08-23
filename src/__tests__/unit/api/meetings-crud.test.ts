@@ -16,7 +16,7 @@ import type { TestContext } from '@/__tests__/types/test-context';
 
 // Import route handlers - Replace with actual imports
 // import { GET, POST } from '@/app/api/meetings/route';
-// import { GET as getMeeting, PUT, DELETE } from '@/app/api/meetings/[id]/route';
+// import { GET as getmeeting, PUT, DELETE } from '@/app/api/meetings/[id]/route';
 
 // Define input/output types
 interface CreateMeetingInput {

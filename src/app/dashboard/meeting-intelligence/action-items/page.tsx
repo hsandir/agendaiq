@@ -6,7 +6,7 @@ import {
   Clock, 
   AlertCircle, 
   Calendar,
-  User,
+  users,
   Filter,
   ChevronRight,
   Target,
@@ -27,9 +27,9 @@ interface ActionItem {
   status: 'pending' | 'in_progress' | 'completed' | 'overdue' | 'cancelled';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   dueDate?: string;
-  createdAt: string;
+  created_at: string;
   completedAt?: string;
-  assignedRole: {
+  assignedrole: {
     id: number;
     label: string; // role key label
   };
@@ -93,8 +93,8 @@ export default function ActionItemsTrackingPage() {
       const safeItems = (data.items ?? []).map((item: { meeting?: unknown; assignedRole?: { id: number; label: string }; assignedStaff?: unknown; [key: string]: unknown }) => ({
         ...item,
         meeting: item.meeting ?? undefined,
-        assignedRole: item.assignedRole || { id: 0, label: 'UNASSIGNED' },
-        assignedStaff: item.assignedStaff ?? undefined
+        assignedrole: item.assignedRole || { id: 0, label: 'UNASSIGNED' },
+        assignedstaff: item.assignedStaff ?? undefined
       }));
       setActionItems(safeItems);
       setStats(data.stats ?? null);
@@ -333,7 +333,7 @@ export default function ActionItemsTrackingPage() {
                     <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <User className="h-3 w-3" />
-                        <span>Role: {item.assignedRole.label}</span>
+                        <span>role: {item.assignedRole.label}</span>
                         {item.assignedStaff && (
                           <span className="ml-1">({item.assignedStaff.name})</span>
                         )}
