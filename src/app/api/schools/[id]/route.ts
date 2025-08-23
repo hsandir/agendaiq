@@ -1,29 +1,19 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
-import { authOptions } from "@/lib/auth/auth-options";
 import { Prisma } from "@prisma/client";
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 
 // PUT /api/schools/:id - Update a school
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id as string) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    // Check if user is admin
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id as string },
-      include: { Staff: { include: { Role: true } } },
-    });
-
-    if (user?.Staff?.[0]?.Role?.title !== "Administrator") {
-      return new NextResponse("Forbidden", { status: 403 });
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.SCHOOL_MANAGE });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
     const body = await request.json();
@@ -70,24 +60,14 @@ export async function PUT(
 
 // DELETE /api/schools/:id - Delete a school
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id as string) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
-    // Check if user is admin
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id as string },
-      include: { Staff: { include: { Role: true } } },
-    });
-
-    if (user?.Staff?.[0]?.Role?.title !== "Administrator") {
-      return new NextResponse("Forbidden", { status: 403 });
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.SCHOOL_MANAGE });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
     await prisma.school.delete({

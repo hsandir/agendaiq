@@ -160,7 +160,9 @@ const AUTH_RULES = {
     '/api/auth/callback',
     '/api/auth/error',
     '/api/health',
-    '/api/setup/check'
+    '/api/setup/check',
+    '/api/github/webhook',
+    '/api/monitoring/uptime'
   ]
 };
 

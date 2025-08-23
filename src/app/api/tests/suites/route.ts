@@ -1,4 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs/promises';
@@ -6,8 +8,12 @@ import path from 'path';
 
 const execAsync = promisify(exec);
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
+    if (!auth.success) {
+      return NextResponse.json({ success: false, error: auth.error }, { status: auth.statusCode });
+    }
     // Get list of test files from Jest
     const { stdout } = await execAsync('npm test -- --listTests', {
       cwd: process.cwd(),
