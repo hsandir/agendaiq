@@ -340,12 +340,12 @@ export function removeSensitiveFields<T>(obj: T): T {
     // Check if field name is sensitive
     if (SENSITIVE_FIELDS.some(field => lowerKey.includes(field.toLowerCase()))) {
       cleaned[key] = '[REDACTED]';
-    } else if typeof (cleaned[key] === 'object' && cleaned[key] !== null) {
+    } else if (typeof cleaned[key] === 'object' && cleaned[key] !== null) {
       // Recursively clean nested objects
-      cleaned[key] = removeSensitiveFields(cleaned as Record<string, unknown>[key]);
-    } else if typeof (cleaned[key] === 'string') {
+      cleaned[key] = removeSensitiveFields(cleaned[key] as Record<string, unknown>);
+    } else if (typeof cleaned[key] === 'string') {
       // Mask sensitive patterns in string values
-      cleaned[key] = maskSensitiveData(cleaned as Record<string, unknown>[key] as string);
+      cleaned[key] = maskSensitiveData(cleaned[key] as string);
     }
   });
   

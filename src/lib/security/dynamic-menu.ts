@@ -478,7 +478,7 @@ export class DynamicMenu {
         .map(item => ({
           ...item,
           children: item.children ? sortItems(item.children) : []
-        })));
+        }));
     };
 
     return sortItems(rootItems);
