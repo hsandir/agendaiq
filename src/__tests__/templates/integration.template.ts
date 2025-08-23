@@ -800,7 +800,6 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
       });
     }
   }
-});
 
 // ============================================================================
 // Usage Instructions

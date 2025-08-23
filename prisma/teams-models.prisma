@@ -1,0 +1,109 @@
+// ========================================
+// TEAMS FEATURE MODELS (Snake Case Standard)
+// ========================================
+// This file contains Team models to be added to schema.prisma
+
+model Team {
+  id                String            @id @default(cuid())
+  name              String
+  code              String            @unique
+  type              String            @default("PROJECT") // EVENT, PROJECT, COMMITTEE
+  status            String            @default("ACTIVE")  // ACTIVE, COMPLETED, ARCHIVED
+  purpose           String            @db.Text
+  start_date        DateTime          @default(now())
+  end_date          DateTime?
+  is_recurring      Boolean           @default(false)
+  budget            Decimal?          @db.Decimal(10, 2)
+  
+  // Organization links (nullable for flexibility)
+  school_id         Int?
+  department_id     Int?
+  district_id       Int?
+  
+  // Metadata
+  created_by        Int
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+  archived_at       DateTime?
+  parent_team_id    String?
+  
+  // Relations
+  School            School?           @relation(fields: [school_id], references: [id])
+  Department        Department?       @relation(fields: [department_id], references: [id])
+  District          District?         @relation(fields: [district_id], references: [id])
+  Creator           User              @relation("TeamCreator", fields: [created_by], references: [id])
+  ParentTeam        Team?             @relation("TeamHierarchy", fields: [parent_team_id], references: [id])
+  ChildTeams        Team[]            @relation("TeamHierarchy")
+  Members           TeamMember[]
+  Knowledge         TeamKnowledge[]
+  Meetings          Meeting[]
+  
+  @@index([school_id, status])
+  @@index([type, status])
+  @@index([created_by])
+  @@map("teams")
+}
+
+model TeamMember {
+  id                String            @id @default(cuid())
+  team_id           String
+  user_id           Int
+  staff_id          Int?
+  role              String            @default("MEMBER") // LEAD, COORDINATOR, MEMBER
+  joined_at         DateTime          @default(now())
+  left_at           DateTime?
+  is_active         Boolean           @default(true)
+  
+  // Relations
+  Team              Team              @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  User              User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  Staff             Staff?            @relation(fields: [staff_id], references: [id])
+  
+  @@unique([team_id, user_id])
+  @@index([user_id, is_active])
+  @@index([team_id])
+  @@map("team_members")
+}
+
+model TeamKnowledge {
+  id                String            @id @default(cuid())
+  team_id           String
+  title             String
+  content           String            @db.Text
+  category          String            @default("NOTE") // NOTE, DECISION, LESSON, TEMPLATE
+  visibility        String            @default("TEAM") // TEAM, SIMILAR_TEAMS, PUBLIC
+  created_by        Int
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+  
+  // Relations
+  Team              Team              @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  Creator           User              @relation(fields: [created_by], references: [id])
+  
+  @@index([team_id, category])
+  @@index([visibility])
+  @@map("team_knowledge")
+}
+
+// Relations to add to existing models:
+
+// Add to User model:
+//   CreatedTeams                Team[]             @relation("TeamCreator")
+//   TeamMemberships             TeamMember[]
+//   TeamKnowledgeItems          TeamKnowledge[]
+
+// Add to Staff model:
+//   TeamMemberships           TeamMember[]
+
+// Add to Meeting model:
+//   Team                 Team?              @relation(fields: [team_id], references: [id])
+//   team_id              String?
+
+// Add to School model:
+//   Teams       Team[]
+
+// Add to Department model:
+//   Teams      Team[]
+
+// Add to District model:
+//   Teams      Team[]

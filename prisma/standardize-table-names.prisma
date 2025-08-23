@@ -1,0 +1,97 @@
+// Recommended table naming standardization
+// Add @@map to all models for consistent snake_case naming
+
+model Account {
+  // existing fields...
+  @@map("accounts")
+}
+
+model District {
+  // existing fields...
+  @@map("districts")
+}
+
+model School {
+  // existing fields...
+  @@map("schools")
+}
+
+model Department {
+  // existing fields...
+  @@map("departments")
+}
+
+model Role {
+  // existing fields...
+  @@map("roles")
+}
+
+model RoleHierarchy {
+  // existing fields...
+  @@map("role_hierarchies")
+}
+
+model Permission {
+  // existing fields...
+  @@map("permissions")
+}
+
+model Staff {
+  // existing fields...
+  @@map("staff")
+}
+
+model Meeting {
+  // existing fields...
+  @@map("meetings")
+}
+
+model MeetingAttendee {
+  // existing fields...
+  @@map("meeting_attendees")
+}
+
+model Session {
+  // existing fields...
+  @@map("sessions")
+}
+
+model SystemSetting {
+  // existing fields...
+  @@map("system_settings")
+}
+
+model VerificationToken {
+  // existing fields...
+  @@map("verification_tokens")
+}
+
+model MeetingActionItem {
+  // existing fields...
+  @@map("meeting_action_items")
+}
+
+model MeetingTranscript {
+  // existing fields...
+  @@map("meeting_transcripts")
+}
+
+model MeetingSearch {
+  // existing fields...
+  @@map("meeting_search")
+}
+
+model RoleTransition {
+  // existing fields...
+  @@map("role_transitions")
+}
+
+model DevLog {
+  // existing fields...
+  @@map("dev_logs")
+}
+
+model SecurityLog {
+  // existing fields...
+  @@map("security_logs")
+}
