@@ -16,7 +16,7 @@ export function RoleSwitch({ staff }: RoleSwitchProps) {
     const selectedRoleId = Number(e.target.value);
     
     // Don't switch if already the current role
-    if (selectedRoleId === staff?.Role?.id) {
+    if (selectedRoleId === staff?.role?.id) {
       return;
     }
 
@@ -46,26 +46,26 @@ export function RoleSwitch({ staff }: RoleSwitchProps) {
       console.error('Error switching role:', error);
       setError(error instanceof Error ? error.message : 'Failed to switch role');
       // Reset the select to the original value on error
-      e.target.value = staff?.Role?.id?.toString() ?? '';
+      e.target.value = staff?.role?.id?.toString() ?? '';
     } finally {
       setIsLoading(false);
     }
   };
 
   // Determine current role - default to user if not admin
-  const currentRoleKey = staff?.Role?.title === 'Administrator' ? 'admin' : 'user';
+  const currentRoleKey = staff?.role?.title === 'Administrator' ? 'admin' : 'user';
 
   return (
     <div className="flex items-center space-x-2">
       <select 
         name="role"
-        value={staff?.Role?.id?.toString() ?? ''}
+        value={staff?.role?.id?.toString() ?? ''}
         onChange={handleRoleChange}
         disabled={isLoading}
         className="ml-2 text-sm border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
       >
         <option value="">Select role</option>
-        <option value={staff?.Role?.id?.toString() ?? ''}>{staff?.Role?.title || 'Current Role'}</option>
+        <option value={staff?.role?.id?.toString() ?? ''}>{staff?.role?.title || 'Current Role'}</option>
       </select>
       {isLoading && (
         <span className="text-xs text-muted-foreground">Switching...</span>

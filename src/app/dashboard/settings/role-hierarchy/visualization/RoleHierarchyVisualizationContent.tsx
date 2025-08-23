@@ -16,7 +16,7 @@ interface Role {
   Children?: Role[];
   Staff?: Array<{
     id: string;
-    User: {
+    users: {
       name: string;
       email: string;
     };
@@ -73,7 +73,7 @@ export default function RoleHierarchyVisualizationContent() {
                 <div>
                   <label className="block text-sm font-medium text-foreground">Department</label>
                   <p className="mt-1 text-sm text-foreground">
-                    {selectedRole.Department?.name || 'No Department'}
+                    {selectedRole.department?.name || 'No Department'}
                   </p>
                 </div>
                 
@@ -84,16 +84,16 @@ export default function RoleHierarchyVisualizationContent() {
                   </p>
                 </div>
                 
-                {selectedRole.Staff && selectedRole.Staff.length > 0 && (
+                {selectedRole.staff && selectedRole.staff.length > 0 && (
                   <div className="md:col-span-2 lg:col-span-3">
                     <label className="block text-sm font-medium text-foreground">
-                      Staff Members ({selectedRole.Staff.length})
+                      Staff Members ({selectedRole.staff.length})
                     </label>
                     <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {selectedRole.Staff.map((staff) => (
+                      {selectedRole.staff.map((staff) => (
                         <div key={staff.id} className="text-sm text-foreground bg-muted p-2 rounded">
-                          <div className="font-medium">{staff.User.name}</div>
-                          <div className="text-muted-foreground">{staff.User.email}</div>
+                          <div className="font-medium">{staff.users.name}</div>
+                          <div className="text-muted-foreground">{staff.users.email}</div>
                         </div>
                       ))}
                     </div>

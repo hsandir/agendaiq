@@ -28,7 +28,7 @@ export default async function MeetingPage({ params }: PageProps) {
   const meeting = await prisma.meeting.findUnique({
     where: { id: meetingId },
     include: {
-      MeetingAttendee: {
+      meeting_attendee: {
         where: { staff_id: user.staff?.id || -1 }
       }
     }
@@ -40,7 +40,7 @@ export default async function MeetingPage({ params }: PageProps) {
 
   // Check permissions
   const isOrganizer = meeting.organizer_id === user.staff?.id;
-  const isAttendee = meeting.MeetingAttendee.length > 0;
+  const isAttendee = meeting.meeting_attendee.length > 0;
   const hasAdminAccess = isAnyAdmin(user);
 
   if (!isOrganizer && !isAttendee && !hasAdminAccess) {

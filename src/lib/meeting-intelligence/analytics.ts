@@ -48,15 +48,15 @@ export class MeetingAnalyticsService {
           id: true,
           start_time: true,
           end_time: true,
-          MeetingAttendee: true,
-          MeetingAgendaItems: {
+          meeting_attendee: true,
+          meeting_agenda_items: {
             where: { carried_forward: true }
           }
         }
       }),
       prisma.meetingActionItem.findMany({
         where: {
-          Meeting: where
+          meeting: where
         },
         select: {
           status: true
@@ -89,7 +89,7 @@ export class MeetingAnalyticsService {
     const averageDuration = meetingsWithDuration > 0 ? totalDuration / meetingsWithDuration : 0;
 
     // Calculate participation rate
-    const totalAttendees = meetings.reduce((sum, m) => sum + m.MeetingAttendee.length, 0);
+    const totalAttendees = meetings.reduce((sum, m) => sum + m.meeting_attendee.length, 0);
     const participationRate = totalMeetings > 0 ? totalAttendees / totalMeetings : 0;
 
     // Calculate carry forward rate
@@ -136,14 +136,14 @@ export class MeetingAnalyticsService {
         prisma.meeting.count({ where }),
         prisma.meetingActionItem.findMany({
           where: {
-            Meeting: where
+            meeting: where
           },
           select: { status: true }
         }),
         prisma.meeting.findMany({
           where,
           select: {
-            MeetingAttendee: true
+            meeting_attendee: true
           }
         })
       ]);
@@ -155,7 +155,7 @@ export class MeetingAnalyticsService {
         ? (completedActions / actionItems.length) * 100 
         : 0;
 
-      const totalAttendees = attendanceData.reduce((sum, m) => sum + m.MeetingAttendee.length, 0);
+      const totalAttendees = attendanceData.reduce((sum, m) => sum + m.meeting_attendee.length, 0);
       const averageAttendance = meetingCount > 0 ? totalAttendees / meetingCount : 0;
 
       stats.push({
@@ -203,7 +203,7 @@ export class MeetingAnalyticsService {
       select: {
         id: true,
         start_time: true,
-        MeetingActionItems: {
+        meeting_action_items: {
           select: {
             status: true
           }
@@ -279,29 +279,29 @@ export class MeetingAnalyticsService {
         start_time: {}
       };
       if (options.dateFrom) {
-        where.Meeting.start_time.gte = options.dateFrom;
+        where.meeting.start_time.gte = options.dateFrom;
       }
       if (options.dateTo) {
-        where.Meeting.start_time.lte = options.dateTo;
+        where.meeting.start_time.lte = options.dateTo;
       }
     }
 
     const attendance = await prisma.meetingAttendee.findMany({
       where,
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true,
                 email: true
               }
             },
-            Role: true,
-            Department: true
+            role: true,
+            department: true
           }
         },
-        Meeting: {
+        meeting: {
           select: {
             title: true,
             start_time: true
@@ -319,20 +319,20 @@ export class MeetingAnalyticsService {
       if (!staffStats[staffId]) {
         staffStats[staffId] = {
           staffId,
-          name: record.Staff.User.name,
-          email: record.Staff.User.email,
-          role: record.Staff.Role.key ?? record.Staff.Role.id,
-          department: record.Staff.Department.name,
+          name: record.staff.users.name,
+          email: record.staff.users.email,
+          role: record.staff.role.key ?? record.staff.role.id,
+          department: record.staff.department.name,
           meetingsAttended: 0,
-          lastMeeting: null
+          lastmeeting: null
         };
       }
 
       staffStats[staffId].meetingsAttended++;
       
       if (!staffStats[staffId].lastMeeting || 
-          (record.Meeting.start_time && record.Meeting.start_time > staffStats[staffId].lastMeeting)) {
-        staffStats[staffId].lastMeeting = record.Meeting.start_time;
+          (record.meeting.start_time && record.meeting.start_time > staffStats[staffId].lastMeeting)) {
+        staffStats[staffId].lastMeeting = record.meeting.start_time;
       }
     });
 
@@ -375,14 +375,14 @@ export class MeetingAnalyticsService {
     const actionItems = await prisma.meetingActionItem.findMany({
       where,
       include: {
-        AssignedTo: {
+        assigned_to: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true
               }
             },
-            Role: true
+            role: true
           }
         }
       }
@@ -463,9 +463,9 @@ export class MeetingAnalyticsService {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        MeetingAgendaItems: true,
-        MeetingActionItems: true,
-        MeetingAttendee: true
+        meeting_agenda_items: true,
+        meeting_action_items: true,
+        meeting_attendee: true
       }
     });
 
@@ -514,7 +514,7 @@ export class MeetingAnalyticsService {
     }
 
     // Factor 4: Attendance rate
-    const attendanceCount = meeting.MeetingAttendee.length;
+    const attendanceCount = meeting.meeting_attendee.length;
     if (attendanceCount >= 3) {
       score += 20;
       factors.push({ 

@@ -48,26 +48,26 @@ export async function GET(request: NextRequest, props: Props) {
     const agendaItems = await prisma.meetingAgendaItem.findMany({
       where: { meeting_id: meetingId },
       include: {
-        ResponsibleStaff: {
+        responsible_staff: {
           include: {
-            User: true
+            users: true
           }
         },
-        Comments: {
+        comments: {
           include: {
-            Staff: {
+            staff: {
               include: {
-                User: true
+                users: true
               }
             }
           }
         },
-        Attachments: true,
-        ActionItems: {
+        attachments: true,
+        action_items: {
           include: {
             AssignedTo: {
               include: {
-                User: true
+                users: true
               }
             }
           }
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest, props: Props) {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        MeetingAttendee: true
+        meeting_attendee: true
       }
     });
 
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest, props: Props) {
     }
 
     const isOrganizer = meeting.organizer_id === user.staff?.id;
-    const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
+    const isAttendee = meeting.meeting_attendee.some(ma => ma.staff_id === user.staff?.id);
     const hasAdminAccess = user.is_admin || user.is_system_admin || user.is_school_admin;
 
     // Debug logging
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest, props: Props) {
       organizerId: meeting.organizer_id,
       isOrganizer,
       isAttendee,
-      attendeeIds: meeting.MeetingAttendee.map(ma => ma.staff_id),
+      attendeeIds: meeting.meeting_attendee.map(ma => ma.staff_id),
       userFlags: {
         is_admin: user.is_admin,
         is_system_admin: user.is_system_admin,
@@ -173,13 +173,13 @@ export async function POST(request: NextRequest, props: Props) {
           ...itemData
         },
         include: {
-          ResponsibleStaff: {
+          responsible_staff: {
             include: {
-              User: true
+              users: true
             }
           },
-          Comments: true,
-          ActionItems: true
+          comments: true,
+          action_items: true
         }
       });
       createdItems = [newItem];
@@ -205,13 +205,13 @@ export async function POST(request: NextRequest, props: Props) {
       createdItems = await prisma.meetingAgendaItem.findMany({
         where: { meeting_id: meetingId },
         include: {
-          ResponsibleStaff: {
+          responsible_staff: {
             include: {
-              User: true
+              users: true
             }
           },
-          Comments: true,
-          ActionItems: true
+          comments: true,
+          action_items: true
         },
         orderBy: { order_index: 'asc' }
       });
@@ -305,7 +305,7 @@ export async function PUT(request: NextRequest, props: Props) {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        MeetingAttendee: true
+        meeting_attendee: true
       }
     });
 
@@ -317,7 +317,7 @@ export async function PUT(request: NextRequest, props: Props) {
     }
 
     const isOrganizer = meeting.organizer_id === user.staff?.id;
-    const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
+    const isAttendee = meeting.meeting_attendee.some(ma => ma.staff_id === user.staff?.id);
     const hasAdminAccess = user.is_admin || user.is_system_admin || user.is_school_admin;
 
     // Debug logging
@@ -328,7 +328,7 @@ export async function PUT(request: NextRequest, props: Props) {
       organizerId: meeting.organizer_id,
       isOrganizer,
       isAttendee,
-      attendeeIds: meeting.MeetingAttendee.map(ma => ma.staff_id),
+      attendeeIds: meeting.meeting_attendee.map(ma => ma.staff_id),
       userFlags: {
         is_admin: user.is_admin,
         is_system_admin: user.is_system_admin,
@@ -362,13 +362,13 @@ export async function PUT(request: NextRequest, props: Props) {
             order_index: index
           },
           include: {
-            ResponsibleStaff: {
+            responsible_staff: {
               include: {
-                User: true
+                users: true
               }
             },
-            Comments: true,
-            ActionItems: true
+            comments: true,
+            action_items: true
           }
         });
       })

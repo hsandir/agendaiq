@@ -265,7 +265,7 @@ export default function MeetingSearchPage() {
                         </p>
                       )}
                       <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
-                        <span>Meeting: {item.meeting?.title ?? 'Unknown'}</span>
+                        <span>meeting: {item.meeting?.title ?? 'Unknown'}</span>
                         <span className={`px-2 py-1 rounded ${
                           item.status === 'Resolved' ? 'bg-green-100 text-green-700' :
                           item.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :

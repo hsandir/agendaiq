@@ -12,10 +12,10 @@ export async function GET(request: NextRequest) {
     // Get all roles from the database
     const roles = await prisma.role.findMany({
       include: {
-        Department: true,
-        Staff: {
+        department: true,
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       },
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
         department_id
       },
       include: {
-        Department: true
+        department: true
       }
     });
 

@@ -65,31 +65,31 @@ export async function GET(request: NextRequest, props: Props) {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        Department: true,
-        District: true,
-        School: true,
-        Staff: {
+        department: true,
+        district: true,
+        school: true,
+        staff: {
           include: {
-            User: true,
-            Role: true
+            users: true,
+            role: true
           }
         },
-        MeetingAttendee: {
+        meeting_attendee: {
           include: {
-            Staff: {
+            staff: {
               include: {
-                User: true,
-                Role: true,
-                Department: true
+                users: true,
+                role: true,
+                department: true
               }
             }
           }
         },
-        MeetingNote: {
+        meeting_notes: {
           include: {
-            Staff: {
+            staff: {
               include: {
-                User: true
+                users: true
               }
             }
           },
@@ -97,27 +97,27 @@ export async function GET(request: NextRequest, props: Props) {
             created_at: 'desc'
           }
         },
-        MeetingAgendaItems: {
+        meeting_agenda_items: {
           include: {
-            ResponsibleStaff: {
+            responsible_staff: {
               include: {
-                User: true
+                users: true
               }
             },
-            Comments: {
+            comments: {
               include: {
-                Staff: {
+                staff: {
                   include: {
-                    User: true
+                    users: true
                   }
                 }
               }
             },
-            ActionItems: {
+            action_items: {
               include: {
-                AssignedTo: {
+                assigned_to: {
                   include: {
-                    User: true
+                    users: true
                   }
                 }
               }
@@ -127,18 +127,18 @@ export async function GET(request: NextRequest, props: Props) {
             order_index: 'asc'
           }
         },
-        MeetingActionItems: {
+        meeting_action_items: {
           include: {
-            AssignedTo: {
+            assigned_to: {
               include: {
-                User: true,
-                Role: true
+                users: true,
+                role: true
               }
             }
           }
         },
-        ParentMeeting: true,
-        ContinuationMeetings: {
+        parent_meeting: true,
+        continuation_meetings: {
           orderBy: {
             start_time: 'desc'
           }
@@ -153,7 +153,7 @@ export async function GET(request: NextRequest, props: Props) {
     // Check if user is authorized to view this meeting
     const hasAdminAccess = isAnyAdmin(user);
     const isOrganizer = meeting.organizer_id === user.staff?.id;
-    const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
+    const isAttendee = meeting.meeting_attendee.some(ma => ma.staff_id === user.staff?.id);
     const isSameDepartment = meeting.department_id === user.staff?.department?.id;
 
     if (!hasAdminAccess && !isOrganizer && !isAttendee && !isSameDepartment) {
@@ -230,7 +230,7 @@ export async function PATCH(
     // Check permissions
     const existingMeeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
-      include: { MeetingAttendee: true }
+      include: { meeting_attendee: true }
     });
 
     if (!existingMeeting) {
@@ -253,7 +253,7 @@ export async function PATCH(
       agenda: existingMeeting.agenda,
       notes: existingMeeting.notes,
       status: existingMeeting.status,
-      attendee_count: existingMeeting.MeetingAttendee.length
+      attendee_count: existingMeeting.meeting_attendee.length
     };
 
     // Prepare update data with proper types

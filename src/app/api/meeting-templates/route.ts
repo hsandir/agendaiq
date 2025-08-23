@@ -15,9 +15,9 @@ export async function GET(request: NextRequest) {
         is_active: true
       },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       },
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
         created_by: template.created_by,
         created_at: template.created_at,
         updated_at: template.updated_at,
-        creator: template.Staff.User.name ?? template.Staff.User.email
+        creator: template.staff.users.name ?? template.staff.users.email
       })),
       count: templates.length
     });
@@ -94,9 +94,9 @@ export async function POST(request: NextRequest) {
         created_by: staff.id
       },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       }
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
         created_by: template.created_by,
         created_at: template.created_at,
         updated_at: template.updated_at,
-        creator: template.Staff.User.name ?? template.Staff.User.email
+        creator: template.staff.users.name ?? template.staff.users.email
       }
     });
 

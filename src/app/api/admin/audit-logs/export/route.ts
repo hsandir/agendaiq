@@ -78,8 +78,8 @@ export async function GET(request: NextRequest) {
       const processedLegacyLogs = legacyLogs.map(log => ({
         ...log,
         created_at: log.created_at instanceof Date ? log.created_at.toISOString() : log?.created_at,
-        User: log.User ?? undefined,
-        Staff: log.Staff ?? undefined
+        User: log.users ?? undefined,
+        Staff: log.staff ?? undefined
       })) as SortableAuditRecord[];
 
       if (logType === 'legacy') {
@@ -133,8 +133,8 @@ export async function GET(request: NextRequest) {
         const type = log?.source || (log.category ? 'critical' : 'legacy');
         const categoryOrTable = log.category ?? log.table_name ?? '';
         const actionOrOperation = log.action ?? log.operation ?? '';
-        const userEmail = log.User?.email ?? '';
-        const staffRole = log.Staff?.Role?.title ?? '';
+        const userEmail = log.users?.email ?? '';
+        const staffRole = log.staff?.role?.title ?? '';
         const ipAddress = log.ip_address ?? '';
         const riskScore = log.risk_score?.toString() ?? '';
         const success = log.success !== undefined ? log.success.toString() : '';

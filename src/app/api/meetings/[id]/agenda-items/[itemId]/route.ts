@@ -31,7 +31,7 @@ export async function PATCH(
     }
     const user = authResult.user!;
 
-    const meetingId = params.id;
+    const meetingId = parseInt(params.id);
     const itemId = parseInt(params.itemId);
 
     if (isNaN(meetingId) || isNaN(itemId)) {
@@ -56,9 +56,9 @@ export async function PATCH(
     const agendaItem = await prisma.meetingAgendaItem.findUnique({
       where: { id: itemId },
       include: {
-        Meeting: {
+        meeting: {
           include: {
-            MeetingAttendee: {
+            meeting_attendee: {
               where: { staff_id: user.staff?.id || -1 }
             }
           }
@@ -74,7 +74,7 @@ export async function PATCH(
     }
 
     // Check permissions
-    const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
+    const isOrganizer = agendaItem.meeting.organizer_id === user.staff?.id;
     const hasAdminAccess = isAnyAdmin(user);
     const isResponsible = agendaItem.responsible_staff_id === user.staff?.id;
 
@@ -90,13 +90,13 @@ export async function PATCH(
       where: { id: itemId },
       data: validationResult.data,
       include: {
-        ResponsibleStaff: {
+        responsible_staff: {
           include: {
-            User: true
+            users: true
           }
         },
-        Comments: true,
-        ActionItems: true
+        comments: true,
+        action_items: true
       }
     });
 
@@ -145,7 +145,7 @@ export async function DELETE(
     }
     const user = authResult.user!;
 
-    const meetingId = params.id;
+    const meetingId = parseInt(params.id);
     const itemId = parseInt(params.itemId);
 
     if (isNaN(meetingId) || isNaN(itemId)) {

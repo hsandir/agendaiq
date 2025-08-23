@@ -20,10 +20,10 @@ export default async function RolePage() {
   // Fetch real role and organizational data
   const roles = await prisma.role.findMany({
     include: {
-      Department: true,
-      Staff: {
+      department: true,
+      staff: {
         include: {
-          User: true
+          users: true
         }
       }
     },
@@ -34,10 +34,10 @@ export default async function RolePage() {
 
   const departments = await prisma.department.findMany({
     include: {
-      Staff: {
+      staff: {
         include: {
-          User: true,
-          Role: true
+          users: true,
+          role: true
         }
       }
     }
@@ -46,17 +46,17 @@ export default async function RolePage() {
   // Calculate real statistics
   const totalRoles = roles.length;
   const leadershipRoles = roles.filter(role => role.is_leadership).length;
-  const totalStaff = roles.reduce((acc, role) => acc + role.Staff.length, 0);
+  const totalStaff = roles.reduce((acc, role) => acc + role.staff.length, 0);
   const totalDepartments = departments.length;
   const activeUsers = roles.reduce((acc, role) => 
-    acc + role.Staff.filter(staff => staff.User.emailVerified).length, 0
+    acc + role.staff.filter(staff => staff.users.emailVerified).length, 0
   );
 
   // Role distribution by department
   const roleDistribution = (departments.map(dept => ({
     name: dept.name,
-    count: dept.Staff.length,
-    roles: dept.Staff.map(staff => staff.Role?.title).filter(Boolean)
+    count: dept.staff.length,
+    roles: dept.staff.map(staff => staff.role?.title).filter(Boolean)
   })));
 
   // Leadership hierarchy
@@ -66,8 +66,8 @@ export default async function RolePage() {
     .map(role => ({
       title: role.title,
       priority: role.priority,
-      staffCount: role.Staff.length,
-      department: role.Department?.name || 'No Department'
+      staffCount: role.staff.length,
+      department: role.department?.name || 'No Department'
     })));
 
   return (
@@ -301,7 +301,7 @@ export default async function RolePage() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {role.Department?.name || 'No Department'} • {role.Staff.length} staff members
+                    {role.department?.name || 'No Department'} • {role.staff.length} staff members
                   </p>
                 </div>
                 <div className="text-right">

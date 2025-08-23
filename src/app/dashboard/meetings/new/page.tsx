@@ -22,7 +22,7 @@ export default async function NewMeetingPage() {
         // Leadership roles from same school
         ...(currentStaff?.school?.id ? [{
           school_id: currentStaff.school.id,
-          Role: {
+          role: {
             is_leadership: true
           }
         }] : []),
@@ -37,25 +37,25 @@ export default async function NewMeetingPage() {
     },
     select: {
       id: true,
-      User: {
+      users: {
         select: {
           name: true,
           email: true
         }
       },
-      Department: {
+      department: {
         select: {
           name: true
         }
       },
-      Role: {
+      role: {
         select: {
           title: true
         }
       }
     },
     orderBy: {
-      User: {
+      users: {
         name: "asc",
       }
     },
@@ -79,10 +79,10 @@ export default async function NewMeetingPage() {
   // Transform staff data to match MeetingFormStep1 interface
   const users = (staff.map(s => ({
     id: s.id.toString(), // Use staff ID, not user ID
-    name: (s.User.name ?? s.User.email) || "Unknown User",
-    email: s.User.email ?? "",
-    department: s.Department?.name ?? "No Department",
-    role: s.Role?.title ?? "No Role",
+    name: (s.users.name ?? s.users.email) || "Unknown User",
+    email: s.users.email ?? "",
+    department: s.department?.name ?? "No Department",
+    role: s.role?.title ?? "No Role",
   })));
   
   console.log("Server: Found staff members:", users.length, "Current user staff:", !!currentStaff);
@@ -170,9 +170,9 @@ export default async function NewMeetingPage() {
       const staffWithRelations = await prisma.staff.findUnique({
         where: { id: currentUser.staff.id },
         include: {
-          Department: true,
-          School: true,
-          District: true
+          department: true,
+          school: true,
+          district: true
         }
       });
 
@@ -280,7 +280,7 @@ export default async function NewMeetingPage() {
             department_id: staffWithRelations.department_id,
             school_id: staffWithRelations.school_id,
             district_id: staffWithRelations.district_id,
-            MeetingAttendee: {
+            meeting_attendee: {
               create: data.attendeeIds.map((staffId) => ({
                 staff_id: parseInt(staffId),
                 status: "pending",

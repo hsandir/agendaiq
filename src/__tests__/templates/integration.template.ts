@@ -105,9 +105,9 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
       const user = await context.prisma.user.findUnique({
         where: { id: workflowState.currentUser.id },
         include: {
-          Staff: {
+          staff: {
             include: {
-              Role: true,
+              role: true,
             },
           },
         },

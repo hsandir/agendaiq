@@ -34,9 +34,9 @@ export async function GET(
     const comments = await prisma.agendaItemComment.findMany({
       where: { agenda_item_id: itemId },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       },
@@ -72,7 +72,7 @@ export async function POST(
     }
     const user = authResult.user!;
 
-    const meetingId = params.id;
+    const meetingId = parseInt(params.id);
     const itemId = parseInt(params.itemId);
 
     if (isNaN(meetingId) || isNaN(itemId)) {
@@ -97,9 +97,9 @@ export async function POST(
     const agendaItem = await prisma.meetingAgendaItem.findUnique({
       where: { id: itemId },
       include: {
-        Meeting: {
+        meeting: {
           include: {
-            MeetingAttendee: {
+            meeting_attendee: {
               where: { staff_id: user.staff?.id || -1 }
             }
           }
@@ -107,7 +107,7 @@ export async function POST(
       }
     });
 
-    if (!agendaItem ?? agendaItem.meeting_id !== meetingId) {
+    if (!agendaItem || agendaItem.meeting_id !== meetingId) {
       return NextResponse.json(
         { error: 'Agenda item not found' },
         { status: 404 }
@@ -115,8 +115,8 @@ export async function POST(
     }
 
     // Check permissions
-    const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
-    const isAttendee = agendaItem.Meeting.MeetingAttendee.length > 0;
+    const isOrganizer = agendaItem.meeting.organizer_id === user.staff?.id;
+    const isAttendee = agendaItem.meeting.meeting_attendee.length > 0;
     const hasAdminAccess = isAnyAdmin(user);
 
     if (!isOrganizer && !isAttendee && !hasAdminAccess) {
@@ -134,9 +134,9 @@ export async function POST(
         staff_id: user.staff!.id
       },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       }

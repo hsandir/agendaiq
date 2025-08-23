@@ -21,15 +21,15 @@ export default async function AuditPage() {
       email: user.email!
     },
     include: { 
-      Staff: {
+      staff: {
         include: {
-          Role: true
+          role: true
         }
       }
     }
   });
 
-  if (!userDetails || (userDetails.Staff?.[0]?.Role?.title !== "Administrator")) {
+  if (!userDetails || (userDetails.staff?.[0]?.role?.title !== "Administrator")) {
     redirect("/dashboard");
   }
 
@@ -37,12 +37,12 @@ export default async function AuditPage() {
   // Fetch real meeting audit logs
   // const auditLogs = await prisma.meetingAuditLog.findMany({
   //   include: {
-  //     User: true,
-  //     Meeting: {
+  //     users: true,
+  //     meeting: {
   //       include: {
-  //         Staff: {
+  //         staff: {
   //           include: {
-  //             User: true
+  //             users: true
   //           }
   //         }
   //       }
@@ -59,10 +59,10 @@ export default async function AuditPage() {
     id: number;
     action: string;
     created_at: string;
-    Meeting: {
+    meeting: {
       title: string;
     };
-    User: {
+    users: {
       name?: string | null;
       email: string;
     };
@@ -135,10 +135,10 @@ export default async function AuditPage() {
                           </div>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Meeting: {log.Meeting.title}
+                          meeting: {log.meeting.title}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          By: {log.User.name ?? log.User.email}
+                          By: {log.users.name ?? log.users.email}
                         </p>
                         {log.details && typeof log.details === 'object' && (
                           <p className="text-sm text-muted-foreground">

@@ -105,17 +105,17 @@ export class RoleBasedAssignmentService {
           ...agendaStatusFilter
         },
         include: {
-          Meeting: {
+          meeting: {
             select: {
               id: true,
               title: true,
               start_time: true
             }
           },
-          ResponsibleStaff: {
+          responsible_staff: {
             select: {
               id: true,
-              User: {
+              users: {
                 select: {
                   name: true,
                   email: true
@@ -136,17 +136,17 @@ export class RoleBasedAssignmentService {
           ...actionStatusFilter
         },
         include: {
-          Meeting: {
+          meeting: {
             select: {
               id: true,
               title: true,
               start_time: true
             }
           },
-          AssignedTo: {
+          assigned_to: {
             select: {
               id: true,
-              User: {
+              users: {
                 select: {
                   name: true,
                   email: true
@@ -220,7 +220,7 @@ export class RoleBasedAssignmentService {
       include: {
         FromStaff: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true,
                 email: true
@@ -230,7 +230,7 @@ export class RoleBasedAssignmentService {
         },
         ToStaff: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true,
                 email: true
@@ -238,7 +238,7 @@ export class RoleBasedAssignmentService {
             }
           }
         },
-        Role: true
+        role: true
       },
       orderBy: {
         transition_date: 'desc'
@@ -265,14 +265,14 @@ export class RoleBasedAssignmentService {
         }
       },
       include: {
-        Meeting: {
+        meeting: {
           select: {
             title: true
           }
         },
-        AssignedTo: {
+        assigned_to: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true
               }

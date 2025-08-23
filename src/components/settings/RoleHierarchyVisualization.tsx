@@ -16,7 +16,7 @@ interface Role {
   Children?: Role[];
   Staff?: Array<{
     id: string;
-    User: {
+    users: {
       name: string;
       email: string;
     };
@@ -68,9 +68,9 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
 
   const renderRole = (role: Role, depth = 0) => {
     const hasChildren = role.Children && role.Children.length > 0;
-    const hasStaff = role.Staff && role.Staff.length > 0;
+    const hasStaff = role.staff && role.staff.length > 0;
     const isExpanded = expandedRoles.has(role.id);
-    const staffCount = role.Staff?.length ?? 0;
+    const staffCount = role.staff?.length ?? 0;
     
     return (
       <div key={role.id} className="role-item">
@@ -127,14 +127,14 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
                         className="inline-flex items-center px-2 py-1 rounded bg-primary text-primary-foreground text-xs font-medium"
                       >
                         <FiUser className="h-3 w-3 mr-1" />
-                        {staffMember.User.name || 'No Name'}
+                        {staffMember.users.name || 'No Name'}
                       </span>
                     ))}
                   </div>
                 )}
                 
                 <div className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
-                  <span>{role.Department?.name || 'No Department'}</span>
+                  <span>{role.department?.name || 'No Department'}</span>
                   <span>•</span>
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     role.is_leadership 
@@ -167,8 +167,8 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
             {role.Staff!.map((staffMember) => (
               <div key={staffMember.id} className="flex items-center text-sm text-muted-foreground py-1 px-3 bg-muted rounded">
                 <FiUserCheck className="h-3 w-3 mr-2 text-green-500" />
-                <span className="font-medium">{staffMember.User.name || 'No Name'}</span>
-                <span className="text-muted-foreground ml-2">({staffMember.User.email})</span>
+                <span className="font-medium">{staffMember.users.name || 'No Name'}</span>
+                <span className="text-muted-foreground ml-2">({staffMember.users.email})</span>
               </div>
             ))}
           </div>

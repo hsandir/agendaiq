@@ -24,15 +24,15 @@ export async function respondToMeeting(
   const currentUser = await prisma.user.findUnique({
     where: { email: session.user.email },
     include: {
-      Staff: true
+      staff: true
     }
   });
 
-  if (!currentUser || !currentUser.Staff ?? currentUser.Staff.length === 0) {
+  if (!currentUser || !currentUser.staff ?? currentUser.staff.length === 0) {
     throw new Error("User staff record not found");
   }
 
-  const userStaffId = currentUser.Staff[0].id;
+  const userStaffId = currentUser.staff[0].id;
 
   const attendee = await prisma.meetingAttendee.findFirst({
     where: {

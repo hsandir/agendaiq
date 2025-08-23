@@ -33,17 +33,17 @@ export default async function DashboardLayout({
   const userWithStaff = await prisma.user.findUnique({
     where: { email: user.email! },
     include: {
-      Staff: {
+      staff: {
         include: {
-          Role: true,
-          Department: true,
-          School: true
+          role: true,
+          department: true,
+          school: true
         }
       }
     },
   });
 
-  const currentRole = userWithStaff?.Staff?.[0]?.Role ?? null;
+  const currentRole = userWithStaff?.staff?.[0]?.role ?? null;
   const isAdmin = isUserAdmin(userWithStaff);
 
   return (
@@ -54,7 +54,7 @@ export default async function DashboardLayout({
         user={{
           email: user.email,
           name: user.name ?? undefined,
-          staff_id: userWithStaff?.Staff?.[0]?.id ?? null,
+          staff_id: userWithStaff?.staff?.[0]?.id ?? null,
         }}
         currentRole={currentRole}
         userWithStaff={userWithStaff}

@@ -42,9 +42,9 @@ export async function GET(request: NextRequest) {
     // Find all users who have admin role
     const adminUsers = await prisma.user.findMany({
       where: {
-        Staff: {
+        staff: {
           some: {
-            Role: {
+            role: {
               title: 'Administrator'
             }
           }
@@ -53,9 +53,9 @@ export async function GET(request: NextRequest) {
       select: {
         email: true,
         name: true,
-        Staff: {
+        staff: {
           select: {
-            Role: {
+            role: {
               select: {
                 title: true
               }
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
 
     // Filter to only include users with Administrator role
     const filteredAdminUsers = adminUsers.filter(user => 
-      user.Staff.some(staff => staff.Role?.title === 'Administrator')
+      user.staff.some(staff => staff.role?.title === 'Administrator')
     );
 
     return NextResponse.json({

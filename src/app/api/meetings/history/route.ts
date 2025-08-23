@@ -121,21 +121,21 @@ export async function GET(request: NextRequest) {
     const meetings = await prisma.meeting.findMany({
       where: whereClause,
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true,
-            Role: true,
-            Department: true
+            users: true,
+            role: true,
+            department: true
           }
         },
-        MeetingAttendee: true,
+        meeting_attendee: true,
         MeetingAgendaItems: true,
         MeetingActionItems: {
           include: {
             AssignedTo: true
           }
         },
-        Department: true
+        department: true
       },
       orderBy: { start_time: 'desc' },
       take: 50
@@ -151,15 +151,15 @@ export async function GET(request: NextRequest) {
       status: meeting.status,
       meeting_type: meeting.meeting_type,
       organizer: {
-        name: meeting.Staff?.User?.name ?? 'Unknown',
-        role: meeting.Staff?.Role?.title ?? 'Unknown',
-        department: meeting.Staff?.Department?.name ?? 'Unknown'
+        name: meeting.staff?.users?.name ?? 'Unknown',
+        role: meeting.staff?.role?.title ?? 'Unknown',
+        department: meeting.staff?.department?.name ?? 'Unknown'
       },
-      attendees: meeting.MeetingAttendee.length,
+      attendees: meeting.meeting_attendee.length,
       agendaItems: meeting.MeetingAgendaItems.length,
       actionItems: meeting.MeetingActionItems.length,
       completedActions: meeting.MeetingActionItems.filter((item: { status: string }) => item.status === 'Completed').length,
-      department: meeting.Department?.name,
+      department: meeting.department?.name,
       isRecurring: !!meeting.repeat_type,
       parentMeetingId: meeting.parent_meeting_id
     })));

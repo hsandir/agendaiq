@@ -121,7 +121,7 @@ export function isUserWithStaff(user: unknown): user is UserWithStaff {
          typeof user === 'object' && 
          'Staff' in user && 
          Array.isArray((user as any).Staff) &&
-         (user as any).Staff.length > 0;
+         (user as any).staff.length > 0;
 }
 
 // Check if user is admin
@@ -136,7 +136,7 @@ export function isUserAdmin(user: unknown): boolean {
   }
   
   // Check role-based admin
-  if (isUserWithStaff(user) && user.Staff?.[0]?.Role) {
+  if (isUserWithStaff(user) && user.staff?.[0]?.Role) {
     // Do not infer admin via title/priority; rely on flags/capabilities
     return false;
   }

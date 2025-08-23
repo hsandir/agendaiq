@@ -19,10 +19,10 @@ export default async function PermissionsPage() {
   // Fetch real permission data from database
   const roles = await prisma.role.findMany({
     include: {
-      Department: true,
-      Staff: {
+      department: true,
+      staff: {
         include: {
-          User: true
+          users: true
         }
       }
     },
@@ -33,7 +33,7 @@ export default async function PermissionsPage() {
 
   // Calculate permission statistics
   const totalRoles = roles.length;
-  const totalUsers = roles.reduce((acc, role) => acc + role.Staff.length, 0);
+  const totalUsers = roles.reduce((acc, role) => acc + role.staff.length, 0);
   const leadershipRoles = roles.filter(role => role.is_leadership).length;
   const regularRoles = totalRoles - leadershipRoles;
 
@@ -210,7 +210,7 @@ export default async function PermissionsPage() {
                       .filter(role => role.Department)
                       .map((role) => (
                         <Badge key={role.id} variant="secondary" className="text-xs">
-                          {role.Department?.name}
+                          {role.department?.name}
                         </Badge>
                       ))}
                   </div>

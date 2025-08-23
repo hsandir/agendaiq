@@ -18,11 +18,11 @@ export default async function DashboardPage() {
   const userWithStaff = await prisma.user.findUnique({
     where: { email: user.email! },
     include: {
-      Staff: {
+      staff: {
         include: {
-          Role: true,
-          Department: true,
-          School: true
+          role: true,
+          department: true,
+          school: true
         }
       }
     },
@@ -54,7 +54,7 @@ export default async function DashboardPage() {
   }
   
   const userId = userWithStaff?.id;
-  const staffId = userWithStaff?.Staff?.[0]?.id;
+  const staffId = userWithStaff?.staff?.[0]?.id;
   
   if (!userId) {
     redirect("/auth/signin");
@@ -66,7 +66,7 @@ export default async function DashboardPage() {
       OR: [
         { organizer_id: staffId },
         {
-          MeetingAttendee: {
+          meeting_attendee: {
             some: {
               staff_id: staffId,
               status: "ACCEPTED",
@@ -87,10 +87,10 @@ export default async function DashboardPage() {
       status: true,
       organizer_id: true,
       created_at: true,
-      Staff: {
+      staff: {
         select: {
           id: true,
-          User: {
+          users: {
             select: {
               id: true,
               name: true,
@@ -99,15 +99,15 @@ export default async function DashboardPage() {
           }
         }
       },
-      MeetingAttendee: {
+      meeting_attendee: {
         select: {
           id: true,
           staff_id: true,
           status: true,
-          Staff: {
+          staff: {
             select: {
               id: true,
-              User: {
+              users: {
                 select: {
                   id: true,
                   name: true,
@@ -135,7 +135,7 @@ export default async function DashboardPage() {
         OR: [
           { organizer_id: staffId },
           {
-            MeetingAttendee: {
+            meeting_attendee: {
               some: {
                 staff_id: staffId,
                 status: "ACCEPTED",
@@ -165,7 +165,7 @@ export default async function DashboardPage() {
         OR: [
           { organizer_id: staffId },
           {
-            MeetingAttendee: {
+            meeting_attendee: {
               some: {
                 staff_id: staffId
               }
@@ -178,15 +178,15 @@ export default async function DashboardPage() {
       },
       take: 3,
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         },
         _count: {
           select: {
-            MeetingAgendaItems: true,
-            MeetingAttendee: true
+            meeting_agenda_items: true,
+            meeting_attendee: true
           }
         }
       }
@@ -201,7 +201,7 @@ export default async function DashboardPage() {
       },
       take: 3,
       include: {
-        Meeting: true
+        meeting: true
       }
     })
   ]) : [[], []];
@@ -217,13 +217,13 @@ export default async function DashboardPage() {
       {/* Welcome Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground mb-2">Welcome back, {user.name}</h1>
-        {userWithStaff?.Staff?.[0]?.School && (
+        {userWithStaff?.staff?.[0]?.school && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>{userWithStaff.Staff[0].School.name}</span>
-            {userWithStaff.Staff[0].School.address && (
+            <span>{userWithStaff.staff[0].school.name}</span>
+            {userWithStaff.staff[0].school.address && (
               <>
                 <span>•</span>
-                <span>{userWithStaff.Staff[0].School.address}</span>
+                <span>{userWithStaff.staff[0].school.address}</span>
               </>
             )}
           </div>
@@ -312,7 +312,7 @@ export default async function DashboardPage() {
                   <ul className="text-sm text-muted-foreground space-y-1 pl-4">
                     <li>• {meeting._count.MeetingAgendaItems} agenda items</li>
                     <li>• {meeting._count.MeetingAttendee} attendees</li>
-                    <li>• Organized by {meeting.Staff.User.name ?? meeting.Staff.User.email}</li>
+                    <li>• Organized by {meeting.staff.users.name ?? meeting.staff.users.email}</li>
                   </ul>
                   <div className="text-xs text-muted-foreground mt-3 text-right">
                     {meeting.created_at ? new Date(meeting.created_at).toLocaleString() : 'Recently'}
@@ -331,7 +331,7 @@ export default async function DashboardPage() {
                 <p className="font-medium text-foreground mb-1">Recent Notes</p>
                 <ul className="text-sm text-muted-foreground space-y-1 pl-4">
                   {recentActivity[1].slice(0, 3).map((note) => (
-                    <li key={note.id}>• Note for: {note.Meeting.title}</li>
+                    <li key={note.id}>• Note for: {note.meeting.title}</li>
                   ))}
                 </ul>
                 <div className="text-xs text-muted-foreground mt-3 text-right">

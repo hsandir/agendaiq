@@ -198,7 +198,7 @@ describe('Policy Unit Tests', () => {
         is_system_admin: false,
         is_school_admin: false,
         Staff: [{
-          Role: {
+          role: {
             Permissions: [
               { capability: Capability.MEETING_CREATE },
               { capability: Capability.MEETING_VIEW },

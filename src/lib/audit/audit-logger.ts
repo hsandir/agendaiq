@@ -182,14 +182,14 @@ export class AuditLogger {
     return prisma.auditLog.findMany({
       where,
       include: {
-        User: {
+        users: {
           select: { id: true, email: true, name: true }
         },
-        Staff: {
+        staff: {
           select: { 
             id: true,
-            Role: { select: { title: true } },
-            Department: { select: { name: true } }
+            role: { select: { title: true } },
+            department: { select: { name: true } }
           }
         }
       },

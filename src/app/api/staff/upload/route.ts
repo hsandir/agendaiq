@@ -214,10 +214,10 @@ export async function POST(request: NextRequest) {
         if (!record.StaffId || !staffIdSchema.safeParse(record.StaffId).success) {
           recordErrors.push('Staff ID must be 3-15 characters');
         }
-        if (!record.Role ?? record.String(Role).trim().length === 0) {
+        if (!record.role ?? record.String(Role).trim().length === 0) {
           recordErrors.push('Role is required');
         }
-        if (!record.Department ?? record.String(Department).trim().length === 0) {
+        if (!record.department ?? record.String(Department).trim().length === 0) {
           recordErrors.push('Department is required');
         }
 
@@ -229,12 +229,12 @@ export async function POST(request: NextRequest) {
         }
 
         // Validate role exists
-        if (record.Role && !validRoles.includes(record.Role)) {
+        if (record.role && !validRoles.includes(record.Role)) {
           recordErrors.push(`Invalid role "${record.Role}". Valid roles: ${validRoles.slice(0, 3).join(', ')}...`);
         }
 
         // Validate department exists
-        if (record.Department && !validDepartments.includes(record.Department)) {
+        if (record.department && !validDepartments.includes(record.Department)) {
           recordErrors.push(`Invalid department "${record.Department}". Valid departments: ${validDepartments.slice(0, 3).join(', ')}...`);
         }
 
@@ -242,10 +242,10 @@ export async function POST(request: NextRequest) {
         const existingUser = await prisma.user.findUnique({
           where: { email: record.Email },
           include: { 
-            Staff: {
+            staff: {
               include: {
-                Role: true, 
-                Department: true
+                role: true, 
+                department: true
               }
             }
           }
@@ -260,9 +260,9 @@ export async function POST(request: NextRequest) {
               id: { not: existingUser?.id }
             },
             include: {
-              Staff: {
+              staff: {
                 include: {
-                  Role: true
+                  role: true
                 }
               }
             }
@@ -292,14 +292,14 @@ export async function POST(request: NextRequest) {
         if (existingUser) {
           // User exists - check for conflicts
           processedRecord.status = 'update';
-          const existingStaff = existingUser.Staff.length > 0 ? existingUser.Staff[0] : null;
+          const existingStaff = existingUser.staff.length > 0 ? existingUser.staff[0] : null;
           
           if (existingStaff) {
             processedRecord.existingData = {
               name: existingUser.name ?? '',
               staffId: existingUser.staff_id ?? '',
-              role: existingStaff.Role.key ?? existingStaff.Role.id.toString(),
-              department: existingStaff.Department.name
+              role: existingStaff.role.key ?? existingStaff.role.id.toString(),
+              department: existingStaff.department.name
             };
 
             // Check for conflicts
@@ -320,18 +320,18 @@ export async function POST(request: NextRequest) {
                 action: 'update_staff_id'
               });
             }
-            if (record.Role !== (existingStaff.Role.key ?? existingStaff.Role.id.toString())) {
+            if (record.role !== (existingStaff.role.key ?? existingStaff.role.id.toString())) {
               conflicts.push({
                 field: 'role',
-                existing: existingStaff.Role.key ?? existingStaff.Role.id.toString(),
+                existing: existingStaff.role.key ?? existingStaff.role.id.toString(),
                 new: record.Role,
                 action: 'change_role'
               });
             }
-            if (record.Department !== existingStaff.Department.name) {
+            if (record.department !== existingStaff.department.name) {
               conflicts.push({
                 field: 'department',
-                existing: existingStaff.Department.name,
+                existing: existingStaff.department.name,
                 new: record.Department,
                 action: 'change_department'
               });
@@ -454,7 +454,7 @@ export async function POST(request: NextRequest) {
 
           const existingUser = await prisma.user.findUnique({
             where: { email: record.email },
-            include: { Staff: true }
+            include: { staff: true }
           });
 
           if (existingUser) {
@@ -467,9 +467,9 @@ export async function POST(request: NextRequest) {
               }
             });
 
-            if (existingUser.Staff.length > 0) {
+            if (existingUser.staff.length > 0) {
               await prisma.staff.update({
-                where: { id: existingUser.Staff[0].id },
+                where: { id: existingUser.staff[0].id },
                 data: {
                   role_id: parseInt(role.id),
                   department_id: parseInt(department.id)

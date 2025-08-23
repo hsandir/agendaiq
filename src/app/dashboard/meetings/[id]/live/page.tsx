@@ -26,13 +26,13 @@ export default async function MeetingLivePage(props: Props) {
   const meeting = await prisma.meeting.findUnique({
     where: { id: meetingId },
     include: {
-      Department: true,
-      District: true,
-      School: true,
-      Staff: {
+      department: true,
+      district: true,
+      school: true,
+      staff: {
         include: {
-          User: true,
-          Role: true
+          users: true,
+          role: true
         }
       }
     }
@@ -62,11 +62,11 @@ export default async function MeetingLivePage(props: Props) {
   const attendees = await prisma.meetingAttendee.findMany({
     where: { meeting_id: meetingId },
     include: {
-      Staff: {
+      staff: {
         include: {
-          User: true,
-          Role: true,
-          Department: true
+          users: true,
+          role: true,
+          department: true
         }
       }
     }
@@ -86,15 +86,15 @@ export default async function MeetingLivePage(props: Props) {
       duration_minutes: true,
       priority: true,
       purpose: true,
-      ResponsibleStaff: {
+      responsible_staff: {
         include: {
-          User: true
+          users: true
         }
       },
       _count: {
         select: {
-          Comments: true,
-          ActionItems: true
+          comments: true,
+          action_items: true
         }
       }
     },
@@ -109,8 +109,8 @@ export default async function MeetingLivePage(props: Props) {
     include: {
       AssignedTo: {
         include: {
-          User: true,
-          Role: true
+          users: true,
+          role: true
         }
       }
     }
@@ -133,7 +133,7 @@ export default async function MeetingLivePage(props: Props) {
         // Leadership roles from same school
         { 
           school_id: user.staff?.school?.id,
-          Role: {
+          role: {
             is_leadership: true
           }
         }
@@ -141,20 +141,20 @@ export default async function MeetingLivePage(props: Props) {
     },
     select: {
       id: true,
-      User: {
+      users: {
         select: {
           id: true,
           name: true,
           email: true
         }
       },
-      Role: {
+      role: {
         select: {
           id: true,
           title: true
         }
       },
-      Department: {
+      department: {
         select: {
           id: true,
           name: true

@@ -43,7 +43,7 @@ describe('Authentication Integration Tests', () => {
         two_factor_enabled: false,
         Staff: [{
           id: 10,
-          Role: {
+          role: {
             key: 'OPS_ADMIN',
             title: 'Administrator',
             Permissions: [
@@ -51,9 +51,9 @@ describe('Authentication Integration Tests', () => {
               { capability: 'user:manage' },
             ],
           },
-          Department: { id: 1, name: 'Admin' },
-          School: { id: 1, name: 'Test School' },
-          District: { id: 1, name: 'Test District' },
+          department: { id: 1, name: 'Admin' },
+          school: { id: 1, name: 'Test School' },
+          district: { id: 1, name: 'Test District' },
         }],
       };
 
@@ -71,12 +71,12 @@ describe('Authentication Integration Tests', () => {
       await prisma.user.findUnique({
         where: { email: credentials.email },
         include: {
-          Staff: {
+          staff: {
             include: {
-              Role: true,
-              Department: true,
-              School: true,
-              District: true
+              role: true,
+              department: true,
+              school: true,
+              district: true
             }
           }
         }
@@ -89,12 +89,12 @@ describe('Authentication Integration Tests', () => {
       expect(prisma.user.findUnique).toHaveBeenCalledWith({
         where: { email: 'test@school.edu' },
         include: {
-          Staff: {
+          staff: {
             include: {
-              Role: true,
-              Department: true,
-              School: true,
-              District: true,
+              role: true,
+              department: true,
+              school: true,
+              district: true,
             },
           },
         },

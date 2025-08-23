@@ -398,7 +398,7 @@ describe('Comprehensive API Route Tests', () => {
     });
 
     describe('Meeting Agenda Items API', () => {
-      let testMeeting: { id: number };
+      let testmeeting: { id: number };
 
       beforeAll(async () => {
         // Create a test meeting

@@ -34,16 +34,16 @@ export default async function EditMeetingPage({ params }: PageProps) {
   const meeting = await prisma.meeting.findUnique({
     where: { id: meetingId },
     include: {
-      Staff: {
+      staff: {
         include: {
-          User: true
+          users: true
         }
       },
-      MeetingAttendee: {
+      meeting_attendee: {
         include: {
-          Staff: {
+          staff: {
             include: {
-              User: true
+              users: true
             }
           }
         }
@@ -80,7 +80,7 @@ export default async function EditMeetingPage({ params }: PageProps) {
         // Leadership roles from same school
         { 
           school_id: user.staff?.school?.id,
-          Role: {
+          role: {
             is_leadership: true
           }
         }
@@ -88,18 +88,18 @@ export default async function EditMeetingPage({ params }: PageProps) {
     },
     select: {
       id: true,
-      User: {
+      users: {
         select: {
           name: true,
           email: true
         }
       },
-      Role: {
+      role: {
         select: {
           key: true
         }
       },
-      Department: {
+      department: {
         select: {
           name: true
         }
@@ -110,10 +110,10 @@ export default async function EditMeetingPage({ params }: PageProps) {
 
   const transformedUsers = (allStaff.map(staff => ({
     id: staff.id.toString(),
-    name: staff.User.name ?? staff.User.email ?? '',
-    email: staff.User.email ?? '',
-    role: staff.Role.key ?? 'UNKNOWN_ROLE',
-    department: staff.Department.name
+    name: staff.users.name ?? staff.users.email ?? '',
+    email: staff.users.email ?? '',
+    role: staff.role.key ?? 'UNKNOWN_ROLE',
+    department: staff.department.name
   })));
 
   // Check if this is a draft meeting (Step 2) or existing meeting (edit)
@@ -134,10 +134,10 @@ export default async function EditMeetingPage({ params }: PageProps) {
     zoomLink: meeting.zoom_join_url ?? '',
     zoomMeetingId: meeting.zoom_meeting_id ?? '',
     calendarIntegration: meeting.calendar_integration ?? 'none',
-    attendees: meeting.MeetingAttendee.map(attendee => ({
-      id: attendee.Staff.id.toString(),
-      name: attendee.Staff.User.name ?? attendee.Staff.User.email ?? '',
-      email: attendee.Staff.User.email ?? '',
+    attendees: meeting.meeting_attendee.map(attendee => ({
+      id: attendee.staff.id.toString(),
+      name: attendee.staff.users.name ?? attendee.staff.users.email ?? '',
+      email: attendee.staff.users.email ?? '',
       status: attendee.status ?? 'pending'
     })),
     agendaItems: meeting.MeetingAgendaItems.map(item => ({

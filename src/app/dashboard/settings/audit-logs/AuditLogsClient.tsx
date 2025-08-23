@@ -132,11 +132,11 @@ interface LegacyAuditLog {
   ip_address: string | null;
   user_agent: string | null;
   created_at: string;
-  User: { id: number; email: string; name: string | null } | null;
-  Staff: { 
+  users: { id: number; email: string; name: string | null } | null;
+  staff: { 
     id: number; 
-    Role: { label: string }; 
-    Department: { name: string } 
+    role: { label: string }; 
+    department: { name: string } 
   } | null;
 }
 
@@ -155,11 +155,11 @@ interface CriticalAuditLog {
   error_message: string | null;
   description: string | null;
   timestamp: string;
-  User: { id: number; email: string; name: string | null } | null;
-  Staff: { 
+  users: { id: number; email: string; name: string | null } | null;
+  staff: { 
     id: number; 
-    Role: { label: string }; 
-    Department: { name: string } 
+    role: { label: string }; 
+    department: { name: string } 
   } | null;
 }
 
@@ -404,13 +404,13 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
     }
 
     // Leadership can view logs from their own organization
-    if (user.staff?.Role?.is_leadership) {
+    if (user.staff?.role?.is_leadership) {
       // Can view logs from same user or their own staff actions
       if (isCriticalLog(log)) {
         return log.user_id === user.id ?? log.staff_id === user.staff.id;
       } else {
         // For legacy logs, check the User/Staff relations
-        return log.User?.id === user.id ?? log.Staff?.id === user.staff.id;
+        return log.users?.id === user.id ?? log.staff?.id === user.staff.id;
       }
     }
 
@@ -419,7 +419,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
       return log.user_id === user.id ?? log.staff_id === user.staff?.id;
     } else {
       // For legacy logs, check the User/Staff relations
-      return log.User?.id === user.id ?? log.Staff?.id === user.staff?.id;
+      return log.users?.id === user.id ?? log.staff?.id === user.staff?.id;
     }
   }, [user]);
 
@@ -787,12 +787,12 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                      {log.User ? (
+                      {log.users ? (
                         <div>
-                          <div className="font-medium">{log.User.name ?? log.User.email}</div>
-                          {log.Staff && (
+                          <div className="font-medium">{log.users.name ?? log.users.email}</div>
+                          {log.staff && (
                             <div className="text-muted-foreground text-xs">
-                              {log.Staff.Role.title} - {log.Staff.Department.name}
+                              {log.staff.role.title} - {log.staff.department.name}
                             </div>
                           )}
                         </div>
@@ -937,7 +937,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                     <div>
                       <label className="text-sm font-medium text-foreground">User/Staff ID</label>
                       <p className="text-sm text-foreground">
-                        User: {selectedLog.user_id || 'N/A'}, Staff: {selectedLog.staff_id || 'N/A'}
+                        users: {selectedLog.user_id || 'N/A'}, Staff: {selectedLog.staff_id || 'N/A'}
                       </p>
                     </div>
                   </>

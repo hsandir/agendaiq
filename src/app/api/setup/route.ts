@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
 
     const schools = await prisma.school.findMany({
       include: { 
-        District: true,
-        Department: true,
+        district: true,
+        department: true,
       },
     });
 

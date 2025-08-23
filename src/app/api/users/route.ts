@@ -23,11 +23,11 @@ export async function GET(request: NextRequest) {
 
     const users = await prisma.user.findMany({
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: true,
-            Department: true,
-            School: true
+            role: true,
+            department: true,
+            school: true
           }
         }
       },

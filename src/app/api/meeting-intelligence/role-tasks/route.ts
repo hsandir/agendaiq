@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       roleWhereConditions.is_leadership = true;
     } else if (filter === 'active') {
       // Roles with active tasks
-      roleWhereConditions.ActionItems = {
+      roleWhereConditions.action_items = {
         some: {
           status: {
             not: 'Completed'
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       };
     } else if (filter === 'overdue') {
       // Roles with overdue tasks
-      roleWhereConditions.ActionItems = {
+      roleWhereConditions.action_items = {
         some: {
           due_date: {
             lt: new Date()
@@ -44,9 +44,9 @@ export async function GET(request: NextRequest) {
     const roles = await prisma.role.findMany({
       where: roleWhereConditions,
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: {
+            users: {
               select: {
                 id: true,
                 name: true,
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
         },
         AgendaItems: {
           include: {
-            Meeting: {
+            meeting: {
               select: {
                 id: true,
                 title: true,
@@ -66,18 +66,18 @@ export async function GET(request: NextRequest) {
             }
           }
         },
-        ActionItems: {
+        action_items: {
           include: {
-            Meeting: {
+            meeting: {
               select: {
                 id: true,
                 title: true,
                 start_time: true
               }
             },
-            AssignedTo: {
+            assigned_to: {
               include: {
-                User: {
+                users: {
                   select: {
                     id: true,
                     name: true
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
     // Transform roles with tasks
     const now = new Date();
     const rolesWithTasks = roles.map(role => {
-      const tasks = role.ActionItems.map((item) => {
+      const tasks = role.action_items.map((item) => {
         const isOverdue = item.due_date && item.due_date < now && item.status !== 'Completed';
         
         return {
@@ -112,9 +112,9 @@ export async function GET(request: NextRequest) {
           dueDate: item.due_date?.toISOString(),
           assignedAt: item.created_at.toISOString(),
           meeting: item.Meeting ? {
-            id: item.Meeting.id,
-            title: item.Meeting.title,
-            date: item.Meeting.start_time?.toISOString() || new Date().toISOString()
+            id: item.meeting.id,
+            title: item.meeting.title,
+            date: item.meeting.start_time?.toISOString() || new Date().toISOString()
           } : undefined,
           previousHolder: undefined // Would need transition history tracking
         };
@@ -139,10 +139,10 @@ export async function GET(request: NextRequest) {
       };
       
       // Get current holder
-      const currentHolder = role.Staff.length > 0 ? {
-        id: role.Staff[0].id,
-        name: role.Staff[0].User.name ?? 'Unknown',
-        email: role.Staff[0].User.email
+      const currentHolder = role.staff.length > 0 ? {
+        id: role.staff[0].id,
+        name: role.staff[0].users.name ?? 'Unknown',
+        email: role.staff[0].users.email
       } : undefined;
       
       return {

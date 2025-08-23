@@ -37,33 +37,33 @@ export async function GET(request: NextRequest) {
         OR: [
           { parent_meeting_id: { not: null } },
           { 
-            ContinuationMeetings: {
+            continuation_meetings: {
               some: {}
             }
           }
         ]
       },
       include: {
-        ParentMeeting: true,
-        ContinuationMeetings: {
+        Parentmeeting: true,
+        continuation_meetings: {
           include: {
-            MeetingAgendaItems: true,
-            MeetingActionItems: true,
-            MeetingAttendee: true
+            meeting_agenda_items: true,
+            meeting_action_items: true,
+            meeting_attendee: true
           }
         },
-        MeetingAgendaItems: {
+        meeting_agenda_items: {
           include: {
             ResponsibleRole: true
           }
         },
-        MeetingActionItems: {
+        meeting_action_items: {
           include: {
             AssignedToRole: true
           }
         },
-        MeetingAttendee: true,
-        Department: true
+        meeting_attendee: true,
+        department: true
       },
       orderBy: {
         start_time: 'desc'
@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
         const rootMeeting = meetings.find(m => m.id === rootId) || meeting;
         chainsMap.set(chainId, {
           id: chainId,
-          rootMeeting: {
+          rootmeeting: {
             id: rootMeeting.id,
             title: rootMeeting.title,
             date: rootMeeting.start_time?.toISOString() || new Date().toISOString(),
@@ -185,7 +185,7 @@ function buildMeetingNode(meeting: Record<string, unknown>, allMeetings: Record<
         return i.due_date && i.due_date < new Date() && i.status !== 'Completed';
       }).length
     },
-    attendeeCount: (meeting.MeetingAttendee as unknown[]).length,
+    attendeeCount: (meeting.meeting_attendee as unknown[]).length,
     duration: meeting.start_time && meeting.end_time
       ? Math.round(((meeting.end_time as Date).getTime() - (meeting.start_time as Date).getTime()) / 60000)
       : 60

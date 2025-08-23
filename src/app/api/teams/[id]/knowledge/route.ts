@@ -52,7 +52,7 @@ export async function GET(
     }
 
     const { user } = auth;
-    const teamId = parseInt(params.id);
+    const teamId = params.id;
 
     // Get user's staff record
     const staff = await prisma.staff.findFirst({
@@ -197,7 +197,7 @@ export async function POST(
     }
 
     const { user } = auth;
-    const teamId = parseInt(params.id);
+    const teamId = params.id;
 
     // Parse and validate request body
     const body = await request.json();
@@ -318,7 +318,7 @@ export async function PUT(
     }
 
     const { user } = auth;
-    const teamId = parseInt(params.id);
+    const teamId = params.id;
 
     // Get knowledge ID from query params
     const { searchParams } = new URL(request.url);
@@ -349,7 +349,7 @@ export async function PUT(
 
     // Check if knowledge exists
     const knowledge = await prisma.teamKnowledge.findUnique({
-      where: { id: parseInt(knowledgeId) },
+      where: { id: knowledgeId },
       include: {
         team: {
           include: {
@@ -382,7 +382,7 @@ export async function PUT(
 
     // Update the knowledge resource
     const updatedKnowledge = await prisma.teamKnowledge.update({
-      where: { id: parseInt(knowledgeId) },
+      where: { id: knowledgeId },
       data: {
         ...(validatedData.title && { title: validatedData.title }),
         ...(validatedData.content && { content: validatedData.content }),
@@ -457,7 +457,7 @@ export async function DELETE(
     }
 
     const { user } = auth;
-    const teamId = parseInt(params.id);
+    const teamId = params.id;
 
     // Get knowledge ID from query params
     const { searchParams } = new URL(request.url);
@@ -484,7 +484,7 @@ export async function DELETE(
 
     // Check if knowledge exists
     const knowledge = await prisma.teamKnowledge.findUnique({
-      where: { id: parseInt(knowledgeId) },
+      where: { id: knowledgeId },
       include: {
         team: {
           include: {
@@ -517,12 +517,12 @@ export async function DELETE(
 
     // Delete associated views first
     await prisma.teamKnowledgeView.deleteMany({
-      where: { knowledge_id: parseInt(knowledgeId) }
+      where: { knowledge_id: knowledgeId }
     });
 
     // Delete the knowledge resource
     await prisma.teamKnowledge.delete({
-      where: { id: parseInt(knowledgeId) }
+      where: { id: knowledgeId }
     });
 
     return NextResponse.json({

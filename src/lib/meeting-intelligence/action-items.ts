@@ -42,10 +42,10 @@ export class ActionItemsService {
         status: 'Pending'
       },
       include: {
-        AssignedTo: {
+        assigned_to: {
           include: {
-            User: true,
-            Role: true
+            users: true,
+            role: true
           }
         }
       }
@@ -75,14 +75,14 @@ export class ActionItemsService {
       where: { id: actionItemId },
       data: updateData,
       include: {
-        AssignedTo: {
+        assigned_to: {
           include: {
-            User: true
+            users: true
           }
         },
         CompletedBy: {
           include: {
-            User: true
+            users: true
           }
         }
       }
@@ -123,18 +123,18 @@ export class ActionItemsService {
     const overdueItems = await prisma.meetingActionItem.findMany({
       where,
       include: {
-        Meeting: {
+        meeting: {
           select: {
             id: true,
             title: true,
             start_time: true
           }
         },
-        AssignedTo: {
+        assigned_to: {
           include: {
-            User: true,
-            Role: true,
-            Department: true
+            users: true,
+            role: true,
+            department: true
           }
         }
       },
@@ -188,21 +188,21 @@ export class ActionItemsService {
     return await prisma.meetingActionItem.findMany({
       where,
       include: {
-        Meeting: {
+        meeting: {
           select: {
             id: true,
             title: true,
             start_time: true,
-            Department: true
+            department: true
           }
         },
-        AssignedTo: {
+        assigned_to: {
           include: {
-            User: true,
-            Role: true
+            users: true,
+            role: true
           }
         },
-        AgendaItem: {
+        agenda_item: {
           select: {
             topic: true
           }
@@ -328,14 +328,14 @@ export class ActionItemsService {
     const items = await prisma.meetingActionItem.findMany({
       where,
       include: {
-        Meeting: {
+        meeting: {
           select: {
             title: true
           }
         },
-        AssignedTo: {
+        assigned_to: {
           include: {
-            User: true
+            users: true
           }
         }
       },

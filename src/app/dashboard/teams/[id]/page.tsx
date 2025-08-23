@@ -50,7 +50,7 @@ interface TeamMember {
 }
 
 interface Team {
-  id: number;
+  id: string;
   name: string;
   description?: string | null;
   type: string;
@@ -97,7 +97,7 @@ export default function TeamDetailPage() {
       // In a real app, we'd have a separate endpoint for team details
       if (data.members && data.members.length > 0) {
         setTeam({
-          id: parseInt(params.id as string),
+          id: params.id as string,
           name: 'Team Name', // This would come from a proper endpoint
           description: 'Team Description',
           type: 'DEPARTMENT',

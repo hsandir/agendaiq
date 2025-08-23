@@ -315,10 +315,10 @@ class HybridAuditSystem {
         ...(userId && { user_id: userId })
       },
       include: {
-        User: {
+        users: {
           select: { id: true, email: true, name: true }
         },
-        Staff: {
+        staff: {
           select: { id: true, Role: { select: { title: true } } }
         }
       },
@@ -341,10 +341,10 @@ class HybridAuditSystem {
         timestamp: { gte: since }
       },
       include: {
-        User: {
+        users: {
           select: { id: true, email: true, name: true }
         },
-        Staff: {
+        staff: {
           select: { id: true, Role: { select: { title: true } } }
         }
       },

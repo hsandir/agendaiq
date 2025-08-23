@@ -69,9 +69,9 @@ export default async function CreateFirstAdminPage() {
       email: true,
       name: true,
       hashedPassword: true,
-      Staff: {
+      staff: {
         select: {
-          Role: {
+          role: {
             select: {
               title: true,
               key: true

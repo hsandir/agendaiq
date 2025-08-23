@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     const complexStart = performance.now();
     await prisma.meeting.findFirst({
       include: {
-        MeetingAttendee: {
+        meeting_attendee: {
           take: 5
         }
       }

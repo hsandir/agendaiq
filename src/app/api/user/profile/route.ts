@@ -14,13 +14,13 @@ export async function GET(request: NextRequest) {
     const userProfile = await prisma.user.findUnique({
       where: { email: user.email },
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: true,
-            Department: true,
-            School: {
+            role: true,
+            department: true,
+            school: {
               include: {
-                District: true
+                district: true
               }
             }
           }
@@ -37,11 +37,11 @@ export async function GET(request: NextRequest) {
       email: userProfile.email,
       name: userProfile.name,
       staff_id: userProfile.staff_id,
-      staff: userProfile.Staff?.[0] ? {
-        id: userProfile.Staff[0].id,
-        role: userProfile.Staff[0].Role,
-        department: userProfile.Staff[0].Department,
-        school: userProfile.Staff[0].School
+      staff: userProfile.staff?.[0] ? {
+        id: userProfile.staff[0].id,
+        role: userProfile.staff[0].Role,
+        department: userProfile.staff[0].Department,
+        school: userProfile.staff[0].school
       } : null
     });
   } catch (error: unknown) {
@@ -70,13 +70,13 @@ export async function PUT(request: NextRequest) {
       where: { email: user.email },
       data: updateData,
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: true,
-            Department: true,
-            School: {
+            role: true,
+            department: true,
+            school: {
               include: {
-                District: true
+                district: true
               }
             }
           }
@@ -89,11 +89,11 @@ export async function PUT(request: NextRequest) {
       email: updatedUser.email,
       name: updatedUser.name,
       staff_id: updatedUser.staff_id,
-      staff: updatedUser.Staff?.[0] ? {
-        id: updatedUser.Staff[0].id,
-        role: updatedUser.Staff[0].Role,
-        department: updatedUser.Staff[0].Department,
-        school: updatedUser.Staff[0].School
+      staff: updatedUser.staff?.[0] ? {
+        id: updatedUser.staff[0].id,
+        role: updatedUser.staff[0].Role,
+        department: updatedUser.staff[0].Department,
+        school: updatedUser.staff[0].school
       } : null
     });
   } catch (error: unknown) {

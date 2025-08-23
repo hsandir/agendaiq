@@ -32,7 +32,7 @@ interface RoleData {
   };
   Staff?: Array<{
     id: number;
-    User: {
+    users: {
       name: string | null;
       email: string;
     };
@@ -98,8 +98,8 @@ export default function RoleManagement() {
               <TableRow key={role.id}>
                 <TableCell className="font-medium">{role.title}</TableCell>
                 <TableCell>{role.category || 'N/A'}</TableCell>
-                <TableCell>{role.Department?.name || 'No Department'}</TableCell>
-                <TableCell>{role.Staff?.length ?? 0}</TableCell>
+                <TableCell>{role.department?.name || 'No Department'}</TableCell>
+                <TableCell>{role.staff?.length ?? 0}</TableCell>
                 <TableCell>
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     role.is_leadership 

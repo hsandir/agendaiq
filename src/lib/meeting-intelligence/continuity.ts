@@ -19,7 +19,7 @@ export class MeetingContinuityService {
           }
         },
         include: {
-          ResponsibleStaff: true,
+          responsible_staff: true,
           ResponsibleRole: true
         }
       }),
@@ -33,7 +33,7 @@ export class MeetingContinuityService {
           }
         },
         include: {
-          AssignedTo: true,
+          assigned_to: true,
           AssignedToRole: true
         }
       })
@@ -136,8 +136,8 @@ export class MeetingContinuityService {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        ParentMeeting: true,
-        ContinuationMeetings: {
+        Parentmeeting: true,
+        continuation_meetings: {
           orderBy: { created_at: 'asc' }
         }
       }
@@ -151,8 +151,8 @@ export class MeetingContinuityService {
       const parent = await prisma.meeting.findUnique({
         where: { id: rootMeeting.parent_meeting_id! },
         include: { 
-          ParentMeeting: true,
-          ContinuationMeetings: {
+          Parentmeeting: true,
+          continuation_meetings: {
             orderBy: { created_at: 'asc' }
           }
         }
@@ -166,11 +166,11 @@ export class MeetingContinuityService {
       const children = await prisma.meeting.findMany({
         where: { parent_meeting_id: id },
         include: {
-          MeetingAgendaItems: { 
+          meeting_agenda_items: { 
             where: { carried_forward: true },
             select: { id: true, topic: true, status: true }
           },
-          MeetingActionItems: {
+          meeting_action_items: {
             where: { parent_action_id: { not: null } },
             select: { id: true, title: true, status: true }
           }
@@ -191,7 +191,7 @@ export class MeetingContinuityService {
     return {
       root: rootMeeting,
       chain: await getAllDescendants(rootMeeting.id),
-      currentMeeting: meeting
+      currentmeeting: meeting
     };
   }
 

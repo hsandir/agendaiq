@@ -27,12 +27,12 @@ export async function GET(request: NextRequest) {
     const userRecord = await prisma.user.findUnique({
       where: { email: user.email },
       include: { 
-        Staff: {
+        staff: {
           include: {
-            Role: true,
-            School: {
+            role: true,
+            school: {
               include: {
-                District: true
+                district: true
               }
             }
           }
@@ -40,16 +40,16 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    if (!userRecord || (!userRecord.Staff ?? (userRecord.Staff.length === 0))) {
+    if (!userRecord || (!userRecord.staff ?? (userRecord.staff.length === 0))) {
       return NextResponse.json({ error: "User staff record not found" }, { status: 404 });
     }
 
-    const staffRecord = userRecord.Staff[0];
+    const staffRecord = userRecord.staff[0];
 
-    if (staffRecord.Role?.title === "Administrator") {
+    if (staffRecord.role?.title === "Administrator") {
       // Admin: return all schools
       const schools = await prisma.school.findMany({
-        include: { District: true },
+        include: { district: true },
         orderBy: { name: "asc" },
       });
       return NextResponse.json(schools);
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
         district_id: district_id as number,
       },
       include: {
-        District: true,
+        district: true,
       },
     });
 
@@ -203,7 +203,7 @@ export async function PUT(request: NextRequest) {
       where: { id: id as number },
       data: updateData,
       include: {
-        District: true,
+        district: true,
       },
     });
 

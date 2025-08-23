@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
     const users = await prisma.user.findMany({
       include: {
-        Staff: { include: { Role: true, Department: true, School: true } },
+        staff: { include: { role: true, department: true, school: true } },
       },
       orderBy: {
         name: 'asc',

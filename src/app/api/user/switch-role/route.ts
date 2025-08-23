@@ -24,25 +24,25 @@ export async function POST(request: NextRequest) {
     const user = await prisma.user.findUnique({
       where: { email: auth.user.email },
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: true,
-            Department: true,
-            School: true,
-            District: true
+            role: true,
+            department: true,
+            school: true,
+            district: true
           }
         }
       }
     });
 
-    if (!user || !(user.Staff ?? user.Staff.length === 0)) {
+    if (!user || !(user.staff ?? user.staff.length === 0)) {
       return NextResponse.json(
         { error: "User staff record not found" },
         { status: 404 }
       );
     }
 
-    const staffRecord = user.Staff[0];
+    const staffRecord = user.staff[0];
     let targetRole;
 
     if (role === 'admin') {

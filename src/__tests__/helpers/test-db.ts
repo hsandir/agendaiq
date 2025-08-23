@@ -64,22 +64,22 @@ export async function seedTestDatabase() {
   // Use existing data from copied main database
   const users: UserWithStaff[] = await prisma.user.findMany({
     include: {
-      Staff: {
+      staff: {
         include: {
-          Role: true,
-          Department: true,
-          School: true,
-          District: true
+          role: true,
+          department: true,
+          school: true,
+          district: true
         }
       }
     }
   })
   
   if (users.length >= 2) {
-    const _adminUser = users.find(u => u.Staff?.[0]?.Role?.is_leadership) || users[0]
-    const teacherUser = users.find(u => !u.Staff?.[0]?.Role?.is_leadership) || users[1]
-    const _adminStaff = adminUser.Staff?.[0]
-    const teacherStaff = teacherUser.Staff?.[0]
+    const _adminUser = users.find(u => u.staff?.[0]?.role?.is_leadership) || users[0]
+    const teacherUser = users.find(u => !u.staff?.[0]?.role?.is_leadership) || users[1]
+    const _adminStaff = adminUser.staff?.[0]
+    const teacherStaff = teacherUser.staff?.[0]
     
     if (adminStaff && teacherStaff) {
       return { adminUser, teacherUser, adminStaff, teacherStaff }

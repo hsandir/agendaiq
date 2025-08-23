@@ -43,7 +43,7 @@ export async function GET(
     }
 
     const { user } = auth;
-    const teamId = parseInt(params.id);
+    const teamId = params.id;
 
     // Check if team exists
     const team = await prisma.team.findUnique({
@@ -135,7 +135,7 @@ export async function POST(
     }
 
     const { user } = auth;
-    const teamId = parseInt(params.id);
+    const teamId = params.id;
 
     // Parse and validate request body
     const body = await request.json();
@@ -272,7 +272,7 @@ export async function PUT(
     }
 
     const { user } = auth;
-    const teamId = parseInt(params.id);
+    const teamId = params.id;
 
     // Get member ID from query params
     const { searchParams } = new URL(request.url);
@@ -412,7 +412,7 @@ export async function DELETE(
     }
 
     const { user } = auth;
-    const teamId = parseInt(params.id);
+    const teamId = params.id;
 
     // Get member ID from query params
     const { searchParams } = new URL(request.url);

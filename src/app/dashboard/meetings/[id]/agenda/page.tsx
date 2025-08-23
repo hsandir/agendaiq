@@ -34,19 +34,19 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
   const meeting = await prisma.meeting.findUnique({
     where: { id: meetingId },
     include: {
-      Staff: {
+      staff: {
         include: {
-          User: true,
-          Role: true
+          users: true,
+          role: true
         }
       },
-      Department: true,
+      department: true,
       MeetingAgendaItems: {
         include: {
-          ResponsibleStaff: {
+          responsible_staff: {
             include: {
-              User: true,
-              Role: true
+              users: true,
+              role: true
             }
           }
         },
@@ -54,13 +54,13 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
           order_index: 'asc'
         }
       },
-      MeetingAttendee: {
+      meeting_attendee: {
         include: {
-          Staff: {
+          staff: {
             include: {
-              User: true,
-              Role: true,
-              Department: true
+              users: true,
+              role: true,
+              department: true
             }
           }
         }
@@ -75,7 +75,7 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
   // Check if user has permission to edit this meeting's agenda
   const hasAdminAccess = isAnyAdmin(user);
   const isOrganizer = meeting.organizer_id === user.staff?.id;
-  const isAttendee = meeting.MeetingAttendee.some(a => a.staff_id === user.staff?.id);
+  const isAttendee = meeting.meeting_attendee.some(a => a.staff_id === user.staff?.id);
 
   if (!hasAdminAccess && !isOrganizer && !isAttendee) {
     redirect("/dashboard/meetings");
@@ -90,22 +90,22 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
         // Leadership roles from same school
         { 
           school_id: parseInt(user).staff?.school?.id,
-          Role: {
+          role: {
             is_leadership: true
           }
         },
         // Meeting attendees
         {
           id: {
-            in: meeting.MeetingAttendee.map(a => a.staff_id)
+            in: meeting.meeting_attendee.map(a => a.staff_id)
           }
         }
       ]
     },
     include: {
-      User: true,
-      Role: true,
-      Department: true
+      users: true,
+      role: true,
+      department: true
     },
     take: 200 // Limit for performance
   }));
@@ -120,7 +120,7 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
         { organizer_id: user.staff?.id },
         { department_id: parseInt(user).staff?.department?.id },
         {
-          MeetingAttendee: {
+          meeting_attendee: {
             some: {
               staff_id: user.staff?.id
             }
@@ -150,8 +150,8 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
   // Transform staff data to match the component's expected format
   const staffForAgenda = (allStaff.map(staff => ({
     id: staff.id,
-    name: staff.User.name ?? staff.User.email ?? 'Unknown',
-    initials: staff.User.name?.split(' ').map(n => n[0]).join('').toUpperCase()
+    name: staff.users.name ?? staff.users.email ?? 'Unknown',
+    initials: staff.users.name?.split(' ').map(n => n[0]).join('').toUpperCase()
   })));
 
   return (

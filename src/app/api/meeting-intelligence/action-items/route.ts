@@ -65,23 +65,23 @@ export async function GET(request: NextRequest) {
     const actionItems = await prisma.meetingActionItem.findMany({
       where: whereConditions,
       include: {
-        Meeting: {
+        meeting: {
           select: {
             id: true,
             title: true,
             start_time: true
           }
         },
-        AssignedTo: {
+        assigned_to: {
           include: {
-            User: {
+            users: {
               select: {
                 id: true,
                 name: true,
                 email: true
               }
             },
-            Role: true
+            role: true
           }
         },
         AssignedToRole: true
@@ -115,13 +115,13 @@ export async function GET(request: NextRequest) {
         },
         assignedStaff: item.AssignedTo ? {
           id: item.AssignedTo.id,
-          name: item.AssignedTo.User.name ?? 'Unknown',
-          email: item.AssignedTo.User.email
+          name: item.AssignedTo.users.name ?? 'Unknown',
+          email: item.AssignedTo.users.email
         } : undefined,
         meeting: item.Meeting ? {
-          id: item.Meeting.id,
-          title: item.Meeting.title,
-          date: item.Meeting.start_time?.toISOString() || new Date().toISOString()
+          id: item.meeting.id,
+          title: item.meeting.title,
+          date: item.meeting.start_time?.toISOString() || new Date().toISOString()
         } : undefined,
         carriedForwardCount: item.carry_forward_count ?? 0,
         parentItemId: item.parent_action_id

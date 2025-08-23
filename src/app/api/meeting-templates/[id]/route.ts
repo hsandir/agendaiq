@@ -27,9 +27,9 @@ export async function GET(
     const template = await prisma.meetingTemplate.findUnique({
       where: { id: templateId },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       }
@@ -55,7 +55,7 @@ export async function GET(
         created_by: template.created_by,
         created_at: template.created_at,
         updated_at: template.updated_at,
-        creator: template.Staff.User.name ?? template.Staff.User.email
+        creator: template.staff.users.name ?? template.staff.users.email
       }
     });
 
@@ -103,9 +103,9 @@ export async function PUT(
         is_active: is_active !== undefined ? is_active : undefined
       },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       }
@@ -124,7 +124,7 @@ export async function PUT(
         created_by: template.created_by,
         created_at: template.created_at,
         updated_at: template.updated_at,
-        creator: template.Staff.User.name ?? template.Staff.User.email
+        creator: template.staff.users.name ?? template.staff.users.email
       }
     });
 

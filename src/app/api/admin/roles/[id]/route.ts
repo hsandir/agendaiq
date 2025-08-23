@@ -34,10 +34,10 @@ export async function PUT(
         department_id: typeof department_id === 'string' ? parseInt(department_id) : (typeof department_id === 'number' ? department_id : undefined),
       },
       include: {
-        Department: true,
-        Staff: {
+        department: true,
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       }

@@ -198,7 +198,7 @@ export default async function MeetingIntelligenceDashboard() {
                   </p>
                   <p className="text-xs text-red-700 dark:text-red-400">
                     Due: {item.due_date ? new Date(item.due_date).toLocaleDateString() : ''} | 
-                    Meeting: {item.Meeting.title}
+                    meeting: {item.meeting.title}
                   </p>
                 </div>
                 <Link

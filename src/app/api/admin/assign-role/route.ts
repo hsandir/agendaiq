@@ -10,10 +10,10 @@ async function findManagerId(roleTitle: string, departmentId: number) {
       // Find Department Chair of the same department
       const departmentChair = await prisma.staff.findFirst({
         where: {
-          Role: { title: 'Department Chair' },
+          role: { title: 'Department Chair' },
           department_id: parseInt(departmentId),
         },
-        include: { User: true },
+        include: { users: true },
       });
       return departmentChair?.user_id;
 
@@ -21,9 +21,9 @@ async function findManagerId(roleTitle: string, departmentId: number) {
       // Find STEM Chair
       const stemChair = await prisma.staff.findFirst({
         where: {
-          Role: { title: 'STEM Chair' },
+          role: { title: 'STEM Chair' },
         },
-        include: { User: true },
+        include: { users: true },
       });
       return stemChair?.user_id;
 
@@ -31,9 +31,9 @@ async function findManagerId(roleTitle: string, departmentId: number) {
       // Find Admin
       const admin = await prisma.staff.findFirst({
         where: {
-          Role: { title: 'Administrator' },
+          role: { title: 'Administrator' },
         },
-        include: { User: true },
+        include: { users: true },
       });
       return admin?.user_id;
 
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     // Find the user
     const user = await prisma.user.findUnique({
       where: { email },
-      include: { Staff: true },
+      include: { staff: true },
     });
 
     if (!user) {
@@ -83,9 +83,9 @@ export async function POST(request: NextRequest) {
     const finalManagerId = managerId ? (typeof managerId === 'string' ? parseInt(managerId) : Number(managerId)) : autoAssignedManagerId ?? undefined;
 
     // Update or create staff record
-    if (user.Staff?.[0]) {
+    if (user.staff?.[0]) {
       await prisma.staff.update({
-        where: { id: user.Staff[0].id },
+        where: { id: user.staff[0].id },
         data: {
           role_id: typeof roleId === 'string' ? parseInt(roleId) : Number(roleId),
           department_id: deptIdNum,
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
     // Get updated user with staff
     const updatedUser = await prisma.user.findUnique({
       where: { id: user?.id },
-      include: { Staff: { include: { Role: true, Department: true } } },
+      include: { staff: { include: { role: true, department: true } } },
     });
 
     return NextResponse.json(updatedUser);

@@ -47,9 +47,9 @@ export async function POST(request: NextRequest) {
         id: true,
         email: true,
         hashedPassword: true,
-        Staff: {
+        staff: {
           select: {
-            Role: {
+            role: {
               select: {
                 key: true,
                 is_leadership: true

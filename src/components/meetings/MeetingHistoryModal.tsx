@@ -66,7 +66,7 @@ interface ImportOptions {
 interface MeetingHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectMeeting: (meeting: Meeting) => void;
+  onSelectmeeting: (meeting: Meeting) => void;
   currentUserId?: string;
   currentDepartment?: string;
   currentRole?: string;

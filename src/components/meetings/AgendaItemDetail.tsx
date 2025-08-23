@@ -351,7 +351,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
             <div className="bg-card rounded-xl shadow-sm border border-border p-6">
               <AgendaItemComments
                 itemId={item.id}
-                comments={item.Comments ?? []}
+                comments={item.comments ?? []}
                 onAddComment={handleAddComment}
                 canComment={true}
               />
@@ -484,21 +484,21 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                         <SelectItem value="none">None</SelectItem>
                         {allStaff.map((s) => (
                           <SelectItem key={s.id} value={s.id.toString()}>
-                            {s.User.name ?? s.User.email}
+                            {s.users.name ?? s.users.email}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   ) : (
                     <div className="mt-1">
-                      {item.ResponsibleStaff ? (
+                      {item.responsible_staff ? (
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                             <User className="h-4 w-4 text-primary" />
                           </div>
                           <div>
-                            <p className="font-medium text-foreground">{item.ResponsibleStaff.User.name ?? item.ResponsibleStaff.User.email}</p>
-                            <p className="text-xs text-muted-foreground">{item.ResponsibleStaff.Role.title}</p>
+                            <p className="font-medium text-foreground">{item.responsible_staff.users.name ?? item.responsible_staff.users.email}</p>
+                            <p className="text-xs text-muted-foreground">{item.responsible_staff.role.title}</p>
                           </div>
                         </div>
                       ) : (
@@ -558,9 +558,9 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                 )}
               </div>
               
-              {item.Attachments?.length > 0 ? (
+              {item.attachments?.length > 0 ? (
                 <div className="space-y-2">
-                  {item.Attachments.map((attachment) => (
+                  {item.attachments.map((attachment) => (
                     <div key={attachment.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted">
                       <FileText className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm text-foreground">{attachment.file_name}</span>

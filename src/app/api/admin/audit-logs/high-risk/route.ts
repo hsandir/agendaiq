@@ -54,8 +54,8 @@ export async function GET(request: NextRequest) {
       stats.categoryDistribution[event.category] = (stats.categoryDistribution[event.category] || 0) + 1;
 
       // User distribution (top 10)
-      if (event.User?.email) {
-        stats.userDistribution[event.User.email] = (stats.userDistribution[event.User.email] || 0) + 1;
+      if (event.users?.email) {
+        stats.userDistribution[event.users.email] = (stats.userDistribution[event.users.email] || 0) + 1;
       }
 
       // IP distribution (top 10)

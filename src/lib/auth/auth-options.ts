@@ -109,12 +109,12 @@ export const authOptions: NextAuthOptions = {
           const user = await prisma.user.findUnique({
             where: { email: credentials.email },
             include: {
-              Staff: {
+              staff: {
                 include: {
-                  Role: true,
-                  Department: true,
-                  School: true,
-                  District: true
+                  role: true,
+                  department: true,
+                  school: true,
+                  district: true
                 }
               }
             }
@@ -138,7 +138,7 @@ export const authOptions: NextAuthOptions = {
           
           if (!isValid) {
             console.error('Invalid password for user:', user.email);
-            // // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, 'Password mismatch');
+            // // await AuditClient.logAuthEvent('login_failure', user.id, user.staff[0]?.id, req, 'Password mismatch');
             return null; // Return null for invalid password
           }
           
@@ -163,7 +163,7 @@ export const authOptions: NextAuthOptions = {
               const isBackupCode = user.backup_codes.includes(credentials.twoFactorCode);
               
               if (!isBackupCode) {
-                // // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, '2FA code invalid');
+                // // await AuditClient.logAuthEvent('login_failure', user.id, user.staff[0]?.id, req, '2FA code invalid');
                 console.error('Invalid 2FA code and not a backup code');
                 return null; // Return null for invalid 2FA
               }
@@ -178,7 +178,7 @@ export const authOptions: NextAuthOptions = {
             }
           }
 
-          const staff = user.Staff[0];
+          const staff = user.staff[0];
           const userData = {
             id: String(user.id), // Ensure string conversion for NextAuth
             email: user.email,
@@ -187,25 +187,25 @@ export const authOptions: NextAuthOptions = {
               staff: {
                 id: staff.id,
                 role: {
-                  id: staff.Role.id,
-                  key: staff.Role.key,
-                  category: staff.Role.category,
-                  is_leadership: staff.Role.is_leadership
+                  id: staff.role.id,
+                  key: staff.role.key,
+                  category: staff.role.category,
+                  is_leadership: staff.role.is_leadership
                 },
                 department: {
-                  id: staff.Department.id,
-                  name: staff.Department.name,
-                  code: staff.Department.code
+                  id: staff.department.id,
+                  name: staff.department.name,
+                  code: staff.department.code
                 },
                 school: {
-                  id: staff.School.id,
-                  name: staff.School.name,
-                  code: staff.School.code
+                  id: staff.school.id,
+                  name: staff.school.name,
+                  code: staff.school.code
                 },
                 district: {
-                  id: staff.District.id,
-                  name: staff.District.name,
-                  code: staff.District.code
+                  id: staff.district.id,
+                  name: staff.district.name,
+                  code: staff.district.code
                 }
               }
             })
@@ -332,12 +332,12 @@ export const authOptions: NextAuthOptions = {
           const dbUser = await prisma.user.findUnique({
             where: { email: token.email },
             include: {
-              Staff: {
+              staff: {
                 include: {
-                  Role: true,
-                  Department: true,
-                  School: true,
-                  District: true
+                  role: true,
+                  department: true,
+                  school: true,
+                  district: true
                 }
               }
             }
@@ -354,29 +354,29 @@ export const authOptions: NextAuthOptions = {
             (token as unknown as { capsRefreshedAt?: number }).capsRefreshedAt = nowSec;
             
             // Add staff info if available
-            if (dbUser.Staff && dbUser.Staff.length > 0) {
-              const staff = dbUser.Staff[0];
+            if (dbUser.staff && dbUser.staff.length > 0) {
+              const staff = dbUser.staff[0];
               token.staff = {
                 id: staff.id,
                 role: {
-                  key: staff.Role.key,
-                  category: staff.Role.category,
-                  is_leadership: staff.Role.is_leadership
+                  key: staff.role.key,
+                  category: staff.role.category,
+                  is_leadership: staff.role.is_leadership
                 },
                 department: {
-                  id: staff.Department.id,
-                  name: staff.Department.name,
-                  code: staff.Department.code
+                  id: staff.department.id,
+                  name: staff.department.name,
+                  code: staff.department.code
                 },
                 school: {
-                  id: staff.School.id,
-                  name: staff.School.name,
-                  code: staff.School.code
+                  id: staff.school.id,
+                  name: staff.school.name,
+                  code: staff.school.code
                 },
                 district: {
-                  id: staff.District.id,
-                  name: staff.District.name,
-                  code: staff.District.code
+                  id: staff.district.id,
+                  name: staff.district.name,
+                  code: staff.district.code
                 }
               } satisfies Record<string, unknown>;
             }

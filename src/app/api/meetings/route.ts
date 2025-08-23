@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     if (hasAdminAccess) {
       // Admins can see all meetings in their district
       meetingWhereClause = {
-        Staff: {
+        staff: {
           school_id: staffRecord.school?.id
         }
       };
@@ -67,12 +67,12 @@ export async function GET(request: NextRequest) {
         OR: [
           { organizer_id: staffRecord.id },
           {
-            Staff: {
+            staff: {
               school_id: staffRecord.school?.id
             }
           },
           {
-            MeetingAttendee: {
+            meeting_attendee: {
               some: {
                 staff_id: staffRecord.id
               }
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
         OR: [
           { organizer_id: staffRecord.id },
           {
-            MeetingAttendee: {
+            meeting_attendee: {
               some: {
                 staff_id: staffRecord.id
               }
@@ -118,9 +118,9 @@ export async function GET(request: NextRequest) {
         status: true,
         organizer_id: true,
         // Only get organizer name for display
-        Staff: {
+        staff: {
           select: {
-            User: {
+            users: {
               select: {
                 name: true,
                 email: true,
@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
         // Only count attendees, don't fetch all data
         _count: {
           select: {
-            MeetingAttendee: true
+            meeting_attendee: true
           }
         }
       },
@@ -149,8 +149,8 @@ export async function GET(request: NextRequest) {
       endTime: meeting.end_time?.toISOString() || new Date().toISOString(),
       zoomLink: meeting.zoom_join_url ?? null,
       status: meeting.status,
-      organizerName: meeting.Staff.User.name ?? meeting.Staff.User.email ?? 'Unknown',
-      attendeeCount: meeting._count.MeetingAttendee
+      organizerName: meeting.staff.users.name ?? meeting.staff.users.email ?? 'Unknown',
+      attendeeCount: meeting._count.meeting_attendee
     })));
 
     const responseData = { 
@@ -256,16 +256,16 @@ export async function POST(request: NextRequest) {
         school_id: staffRecord.school.id,
       },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: {
+            users: {
               select: {
                 id: true,
                 name: true,
                 email: true,
               },
             },
-            Role: true,
+            role: true,
           },
         },
       },
@@ -286,30 +286,30 @@ export async function POST(request: NextRequest) {
     const completeeMeeting = await prisma.meeting.findUnique({
       where: { id: meeting.id },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: {
+            users: {
               select: {
                 id: true,
                 name: true,
                 email: true,
               },
             },
-            Role: true,
+            role: true,
           },
         },
-        MeetingAttendee: {
+        meeting_attendee: {
           include: {
-            Staff: {
+            staff: {
               include: {
-                User: {
+                users: {
                   select: {
                     id: true,
                     name: true,
                     email: true,
                   },
                 },
-                Role: true,
+                role: true,
               },
             },
           },
@@ -330,16 +330,16 @@ export async function POST(request: NextRequest) {
       zoomLink: completeeMeeting!.zoom_join_url ?? null,
       status: completeeMeeting!.status,
       organizer: {
-        id: completeeMeeting!.Staff.id,
-        name: completeeMeeting!.Staff.User.name,
-        email: completeeMeeting!.Staff.User.email,
-        role: completeeMeeting!.Staff.Role.key ?? 'UNKNOWN_ROLE',
+        id: completeeMeeting!.staff.id,
+        name: completeeMeeting!.staff.users.name,
+        email: completeeMeeting!.staff.users.email,
+        role: completeeMeeting!.staff.role.key ?? 'UNKNOWN_ROLE',
       },
-      attendees: completeeMeeting!.MeetingAttendee.map((attendee) => ({
-        id: attendee.Staff.id,
-        name: attendee.Staff.User.name,
-        email: attendee.Staff.User.email,
-        role: attendee.Staff.Role.key ?? 'UNKNOWN_ROLE',
+      attendees: completeeMeeting!.meeting_attendee.map((attendee) => ({
+        id: attendee.staff.id,
+        name: attendee.staff.users.name,
+        email: attendee.staff.users.email,
+        role: attendee.staff.role.key ?? 'UNKNOWN_ROLE',
         status: attendee.status ?? 'PENDING',
       })),
     };

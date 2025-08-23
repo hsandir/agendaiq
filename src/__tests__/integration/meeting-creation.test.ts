@@ -197,7 +197,7 @@ describe('Meeting Creation Integration', () => {
           department_id: organizer.department_id,
           school_id: organizer.school_id,
           district_id: organizer.district_id,
-          MeetingAttendee: {
+          meeting_attendee: {
             create: [{
               staff_id: attendee.id,
               status: 'pending',
@@ -205,13 +205,13 @@ describe('Meeting Creation Integration', () => {
           }
         },
         include: {
-          MeetingAttendee: true
+          meeting_attendee: true
         }
       });
 
       expect(meeting.MeetingAttendee).toHaveLength(1);
-      expect(meeting.MeetingAttendee[0].status).toBe('pending');
-      expect(meeting.MeetingAttendee[0].staff_id).toBe(attendee.id);
+      expect(meeting.meeting_attendee[0].status).toBe('pending');
+      expect(meeting.meeting_attendee[0].staff_id).toBe(attendee.id);
     });
   });
 });

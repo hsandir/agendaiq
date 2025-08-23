@@ -25,11 +25,11 @@ export async function GET(
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: true,
-            Department: true,
-            School: true
+            role: true,
+            department: true,
+            school: true
           }
         }
       }

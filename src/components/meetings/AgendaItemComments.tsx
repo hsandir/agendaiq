@@ -11,8 +11,8 @@ interface Comment {
   id: number;
   comment: string;
   created_at: string | Date;  // Support both string and Date
-  Staff: {
-    User: {
+  staff: {
+    users: {
       id: number;
       name: string | null;
       email: string;
@@ -95,7 +95,7 @@ export function AgendaItemComments({ itemId, comments, onAddComment, canComment 
                 <div className="flex-1">
                   <div className="flex items-baseline gap-2">
                     <span className="font-medium text-sm">
-                      {comment.Staff.User.name ?? comment.Staff.User.email}
+                      {comment.staff.users.name ?? comment.staff.users.email}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       {(() => {

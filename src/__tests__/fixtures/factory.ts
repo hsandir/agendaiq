@@ -57,8 +57,8 @@ export class TestFactory {
     const user = overrides.user ?? await this.createUser()
     const role = overrides.role ?? await this.getOrCreateRole('Teacher')
     const department = overrides.department ?? await this.getOrCreateDepartment()
-    const school = overrides.school ?? department.School
-    const district = overrides.district ?? school.District
+    const school = overrides.school ?? department.school
+    const district = overrides.district ?? school.district
 
     return this.prisma.staff.create({
       data: {
@@ -77,22 +77,22 @@ export class TestFactory {
       },
       include: {
         users: true,
-        Role: true,
-        Department: {
+        role: true,
+        department: {
           include: {
-            School: {
+            school: {
               include: {
-                District: true,
+                district: true,
               },
             },
           },
         },
-        School: {
+        school: {
           include: {
-            District: true,
+            district: true,
           },
         },
-        District: true,
+        district: true,
       },
     })
   }
@@ -118,17 +118,17 @@ export class TestFactory {
         ...overrides,
       },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true,
-            Role: true,
+            users: true,
+            role: true,
           },
         },
-        MeetingAttendee: {
+        meeting_attendee: {
           include: {
-            Staff: {
+            staff: {
               include: {
-                User: true,
+                users: true,
               },
             },
           },
@@ -152,10 +152,10 @@ export class TestFactory {
           status: faker.helpers.arrayElement(['PENDING', 'ACCEPTED', 'DECLINED']),
         },
         include: {
-          Staff: {
+          staff: {
             include: {
-              User: true,
-              Role: true,
+              users: true,
+              role: true,
             },
           },
         },
@@ -205,9 +205,9 @@ export class TestFactory {
   private async getOrCreateDepartment(): Promise<Department & { School: School & { District: District } }> {
     let department = await this.prisma.department.findFirst({
       include: {
-        School: {
+        school: {
           include: {
-            District: true,
+            district: true,
           },
         },
       },
@@ -222,9 +222,9 @@ export class TestFactory {
           school_id: school.id,
         },
         include: {
-          School: {
+          school: {
             include: {
-              District: true,
+              district: true,
             },
           },
         },
@@ -237,7 +237,7 @@ export class TestFactory {
   private async getOrCreateSchool(): Promise<School & { District: District }> {
     let school = await this.prisma.school.findFirst({
       include: {
-        District: true,
+        district: true,
       },
     })
     
@@ -251,7 +251,7 @@ export class TestFactory {
           address: faker.location.streetAddress(),
         },
         include: {
-          District: true,
+          district: true,
         },
       })
     }

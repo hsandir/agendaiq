@@ -23,10 +23,10 @@ export default async function ZoomUserPreferences() {
   const userWithZoom = await prisma.user.findUnique({
     where: { email: user.email },
     include: {
-      Staff: {
+      staff: {
         include: {
-          Role: true,
-          Department: true
+          role: true,
+          department: true
         }
       }
     }
@@ -35,7 +35,7 @@ export default async function ZoomUserPreferences() {
   // Get user's meeting statistics for Zoom integration
   const userMeetings = await prisma.meeting.findMany({
     where: {
-      organizer_id: userWithZoom?.Staff?.[0]?.id
+      organizer_id: userWithZoom?.staff?.[0]?.id
     },
     orderBy: {
       start_time: 'desc'

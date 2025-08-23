@@ -224,10 +224,10 @@ describe('Meetings CRUD API', () => {
       // Check if teacher has permission to create meetings
       const teacherStaff = await context.prisma.staff.findFirst({
         where: { user_id: context.teacherUser.id },
-        include: { Role: true },
+        include: { role: true },
       });
 
-      expect(teacherStaff?.Role.is_leadership).toBe(false);
+      expect(teacherStaff?.role.is_leadership).toBe(false);
       
       // Depending on business rules, this might be allowed or denied
       // For this test, assume teachers can create meetings in their department
@@ -311,9 +311,9 @@ describe('Meetings CRUD API', () => {
           organizer_id: context.adminStaff.id,
         },
         include: {
-          Staff: {
+          staff: {
             include: {
-              User: true,
+              users: true,
             },
           },
         },
@@ -527,16 +527,16 @@ describe('Meetings CRUD API', () => {
       const fetchedMeeting = await context.prisma.meeting.findUnique({
         where: { id: meeting.id },
         include: {
-          Staff: {
+          staff: {
             include: {
-              User: true,
+              users: true,
             },
           },
-          MeetingAttendee: {
+          meeting_attendee: {
             include: {
-              Staff: {
+              staff: {
                 include: {
-                  User: true,
+                  users: true,
                 },
               },
             },
@@ -886,7 +886,7 @@ describe('Meetings CRUD API', () => {
       });
 
       const canDelete = 
-        meeting.organizer_id === teacherStaff?.id ?? teacherStaff?.Role?.is_leadership === true;
+        meeting.organizer_id === teacherStaff?.id ?? teacherStaff?.role?.is_leadership === true;
 
       expect(canDelete).toBe(false); // Teacher cannot delete admin's meeting
     });

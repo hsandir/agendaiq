@@ -15,7 +15,7 @@ interface Role {
   };
   Staff?: Array<{
     id: string;
-    User: {
+    users: {
       id: string;
       name: string | null;
       email: string;
@@ -183,14 +183,14 @@ export function RoleHierarchyManagement() {
               <div>
                 <h4 className="font-medium">{role.title}</h4>
                 <p className="text-sm text-muted-foreground">
-                  Department: {role.Department?.name ?? 'None'}
+                  department: {role.department?.name ?? 'None'}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Priority: {role.priority || 'Not set'}
                 </p>
-                {role.Staff && role.Staff.length > 0 && (
+                {role.staff && role.staff.length > 0 && (
                   <p className="text-sm text-muted-foreground">
-                    Staff: {role.Staff.length} member{role.Staff.length !== 1 ? 's' : ''}
+                    staff: {role.staff.length} member{role.staff.length !== 1 ? 's' : ''}
                   </p>
                 )}
               </div>

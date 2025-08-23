@@ -12,13 +12,13 @@ interface RoleWithRelations {
   category: string | null;
   parent_id: number | null;
   priority: number;
-  Department: {
+  department: {
     id: number;
     name: string;
   } | null;
   Staff: Array<{
     id: number;
-    User: {
+    users: {
       name: string | null;
       email: string;
     };
@@ -33,7 +33,7 @@ interface HierarchicalRole {
   is_leadership: boolean;
   category: string;
   parent_id: number | null;
-  Department: { id: string; name: string } | null;
+  department: { id: string; name: string } | null;
   Children: HierarchicalRole[];
   Staff: Array<{ id: string; name: string; email: string }>;
 }
@@ -56,10 +56,10 @@ export async function GET(request: NextRequest) {
     // Fetch all roles with hierarchical relationships and staff
     const allRoles = await prisma.role.findMany({
       include: {
-        Department: true,
-        Staff: {
+        department: true,
+        staff: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true,
                 email: true
@@ -85,16 +85,16 @@ export async function GET(request: NextRequest) {
         is_leadership: role.is_leadership,
         category: role.category ?? '',
         parent_id: role.parent_id,
-        Department: role.Department ? {
-          id: role.Department.id.toString(),
-          name: role.Department.name
+        Department: role.department ? {
+          id: role.department.id.toString(),
+          name: role.department.name
         } : null,
         Children: [],
-        Staff: role.Staff?.map((staff) => ({
+        Staff: role.staff?.map((staff) => ({
           id: staff.id.toString(),
-          User: {
-            name: staff.User.name,
-            email: staff.User.email
+          users: {
+            name: staff.users.name,
+            email: staff.users.email
           }
         })) || []
       });

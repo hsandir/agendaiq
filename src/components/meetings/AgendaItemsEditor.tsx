@@ -44,19 +44,19 @@ interface Meeting {
   id: number
   title: string
   start_time: Date | null
-  Staff: {
-    User: {
+  staff: {
+    users: {
       name: string | null
       email: string | null
     }
-    Role: {
+    role: {
       title: string
     }
   }
-  Department: {
+  department: {
     name: string
   } | null
-  MeetingAgendaItems: Array<{
+  meeting_agenda_items: Array<{
     id: number
     topic: string
     problem_statement: string | null
@@ -74,27 +74,27 @@ interface Meeting {
     duration_minutes: number | null
     carried_forward: boolean
     carry_forward_count: number
-    ResponsibleStaff: {
-      User: {
+    responsible_staff: {
+      users: {
         name: string | null
         email: string | null
       }
-      Role: {
+      role: {
         title: string
       }
     } | null
   }>
-  MeetingAttendee: Array<{
+  meeting_attendee: Array<{
     staff_id: number
-    Staff: {
-      User: {
+    staff: {
+      users: {
         name: string | null
         email: string | null
       }
-      Role: {
+      role: {
         title: string
       }
-      Department: {
+      department: {
         name: string
       } | null
     }
@@ -112,7 +112,7 @@ interface PastMeeting {
   title: string
   start_time: Date | null
   _count: {
-    MeetingAgendaItems: number
+    meeting_agenda_items: number
   }
 }
 
@@ -328,7 +328,7 @@ export function AgendaItemsEditor({
         <div>
           <h1 className="text-3xl font-bold text-foreground">Edit Agenda Items</h1>
           <p className="text-muted-foreground mt-2">
-            Meeting: {meeting.title} • {safeFormatDate(meeting.start_time)}
+            meeting: {meeting.title} • {safeFormatDate(meeting.start_time)}
           </p>
         </div>
         <Button
@@ -349,15 +349,15 @@ export function AgendaItemsEditor({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <p className="text-sm text-muted-foreground">Organizer</p>
-              <p className="font-medium">{meeting.Staff.User.name ?? meeting.Staff.User.email}</p>
+              <p className="font-medium">{meeting.staff.users.name ?? meeting.staff.users.email}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Department</p>
-              <p className="font-medium">{meeting.Department?.name || 'N/A'}</p>
+              <p className="font-medium">{meeting.department?.name || 'N/A'}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Attendees</p>
-              <p className="font-medium">{meeting.MeetingAttendee.length} people</p>
+              <p className="font-medium">{meeting.meeting_attendee.length} people</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Agenda Items</p>

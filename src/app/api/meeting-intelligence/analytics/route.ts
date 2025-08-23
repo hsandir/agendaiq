@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     };
     
     if (department !== 'all') {
-      whereConditions.Department = {
+      whereConditions.department = {
         name: department
       };
     }
@@ -53,12 +53,12 @@ export async function GET(request: NextRequest) {
       include: {
         MeetingAgendaItems: true,
         MeetingActionItems: true,
-        MeetingAttendee: true,
-        Department: true,
-        Staff: {
+        meeting_attendee: true,
+        department: true,
+        staff: {
           include: {
-            User: true,
-            Role: true
+            users: true,
+            role: true
           }
         }
       }
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
     
     const averageDuration = totalMeetings > 0 ? Math.round(totalDuration / totalMeetings) : 0;
     const averageAttendees = totalMeetings > 0 
-      ? Math.round(meetings.reduce((sum, m) => sum + m.MeetingAttendee.length, 0) / totalMeetings)
+      ? Math.round(meetings.reduce((sum, m) => sum + m.meeting_attendee.length, 0) / totalMeetings)
       : 0;
     
     // Calculate completion rates
@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
     const departmentMap = new Map();
     meetings.forEach(m => {
       if (m.Department) {
-        const key = m.Department.name;
+        const key = m.department.name;
         if (!departmentMap.has(key)) {
           departmentMap.set(key, {
             department: key,
@@ -163,12 +163,12 @@ export async function GET(request: NextRequest) {
     // Top contributors
     const contributorMap = new Map();
     meetings.forEach(m => {
-      if (m.Staff?.User) {
-        const key = m.Staff.User.id;
+      if (m.staff?.users) {
+        const key = m.staff.users.id;
         if (!contributorMap.has(key)) {
           contributorMap.set(key, {
-            name: m.Staff.User.name ?? 'Unknown',
-            role: m.Staff.Role?.title ?? 'Staff',
+            name: m.staff.users.name ?? 'Unknown',
+            role: m.staff.role?.title ?? 'Staff',
             contributions: 0
           });
         }

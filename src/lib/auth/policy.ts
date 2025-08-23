@@ -239,9 +239,9 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: true
+            role: true
           }
         }
       }
@@ -265,7 +265,7 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
     }
     
     // Get capabilities from role permissions (type-safe)
-    const perms = user.Staff?.[0]?.Role?.Permissions;
+    const perms = user.staff?.[0]?.role?.Permissions;
     if (Array.isArray(perms)) {
       const result: string[] = [];
       for (const perm of perms) {
@@ -471,20 +471,20 @@ export async function enrichUserWithCapabilities(user: MinimalUserInput): Promis
           ? { id: user.staff.school.id, name: user.staff.school.name }
           : undefined,
       }
-    : user.Staff && user.Staff.length > 0
+    : user.staff && user.staff.length > 0
     ? {
-        id: user.Staff[0].id,
-        role: user.Staff[0].Role
+        id: user.staff[0].id,
+        role: user.staff[0].role
           ? {
-              id: typeof user.Staff[0].Role.id === 'number' ? user.Staff[0].Role.id : 0,
-              key: user.Staff[0].Role.key ?? undefined,
+              id: typeof user.staff[0].role.id === 'number' ? user.staff[0].role.id : 0,
+              key: user.staff[0].role.key ?? undefined,
             }
           : undefined,
-        department: user.Staff[0].Department
-          ? { id: user.Staff[0].Department.id, name: user.Staff[0].Department.name }
+        department: user.staff[0].department
+          ? { id: user.staff[0].department.id, name: user.staff[0].department.name }
           : undefined,
-        school: user.Staff[0].School
-          ? { id: user.Staff[0].School.id, name: user.Staff[0].School.name }
+        school: user.staff[0].school
+          ? { id: user.staff[0].school.id, name: user.staff[0].school.name }
           : undefined,
       }
     : undefined;
@@ -498,7 +498,7 @@ export async function enrichUserWithCapabilities(user: MinimalUserInput): Promis
     capabilities,
     roleKey:
       (normalizedStaff?.role?.key) ||
-      (user.Staff?.[0]?.Role?.key) ||
+      (user.staff?.[0]?.role?.key) ||
       undefined,
     staff: normalizedStaff,
   };

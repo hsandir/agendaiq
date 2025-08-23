@@ -300,7 +300,7 @@ export async function PUT(request: NextRequest) {
 
     // Check if team exists and user has permission
     const team = await prisma.team.findUnique({
-      where: { id: parseInt(teamId) },
+      where: { id: teamId },
       include: {
         team_members: true
       }
@@ -327,7 +327,7 @@ export async function PUT(request: NextRequest) {
 
     // Update the team
     const updatedTeam = await prisma.team.update({
-      where: { id: parseInt(teamId) },
+      where: { id: teamId },
       data: {
         ...(validatedData.name && { name: validatedData.name }),
         ...(validatedData.description !== undefined && { description: validatedData.description }),
@@ -422,7 +422,7 @@ export async function DELETE(request: NextRequest) {
 
     // Check if team exists
     const team = await prisma.team.findUnique({
-      where: { id: parseInt(teamId) }
+      where: { id: teamId }
     });
 
     if (!team) {
@@ -434,7 +434,7 @@ export async function DELETE(request: NextRequest) {
 
     // Soft delete the team
     await prisma.team.update({
-      where: { id: parseInt(teamId) },
+      where: { id: teamId },
       data: {
         is_active: false,
         updated_at: new Date()

@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        MeetingAttendee: {
+        meeting_attendee: {
           where: { staff_id: user.staff?.id || -1 }
         }
       }
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     // Check if user is authorized
     const isOrganizer = meeting.organizer_id === user.staff?.id;
-    const isAttendee = meeting.MeetingAttendee.length > 0;
+    const isAttendee = meeting.meeting_attendee.length > 0;
     const isAdmin = isRole(user, RoleKey.OPS_ADMIN);
 
     if (!isOrganizer && !isAttendee && !isAdmin) {

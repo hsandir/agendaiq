@@ -282,11 +282,11 @@ export function AgendaItemLive({
               )}
               
               {/* Assigned User Pill */}
-              {item.ResponsibleStaff && !isEditing && (
+              {item.responsible_staff && !isEditing && (
                 <div className="flex items-center gap-2 mt-2">
                   <div className="flex items-center gap-1.5 bg-primary text-primary-foreground px-2.5 py-1 rounded-full text-xs font-medium">
                     <User className="h-3 w-3" />
-                    <span>{item.ResponsibleStaff.User.name}</span>
+                    <span>{item.responsible_staff.users.name}</span>
                   </div>
                 </div>
               )}
@@ -372,7 +372,7 @@ export function AgendaItemLive({
                   <SelectItem value="none">None</SelectItem>
                   {staff.map((s) => (
                     <SelectItem key={s.id} value={s.id.toString()}>
-                      {s.User.name} ({s.User.email})
+                      {s.users.name} ({s.users.email})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -381,7 +381,7 @@ export function AgendaItemLive({
               <div className="mt-1 flex items-center space-x-2">
                 <User className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm">
-                  {item.ResponsibleStaff ? item.ResponsibleStaff.User.name : 'Unassigned'}
+                  {item.responsible_staff ? item.responsible_staff.users.name : 'Unassigned'}
                   {item.staff_initials && ` (${item.staff_initials})`}
                 </span>
               </div>
@@ -575,11 +575,11 @@ export function AgendaItemLive({
                   onClick={() => setShowComments(!showComments)}
                 >
                   <MessageSquare className="h-4 w-4" />
-                  <span>{item.Comments?.length ?? 0} Comments</span>
+                  <span>{item.comments?.length ?? 0} Comments</span>
                 </button>
                 <div className="flex items-center space-x-1">
                   <Paperclip className="h-4 w-4" />
-                  <span>{item.ActionItems?.length ?? 0}</span>
+                  <span>{item.action_items?.length ?? 0}</span>
                 </div>
                 {item.future_implications && !isEditing && (
                   <div className="flex items-center space-x-1 text-yellow-600">
@@ -608,7 +608,7 @@ export function AgendaItemLive({
               <div className="mt-4 pt-4 border-t">
                 <AgendaItemComments
                   itemId={item.id}
-                  comments={item.Comments ?? []}
+                  comments={item.comments ?? []}
                   onAddComment={handleAddComment}
                   canComment={canEdit}
                 />

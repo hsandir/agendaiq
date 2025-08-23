@@ -336,12 +336,12 @@ export async function POST(request: NextRequest) {
         const user = await prisma.user.findUnique({
           where: { email: body.details.email },
           include: {
-            Staff: {
+            staff: {
               include: {
-                Role: true,
-                Department: true,
-                School: true,
-                District: true
+                role: true,
+                department: true,
+                school: true,
+                district: true
               }
             }
           }
@@ -390,8 +390,8 @@ export async function POST(request: NextRequest) {
               userId: user.id,
               email: user.email,
               passwordValid: isValidPassword,
-              hasStaff: !!user.Staff?.length,
-              staffRole: user.Staff?.[0]?.Role?.title,
+              hasStaff: !!user.staff?.length,
+              staffRole: user.staff?.[0]?.role?.title,
               timestamp: new Date().toISOString()
             },
             ip,
@@ -411,8 +411,8 @@ export async function POST(request: NextRequest) {
                   id: String(user.id),
                   email: user.email,
                   name: user.name,
-                  hasStaff: !!user.Staff?.length,
-                  staffData: user.Staff?.[0] || null
+                  hasStaff: !!user.staff?.length,
+                  staffData: user.staff?.[0] || null
                 }
               }
             });
@@ -421,8 +421,8 @@ export async function POST(request: NextRequest) {
             addAuthFlow('credentials_validated', {
               email: user.email,
               userId: user.id,
-              hasStaff: !!user.Staff?.length,
-              role: user.Staff?.[0]?.Role?.title
+              hasStaff: !!user.staff?.length,
+              role: user.staff?.[0]?.role?.title
             });
           }
         }

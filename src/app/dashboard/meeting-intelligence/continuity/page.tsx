@@ -21,7 +21,7 @@ import { BackLink } from '@/components/ui/back-link';
 
 interface MeetingChain {
   id: number;
-  rootMeeting: {
+  rootmeeting: {
     id: number;
     title: string;
     date: string;

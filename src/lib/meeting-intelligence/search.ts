@@ -44,7 +44,7 @@ export class MeetingSearchService {
           OR: [
             { organizer_id: query.filters.staffId },
             {
-              MeetingAttendee: {
+              meeting_attendee: {
                 some: { staff_id: query.filters.staffId }
               }
             }
@@ -79,17 +79,17 @@ export class MeetingSearchService {
       prisma.meeting.findMany({
         where,
         include: {
-          Department: true,
-          Staff: {
+          department: true,
+          staff: {
             include: {
-              User: {
+              users: {
                 select: {
                   name: true
                 }
               }
             }
           },
-          MeetingAgendaItems: {
+          meeting_agenda_items: {
             where: searchTerm ? {
               OR: [
                 { topic: { contains: searchTerm, mode: 'insensitive' } },
@@ -100,7 +100,7 @@ export class MeetingSearchService {
             } : undefined,
             take: 3
           },
-          MeetingActionItems: {
+          meeting_action_items: {
             where: searchTerm ? {
               OR: [
                 { title: { contains: searchTerm, mode: 'insensitive' } },
@@ -224,23 +224,23 @@ export class MeetingSearchService {
     return await prisma.meetingAgendaItem.findMany({
       where,
       include: {
-        Meeting: {
+        meeting: {
           select: {
             id: true,
             title: true,
             start_time: true
           }
         },
-        ResponsibleStaff: {
+        responsible_staff: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true
               }
             }
           }
         },
-        ActionItems: {
+        action_items: {
           select: {
             id: true,
             title: true,
@@ -249,7 +249,7 @@ export class MeetingSearchService {
         }
       },
       orderBy: [
-        { Meeting: { start_time: 'desc' } },
+        { meeting: { start_time: 'desc' } },
         { order_index: 'asc' }
       ],
       take: 50
@@ -263,7 +263,7 @@ export class MeetingSearchService {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        MeetingAgendaItems: {
+        meeting_agenda_items: {
           select: { topic: true }
         }
       }
@@ -294,7 +294,7 @@ export class MeetingSearchService {
         id: true,
         title: true,
         start_time: true,
-        Department: {
+        department: {
           select: {
             name: true
           }
@@ -343,24 +343,24 @@ export class MeetingSearchService {
     return await prisma.meetingActionItem.findMany({
       where,
       include: {
-        Meeting: {
+        meeting: {
           select: {
             id: true,
             title: true,
             start_time: true
           }
         },
-        AssignedTo: {
+        assigned_to: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true
               }
             },
-            Role: true
+            role: true
           }
         },
-        AgendaItem: {
+        agenda_item: {
           select: {
             topic: true
           }

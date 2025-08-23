@@ -79,12 +79,12 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
     const dbUser = await prisma.user.findUnique({
       where: { email: session.user.email },
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: true,
-            Department: true,
-            School: true,
-            District: true
+            role: true,
+            department: true,
+            school: true,
+            district: true
           }
         }
       }
@@ -102,28 +102,28 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
       name: dbUser.name,
       is_system_admin: dbUser.is_system_admin,
       is_school_admin: dbUser.is_school_admin,
-      staff: dbUser.Staff && dbUser.Staff.length > 0 ? {
-        id: dbUser.Staff[0].id,
+      staff: dbUser.staff && dbUser.staff.length > 0 ? {
+        id: dbUser.staff[0].id,
         role: {
-          id: dbUser.Staff[0].Role.id,
-          key: dbUser.Staff[0].Role.key,
-          category: dbUser.Staff[0].Role.category,
-          is_leadership: dbUser.Staff[0].Role.is_leadership
+          id: dbUser.staff[0].role.id,
+          key: dbUser.staff[0].role.key,
+          category: dbUser.staff[0].role.category,
+          is_leadership: dbUser.staff[0].role.is_leadership
         },
         department: {
-          id: dbUser.Staff[0].Department.id,
-          name: dbUser.Staff[0].Department.name,
-          code: dbUser.Staff[0].Department.code
+          id: dbUser.staff[0].department.id,
+          name: dbUser.staff[0].department.name,
+          code: dbUser.staff[0].department.code
         },
         school: {
-          id: dbUser.Staff[0].School.id,
-          name: dbUser.Staff[0].School.name,
-          code: dbUser.Staff[0].School.code
+          id: dbUser.staff[0].school.id,
+          name: dbUser.staff[0].school.name,
+          code: dbUser.staff[0].school.code
         },
         district: {
-          id: dbUser.Staff[0].District.id,
-          name: dbUser.Staff[0].District.name,
-          code: dbUser.Staff[0].District.code
+          id: dbUser.staff[0].district.id,
+          name: dbUser.staff[0].district.name,
+          code: dbUser.staff[0].district.code
         }
       } : null
     });

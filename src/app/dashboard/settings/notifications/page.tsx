@@ -20,10 +20,10 @@ export default async function NotificationsPage() {
   const userWithSettings = await prisma.user.findUnique({
     where: { email: user.email },
     include: {
-      Staff: {
+      staff: {
         include: {
-          Role: true,
-          Department: true
+          role: true,
+          department: true
         }
       }
     }
@@ -32,7 +32,7 @@ export default async function NotificationsPage() {
   // Get recent system notifications/activities
   const recentActivities = await prisma.meeting.findMany({
     where: {
-      organizer_id: userWithSettings?.Staff?.[0]?.id
+      organizer_id: userWithSettings?.staff?.[0]?.id
     },
     orderBy: {
       start_time: 'desc'
@@ -103,7 +103,7 @@ export default async function NotificationsPage() {
       name: "Role-Based Notifications",
       icon: Users,
       description: "Notifications based on your role and responsibilities",
-      settings: userWithSettings?.Staff?.[0]?.Role?.is_leadership ? [
+      settings: userWithSettings?.staff?.[0]?.role?.is_leadership ? [
         {
           name: "Staff Updates",
           description: "When staff members join or leave your department",
@@ -196,10 +196,10 @@ export default async function NotificationsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {userWithSettings?.Staff?.[0]?.Role?.title || 'No Role'}
+              {userWithSettings?.staff?.[0]?.role?.title || 'No Role'}
             </div>
             <p className="text-xs text-muted-foreground">
-              {userWithSettings?.Staff?.[0]?.Role?.is_leadership ? 'Leadership' : 'Regular User'}
+              {userWithSettings?.staff?.[0]?.role?.is_leadership ? 'Leadership' : 'Regular User'}
             </p>
           </CardContent>
         </Card>

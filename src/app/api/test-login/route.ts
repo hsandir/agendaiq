@@ -24,9 +24,9 @@ export async function POST(request: NextRequest) {
         name: true,
         hashedPassword: true,
         emailVerified: true,
-        Staff: {
+        staff: {
           include: {
-            Role: true
+            role: true
           }
         }
       }
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
         name: user.name,
         hasPassword: !!user.hashedPassword,
         emailVerified: !!user.emailVerified,
-        role: user.Staff?.[0]?.Role?.title
+        role: user.staff?.[0]?.role?.title
       },
       passwordCheck: {
         providedPassword: password,

@@ -147,7 +147,7 @@ export function MeetingLiveView({
       if (typeof typedData.itemId === 'number' && typedData.comment && typeof typedData.comment === 'object') {
         setAgendaItems(prev => prev.map(item => 
           item.id === typedData.itemId 
-            ? { ...item, Comments: [...(item.Comments ?? []), typedData.comment as Record<string, unknown>] }
+            ? { ...item, Comments: [...(item.comments ?? []), typedData.comment as Record<string, unknown>] }
             : item
         ));
       }
@@ -285,11 +285,11 @@ export function MeetingLiveView({
                   </div>
                   <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-sm">
                     <Users className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-foreground">{meeting.MeetingAttendee.length} attendees</span>
+                    <span className="text-foreground">{meeting.meeting_attendee.length} attendees</span>
                   </div>
                   <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-sm">
                     <User className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-foreground">Host: {meeting.Staff.User.name}</span>
+                    <span className="text-foreground">Host: {meeting.staff.users.name}</span>
                   </div>
                 </div>
               </div>
@@ -448,15 +448,15 @@ export function MeetingLiveView({
                 Attendees
               </h3>
               <div className="space-y-3">
-                {meeting.MeetingAttendee.map((attendee) => (
+                {meeting.meeting_attendee.map((attendee) => (
                   <div key={attendee.id} className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-foreground text-sm font-medium">
-                        {attendee.Staff.User.name?.charAt(0) ?? 'U'}
+                        {attendee.staff.users.name?.charAt(0) ?? 'U'}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-foreground">{attendee.Staff.User.name}</p>
-                        <p className="text-xs text-muted-foreground">{attendee.Staff.Role.title}</p>
+                        <p className="text-sm font-medium text-foreground">{attendee.staff.users.name}</p>
+                        <p className="text-xs text-muted-foreground">{attendee.staff.role.title}</p>
                       </div>
                     </div>
                     <Badge 

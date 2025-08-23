@@ -30,7 +30,7 @@ export async function PUT(request: NextRequest) {
     const updatedStaff = await prisma.staff.update({
       where: { id: staff?.id },
       data: { department_id: parseInt(departmentId) },
-      include: { Role: true, Department: true },
+      include: { role: true, department: true },
     });
 
     return NextResponse.json({ staff: updatedStaff });

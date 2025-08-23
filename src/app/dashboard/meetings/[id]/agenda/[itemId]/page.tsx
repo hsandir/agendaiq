@@ -23,33 +23,33 @@ export default async function AgendaItemPage(props: Props) {
   const agendaItem = await prisma.meetingAgendaItem.findUnique({
     where: { id: itemId },
     include: {
-      Meeting: {
+      meeting: {
         include: {
-          Department: true,
-          Staff: {
+          department: true,
+          staff: {
             include: {
-              User: true,
-              Role: true
+              users: true,
+              role: true
             }
           },
-          MeetingAttendee: {
+          meeting_attendee: {
             where: { staff_id: user.staff?.id || -1 }
           }
         }
       },
-      ResponsibleStaff: {
+      responsible_staff: {
         include: {
-          User: true,
-          Role: true,
-          Department: true
+          users: true,
+          role: true,
+          department: true
         }
       },
-      Comments: {
+      comments: {
         include: {
-          Staff: {
+          staff: {
             include: {
-              User: true,
-              Role: true
+              users: true,
+              role: true
             }
           }
         },
@@ -57,17 +57,17 @@ export default async function AgendaItemPage(props: Props) {
           created_at: 'desc'
         }
       },
-      ActionItems: {
+      action_items: {
         include: {
-          AssignedTo: {
+          assigned_to: {
             include: {
-              User: true,
-              Role: true
+              users: true,
+              role: true
             }
           }
         }
       },
-      Attachments: true
+      attachments: true
     }
   });
 
@@ -76,8 +76,8 @@ export default async function AgendaItemPage(props: Props) {
   }
 
   // Check permissions
-  const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
-  const isAttendee = agendaItem.Meeting.MeetingAttendee.length > 0;
+  const isOrganizer = agendaItem.meeting.organizer_id === user.staff?.id;
+  const isAttendee = agendaItem.meeting.meeting_attendee.length > 0;
   const hasAdminAccess = isAnyAdmin(user);
   const isResponsible = agendaItem.responsible_staff_id === user.staff?.id;
 
@@ -88,9 +88,9 @@ export default async function AgendaItemPage(props: Props) {
   // Get all staff for assignment
   const allStaff = await prisma.staff.findMany({
     include: {
-      User: true,
-      Role: true,
-      Department: true
+      users: true,
+      role: true,
+      department: true
     }
   });
 

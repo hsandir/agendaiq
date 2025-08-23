@@ -12,9 +12,9 @@ export default async function DebugCapabilitiesPage() {
   const userWithRole = await prisma.user.findUnique({
     where: { id: parseInt(user.id) },
     include: {
-      Staff: {
+      staff: {
         include: {
-          Role: true
+          role: true
         }
       }
     }
@@ -28,12 +28,12 @@ export default async function DebugCapabilitiesPage() {
     is_school_admin: user.is_school_admin ?? false,
     
     // Role info
-    roleKey: userWithRole?.Staff?.[0]?.Role?.key || 'No Key',
-    roleId: userWithRole?.Staff?.[0]?.Role?.id,
+    roleKey: userWithRole?.staff?.[0]?.role?.key || 'No Key',
+    roleId: userWithRole?.staff?.[0]?.role?.id,
     
     // Permissions from database
-    permissionCount: userWithRole?.Staff?.[0]?.Role?.Permissions?.length ?? 0,
-    permissions: userWithRole?.Staff?.[0]?.Role?.Permissions?.map(p => ({
+    permissionCount: userWithRole?.staff?.[0]?.role?.permission?.length ?? 0,
+    permissions: userWithRole?.staff?.[0]?.role?.permission?.map(p => ({
       id: p.id,
       capability: p.capability,
       resource: p.resource,

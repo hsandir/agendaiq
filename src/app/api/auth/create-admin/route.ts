@@ -41,9 +41,9 @@ export async function POST(request: NextRequest) {
     const existingUser = await prisma.user.findUnique({
       where: { email },
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: true
+            role: true
           }
         }
       }
@@ -57,8 +57,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has admin role
-    const hasAdminRole = existingUser.Staff.some(staff => 
-      staff.Role?.title === 'Administrator'
+    const hasAdminRole = existingUser.staff.some(staff => 
+      staff.role?.title === 'Administrator'
     );
 
     if (!hasAdminRole) {
@@ -86,18 +86,18 @@ export async function POST(request: NextRequest) {
         emailVerified: new Date()
       },
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: true,
-            Department: true,
-            School: true,
-            District: true
+            role: true,
+            department: true,
+            school: true,
+            district: true
           }
         }
       }
     });
 
-    const staff = updatedUser.Staff.find(s => s.Role?.title === 'Administrator');
+    const staff = updatedUser.staff.find(s => s.role?.title === 'Administrator');
 
     return NextResponse.json({
       success: true,
@@ -109,10 +109,10 @@ export async function POST(request: NextRequest) {
       },
       staff: staff ? {
         id: staff.id,
-        role: staff.Role?.title,
-        department: staff.Department?.name,
-        school: staff.School?.name,
-        district: staff.District?.name
+        role: staff.role?.title,
+        department: staff.department?.name,
+        school: staff.school?.name,
+        district: staff.district?.name
       } : null
     });
   } catch (error: unknown) {

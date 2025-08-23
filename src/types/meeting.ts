@@ -30,7 +30,7 @@ export interface AttendeeWithRelations extends MeetingAttendee {
 // Type for meeting with all relations
 export interface MeetingWithRelations extends Meeting {
   Staff: StaffWithRelations;
-  MeetingAttendee: AttendeeWithRelations[];
+  meeting_attendee: AttendeeWithRelations[];
   MeetingAgendaItems?: AgendaItemWithRelations[];
   MeetingActionItems?: ActionItemWithRelations[];
   Department?: Department | null;
@@ -45,13 +45,13 @@ export interface CommentWithRelations extends AgendaItemComment {
 
 // Type for action item with relations
 export interface ActionItemWithRelations extends MeetingActionItem {
-  AssignedTo: StaffWithRelations | null;
+  assigned_to: StaffWithRelations | null;
 }
 
 // Type for agenda item with all relations
 export interface AgendaItemWithRelations extends MeetingAgendaItem {
-  Meeting: MeetingWithRelations;
-  ResponsibleStaff: StaffWithRelations | null;
+  meeting: MeetingWithRelations;
+  responsible_staff: StaffWithRelations | null;
   Comments: CommentWithRelations[];
   ActionItems: ActionItemWithRelations[];
   Attachments: AgendaItemAttachment[];
@@ -64,12 +64,12 @@ export interface AgendaItemWithRelations extends MeetingAgendaItem {
 // Simple staff for dropdowns/assignment
 export interface StaffForAssignment {
   id: number;
-  User: {
+  users: {
     id: number;  // Changed from string to number to match Prisma schema
     name: string | null;
     email: string;
   };
-  Role: {
+  role: {
     id: number;
     title: string;
   };

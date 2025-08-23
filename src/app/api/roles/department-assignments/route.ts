@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
         where: { id: roleId },
         data: { department_id: parseInt(departmentId) },
         include: {
-          Department: true
+          department: true
         }
       });
 
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         staffId: user.staff?.id,
         source: 'SYSTEM', 
-        description: `Role "${role.key ?? 'UNKNOWN_ROLE'}" assigned to department: ${role.Department?.name ?? 'Unassigned'}`
+        description: `Role "${role.key ?? 'UNKNOWN_ROLE'}" assigned to department: ${role.department?.name ?? 'Unassigned'}`
       });
 
       return role;

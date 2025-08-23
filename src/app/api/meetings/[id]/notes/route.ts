@@ -34,7 +34,7 @@ export async function GET(request: NextRequest, props: Props) {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        MeetingAttendee: {
+        meeting_attendee: {
           where: {
             staff_id: authResult.user?.staff?.id || -1
           }
@@ -47,7 +47,7 @@ export async function GET(request: NextRequest, props: Props) {
     }
 
     const isOrganizer = meeting.organizer_id === authResult.user?.staff?.id;
-    const isAttendee = meeting.MeetingAttendee.length > 0;
+    const isAttendee = meeting.meeting_attendee.length > 0;
 
     if (!isOrganizer && !isAttendee) {
       return NextResponse.json(
@@ -60,9 +60,9 @@ export async function GET(request: NextRequest, props: Props) {
     const notes = await prisma.meetingNote.findMany({
       where: { meeting_id: meetingId },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       },
@@ -78,8 +78,8 @@ export async function GET(request: NextRequest, props: Props) {
         content: note.content,
         created_at: note.created_at,
         author: {
-          name: note.Staff.User.name,
-          email: note.Staff.User.email
+          name: note.staff.users.name,
+          email: note.staff.users.email
         }
       }))
     });
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest, props: Props) {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        MeetingAttendee: {
+        meeting_attendee: {
           where: {
             staff_id: user.staff.id
           }
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest, props: Props) {
     }
 
     const isOrganizer = meeting.organizer_id === user.staff.id;
-    const isAttendee = meeting.MeetingAttendee.length > 0;
+    const isAttendee = meeting.meeting_attendee.length > 0;
 
     if (!isOrganizer && !isAttendee) {
       return NextResponse.json(
@@ -161,9 +161,9 @@ export async function POST(request: NextRequest, props: Props) {
         content: result.data.content
       },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       }
@@ -187,8 +187,8 @@ export async function POST(request: NextRequest, props: Props) {
         content: note.content,
         created_at: note.created_at,
         author: {
-          name: note.Staff.User.name,
-          email: note.Staff.User.email
+          name: note.staff.users.name,
+          email: note.staff.users.email
         }
       }
     });
@@ -233,7 +233,7 @@ export async function DELETE(request: NextRequest, props: Props) {
     const note = await prisma.meetingNote.findUnique({
       where: { id: noteId },
       include: {
-        Meeting: true
+        meeting: true
       }
     });
 
@@ -243,7 +243,7 @@ export async function DELETE(request: NextRequest, props: Props) {
 
     // Only the author or meeting organizer can delete the note
     const isAuthor = note.staff_id === user.staff.id;
-    const isOrganizer = note.Meeting.organizer_id === user.staff.id;
+    const isOrganizer = note.meeting.organizer_id === user.staff.id;
 
     if (!isAuthor && !isOrganizer) {
       return NextResponse.json(
@@ -265,7 +265,7 @@ export async function DELETE(request: NextRequest, props: Props) {
       userId: user.id,
       staffId: user.staff.id,
       source: 'WEB_UI',
-      description: `Deleted note from meeting: ${note.Meeting.title}`
+      description: `Deleted note from meeting: ${note.meeting.title}`
     });
 
     return NextResponse.json({

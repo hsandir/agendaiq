@@ -41,7 +41,7 @@ interface TeamMember {
 }
 
 interface Team {
-  id: number;
+  id: string;
   name: string;
   description?: string | null;
   type: string;

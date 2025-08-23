@@ -15,9 +15,9 @@ export default async function MeetingTemplatesPage() {
   // Fetch meeting templates from database
   const templates = await prisma.meetingTemplate.findMany({
     include: {
-      Staff: {
+      staff: {
         include: {
-          User: true
+          users: true
         }
       }
     },
@@ -54,7 +54,7 @@ export default async function MeetingTemplatesPage() {
     ...template,
     created_at: template.created_at.toISOString(),
     updated_at: template.updated_at.toISOString(),
-    creator: template.Staff.User.name ?? template.Staff.User.email ?? 'Unknown'
+    creator: template.staff.users.name ?? template.staff.users.email ?? 'Unknown'
   })));
 
   return (

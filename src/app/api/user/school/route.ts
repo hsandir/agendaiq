@@ -13,14 +13,14 @@ export async function GET(request: NextRequest) {
 
     const user = await prisma.user.findUnique({
       where: { id: auth.user.id },
-      include: { Staff: { include: { School: true } } },
+      include: { staff: { include: { school: true } } },
     });
 
-    if (!user?.Staff?.[0]?.School) {
+    if (!user?.staff?.[0]?.School) {
       return new NextResponse("School not found", { status: 404 });
     }
 
-    return new NextResponse(JSON.stringify(user.Staff[0].School), {
+    return new NextResponse(JSON.stringify(user.staff[0].School), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -72,10 +72,10 @@ export async function POST(request: NextRequest) {
     // Get updated user with staff
     const updatedUser = await prisma.user.findUnique({
       where: { id: auth.user.id },
-      include: { Staff: { include: { School: true } } },
+      include: { staff: { include: { school: true } } },
     });
 
-    return new NextResponse(JSON.stringify(updatedUser?.Staff?.[0]?.School), {
+    return new NextResponse(JSON.stringify(updatedUser?.staff?.[0]?.School), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
