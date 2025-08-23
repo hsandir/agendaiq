@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Download as FiDownload, Eye as FiEye, Trash2 as FiTrash2, Edit as FiEdit, RefreshCw as FiRefreshCw, User as FiUser, Database as FiDatabase, Activity as FiActivity, Shield as FiShield, AlertTriangle as FiAlertTriangle } from 'lucide-react';
-import { RoleID } from '@/lib/auth/policy';
+import { isRole, RoleKey } from '@/lib/auth/policy';
 import type { UserWithStaff, SessionUser } from '@/types/auth';
 
 // User interface for authentication context
@@ -399,7 +399,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
   // Permission validation helper
   const canViewAuditDetails = useCallback((log: AuditLog): boolean => {
     // Ops Admin can view all logs
-    if (user.staff?.Role?.id === RoleID.OPS_ADMIN || user.is_school_admin) {
+    if (user.is_school_admin || isRole(user as any, RoleKey.OPS_ADMIN)) {
       return true;
     }
 
