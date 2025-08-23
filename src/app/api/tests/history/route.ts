@@ -4,8 +4,10 @@ import { Capability } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
-  // Development endpoint - no auth required
-  console.log('Test history API called');
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
 
   try {
     // Get test history from audit logs or create a test_runs table in future
@@ -34,32 +36,6 @@ export async function GET(request: NextRequest) {
         duration: changes.duration ?? 0
       };
     });
-
-    // If no history exists, generate some simulated data for development
-    if (history.length === 0) {
-      const simulatedHistory = [];
-      for (let i = 0; i < 30; i++) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        
-        const baseTests = 250;
-        const passed = Math.floor(Math.random() * 20) + (baseTests - 25);
-        const failed = baseTests - passed;
-        const coverage = Math.floor(Math.random() * 15) + 75; // 75-90%
-        const duration = Math.floor(Math.random() * 60) + 180; // 180-240 seconds
-        
-        simulatedHistory.push({
-          date: date.toISOString().split('T')[0],
-          passed,
-          failed,
-          coverage,
-          duration
-        });
-      }
-      
-      // Sort by date, newest first
-      return NextResponse.json({ history: simulatedHistory });
-    }
 
     return NextResponse.json({ history });
   } catch (error: unknown) {
