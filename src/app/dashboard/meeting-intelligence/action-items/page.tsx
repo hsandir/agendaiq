@@ -333,7 +333,7 @@ export default function ActionItemsTrackingPage() {
                     <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <User className="h-3 w-3" />
-                        <span>Role: {item.assignedRole.title}</span>
+                        <span>Role: {item.assignedRole.label}</span>
                         {item.assignedStaff && (
                           <span className="ml-1">({item.assignedStaff.name})</span>
                         )}
