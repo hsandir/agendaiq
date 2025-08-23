@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getUltraFastUser } from '@/lib/auth/auth-utils-ultra-fast';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Check auth
-    const user = await getUltraFastUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
+    const user = authResult.user!;
 
     interface TestResult {
       name: string;
