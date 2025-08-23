@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
   let body: { command?: string; args?: string[] } = {};
   try {
     body = await request.json();
-    const { __command, args = []  } = body;
+    const { command, args = []  } = body;
 
     const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_GIT });
     if (!auth.success) {
@@ -65,16 +65,16 @@ export async function POST(request: NextRequest) {
     console.log('Executing git command:', gitCommand);
 
     // Execute command
-    const { stdout, stderr } = await execAsync(__gitCommand, {
+    const { stdout, stderr } = await execAsync(gitCommand, {
       cwd: process.cwd(),
-      timeout: __30000, // 30 second timeout
-      maxBuffer: 1024 * 1024 * 10 // 10MB __buffer
+      timeout: 30000, // 30 second timeout
+      maxBuffer: 1024 * 1024 * 10 // 10MB buffer
     });
 
     const output = stdout ?? stderr;
 
     return NextResponse.json({
-      success: !stderr ?? command === 'diff', // diff uses stderr for output
+      success: (!stderr) || (command === 'diff'), // diff uses stderr for output
       command: gitCommand,
       output,
       timestamp: new Date().toISOString()

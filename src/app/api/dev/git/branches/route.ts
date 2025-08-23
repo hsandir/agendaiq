@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     const { stdout: currentBranch  } = await execAsync('git rev-parse --abbrev-ref HEAD');
     
     // Get all branches with last commit info
-    const { stdout: __branchList  } = await execAsync('git branch -a -v');
+    const { stdout: branchList  } = await execAsync('git branch -a -v');
     
     const branches: Array<{
       name: string;
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
     const current = branches.find(b => b?.current);
     if (current) {
       try {
-        const { stdout: ___revList  } = await execAsync(
+        const { stdout: revList  } = await execAsync(
           `git rev-list --left-right --count origin/${current?.name}...HEAD`
         );
         const [behind, ahead] = String(revList).trim().split('\t');

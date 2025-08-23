@@ -6,10 +6,10 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createTestUser, cleanupTestData } from '../helpers/test-db';
-import type { AuthenticatedUser, StaffWithRelations } from '@/types';
+import type { StaffWithRelations } from '@/types';
 
 describe('Comprehensive API Route Tests', () => {
-  let testStaff: _StaffWithRelations;
+  let testStaff: StaffWithRelations;
 
   beforeAll(async () => {
     // Create test users
@@ -508,8 +508,8 @@ describe('Comprehensive API Route Tests', () => {
           method: 'GET',
         });
         
-        const _module = await import('@/app/api/users/route');
-        return GET(request);
+        const module = await import('@/app/api/users/route');
+        return module.GET(request);
       });
 
       await Promise.all(requests);
