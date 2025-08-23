@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/auth-options';
+import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import * as os from 'os';
 import { exec } from 'child_process';
 import { promisify } from 'util';
@@ -48,15 +48,14 @@ interface ServerMetrics {
   };
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_HEALTH });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    Logger.info('Fetching real-time server metrics', { userId: session.user.id as string }, 'system-metrics');
+    Logger.info('Fetching real-time server metrics', { userId: auth.user?.id }, 'system-metrics');
 
     // Get real system information
     const memoryUsage = process.memoryUsage();

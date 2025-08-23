@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
@@ -37,6 +39,11 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
     const { __command, args = []  } = body;
+
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_GIT });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
 
     // Validate command
     if (!command || !ALLOWED_COMMANDS.includes(command)) {

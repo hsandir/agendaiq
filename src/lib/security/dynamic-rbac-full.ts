@@ -474,17 +474,15 @@ export class DynamicRBAC {
   async getPrimaryStaff(user: _AuthenticatedUser): Promise<StaffWithRole | null> {
     const userStaff = await this.getUserStaff(user);
     if (userStaff.length === 0) return null;
-    
-    // Return highest priority role
-    return userStaff.reduce((prev, current) => 
-      current.Role.priority > prev.Role.priority ? current : prev
-    );
+    // Return deterministic primary record without title/priority heuristics
+    return userStaff[0];
   }
 
   // Get all roles user has access to
   async getUserRoles(user: _AuthenticatedUser): Promise<string[]> {
     const userStaff = await this.getUserStaff(user);
-    return userStaff.map(staff => staff.Role.title);
+    // Expose role ids as strings to avoid relying on titles
+    return userStaff.map(staff => staff.Role.id.toString());
   }
 
   // Get user's departments

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
@@ -14,6 +16,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_GIT });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     const { searchParams } = new URL(request?.url);
     const limit = searchParams.get('limit') ?? '50';
     

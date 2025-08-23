@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/auth/auth-utils';
-import { can, Capability } from '@/lib/auth/policy';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 
 // GitHub Actions API types
 interface GitHubWorkflowRun {
@@ -177,14 +177,9 @@ function extractStages(run: GitHubWorkflowRun): PipelineStage[] {
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
-    }
-
-    // Check for CI/CD monitoring capability
-    if (!can(user, Capability.DEV_CI)) {
-      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_CI });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
     // Fetch real pipeline data from GitHub Actions

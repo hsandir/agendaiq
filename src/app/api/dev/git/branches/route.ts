@@ -1,10 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   // Only allow in development
   if (process.env.NODE_ENV !== 'development') {
     return NextResponse.json(
@@ -14,6 +16,10 @@ export async function GET() {
   }
 
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_GIT });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     // Get current branch
     const { stdout: currentBranch  } = await execAsync('git rev-parse --abbrev-ref HEAD');
     

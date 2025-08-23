@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 // import { z } from 'zod';
 import { exec } from 'child_process';
 import { promisify } from 'util';
@@ -37,8 +39,10 @@ interface AutofixSuggestion {
 // GET /api/dev/ci-cd/autofix - Get autofix suggestions for an error
 export async function GET(request: NextRequest) {
   try {
-    // Development endpoint - no auth required
-    console.log('Autofix API called');
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_FIX });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
 
     const { searchParams } = new URL(request.url);
     const errorType = searchParams.get('errorType') ?? '';
@@ -66,8 +70,10 @@ export async function GET(request: NextRequest) {
 // POST /api/dev/ci-cd/autofix - Apply an autofix
 export async function POST(request: NextRequest) {
   try {
-    // Development endpoint - no auth required
-    console.log('Autofix POST API called');
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_FIX });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
 
     const body = await request.json();
     const { __suggestionId, __errorType, __errorMessage, dryRun = __true, __customSuggestion  } = body;
