@@ -333,13 +333,13 @@ export async function POST(request: NextRequest) {
         id: completeeMeeting!.Staff.id,
         name: completeeMeeting!.Staff.User.name,
         email: completeeMeeting!.Staff.User.email,
-        role: completeeMeeting!.Staff.Role.title,
+        role: completeeMeeting!.Staff.Role.key ?? 'UNKNOWN_ROLE',
       },
       attendees: completeeMeeting!.MeetingAttendee.map((attendee) => ({
         id: attendee.Staff.id,
         name: attendee.Staff.User.name,
         email: attendee.Staff.User.email,
-        role: attendee.Staff.Role.title,
+        role: attendee.Staff.Role.key ?? 'UNKNOWN_ROLE',
         status: attendee.status ?? 'PENDING',
       })),
     };

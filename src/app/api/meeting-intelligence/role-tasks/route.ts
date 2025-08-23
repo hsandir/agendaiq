@@ -148,8 +148,8 @@ export async function GET(request: NextRequest) {
       return {
         role: {
           id: role.id,
-          title: role.title,
-          priority: role.priority,
+          title: role.key ?? 'UNKNOWN_ROLE',
+          priority: undefined,
           isLeadership: role.is_leadership,
           currentHolder
         },

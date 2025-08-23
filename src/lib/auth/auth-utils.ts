@@ -111,8 +111,6 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
         role: {
           id: dbUser.Staff[0].Role.id,
           key: dbUser.Staff[0].Role.key,
-          title: dbUser.Staff[0].Role.title,
-          priority: dbUser.Staff[0].Role.priority,
           category: dbUser.Staff[0].Role.category,
           is_leadership: dbUser.Staff[0].Role.is_leadership
         },
