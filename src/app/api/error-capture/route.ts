@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 
 interface ErrorData {
   message: string;
@@ -14,6 +16,10 @@ const errors: ErrorData[] = [];
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_MONITORING });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+    }
     const errorData = await request.json();
     
     const capturedError: ErrorData = {
@@ -41,23 +47,18 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
-  // Only show errors in development or for debugging purposes
-  if (process.env.NODE_ENV === 'development') {
-    return NextResponse.json({ 
-      success: true,
-      totalErrors: errors?.length,
-      errors 
-    });
-  } else {
-    return NextResponse.json({ 
-      success: true,
-      totalErrors: errors?.length, 
-      recentErrors: errors.slice(-5).map(e => ({
-        message: (e instanceof Error ? e.message : String(e)),
-        timestamp: e?.timestamp,
-        url: e?.url
-      }))
-    });
+export async function GET(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_MONITORING });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
+  return NextResponse.json({ 
+    success: true,
+    totalErrors: errors?.length, 
+    recentErrors: errors.slice(-5).map(e => ({
+      message: (e instanceof Error ? e.message : String(e)),
+      timestamp: e?.timestamp,
+      url: e?.url
+    }))
+  });
 }

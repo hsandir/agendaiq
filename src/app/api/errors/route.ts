@@ -1,23 +1,14 @@
-import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/auth-options';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 
 // GET /api/errors - Get all errors
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id as string) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id as string },
-      include: { Staff: { include: { Role: true } } },
-    });
-
-    if (!user ?? user.Staff?.[0]?.Role?.title !== 'Administrator') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_MONITORING });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
     // Return empty array since SystemError model doesn't exist
@@ -32,20 +23,11 @@ export async function GET() {
 }
 
 // POST /api/errors - Create a new error
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id as string) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id as string },
-      include: { Staff: { include: { Role: true } } },
-    });
-
-    if (!user ?? user.Staff?.[0]?.Role?.title !== 'Administrator') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_MONITORING });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
     const body = await request.json();
