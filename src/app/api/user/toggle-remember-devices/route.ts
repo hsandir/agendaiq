@@ -1,20 +1,18 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth/auth-options";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id as string) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
     // TODO: Add rememberDevices field to User model in schema
     // Get current user settings
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id as string },
+      where: { id: auth.user.id },
       select: { 
         id: true,
         // rememberDevices: true 
@@ -27,7 +25,7 @@ export async function POST(request: Request) {
 
     // TODO: Toggle remember devices setting once field is added
     // const updatedUser = await prisma.user.update({
-    //   where: { id: session.user.id as string },
+    //   where: { id: auth.user.id },
     //   data: { rememberDevices: !user?.rememberDevices },
     // });
 
