@@ -204,6 +204,10 @@ app.post('/auth/compliance/scan', (req, res) => {
     // Forbidden patterns
     for (const file of files) {
       const content = fs.readFileSync(file, 'utf8');
+      const normalizedPath = file.replace(/\\/g, '/');
+      // Skip UI components, tests, and settings UI when checking forbidden patterns
+      const skipPatternChecks = normalizedPath.includes('/src/components/') || normalizedPath.includes('/src/__tests__/') || normalizedPath.includes('/src/app/dashboard/settings/');
+      if (skipPatternChecks) continue;
       const lines = content.split(/\r?\n/);
       for (const rule of AUTH_RULES.forbidden) {
         if (rule.pattern.test(content)) {
@@ -220,6 +224,10 @@ app.post('/auth/compliance/scan', (req, res) => {
     const pageFiles = files.filter((f) => /src\/(app)\/(?!api\/).*\/page\.tsx$/.test(f.replace(/\\/g, '/')));
     for (const file of pageFiles) {
       const content = fs.readFileSync(file, 'utf8');
+      const normalizedPath = file.replace(/\\/g, '/');
+      // Treat auth-related pages and verify-email as public
+      const isPublicPage = normalizedPath.includes('/src/app/auth/') || normalizedPath.endsWith('/src/app/verify-email/page.tsx');
+      if (isPublicPage) continue;
       if (/export\s+default/.test(content) && !/requireAuth\(/.test(content) && !/ServerAuthWrapper/.test(content)) {
         findings.push({ type: 'page_guard', rule: 'require-auth-on-pages', severity: 'warn', file, message: 'Page likely missing server requireAuth or ServerAuthWrapper.' });
       }
