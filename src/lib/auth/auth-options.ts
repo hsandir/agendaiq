@@ -105,6 +105,7 @@ export const authOptions: NextAuthOptions = {
             }
           }
 
+          console.log('🔍 Looking up user in database:', credentials.email);
           const user = await prisma.user.findUnique({
             where: { email: credentials.email },
             include: {
@@ -118,6 +119,7 @@ export const authOptions: NextAuthOptions = {
               }
             }
           });
+          console.log('🔍 User found:', !!user, user ? { id: user.id, email: user.email, hasPassword: !!user.hashedPassword } : null);
 
           if (!user) {
             console.error('User not found:', credentials.email);

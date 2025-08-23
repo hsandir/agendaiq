@@ -56,6 +56,11 @@ export const sidebarItems: NavigationSection[] = [
         icon: Calendar,
       },
       {
+        href: "/dashboard/teams",
+        label: "Teams",
+        icon: Users,
+      },
+      {
         href: "/dashboard/meeting-intelligence",
         label: "Meeting Intelligence",
         icon: Brain,
