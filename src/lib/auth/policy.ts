@@ -209,10 +209,6 @@ export interface UserWithCapabilities {
     role?: {
       id: number;
       key?: string | null; // Legacy - optional in DB
-      title: string;
-      is_leadership?: boolean;
-      priority?: number;
-      category?: string | null;
     };
     department?: {
       id: number;
@@ -421,10 +417,6 @@ export function canAccessApi(user: UserWithCapabilities | null | undefined, path
 type MinimalRole = {
   id?: number;
   key?: string | null;
-  title: string;
-  is_leadership?: boolean;
-  priority?: number;
-  category?: string | null;
 };
 
 type MinimalDepartment = { id: number; name: string };
@@ -462,10 +454,6 @@ export async function enrichUserWithCapabilities(user: MinimalUserInput): Promis
           ? {
               id: typeof user.staff.role.id === 'number' ? user.staff.role.id : 0,
               key: user.staff.role.key ?? undefined,
-              title: user.staff.role.title,
-              is_leadership: user.staff.role.is_leadership,
-              priority: user.staff.role.priority,
-              category: user.staff.role.category,
             }
           : undefined,
         department: user.staff.department
@@ -482,10 +470,6 @@ export async function enrichUserWithCapabilities(user: MinimalUserInput): Promis
           ? {
               id: typeof user.Staff[0].Role.id === 'number' ? user.Staff[0].Role.id : 0,
               key: user.Staff[0].Role.key ?? undefined,
-              title: user.Staff[0].Role.title,
-              is_leadership: user.Staff[0].Role.is_leadership,
-              priority: user.Staff[0].Role.priority,
-              category: user.Staff[0].Role.category,
             }
           : undefined,
         department: user.Staff[0].Department

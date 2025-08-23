@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 
 // PostHog metrics API endpoint
 export async function GET(request: NextRequest) {
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_MONITORING });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     const searchParams = request.nextUrl.searchParams;
     const timeRange = searchParams.get('timeRange') || '24h';
     

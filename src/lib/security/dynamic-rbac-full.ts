@@ -3,7 +3,7 @@
  * Database schema'ya uygun, tam fonksiyonellik ile
  */
 
-import { AuthenticatedUser } from '../auth/auth-utils';
+import { AuthenticatedUser as _AuthenticatedUser } from '../auth/auth-utils';
 import { prisma } from '../prisma';
 import { Capability, RoleKey, can, isRole } from '@/lib/auth/policy';
 
@@ -41,13 +41,10 @@ export interface RolePermission {
 interface StaffWithRole {
   id: number;
   user_id: number;
-  school_id: parseInt(number);
-  department_id: parseInt(number);
+  school_id: number;
+  department_id: number;
   Role: {
     id: number;
-    title: string;
-    priority: number;
-    is_leadership: boolean;
     department_id?: number;
   };
   School: {
@@ -95,7 +92,7 @@ export class DynamicRBAC {
       const userStaff = await this.getUserStaff(context.user);
       const appliedRules: string[] = [];
       
-      if (!userStaff ?? userStaff.length === 0) {
+      if (!userStaff || userStaff.length === 0) {
         return {
           granted: false,
           reason: 'User is not staff member',
@@ -109,16 +106,17 @@ export class DynamicRBAC {
       for (const staff of userStaff) {
         // Check direct role permissions
         const directAccess = await this.checkDirectRolePermissions(
+          context.user,
           staff.Role,
           context.resource,
           context.action
         );
         
         if (directAccess.granted) {
-          appliedRules.push(`direct_role_${staff.Role.title}`);
+          appliedRules.push(`direct_role_${staff.Role.id}`);
           return {
             granted: true,
-            reason: `Access granted through role: ${staff.Role.title}`,
+            reason: `Access granted through role id: ${staff.Role.id}`,
             appliedRules,
             context,
             timestamp: new Date()
@@ -133,7 +131,7 @@ export class DynamicRBAC {
         );
 
         if (inheritedAccess.granted) {
-          appliedRules.push(`inherited_${staff.Role.title}`);
+          appliedRules.push(`inherited_role_${staff.Role.id}`);
           return {
             granted: true,
             reason: `Access granted through role hierarchy: ${inheritedAccess.reason}`,
@@ -147,7 +145,7 @@ export class DynamicRBAC {
         const contextAccess = await this.checkContextualPermissions(context, staff);
         
         if (contextAccess.granted) {
-          appliedRules.push(`contextual_${staff.Role.title}`);
+          appliedRules.push(`contextual_role_${staff.Role.id}`);
           return {
             granted: true,
             reason: `Access granted through context: ${contextAccess.reason}`,
@@ -201,10 +199,7 @@ export class DynamicRBAC {
           Role: {
             select: {
               id: true,
-              title: true,
-              priority: true,
-              is_leadership: true,
-              department_id: parseInt(true)
+              department_id: true
             }
           },
           School: {
@@ -226,14 +221,11 @@ export class DynamicRBAC {
       const typedStaffRecords: StaffWithRole[] = staffRecords.map(record => ({
         id: record.id,
         user_id: record.user_id,
-        school_id: parseInt(record).school_id,
-        department_id: parseInt(record).department_id,
+        school_id: record.school_id,
+        department_id: record.department_id,
         Role: {
           id: record.Role.id,
-          title: record.Role.title,
-          priority: record.Role.priority,
-          is_leadership: record.Role.is_leadership,
-          department_id: parseInt(record).Role.department_id ?? undefined
+          department_id: record.Role.department_id ?? undefined
         },
         School: {
           id: record.School.id,
@@ -303,10 +295,7 @@ export class DynamicRBAC {
           where: { id: parseInt(parentRoleId) },
           select: {
             id: true,
-            title: true,
-            priority: true,
-            is_leadership: true,
-            department_id: parseInt(true)
+            department_id: true
           }
         });
 
@@ -314,20 +303,15 @@ export class DynamicRBAC {
           // Convert null to undefined for type compatibility
           const roleWithConvertedDeptId = {
             ...parentRole,
-            department_id: parseInt(parentRole).department_id ?? undefined
+            department_id: parentRole.department_id ?? undefined
           };
           
-          const parentAccess = await this.checkDirectRolePermissions(
-            ({} as any),
-            roleWithConvertedDeptId, 
-            resource, 
-            action
-          );
+          const parentAccess = await this.checkDirectRolePermissions(({} as any), roleWithConvertedDeptId, resource, action);
           
           if (parentAccess.granted) {
             return { 
               granted: true, 
-              reason: `Inherited from parent role: ${parentRole.title}` 
+              reason: `Inherited from parent role id: ${parentRole.id}` 
             };
           }
         }
@@ -422,10 +406,10 @@ export class DynamicRBAC {
       // Get role hierarchy relationships
       const hierarchyRecords = await prisma.roleHierarchy.findMany({
         where: { child_role_id: parseInt(roleId) },
-        select: { parent_role_id: parseInt(true) }
+        select: { parent_role_id: true }
       });
 
-      const parentIds = (hierarchyRecords.map(r => r.parent_role_id.toString()));
+      const parentIds = hierarchyRecords.map(r => r.parent_role_id.toString());
       
       // Cache results
       this.roleHierarchyCache.set(cacheKey, parentIds);
@@ -547,7 +531,7 @@ export class DynamicRBAC {
     try {
       const hierarchyRecords = await prisma.roleHierarchy.findMany({
         where: { parent_role_id: parseInt(roleId) },
-        select: { child_role_id: parseInt(true) }
+        select: { child_role_id: true }
       });
 
       return hierarchyRecords.map(r => r.child_role_id.toString());
@@ -572,10 +556,7 @@ export class DynamicRBAC {
         where: { id: parseInt(roleId) },
         select: {
           id: true,
-          title: true,
-          priority: true,
-          is_leadership: true,
-          department_id: parseInt(true)
+          department_id: true
         }
       });
 
@@ -586,7 +567,7 @@ export class DynamicRBAC {
       // Convert null to undefined for type compatibility
       const roleWithConvertedDeptId = {
         ...role,
-        department_id: parseInt(role).department_id ?? undefined
+        department_id: role.department_id ?? undefined
       };
       
       // Generate permissions based on role
@@ -608,7 +589,7 @@ export class DynamicRBAC {
     const permissions: RolePermission[] = [];
     const now = new Date();
 
-    // Base permissions for all roles
+    // Base permissions for all roles (no title/priority heuristics)
     permissions.push({
       id: `${role.id}_read_own`,
       roleId: role.id,
@@ -620,33 +601,6 @@ export class DynamicRBAC {
       createdAt: now,
       updatedAt: now
     });
-
-    // Role-specific permissions
-    if (role.is_leadership) {
-      permissions.push({
-        id: `${role.id}_leadership_access`,
-        roleId: role.id,
-        resource: 'school',
-        action: 'manage',
-        priority: role.priority,
-        granted: true,
-        createdAt: now,
-        updatedAt: now
-      });
-    }
-
-    if (role.priority >= 8) {
-      permissions.push({
-        id: `${role.id}_high_priority`,
-        roleId: role.id,
-        resource: 'staff',
-        action: 'manage',
-        priority: role.priority,
-        granted: true,
-        createdAt: now,
-        updatedAt: now
-      });
-    }
 
     return permissions;
   }
