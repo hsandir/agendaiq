@@ -95,7 +95,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
     }
   };
 
-  return 
+  return (
     <div className="space-y-8">
       {/* Two-Factor Authentication Section */}
       <section className="bg-card p-6 rounded-lg shadow-sm border">

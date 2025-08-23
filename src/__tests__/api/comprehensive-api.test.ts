@@ -6,20 +6,10 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { createTestUser, cleanupTestData } from '../helpers/test-db';
-import type { AuthenticatedUser, StaffWithRelations } from '@/types';
-
-// Performance tracking
-interface PerformanceMetrics {
-  responseTime: number;
-  memoryUsage: number;
-  statusCode: number;
-}
+import type { StaffWithRelations } from '@/types';
 
 describe('Comprehensive API Route Tests', () => {
-  let testUser: _AuthenticatedUser;
-  let testStaff: _StaffWithRelations;
-  let adminUser: _AuthenticatedUser;
-  let adminStaff: _StaffWithRelations;
+  let testStaff: StaffWithRelations;
 
   beforeAll(async () => {
     // Create test users
@@ -30,18 +20,14 @@ describe('Comprehensive API Route Tests', () => {
       staffRole: 'Teacher'
     });
     
-    testUser = userResult.user as AuthenticatedUser;
     testStaff = userResult.staff as StaffWithRelations;
 
-    const adminResult = await createTestUser({
+    await createTestUser({
       email: 'api-test-admin@agendaiq.com',
       name: 'API Test Admin',
       withStaff: true,
       staffRole: 'Administrator'
     });
-
-    adminUser = adminResult.user as AuthenticatedUser;
-    adminStaff = adminResult.staff as StaffWithRelations;
   });
 
   afterAll(async () => {
@@ -522,8 +508,8 @@ describe('Comprehensive API Route Tests', () => {
           method: 'GET',
         });
         
-        const _module = await import('@/app/api/users/route');
-        return GET(request);
+        const module = await import('@/app/api/users/route');
+        return module.GET(request);
       });
 
       await Promise.all(requests);

@@ -131,8 +131,26 @@ export async function POST(request: NextRequest, props: Props) {
 
     const isOrganizer = meeting.organizer_id === user.staff?.id;
     const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
+    const hasAdminAccess = user.is_admin || user.is_system_admin || user.is_school_admin;
 
-    if (!isOrganizer && !isAttendee) {
+    // Debug logging
+    console.log('Authorization check for meeting agenda:', {
+      meetingId,
+      userId: user.id,
+      staffId: user.staff?.id,
+      organizerId: meeting.organizer_id,
+      isOrganizer,
+      isAttendee,
+      attendeeIds: meeting.MeetingAttendee.map(ma => ma.staff_id),
+      userFlags: {
+        is_admin: user.is_admin,
+        is_system_admin: user.is_system_admin,
+        is_school_admin: user.is_school_admin
+      },
+      hasAdminAccess
+    });
+
+    if (!isOrganizer && !isAttendee && !hasAdminAccess) {
       return NextResponse.json(
         { error: "You are not authorized to manage this meeting's agenda" },
         { status: 403 }
@@ -300,8 +318,26 @@ export async function PUT(request: NextRequest, props: Props) {
 
     const isOrganizer = meeting.organizer_id === user.staff?.id;
     const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
+    const hasAdminAccess = user.is_admin || user.is_system_admin || user.is_school_admin;
 
-    if (!isOrganizer && !isAttendee) {
+    // Debug logging
+    console.log('Authorization check for meeting agenda:', {
+      meetingId,
+      userId: user.id,
+      staffId: user.staff?.id,
+      organizerId: meeting.organizer_id,
+      isOrganizer,
+      isAttendee,
+      attendeeIds: meeting.MeetingAttendee.map(ma => ma.staff_id),
+      userFlags: {
+        is_admin: user.is_admin,
+        is_system_admin: user.is_system_admin,
+        is_school_admin: user.is_school_admin
+      },
+      hasAdminAccess
+    });
+
+    if (!isOrganizer && !isAttendee && !hasAdminAccess) {
       return NextResponse.json(
         { error: "You are not authorized to manage this meeting's agenda" },
         { status: 403 }

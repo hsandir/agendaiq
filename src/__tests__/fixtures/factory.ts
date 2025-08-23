@@ -76,7 +76,7 @@ export class TestFactory {
         ...overrides,
       },
       include: {
-        User: true,
+        users: true,
         Role: true,
         Department: {
           include: {

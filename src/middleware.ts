@@ -30,15 +30,17 @@ function tokenToUser(token: JWT | NextAuthToken | null): UserWithCapabilities | 
   const id = typeof token.id === 'string' ? parseInt(token.id) : (token.id as number);
   if (!id) return null;
   
+  const staff = token.staff as { id: number; role?: { id: number; key?: string | null; is_leadership?: boolean } } | undefined;
+  
   return {
     id,
     email: token.email as string,
     name: token.name as string | undefined,
-    is_system_admin: Boolean(token.is_system_admin) || ((token as any).staff?.role && 'key' in token.staff.role && token.staff.role.key === 'DEV_ADMIN') || false,
-    is_school_admin: Boolean(token.is_school_admin) || ((token as any).staff?.role && 'key' in token.staff.role && token.staff.role.key === 'OPS_ADMIN') || false,
-    roleKey: ((token as any).staff?.role && 'key' in token.staff.role ? token.staff.role.key : undefined) as string | undefined,
+    is_system_admin: Boolean(token.is_system_admin) || (staff?.role?.key === 'DEV_ADMIN') || false,
+    is_school_admin: Boolean(token.is_school_admin) || (staff?.role?.key === 'OPS_ADMIN') || false,
+    roleKey: staff?.role?.key as string | undefined,
     capabilities: (token.capabilities as string[]) || [],
-    staff: token.staff as { id: number; role?: { id: number; key?: string | null; is_leadership?: boolean } } | undefined
+    staff
   };
 }
 

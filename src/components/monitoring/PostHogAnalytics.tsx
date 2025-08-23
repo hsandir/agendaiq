@@ -105,7 +105,7 @@ export default function PostHogAnalytics() {
       }
       
       // Fallback to client-side PostHog data
-      let realMetrics = {
+      const realMetrics = {
         totalEvents: 0,
         uniqueUsers: 0,
         errorCount: 0,
