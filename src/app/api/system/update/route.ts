@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 
@@ -6,6 +8,10 @@ const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_UPDATE });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     const { type, packages } = (await request.json()) as Record<string, unknown>;
 
     if (type === 'packages') {

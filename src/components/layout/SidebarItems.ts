@@ -103,7 +103,7 @@ export const sidebarItems: NavigationSection[] = [
         icon: Settings,
         children: [
           {
-            href: "/dashboard/settings/account",
+            href: "/dashboard/settings/profile",
             label: "Account",
             icon: User,
             children: [
@@ -118,9 +118,24 @@ export const sidebarItems: NavigationSection[] = [
                 icon: Monitor,
               },
               {
+                href: "/dashboard/settings/theme",
+                label: "Theme Selection",
+                icon: Palette,
+              },
+              {
+                href: "/dashboard/settings/layout",
+                label: "Layout Settings",
+                icon: Monitor,
+              },
+              {
                 href: "/dashboard/settings/security",
                 label: "Security",
                 icon: Lock,
+              },
+              {
+                href: "/dashboard/settings/security/2fa",
+                label: "Two-Factor Auth",
+                icon: Shield,
               },
             ],
           },
@@ -139,10 +154,20 @@ export const sidebarItems: NavigationSection[] = [
                 label: "Permissions",
                 icon: Lock,
               },
+              {
+                href: "/dashboard/settings/staff-upload",
+                label: "Staff Upload",
+                icon: Users,
+              },
+              {
+                href: "/dashboard/settings/school",
+                label: "School Management",
+                icon: FileText,
+              },
             ],
           },
           {
-            href: "/dashboard/settings/production",
+            href: "/dashboard/settings/system",
             label: "Production",
             icon: Server,
             children: [
@@ -150,11 +175,6 @@ export const sidebarItems: NavigationSection[] = [
                 href: "/dashboard/settings/system",
                 label: "System Settings",
                 icon: Settings,
-              },
-              {
-                href: "/dashboard/settings/monitoring",
-                label: "System Monitoring",
-                icon: Activity,
               },
               {
                 href: "/dashboard/settings/audit",
@@ -166,10 +186,15 @@ export const sidebarItems: NavigationSection[] = [
                 label: "Backup & Restore",
                 icon: Shield,
               },
+              {
+                href: "/dashboard/page-selection",
+                label: "Page Selection",
+                icon: FileText,
+              },
             ],
           },
           {
-            href: "/dashboard/settings/development",
+            href: "/dashboard/development",
             label: "Development",
             icon: Code,
             children: [
@@ -201,7 +226,7 @@ export const sidebarItems: NavigationSection[] = [
             ],
           },
           {
-            href: "/dashboard/settings/meeting",
+            href: "/dashboard/settings/meeting-templates",
             label: "Meeting",
             icon: Briefcase,
             children: [
@@ -220,10 +245,20 @@ export const sidebarItems: NavigationSection[] = [
                 label: "Meeting Permissions",
                 icon: Shield,
               },
+              {
+                href: "/dashboard/settings/meeting-audit",
+                label: "Meeting Audit",
+                icon: Activity,
+              },
+              {
+                href: "/dashboard/settings/meeting-help",
+                label: "Meeting Help",
+                icon: FileText,
+              },
             ],
           },
           {
-            href: "/dashboard/settings/zoom",
+            href: "/dashboard/settings/zoom-integration",
             label: "Zoom",
             icon: Video,
             children: [

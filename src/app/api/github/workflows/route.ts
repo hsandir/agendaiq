@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_OWNER = process.env.GITHUB_OWNER;
 const GITHUB_REPO = process.env.GITHUB_REPO;
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Auth check - development capability required
-    await requireAuth(AuthPresets.requireDevelopment);
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     
     if (!GITHUB_TOKEN || !GITHUB_OWNER || !GITHUB_REPO) {
       return NextResponse.json(
@@ -49,8 +52,10 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    // Auth check - development capability required
-    await requireAuth(AuthPresets.requireDevelopment);
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     
     const { workflow_id, ref = 'main', inputs = {} } = await request.json();
     

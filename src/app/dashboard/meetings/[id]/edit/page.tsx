@@ -90,7 +90,7 @@ export default async function EditMeetingPage({ params }: PageProps) {
       },
       Role: {
         select: {
-          title: true
+          key: true
         }
       },
       Department: {
@@ -106,7 +106,7 @@ export default async function EditMeetingPage({ params }: PageProps) {
     id: staff.id.toString(),
     name: staff.User.name ?? staff.User.email ?? '',
     email: staff.User.email ?? '',
-    role: staff.Role.title,
+    role: staff.Role.key ?? 'UNKNOWN_ROLE',
     department: staff.Department.name
   })));
 

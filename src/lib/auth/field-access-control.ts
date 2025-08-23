@@ -3,6 +3,7 @@
 
 import { User } from "next-auth";
 import { AuthenticatedUser } from "./auth-utils";
+import { can, isRole, RoleKey, Capability } from "./policy";
 
 export interface FieldAccessRule {
   field: string;
@@ -179,21 +180,53 @@ function checkAccess(
     return true;
   }
 
-  // Check specific role titles
-  const userRoleTitle = user.staff?.role?.title;
-  if (userRoleTitle && allowedRoles.includes(userRoleTitle)) {
-    return true;
-  }
-
-  // Check role categories
-  const userRole = user.staff?.role;
-  if (userRole && 'category' in userRole && userRole?.category) {
-    if (allowedRoles.includes(userRole?.category)) {
+  // Check role-based access using capabilities instead of titles
+  for (const allowedRole of allowedRoles) {
+    if (checkRoleAccess(user, allowedRole)) {
       return true;
     }
   }
 
   return false;
+}
+
+// Map role titles to capability checks (secure replacement for title-based auth)
+function checkRoleAccess(user: User | AuthenticatedUser, roleTitle: string): boolean {
+  // Map common role titles to capabilities
+  switch (roleTitle) {
+    case 'Administrator':
+    case 'System Administrator':
+      return isRole(user, RoleKey.OPS_ADMIN) || can(user, Capability.USER_MANAGE);
+    
+    case 'HR':
+    case 'Human Resources':
+      return can(user, [Capability.USER_MANAGE, Capability.STAFF_MANAGE]);
+    
+    case 'Finance':
+    case 'Financial Officer':
+      return can(user, Capability.FINANCE_VIEW);
+    
+    case 'Principal':
+      return isRole(user, RoleKey.PRINCIPAL) || can(user, Capability.SCHOOL_MANAGE);
+    
+    case 'Teacher':
+      return isRole(user, RoleKey.TEACHER) || can(user, Capability.MEETING_PARTICIPATE);
+    
+    case 'Support Staff':
+      return isRole(user, RoleKey.SUPPORT_STAFF);
+    
+    // For any unrecognized role title, check if user has the role key directly
+    default:
+      // Try to match against RoleKey enum values
+      const roleKeys = Object.values(RoleKey);
+      const matchingRoleKey = roleKeys.find(key => key === roleTitle);
+      if (matchingRoleKey) {
+        return isRole(user, matchingRoleKey as RoleKey);
+      }
+      
+      // Fallback: return false for unknown roles (secure by default)
+      return false;
+  }
 }
 
 // Filter object fields based on read access

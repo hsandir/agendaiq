@@ -1,15 +1,13 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth/auth-options";
 import { authenticator } from "otplib";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
     // Generate secret
@@ -26,11 +24,7 @@ export async function POST() {
     // });
 
     // Generate QR code data
-    const otpauth = authenticator.keyuri(
-      session.user?.email!,
-      "AgendaIQ",
-      secret
-    );
+    const otpauth = authenticator.keyuri(auth.user.email!, "AgendaIQ", secret);
 
     return new NextResponse(JSON.stringify({ secret, otpauth }), {
       status: 200,

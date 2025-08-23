@@ -126,6 +126,7 @@ jobs:
           npx prisma db push
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/agendaiq_test
+          DIRECT_URL: postgresql://test:test@localhost:5432/agendaiq_test
       
       - name: Install Playwright (E2E only)
         if: matrix.test-type == 'e2e'
@@ -136,6 +137,7 @@ jobs:
         run: npm run build
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/agendaiq_test
+          DIRECT_URL: postgresql://test:test@localhost:5432/agendaiq_test
           NEXTAUTH_URL: http://localhost:3000
           NEXTAUTH_SECRET: test-secret
       
@@ -143,12 +145,13 @@ jobs:
         run: npm run test:${{ matrix.test-type }}
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/agendaiq_test
+          DIRECT_URL: postgresql://test:test@localhost:5432/agendaiq_test
           NEXTAUTH_URL: http://localhost:3000
           NEXTAUTH_SECRET: test-secret
       
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.test-type }}-results
           path: |
@@ -192,7 +195,7 @@ jobs:
           find .next -name "*.js" -size +500k -exec ls -lh {} \;
       
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: .next/

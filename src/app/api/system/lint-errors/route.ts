@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { writeFile, readFile } from 'fs/promises';
@@ -42,6 +44,10 @@ interface LintResult {
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_LINT });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     const url = new URL(request.url);
     const action = url.searchParams.get('action');
     const severity = url.searchParams.get('severity') ?? 'all'; // all, errors, warnings
@@ -73,6 +79,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_LINT });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     const body = await request.json();
     const { action, filePath, fixes } = body;
 

@@ -1,15 +1,13 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/auth/api-auth';
 import { hash } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth/auth-options";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
     const data = await request.json();
@@ -24,7 +22,7 @@ export async function POST(request: Request) {
     }
 
     const user = await prisma.user.findUnique({
-      where: { email: session.user?.email! },
+      where: { email: auth.user.email! },
       select: { hashedPassword: true },
     });
 
@@ -34,7 +32,7 @@ export async function POST(request: Request) {
 
     const hashedPassword = await hash(newPassword, 12);
     await prisma.user.update({
-      where: { email: session.user?.email! },
+      where: { email: auth.user.email! },
       data: { hashedPassword },
     });
 

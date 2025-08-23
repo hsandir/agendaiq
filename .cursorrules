@@ -435,3 +435,44 @@ If authentication system fails:
 5. Review migration system status
 
 Follow these rules religiously. Any deviation must be explicitly justified and documented.
+
+## LOCAL VALIDATION AGENT FOR CURSOR
+
+### Setup Instructions
+1. Navigate to validation-server directory: `cd validation-server`
+2. Install dependencies: `npm install`
+3. Start server: `npm start` (runs on http://localhost:3456)
+4. Keep server running while using Cursor
+
+### How It Works
+- **No API Quota Usage**: Runs locally on your machine
+- **Same as Claude Code Agent**: Provides identical validation functionality
+- **Real-time**: Instant validation without network delays
+- **Extensible**: Add custom schemas as needed
+
+### Usage in Cursor
+When you need to validate data, instead of asking Cursor AI to write validation:
+
+```typescript
+// DON'T DO THIS (uses Cursor quota):
+// "Write validation for email field"
+
+// DO THIS (uses local server):
+const response = await fetch('http://localhost:3456/validate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    schema: 'email',
+    data: userEmail
+  })
+});
+```
+
+### Benefits Over AI Validation
+1. **Zero quota usage** - Unlimited validations
+2. **Consistent rules** - Same validation logic everywhere
+3. **Type-safe** - Zod schemas ensure type safety
+4. **Faster** - No AI processing time
+5. **Offline capable** - Works without internet
+
+This local validation server provides the exact same functionality as a validation agent but runs entirely on your machine without using any API quotas.

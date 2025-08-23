@@ -34,6 +34,7 @@ const globalThemeState = {
   customTheme: undefined as CustomTheme | undefined,
   initialized: false,
   lastFetch: 0,
+  dbSynced: false, // Track if we've synced with database this session
 };
 
 interface ThemeProviderProps {
@@ -56,79 +57,75 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
   useEffect(() => {
     setMounted(true);
 
-    // Only initialize once per app lifecycle
-    if (!globalThemeState.initialized) {
-      globalThemeState.initialized = true;
+    // Load from localStorage immediately - this is our source of truth
+    const savedTheme = localStorage.getItem("agendaiq-theme");
+    const savedCustomTheme = localStorage.getItem("agendaiq-custom-theme");
 
-      // Load from localStorage
-      const savedTheme = localStorage.getItem("agendaiq-theme");
-      const savedCustomTheme = localStorage.getItem("agendaiq-custom-theme");
+    if (savedTheme && themes.find((t) => t.id === savedTheme)) {
+      globalThemeState.currentThemeId = savedTheme;
+      setCurrentThemeId(savedTheme);
+    }
 
-      if (savedTheme && themes.find((t) => t.id === savedTheme)) {
-        globalThemeState.currentThemeId = savedTheme;
-        setCurrentThemeId(savedTheme);
+    if (savedCustomTheme) {
+      try {
+        const parsed = JSON.parse(savedCustomTheme);
+        globalThemeState.customTheme = parsed;
+        setCustomTheme(parsed);
+      } catch (e: unknown) {
+        console.error("Failed to parse custom theme");
       }
+    }
 
-      if (savedCustomTheme) {
-        try {
-          const parsed = JSON.parse(savedCustomTheme);
-          globalThemeState.customTheme = parsed;
-          setCustomTheme(parsed);
-        } catch (e: unknown) {
-          console.error("Failed to parse custom theme");
-        }
-      }
+    // Mark as initialized
+    globalThemeState.initialized = true;
 
-      // Fetch from database ONCE after initial load (if user is logged in)
-      // Only if we haven't fetched in the last 5 minutes
-      if (typeof window !== "undefined") {
-        const now = Date.now();
-        if (now - globalThemeState.lastFetch > 5 * 60 * 1000) {
-          globalThemeState.lastFetch = now;
+    // Sync with database ONLY ONCE per application session
+    // This happens in the background and doesn't block rendering
+    if (!globalThemeState.dbSynced && typeof window !== "undefined") {
+      globalThemeState.dbSynced = true; // Mark as synced immediately to prevent multiple calls
+      
+      // Check if user has a session (simple check for auth cookie)
+      const hasSession = document.cookie.includes('next-auth.session-token') || 
+                        document.cookie.includes('__Secure-next-auth.session-token');
+      
+      if (hasSession) {
+        // Delayed fetch to not block initial render
+        // This is fire-and-forget - we don't wait for it
+        setTimeout(() => {
+          fetch("/api/user/theme")
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => {
+              if (data?.theme && data.theme !== savedTheme) {
+                // Only update if different from localStorage
+                globalThemeState.currentThemeId = data.theme;
+                setCurrentThemeId(data.theme);
+                localStorage.setItem("agendaiq-theme", data.theme);
+              }
+            })
+            .catch(() => {
+              // Silently ignore - not critical
+            });
 
-          // Delayed fetch to not block initial render
-          setTimeout(() => {
-            fetch("/api/user/theme")
+          // Fetch custom theme if needed
+          if (savedTheme === "custom" || globalThemeState.currentThemeId === "custom") {
+            fetch("/api/user/custom-theme")
               .then((res) => (res.ok ? res.json() : null))
               .then((data) => {
-                if (
-                  data?.theme &&
-                  data.theme !== globalThemeState.currentThemeId
-                ) {
-                  globalThemeState.currentThemeId = data.theme;
-                  setCurrentThemeId(data.theme);
-                  localStorage.setItem("agendaiq-theme", data.theme);
+                if (data?.customTheme) {
+                  globalThemeState.customTheme = data.customTheme;
+                  setCustomTheme(data.customTheme);
+                  localStorage.setItem(
+                    "agendaiq-custom-theme",
+                    JSON.stringify(data.customTheme),
+                  );
                 }
               })
               .catch(() => {
-                // Silently ignore - user might not be logged in
+                // Silently ignore
               });
-
-            // Fetch custom theme if needed
-            if (globalThemeState.currentThemeId === "custom") {
-              fetch("/api/user/custom-theme")
-                .then((res) => (res.ok ? res.json() : null))
-                .then((data) => {
-                  if (data?.customTheme) {
-                    globalThemeState.customTheme = data.customTheme;
-                    setCustomTheme(data.customTheme);
-                    localStorage.setItem(
-                      "agendaiq-custom-theme",
-                      JSON.stringify(data.customTheme),
-                    );
-                  }
-                })
-                .catch(() => {
-                  // Silently ignore
-                });
-            }
-          }, 1000); // 1 second delay to not interfere with initial page load
-        }
+          }
+        }, 2000); // 2 second delay to ensure page is fully loaded
       }
-    } else {
-      // Already initialized, just use global state
-      setCurrentThemeId(globalThemeState.currentThemeId);
-      setCustomTheme(globalThemeState.customTheme);
     }
   }, []); // Empty deps - only run once
 

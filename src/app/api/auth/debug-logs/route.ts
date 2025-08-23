@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { getServerSession } from 'next-auth';
 import { getToken } from 'next-auth/jwt';
 import { authOptions } from '@/lib/auth/auth-options';
@@ -52,21 +54,30 @@ function addLog(log: Partial<DebugLog>) {
 }
 
 // Helper to track auth flow
-function addAuthFlow(step: string, details: Record<string, unknown>) {
-  authFlowSteps.unshift({
-    id: `flow_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    timestamp: new Date().toISOString(),
-    step,
-    details
-  });
-  
-  if (authFlowSteps.length > MAX_FLOW_STEPS) {
-    authFlowSteps = authFlowSteps.slice(0, MAX_FLOW_STEPS);
+function addAuthFlow(stepName: string, details: Record<string, unknown>) {
+  try {
+    const flowStep: AuthFlowStep = {
+      id: `flow_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: new Date().toISOString(),
+      step: stepName,
+      details: details || {}
+    };
+    
+    authFlowSteps.unshift(flowStep);
+    
+    if (authFlowSteps.length > MAX_FLOW_STEPS) {
+      authFlowSteps = authFlowSteps.slice(0, MAX_FLOW_STEPS);
+    }
+  } catch (err: unknown) {
+    console.error('Error adding auth flow step:', err);
   }
 }
 
-// THIS IS A PUBLIC ENDPOINT - NO AUTH REQUIRED FOR DEBUGGING
 export async function GET(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
   try {
     // Get all possible auth information
     const session = await getServerSession(authOptions).catch(() => null);
@@ -305,8 +316,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// THIS IS A PUBLIC ENDPOINT - NO AUTH REQUIRED FOR DEBUGGING
 export async function POST(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
   try {
     const body = await request.json();
     
@@ -460,7 +474,11 @@ export async function POST(request: NextRequest) {
 }
 
 // Clear logs
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
   debugLogs = [];
   authFlowSteps = [];
   return NextResponse.json({ success: true, message: 'Logs and auth flow cleared' });

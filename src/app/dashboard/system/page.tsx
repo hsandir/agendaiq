@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useAuthorization } from '@/hooks/useAuthorization';
+import { RoleKey } from '@/lib/auth/policy';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -106,7 +107,7 @@ interface PostHogMetrics {
 }
 
 export default function SystemManagementPage() {
-  const { data: session  } = useSession();
+  const { is, user, loading: authLoading } = useAuthorization();
   const router = useRouter();
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [healthChecks, setHealthChecks] = useState<HealthChecks | null>(null);
@@ -127,11 +128,11 @@ export default function SystemManagementPage() {
 
   // Auth check - only admins can access system management
   useEffect(() => {
-    if (session && session.user?.staff?.role?.title !== 'Administrator') {
+    if (!authLoading && !is(RoleKey.OPS_ADMIN)) {
       router.push('/dashboard');
       return;
     }
-  }, [session, router]);
+  }, [authLoading, is, router]);
 
   const showNotification = (message: string) => {
     setNotifications(prev => [...prev, message]);

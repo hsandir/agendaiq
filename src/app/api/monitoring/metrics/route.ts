@@ -1,4 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
 
 // Web Vitals metrics interface
@@ -66,8 +68,12 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_MONITORING });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     // Calculate aggregated metrics
     const metrics = {
       timestamp: new Date().toISOString(),

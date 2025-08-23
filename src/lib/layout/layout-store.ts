@@ -6,8 +6,18 @@ class LayoutStore {
   private initialized: boolean = false;
   private lastSyncTime: number = 0;
   private currentLayout: string | null = null;
+  private sessionId: string | null = null;
   
-  private constructor() {}
+  private constructor() {
+    // Generate a session ID to track if we're in the same browser session
+    if (typeof window !== 'undefined') {
+      this.sessionId = sessionStorage.getItem('agendaiq-session-id');
+      if (!this.sessionId) {
+        this.sessionId = Date.now().toString();
+        sessionStorage.setItem('agendaiq-session-id', this.sessionId);
+      }
+    }
+  }
   
   static getInstance(): LayoutStore {
     if (!LayoutStore.instance) {
@@ -41,14 +51,21 @@ class LayoutStore {
   }
   
   needsSync(): boolean {
-    const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
-    return !this.initialized ?? this.lastSyncTime < fiveMinutesAgo;
+    // Only sync once per browser session, not per navigation
+    if (this.lastSyncTime > 0) {
+      return false; // Already synced this session
+    }
+    return true;
   }
   
   reset(): void {
     this.initialized = false;
     this.lastSyncTime = 0;
     this.currentLayout = null;
+    // Clear session on reset
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('agendaiq-session-id');
+    }
   }
 }
 

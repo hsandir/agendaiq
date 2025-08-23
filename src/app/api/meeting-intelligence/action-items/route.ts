@@ -108,10 +108,10 @@ export async function GET(request: NextRequest) {
         completedAt: item.completed_at?.toISOString(),
         assignedRole: item.AssignedToRole ? {
           id: item.AssignedToRole.id,
-          title: item.AssignedToRole.title
+          label: item.AssignedToRole.key ?? 'UNASSIGNED'
         } : {
           id: 0,
-          title: 'Unassigned'
+          label: 'UNASSIGNED'
         },
         assignedStaff: item.AssignedTo ? {
           id: item.AssignedTo.id,

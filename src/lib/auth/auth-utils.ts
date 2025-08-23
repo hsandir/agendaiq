@@ -10,7 +10,9 @@ import {
   can,
   isDevAdmin,
   isOpsAdmin,
-  enrichUserWithCapabilities 
+  enrichUserWithCapabilities,
+  RoleKey,
+  isRole,
 } from './policy';
 
 // Types for better type safety - extend UserWithCapabilities
@@ -49,6 +51,7 @@ export interface AuthRequirements {
   requireAdminRole?: boolean; // Deprecated - use requireCapability
   requireLeadership?: boolean; // Deprecated - use requireCapability
   requireCapability?: Capability | Capability[];
+  requireRole?: RoleKey | RoleKey[];
   requireDevAdmin?: boolean;
   requireOpsAdmin?: boolean;
 }
@@ -108,8 +111,6 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
         role: {
           id: dbUser.Staff[0].Role.id,
           key: dbUser.Staff[0].Role.key,
-          title: dbUser.Staff[0].Role.title,
-          priority: dbUser.Staff[0].Role.priority,
           category: dbUser.Staff[0].Role.category,
           is_leadership: dbUser.Staff[0].Role.is_leadership
         },
@@ -177,6 +178,21 @@ export async function checkAuthRequirements(requirements: AuthRequirements = {})
           authorized: false, 
           error: 'Insufficient permissions', 
           statusCode: 403 
+        };
+      }
+    }
+    
+    // Check role requirement (canonical RoleKey)
+    if (requirements.requireRole) {
+      const roles = Array.isArray(requirements.requireRole)
+        ? requirements.requireRole
+        : [requirements.requireRole];
+      const ok = roles.some((r) => isRole(user, r));
+      if (!ok) {
+        return {
+          authorized: false,
+          error: 'Required role missing',
+          statusCode: 403,
         };
       }
     }
@@ -264,6 +280,10 @@ export const AuthPresets = {
   requireDevAdmin: { requireAuth: true, requireCapability: Capability.DEV_DEBUG },
   requireOpsAdmin: { requireAuth: true, requireCapability: Capability.OPS_HEALTH },
   requireAnyAdmin: { requireAuth: true, requireCapability: [Capability.USER_MANAGE, Capability.DEV_DEBUG] },
+  
+  // New role-based presets
+  requireOpsAdminRole: { requireAuth: true, requireRole: RoleKey.OPS_ADMIN },
+  requireDevAdminRole: { requireAuth: true, requireRole: RoleKey.DEV_ADMIN },
   
   // Development access
   requireDevelopment: { requireAuth: true, requireCapability: Capability.DEV_DEBUG },

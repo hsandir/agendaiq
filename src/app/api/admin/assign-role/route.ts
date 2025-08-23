@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/auth-options";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { AssignRoleRequest } from "@/types";
+import { withAuth } from "@/lib/auth/api-auth";
+import { Capability } from "@/lib/auth/policy";
 
 async function findManagerId(roleTitle: string, departmentId: number) {
   switch (roleTitle) {
@@ -42,31 +42,15 @@ async function findManagerId(roleTitle: string, departmentId: number) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    // Verify admin access
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id as string) {
-      return NextResponse.json(
-        { error: "Not authenticated" },
-        { status: 401 }
-      );
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const currentUser = await prisma.user.findUnique({
-      where: { id: session.user.id as string },
-      include: { Staff: { include: { Role: true } } },
-    });
-
-    if (!currentUser ?? currentUser.Staff?.[0]?.Role?.title !== 'Administrator') {
-      return NextResponse.json(
-        { error: "Not authorized" },
-        { status: 403 }
-      );
-    }
-
-    const body = (await request.json()) as AssignRoleRequest;
-    const { email, __roleId, __departmentId, __managerId  } = body;
+    const body = (await request.json()) as AssignRoleRequest & { email?: string; roleId?: number | string; departmentId?: number | string; managerId?: number | string };
+    const { email, roleId, departmentId, managerId } = body;
 
     if (!email || !roleId || !departmentId) {
       return NextResponse.json(
@@ -90,21 +74,22 @@ export async function POST(request: Request) {
 
     // Get role title for manager assignment
     const role = await prisma.role.findUnique({
-      where: { id: parseInt(roleId) },
+      where: { id: typeof roleId === 'string' ? parseInt(roleId) : Number(roleId) },
     });
 
     // Find or determine manager ID
-    const autoAssignedManagerId = role ? await findManagerId(role?.title, parseInt(departmentId)) : null;
-    const finalManagerId = managerId ? parseInt(managerId) : autoAssignedManagerId;
+    const deptIdNum = typeof departmentId === 'string' ? parseInt(departmentId) : Number(departmentId);
+    const autoAssignedManagerId = role ? await findManagerId(role?.title, deptIdNum) : null;
+    const finalManagerId = managerId ? (typeof managerId === 'string' ? parseInt(managerId) : Number(managerId)) : autoAssignedManagerId ?? undefined;
 
     // Update or create staff record
     if (user.Staff?.[0]) {
       await prisma.staff.update({
         where: { id: user.Staff[0].id },
         data: {
-          role_id: parseInt(roleId),
-          department_id: parseInt(departmentId),
-          manager_id: parseInt(finalManagerId),
+          role_id: typeof roleId === 'string' ? parseInt(roleId) : Number(roleId),
+          department_id: deptIdNum,
+          manager_id: typeof finalManagerId === 'number' ? finalManagerId : undefined,
         },
       });
     } else {
@@ -121,12 +106,12 @@ export async function POST(request: Request) {
 
       await prisma.staff.create({
         data: {
-          user_id: parseInt(user?.id),
-          role_id: parseInt(roleId),
-          department_id: parseInt(departmentId),
-          school_id: parseInt(defaultSchool?.id),
-          district_id: parseInt(defaultDistrict?.id),
-          manager_id: parseInt(finalManagerId),
+          user_id: typeof user?.id === 'string' ? parseInt(user?.id) : Number(user?.id),
+          role_id: typeof roleId === 'string' ? parseInt(roleId) : Number(roleId),
+          department_id: deptIdNum,
+          school_id: typeof defaultSchool?.id === 'string' ? parseInt(defaultSchool?.id) : Number(defaultSchool?.id),
+          district_id: typeof defaultDistrict?.id === 'string' ? parseInt(defaultDistrict?.id) : Number(defaultDistrict?.id),
+          manager_id: typeof finalManagerId === 'number' ? finalManagerId : undefined,
         },
       });
     }

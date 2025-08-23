@@ -120,7 +120,7 @@ export function MeetingFormStep2({
     }
 
     // Validate all agenda items have titles
-    const invalidItems = agendaItems.filter(item => !item.String(title).trim());
+    const invalidItems = agendaItems.filter(item => !item.title.trim());
     if (invalidItems.length > 0) {
       alert("All agenda items must have a title.");
       return;
@@ -134,7 +134,7 @@ export function MeetingFormStep2({
       if (result.success) {
         const finalizeResult = await onFinalize();
         if (finalizeResult.success && finalizeResult.redirect) {
-          router.pushfinalizeResult.redirect;
+          router.push(finalizeResult.redirect);
         }
       } else {
         alert(result.message || "Failed to save agenda items.");
@@ -151,8 +151,8 @@ export function MeetingFormStep2({
   const presenters = (attendees ?? []).map(a => ({
     id: parseInt(a.id),
     name: a.name,
-    role: a.role
-  })));
+    role: a.role,
+  }));
 
   return (
     <div className="space-y-6">
@@ -317,11 +317,11 @@ export function MeetingFormStep2({
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => router.push'/dashboard/meetings'}
+            onClick={() => router.push('/dashboard/meetings')}
           >
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={isSaving ?? agendaItems.length === 0}>
+          <Button onClick={handleSave} disabled={isSaving || agendaItems.length === 0}>
             {isSaving ? (
               "Saving..."
             ) : (

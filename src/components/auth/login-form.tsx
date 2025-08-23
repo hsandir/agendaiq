@@ -29,7 +29,7 @@ export default function LoginForm() {
     return true;
   };
 
-  const handleSubmit = async (e: React?.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 

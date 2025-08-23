@@ -24,13 +24,13 @@ export class MeetingAnalyticsService {
       where.school_id = options.schoolId;
     }
 
-    if (options?.dateFrom ?? options?.dateTo) {
+    if (options?.dateFrom || options?.dateTo) {
       where.start_time = {};
       if (options.dateFrom) {
-        where.start_time.gte = options.dateFrom;
+        (where.start_time as Record<string, unknown>).gte = options.dateFrom;
       }
       if (options.dateTo) {
-        where.start_time.lte = options.dateTo;
+        (where.start_time as Record<string, unknown>).lte = options.dateTo;
       }
     }
 
@@ -321,7 +321,7 @@ export class MeetingAnalyticsService {
           staffId,
           name: record.Staff.User.name,
           email: record.Staff.User.email,
-          role: record.Staff.Role.title,
+          role: record.Staff.Role.key ?? record.Staff.Role.id,
           department: record.Staff.Department.name,
           meetingsAttended: 0,
           lastMeeting: null

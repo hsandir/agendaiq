@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 // import { z } from 'zod';
 
 // Schema for query parameters
@@ -163,6 +165,10 @@ interface WorkflowJob {
 // GET /api/dev/ci-cd/runs - Get workflow runs and their status
 export async function GET(request: NextRequest) {
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_CI });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     // Development tools should be accessible without auth in dev mode
     // The /api/dev/* routes are specifically for development
     // In production, these endpoints should be disabled or protected
@@ -341,6 +347,10 @@ export async function GET(request: NextRequest) {
 // POST /api/dev/ci-cd/runs - Trigger workflow or retry failed run
 export async function POST(request: NextRequest) {
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_CI });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     // Development endpoint - no auth required in dev mode
     console.log('CI/CD POST API called');
 

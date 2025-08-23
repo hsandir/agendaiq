@@ -49,6 +49,10 @@ private/
 # Optional: Completed tasks documentation
 docs/completed/
 
+# Page configuration files
+page-config.json
+src/components/layout/SidebarItems.generated.ts
+
 # Trash folder - removed components
 trash/
 

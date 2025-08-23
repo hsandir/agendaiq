@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/auth/auth-utils';
-import { getFastUser } from '@/lib/auth/auth-utils-fast';
+import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from '@/lib/prisma';
 import { AuditLogger } from '@/lib/audit/audit-logger';
 import { z } from 'zod';
@@ -31,14 +30,14 @@ const customThemeSchema = z.object({
 // GET /api/user/custom-theme - Get user's custom theme
 export async function GET(request: NextRequest) {
   try {
-    const user = await getFastUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return NextResponse.json({ error: auth.error || 'Authentication required' }, { status: auth.statusCode || 401 });
     }
 
     // Get custom theme from database (fast query)
     const userData = await prisma.user.findUnique({
-      where: { id: user.id },
+      where: { id: auth.user.id },
       select: { custom_theme: true }
     });
     
@@ -69,9 +68,9 @@ export async function PUT(request: NextRequest) {
     }
   }
 
-  const user = await getFastUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const auth = await withAuth(request, { requireAuth: true });
+  if (!auth.success || !auth.user) {
+    return NextResponse.json({ error: auth.error || 'Authentication required' }, { status: auth.statusCode || 401 });
   }
 
   try {
@@ -80,7 +79,7 @@ export async function PUT(request: NextRequest) {
 
     // Save custom theme to user profile (optimized)
     await prisma.user.update({
-      where: { id: user.id },
+      where: { id: auth.user.id },
       data: {
         custom_theme: validatedData,
         theme_preference: 'custom', // Set theme preference to custom
@@ -91,10 +90,10 @@ export async function PUT(request: NextRequest) {
     // Log the custom theme save asynchronously (don't wait)
     AuditLogger.logFromRequest(request, {
       tableName: 'users',
-      recordId: user.id.toString(),
+      recordId: auth.user.id.toString(),
       operation: 'UPDATE',
-      userId: user.id,
-      staffId: user.staff?.id,
+      userId: auth.user.id,
+      staffId: auth.user.staff?.id,
       source: 'WEB_UI',
       description: `Custom theme "${validatedData.name}" saved`,
     }).catch(err => console.error('Audit log failed:', err));
@@ -131,15 +130,15 @@ export async function DELETE(request: NextRequest) {
     }
   }
 
-  const user = await getFastUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+  const auth = await withAuth(request, { requireAuth: true });
+  if (!auth.success || !auth.user) {
+    return NextResponse.json({ error: auth.error || 'Authentication required' }, { status: auth.statusCode || 401 });
   }
 
   try {
     // Clear custom theme and reset to default (optimized)
     await prisma.user.update({
-      where: { id: user.id },
+      where: { id: auth.user.id },
       data: {
         custom_theme: Prisma.JsonNull,
         theme_preference: 'standard',
@@ -150,10 +149,10 @@ export async function DELETE(request: NextRequest) {
     // Log the custom theme deletion asynchronously (don't wait)
     AuditLogger.logFromRequest(request, {
       tableName: 'users',
-      recordId: user.id.toString(),
+      recordId: auth.user.id.toString(),
       operation: 'UPDATE',
-      userId: user.id,
-      staffId: user.staff?.id,
+      userId: auth.user.id,
+      staffId: auth.user.staff?.id,
       source: 'WEB_UI',
       description: 'Custom theme deleted',
     }).catch(err => console.error('Audit log failed:', err));

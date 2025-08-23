@@ -117,7 +117,7 @@ export function DashboardContent({
         </div>
       ))}
     </div>
-  ));
+  );
 
   const renderMeetingsList = () => (
     <section className="card p-6">
@@ -168,7 +168,7 @@ export function DashboardContent({
         )}
       </div>
     </section>
-  ));
+  );
 
   const renderActivitySummary = () => (
     <section className="card p-6">

@@ -1,16 +1,14 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth/auth-options";
 import { authenticator } from "otplib";
 import { sendEmail, getTwoFactorCodeHtml } from "@/lib/email/email-service";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id as string) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
     // Generate secret
@@ -28,14 +26,14 @@ export async function POST(request: Request) {
 
     // Generate QR code URL
     const otpauth = authenticator.keyuri(
-      session.user.email!,
+      auth.user.email!,
       "AgendaIQ",
       secret
     );
 
     // Send backup codes via email
     await sendEmail({
-      to: session.user.email!,
+      to: auth.user.email!,
       subject: "Two-Factor Authentication Setup - AgendaIQ",
       html: getTwoFactorCodeHtml(secret),
     });

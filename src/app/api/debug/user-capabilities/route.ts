@@ -1,26 +1,18 @@
-import { NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/auth/auth-utils';
-import { getUserCapabilities } from '@/lib/auth/policy';
+import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability, getUserCapabilities } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    
-    if (!user) {
-      // Return debug info even when not authenticated
-      return NextResponse.json({ 
-        error: 'Not authenticated',
-        debug: {
-          message: 'No active session found',
-          timestamp: new Date().toISOString(),
-          environment: process.env.NODE_ENV
-        }
-      }, { status: 200 }); // Return 200 for debug purposes
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
+    if (!auth.success || !auth.user) {
+      return NextResponse.json({ error: auth.error || 'Authentication required' }, { status: auth.statusCode || 401 });
     }
+    const user = auth.user;
 
     // Get capabilities from database
-    const capabilities = await getUserCapabilities(user?.id);
+    const capabilities = await getUserCapabilities(user.id);
     
     // Get user's role permissions
     const userWithRole = await prisma.user.findUnique({
@@ -49,7 +41,7 @@ export async function GET() {
       capabilityCount: capabilities?.length,
       
       // Direct from database
-      role: userWithRole?.Staff?.[0]?.Role?.title,
+      role: userWithRole?.Staff?.[0]?.Role?.key ?? null,
       roleKey: userWithRole?.Staff?.[0]?.Role?.key,
       permissions: userWithRole?.Staff?.[0]?.Role?.Permissions ?? [],
       

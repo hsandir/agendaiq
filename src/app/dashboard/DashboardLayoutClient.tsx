@@ -34,56 +34,62 @@ export function DashboardLayoutClient({
     if (storeLayout) {
       return storeLayout;
     }
+    // Check localStorage on client side only
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('agendaiq-layout') ?? 'modern';
+      const saved = localStorage.getItem('agendaiq-layout');
+      if (saved) {
+        layoutStore.setCurrentLayout(saved); // Update store
+        return saved;
+      }
     }
     return 'modern';
   });
   const [mounted, setMounted] = useState(false);
 
-  // Load layout preference from database and localStorage
+  // Load layout preference from localStorage and optionally sync with database
   useEffect(() => {
-    // Use singleton store to prevent re-initialization on every navigation
+    setMounted(true);
+    
+    // If already initialized for this session, skip everything
     if (layoutStore.isInitialized()) {
-      setMounted(true);
       return;
     }
     
-    const startTime = performance.now();
-    setMounted(true);
     layoutStore.setInitialized(true);
     
-    // First check localStorage for immediate update
+    // localStorage is our primary source of truth
     const savedLayout = localStorage.getItem('agendaiq-layout');
     if (savedLayout && savedLayout !== layoutId) {
       setLayoutId(savedLayout);
+      layoutStore.setCurrentLayout(savedLayout);
     }
     
-    // Only sync with database if needed (using singleton store)
-    if (layoutStore.needsSync()) {
-      // Optimized database sync with better caching
+    // Only sync with database ONCE per session (not per navigation)
+    // Check if user has a session before making API call
+    const hasSession = document.cookie.includes('next-auth.session-token') || 
+                      document.cookie.includes('__Secure-next-auth.session-token');
+    
+    if (hasSession && layoutStore.needsSync()) {
+      // Mark as synced immediately to prevent multiple calls
+      layoutStore.setLastSyncTime(Date.now());
+      
+      // Database sync in background - fire and forget
+      // This won't block the UI and only happens once per session
       const dbSyncTimer = setTimeout(() => {
-        // Fetch from database with caching headers
-        fetch('/api/user/layout', {
-          headers: { 'Cache-Control': 'max-age=300' }
-        })
+        fetch('/api/user/layout')
           .then(res => res.ok ? res.json() : null)
           .then(data => {
-            // Mark as synced in store
-            layoutStore.setLastSyncTime(Date.now());
-            
             if (data?.layout && data.layout !== savedLayout) {
+              // Only update if different from localStorage
               setLayoutId(data.layout);
               layoutStore.setCurrentLayout(data.layout);
               localStorage.setItem('agendaiq-layout', data.layout);
             }
-            
-            // Track layout load performance
-            const endTime = performance.now();
-            // Performance tracking removed - now handled through hooks
           })
-          .catch(err => console.debug('Layout fetch skipped (user may not be authenticated)'));
-      }, 750); // Reduced delay for faster sync
+          .catch(() => {
+            // Silently ignore - not critical
+          });
+      }, 2000); // 2 second delay to not interfere with page load
       
       return () => clearTimeout(dbSyncTimer);
     }

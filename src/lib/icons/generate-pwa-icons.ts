@@ -17,7 +17,7 @@ export function generatePWAIcons() {
   }
 
   sizes.forEach(size => {
-    const fontSize = Math.floor(size * 0.4));
+    const fontSize = Math.floor(size * 0.4);
     const svg = svgContent
       .replace(/SIZE/g, size.toString())
       .replace('FONTSIZE', fontSize.toString());

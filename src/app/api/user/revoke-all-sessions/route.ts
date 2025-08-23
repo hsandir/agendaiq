@@ -1,22 +1,16 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth/auth-options";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
     // Delete all sessions for the user
-    await prisma.session.deleteMany({
-      where: {
-        userId: session.user?.id!,
-      },
-    });
+    await prisma.session.deleteMany({ where: { userId: auth.user.id } });
 
     return new NextResponse("All sessions revoked successfully", { status: 200 });
   } catch (error: unknown) {

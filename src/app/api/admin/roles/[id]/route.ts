@@ -1,49 +1,21 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/auth-options";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
-// Helper function to verify admin access
-async function verifyAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) {
-    return null;
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user?.email },
-    include: {
-      Staff: {
-        include: {
-          Role: true
-        }
-      }
-    }
-  });
-
-  if (!user || !(user.Staff?.[0] || user.Staff[0].Role?.title !== 'Administrator')) {
-    return null;
-  }
-
-  return user;
-}
+import { withAuth } from "@/lib/auth/api-auth";
+import { Capability } from "@/lib/auth/policy";
 
 export async function PUT(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await params;
-  const admin = await verifyAdmin();
-  if (!admin) {
-    return NextResponse.json(
-      { error: "Not authorized" },
-      { status: 403 }
-    );
+  const { id } = params;
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
 
   try {
     const body = await request.json();
-    const { __title, __priority, category, __department_id  } = body;
+    const { title, priority, category, department_id } = body as { title?: string; priority?: number; category?: string; department_id?: number | string };
 
     if (!title) {
       return NextResponse.json(
@@ -57,9 +29,9 @@ export async function PUT(
       where: { id: parseInt(id) },
       data: {
         title,
-        priority: priority ?? undefined,
+        priority: typeof priority === 'number' ? priority : undefined,
         category: category ?? undefined,
-        department_id: parseInt(department_id) || undefined,
+        department_id: typeof department_id === 'string' ? parseInt(department_id) : (typeof department_id === 'number' ? department_id : undefined),
       },
       include: {
         Department: true,
@@ -82,16 +54,13 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await params;
-  const admin = await verifyAdmin();
-  if (!admin) {
-    return NextResponse.json(
-      { error: "Not authorized" },
-      { status: 403 }
-    );
+  const { id } = params;
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
 
   try {

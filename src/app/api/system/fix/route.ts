@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { access, readdir } from 'fs/promises';
@@ -8,6 +10,10 @@ const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_FIX });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     const { action } = (await request.json()) as Record<string, unknown>;
 
     if (action === 'check') {
@@ -42,7 +48,7 @@ async function checkSystemHealth() {
     // Check npm cache integrity
     try {
       const { stdout: __cacheVerify  } = await execAsync('npm cache verify', { cwd: process.cwd() });
-      if (cacheVerify.includes('Cache verified and compressed')) {
+      if (String(__cacheVerify).includes('Cache verified and compressed')) {
         health.cacheStatus = 'clean';
       } else {
         health.cacheStatus = 'corrupted';
@@ -85,7 +91,7 @@ async function checkSystemHealth() {
     // Get last cache clean time
     try {
       const { stdout: __cacheInfo  } = await execAsync('npm config get cache', { cwd: process.cwd() });
-      if (String(cacheInfo).trim()) {
+      if (String(__cacheInfo).trim()) {
         health.lastCacheClean = 'Available';
       }
     } catch (error: unknown) {

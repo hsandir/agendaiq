@@ -6,13 +6,15 @@
  * 3. Role level = 0 (system level)
  */
 
+import { isRole, RoleKey } from '@/lib/auth/policy';
+
 interface UserWithStaff {
   is_admin?: boolean;
   is_system_admin?: boolean;
   is_school_admin?: boolean;
   Staff?: Array<{
     Role?: {
-      title: string;
+      title?: string;
       key?: string;
       priority?: number;
       level?: number;
@@ -30,17 +32,9 @@ export function isUserAdmin(user: UserWithStaff | null | undefined): boolean {
   // Legacy check for backward compatibility
   if (user?.is_admin) return true;
   
-  // Check role properties
-  const role = user.Staff?.[0]?.Role;
-  if (!role) return false;
-  
-  // Check for admin role keys
-  if (role.key === 'DEV_ADMIN' || role.key === 'OPS_ADMIN') {
-    return true;
-  }
-  
-  // Admin roles have priority 0 or 1 and level 0
-  return (role.priority === 0 ?? role.priority === 1) && role.level === 0;
+  // Prefer canonical RoleKey checks; fall back to flags already handled above
+  if (isRole(user as any, RoleKey.DEV_ADMIN) || isRole(user as any, RoleKey.OPS_ADMIN)) return true;
+  return false;
 }
 
 export function isUserLeadership(user: UserWithStaff | null | undefined): boolean {
@@ -49,21 +43,9 @@ export function isUserLeadership(user: UserWithStaff | null | undefined): boolea
   // Admin is also leadership
   if (isUserAdmin(user)) return true;
   
-  // Check if role is leadership role
-  const roleTitle = user.Staff?.[0]?.Role?.title;
-  const leadershipRoles = [
-    "Chief Education Officer",
-    "Director of Operations", 
-    "Business Administrator",
-    "Assistant Business Administrator",
-    "Director of Curriculum - Humanities",
-    "Director of Curriculum - STEM",
-    "Supervisors - Curriculum/Professional Development",
-    "Director of Accountability",
-    "Director of Student Support Services",
-    "Assistant Director of Student Support Services",
-    "Director of Special Education"
-  ];
-  
-  return leadershipRoles.includes(roleTitle ?? "");
+  // Leadership should be driven by capability/role key, not title
+  // Treat Ops Admin and Dev Admin as leadership for UI gates
+  if (isUserAdmin(user)) return true;
+  // If role carries leadership flag, allow
+  return !!user.Staff?.[0]?.Role?.is_leadership;
 }

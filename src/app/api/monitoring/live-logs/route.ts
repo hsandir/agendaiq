@@ -1,4 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { LiveLogEvent } from '@/lib/logging/types';
 
 // Generate sample logs for demonstration
@@ -102,8 +104,12 @@ function generateStats(logs: LiveLogEvent[]) {
   return stats;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_LOGS });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     // Generate sample logs
     const logs = generateSampleLogs();
     const stats = generateStats(logs);

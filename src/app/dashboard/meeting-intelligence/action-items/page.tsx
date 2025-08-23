@@ -31,7 +31,7 @@ interface ActionItem {
   completedAt?: string;
   assignedRole: {
     id: number;
-    title: string;
+    label: string; // role key label
   };
   assignedStaff?: {
     id: number;
@@ -90,10 +90,10 @@ export default function ActionItemsTrackingPage() {
       const data = await response.json();
       
       // Ensure all items have proper structure
-      const safeItems = (data.items ?? []).map((item: { meeting?: unknown; assignedRole?: { id: number; title: string }; assignedStaff?: unknown; [key: string]: unknown }) => ({
+      const safeItems = (data.items ?? []).map((item: { meeting?: unknown; assignedRole?: { id: number; label: string }; assignedStaff?: unknown; [key: string]: unknown }) => ({
         ...item,
         meeting: item.meeting ?? undefined,
-        assignedRole: item.assignedRole || { id: 0, title: 'Unassigned' },
+        assignedRole: item.assignedRole || { id: 0, label: 'UNASSIGNED' },
         assignedStaff: item.assignedStaff ?? undefined
       }));
       setActionItems(safeItems);
@@ -333,7 +333,7 @@ export default function ActionItemsTrackingPage() {
                     <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <User className="h-3 w-3" />
-                        <span>Role: {item.assignedRole.title}</span>
+                        <span>Role: {item.assignedRole.label}</span>
                         {item.assignedStaff && (
                           <span className="ml-1">({item.assignedStaff.name})</span>
                         )}

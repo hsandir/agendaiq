@@ -1,14 +1,14 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/auth-options";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { withAuth } from "@/lib/auth/api-auth";
+import { Capability } from "@/lib/auth/policy";
 
 // GET /api/setup - Get district setup information
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id as string) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.SCHOOL_VIEW });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
     const schools = await prisma.school.findMany({
@@ -29,20 +29,11 @@ export async function GET() {
 }
 
 // POST /api/setup/district - Create or update district
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id as string) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id as string },
-      include: { Staff: { include: { Role: true } } },
-    });
-
-    if (!user ?? user.Staff?.[0]?.Role?.title !== 'Administrator') {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_UPDATE });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
     const body = await request.json();
@@ -89,20 +80,11 @@ export async function POST(request: Request) {
 }
 
 // POST /api/setup/import - Import data from Excel
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id as string) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id as string },
-      include: { Staff: { include: { Role: true } } },
-    });
-
-    if (!user ?? user.Staff?.[0]?.Role?.title !== 'Administrator') {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_UPDATE });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
     const body = await request.json();

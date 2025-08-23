@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
     const existingRoles = await prisma.role.findMany();
     const existingDepartments = await prisma.department.findMany();
     
-    const validRoles = (existingRoles.map((r) => r.title));
+    const validRoles = (existingRoles.map((r) => r.key ?? r.id.toString()));
     const validDepartments = (existingDepartments.map((d) => d.name));
 
     // Get the admin's school and district for creating staff records
@@ -298,7 +298,7 @@ export async function POST(request: NextRequest) {
             processedRecord.existingData = {
               name: existingUser.name ?? '',
               staffId: existingUser.staff_id ?? '',
-              role: existingStaff.Role.title,
+              role: existingStaff.Role.key ?? existingStaff.Role.id.toString(),
               department: existingStaff.Department.name
             };
 
@@ -320,10 +320,10 @@ export async function POST(request: NextRequest) {
                 action: 'update_staff_id'
               });
             }
-            if (record.Role !== existingStaff.Role.title) {
+            if (record.Role !== (existingStaff.Role.key ?? existingStaff.Role.id.toString())) {
               conflicts.push({
                 field: 'role',
-                existing: existingStaff.Role.title,
+                existing: existingStaff.Role.key ?? existingStaff.Role.id.toString(),
                 new: record.Role,
                 action: 'change_role'
               });

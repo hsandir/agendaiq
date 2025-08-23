@@ -1,8 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 
-// Public debug endpoint to check auth state
-export async function GET() {
+// Debug endpoint restricted to dev debug capability
+export async function GET(request: NextRequest) {
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
+  if (!authResult.success) {
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+  }
   const debugInfo = {
     timestamp: new Date().toISOString(),
     environment: process.env?.NODE_ENV,

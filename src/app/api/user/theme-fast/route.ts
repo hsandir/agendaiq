@@ -4,53 +4,24 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from '@/lib/prisma';
 
 // In-memory cache
 const themeCache = new Map<number, { theme: string; expires: number }>();
 
-// Fast auth without NextAuth overhead
-async function getFastUser(req: NextRequest) {
-  try {
-    const cookieHeader = req.headers.get('cookie');
-    if (!cookieHeader) return null;
-    
-    // Try both development and production cookie names
-    const tokenMatch = cookieHeader.match(/next-auth\.session-token=([^;]+)/) ||
-                      cookieHeader.match(/__Secure-next-auth\.session-token=([^;]+)/);
-    if (!tokenMatch) return null;
-    
-    const decoded = jwt.decode(tokenMatch[1]) as Record<string, unknown>;
-    
-    // NextAuth stores user data differently - check various fields
-    const userId = decoded?.id ?? decoded?.sub ?? decoded?.userId;
-    const userEmail = decoded?.email ?? decoded?.userEmail;
-    
-    if (!userId) return null;
-    
-    return { 
-      id: typeof userId === 'string' ? parseInt(userId) : userId, 
-      email: userEmail ?? 'unknown'
-    };
-  } catch (error: unknown) {
-    console.error('Fast auth error:', error);
-    return null;
-  }
-}
 
 export async function GET(request: NextRequest) {
   const start = Date.now();
   
   try {
-    // Fast auth
-    const user = await getFastUser(request);
-    if (!user) {
-      return NextResponse.json({ error: 'Auth required' }, { status: 401 });
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return NextResponse.json({ error: auth.error || 'Auth required' }, { status: auth.statusCode || 401 });
     }
     
     // Check cache
-    const cached = themeCache.get(user?.id);
+    const cached = themeCache.get(auth.user.id);
     if (cached && cached.expires > Date.now()) {
       const res = NextResponse.json({ theme: cached?.theme });
       res.headers.set('X-Time', `${Date.now() - start}ms`);
@@ -60,13 +31,13 @@ export async function GET(request: NextRequest) {
     
     // Get from DB (optimized query)
     const result = await prisma.$queryRaw<{theme_preference: string}[]>`
-      SELECT theme_preference FROM "User" WHERE id = ${user?.id} LIMIT 1
+      SELECT theme_preference FROM "User" WHERE id = ${auth.user.id} LIMIT 1
     `;
     
     const theme = result[0]?.theme_preference ?? 'standard';
     
     // Cache for 5 minutes
-    themeCache.set(user?.id, {
+    themeCache.set(auth.user.id, {
       theme,
       expires: Date.now() + 300000
     });
@@ -86,9 +57,9 @@ export async function PUT(request: NextRequest) {
   const start = Date.now();
   
   try {
-    const user = await getFastUser(request);
-    if (!user) {
-      return NextResponse.json({ error: 'Auth required' }, { status: 401 });
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return NextResponse.json({ error: auth.error || 'Auth required' }, { status: auth.statusCode || 401 });
     }
     
     const { theme } = (await request.json()) as Record<string, unknown>;
@@ -98,11 +69,11 @@ export async function PUT(request: NextRequest) {
     
     // Update DB
     await prisma.$executeRaw`
-      UPDATE "User" SET theme_preference = ${theme} WHERE id = ${user?.id}
+      UPDATE "User" SET theme_preference = ${theme} WHERE id = ${auth.user.id}
     `;
     
     // Clear cache
-    themeCache.delete(user?.id);
+    themeCache.delete(auth.user.id);
     
     const res = NextResponse.json({ success: true, theme });
     res.headers.set('X-Time', `${Date.now() - start}ms`);

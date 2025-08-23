@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { ErrorAnalyzer } from '@/lib/monitoring/error-analyzer';
 
 interface StoredError extends ErrorReport {
@@ -124,6 +126,10 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_MONITORING });
+    if (!auth.success) {
+      return NextResponse.json({ success: false, error: auth.error }, { status: auth.statusCode });
+    }
     const { searchParams } = new URL(request.url);
     const pageContext = searchParams.get('page');
     const severity = searchParams.get('severity');
@@ -193,6 +199,10 @@ export async function GET(request: NextRequest) {
 // Mark error as resolved
 export async function PATCH(request: NextRequest) {
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_MONITORING });
+    if (!auth.success) {
+      return NextResponse.json({ success: false, error: auth.error }, { status: auth.statusCode });
+    }
     const { errorId, resolved } = (await request.json()) as Record<string, unknown>;
     
     // Find and update error in all pages

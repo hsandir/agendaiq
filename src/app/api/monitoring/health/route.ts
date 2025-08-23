@@ -1,8 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
 
-// Public health check endpoint - no auth required for monitoring
-export async function GET() {
+// Secure health check endpoint for internal monitoring
+export async function GET(request: NextRequest) {
+  const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_MONITORING });
+  if (!auth.success) {
+    return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+  }
   const startTime = Date.now();
   
   const health = {

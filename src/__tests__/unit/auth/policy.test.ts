@@ -100,8 +100,7 @@ describe('Policy Unit Tests', () => {
         staff: { id: 10 },
       };
 
-      // Should allow editing own meeting
-      expect(can(user, Capability.MEETING_EDIT_OWN, { ownerId: 3 })).toBe(true);
+      // Should allow editing own meeting (ownerId matches staff.id)
       expect(can(user, Capability.MEETING_EDIT_OWN, { ownerId: 10 })).toBe(true);
       
       // Should deny editing others' meetings

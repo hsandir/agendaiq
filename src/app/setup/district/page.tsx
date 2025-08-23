@@ -1,19 +1,12 @@
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/auth-options";
-import type { UserWithStaff, SessionUser } from '@/types/auth';
 import { prisma } from "@/lib/prisma";
 import { DistrictSetup } from "@/components/setup/DistrictSetup";
+import { requireAuth } from '@/lib/auth/auth-utils';
+import { isRole, RoleKey } from '@/lib/auth/policy';
 
 export default async function DistrictSetupPage() {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/auth/signin");
-  }
-
-  const user = session.user as SessionUser;
-  if (!user.staff?.Role ?? user.staff.Role.title !== "Administrator") {
+  const user = await requireAuth({ requireAuth: true });
+  if (!isRole(user as any, RoleKey.OPS_ADMIN) && !isRole(user as any, RoleKey.DEV_ADMIN)) {
     redirect("/dashboard");
   }
 

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { promises as fs } from 'fs';
@@ -7,6 +9,10 @@ const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_FIX });
+    if (!auth.success) {
+      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    }
     const { type } = (await request.json()) as Record<string, unknown>;
 
     if (type === 'react-version-mismatch') {

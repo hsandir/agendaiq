@@ -1,16 +1,13 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/auth/api-auth';
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return NextResponse.json(
-        { error: "Not authenticated" },
-        { status: 401 }
-      );
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: auth.statusCode || 401 });
     }
 
     const body = await request.json();
@@ -25,7 +22,7 @@ export async function POST(request: Request) {
 
     // Find the user and their staff record
     const user = await prisma.user.findUnique({
-      where: { email: session.user?.email },
+      where: { email: auth.user.email },
       include: {
         Staff: {
           include: {

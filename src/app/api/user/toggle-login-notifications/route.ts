@@ -1,19 +1,17 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth/auth-options";
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
     // TODO: Add loginNotifications field to User model in schema
     const user = await prisma.user.findUnique({
-      where: { email: session.user?.email! },
+      where: { email: auth.user.email! },
       select: { 
         email: true,
         // loginNotifications: true 
@@ -26,7 +24,7 @@ export async function POST() {
 
     // TODO: Toggle the setting once loginNotifications field is added
     // await prisma.user.update({
-    //   where: { email: session.user?.email! },
+    //   where: { email: auth.user.email! },
     //   data: { loginNotifications: !user?.loginNotifications },
     // });
 

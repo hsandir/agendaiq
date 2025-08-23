@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { APIAuthPatterns } from "@/lib/auth/api-auth";
-import { AuthenticatedUser } from "@/lib/auth/auth-utils";
+import { withAuth } from "@/lib/auth/api-auth";
+import { Capability, isAnyAdmin } from '@/lib/auth/policy';
 import { prisma } from "@/lib/prisma";
-import { isAnyAdmin } from '@/lib/auth/policy';
 
 // GET /api/meetings/search - Search meetings for continuation feature
-export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: _AuthenticatedUser) => {
+export async function GET(request: NextRequest) {
   try {
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.MEETING_VIEW });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
+    }
+    const user = authResult.user!;
+
     if (!user.staff) {
       return NextResponse.json({ error: "Staff record not found" }, { status: 404 });
     }
@@ -28,8 +33,8 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
       // Admins can search all meetings in their organization
       searchWhereClause = {
         OR: [
-          { school_id: parseInt(staffRecord)?.school?.id },
-          { district_id: parseInt(staffRecord)?.district?.id }
+          { school_id: staffRecord?.school?.id },
+          { district_id: staffRecord?.district?.id }
         ]
       };
     } else {
@@ -118,7 +123,9 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
                 email: true,
               },
             },
-            Role: true
+            Role: {
+              select: { key: true }
+            }
           },
         },
         Department: true,
@@ -156,7 +163,7 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
         id: meeting.Staff.User.id,
         name: meeting.Staff.User.name,
         email: meeting.Staff.User.email,
-        role: meeting.Staff.Role?.title
+        roleKey: meeting.Staff.Role?.key ?? null
       },
       department: meeting.Department?.name,
       attendee_count: meeting.MeetingAttendee.length,
@@ -178,4 +185,4 @@ export const GET = APIAuthPatterns.staffOnly(async (request: NextRequest, user: 
       { status: 500 }
     );
   }
-}); 
+}

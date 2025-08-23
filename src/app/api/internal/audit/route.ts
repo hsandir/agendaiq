@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auditSystem } from '@/lib/audit/hybrid-audit-system';
+import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
 
 /**
  * Internal API endpoint for processing audit events from middleware
@@ -7,6 +9,10 @@ import { auditSystem } from '@/lib/audit/hybrid-audit-system';
  */
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_LOGS });
+    if (!authResult.success) {
+      return NextResponse.json({ success: false, error: authResult.error }, { status: authResult.statusCode });
+    }
     const auditEvent = await request.json();
     
     // Extract event data
