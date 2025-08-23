@@ -18,7 +18,6 @@ interface NextAuthToken {
     role?: {
       id: number;
       key?: string | null;
-      title: string;
       is_leadership?: boolean;
     };
   };
@@ -39,7 +38,7 @@ function tokenToUser(token: JWT | NextAuthToken | null): UserWithCapabilities | 
     is_school_admin: Boolean(token.is_school_admin) || ((token as any).staff?.role && 'key' in token.staff.role && token.staff.role.key === 'OPS_ADMIN') || false,
     roleKey: ((token as any).staff?.role && 'key' in token.staff.role ? token.staff.role.key : undefined) as string | undefined,
     capabilities: (token.capabilities as string[]) || [],
-    staff: token.staff as { id: number; role?: { id: number; key?: string | null; title: string; is_leadership?: boolean } } | undefined
+    staff: token.staff as { id: number; role?: { id: number; key?: string | null; is_leadership?: boolean } } | undefined
   };
 }
 
