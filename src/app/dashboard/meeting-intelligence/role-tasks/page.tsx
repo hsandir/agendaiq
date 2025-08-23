@@ -22,8 +22,8 @@ import { BackLink } from '@/components/ui/back-link';
 
 interface Role {
   id: number;
-  title: string;
-  priority: number;
+  title: string; // role key label
+  priority?: number;
   isLeadership: boolean;
   currentHolder?: {
     id: number;

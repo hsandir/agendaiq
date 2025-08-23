@@ -24,9 +24,9 @@ export interface UserWithAuth {
 // Role information
 export interface RoleInfo {
   id: number;
-  title: string;
   key?: string;
-  priority?: number;
+  title?: string; // legacy optional
+  priority?: number; // legacy optional
   level?: number;
   is_leadership?: boolean;
 }
@@ -137,8 +137,8 @@ export function isUserAdmin(user: unknown): boolean {
   if (isUserWithStaff(user)) {
     const role = user.Staff[0]?.Role;
     if (role) {
-      // Admin roles have priority 0 or 1 and level 0
-      return (role.priority === 0 ?? role.priority === 1) && role.level === 0;
+      // Do not infer admin via title/priority; rely on flags/capabilities
+      return false;
     }
   }
   

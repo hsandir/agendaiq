@@ -186,8 +186,7 @@ export const authOptions: NextAuthOptions = {
                 id: staff.id,
                 role: {
                   id: staff.Role.id,
-                  title: staff.Role.title,
-                  priority: staff.Role.priority,
+                  key: staff.Role.key,
                   category: staff.Role.category,
                   is_leadership: staff.Role.is_leadership
                 },
@@ -363,8 +362,6 @@ export const authOptions: NextAuthOptions = {
                 id: staff.id,
                 role: {
                   key: staff.Role.key,
-                  title: staff.Role.title,
-                  priority: staff.Role.priority,
                   category: staff.Role.category,
                   is_leadership: staff.Role.is_leadership
                 },

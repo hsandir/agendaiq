@@ -321,7 +321,7 @@ export class MeetingAnalyticsService {
           staffId,
           name: record.Staff.User.name,
           email: record.Staff.User.email,
-          role: record.Staff.Role.title,
+          role: record.Staff.Role.key ?? record.Staff.Role.id,
           department: record.Staff.Department.name,
           meetingsAttended: 0,
           lastMeeting: null

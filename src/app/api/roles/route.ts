@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 // Role update data interface
 interface RoleUpdateData {
-  title?: string;
+  key?: string | null;
   priority?: number;
   is_leadership?: boolean;
   category?: string;
@@ -39,30 +39,30 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { __title, __priority, __is_leadership, category, description  } = body;
+    const { key, priority, is_leadership, category, description  } = body;
 
-    if (!title ?? priority === undefined) {
+    if (!key ?? priority === undefined) {
       return NextResponse.json(
-        { error: 'Title and priority are required' },
+        { error: 'Role key and priority are required' },
         { status: 400 }
       );
     }
 
-    // Check if role with same title exists
+    // Check if role with same key exists
     const existingRole = await prisma.role.findFirst({
-      where: { title }
+      where: { key }
     });
 
     if (existingRole) {
       return NextResponse.json(
-        { error: 'Role with this title already exists' },
+        { error: 'Role with this key already exists' },
         { status: 409 }
       );
     }
 
     const role = await prisma.role.create({
       data: {
-        title,
+        key,
         priority,
         is_leadership: is_leadership ?? false,
         category,
@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { __id, __title, __priority, __is_leadership, category, description  } = body;
+    const { id, key, priority, is_leadership, category, description  } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -109,21 +109,21 @@ export async function PUT(request: NextRequest) {
     }
 
     // If title is being changed, check for conflicts
-    if (title && title !== existingRole.title) {
-      const titleConflict = await prisma.role.findFirst({
-        where: { title }
+    if (key && key !== existingRole.key) {
+      const keyConflict = await prisma.role.findFirst({
+        where: { key }
       });
 
-      if (titleConflict) {
+      if (keyConflict) {
         return NextResponse.json(
-          { error: 'Role with this title already exists' },
+          { error: 'Role with this key already exists' },
           { status: 409 }
         );
       }
     }
 
     const updateData: RoleUpdateData = {};
-    if (title !== undefined) updateData.title = title;
+    if (key !== undefined) updateData.key = key;
     if (priority !== undefined) updateData.priority = priority;
     if (is_leadership !== undefined) updateData.is_leadership = is_leadership;
     if (category !== undefined) updateData.category = category;

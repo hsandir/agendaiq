@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 // Role with included relations from Prisma query
 interface RoleWithRelations {
   id: number;
-  title: string;
+  key: string | null;
   level: number;
   is_leadership: boolean;
   category: string | null;
@@ -28,7 +28,7 @@ interface RoleWithRelations {
 // Hierarchical role structure for response
 interface HierarchicalRole {
   id: string;
-  title: string;
+  key: string;
   level: number;
   is_leadership: boolean;
   category: string;
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
     allRoles.forEach((role: RoleWithRelations) => {
       roleMap.set(role.id, {
         id: role.id.toString(),
-        title: role.title,
+        key: role.key ?? 'UNKNOWN_ROLE',
         level: role.level,
         is_leadership: role.is_leadership,
         category: role.category ?? '',
