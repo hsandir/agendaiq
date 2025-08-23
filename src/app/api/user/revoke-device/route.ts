@@ -1,14 +1,12 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth/auth-options";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id as string) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
     const { searchParams } = new URL(request?.url);
@@ -30,7 +28,7 @@ export async function POST(request: Request) {
     //   select: { user_id: true },
     // });
 
-    // if (!device ?? device.user_id !== session.user.id as string) {
+    // if (!device ?? device.user_id !== auth.user.id) {
     //   return new NextResponse("Device not found", { status: 404 });
     // }
 

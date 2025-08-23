@@ -1,18 +1,18 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from '@/lib/auth/api-auth';
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/user/school - Get current user's school
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id as string) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id as string },
+      where: { id: auth.user.id },
       include: { Staff: { include: { School: true } } },
     });
 
@@ -20,7 +20,7 @@ export async function GET() {
       return new NextResponse("School not found", { status: 404 });
     }
 
-    return new NextResponseJSON.stringify((user.Staff[0].School), {
+    return new NextResponse(JSON.stringify(user.Staff[0].School), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -31,11 +31,11 @@ export async function GET() {
 }
 
 // POST /api/user/school - Update user's school
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id as string) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
     const body = await request.json();
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
 
     // Find user's staff record
     const userStaff = await prisma.staff.findFirst({
-      where: { user_id: session.user.id as string },
+      where: { user_id: auth.user.id },
     });
 
     if (!userStaff) {
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
 
     // Get updated user with staff
     const updatedUser = await prisma.user.findUnique({
-      where: { id: session.user.id as string },
+      where: { id: auth.user.id },
       include: { Staff: { include: { School: true } } },
     });
 
@@ -86,16 +86,16 @@ export async function POST(request: Request) {
 }
 
 // DELETE /api/user/school - Remove user from school
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id as string) {
-      return new NextResponse("Unauthorized", { status: 401 });
+    const auth = await withAuth(request, { requireAuth: true });
+    if (!auth.success || !auth.user) {
+      return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
     // Find user's staff record
     const userStaff = await prisma.staff.findFirst({
-      where: { user_id: session.user.id as string },
+      where: { user_id: auth.user.id },
     });
 
     if (!userStaff) {
