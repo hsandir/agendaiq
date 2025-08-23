@@ -1,18 +1,9 @@
-import { getCurrentUser } from '@/lib/auth/auth-utils';
+import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
 import { getUserCapabilities, can, Capability, isOpsAdmin } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
 
 export default async function DebugCapabilitiesPage() {
-  const user = await getCurrentUser();
-  
-  if (!user) {
-    return (
-      <div className="p-8">
-        <h1 className="text-2xl font-bold mb-4">Not Authenticated</h1>
-        <a href="/auth/signin" className="text-blue-600 hover:underline">Sign In</a>
-      </div>
-    );
-  }
+  const user = await requireAuth(AuthPresets.requireDevelopment);
 
   // Get capabilities from database
   const capabilities = await getUserCapabilities(user.id);
@@ -41,7 +32,6 @@ export default async function DebugCapabilitiesPage() {
     is_school_admin: user.is_school_admin ?? false,
     
     // Role info
-    role: userWithRole?.Staff?.[0]?.Role?.title || 'No Role',
     roleKey: userWithRole?.Staff?.[0]?.Role?.key || 'No Key',
     roleId: userWithRole?.Staff?.[0]?.Role?.id,
     
@@ -91,7 +81,6 @@ export default async function DebugCapabilitiesPage() {
         <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
           <h2 className="text-xl font-semibold mb-4 text-gray-900">Role Information</h2>
           <div className="space-y-2 text-gray-700">
-            <div><strong className="text-gray-900">Role Title:</strong> {checks.role}</div>
             <div><strong className="text-gray-900">Role Key:</strong> {checks.roleKey}</div>
             <div><strong className="text-gray-900">Role ID:</strong> {checks.roleId}</div>
             <div><strong className="text-gray-900">Is Ops Admin:</strong> {checks.isOpsAdmin ? '✅ Yes' : '❌ No'}</div>
