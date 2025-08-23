@@ -1,33 +1,17 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth/auth-options";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { withAuth } from "@/lib/auth/api-auth";
+import { Capability } from "@/lib/auth/policy";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    // Verify admin access
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id as string) {
-      return NextResponse.json(
-        { error: "Not authenticated" },
-        { status: 401 }
-      );
-    }
-
-    const currentUser = await prisma.user.findUnique({
-      where: { id: session.user.id as string },
-      include: { Staff: { include: { Role: true } } },
-    });
-
-    if (!currentUser || (currentUser.Staff?.[0]?.Role?.title !== 'Administrator')) {
-      return NextResponse.json(
-        { error: "Not authorized" },
-        { status: 403 }
-      );
+    const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
+    if (!authResult.success) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
     const body = await request.json();
-    const { email, roleId } = body;
+    const { email, roleId } = body as { email?: string; roleId?: number | string };
 
     if (!email || !roleId) {
       return NextResponse.json(
@@ -53,7 +37,7 @@ export async function POST(request: Request) {
     if (user.Staff?.[0]) {
       await prisma.staff.update({
         where: { id: user.Staff[0].id },
-        data: { role_id: parseInt(roleId) },
+        data: { role_id: typeof roleId === 'string' ? parseInt(roleId) : Number(roleId) },
       });
     } else {
       // Need school_id and district_id for new staff record
