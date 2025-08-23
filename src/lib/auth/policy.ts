@@ -241,11 +241,7 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
       include: {
         Staff: {
           include: {
-            Role: {
-              include: {
-                Permissions: true
-              }
-            }
+            Role: true
           }
         }
       }

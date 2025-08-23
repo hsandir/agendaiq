@@ -14,11 +14,7 @@ export default async function DebugCapabilitiesPage() {
     include: {
       Staff: {
         include: {
-          Role: {
-            include: {
-              Permissions: true
-            }
-          }
+          Role: true
         }
       }
     }

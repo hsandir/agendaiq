@@ -20,11 +20,7 @@ export async function GET(request: NextRequest) {
       include: {
         Staff: {
           include: {
-            Role: {
-              include: {
-                Permissions: true
-              }
-            }
+            Role: true
           }
         }
       }

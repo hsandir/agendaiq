@@ -9,40 +9,41 @@ datasource db {
 }
 
 model User {
-  id                          Int                @id @default(autoincrement())
-  email                       String             @unique
+  id                          Int                 @id @default(autoincrement())
+  email                       String              @unique
   name                        String?
-  staff_id                    String?            @unique
-  hashedPassword              String?            @map("hashed_password")
-  emailVerified               DateTime?          @map("email_verified")
+  staff_id                    String?             @unique
+  hashedPassword              String?             @map("hashed_password")
+  emailVerified               DateTime?           @map("email_verified")
   image                       String?
-  is_admin                    Boolean            @default(false)
-  is_system_admin             Boolean            @default(false)
-  is_school_admin             Boolean            @default(false)
-  two_factor_enabled          Boolean            @default(false)
+  is_admin                    Boolean             @default(false)
+  is_system_admin             Boolean             @default(false)
+  is_school_admin             Boolean             @default(false)
+  two_factor_enabled          Boolean             @default(false)
   two_factor_secret           String?
   backup_codes                String[]
-  login_notifications_enabled Boolean            @default(true)
-  suspicious_alerts_enabled   Boolean            @default(true)
-  remember_devices_enabled    Boolean            @default(true)
-  created_at                  DateTime           @default(now())
-  updated_at                  DateTime           @updatedAt
-  theme_preference            String?            @default("standard")
-  layout_preference           String?            @default("modern")
+  login_notifications_enabled Boolean             @default(true)
+  suspicious_alerts_enabled   Boolean             @default(true)
+  remember_devices_enabled    Boolean             @default(true)
+  created_at                  DateTime            @default(now())
+  updated_at                  DateTime            @updatedAt
+  theme_preference            String?             @default("standard")
+  layout_preference           String?             @default("modern")
   custom_theme                Json?
   Account                     Account[]
   Session                     Session[]
   Staff                       Staff[]
   AuditLog                    AuditLog[]
-  TargetCriticalAuditLog      CriticalAuditLog[] @relation("TargetUser")
+  TargetCriticalAuditLog      CriticalAuditLog[]  @relation("TargetUser")
   CriticalAuditLog            CriticalAuditLog[]
   DevLogs                     DevLog[]
   Device                      Device[]
   MeetingAuditLog             MeetingAuditLog[]
   SecurityLogs                SecurityLog[]
-  CreatedTeams                Team[]             @relation("TeamCreator")
+  CreatedTeams                Team[]              @relation("TeamCreator")
   TeamMemberships             TeamMember[]
-  TeamKnowledgeItems          TeamKnowledge[]
+  TeamKnowledgeItems          TeamKnowledge[]     @relation("TeamKnowledgeCreator")
+  TeamKnowledgeViews          TeamKnowledgeView[]
 
   @@map("users")
 }
@@ -495,7 +496,6 @@ model Meeting {
   @@index([school_id, start_time])
   @@index([start_time])
   @@index([status, start_time])
-
   @@map("meeting")
 }
 
@@ -511,7 +511,6 @@ model MeetingAttendee {
 
   @@index([meeting_id, staff_id])
   @@index([staff_id])
-
   @@map("meeting_attendee")
 }
 
@@ -529,7 +528,6 @@ model Permission {
   @@unique([role_id, capability])
   @@index([capability])
   @@index([resource, action])
-
   @@map("permission")
 }
 
@@ -572,7 +570,6 @@ model RoleHierarchy {
   Role_RoleHierarchy_parent_role_idToRole Role     @relation("RoleHierarchy_parent_role_idToRole", fields: [parent_role_id], references: [id])
 
   @@unique([parent_role_id, child_role_id])
-
   @@map("role_hierarchy")
 }
 
@@ -688,40 +685,40 @@ model Department {
 // ========================================
 
 model Team {
-  id                String            @id @default(cuid())
-  name              String
-  code              String            @unique
-  type              String            @default("PROJECT") // EVENT, PROJECT, COMMITTEE
-  status            String            @default("ACTIVE")  // ACTIVE, COMPLETED, ARCHIVED
-  purpose           String            @db.Text
-  start_date        DateTime          @default(now())
-  end_date          DateTime?
-  is_recurring      Boolean           @default(false)
-  budget            Decimal?          @db.Decimal(10, 2)
-  
+  id           String    @id @default(cuid())
+  name         String
+  code         String    @unique
+  type         String    @default("PROJECT") // EVENT, PROJECT, COMMITTEE
+  status       String    @default("ACTIVE") // ACTIVE, COMPLETED, ARCHIVED
+  purpose      String    @db.Text
+  start_date   DateTime  @default(now())
+  end_date     DateTime?
+  is_recurring Boolean   @default(false)
+  budget       Decimal?  @db.Decimal(10, 2)
+
   // Organization links (nullable for flexibility)
-  school_id         Int?
-  department_id     Int?
-  district_id       Int?
-  
+  school_id     Int?
+  department_id Int?
+  district_id   Int?
+
   // Metadata
-  created_by        Int
-  created_at        DateTime          @default(now())
-  updated_at        DateTime          @updatedAt
-  archived_at       DateTime?
-  parent_team_id    String?
-  
+  created_by     Int
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+  archived_at    DateTime?
+  parent_team_id String?
+
   // Relations
-  School            School?           @relation(fields: [school_id], references: [id])
-  Department        Department?       @relation(fields: [department_id], references: [id])
-  District          District?         @relation(fields: [district_id], references: [id])
-  Creator           User              @relation("TeamCreator", fields: [created_by], references: [id])
-  ParentTeam        Team?             @relation("TeamHierarchy", fields: [parent_team_id], references: [id])
-  ChildTeams        Team[]            @relation("TeamHierarchy")
-  Members           TeamMember[]
-  Knowledge         TeamKnowledge[]
-  Meetings          Meeting[]
-  
+  School     School?         @relation(fields: [school_id], references: [id])
+  Department Department?     @relation(fields: [department_id], references: [id])
+  District   District?       @relation(fields: [district_id], references: [id])
+  Creator    User            @relation("TeamCreator", fields: [created_by], references: [id])
+  ParentTeam Team?           @relation("TeamHierarchy", fields: [parent_team_id], references: [id])
+  ChildTeams Team[]          @relation("TeamHierarchy")
+  Members    TeamMember[]
+  Knowledge  TeamKnowledge[]
+  Meetings   Meeting[]
+
   @@index([school_id, status])
   @@index([type, status])
   @@index([created_by])
@@ -729,20 +726,20 @@ model Team {
 }
 
 model TeamMember {
-  id                String            @id @default(cuid())
-  team_id           String
-  user_id           Int
-  staff_id          Int?
-  role              String            @default("MEMBER") // LEAD, COORDINATOR, MEMBER
-  joined_at         DateTime          @default(now())
-  left_at           DateTime?
-  is_active         Boolean           @default(true)
-  
+  id        String    @id @default(cuid())
+  team_id   String
+  user_id   Int
+  staff_id  Int?
+  role      String    @default("MEMBER") // LEAD, COORDINATOR, MEMBER
+  joined_at DateTime  @default(now())
+  left_at   DateTime?
+  is_active Boolean   @default(true)
+
   // Relations
-  Team              Team              @relation(fields: [team_id], references: [id], onDelete: Cascade)
-  User              User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  Staff             Staff?            @relation(fields: [staff_id], references: [id])
-  
+  Team  Team   @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  User  User   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  Staff Staff? @relation(fields: [staff_id], references: [id])
+
   @@unique([team_id, user_id])
   @@index([user_id, is_active])
   @@index([team_id])
@@ -750,23 +747,43 @@ model TeamMember {
 }
 
 model TeamKnowledge {
-  id                String            @id @default(cuid())
-  team_id           String
-  title             String
-  content           String            @db.Text
-  category          String            @default("NOTE") // NOTE, DECISION, LESSON, TEMPLATE
-  visibility        String            @default("TEAM") // TEAM, SIMILAR_TEAMS, PUBLIC
-  created_by        Int
-  created_at        DateTime          @default(now())
-  updated_at        DateTime          @updatedAt
-  
+  id         Int      @id @default(autoincrement())
+  team_id    String
+  title      String
+  content    String   @db.Text
+  type       String   @default("NOTE") // DOCUMENT, LINK, NOTE, TEMPLATE, GUIDE, POLICY
+  tags       String[]
+  url        String?
+  is_pinned  Boolean  @default(false)
+  metadata   Json?
+  created_by Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
   // Relations
-  Team              Team              @relation(fields: [team_id], references: [id], onDelete: Cascade)
-  Creator           User              @relation(fields: [created_by], references: [id])
-  
-  @@index([team_id, category])
-  @@index([visibility])
+  team            Team                @relation(fields: [team_id], references: [id], onDelete: Cascade)
+  created_by_user User                @relation("TeamKnowledgeCreator", fields: [created_by], references: [id])
+  views           TeamKnowledgeView[]
+
+  @@index([team_id])
+  @@index([created_by])
   @@map("team_knowledge")
+}
+
+model TeamKnowledgeView {
+  id           Int      @id @default(autoincrement())
+  knowledge_id Int
+  user_id      Int
+  viewed_at    DateTime @default(now())
+
+  // Relations
+  knowledge TeamKnowledge @relation(fields: [knowledge_id], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [user_id], references: [id])
+
+  @@unique([knowledge_id, user_id])
+  @@index([knowledge_id])
+  @@index([user_id])
+  @@map("team_knowledge_views")
 }
 
 enum AuditCategory {

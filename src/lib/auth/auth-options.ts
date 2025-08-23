@@ -334,11 +334,7 @@ export const authOptions: NextAuthOptions = {
             include: {
               Staff: {
                 include: {
-                  Role: {
-                    include: {
-                      Permissions: true
-                    }
-                  },
+                  Role: true,
                   Department: true,
                   School: true,
                   District: true

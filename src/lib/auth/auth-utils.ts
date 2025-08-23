@@ -81,11 +81,7 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
       include: {
         Staff: {
           include: {
-            Role: {
-              include: {
-                Permissions: true
-              }
-            },
+            Role: true,
             Department: true,
             School: true,
             District: true
