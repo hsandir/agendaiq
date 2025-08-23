@@ -10,6 +10,8 @@ const cors = require('cors');
 const { z } = require('zod');
 const app = express();
 const PORT = 3456;
+const fs = require('fs');
+const path = require('path');
 
 app.use(cors());
 app.use(express.json());
@@ -137,6 +139,105 @@ app.post('/schema/add', (req, res) => {
       success: false,
       error: error.message
     });
+  }
+});
+
+// -------------------------
+// Auth Compliance Validation
+// -------------------------
+
+// Forbidden/required patterns for auth compliance
+const AUTH_RULES = {
+  forbidden: [
+    { name: 'no-title-based-auth', pattern: /role\.(title|priority)/i, message: 'Title/priority based auth detected. Use isRole()/can() with RoleKey/Capability.', severity: 'error' },
+    { name: 'no-roleid-auth', pattern: /RoleID\.[A-Z_]+/, message: 'Numeric RoleID check detected in auth. Prefer RoleKey.', severity: 'warn' },
+    { name: 'use-staff-id-for-organizer', pattern: /organizer_id\s*:\s*user\??\.(id|userId)/, message: 'Use staff.id for organizer_id, not user.id', severity: 'error' },
+  ],
+  publicApis: [
+    '/api/auth',
+    '/api/auth/signin',
+    '/api/auth/register',
+    '/api/auth/callback',
+    '/api/auth/error',
+    '/api/health',
+    '/api/setup/check'
+  ]
+};
+
+function isPublicAPI(routePath) {
+  return AUTH_RULES.publicApis.some((p) => routePath.startsWith(p));
+}
+
+function walkFiles(dir, files = []) {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.name === 'node_modules' || entry.name.startsWith('.git')) continue;
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) walkFiles(full, files);
+    else if (/\.(ts|tsx|mjs|js)$/.test(entry.name)) files.push(full);
+  }
+  return files;
+}
+
+function guessRouteFromFile(filePath) {
+  // Maps src/app/api/.../route.ts to /api/...
+  const idx = filePath.indexOf(path.join('src', 'app'));
+  if (idx === -1) return null;
+  const sub = filePath.slice(idx + ('src' + path.sep + 'app').length);
+  const parts = sub.split(path.sep).filter(Boolean);
+  if (parts[0] !== 'api') return null;
+  const routeParts = parts.slice(0, -1); // drop route.ts
+  return '/' + routeParts.join('/');
+}
+
+app.post('/auth/compliance/scan', (req, res) => {
+  try {
+    const rootDir = req.body?.rootDir || process.cwd();
+    const projectRoot = path.isAbsolute(rootDir) ? rootDir : path.join(process.cwd(), '..');
+    const srcDir = path.join(projectRoot, 'src');
+    const files = walkFiles(srcDir, []);
+
+    const findings = [];
+
+    // Forbidden patterns
+    for (const file of files) {
+      const content = fs.readFileSync(file, 'utf8');
+      const lines = content.split(/\r?\n/);
+      for (const rule of AUTH_RULES.forbidden) {
+        if (rule.pattern.test(content)) {
+          lines.forEach((line, i) => {
+            if (rule.pattern.test(line)) {
+              findings.push({ type: 'pattern', rule: rule.name, severity: rule.severity, file, line: i + 1, message: rule.message, snippet: line.trim() });
+            }
+          });
+        }
+      }
+    }
+
+    // Pages missing server guard (heuristic)
+    const pageFiles = files.filter((f) => /src\/(app)\/(?!api\/).*\/page\.tsx$/.test(f.replace(/\\/g, '/')));
+    for (const file of pageFiles) {
+      const content = fs.readFileSync(file, 'utf8');
+      if (/export\s+default/.test(content) && !/requireAuth\(/.test(content) && !/ServerAuthWrapper/.test(content)) {
+        findings.push({ type: 'page_guard', rule: 'require-auth-on-pages', severity: 'warn', file, message: 'Page likely missing server requireAuth or ServerAuthWrapper.' });
+      }
+    }
+
+    // APIs missing withAuth (non-public)
+    const apiFiles = files.filter((f) => /src\/app\/api\/.+\/route\.ts$/.test(f.replace(/\\/g, '/')));
+    for (const file of apiFiles) {
+      const content = fs.readFileSync(file, 'utf8');
+      const routePath = guessRouteFromFile(file);
+      if (!routePath) continue;
+      if (isPublicAPI(routePath)) continue;
+      if (!/withAuth\(/.test(content)) {
+        findings.push({ type: 'api_guard', rule: 'with-auth-on-apis', severity: 'error', file, route: routePath, message: 'API route missing withAuth() guard.' });
+      }
+    }
+
+    res.json({ success: true, findings, summary: { total: findings.length } });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err?.message || 'scan failed' });
   }
 });
 
