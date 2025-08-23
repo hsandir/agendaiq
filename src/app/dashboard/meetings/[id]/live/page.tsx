@@ -13,6 +13,10 @@ export default async function MeetingLivePage(props: Props) {
   const params = await props.params;
   const user = await requireAuth(AuthPresets.requireStaff);
   
+  if (!params?.id) {
+    notFound();
+  }
+  
   const meetingId = parseInt(params.id);
   if (isNaN(meetingId)) {
     notFound();

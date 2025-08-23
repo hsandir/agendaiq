@@ -71,7 +71,7 @@ export default async function AgendaItemPage(props: Props) {
     }
   });
 
-  if (!agendaItem ?? agendaItem.meeting_id !== meetingId) {
+  if (!agendaItem || agendaItem.meeting_id !== meetingId) {
     notFound();
   }
 
