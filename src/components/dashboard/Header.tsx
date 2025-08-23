@@ -9,7 +9,7 @@ import { useAuthorization } from '@/hooks/useAuthorization';
 export function Header() {
   const { user, loading } = useAuthorization();
 
-  return 
+  return (
     <header className="bg-card text-card-foreground border-b border-border">
       <div className="flex items-center justify-between px-4 py-4">
         <div className="flex items-center space-x-4">

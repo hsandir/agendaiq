@@ -55,7 +55,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
     }
   };
 
-  return 
+  return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-foreground">
@@ -63,7 +63,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
         </label>
         <div className="mt-2 flex items-center space-x-4">
           <div className="relative h-12 w-12 rounded-full overflow-hidden">
-            {user.image ? 
+            {user.image ? (
               <Image
                 src={user.image}
                 alt={user.name || 'Profile picture'}

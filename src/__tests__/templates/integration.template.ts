@@ -495,12 +495,13 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
       expect(result.error).toContain('integrity');
     });
   });
+});
 
-  // ============================================================================
-  // Workflow Step Implementations
-  // ============================================================================
+// ============================================================================
+// Workflow Step Implementations
+// ============================================================================
 
-  async function step1_AuthenticateUser(): Promise<{
+async function step1_AuthenticateUser(): Promise<{
     success: boolean;
     user?: unknown;
     error?: string;
@@ -533,18 +534,17 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
 
       return { success: true, user };
     } catch (error) {
-    if (error instanceof Error) {
       const errorMessage = error instanceof Error ? error.message : 'Authentication failed';
       workflowState.errors.push(errorMessage);
       return { success: false, error: errorMessage };
     }
   }
 
-  async function step2_CreateMeeting(meetingData: WorkflowData['meeting']): Promise<{
-    success: boolean;
-    meetingId?: number;
-    error?: string;
-  }> {
+async function step2_CreateMeeting(meetingData: WorkflowData['meeting']): Promise<{
+  success: boolean;
+  meetingId?: number;
+  error?: string;
+}> {
     try {
       workflowState.workflowStep = 2;
       
@@ -585,7 +585,6 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
       
       return { success: true, meetingId: meeting.id };
     } catch (error) {
-    if (error instanceof Error) {
       const errorMessage = error instanceof Error ? error.message : 'Meeting creation failed';
       workflowState.errors.push(errorMessage);
       return { success: false, error: errorMessage };
@@ -658,7 +657,6 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
         throw new Error('Failed to create any agenda items');
       }
     } catch (error) {
-    if (error instanceof Error) {
       const errorMessage = error instanceof Error ? error.message : 'Agenda item creation failed';
       workflowState.errors.push(errorMessage);
       return { success: false, error: errorMessage };
@@ -695,7 +693,6 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
         };
       }
     } catch (error) {
-    if (error instanceof Error) {
       const errorMessage = error instanceof Error ? error.message : 'Workflow validation failed';
       workflowState.errors.push(errorMessage);
       return { success: false, error: errorMessage };

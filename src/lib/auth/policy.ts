@@ -501,8 +501,8 @@ export async function enrichUserWithCapabilities(user: MinimalUserInput): Promis
     is_school_admin: user.is_school_admin,
     capabilities,
     roleKey:
-      (normalizedStaff && normalizedStaff.role && normalizedStaff.role.key) ||
-      (user.Staff && user.Staff[0] && user.Staff[0].Role && user.Staff[0].Role.key) ||
+      (normalizedStaff?.role?.key) ||
+      (user.Staff?.[0]?.Role?.key) ||
       undefined,
     staff: normalizedStaff,
   };

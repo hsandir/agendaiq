@@ -131,8 +131,9 @@ export async function POST(request: NextRequest, props: Props) {
 
     const isOrganizer = meeting.organizer_id === user.staff?.id;
     const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
+    const hasAdminAccess = user.is_admin || user.is_system_admin || user.is_school_admin;
 
-    if (!isOrganizer && !isAttendee) {
+    if (!isOrganizer && !isAttendee && !hasAdminAccess) {
       return NextResponse.json(
         { error: "You are not authorized to manage this meeting's agenda" },
         { status: 403 }
@@ -300,8 +301,9 @@ export async function PUT(request: NextRequest, props: Props) {
 
     const isOrganizer = meeting.organizer_id === user.staff?.id;
     const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
+    const hasAdminAccess = user.is_admin || user.is_system_admin || user.is_school_admin;
 
-    if (!isOrganizer && !isAttendee) {
+    if (!isOrganizer && !isAttendee && !hasAdminAccess) {
       return NextResponse.json(
         { error: "You are not authorized to manage this meeting's agenda" },
         { status: 403 }

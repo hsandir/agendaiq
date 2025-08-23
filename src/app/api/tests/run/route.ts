@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
 
     // Build the actual Jest command
     let command = 'npm test';
-    let jestArgs = [];
+    const jestArgs = [];
     
     // Add specific test suite/file if provided
     if (suite && suite !== 'all') {
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
       
       // Try to parse results even on failure
       let testResults = null;
-      let coverageData = null;
+      const coverageData = null;
       
       try {
         const resultsPath = path.join(process.cwd(), 'test-results.json');
