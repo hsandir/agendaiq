@@ -31,7 +31,7 @@ interface ActionItem {
   completedAt?: string;
   assignedRole: {
     id: number;
-    title: string; // role key label
+    label: string; // role key label
   };
   assignedStaff?: {
     id: number;
@@ -90,10 +90,10 @@ export default function ActionItemsTrackingPage() {
       const data = await response.json();
       
       // Ensure all items have proper structure
-      const safeItems = (data.items ?? []).map((item: { meeting?: unknown; assignedRole?: { id: number; title: string }; assignedStaff?: unknown; [key: string]: unknown }) => ({
+      const safeItems = (data.items ?? []).map((item: { meeting?: unknown; assignedRole?: { id: number; label: string }; assignedStaff?: unknown; [key: string]: unknown }) => ({
         ...item,
         meeting: item.meeting ?? undefined,
-        assignedRole: item.assignedRole || { id: 0, title: 'UNASSIGNED' },
+        assignedRole: item.assignedRole || { id: 0, label: 'UNASSIGNED' },
         assignedStaff: item.assignedStaff ?? undefined
       }));
       setActionItems(safeItems);

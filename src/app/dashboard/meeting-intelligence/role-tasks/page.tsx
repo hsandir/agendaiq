@@ -22,7 +22,7 @@ import { BackLink } from '@/components/ui/back-link';
 
 interface Role {
   id: number;
-  title: string; // role key label
+  label: string; // role key label
   priority?: number;
   isLeadership: boolean;
   currentHolder?: {
@@ -240,7 +240,7 @@ export default function RoleTasksPage() {
                     {getRoleIcon(roleData.role)}
                     <div>
                       <h3 className="font-semibold text-foreground text-lg flex items-center gap-2">
-                        {roleData.role.title}
+                        {roleData.role.label}
                         {hasOverdue && (
                           <span className="text-xs px-2 py-1 bg-red-600 text-white rounded">
                             {roleData.stats.overdueTasks} overdue
