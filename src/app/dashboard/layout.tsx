@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { requireAuth, getCurrentusers, AuthPresets } from '@/lib/auth/auth-utils';
+import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils';
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth/auth-options";
@@ -30,7 +30,7 @@ export default async function DashboardLayout({
   const user = await requireAuth(AuthPresets.requireAuth);
 
   // Get user with staff and role information
-  const userWithStaff = await prisma.user.findUnique({
+  const userWithStaff = await prisma.users.findUnique({
     where: { email: user.email! },
     include: {
       staff: {

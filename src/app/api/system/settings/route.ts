@@ -48,8 +48,8 @@ export async function PUT(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = await request.json();
-    const { settings } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { _settings } = body;
 
     if (!settings ?? typeof settings !== 'object') {
       return NextResponse.json(

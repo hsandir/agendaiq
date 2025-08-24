@@ -42,7 +42,7 @@ export async function PATCH(
     }
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     const validationResult = updateSchema.safeParse(body);
 
     if (!validationResult.success) {
@@ -59,7 +59,7 @@ export async function PATCH(
         meeting: {
           include: {
             meeting_attendee: {
-              where: { staff_id: user.staff?.id || -1 }
+              where: { staff_id: (user.staff as Record<string, unknown> | null)?.id || -1 }
             }
           }
         }
@@ -74,9 +74,9 @@ export async function PATCH(
     }
 
     // Check permissions
-    const isOrganizer = agendaItem.meeting.organizer_id === user.staff?.id;
+    const isOrganizer = agendaItem.meeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
     const hasAdminAccess = isAnyAdmin(user);
-    const isResponsible = agendaItem.responsible_staff_id === user.staff?.id;
+    const isResponsible = agendaItem.responsible_staff_id === (user.staff as Record<string, unknown> | null)?.id;
 
     if (!isOrganizer && !hasAdminAccess && !isResponsible) {
       return NextResponse.json(

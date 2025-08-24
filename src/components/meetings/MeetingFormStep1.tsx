@@ -113,8 +113,8 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     value: user.id,
     label: user.name,
     email: user.email,
-    department: 'department' in user ? user.department : null,
-    role: 'role' in user ? user.role : null
+    department: 'department' in user ? (user as Record<string, unknown>).department : null,
+    role: 'role' in user ? (user as Record<string, unknown>).role : null
   }));
   
   console.log("Attendee options created:", attendeeOptions.length, "options");

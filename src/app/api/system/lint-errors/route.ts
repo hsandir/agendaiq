@@ -83,8 +83,8 @@ export async function POST(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
-    const body = await request.json();
-    const { action, filePath, fixes } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { _action, _filePath, _fixes } = body;
 
     if (action === 'fix') {
       return await fixLintErrors(filePath, fixes);
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
 
 async function getLintSummary() {
   try {
-    const { stdout, stderr } = await execAsync('npx eslint src/ --format json', { 
+    const { _stdout, _stderr } = await execAsync('npx eslint src/ --format json', { 
       cwd: process.cwd() 
     });
     
@@ -197,7 +197,7 @@ async function getLintSummary() {
 
 async function getLintDetails(severity: string, limit: number, offset: number) {
   try {
-    const { stdout } = await execAsync('npx eslint src/ --format json', { 
+    const { _stdout } = await execAsync('npx eslint src/ --format json', { 
       cwd: process.cwd() 
     });
     
@@ -278,7 +278,7 @@ async function getLintDetails(severity: string, limit: number, offset: number) {
 
 async function getFixableErrors() {
   try {
-    const { stdout } = await execAsync('npx eslint src/ --format json', { 
+    const { _stdout } = await execAsync('npx eslint src/ --format json', { 
       cwd: process.cwd() 
     });
     
@@ -334,7 +334,7 @@ async function getFixableErrors() {
 async function autoFixErrors() {
   try {
     // Run ESLint with --fix flag
-    const { stdout, stderr } = await execAsync('npx eslint src/ --fix --format json', { 
+    const { _stdout, _stderr } = await execAsync('npx eslint src/ --fix --format json', { 
       cwd: process.cwd() 
     });
     
@@ -448,8 +448,8 @@ async function reportErrorsToAdmin(errors: Array<Record<string, unknown>>) {
 
 async function getTypeCastingViolations() {
   try {
-    const { stdout } = await execAsync(
-      'grep -rn "as Record<string, unknown>" src/ --include="*.ts" --include="*.tsx" || true',
+    const { _stdout } = await execAsync(
+      'grep -rn "as Record<_string, unknown>" src/ --include="*.ts" --include="*.tsx" || true',
       { cwd: process.cwd() }
     );
 
@@ -481,7 +481,7 @@ async function getTypeCastingViolations() {
     }
 
     // Also check for multiple chained assertions
-    const { stdout: chainedAssertions } = await execAsync(
+    const { stdout: _chainedAssertions } = await execAsync(
       'grep -rn "as.*as" src/ --include="*.ts" --include="*.tsx" || true',
       { cwd: process.cwd() }
     );
@@ -556,8 +556,8 @@ async function getDangerousPatterns() {
     const results = [];
 
     for (const pattern of patterns) {
-      const { stdout } = await execAsync(
-        `grep -rn "${pattern.pattern}" src/ --include="*.ts" --include="*.tsx" | wc -l ?? echo 0`,
+      const { _stdout } = await execAsync(
+        `grep -rn "${pattern._pattern}" src/ --include="*.ts" --include="*.tsx" | wc -l ?? echo 0`,
         { cwd: process.cwd() }
       );
       

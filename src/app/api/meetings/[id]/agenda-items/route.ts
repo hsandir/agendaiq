@@ -104,7 +104,7 @@ export async function POST(request: NextRequest, props: Props) {
     const user = authResult.user!;
 
     const meetingId = parseInt(params.id);
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     
     const result = createAgendaItemsSchema.safeParse(body);
     if (!result.success) {
@@ -129,15 +129,15 @@ export async function POST(request: NextRequest, props: Props) {
       );
     }
 
-    const isOrganizer = meeting.organizer_id === user.staff?.id;
-    const isAttendee = meeting.meeting_attendee.some(ma => ma.staff_id === user.staff?.id);
-    const hasAdminAccess = user.is_admin || user.is_system_admin || user.is_school_admin;
+    const isOrganizer = meeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
+    const isAttendee = meeting.meeting_attendee.some(ma => ma.staff_id === (user.staff as Record<string, unknown> | null)?.id);
+    const hasAdminAccess = user.is_admin || user.is_system_admin || (user as Record<string, unknown>).is_school_admin;
 
     // Debug logging
     console.log('Authorization check for meeting agenda:', {
       meetingId,
       userId: user.id,
-      staffId: user.staff?.id,
+      staffId: (user.staff as Record<string, unknown> | null)?.id,
       organizerId: meeting.organizer_id,
       isOrganizer,
       isAttendee,
@@ -145,7 +145,7 @@ export async function POST(request: NextRequest, props: Props) {
       userFlags: {
         is_admin: user.is_admin,
         is_system_admin: user.is_system_admin,
-        is_school_admin: user.is_school_admin
+        is_school_admin: (user as Record<string, unknown>).is_school_admin
       },
       hasAdminAccess
     });
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest, props: Props) {
     if (isSingleAddition) {
       // For single item addition, just add it without deleting existing items
       // Remove id field if it exists to avoid unique constraint error
-      const { id, ...itemData } = result.data.items[0];
+      const { _id, ..._itemData } = result.data.items[0];
       const newItem = await prisma.meetingAgendaItem.create({
         data: {
           meeting_id: meetingId,
@@ -193,7 +193,7 @@ export async function POST(request: NextRequest, props: Props) {
       // Remove id field from each item to avoid unique constraint errors
       await prisma.meetingAgendaItem.createMany({
         data: result.data.items.map(item => {
-          const { id, ...itemData } = item;
+          const { _id, ..._itemData } = item;
           return {
             meeting_id: meetingId,
             ...itemData
@@ -223,7 +223,7 @@ export async function POST(request: NextRequest, props: Props) {
       recordId: meetingId.toString(),
       operation: 'BULK_CREATE',
       userId: user.id,
-      staffId: user.staff?.id,
+      staffId: (user.staff as Record<string, unknown> | null)?.id,
       source: 'WEB_UI',
       description: `Created ${createdItems.length} agenda items for meeting ${meeting.title}`
     });
@@ -291,7 +291,7 @@ export async function PUT(request: NextRequest, props: Props) {
     const user = authResult.user!;
 
     const meetingId = parseInt(params.id);
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     
     const result = createAgendaItemsSchema.safeParse(body);
     if (!result.success) {
@@ -316,15 +316,15 @@ export async function PUT(request: NextRequest, props: Props) {
       );
     }
 
-    const isOrganizer = meeting.organizer_id === user.staff?.id;
-    const isAttendee = meeting.meeting_attendee.some(ma => ma.staff_id === user.staff?.id);
-    const hasAdminAccess = user.is_admin || user.is_system_admin || user.is_school_admin;
+    const isOrganizer = meeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
+    const isAttendee = meeting.meeting_attendee.some(ma => ma.staff_id === (user.staff as Record<string, unknown> | null)?.id);
+    const hasAdminAccess = user.is_admin || user.is_system_admin || (user as Record<string, unknown>).is_school_admin;
 
     // Debug logging
     console.log('Authorization check for meeting agenda:', {
       meetingId,
       userId: user.id,
-      staffId: user.staff?.id,
+      staffId: (user.staff as Record<string, unknown> | null)?.id,
       organizerId: meeting.organizer_id,
       isOrganizer,
       isAttendee,
@@ -332,7 +332,7 @@ export async function PUT(request: NextRequest, props: Props) {
       userFlags: {
         is_admin: user.is_admin,
         is_system_admin: user.is_system_admin,
-        is_school_admin: user.is_school_admin
+        is_school_admin: (user as Record<string, unknown>).is_school_admin
       },
       hasAdminAccess
     });
@@ -353,7 +353,7 @@ export async function PUT(request: NextRequest, props: Props) {
     const createdItems = await Promise.all(
       result.data.items.map(async (item, index) => {
         // Remove id field if it exists to avoid unique constraint error
-        const { id, ...itemData } = item as any;
+        const { _id, ..._itemData } = item as any;
         
         return prisma.meetingAgendaItem.create({
           data: {
@@ -380,7 +380,7 @@ export async function PUT(request: NextRequest, props: Props) {
       recordId: meetingId.toString(),
       operation: 'BULK_UPDATE',
       userId: user.id,
-      staffId: user.staff?.id,
+      staffId: (user.staff as Record<string, unknown> | null)?.id,
       source: 'WEB_UI',
       description: `Updated agenda items for meeting ${meeting.title}`
     });

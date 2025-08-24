@@ -4,7 +4,7 @@ import { http, HttpResponse } from 'msw'
 export const handlers = [
   // Auth endpoints
   http.post('/api/auth/login', async ({ request }) => {
-    const body = await request.json() as { email?: string; password?: string }
+    const body = await request.json() as Record<string, unknown>; as { email?: string; password?: string }
     
     if (body?.email === 'admin@test.com' && body?.password === 'password123') {
       return HttpResponse.json({
@@ -26,7 +26,7 @@ export const handlers = [
   }),
 
   http.post('/api/auth/register', async ({ request }) => {
-    const body = await request.json() as { email?: string }
+    const body = await request.json() as Record<string, unknown>; as { email?: string }
     
     if (body?.email === 'existing@test.com') {
       return HttpResponse.json(
@@ -64,7 +64,7 @@ export const handlers = [
   }),
 
   http.post('/api/meetings', async ({ request }) => {
-    const body = await request.json() as Record<string, unknown>
+    const body = await request.json() as Record<string, unknown>; as Record<string, unknown>
     
     return HttpResponse.json(
       {

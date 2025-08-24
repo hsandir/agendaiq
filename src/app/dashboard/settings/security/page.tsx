@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { requireAuth, getCurrentusers, AuthPresets } from '@/lib/auth/auth-utils';
+import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils';
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 export default async function SecuritySettingsPage() {
   const user = await requireAuth(AuthPresets.requireAuth);
 
-  const userDetails = await prisma.user.findUnique({
+  const userDetails = await prisma.users.findUnique({
     where: { email: user.email! },
     select: {
       id: true,

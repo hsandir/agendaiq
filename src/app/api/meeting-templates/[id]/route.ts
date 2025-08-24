@@ -14,7 +14,7 @@ export async function GET(
   
 
   try {
-    const { id } = await params;
+    const { _id } = await params;
     const templateId = parseInt(id);
     
     if (isNaN(templateId)) {
@@ -79,7 +79,7 @@ export async function PUT(
   
 
   try {
-    const { id } = await params;
+    const { _id } = await params;
     const templateId = parseInt(id);
     
     if (isNaN(templateId)) {
@@ -89,8 +89,8 @@ export async function PUT(
       );
     }
 
-    const body = await request.json();
-    const { name, description, duration, agenda, attendees, is_active  } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { _name, _description, _duration, _agenda, _attendees, _is_active  } = body;
 
     const template = await prisma.meetingTemplate.update({
       where: { id: templateId },
@@ -148,7 +148,7 @@ export async function DELETE(
   
 
   try {
-    const { id } = await params;
+    const { _id } = await params;
     const templateId = parseInt(id);
     
     if (isNaN(templateId)) {

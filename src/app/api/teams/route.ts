@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
 
     // Get user's organization context
     const staff = await prisma.staff.findFirst({
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
       const isMember = team.team_members.some(member => member.staff_id === staff.id);
       
       // Admins can see all teams
-      const isAdmin = user.is_system_admin || user.is_school_admin;
+      const isAdmin = user.is_system_admin || (user as Record<string, unknown>).is_school_admin;
       
       return isMember || isAdmin;
     });
@@ -142,10 +142,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     const validatedData = createTeamSchema.parse(body);
 
     // Get user's organization context
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Only leadership or admins can create teams
-    if (!staff.role.is_leadership && !user.is_system_admin && !user.is_school_admin) {
+    if (!staff.role.is_leadership && !user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to create teams' },
         { status: 403 }
@@ -269,10 +269,10 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
 
     // Get team ID from query params
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const teamId = searchParams.get('id');
 
     if (!teamId) {
@@ -283,7 +283,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     const validatedData = updateTeamSchema.parse(body);
 
     // Get user's staff record
@@ -318,7 +318,7 @@ export async function PUT(request: NextRequest) {
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
 
-    if (!isTeamLead && !user.is_system_admin && !user.is_school_admin) {
+    if (!isTeamLead && !user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to update this team' },
         { status: 403 }
@@ -399,10 +399,10 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
 
     // Get team ID from query params
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const teamId = searchParams.get('id');
 
     if (!teamId) {
@@ -413,7 +413,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Only admins can delete teams
-    if (!user.is_system_admin && !user.is_school_admin) {
+    if (!user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to delete teams' },
         { status: 403 }

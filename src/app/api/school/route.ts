@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Get user and check role through staff
-    const userRecord = await prisma.user.findUnique({
+    const userRecord = await prisma.(user as Record<string, unknown>).findUnique({
       where: { email: user.email },
       include: { 
         staff: {
@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const { name, code, address, phone, email, district_id } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { _name, _code, _address, _phone, _email, _district_id } = body;
 
     if (!name || !code || !district_id) {
       return NextResponse.json(
@@ -141,8 +141,8 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const { id, name, code, address, phone, email, district_id } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { _id, _name, _code, _address, _phone, _email, _district_id } = body;
 
     if (!id) {
       return NextResponse.json(

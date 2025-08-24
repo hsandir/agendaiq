@@ -10,8 +10,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Not authenticated" }, { status: auth.statusCode || 401 });
     }
 
-    const body = await request.json();
-    const { role } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { _role } = body;
 
     if (!role || !['admin', 'user'].includes(role)) {
       return NextResponse.json(
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find the user and their staff record
-    const user = await prisma.user.findUnique({
+    const user = await prisma.(user as Record<string, unknown>).findUnique({
       where: { email: auth.user.email },
       include: {
         staff: {

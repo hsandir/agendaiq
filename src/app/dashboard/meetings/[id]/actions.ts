@@ -21,7 +21,7 @@ export async function respondToMeeting(
   }
 
   // Get current user's staff record
-  const currentUser = await prisma.user.findUnique({
+  const currentUser = await prisma.users.findUnique({
     where: { email: session.user.email },
     include: {
       staff: true
@@ -34,7 +34,7 @@ export async function respondToMeeting(
 
   const userStaffId = currentUser.staff[0].id;
 
-  const attendee = await prisma.meetingAttendee.findFirst({
+  const attendee = await prisma.meeting_attendee.findFirst({
     where: {
       meeting_id: meetingIdInt,
       staff_id: userStaffId,
@@ -45,7 +45,7 @@ export async function respondToMeeting(
     throw new Error("Not invited to this meeting");
   }
 
-  await prisma.meetingAttendee.update({
+  await prisma.meeting_attendee.update({
     where: {
       id: attendee.id,
     },

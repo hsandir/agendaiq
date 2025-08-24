@@ -385,42 +385,6 @@ export interface TestContext {
 }
 
 // ============================================================================
-// Export All Types
+// All types are already exported as interfaces above
+// No need for duplicate exports
 // ============================================================================
-
-export type {
-  APITestContext,
-  APITestCase,
-  APIRouteTestSuite,
-  APIErrorTestCase,
-  APISecurityTestSuite,
-  ComponentTestProps,
-  ComponentInteraction,
-  AccessibilityTest,
-  ComponentTestSuite,
-  TypeSafeMock,
-  MockFactory,
-  TestDataSeed,
-  DatabaseTestContext,
-  TestFactory,
-  IntegrationTestStep,
-  IntegrationTestSuite,
-  E2ETestScenario,
-  TestResult,
-  TestError,
-  TestWarning,
-  TestSuiteResult,
-  PerformanceTestCase,
-  PerformanceTestResult,
-  SecurityTestCase,
-  SecurityTestResult,
-  TestConfig,
-  TestEnvironment,
-  MockType,
-  TestRunner,
-  TestMetadata,
-  ValidationRule,
-  ValidationSchema,
-  TestErrorHandler,
-  TestContext,
-};

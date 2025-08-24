@@ -239,7 +239,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Check if email already exists in database
-        const existingUser = await prisma.user.findUnique({
+        const existingUser = await prisma.(user as Record<string, unknown>).findUnique({
           where: { email: record.Email },
           include: { 
             staff: {
@@ -254,7 +254,7 @@ export async function POST(request: NextRequest) {
         // Check if StaffId already exists (if not updating existing user)
         let existingStaffId = null;
         if (record.StaffId) {
-          existingStaffId = await prisma.user.findFirst({
+          existingStaffId = await prisma.(user as Record<string, unknown>).findFirst({
             where: { 
               staff_id: record.StaffId,
               id: { not: existingUser?.id }
@@ -452,14 +452,14 @@ export async function POST(request: NextRequest) {
             continue;
           }
 
-          const existingUser = await prisma.user.findUnique({
+          const existingUser = await prisma.(user as Record<string, unknown>).findUnique({
             where: { email: record.email },
             include: { staff: true }
           });
 
           if (existingUser) {
             // Update existing user
-            await prisma.user.update({
+            await prisma.(user as Record<string, unknown>).update({
               where: { id: existingUser.id },
               data: { 
                 name: record.name,
@@ -499,7 +499,7 @@ export async function POST(request: NextRequest) {
             }
 
             // Create new user
-            const newUser = await prisma.user.create({
+            const newUser = await prisma.(user as Record<string, unknown>).create({
               data: {
                 email: record.email,
                 name: record.name,
@@ -530,7 +530,7 @@ export async function POST(request: NextRequest) {
         recordId: 'bulk',
         operation: 'BULK_CREATE',
         userId: user.id,
-        staffId: user.staff?.id,
+        staffId: (user.staff as Record<string, unknown> | null)?.id,
         source: 'BULK_UPLOAD',
         description: `Staff bulk upload: ${created + updated} records processed (${created} created, ${updated} updated)`,
         metadata: {

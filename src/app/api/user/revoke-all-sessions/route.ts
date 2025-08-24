@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Delete all sessions for the user
-    await prisma.session.deleteMany({ where: { userId: auth.user.id } });
+    await prisma.session.deleteMany({ where: { user_id: auth.user.id } });
 
     return new NextResponse("All sessions revoked successfully", { status: 200 });
   } catch (error: unknown) {

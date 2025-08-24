@@ -31,14 +31,14 @@ interface UseAuthReturn {
  */
 export function useAuth(options: UseAuthOptions = {}): UseAuthReturn {
   const { redirectTo = '/auth/signin',
-    redirectIfFound = false,
-    requireAuth = false,
-    requireStaff = false,
-    requireAdmin = false,
+    redirectIfFound = _false,
+    requireAuth = _false,
+    requireStaff = _false,
+    requireAdmin = _false,
     allowedRoles = []
    } = options;
   
-  const { data: session, status } = useSession();
+  const { data: _session, _status } = useSession();
   const router = useRouter();
   const [error, setError] = useState<Error | null>(null);
   

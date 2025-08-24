@@ -13,16 +13,16 @@ export async function POST(request: NextRequest) {
     if (!authResult.success) {
       return NextResponse.json({ success: false, error: authResult.error }, { status: authResult.statusCode });
     }
-    const auditEvent = await request.json();
+    const auditEvent = await request.json() as Record<string, unknown>;
     
     // Extract event data
-    const { __action,
-      __path,
-      __method,
-      __success,
-      __errorMessage,
-      __metadata,
-      category
+    const { ___action,
+      ___path,
+      ___method,
+      ___success,
+      ___errorMessage,
+      ___metadata,
+      _category
      } = auditEvent;
 
     // Determine category and log appropriately

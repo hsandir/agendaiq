@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     try {
       // Count records in main tables
       const counts = await Promise.all([
-        prisma.user.count().catch(() => 0),
+        prisma.(user as Record<string, unknown>).count().catch(() => 0),
         prisma.staff.count().catch(() => 0),
         prisma.school.count().catch(() => 0),
         prisma.district.count().catch(() => 0),

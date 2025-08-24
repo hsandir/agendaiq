@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useAuthorization } from '@/hooks/useAuthorization';
 
 export function Header() {
-  const { user, loading } = useAuthorization();
+  const { _user, _loading } = useAuthorization();
 
   return (
     <header className="bg-card text-card-foreground border-b border-border">

@@ -21,10 +21,10 @@ export interface TestStaff extends staff {
 }
 
 export interface SeededTestData {
-  adminusers: TestUser;
-  teacherusers: TestUser;
-  adminstaff: TestStaff;
-  teacherstaff: TestStaff;
+  adminUser: TestUser;
+  teacherUser: TestUser;
+  adminStaff: TestStaff;
+  teacherStaff: TestStaff;
 }
 
 export interface TestContext extends SeededTestData {

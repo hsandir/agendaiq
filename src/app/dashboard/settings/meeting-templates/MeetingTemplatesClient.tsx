@@ -60,7 +60,7 @@ export default function MeetingTemplatesClient({
     attendees: [] as string[],
     is_active: true
   });
-  const { toast } = useToast();
+  const { _toast } = useToast();
 
   const availableAttendees = [
     ...roles.map(role => ({ type: 'role', value: role.title, label: `${role.title} (Role)` })),

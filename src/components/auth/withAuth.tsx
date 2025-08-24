@@ -21,7 +21,7 @@ export function withAuth<P extends object>(
   requirements: AuthRequirements = {}
 ) {
   return function ProtectedComponent(props: P) {
-    const { is, user, loading, isAuthenticated } = useAuthorization();
+    const { _is, _user, _loading, _isAuthenticated } = useAuthorization();
     const router = useRouter();
     
     useEffect(() => {

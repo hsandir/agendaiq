@@ -275,13 +275,13 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Start Time</label>
                     <p className="text-sm text-foreground">
-                      {safeFormatDateTime(meeting.startTime, undefined, 'No start time')}
+                      {safeFormatDateTime(meeting.start_time, undefined, 'No start time')}
                     </p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">End Time</label>
                     <p className="text-sm text-foreground">
-                      {safeFormatDateTime(meeting.endTime, undefined, 'No end time')}
+                      {safeFormatDateTime(meeting.end_time, undefined, 'No end time')}
                     </p>
                   </div>
                   <div>

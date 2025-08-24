@@ -59,7 +59,7 @@ describe('Comprehensive API Route Tests', () => {
         const startTime = Date.now();
         const startMemory = process.memoryUsage().heapUsed;
 
-        const { POST } = await import('@/app/api/districts/route');
+        const { _POST } = await import('@/app/api/districts/route');
         const response = await POST(request);
         
         const endTime = Date.now();
@@ -96,7 +96,7 @@ describe('Comprehensive API Route Tests', () => {
             body: JSON.stringify(data),
           });
 
-          const { POST } = await import('@/app/api/districts/route');
+          const { _POST } = await import('@/app/api/districts/route');
         const response = await POST(request);
           
           expect(response.status).toBe(400);
@@ -121,7 +121,7 @@ describe('Comprehensive API Route Tests', () => {
           body: JSON.stringify(districtData),
         });
 
-        const { POST } = await import('@/app/api/districts/route');
+        const { _POST } = await import('@/app/api/districts/route');
         const response = await POST(request);
         
         expect(response.status).toBe(409); // Conflict
@@ -157,7 +157,7 @@ describe('Comprehensive API Route Tests', () => {
           body: JSON.stringify(schoolData),
         });
 
-        const { POST } = await import('@/app/api/schools/route');
+        const { _POST } = await import('@/app/api/schools/route');
         const response = await POST(request);
 
         if (response.ok) {
@@ -181,7 +181,7 @@ describe('Comprehensive API Route Tests', () => {
         });
 
         const startTime = Date.now();
-        const { GET } = await import('@/app/api/users/route');
+        const { _GET } = await import('@/app/api/users/route');
         const response = await GET(request);
         const responseTime = Date.now() - startTime;
 
@@ -209,7 +209,7 @@ describe('Comprehensive API Route Tests', () => {
           method: 'GET',
         });
 
-        const { GET } = await import('@/app/api/users/route');
+        const { _GET } = await import('@/app/api/users/route');
         const response = await GET(request);
 
         if (response.ok) {
@@ -230,7 +230,7 @@ describe('Comprehensive API Route Tests', () => {
           method: 'GET',
         });
 
-        const { GET } = await import('@/app/api/users/route');
+        const { _GET } = await import('@/app/api/users/route');
         const response = await GET(request);
 
         if (response.ok) {
@@ -258,7 +258,7 @@ describe('Comprehensive API Route Tests', () => {
         }
 
         // Create a user first
-        const user = await prisma.user.create({
+        const user = await prisma.(user as Record<string, unknown>).create({
           data: {
             email: 'newstaff@agendaiq.com',
             name: 'New Staff Member'
@@ -277,7 +277,7 @@ describe('Comprehensive API Route Tests', () => {
           body: JSON.stringify(staffData),
         });
 
-        const { POST } = await import('@/app/api/staff/route');
+        const { _POST } = await import('@/app/api/staff/route');
         const response = await POST(request);
 
         if (response.ok) {
@@ -288,7 +288,7 @@ describe('Comprehensive API Route Tests', () => {
           await prisma.staff.delete({ where: { id: data.staff.id } });
         }
 
-        await prisma.user.delete({ where: { id: user.id } });
+        await prisma.(user as Record<string, unknown>).delete({ where: { id: user.id } });
       });
     });
   });
@@ -311,7 +311,7 @@ describe('Comprehensive API Route Tests', () => {
         });
 
         const startTime = Date.now();
-        const { POST } = await import('@/app/api/meetings/route');
+        const { _POST } = await import('@/app/api/meetings/route');
         const response = await POST(request);
         const responseTime = Date.now() - startTime;
 
@@ -348,7 +348,7 @@ describe('Comprehensive API Route Tests', () => {
             body: JSON.stringify(meetingData),
           });
 
-          const { POST } = await import('@/app/api/meetings/route');
+          const { _POST } = await import('@/app/api/meetings/route');
         const response = await POST(request);
 
           expect(response.status).toBe(400);
@@ -449,7 +449,7 @@ describe('Comprehensive API Route Tests', () => {
           body: JSON.stringify({ items: agendaItems }),
         });
 
-        const { PUT } = await import('@/app/api/meetings/[id]/agenda-items/route');
+        const { _PUT } = await import('@/app/api/meetings/[id]/agenda-items/route');
         const response = await PUT(request, { params: Promise.resolve({ id: testMeeting.id.toString() }) });
 
         expect(response.status).toBe(200);
@@ -537,7 +537,7 @@ describe('Comprehensive API Route Tests', () => {
         },
       });
 
-      const { POST } = await import('@/app/api/users/route');
+      const { _POST } = await import('@/app/api/users/route');
         const response = await POST(request);
 
       expect(response.status).toBe(400);
@@ -563,7 +563,7 @@ describe('Comprehensive API Route Tests', () => {
         body: JSON.stringify(largeData),
       });
 
-      const { POST } = await import('@/app/api/districts/route');
+      const { _POST } = await import('@/app/api/districts/route');
         const response = await POST(request);
 
       // Should either reject (413) or validate and reject (400)

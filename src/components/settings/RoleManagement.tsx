@@ -42,7 +42,7 @@ interface RoleData {
 export default function RoleManagement() {
   const [roles, setRoles] = useState<RoleData[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const { _toast } = useToast();
 
   useEffect(() => {
     fetchRoles();

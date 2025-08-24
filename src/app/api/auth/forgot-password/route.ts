@@ -14,13 +14,13 @@ export async function POST(request: Request) {
       return RateLimiters.passwordReset.createErrorResponse(rateLimitResult);
     }
 
-    const { email } = (await request.json()) as Record<string, unknown>;
+    const { _email } = (await request.json()) as Record<_string, unknown>;
 
     if (!email) {
       return new NextResponse("Email is required", { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email },
     });
 
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     const resetToken = crypto.randomBytes(32).toString("hex");
     // TODO: Add resetToken and resetTokenExpiry fields to User model in schema
     // For now, we'll skip saving the token to the database
-    // await prisma.user.update({
+    // await prisma.users.update({
     //   where: { id: user?.id },
     //   data: {
     //     resetToken: hashedToken,
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     const resetUrl = `${process.env?.NEXTAUTH_URL}/auth/reset-password?token=${resetToken}`;
     
     // Import email service
-    const { sendEmail, getPasswordResetHtml } = await import('@/lib/email/email-service');
+    const { _sendEmail, _getPasswordResetHtml } = await import('@/lib/email/email-service');
     
     // Send password reset email
     const emailResult = await sendEmail({

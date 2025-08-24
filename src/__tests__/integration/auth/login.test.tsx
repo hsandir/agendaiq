@@ -52,8 +52,8 @@ describe('Login Flow', () => {
       const emailInput = screen.getByLabelText(/email/i)
       const submitButton = screen.getByRole('button', { name: /sign in/i })
       
-      await user.type(emailInput, 'invalid-email')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'invalid-email')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(await screen.findByText(/please enter a valid email/i)).toBeInTheDocument()
     })
@@ -65,8 +65,8 @@ describe('Login Flow', () => {
       const emailInput = screen.getByLabelText(/email/i)
       const submitButton = screen.getByRole('button', { name: /sign in/i })
       
-      await user.type(emailInput, 'test@example.com')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'test@example.com')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(await screen.findByText(/password is required/i)).toBeInTheDocument()
     })
@@ -82,9 +82,9 @@ describe('Login Flow', () => {
       const passwordInput = screen.getByLabelText(/password/i)
       const submitButton = screen.getByRole('button', { name: /sign in/i })
       
-      await user.type(emailInput, 'test@example.com')
-      await user.type(passwordInput, 'password123')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'test@example.com')
+      await (user as Record<string, unknown>).type(passwordInput, 'password123')
+      await (user as Record<string, unknown>).click(submitButton)
       
       await waitFor(() => {
         expect(mockSignIn).toHaveBeenCalledWith('credentials', {
@@ -109,9 +109,9 @@ describe('Login Flow', () => {
       const passwordInput = screen.getByLabelText(/password/i)
       const submitButton = screen.getByRole('button', { name: /sign in/i })
       
-      await user.type(emailInput, 'test@example.com')
-      await user.type(passwordInput, 'wrongpassword')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'test@example.com')
+      await (user as Record<string, unknown>).type(passwordInput, 'wrongpassword')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(await screen.findByText(/invalid email or password/i)).toBeInTheDocument()
     })
@@ -127,9 +127,9 @@ describe('Login Flow', () => {
       const passwordInput = screen.getByLabelText(/password/i)
       const submitButton = screen.getByRole('button', { name: /sign in/i })
       
-      await user.type(emailInput, 'test@example.com')
-      await user.type(passwordInput, 'password123')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'test@example.com')
+      await (user as Record<string, unknown>).type(passwordInput, 'password123')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(submitButton).toBeDisabled()
       expect(screen.getByText(/signing in/i)).toBeInTheDocument()
@@ -149,9 +149,9 @@ describe('Login Flow', () => {
       const passwordInput = screen.getByLabelText(/password/i)
       const submitButton = screen.getByRole('button', { name: /sign in/i })
       
-      await user.type(emailInput, 'test@example.com')
-      await user.type(passwordInput, 'password123')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'test@example.com')
+      await (user as Record<string, unknown>).type(passwordInput, 'password123')
+      await (user as Record<string, unknown>).click(submitButton)
       
       await waitFor(() => {
         expect(mockPush).toHaveBeenCalledWith('/auth/two-factor?email=test%40example.com')
@@ -174,9 +174,9 @@ describe('Login Flow', () => {
       const passwordInput = screen.getByLabelText(/password/i)
       const submitButton = screen.getByRole('button', { name: /sign in/i })
       
-      await user.type(emailInput, 'test@example.com')
-      await user.type(passwordInput, 'wrongpassword')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'test@example.com')
+      await (user as Record<string, unknown>).type(passwordInput, 'wrongpassword')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(await screen.findByText(/account has been locked/i)).toBeInTheDocument()
     })
@@ -193,7 +193,7 @@ describe('Login Flow', () => {
       const rememberMeCheckbox = screen.getByLabelText(/remember me/i)
       expect(rememberMeCheckbox).toBeInTheDocument()
       
-      await user.click(rememberMeCheckbox)
+      await (user as Record<string, unknown>).click(rememberMeCheckbox)
       expect(rememberMeCheckbox).toBeChecked()
     })
   })

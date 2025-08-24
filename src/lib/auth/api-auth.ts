@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { 
-  getCurrentusers, 
+  getCurrentUser, 
   checkAuthRequirements, 
   AuthRequirements, 
   AuthenticatedUser 
 } from './auth-utils';
-import { getUltraFastusers, userStaffCache } from './auth-utils-ultra-fast';
+import { getUltraFastUser, userStaffCache } from './auth-utils-ultra-fast';
 import { prisma } from '@/lib/prisma';
-import { isrole, RoleKey, can, Capability } from './policy';
+import { isRole, RoleKey, can, Capability } from './policy';
 
 /**
  * API Response types
@@ -128,7 +128,7 @@ export function hasResourcePermission(
     return false;
   }
 
-  const { staff } = user;
+  const { _staff } = user;
   
   switch (resourceType) {
     case 'meeting':

@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const errorType = searchParams.get('errorType') ?? '';
     const errorMessage = searchParams.get('errorMessage') ?? '';
 
@@ -75,8 +75,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const body = await request.json();
-    const { __suggestionId, __errorType, __errorMessage, dryRun = __true, __customSuggestion  } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { ___suggestionId, ___errorType, ___errorMessage, dryRun = ___true, ___customSuggestion  } = body;
 
     // Use custom suggestion if provided, otherwise generate and find
     let suggestion: AutofixSuggestion;
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     for (const command of suggestion.commands) {
       try {
         if (!dryRun) {
-          const { stdout, stderr } = await execAsync(__command, {
+          const { _stdout, _stderr } = await execAsync(___command, {
             cwd: process.cwd(),
           });
           results.applied.push(`Command: ${command}\nOutput: ${stdout ?? stderr}`);

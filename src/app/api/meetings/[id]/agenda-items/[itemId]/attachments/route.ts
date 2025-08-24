@@ -38,7 +38,7 @@ export async function POST(
         meeting: {
           include: {
             meeting_attendee: {
-              where: { staff_id: user.staff?.id || -1 }
+              where: { staff_id: (user.staff as Record<string, unknown> | null)?.id || -1 }
             }
           }
         }
@@ -53,7 +53,7 @@ export async function POST(
     }
 
     // Check permissions
-    const isOrganizer = agendaItem.meeting.organizer_id === user.staff?.id;
+    const isOrganizer = agendaItem.meeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
     const isAttendee = agendaItem.meeting.meeting_attendee.length > 0;
     const hasAdminAccess = isAnyAdmin(user);
 

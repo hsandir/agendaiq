@@ -31,7 +31,7 @@ export async function GET(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const teamId = params.id;
 
     // Get user's staff record
@@ -109,7 +109,7 @@ export async function GET(
 
     // Check if user has access to this team
     const isMember = team.team_members.some(member => member.staff_id === staff.id);
-    const isAdmin = user.is_system_admin || user.is_school_admin;
+    const isAdmin = user.is_system_admin || (user as Record<string, unknown>).is_school_admin;
 
     if (!isMember && !isAdmin) {
       return NextResponse.json(
@@ -157,11 +157,11 @@ export async function PUT(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const teamId = params.id;
 
     // Parse request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     
     const updateSchema = z.object({
       name: z.string().min(1).max(100).optional(),
@@ -204,7 +204,7 @@ export async function PUT(
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
 
-    if (!isTeamLead && !user.is_system_admin && !user.is_school_admin) {
+    if (!isTeamLead && !user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to update this team' },
         { status: 403 }
@@ -288,11 +288,11 @@ export async function DELETE(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const teamId = params.id;
 
     // Only admins can delete teams
-    if (!user.is_system_admin && !user.is_school_admin) {
+    if (!user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to delete teams' },
         { status: 403 }

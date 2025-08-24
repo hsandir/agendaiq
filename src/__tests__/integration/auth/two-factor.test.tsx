@@ -47,14 +47,14 @@ describe('Two-Factor Authentication Flow', () => {
       const submitButton = screen.getByRole('button', { name: /verify/i })
       
       // Test invalid code (less than 6 digits)
-      await user.type(codeInput, '123')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(codeInput, '123')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(await screen.findByText(/code must be 6 digits/i)).toBeInTheDocument()
       
       // Clear error for next test
-      await user.clear(codeInput)
-      await user.type(codeInput, '123456')
+      await (user as Record<string, unknown>).clear(codeInput)
+      await (user as Record<string, unknown>).type(codeInput, '123456')
     })
 
     it('submits valid 2FA code successfully', async () => {
@@ -69,8 +69,8 @@ describe('Two-Factor Authentication Flow', () => {
       const codeInput = screen.getByLabelText(/verification code/i)
       const submitButton = screen.getByRole('button', { name: /verify/i })
       
-      await user.type(codeInput, '123456')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(codeInput, '123456')
+      await (user as Record<string, unknown>).click(submitButton)
       
       await waitFor(() => {
         expect(mockSignIn).toHaveBeenCalledWith('credentials', {
@@ -98,8 +98,8 @@ describe('Two-Factor Authentication Flow', () => {
       const codeInput = screen.getByLabelText(/verification code/i)
       const submitButton = screen.getByRole('button', { name: /verify/i })
       
-      await user.type(codeInput, '999999')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(codeInput, '999999')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(await screen.findByText(/invalid verification code/i)).toBeInTheDocument()
     })
@@ -117,7 +117,7 @@ describe('Two-Factor Authentication Flow', () => {
       render(<TwoFactorForm />)
       
       const resendButton = screen.getByRole('button', { name: /resend code/i })
-      await user.click(resendButton)
+      await (user as Record<string, unknown>).click(resendButton)
       
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith('/api/auth/resend-2fa', {
@@ -137,7 +137,7 @@ describe('Two-Factor Authentication Flow', () => {
       render(<TwoFactorForm />)
       
       const resendButton = screen.getByRole('button', { name: /resend code/i })
-      await user.click(resendButton)
+      await (user as Record<string, unknown>).click(resendButton)
       
       expect(await screen.findByText(/please wait before requesting another code/i)).toBeInTheDocument()
     })
@@ -166,10 +166,10 @@ describe('Two-Factor Authentication Flow', () => {
       const codeInput = screen.getByLabelText(/verification code/i)
       const submitButton = screen.getByRole('button', { name: /verify/i })
       
-      await user.type(codeInput, '123456')
+      await (user as Record<string, unknown>).type(codeInput, '123456')
       
       // Click and don't await to check intermediate state
-      const clickPromise = user.click(submitButton)
+      const clickPromise = (user as Record<string, unknown>).click(submitButton)
       
       // Wait for React to update
       await waitFor(() => {
@@ -197,7 +197,7 @@ describe('Two-Factor Authentication Flow', () => {
       render(<TwoFactorForm />)
       
       const backupCodeButton = screen.getByRole('button', { name: /use backup code/i })
-      await user.click(backupCodeButton)
+      await (user as Record<string, unknown>).click(backupCodeButton)
       
       expect(screen.getByLabelText(/backup code/i)).toBeInTheDocument()
       expect(screen.getByText(/enter your 8-character backup code/i)).toBeInTheDocument()

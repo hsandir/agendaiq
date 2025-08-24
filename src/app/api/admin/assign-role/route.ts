@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = (await request.json()) as AssignRoleRequest & { email?: string; roleId?: number | string; departmentId?: number | string; managerId?: number | string };
-    const { email, roleId, departmentId, managerId } = body;
+    const { _email, _roleId, _departmentId, _managerId } = body;
 
     if (!email || !roleId || !departmentId) {
       return NextResponse.json(
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find the user
-    const user = await prisma.user.findUnique({
+    const user = await prisma.(user as Record<string, unknown>).findUnique({
       where: { email },
       include: { staff: true },
     });
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get updated user with staff
-    const updatedUser = await prisma.user.findUnique({
+    const updatedUser = await prisma.(user as Record<string, unknown>).findUnique({
       where: { id: user?.id },
       include: { staff: { include: { role: true, department: true } } },
     });

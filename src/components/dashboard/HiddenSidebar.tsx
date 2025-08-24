@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  User as Fiusers, 
+  User as FiUser, 
   Lock as FiLock, 
   Bell as FiBell, 
   Settings as FiSettings, 

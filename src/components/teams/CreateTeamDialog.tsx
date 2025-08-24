@@ -49,7 +49,7 @@ export function CreateTeamDialog({
   onOpenChange,
   onSubmit,
 }: CreateTeamDialogProps) {
-  const { toast } = useToast();
+  const { _toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<TeamFormData>({
     name: '',

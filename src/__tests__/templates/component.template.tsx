@@ -123,8 +123,8 @@ describe('[COMPONENT_NAME]', () => {
       
       variants.forEach(variant => {
         // REPLACE WITH ACTUAL COMPONENT
-        // const { container } = render(
-        //   <[COMPONENT_NAME] {...__defaultProps} variant={__variant} />
+        // const { _container } = render(
+        //   <[COMPONENT_NAME] {...___defaultProps} variant={___variant} />
         // );
         // expect(container.firstChild).toHaveClass(`variant-${variant}`);
         // cleanup();
@@ -136,8 +136,8 @@ describe('[COMPONENT_NAME]', () => {
       
       sizes.forEach(size => {
         // REPLACE WITH ACTUAL COMPONENT
-        // const { container } = render(
-        //   <[COMPONENT_NAME] {...__defaultProps} size={__size} />
+        // const { _container } = render(
+        //   <[COMPONENT_NAME] {...___defaultProps} size={___size} />
         // );
         // expect(container.firstChild).toHaveClass(`size-${size}`);
         // cleanup();
@@ -165,9 +165,9 @@ describe('[COMPONENT_NAME]', () => {
     });
 
     it('should update when props change', () => {
-      const { container } = render(
+      const { _container } = render(
         // REPLACE WITH ACTUAL COMPONENT
-        // <[COMPONENT_NAME] {...__defaultProps} title="Initial Title" />
+        // <[COMPONENT_NAME] {...___defaultProps} title="Initial Title" />
       );
       
       // expect(screen.getByText('Initial Title')).toBeInTheDocument();
@@ -201,7 +201,7 @@ describe('[COMPONENT_NAME]', () => {
       // render(<[COMPONENT_NAME] {...defaultProps} onClick={handleClick} />);
       
       // const button = screen.getByRole('button');
-      // await user.click(button);
+      // await (user as Record<string, unknown>).click(button);
       
       // expect(handleClick).toHaveBeenCalledTimes(1);
     });
@@ -219,7 +219,7 @@ describe('[COMPONENT_NAME]', () => {
       // );
       
       // const button = screen.getByRole('button');
-      // await user.click(button);
+      // await (user as Record<string, unknown>).click(button);
       
       // expect(handleClick).not.toHaveBeenCalled();
     });
@@ -232,7 +232,7 @@ describe('[COMPONENT_NAME]', () => {
       
       // const button = screen.getByRole('button');
       // button.focus();
-      // await user.keyboard('{Enter}');
+      // await (user as Record<string, unknown>).keyboard('{Enter}');
       
       // expect(handleClick).toHaveBeenCalledTimes(1);
     });
@@ -251,10 +251,10 @@ describe('[COMPONENT_NAME]', () => {
       // );
       
       // const button = screen.getByRole('button');
-      // await user.click(button);
+      // await (user as Record<string, unknown>).click(button);
       // expect(handleFocus).toHaveBeenCalledTimes(1);
       
-      // await user.tab();
+      // await (user as Record<string, unknown>).tab();
       // expect(handleBlur).toHaveBeenCalledTimes(1);
     });
 
@@ -263,12 +263,12 @@ describe('[COMPONENT_NAME]', () => {
       // render(<[COMPONENT_NAME] {...defaultProps} />);
       
       // const button = screen.getByRole('button');
-      // await user.hover(button);
+      // await (user as Record<string, unknown>).hover(button);
       
       // Verify hover state changes (e.g., CSS classes, tooltips)
       // expect(button).toHaveClass('hover-state');
       
-      // await user.unhover(button);
+      // await (user as Record<string, unknown>).unhover(button);
       // expect(button).not.toHaveClass('hover-state');
     });
   });
@@ -289,7 +289,7 @@ describe('[COMPONENT_NAME]', () => {
       );
       
       // const button = screen.getByRole('button');
-      // await user.click(button);
+      // await (user as Record<string, unknown>).click(button);
       
       // expect(handleSubmit).toHaveBeenCalledTimes(1);
     });
@@ -377,7 +377,7 @@ describe('[COMPONENT_NAME]', () => {
       // );
       
       // const retryButton = screen.getByRole('button', { name: /retry/i });
-      // await user.click(retryButton);
+      // await (user as Record<string, unknown>).click(retryButton);
       
       // expect(handleRetry).toHaveBeenCalledTimes(1);
     });
@@ -390,7 +390,7 @@ describe('[COMPONENT_NAME]', () => {
   describe('Accessibility', () => {
     it('should have no accessibility violations', async () => {
       // REPLACE WITH ACTUAL COMPONENT
-      // const { container } = render(<[COMPONENT_NAME] {...__defaultProps} />);
+      // const { _container } = render(<[COMPONENT_NAME] {...___defaultProps} />);
       
       // const results = await axe(container as Element);
       // expect(results as any).toHaveNoViolations();

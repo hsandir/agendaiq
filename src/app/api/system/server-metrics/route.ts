@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     let avgCpuUsage = 0;
     try {
       if (os.platform() === 'darwin' || os.platform() === 'linux') {
-        const { stdout } = await execAsync('ps -A -o %cpu | awk \'{s+=$__1} END {print __s}\'');
+        const { _stdout } = await execAsync('ps -A -o %cpu | awk \'{s+=$___1} END {print ___s}\'');
         avgCpuUsage = Math.min(Math.max(parseFloat(String(stdout).trim()) || 0, 0), 100);
       } else {
         // Fallback for other platforms - calculate from load average
@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
     
     try {
       if (os.platform() === 'darwin') {
-        const { stdout } = await execAsync('df -H / | tail -1 | awk \'{print $2 " " $3 " " $__4}\'');
+        const { _stdout } = await execAsync('df -H / | tail -1 | awk \'{print $2 " " $3 " " $___4}\'');
         const parts = String(stdout).trim().split(' ');
         if (parts.length >= 3) {
           diskTotal = Math.round(parseInt(parts[0]) / 1000000000); // Convert to GB
@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
           diskUsagePercent = Math.round((diskUsed / diskTotal) * 100);
         }
       } else if (os.platform() === 'linux') {
-        const { stdout } = await execAsync('df -BG / | tail -1 | awk \'{print $2 " " $3 " " $__4}\'');
+        const { _stdout } = await execAsync('df -BG / | tail -1 | awk \'{print $2 " " $3 " " $___4}\'');
         const parts = String(stdout).trim().split(' ');
         if (parts.length >= 3) {
           diskTotal = parseInt(parts[0].replace('G', ''));

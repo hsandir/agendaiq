@@ -26,7 +26,7 @@ export function ThemeSelector({
   showDescription = true, 
   variant = 'grid' 
 }: ThemeSelectorProps) {
-  const { theme: currentTheme, __setTheme  } = useTheme();
+  const { theme: _currentTheme, ___setTheme  } = useTheme();
   const [isChanging, setIsChanging] = useState(false);
 
   const handleThemeChange = async (themeId: string) => {

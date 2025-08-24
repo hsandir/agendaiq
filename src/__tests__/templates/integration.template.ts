@@ -124,7 +124,6 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
       workflowState.errors.push(errorMessage);
       return { success: false, error: errorMessage };
     }
-  }
 
   async function step2_CreateMeeting(meetingData: WorkflowData['meeting']): Promise<{
     success: boolean;
@@ -158,10 +157,10 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
           description: meetingData.description,
           start_time: meetingData.startTime,
           end_time: meetingData.endTime,
-          organizer_id: context.adminstaff.id,
-          department_id: context.adminstaff.department_id,
-          school_id: context.adminstaff.school_id,
-          district_id: context.adminstaff.district_id,
+          organizer_id: context.adminStaff.id,
+          department_id: context.adminStaff.department_id,
+          school_id: context.adminStaff.school_id,
+          district_id: context.adminStaff.district_id,
           status: 'draft',
           meeting_type: 'REGULAR',
         },
@@ -175,7 +174,6 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
       workflowState.errors.push(errorMessage);
       return { success: false, error: errorMessage };
     }
-  }
 
   async function step3_AddAgendaItems(agendaItems: WorkflowData['agendaItems']): Promise<{
     success: boolean;
@@ -247,7 +245,6 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
       workflowState.errors.push(errorMessage);
       return { success: false, error: errorMessage };
     }
-  }
 
   async function step4_ValidateWorkflowCompletion(): Promise<{
     success: boolean;
@@ -283,7 +280,6 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
       workflowState.errors.push(errorMessage);
       return { success: false, error: errorMessage };
     }
-  }
 
   async function executeWorkflowSteps(workflowData: WorkflowData): Promise<void> {
     const step1Result = await step1_AuthenticateUser();

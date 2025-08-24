@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default async function MeetingLivePage(props: Props) {
-  const params = await props.params;
+  const params = await (props as Record<string, unknown>).params;
   const user = await requireAuth(AuthPresets.requireStaff);
   
   if (!params?.id) {
@@ -43,7 +43,7 @@ export default async function MeetingLivePage(props: Props) {
   }
 
   // Check if user is authorized - do a separate simple query
-  const attendeeCheck = await prisma.meetingAttendee.findFirst({
+  const attendeeCheck = await prisma.meeting_attendee.findFirst({
     where: {
       meeting_id: meetingId,
       staff_id: user.staff?.id || -1
@@ -59,7 +59,7 @@ export default async function MeetingLivePage(props: Props) {
   }
 
   // Fetch attendees separately with less nesting
-  const attendees = await prisma.meetingAttendee.findMany({
+  const attendees = await prisma.meeting_attendee.findMany({
     where: { meeting_id: meetingId },
     include: {
       staff: {

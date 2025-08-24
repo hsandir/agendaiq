@@ -113,7 +113,7 @@ interface CustomThemeEditorProps {
 }
 
 export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
-  const { __customTheme, __setCustomTheme, __setTheme  } = useTheme();
+  const { ___customTheme, ___setCustomTheme, ___setTheme  } = useTheme();
   const [themeName, setThemeName] = useState('My Custom Theme');
   const [isDark, setIsDark] = useState(true);
   const [activeColorKey, setActiveColorKey] = useState<string | null>(null);

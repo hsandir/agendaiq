@@ -10,8 +10,8 @@ export async function POST(request: NextRequest) {
       return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
-    const data = await request.json();
-    const { newPassword, confirmPassword } = data;
+    const data = await request.json() as Record<string, unknown>;
+    const { _newPassword, _confirmPassword } = data;
 
     if (newPassword !== confirmPassword) {
       return new NextResponse("Passwords do not match", { status: 400 });
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse("Password must be at least 8 characters long", { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.(user as Record<string, unknown>).findUnique({
       where: { email: auth.user.email! },
       select: { hashed_password: true },
     });
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     const hashedPassword = await hash(newPassword, 12);
-    await prisma.user.update({
+    await prisma.(user as Record<string, unknown>).update({
       where: { email: auth.user.email! },
       data: { hashedPassword },
     });

@@ -36,8 +36,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const body = await request.json();
-    const { districtName, schoolName, address } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { _districtName, _schoolName, _address } = body;
 
     if (!districtName || !schoolName) {
       return NextResponse.json(
@@ -87,8 +87,8 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const body = await request.json();
-    const { districtName, schoolName, address } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { _districtName, _schoolName, _address } = body;
 
     if (!districtName || !schoolName) {
       return NextResponse.json(

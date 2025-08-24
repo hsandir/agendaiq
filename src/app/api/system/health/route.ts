@@ -68,7 +68,7 @@ async function runSystemChecks(): Promise<SystemCheck[]> {
   // Authentication system check
   const authCheckStart = performance.now()
   try {
-    const userCount = await prisma.user.count()
+    const userCount = await prisma.(user as Record<string, unknown>).count()
     const authCheckDuration = performance.now() - authCheckStart
     
     checks.push({

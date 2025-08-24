@@ -19,14 +19,14 @@ import {
   UserCog,
   Palette,
   Monitor,
-  users,
   ShieldCheck,
   Server,
   Code,
   Video,
   Briefcase,
   LogOut,
-  Bug
+  Bug,
+  UserPlus
 } from "lucide-react";
 
 export interface NavigationItem {

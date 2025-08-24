@@ -32,7 +32,7 @@ class DisabledSentryProvider implements MonitoringProvider {
 
   setUser(user: UserContext | null): void {
     if (user) {
-      console.log('User context set:', { id: user.id, role: user.role });
+      console.log('User context set:', { id: user.id, role: (user as Record<string, unknown>).role });
     } else {
       console.log('User context cleared');
     }

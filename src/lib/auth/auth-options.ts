@@ -119,21 +119,21 @@ export const authOptions: NextAuthOptions = {
               }
             }
           });
-          console.log('🔍 User found:', !!user, user ? { id: user.id, email: user.email, hasPassword: !!user.hashed_password } : null);
+          console.log('🔍 User found:', !!user, user ? { id: user.id, email: user.email, hasPassword: !!(user as Record<string, unknown>).hashed_password } : null);
 
           if (!user) {
             console.error('User not found:', credentials.email);
             return null; // Return null for security (don't reveal if user exists)
           }
           
-          if (!user.hashed_password) {
+          if (!(user as Record<string, unknown>).hashed_password) {
             console.error('User has no password:', credentials.email);
             return null; // Return null instead of throwing
           }
 
           // Check password using bcrypt
           console.log('Checking password for user:', user.email);
-          const isValid = await bcrypt.compare(credentials.password, user.hashed_password);
+          const isValid = await bcrypt.compare(credentials.password, (user as Record<string, unknown>).hashed_password);
           console.log('Password valid:', isValid);
           
           if (!isValid) {
@@ -145,14 +145,14 @@ export const authOptions: NextAuthOptions = {
           console.log('✅ Password verified successfully for:', user.email);
 
           // Check 2FA if enabled
-          if (user.two_factor_enabled) {
+          if ((user as Record<string, unknown>).two_factor_enabled) {
             if (!credentials.twoFactorCode) {
               throw new Error("2FA_REQUIRED");
             }
 
             // Verify the 2FA code
             const isValidToken = speakeasy.totp.verify({
-              secret: user.two_factor_secret!,
+              secret: (user as Record<string, unknown>).two_factor_secret!,
               encoding: 'base32',
               token: credentials.twoFactorCode,
               window: 2
@@ -160,7 +160,7 @@ export const authOptions: NextAuthOptions = {
 
             // Check backup codes if TOTP fails
             if (!isValidToken) {
-              const isBackupCode = user.backup_codes.includes(credentials.twoFactorCode);
+              const isBackupCode = (user as Record<string, unknown>).backup_codes.includes(credentials.twoFactorCode);
               
               if (!isBackupCode) {
                 // // await AuditClient.logAuthEvent('login_failure', user.id, user.staff[0]?.id, req, '2FA code invalid');
@@ -172,7 +172,7 @@ export const authOptions: NextAuthOptions = {
               await prisma.users.update({
                 where: { id: parseInt(user.id) },
                 data: {
-                  backup_codes: user.backup_codes.filter(code => code !== credentials.twoFactorCode)
+                  backup_codes: (user as Record<string, unknown>).backup_codes.filter(code => code !== credentials.twoFactorCode)
                 }
               });
             }
@@ -302,7 +302,7 @@ export const authOptions: NextAuthOptions = {
         }
         
         // Handle rememberMe and trustDevice flags
-        if ('rememberMe' in user && user.rememberMe) {
+        if ('rememberMe' in user && (user as Record<string, unknown>).rememberMe) {
           token.rememberMe = true;
           // Set longer expiry for remember me (7 days)
           const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
@@ -313,7 +313,7 @@ export const authOptions: NextAuthOptions = {
           token.exp = Math.floor(Date.now() / 1000) + maxAge;
         }
         
-        if ('trustDevice' in user && user.trustDevice) {
+        if ('trustDevice' in user && (user as Record<string, unknown>).trustDevice) {
           token.trustDevice = true;
         }
       }

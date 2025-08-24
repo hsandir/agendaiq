@@ -20,7 +20,7 @@ export default async function ZoomUserPreferences() {
   const user = await requireAuth(AuthPresets.requireAuth);
 
   // Fetch user's Zoom integration status and preferences
-  const userWithZoom = await prisma.user.findUnique({
+  const userWithZoom = await prisma.users.findUnique({
     where: { email: user.email },
     include: {
       staff: {

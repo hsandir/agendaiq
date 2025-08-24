@@ -22,7 +22,7 @@ export async function GET(
     const currentUser = authResult.user!;
     const userId = params.id;
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.(user as Record<string, unknown>).findUnique({
       where: { id: userId },
       include: {
         staff: {
@@ -74,10 +74,10 @@ export async function PUT(
 
     const currentUser = authResult.user!;
     const userId = params.id;
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
 
     // Get existing user
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await prisma.(user as Record<string, unknown>).findUnique({
       where: { id: userId }
     });
 
@@ -102,7 +102,7 @@ export async function PUT(
     }
 
     // Update user
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.(user as Record<string, unknown>).update({
       where: { id: userId },
       data: {
         ...(body.name !== undefined && { name: body.name }),

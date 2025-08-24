@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 export async function GET(request: NextRequest) {
   // Check if this is first-time setup (no users exist yet)
   try {
-    const userCount = await prisma.user.count();
+    const userCount = await prisma.users.count();
     const isFirstTimeSetup = userCount === 0;
     
     if (!isFirstTimeSetup) {
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const userCount = await prisma.user.count();
+    const userCount = await prisma.users.count();
     const isFirstTimeSetup = userCount === 0;
     
     if (isFirstTimeSetup) {
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Find all users who have admin role
-    const adminUsers = await prisma.user.findMany({
+    const adminUsers = await prisma.users.findMany({
       where: {
         staff: {
           some: {

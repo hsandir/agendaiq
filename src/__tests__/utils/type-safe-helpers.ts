@@ -118,11 +118,11 @@ export class TypeSafeMockFactory {
     }),
 
     createMany: (count: number, overrides: Partial<users> = {}): users[] => {
-      return Array.from({ length: count }, () => TypeSafeMockFactory.user.create(overrides));
+      return Array.from({ length: count }, () => TypeSafeMockFactory.(user as Record<string, unknown>).create(overrides));
     },
 
     createWithRelations: (relations: { staff?: Partial<staff> } = {}): users => {
-      const user = TypeSafeMockFactory.user.create();
+      const user = TypeSafeMockFactory.(user as Record<string, unknown>).create();
       if (relations.staff) {
         // This would be implemented with proper relations
         // For now, return the base user
@@ -308,15 +308,15 @@ export class TypeSafeMockFactory {
   };
 
   static session(userOverrides: Partial<User> = {}): Session {
-    const user = this.user.create(userOverrides);
+    const user = this.(user as Record<string, unknown>).create(userOverrides);
     return {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
-        email_verified: user.email_verified,
-        is_active: user.is_active,
+        email_verified: (user as Record<string, unknown>).email_verified,
+        is_active: (user as Record<string, unknown>).is_active,
         staff: {
           id: 'staff-test',
           user_id: parseInt(user.id.split('-')[1], 36),
@@ -408,14 +408,14 @@ export class TypeSafeTestDB {
 
     // Create test users
     const adminUser = await this.prisma.users.create({
-      data: TypeSafeMockFactory.user.create({
+      data: TypeSafeMockFactory.(user as Record<string, unknown>).create({
         email: 'admin@test.com',
         name: 'Test Admin',
       }),
     });
 
     const teacherUser = await this.prisma.users.create({
-      data: TypeSafeMockFactory.user.create({
+      data: TypeSafeMockFactory.(user as Record<string, unknown>).create({
         email: 'teacher@test.com',
         name: 'Test Teacher',
       }),
@@ -485,6 +485,7 @@ export class TypeSafeTestDB {
         throw new Error('ROLLBACK'); // Force rollback
       });
     } catch (error) {
+    if (error instanceof Error) {
       if (error instanceof Error && error.message === 'ROLLBACK') {
         // Expected rollback
         return;

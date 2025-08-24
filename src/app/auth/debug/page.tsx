@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { RefreshCw, Trash2, Download, CheckCircle, XCircle, AlertCircle, Shield, Database, Server, Key, UserPlus, Activity, Bug, Code, Terminal, Eye, EyeOff, PlayIcon, TestTube2Icon } from 'lucide-react';
+import { RefreshCw, Trash2, Download, CheckCircle, XCircle, AlertCircle, Shield, Database, Server, Key, User, UserPlus, Activity, Bug, Code, Terminal, Eye, EyeOff, PlayIcon, TestTube2Icon } from 'lucide-react';
 
 interface AuthLog {
   id: string;

@@ -399,7 +399,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
   // Permission validation helper
   const canViewAuditDetails = useCallback((log: AuditLog): boolean => {
     // Ops Admin can view all logs
-    if (user.is_school_admin || isRole(user as any, RoleKey.OPS_ADMIN)) {
+    if ((user as Record<string, unknown>).is_school_admin || isRole(user as any, RoleKey.OPS_ADMIN)) {
       return true;
     }
 

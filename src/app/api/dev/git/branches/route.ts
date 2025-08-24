@@ -21,10 +21,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
     // Get current branch
-    const { stdout: currentBranch  } = await execAsync('git rev-parse --abbrev-ref HEAD');
+    const { stdout: _currentBranch  } = await execAsync('git rev-parse --abbrev-ref HEAD');
     
     // Get all branches with last commit info
-    const { stdout: branchList  } = await execAsync('git branch -a -v');
+    const { stdout: _branchList  } = await execAsync('git branch -a -v');
     
     const branches: Array<{
       name: string;
@@ -69,8 +69,8 @@ export async function GET(request: NextRequest) {
     const current = branches.find(b => b?.current);
     if (current) {
       try {
-        const { stdout: revList  } = await execAsync(
-          `git rev-list --left-right --count origin/${current?.name}...HEAD`
+        const { stdout: _revList  } = await execAsync(
+          `git rev-list --left-right --count origin/${current?._name}...HEAD`
         );
         const [behind, ahead] = String(revList).trim().split('\t');
         current.behind = parseInt(behind) ?? 0;

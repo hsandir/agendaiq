@@ -255,7 +255,7 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
     }
     
     // School admin gets ops and management capabilities
-    if (user.is_school_admin) {
+    if ((user as Record<string, unknown>).is_school_admin) {
       return Object.values(Capability).filter(cap => 
         cap.startsWith('ops:') || 
         cap.includes('manage') || 
@@ -301,7 +301,7 @@ export function can(
   }
   
   // School admin special permissions
-  if (user.is_school_admin) {
+  if ((user as Record<string, unknown>).is_school_admin) {
     // School admin cannot access dev capabilities
     if (capability.startsWith('dev:')) return false;
     
@@ -315,7 +315,7 @@ export function can(
   }
   
   // Check user's specific capabilities
-  if (user.capabilities?.includes(capability)) {
+  if ((user as Record<string, unknown>).capabilities?.includes(capability)) {
     // Handle context-specific checks (e.g., own resources)
     if (capability === Capability.MEETING_EDIT_OWN && typeof context?.ownerId === 'number') {
       const ownerId = context.ownerId;
@@ -337,17 +337,17 @@ export function isDevAdmin(user: UserWithCapabilities | null | undefined): boole
   // Prefer canonical RoleKey if available
   if (user.staff?.role?.key === RoleKey.DEV_ADMIN) return true;
   // Legacy check for roleKey (will be removed)
-  return user.roleKey === RoleKey.DEV_ADMIN;
+  return (user as Record<string, unknown>).roleKey === RoleKey.DEV_ADMIN;
 }
 
 export function isOpsAdmin(user: UserWithCapabilities | null | undefined): boolean {
   if (!user) return false;
   // Check school admin flag first
-  if (user.is_school_admin === true) return true;
+  if ((user as Record<string, unknown>).is_school_admin === true) return true;
   // Prefer canonical RoleKey if available
   if (user.staff?.role?.key === RoleKey.OPS_ADMIN) return true;
   // Legacy check for roleKey (will be removed)
-  return user.roleKey === RoleKey.OPS_ADMIN;
+  return (user as Record<string, unknown>).roleKey === RoleKey.OPS_ADMIN;
 }
 
 export function isAnyAdmin(user: UserWithCapabilities | null | undefined): boolean {
@@ -362,9 +362,9 @@ export function isRole(
   if (!user) return false;
   const staffRoleKey = user.staff?.role?.key;
   if (typeof staffRoleKey === 'string' && staffRoleKey === role) return true;
-  if (typeof user.roleKey === 'string' && user.roleKey === role) return true; // legacy fallback
+  if (typeof (user as Record<string, unknown>).roleKey === 'string' && (user as Record<string, unknown>).roleKey === role) return true; // legacy fallback
   if (role === RoleKey.DEV_ADMIN && user.is_system_admin === true) return true;
-  if (role === RoleKey.OPS_ADMIN && user.is_school_admin === true) return true;
+  if (role === RoleKey.OPS_ADMIN && (user as Record<string, unknown>).is_school_admin === true) return true;
   return false;
 }
 
@@ -494,13 +494,13 @@ export async function enrichUserWithCapabilities(user: MinimalUserInput): Promis
     email: user.email,
     name: user.name ?? null,
     is_system_admin: user.is_system_admin,
-    is_school_admin: user.is_school_admin,
+    is_school_admin: (user as Record<string, unknown>).is_school_admin,
     capabilities,
     roleKey:
       (normalizedStaff?.role?.key) ||
       (user.staff?.[0]?.role?.key) ||
       undefined,
-    staff: normalizedstaff,
+    staff: normalizedStaff,
   };
 
   return enriched;

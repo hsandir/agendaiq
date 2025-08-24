@@ -42,7 +42,7 @@ export async function GET(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const teamId = params.id;
 
     // Check if team exists
@@ -85,7 +85,7 @@ export async function GET(
 
     // Check if user has access to view team members
     const isMember = team.team_members.some(member => member.staff_id === staff.id);
-    const isAdmin = user.is_system_admin || user.is_school_admin;
+    const isAdmin = user.is_system_admin || (user as Record<string, unknown>).is_school_admin;
 
     if (!isMember && !isAdmin) {
       return NextResponse.json(
@@ -134,11 +134,11 @@ export async function POST(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const teamId = params.id;
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     const validatedData = addMemberSchema.parse(body);
 
     // Get user's staff record
@@ -173,7 +173,7 @@ export async function POST(
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
 
-    if (!isTeamLead && !user.is_system_admin && !user.is_school_admin) {
+    if (!isTeamLead && !user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to add members to this team' },
         { status: 403 }
@@ -271,11 +271,11 @@ export async function PUT(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const teamId = params.id;
 
     // Get member ID from query params
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const memberId = searchParams.get('member_id');
 
     if (!memberId) {
@@ -286,7 +286,7 @@ export async function PUT(
     }
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     const validatedData = updateMemberSchema.parse(body);
 
     // Get user's staff record
@@ -328,7 +328,7 @@ export async function PUT(
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
 
-    if (!isTeamLead && !user.is_system_admin && !user.is_school_admin) {
+    if (!isTeamLead && !user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to update team members' },
         { status: 403 }
@@ -411,11 +411,11 @@ export async function DELETE(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const teamId = params.id;
 
     // Get member ID from query params
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const memberId = searchParams.get('member_id');
 
     if (!memberId) {
@@ -465,7 +465,7 @@ export async function DELETE(
     );
     const isRemovingSelf = teamMember.staff_id === staff.id;
 
-    if (!isTeamLead && !isRemovingSelf && !user.is_system_admin && !user.is_school_admin) {
+    if (!isTeamLead && !isRemovingSelf && !user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to remove team members' },
         { status: 403 }

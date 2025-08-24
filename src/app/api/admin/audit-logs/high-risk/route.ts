@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     
     // Parse query parameters
     const minRiskScore = parseInt(searchParams.get('minRiskScore') ?? '50');

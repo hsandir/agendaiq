@@ -10,14 +10,14 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { _id } = await params;
     const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.SCHOOL_MANAGE });
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const body = await request.json();
-    const { name, __address, ___city, ___state, ___zipCode, ___phone, ___website, __logo  } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { _name, ___address, ____city, ____state, ____zipCode, ____phone, ____website, ___logo  } = body;
 
     if ((!name ?? (typeof name !== "string")) || String(name).trim().length === 0) {
       return new NextResponse("School name is required", { status: 400 });
@@ -64,7 +64,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { _id } = await params;
     const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.SCHOOL_MANAGE });
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });

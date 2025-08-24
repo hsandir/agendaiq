@@ -38,7 +38,7 @@ interface User {
 
 export function RoleManagementForm() {
   const router = useRouter();
-  const { toast } = useToast();
+  const { _toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);

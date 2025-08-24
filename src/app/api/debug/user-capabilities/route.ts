@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const capabilities = await getUserCapabilities(user.id);
     
     // Get user's role permissions
-    const userWithRole = await prisma.user.findUnique({
+    const userWithRole = await prisma.(user as Record<string, unknown>).findUnique({
       where: { id: user?.id },
       include: {
         staff: {
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
       
       // Debug info
       debugInfo: {
-        sessionCapabilities: user.capabilities ?? [],
+        sessionCapabilities: (user as Record<string, unknown>).capabilities ?? [],
         computedCapabilities: capabilities,
         match: JSON.stringify(user?.capabilities) === JSON.stringify(capabilities)
       }

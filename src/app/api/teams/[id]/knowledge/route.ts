@@ -51,7 +51,7 @@ export async function GET(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const teamId = params.id;
 
     // Get user's staff record
@@ -83,7 +83,7 @@ export async function GET(
 
     // Check if user is team member or admin
     const isMember = team.team_members.some(member => member.staff_id === staff.id);
-    const isAdmin = user.is_system_admin || user.is_school_admin;
+    const isAdmin = user.is_system_admin || (user as Record<string, unknown>).is_school_admin;
 
     if (!isMember && !isAdmin) {
       return NextResponse.json(
@@ -93,7 +93,7 @@ export async function GET(
     }
 
     // Get knowledge resources with search and filtering
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const search = searchParams.get('search');
     const type = searchParams.get('type');
     const tags = searchParams.get('tags')?.split(',');
@@ -196,11 +196,11 @@ export async function POST(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const teamId = params.id;
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     const validatedData = createKnowledgeSchema.parse(body);
 
     // Get user's staff record
@@ -233,7 +233,7 @@ export async function POST(
     // Check if user is team member
     const isMember = team.team_members.some(member => member.staff_id === staff.id);
 
-    if (!isMember && !user.is_system_admin && !user.is_school_admin) {
+    if (!isMember && !user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
       return NextResponse.json(
         { error: 'You must be a team member to add knowledge resources' },
         { status: 403 }
@@ -317,11 +317,11 @@ export async function PUT(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const teamId = params.id;
 
     // Get knowledge ID from query params
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const knowledgeId = searchParams.get('knowledge_id');
 
     if (!knowledgeId) {
@@ -332,7 +332,7 @@ export async function PUT(
     }
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     const validatedData = updateKnowledgeSchema.parse(body);
 
     // Get user's staff record
@@ -371,7 +371,7 @@ export async function PUT(
     const isTeamLead = knowledge.team.team_members.some(
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
-    const isAdmin = user.is_system_admin || user.is_school_admin;
+    const isAdmin = user.is_system_admin || (user as Record<string, unknown>).is_school_admin;
 
     if (!isCreator && !isTeamLead && !isAdmin) {
       return NextResponse.json(
@@ -456,11 +456,11 @@ export async function DELETE(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const teamId = params.id;
 
     // Get knowledge ID from query params
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const knowledgeId = searchParams.get('knowledge_id');
 
     if (!knowledgeId) {
@@ -506,7 +506,7 @@ export async function DELETE(
     const isTeamLead = knowledge.team.team_members.some(
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
-    const isAdmin = user.is_system_admin || user.is_school_admin;
+    const isAdmin = user.is_system_admin || (user as Record<string, unknown>).is_school_admin;
 
     if (!isCreator && !isTeamLead && !isAdmin) {
       return NextResponse.json(

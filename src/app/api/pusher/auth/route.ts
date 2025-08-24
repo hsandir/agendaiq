@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const user = authResult.user!;
 
     // Get the request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     const socketId = body?.socket_id;
     const channel = body?.channel_name;
 
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       where: { id: meetingId },
       include: {
         meeting_attendee: {
-          where: { staff_id: user.staff?.id || -1 }
+          where: { staff_id: (user.staff as Record<string, unknown> | null)?.id || -1 }
         }
       }
     });
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is authorized
-    const isOrganizer = meeting.organizer_id === user.staff?.id;
+    const isOrganizer = meeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
     const isAttendee = meeting.meeting_attendee.length > 0;
     const isAdmin = isRole(user, RoleKey.OPS_ADMIN);
 
@@ -78,8 +78,8 @@ export async function POST(request: NextRequest) {
         user_info: {
           name: user?.name,
           email: user?.email,
-          staff_id: user.staff?.id,
-          role: user.staff?.role?.key,
+          staff_id: (user.staff as Record<string, unknown> | null)?.id,
+          role: (user.staff as Record<string, unknown> | null)?.role?.key,
         }
       };
       authResponse = pusherServer.authorizeChannel(socketId, channel, presenceData);

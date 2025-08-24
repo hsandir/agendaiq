@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode })
   }
   try {
-    const data = await request.json()
+    const data = await request.json() as Record<string, unknown>;
     await fs.writeFile(
       CONFIG_FILE,
       JSON.stringify(data, null, 2),

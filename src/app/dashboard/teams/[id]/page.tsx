@@ -173,6 +173,7 @@ export default function TeamDetailPage() {
         setTeam(prev => prev ? { ...prev, team_knowledge: knowledgeData.knowledge } : null);
       }
     } catch (err) {
+    if (err instanceof Error) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);

@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = await request.json();
-    const { userId, roleId } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { _userId, _roleId } = body;
 
     if (!userId || !roleId) {
       return NextResponse.json(
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Get updated user with staff
-    const updatedUser = await prisma.user.findUnique({
+    const updatedUser = await prisma.(user as Record<string, unknown>).findUnique({
       where: { id: userId },
       include: { staff: { include: { role: true, department: true } } },
     });

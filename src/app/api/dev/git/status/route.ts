@@ -21,15 +21,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
     // Get current branch
-    const { stdout: ___branch  } = await execAsync('git rev-parse --abbrev-ref HEAD');
+    const { stdout: ____branch  } = await execAsync('git rev-parse --abbrev-ref HEAD');
     
     // Get status
-    const { stdout: ___statusOutput  } = await execAsync('git status --porcelain');
+    const { stdout: ____statusOutput  } = await execAsync('git status --porcelain');
     
     // Get ahead/behind info
     let ahead = 0, behind = 0;
     try {
-      const { stdout: ___revList  } = await execAsync(`git rev-list --left-right --count origin/${String(branch).trim()}...HEAD`);
+      const { stdout: ____revList  } = await execAsync(`git rev-list --left-right --count origin/${String(branch).trim()}...HEAD`);
       const [behindStr, aheadStr] = String(revList).trim().split('\t');
       behind = parseInt(behindStr) ?? 0;
       ahead = parseInt(aheadStr) ?? 0;

@@ -166,7 +166,7 @@ export function MeetingLiveView({
   );
 
   // Set up presence channel for live user tracking
-  const { members } = usePresenceChannel(
+  const { _members } = usePresenceChannel(
     CHANNELS.presence(meeting.id),
     useMemo(() => ({}), [])
   );

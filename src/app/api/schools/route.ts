@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const body = await request.json();
-    const { name, __address, ___city, ___state, ___zipCode, ___phone, ___website, __logo  } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { _name, ___address, ____city, ____state, ____zipCode, ____phone, ____website, ___logo  } = body;
 
     if ((!name ?? (typeof name !== "string")) || String(name).trim().length === 0) {
       return new NextResponse("School name is required", { status: 400 });

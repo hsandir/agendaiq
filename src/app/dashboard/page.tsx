@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { requireAuth, getCurrentusers, AuthPresets } from '@/lib/auth/auth-utils';
+import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils';
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 import { Calendar, Users, FileText } from "lucide-react";
@@ -15,7 +15,7 @@ export default async function DashboardPage() {
   const districtCount = await prisma.district.count();
   
   // Get user with staff information first
-  const userWithStaff = await prisma.user.findUnique({
+  const userWithStaff = await prisma.users.findUnique({
     where: { email: user.email! },
     include: {
       staff: {
@@ -150,7 +150,7 @@ export default async function DashboardPage() {
         organizer_id: staffId,
       },
     }),
-    prisma.meetingNote.count({
+    prisma.meeting_notes.count({
       where: {
         staff_id: staffId,
       },
@@ -192,7 +192,7 @@ export default async function DashboardPage() {
       }
     }),
     // Recent notes
-    prisma.meetingNote.findMany({
+    prisma.meeting_notes.findMany({
       where: {
         staff_id: staffId
       },

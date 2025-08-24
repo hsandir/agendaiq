@@ -94,7 +94,7 @@ const KNOWLEDGE_TYPES = [
 ];
 
 export function TeamKnowledge({ teamId, canEdit = false }: TeamKnowledgeProps) {
-  const { toast } = useToast();
+  const { _toast } = useToast();
   const [knowledge, setKnowledge] = useState<KnowledgeResource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -131,6 +131,7 @@ export function TeamKnowledge({ teamId, canEdit = false }: TeamKnowledgeProps) {
       const data = await response.json();
       setKnowledge(data.knowledge);
     } catch (err) {
+    if (err instanceof Error) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
@@ -662,7 +663,7 @@ function KnowledgeCard({
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <Avatar className="h-5 w-5">
-              <AvatarImage src={resource.created_by_user.image || undefined} />
+              <AvatarImage src={resource.created_by_(user as Record<string, unknown>).image || undefined} />
               <AvatarFallback className="text-xs">
                 {resource.created_by_user.name?.charAt(0) || resource.created_by_user.email.charAt(0)}
               </AvatarFallback>

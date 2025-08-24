@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     // Try to connect to database
-    const userCount = await prisma.user.count();
+    const userCount = await prisma.users.count();
     
     // Return false (users exist) instead of error to prevent create account page
     return NextResponse.json(userCount === 0);

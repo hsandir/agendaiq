@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     const validation = updateSchema.safeParse(body);
 
     if (!validation.success) {
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { action, ip } = validation.data;
+    const { _action, _ip } = validation.data;
 
     // Get all rate limiter instances
     const rateLimiters = [

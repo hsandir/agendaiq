@@ -17,7 +17,7 @@ export default async function NotificationsPage() {
   const user = await requireAuth(AuthPresets.requireAuth);
 
   // Fetch user's notification settings and recent notifications
-  const userWithSettings = await prisma.user.findUnique({
+  const userWithSettings = await prisma.users.findUnique({
     where: { email: user.email },
     include: {
       staff: {

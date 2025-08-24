@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
-    const { code } = (await request.json()) as Record<string, unknown>;
+    const { _code } = (await request.json()) as Record<_string, unknown>;
 
     if (!code) {
       return new NextResponse("Verification code is required", { status: 400 });
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     // TODO: Add twoFactorSecret field to User model in schema
     // Get user's 2FA secret
-    // const user = await prisma.user.findUnique({
+    // const user = await prisma.(user as Record<string, unknown>).findUnique({
     //   where: { id: session.user.id as string },
     //   select: { two_factor_secret: true },
     // });
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     // }
 
     // Enable 2FA
-    // await prisma.user.update({
+    // await prisma.(user as Record<string, unknown>).update({
     //   where: { id: session.user.id as string },
     //   data: { two_factor_enabled: true },
     // });

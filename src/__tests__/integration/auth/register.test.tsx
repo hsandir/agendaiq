@@ -38,8 +38,8 @@ describe('Registration Flow', () => {
       const emailInput = screen.getByLabelText(/email address/i)
       const submitButton = screen.getByRole('button', { name: /create account/i })
       
-      await user.type(emailInput, 'invalid-email')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(emailInput, 'invalid-email')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(await screen.findByText(/please enter a valid email/i)).toBeInTheDocument()
     })
@@ -49,14 +49,14 @@ describe('Registration Flow', () => {
       render(<RegisterForm />)
       
       // Fill required fields first
-      await user.type(screen.getByLabelText(/full name/i), 'John Doe')
-      await user.type(screen.getByLabelText(/email address/i), 'john@example.com')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/full name/i), 'John Doe')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/email address/i), 'john@example.com')
       
       const passwordInput = screen.getByLabelText(/^password$/i)
       const submitButton = screen.getByRole('button', { name: /create account/i })
       
-      await user.type(passwordInput, 'weak')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(passwordInput, 'weak')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(await screen.findByText(/password must be at least 8 characters/i)).toBeInTheDocument()
     })
@@ -66,16 +66,16 @@ describe('Registration Flow', () => {
       render(<RegisterForm />)
       
       // Fill required fields first
-      await user.type(screen.getByLabelText(/full name/i), 'John Doe')
-      await user.type(screen.getByLabelText(/email address/i), 'john@example.com')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/full name/i), 'John Doe')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/email address/i), 'john@example.com')
       
       const passwordInput = screen.getByLabelText(/^password$/i)
       const confirmPasswordInput = screen.getByLabelText(/confirm password/i)
       const submitButton = screen.getByRole('button', { name: /create account/i })
       
-      await user.type(passwordInput, 'StrongPass123!')
-      await user.type(confirmPasswordInput, 'DifferentPass123!')
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).type(passwordInput, 'StrongPass123!')
+      await (user as Record<string, unknown>).type(confirmPasswordInput, 'DifferentPass123!')
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(await screen.findByText(/passwords do not match/i)).toBeInTheDocument()
     })
@@ -88,12 +88,12 @@ describe('Registration Flow', () => {
       
       render(<RegisterForm />)
       
-      await user.type(screen.getByLabelText(/full name/i), 'John Doe')
-      await user.type(screen.getByLabelText(/email address/i), 'john@example.com')
-      await user.type(screen.getByLabelText(/^password$/i), 'StrongPass123!')
-      await user.type(screen.getByLabelText(/confirm password/i), 'StrongPass123!')
-      await user.click(screen.getByLabelText(/i agree to the terms/i))
-      await user.click(screen.getByRole('button', { name: /create account/i }))
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/full name/i), 'John Doe')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/email address/i), 'john@example.com')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/^password$/i), 'StrongPass123!')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/confirm password/i), 'StrongPass123!')
+      await (user as Record<string, unknown>).click(screen.getByLabelText(/i agree to the terms/i))
+      await (user as Record<string, unknown>).click(screen.getByRole('button', { name: /create account/i }))
       
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith('/api/auth/register', {
@@ -118,12 +118,12 @@ describe('Registration Flow', () => {
       
       render(<RegisterForm />)
       
-      await user.type(screen.getByLabelText(/full name/i), 'John Doe')
-      await user.type(screen.getByLabelText(/email address/i), 'existing@example.com')
-      await user.type(screen.getByLabelText(/^password$/i), 'StrongPass123!')
-      await user.type(screen.getByLabelText(/confirm password/i), 'StrongPass123!')
-      await user.click(screen.getByLabelText(/i agree to the terms/i))
-      await user.click(screen.getByRole('button', { name: /create account/i }))
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/full name/i), 'John Doe')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/email address/i), 'existing@example.com')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/^password$/i), 'StrongPass123!')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/confirm password/i), 'StrongPass123!')
+      await (user as Record<string, unknown>).click(screen.getByLabelText(/i agree to the terms/i))
+      await (user as Record<string, unknown>).click(screen.getByRole('button', { name: /create account/i }))
       
       expect(await screen.findByText(/email already exists/i)).toBeInTheDocument()
     })
@@ -135,17 +135,17 @@ describe('Registration Flow', () => {
       const passwordInput = screen.getByLabelText(/^password$/i)
       
       // Weak password
-      await user.type(passwordInput, 'weak')
+      await (user as Record<string, unknown>).type(passwordInput, 'weak')
       expect(screen.getByText(/weak/i)).toBeInTheDocument()
       
       // Clear and type medium password
-      await user.clear(passwordInput)
-      await user.type(passwordInput, 'medium123')
+      await (user as Record<string, unknown>).clear(passwordInput)
+      await (user as Record<string, unknown>).type(passwordInput, 'medium123')
       expect(screen.getByText(/medium/i)).toBeInTheDocument()
       
       // Clear and type strong password
-      await user.clear(passwordInput)
-      await user.type(passwordInput, 'StrongPass123!')
+      await (user as Record<string, unknown>).clear(passwordInput)
+      await (user as Record<string, unknown>).type(passwordInput, 'StrongPass123!')
       expect(screen.getByText(/strong/i)).toBeInTheDocument()
     })
 
@@ -162,16 +162,16 @@ describe('Registration Flow', () => {
       
       render(<RegisterForm />)
       
-      await user.type(screen.getByLabelText(/full name/i), 'John Doe')
-      await user.type(screen.getByLabelText(/email address/i), 'john@example.com')
-      await user.type(screen.getByLabelText(/^password$/i), 'StrongPass123!')
-      await user.type(screen.getByLabelText(/confirm password/i), 'StrongPass123!')
-      await user.click(screen.getByLabelText(/i agree to the terms/i))
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/full name/i), 'John Doe')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/email address/i), 'john@example.com')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/^password$/i), 'StrongPass123!')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/confirm password/i), 'StrongPass123!')
+      await (user as Record<string, unknown>).click(screen.getByLabelText(/i agree to the terms/i))
       
       const submitButton = screen.getByRole('button', { name: /create account/i })
       
       // Click and don't await to check intermediate state
-      const clickPromise = user.click(submitButton)
+      const clickPromise = (user as Record<string, unknown>).click(submitButton)
       
       // Wait for React to update
       await waitFor(() => {
@@ -196,17 +196,17 @@ describe('Registration Flow', () => {
       render(<RegisterForm />)
       
       // Fill all required fields first
-      await user.type(screen.getByLabelText(/full name/i), 'John Doe')
-      await user.type(screen.getByLabelText(/email address/i), 'john@example.com')
-      await user.type(screen.getByLabelText(/^password$/i), 'StrongPass123!')
-      await user.type(screen.getByLabelText(/confirm password/i), 'StrongPass123!')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/full name/i), 'John Doe')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/email address/i), 'john@example.com')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/^password$/i), 'StrongPass123!')
+      await (user as Record<string, unknown>).type(screen.getByLabelText(/confirm password/i), 'StrongPass123!')
       
       const termsCheckbox = screen.getByLabelText(/i agree to the terms/i)
       expect(termsCheckbox).toBeInTheDocument()
       expect(termsCheckbox).not.toBeChecked()
       
       const submitButton = screen.getByRole('button', { name: /create account/i })
-      await user.click(submitButton)
+      await (user as Record<string, unknown>).click(submitButton)
       
       expect(await screen.findByText(/you must agree to the terms/i)).toBeInTheDocument()
     })

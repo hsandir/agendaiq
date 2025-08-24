@@ -63,9 +63,9 @@ export function ProfileForm({ user }: ProfileFormProps) {
         </label>
         <div className="mt-2 flex items-center space-x-4">
           <div className="relative h-12 w-12 rounded-full overflow-hidden">
-            {user.image ? (
+            {(user as Record<string, unknown>).image ? (
               <Image
-                src={user.image}
+                src={(user as Record<string, unknown>).image}
                 alt={user.name || 'Profile picture'}
                 fill
                 className="object-cover"
@@ -131,7 +131,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
           type="text"
           name="role"
           id="role"
-          value={user.role ?? 'USER'}
+          value={(user as Record<string, unknown>).role ?? 'USER'}
           disabled
           className="mt-1 block w-full rounded-md border border-border bg-muted py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-ring sm:text-sm"
         />

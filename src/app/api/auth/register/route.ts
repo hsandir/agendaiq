@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return RateLimiters.registration.createErrorResponse(rateLimitResult);
     }
 
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
 
     // SECURITY FIX: Add input validation schema
     const registerSchema = z.object({
@@ -34,10 +34,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const { email, password, name  } = validationResult?.data;
+    const { _email, _password, _name  } = validationResult?.data;
 
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await prisma.users.findUnique({
       where: { email },
     });
 
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user
-    const user = await prisma.user.create({
+    const user = await prisma.users.create({
       data: {
         email,
         name,

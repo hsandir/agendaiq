@@ -598,6 +598,7 @@ model staff {
   role                                                           role                      @relation(fields: [role_id], references: [id], map: "Staff_role_id_fkey")
   school                                                         school                    @relation(fields: [school_id], references: [id], map: "Staff_school_id_fkey")
   users                                                          users                     @relation(fields: [user_id], references: [id], map: "Staff_user_id_fkey")
+  team_knowledge                                                 team_knowledge[]
   team_members                                                   team_members[]
 }
 
@@ -636,12 +637,21 @@ model team_knowledge {
   url                  String?
   is_pinned            Boolean?               @default(false)
   metadata             Json?
+  description          String?
+  is_public            Boolean?               @default(false)
+  views_count          Int?                   @default(0)
+  downloads_count      Int?                   @default(0)
+  created_by_staff_id  Int?
   users                users                  @relation(fields: [created_by], references: [id], map: "TeamKnowledge_created_by_fkey")
   teams                teams                  @relation(fields: [team_id], references: [id], onDelete: Cascade, map: "TeamKnowledge_team_id_fkey")
+  staff                staff?                 @relation(fields: [created_by_staff_id], references: [id], onUpdate: NoAction)
   team_knowledge_views team_knowledge_views[]
 
   @@index([team_id, category])
   @@index([visibility])
+  @@index([is_public], map: "idx_team_knowledge_is_public")
+  @@index([team_id], map: "idx_team_knowledge_team_id")
+  @@index([type], map: "idx_team_knowledge_type")
 }
 
 model team_knowledge_views {
@@ -711,6 +721,8 @@ model teams {
   @@index([created_by])
   @@index([school_id, status])
   @@index([type, status])
+  @@index([is_active], map: "idx_teams_is_active")
+  @@index([type], map: "idx_teams_type")
 }
 
 model users {

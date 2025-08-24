@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get custom theme from database (fast query)
-    const userData = await prisma.user.findUnique({
+    const userData = await prisma.(user as Record<string, unknown>).findUnique({
       where: { id: auth.user.id },
       select: { custom_theme: true }
     });
@@ -74,11 +74,11 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     const validatedData = customThemeSchema.parse(body);
 
     // Save custom theme to user profile (optimized)
-    await prisma.user.update({
+    await prisma.(user as Record<string, unknown>).update({
       where: { id: auth.user.id },
       data: {
         custom_theme: validatedData,
@@ -93,7 +93,7 @@ export async function PUT(request: NextRequest) {
       recordId: auth.user.id.toString(),
       operation: 'UPDATE',
       userId: auth.user.id,
-      staffId: auth.user.staff?.id,
+      staffId: auth.(user.staff as Record<string, unknown> | null)?.id,
       source: 'WEB_UI',
       description: `Custom theme "${validatedData.name}" saved`,
     }).catch(err => console.error('Audit log failed:', err));
@@ -137,7 +137,7 @@ export async function DELETE(request: NextRequest) {
 
   try {
     // Clear custom theme and reset to default (optimized)
-    await prisma.user.update({
+    await prisma.(user as Record<string, unknown>).update({
       where: { id: auth.user.id },
       data: {
         custom_theme: Prisma.JsonNull,
@@ -152,7 +152,7 @@ export async function DELETE(request: NextRequest) {
       recordId: auth.user.id.toString(),
       operation: 'UPDATE',
       userId: auth.user.id,
-      staffId: auth.user.staff?.id,
+      staffId: auth.(user.staff as Record<string, unknown> | null)?.id,
       source: 'WEB_UI',
       description: 'Custom theme deleted',
     }).catch(err => console.error('Audit log failed:', err));

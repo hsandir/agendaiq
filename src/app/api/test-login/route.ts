@@ -11,12 +11,12 @@ export async function POST(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
-    const { email, password } = await request.json();
+    const { _email, _password } = await request.json();
     
     console.log('Test login attempt for:', email);
     
     // Find user
-    const user = await prisma.user.findUnique({
+    const user = await prisma.(user as Record<string, unknown>).findUnique({
       where: { email },
       select: {
         id: true,
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       }, { status: 404 });
     }
     
-    if (!user.hashed_password) {
+    if (!(user as Record<string, unknown>).hashed_password) {
       return NextResponse.json({ 
         error: 'User has no password',
         email,
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Test password
-    const isValid = await bcrypt.compare(password as string, user.hashed_password);
+    const isValid = await bcrypt.compare(password as string, (user as Record<string, unknown>).hashed_password);
     
     return NextResponse.json({
       success: isValid,
@@ -56,14 +56,14 @@ export async function POST(request: NextRequest) {
         id: user.id,
         email: user.email,
         name: user.name,
-        hasPassword: !!user.hashed_password,
-        email_verified: !!user.email_verified,
+        hasPassword: !!(user as Record<string, unknown>).hashed_password,
+        email_verified: !!(user as Record<string, unknown>).email_verified,
         role: user.staff?.[0]?.role?.title
       },
       passwordCheck: {
         providedPassword: password,
-        hashExists: !!user.hashed_password,
-        hashStartsWith: user.hashed_password?.substring(0, 10),
+        hashExists: !!(user as Record<string, unknown>).hashed_password,
+        hashStartsWith: (user as Record<string, unknown>).hashed_password?.substring(0, 10),
         isValid
       }
     });

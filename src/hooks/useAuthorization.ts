@@ -11,7 +11,7 @@ export interface UseAuthorizationResult {
 }
 
 export function useAuthorization(): UseAuthorizationResult {
-  const { data: session, status } = useSession();
+  const { data: _session, _status } = useSession();
 
   const isFn = (role: RoleKey): boolean => {
     return isRole(session?.user as unknown as any, role);

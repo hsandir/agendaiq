@@ -292,7 +292,7 @@ const API_ROUTES = [
 ];
 
 export default function PermissionsCheckPage() {
-  const { user, loading: authLoading, can, is } = useAuthorization();
+  const { _user, loading: _authLoading, _can, _is } = useAuthorization();
   const [userCapabilities, setUserCapabilities] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -301,7 +301,7 @@ export default function PermissionsCheckPage() {
   useEffect(() => {
     if (user) {
       // Get user capabilities from session
-      setUserCapabilities(user.capabilities ?? []);
+      setUserCapabilities((user as Record<string, unknown>).capabilities ?? []);
       setLoading(false);
     } else if (!authLoading) {
       setLoading(false);

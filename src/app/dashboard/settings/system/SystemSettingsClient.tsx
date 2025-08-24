@@ -46,7 +46,7 @@ export default function SystemSettingsClient({ initialSettings }: SystemSettings
 
   const [isLoading, setIsLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
-  const { toast } = useToast();
+  const { _toast } = useToast();
 
   // Check for changes
   useEffect(() => {

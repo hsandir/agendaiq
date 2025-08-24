@@ -12,7 +12,7 @@ import {
   isOpsAdmin,
   enrichUserWithCapabilities,
   RoleKey,
-  isrole,
+  isRole,
 } from './policy';
 
 // Types for better type safety - extend UserWithCapabilities
@@ -76,7 +76,7 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
     }
 
     // Get user from database to get latest admin flags and capabilities
-    const dbUser = await prisma.user.findUnique({
+    const dbUser = await prisma.users.findUnique({
       where: { email: session.user.email },
       include: {
         staff: {

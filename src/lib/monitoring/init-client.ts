@@ -73,7 +73,7 @@ export function initClientMonitoring() {
  * Use this in your root component or auth provider
  */
 export function useMonitoringUser() {
-  const { data: session, __status  } = useSession();
+  const { data: _session, ___status  } = useSession();
 
   useEffect(() => {
     if (status === 'loading') return;

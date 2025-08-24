@@ -56,8 +56,8 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = await request.json();
-    const { passed, failed, coverage, duration  } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { _passed, _failed, _coverage, _duration  } = body;
 
     // Log test run in audit log
     await prisma.auditLog.create({
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
         operation: 'CREATE',
         source: 'SYSTEM',
         user_id: parseInt(user.id),
-        staff_id: user.staff?.id,
+        staff_id: (user.staff as Record<string, unknown> | null)?.id,
         field_changes: {
           passed,
           failed,

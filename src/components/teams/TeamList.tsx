@@ -90,6 +90,7 @@ export function TeamList() {
       const data = await response.json();
       setTeams(data.teams);
     } catch (err) {
+    if (err instanceof Error) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);

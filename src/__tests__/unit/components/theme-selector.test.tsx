@@ -27,7 +27,7 @@ describe('ThemeSelector', () => {
     
     // Add state change interaction test
     const input = screen.getByRole('textbox')
-    await user.type(input, 'New Value')
+    await (user as Record<string, unknown>).type(input, 'New Value')
     
     expect(input).toHaveValue('New Value')
   })

@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const data = await request.json()
+    const data = await request.json() as Record<string, unknown>;
 
     return NextResponse.json({ 
       success: true,

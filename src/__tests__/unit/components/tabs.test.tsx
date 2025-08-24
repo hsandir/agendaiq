@@ -40,7 +40,7 @@ describe('Tabs Component', () => {
     expect(screen.queryByText('Content 2')).not.toBeInTheDocument()
     
     // Click on tab2
-    await user.click(screen.getByText('Tab 2'))
+    await (user as Record<string, unknown>).click(screen.getByText('Tab 2'))
     
     // Now tab2 content should be visible
     await waitFor(() => {
@@ -64,7 +64,7 @@ describe('Tabs Component', () => {
       </Tabs>
     )
     
-    await user.click(screen.getByText('Tab 2'))
+    await (user as Record<string, unknown>).click(screen.getByText('Tab 2'))
     
     expect(handleValueChange).toHaveBeenCalledWith('tab2')
   })
@@ -133,13 +133,13 @@ describe('Tabs Component', () => {
     )
     
     // Click through all tabs
-    await user.click(screen.getByText('Tab 2'))
+    await (user as Record<string, unknown>).click(screen.getByText('Tab 2'))
     expect(screen.getByText('Content 2')).toBeInTheDocument()
     
-    await user.click(screen.getByText('Tab 3'))
+    await (user as Record<string, unknown>).click(screen.getByText('Tab 3'))
     expect(screen.getByText('Content 3')).toBeInTheDocument()
     
-    await user.click(screen.getByText('Tab 1'))
+    await (user as Record<string, unknown>).click(screen.getByText('Tab 1'))
     expect(screen.getByText('Content 1')).toBeInTheDocument()
   })
 })

@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get theme preference using Prisma client (avoids case/permission issues)
-    const userData = await prisma.user.findUnique({
+    const userData = await prisma.(user as Record<string, unknown>).findUnique({
       where: { id: user.id },
       select: { theme_preference: true },
     });
@@ -82,14 +82,14 @@ export async function PUT(request: NextRequest) {
   const user = auth.user;
 
   try {
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     const validatedData = themeSchema.parse(body);
     
     // Use themeId if provided, otherwise use theme
     const themeToSave = validatedData.themeId ?? validatedData.theme ?? 'standard';
 
     // Update user's theme preference (optimized query)
-    await prisma.user.update({
+    await prisma.(user as Record<string, unknown>).update({
       where: { id: user.id },
       data: { theme_preference: themeToSave },
       select: { id: true }, // Only select what we need
@@ -104,7 +104,7 @@ export async function PUT(request: NextRequest) {
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: user.staff?.id ?? undefined,
+      staffId: (user.staff as Record<string, unknown> | null)?.id ?? undefined,
       source: 'WEB_UI',
       description: `Theme changed to ${themeToSave}`,
     }).catch(err => console.error('Audit log failed:', err));

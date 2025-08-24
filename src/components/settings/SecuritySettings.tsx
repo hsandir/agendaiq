@@ -104,7 +104,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
           <h2 className="text-lg font-semibold">Two-Factor Authentication</h2>
         </div>
 
-        {user.two_factor_enabled ? (
+        {(user as Record<string, unknown>).two_factor_enabled ? (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
@@ -226,7 +226,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
             <span className="text-sm">Login notifications</span>
             <input
               type="checkbox"
-              checked={user.login_notifications_enabled}
+              checked={(user as Record<string, unknown>).login_notifications_enabled}
               className="h-4 w-4 text-primary rounded focus:ring-ring"
               disabled
             />
@@ -236,7 +236,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
             <span className="text-sm">Suspicious activity alerts</span>
             <input
               type="checkbox"
-              checked={user.suspicious_alerts_enabled}
+              checked={(user as Record<string, unknown>).suspicious_alerts_enabled}
               className="h-4 w-4 text-primary rounded focus:ring-ring"
               disabled
             />
@@ -246,7 +246,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
             <span className="text-sm">Remember trusted devices</span>
             <input
               type="checkbox"
-              checked={user.remember_devices_enabled}
+              checked={(user as Record<string, unknown>).remember_devices_enabled}
               className="h-4 w-4 text-primary rounded focus:ring-ring"
               disabled
             />

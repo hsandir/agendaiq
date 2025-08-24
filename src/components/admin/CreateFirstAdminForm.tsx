@@ -83,7 +83,7 @@ export function CreateFirstAdminForm({ adminUsers }: CreateFirstAdminFormProps) 
   };
 
   // Filter out users that already have passwords
-  const availableUsers = adminUsers.filter(user => !user.hashed_password);
+  const availableUsers = adminUsers.filter(user => !(user as Record<string, unknown>).hashed_password);
 
   if (availableUsers.length === 0) {
     return (

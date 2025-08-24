@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     }
 
     // TODO: Add suspiciousAlerts field to User model in schema
-    const user = await prisma.user.findUnique({
+    const user = await prisma.(user as Record<string, unknown>).findUnique({
       where: { email: auth.user.email! },
       select: { 
         email: true,
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     }
 
     // TODO: Toggle the setting once suspiciousAlerts field is added
-    // await prisma.user.update({
+    // await prisma.(user as Record<string, unknown>).update({
     //   where: { email: auth.user.email! },
     //   data: { suspiciousAlerts: !user?.suspiciousAlerts },
     // });

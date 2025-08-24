@@ -38,8 +38,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const { key, priority, is_leadership, category, description  } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { _key, _priority, _is_leadership, _category, _description  } = body;
 
     if (!key ?? priority === undefined) {
       return NextResponse.json(
@@ -86,8 +86,8 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const { id, key, priority, is_leadership, category, description  } = body;
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const { _id, _key, _priority, _is_leadership, _category, _description  } = body;
 
     if (!id) {
       return NextResponse.json(

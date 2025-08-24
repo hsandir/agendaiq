@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
     }
 
-    const { searchParams } = new URL(request?.url);
+    const { _searchParams } = new URL(request?.url);
     
     // Parse parameters
     const format = searchParams.get('format') ?? 'csv'; // 'csv' | 'json'

@@ -57,7 +57,7 @@ export async function GET(request: NextRequest, props: Props) {
     }
 
     // Fetch all notes for the meeting
-    const notes = await prisma.meetingNote.findMany({
+    const notes = await prisma.meeting_notes.findMany({
       where: { meeting_id: meetingId },
       include: {
         staff: {
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest, props: Props) {
       return NextResponse.json({ error: "Invalid meeting ID" }, { status: 400 });
     }
 
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     const result = createNoteSchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest, props: Props) {
     }
 
     // Create the note
-    const note = await prisma.meetingNote.create({
+    const note = await prisma.meeting_notes.create({
       data: {
         meeting_id: meetingId,
         staff_id: user.staff.id,
@@ -230,7 +230,7 @@ export async function DELETE(request: NextRequest, props: Props) {
     }
 
     // Check if note exists and belongs to the user
-    const note = await prisma.meetingNote.findUnique({
+    const note = await prisma.meeting_notes.findUnique({
       where: { id: noteId },
       include: {
         meeting: true
@@ -253,7 +253,7 @@ export async function DELETE(request: NextRequest, props: Props) {
     }
 
     // Delete the note
-    await prisma.meetingNote.delete({
+    await prisma.meeting_notes.delete({
       where: { id: noteId }
     });
 

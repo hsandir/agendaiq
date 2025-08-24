@@ -170,7 +170,7 @@ export function MeetingEditForm({ meeting, UserPlus, meetingId, isStep2 }: Meeti
     label: user.name,
     email: user.email,
     role: user.staff?.[0]?.role?.title,
-    department: 'department' in user ? user.department : null
+    department: 'department' in user ? (user as Record<string, unknown>).department : null
   }));
 
   const handleSubmit = async (e: React.FormEvent) => {

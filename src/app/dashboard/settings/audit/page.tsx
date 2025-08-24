@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
-import { requireAuth, getCurrentusers, AuthPresets } from '@/lib/auth/auth-utils';
+import { requireAuth, getCurrentUser, AuthPresets } from '@/lib/auth/auth-utils';
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
@@ -16,7 +16,7 @@ export default async function AuditPage() {
   const user = await requireAuth(AuthPresets.requireAuth);
   
   // Check if user is admin
-  const userDetails = await prisma.user.findUnique({
+  const userDetails = await prisma.users.findUnique({
     where: {
       email: user.email!
     },
@@ -117,7 +117,7 @@ export default async function AuditPage() {
               <div className="absolute left-0 top-0 w-px h-full bg-border" />
               <div className="space-y-8">
                 {auditLogs.map((log) => {
-                  const { icon: Icon, category } = getActionDetails(log.action);
+                  const { icon: _Icon, _category } = getActionDetails(log.action);
                   return (
                     <div key={log.id} className="relative pl-8">
                       <div className="absolute left-0 top-2 -translate-x-1/2">

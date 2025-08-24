@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     const user = authResult.user!;
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     const result = assignmentSchema.safeParse(body);
     
     if (!result.success) {
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { assignments } = result.data;
+    const { _assignments } = result.data;
 
     // Update role department assignments in database
     const updatePromises = assignments.map(async ({ roleId, departmentId }) => {
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
         recordId: roleId.toString(),
         operation: 'UPDATE',
         userId: user.id,
-        staffId: user.staff?.id,
+        staffId: (user.staff as Record<string, unknown> | null)?.id,
         source: 'SYSTEM', 
         description: `Role "${role.key ?? 'UNKNOWN_ROLE'}" assigned to department: ${role.department?.name ?? 'Unassigned'}`
       });

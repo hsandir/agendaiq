@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
-    const { action } = (await request.json()) as Record<string, unknown>;
+    const { _action } = (await request.json()) as Record<_string, unknown>;
 
     if (action === 'check') {
       return await checkSystemHealth();
@@ -47,7 +47,7 @@ async function checkSystemHealth() {
 
     // Check npm cache integrity
     try {
-      const { stdout: __cacheVerify  } = await execAsync('npm cache verify', { cwd: process.cwd() });
+      const { stdout: ___cacheVerify  } = await execAsync('npm cache verify', { cwd: process.cwd() });
       if (String(__cacheVerify).includes('Cache verified and compressed')) {
         health.cacheStatus = 'clean';
       } else {
@@ -90,7 +90,7 @@ async function checkSystemHealth() {
 
     // Get last cache clean time
     try {
-      const { stdout: __cacheInfo  } = await execAsync('npm config get cache', { cwd: process.cwd() });
+      const { stdout: ___cacheInfo  } = await execAsync('npm config get cache', { cwd: process.cwd() });
       if (String(__cacheInfo).trim()) {
         health.lastCacheClean = 'Available';
       }

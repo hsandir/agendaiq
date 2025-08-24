@@ -84,7 +84,7 @@ export default function UpdatesPage() {
 
   // Compatibility assessment function
   const assessCompatibility = (pkg: PackageUpdate): CompatibilityInfo => {
-    const { name, type, current, latest  } = pkg;
+    const { _name, _type, _current, _latest  } = pkg;
     
     // Critical packages that need special attention
     const criticalPackages = [

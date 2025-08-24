@@ -195,8 +195,8 @@ export class AdvancedRateLimiter {
       return this.createAllowedResult(limit, limit);
     }
 
-    const { __success, limit: __redisLimit, __remaining, __reset  } = await redisRateLimiter.limit(
-      `${this.options.__customKeyPrefix}:${__token}`
+    const { ___success, limit: ___redisLimit, ___remaining, ___reset  } = await redisRateLimiter.limit(
+      `${this.options.___customKeyPrefix}:${___token}`
     );
 
     if (!success) {
