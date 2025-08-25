@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Not available in production' }, { status: 403 });
     }
     
-    const { _email, _password } = await request.json();
+    const { email, password } = await request.json();
     
     console.log('Test login attempt for:', email);
     

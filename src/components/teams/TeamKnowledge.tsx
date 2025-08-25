@@ -58,7 +58,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { useToast } from '@/components/ui/use-toast';
 
 interface KnowledgeResource {
-  id: number;
+  id: string;
   title: string;
   content: string;
   type: string;
@@ -68,7 +68,7 @@ interface KnowledgeResource {
   metadata?: any;
   created_at: string;
   updated_at: string;
-  created_by: {
+  staff: {
     users: {
       id: number;
       name: string | null;
@@ -77,12 +77,12 @@ interface KnowledgeResource {
     };
   };
   _count: {
-    views: number
+    team_knowledge_views: number
   };
 }
 
 interface TeamKnowledgeProps {
-  teamId: number;
+  teamId: string;
   canEdit?: boolean;
 }
 
@@ -96,7 +96,7 @@ const KNOWLEDGE_TYPES = [
 ];
 
 export function TeamKnowledge({ teamId, canEdit = false }: TeamKnowledgeProps) {
-  const { _toast } = useToast();
+  const { toast } = useToast();
   const [knowledge, setKnowledge] = useState<KnowledgeResource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -228,7 +228,7 @@ export function TeamKnowledge({ teamId, canEdit = false }: TeamKnowledgeProps) {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this resource?')) {
       return
     }
@@ -666,18 +666,18 @@ function KnowledgeCard({
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <Avatar className="h-5 w-5">
-              <AvatarImage src={resource.created_by.users.image || undefined} />
+              <AvatarImage src={resource.staff.users.image || undefined} />
               <AvatarFallback className="text-xs">
-                {resource.created_by.users.name?.charAt(0) || resource.created_by.users.email.charAt(0)}
+                {resource.staff.users.name?.charAt(0) || resource.staff.users.email.charAt(0)}
               </AvatarFallback>
             </Avatar>
             <span>
-              {resource.created_by.users.name || resource.created_by.users.email.split('@')[0]}
+              {resource.staff.users.name || resource.staff.users.email.split('@')[0]}
             </span>
           </div>
           <div className="flex items-center gap-1">
             <Eye className="h-3 w-3" />
-            {resource._count.views}
+            {resource._count.team_knowledge_views}
           </div>
         </div>
       </CardContent>

@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     // Test 2: Simple user query
     const simpleQueryStart = performance.now();
     await prisma.users.findUnique({
-      where: { id: typeof user?.id === 'string' ? user?.id : String(user?.id) },
+      where: { id: user?.id },
       select: { id: true, email: true }
     });
     const simpleQueryTime = performance.now() - simpleQueryStart;
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
     // Test 6: Transaction test
     const transactionStart = performance.now();
     await prisma.$transaction(async (tx) => {
-      await tx.users.findUnique({ where: { id: typeof user?.id === 'string' ? user?.id : String(user?.id) } });
+      await tx.users.findUnique({ where: { id: user?.id } });
       await tx.meeting.count();
     });
     const transactionTime = performance.now() - transactionStart;
@@ -181,7 +181,7 @@ export async function GET(request: NextRequest) {
 async function getConnectionPoolStatus() {
   try {
     // Get Prisma metrics
-    const metrics = await prisma.$metrics?.json();
+    const metrics = await (prisma as any).$metrics?.json?.() || null;
     
     return {
       status: 'active',

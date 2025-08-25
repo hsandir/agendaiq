@@ -331,11 +331,12 @@ export async function POST(request: NextRequest) {
     const userAgent = headersList.get('user-agent') ?? 'unknown';
     
     // Enhanced logging for sign-in attempts
-    if (body.type === 'signin_attempt' && body.details?.email && body.details?.password) {
+    const details = body.details as { email?: string; password?: string } | undefined;
+    if (body.type === 'signin_attempt' && details?.email && details?.password) {
       try {
         // Try to validate credentials directly
         const user = await prisma.users.findUnique({
-          where: { email: body.details.email },
+          where: { email: details.email },
           include: {
             staff: {
               include: {
@@ -353,10 +354,10 @@ export async function POST(request: NextRequest) {
             type: 'signin_attempt',
             level: 'error',
             message: `Sign-in failed: User not found`,
-            email: body.details.email,
+            email: details.email,
             details: { 
               error: 'USER_NOT_FOUND',
-              email: body.details.email,
+              email: details.email,
               timestamp: new Date().toISOString()
             },
             ip,
@@ -367,7 +368,7 @@ export async function POST(request: NextRequest) {
             type: 'signin_attempt',
             level: 'error',
             message: `Sign-in failed: No password set`,
-            email: body.details.email,
+            email: details.email,
             details: { 
               error: 'NO_PASSWORD',
               userId: user.id,
@@ -378,7 +379,7 @@ export async function POST(request: NextRequest) {
           });
         } else {
           // Test password
-          const isValidPassword = await bcrypt.compare(body.details.password as string, (user as Record<string, unknown>).hashed_password as string);
+          const isValidPassword = await bcrypt.compare(details.password!, (user as Record<string, unknown>).hashed_password as string);
           
           addLog({
             type: 'signin_attempt',
@@ -391,7 +392,7 @@ export async function POST(request: NextRequest) {
               userId: user.id,
               email: user.email,
               passwordValid: isValidPassword,
-              hasStaff: !!(user.staff as Record<string, unknown> | null)?.length,
+              hasStaff: !!(user.staff)?.length,
               staffRole: user.staff?.[0]?.role?.title,
               timestamp: new Date().toISOString()
             },
@@ -412,7 +413,7 @@ export async function POST(request: NextRequest) {
                   id: String(user.id),
                   email: user.email,
                   name: user.name,
-                  hasstaff: !!(user.staff as Record<string, unknown> | null)?.length,
+                  hasstaff: !!(user.staff)?.length,
                   staffData: user.staff?.[0] || null
                 }
               }
@@ -422,7 +423,7 @@ export async function POST(request: NextRequest) {
             addAuthFlow('credentials_validated', {
               email: user.email,
               userId: user.id,
-              hasstaff: !!(user.staff as Record<string, unknown> | null)?.length,
+              hasstaff: !!(user.staff)?.length,
               role: user.staff?.[0]?.role?.title
             });
           }
@@ -432,7 +433,7 @@ export async function POST(request: NextRequest) {
           type: 'error',
           level: 'error',
           message: 'Database error during sign-in validation',
-          email: body.details?.email,
+          email: details?.email,
           details: { 
             error: dbError instanceof Error ? dbError.message : "Unknown error",
             code: (dbError as { code?: string })?.code 
@@ -448,7 +449,7 @@ export async function POST(request: NextRequest) {
         ...body,
         ip,
         userAgent,
-        sessionId: request.cookies.get('next-auth.session-token')?.value?.substring(0, 10) ?? null
+        sessionId: request.cookies.get('next-auth.session-token')?.value?.substring(0, 10) ?? undefined
       });
     }
     

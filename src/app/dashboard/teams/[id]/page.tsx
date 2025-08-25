@@ -91,7 +91,7 @@ interface TeamMember {
 }
 
 interface TeamKnowledge {
-  id: number;
+  id: string;
   title: string;
   description?: string | null;
   type: string;
@@ -143,7 +143,7 @@ interface TeamActivity {
 }
 
 export default function TeamDetailPage() {
-  const { _toast } = useToast();
+  const { toast } = useToast();
   const params = useParams();
   const router = useRouter();
   const [team, setTeam] = useState<Team | null>(null);
@@ -157,6 +157,7 @@ export default function TeamDetailPage() {
   const [knowledgeCategoryFilter, setKnowledgeCategoryFilter] = useState<string>('all');
   const [activities, setActivities] = useState<TeamActivity[]>([]);
   const [activitiesLoading, setActivitiesLoading] = useState(false);
+  const [editingKnowledge, setEditingKnowledge] = useState<TeamKnowledge | null>(null);
 
   // Check feature flag
   if (!FEATURES.TEAMS.enabled) {
@@ -710,11 +711,26 @@ export default function TeamDetailPage() {
                                     <DropdownMenuSeparator />
                                   </>
                                 )}
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setEditingKnowledge(item)}>
                                   <Edit2 className="mr-2 h-4 w-4" />
                                   Edit
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={async () => {
+                                  if (navigator.share) {
+                                    try {
+                                      await navigator.share({
+                                        title: `${team.name} - Team`,
+                                        text: `Join the ${team.name} team on AgendaIQ`,
+                                        url: window.location.href
+                                      });
+                                    } catch (error) {
+                                      console.log('Share cancelled');
+                                    }
+                                  } else {
+                                    await navigator.clipboard.writeText(window.location.href);
+                                    toast.success('Team link copied to clipboard!');
+                                  }
+                                }}>
                                   <Share2 className="mr-2 h-4 w-4" />
                                   Share
                                 </DropdownMenuItem>
@@ -984,6 +1000,22 @@ export default function TeamDetailPage() {
             onOpenChange={setShowCreateKnowledgeDialog}
             teamId={team.id}
             onKnowledgeCreated={() => {
+              fetchTeam();
+              if (activeTab === 'activity') {
+                fetchActivities();
+              }
+            }}
+          />
+          {/* Edit Knowledge Dialog - using same component */}
+          <CreateKnowledgeDialog
+            open={!!editingKnowledge}
+            onOpenChange={(open) => {
+              if (!open) setEditingKnowledge(null);
+            }}
+            teamId={team.id}
+            editData={editingKnowledge}
+            onKnowledgeCreated={() => {
+              setEditingKnowledge(null);
               fetchTeam();
               if (activeTab === 'activity') {
                 fetchActivities();

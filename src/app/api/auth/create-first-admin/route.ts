@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { _userId, _password } = validation?.data;
+    const { userId, password } = validation?.data;
 
     // Check if user exists and doesn't have a password
     const user = await prisma.users.findUnique({

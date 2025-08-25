@@ -14,14 +14,14 @@ export async function POST(request: Request) {
       return RateLimiters.passwordReset.createErrorResponse(rateLimitResult);
     }
 
-    const { _email } = (await request.json()) as Record<_string, unknown>;
+    const { email } = (await request.json()) as Record<string, unknown>;
 
-    if (!email) {
+    if (!email || typeof email !== 'string') {
       return new NextResponse("Email is required", { status: 400 });
     }
 
     const user = await prisma.users.findUnique({
-      where: { email },
+      where: { email: email as string },
     });
 
     if (!user) {
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     const resetUrl = `${process.env?.NEXTAUTH_URL}/auth/reset-password?token=${resetToken}`;
     
     // Import email service
-    const { _sendEmail, _getPasswordResetHtml } = await import('../../../../lib/email/email-service');
+    const { sendEmail, getPasswordResetHtml } = await import('../../../../lib/email/email-service');
     
     // Send password reset email
     const emailResult = await sendEmail({

@@ -55,7 +55,8 @@ interface CreateKnowledgeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   teamId: string;
-  onKnowledgeCreated: () => void
+  onKnowledgeCreated: () => void;
+  editData?: any; // Edit mode data
 }
 
 const RESOURCE_TYPES = {
@@ -90,6 +91,7 @@ export function CreateKnowledgeDialog({
   onOpenChange,
   teamId,
   onKnowledgeCreated,
+  editData,
 }: CreateKnowledgeDialogProps) {
   const [activeTab, setActiveTab] = useState('details');
   const [submitting, setSubmitting] = useState(false);
@@ -115,6 +117,31 @@ export function CreateKnowledgeDialog({
     relatedMeetings: '',
     confidentiality: 'internal'
   });
+
+  // Load edit data when editData prop changes
+  React.useEffect(() => {
+    if (editData) {
+      setTitle(editData.title || '');
+      setDescription(editData.description || '');
+      setResourceType(editData.type || 'DOCUMENT');
+      setCategory(editData.category || '');
+      setUrl(editData.url || '');
+      setContent(editData.content || '');
+      setTags(editData.tags || []);
+      setIsPublic(editData.is_public || false);
+      if (editData.metadata) {
+        setMetadata({
+          author: editData.metadata.author || '',
+          version: editData.metadata.version || '1.0',
+          lastReviewed: editData.metadata.lastReviewed || new Date().toISOString().split('T')[0],
+          expiryDate: editData.metadata.expiryDate || '',
+          department: editData.metadata.department || '',
+          relatedMeetings: editData.metadata.relatedMeetings || '',
+          confidentiality: editData.metadata.confidentiality || 'internal'
+        });
+      }
+    }
+  }, [editData]);
 
   const handleAddTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
@@ -190,7 +217,7 @@ export function CreateKnowledgeDialog({
       return false;
     }
     
-    if (!['LINK', 'NOTE'].includes(resourceType) && !file) {
+    if (!['LINK', 'NOTE'].includes(resourceType) && !file && !editData) {
       toast.error('Please select a file to upload');
       setActiveTab('content');
       return false;
@@ -251,33 +278,40 @@ export function CreateKnowledgeDialog({
         },
       };
       
-      const response = await fetch(`/api/teams/${teamId}/knowledge`, {
-        method: 'POST',
+      const isEditMode = !!editData;
+      const url = isEditMode 
+        ? `/api/teams/${teamId}/knowledge?knowledge_id=${editData.id}`
+        : `/api/teams/${teamId}/knowledge`;
+      
+      const response = await fetch(url, {
+        method: isEditMode ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(knowledgeData),
       });
       
-      if (!response.ok) throw new Error('Failed to create knowledge entry');
+      if (!response.ok) throw new Error(`Failed to ${isEditMode ? 'update' : 'create'} knowledge entry`);
       
-      toast.success('Knowledge resource added successfully', {
-        description: `"${title}" has been added to the team knowledge base`
+      toast.success(`Knowledge resource ${isEditMode ? 'updated' : 'added'} successfully`, {
+        description: `"${title}" has been ${isEditMode ? 'updated in' : 'added to'} the team knowledge base`
       });
       
       onKnowledgeCreated();
       onOpenChange(false);
       
-      // Reset form
-      setTitle('');
-      setDescription('');
-      setResourceType('DOCUMENT');
-      setCategory('');
-      setUrl('');
-      setContent('');
-      setTags([]);
-      setFile(null);
-      setIsPublic(false);
-      setActiveTab('details');
-      setUploadProgress(0);
+      // Reset form only in create mode
+      if (!editData) {
+        setTitle('');
+        setDescription('');
+        setResourceType('DOCUMENT');
+        setCategory('');
+        setUrl('');
+        setContent('');
+        setTags([]);
+        setFile(null);
+        setIsPublic(false);
+        setActiveTab('details');
+        setUploadProgress(0);
+      }
       
     } catch (error) {
       console.error('Error creating knowledge:', error);
@@ -297,10 +331,10 @@ export function CreateKnowledgeDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Add Knowledge Resource
+            {editData ? 'Edit Knowledge Resource' : 'Add Knowledge Resource'}
           </DialogTitle>
           <DialogDescription>
-            Share documents, links, and resources with your team
+            {editData ? 'Update your team resource' : 'Share documents, links, and resources with your team'}
           </DialogDescription>
         </DialogHeader>
 
@@ -338,7 +372,7 @@ export function CreateKnowledgeDialog({
 
               <div className="space-y-2">
                 <Label>Resource Type *</Label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   {Object.entries(RESOURCE_TYPES).map(([key, config]) => {
                     const Icon = config.icon;
                     return (
@@ -350,13 +384,13 @@ export function CreateKnowledgeDialog({
                         )}
                         onClick={() => setResourceType(key as keyof typeof RESOURCE_TYPES)}
                       >
-                        <CardContent className="flex flex-col items-center justify-center p-4">
+                        <CardContent className="flex flex-col items-center justify-center p-2">
                           <Icon className={cn(
-                            "h-6 w-6 mb-1",
+                            "h-4 w-4 mb-1",
                             resourceType === key ? `text-${config.color}-600` : "text-muted-foreground"
                           )} />
                           <span className={cn(
-                            "text-xs",
+                            "text-xs text-center leading-tight",
                             resourceType === key ? "font-semibold" : ""
                           )}>
                             {config.label}
@@ -369,9 +403,14 @@ export function CreateKnowledgeDialog({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category">Category *</Label>
+                <Label htmlFor="category" className="flex items-center gap-1">
+                  <FolderOpen className="h-4 w-4" />
+                  Category <span className="text-red-500">*</span>
+                </Label>
                 <Select value={category} onValueChange={setCategory} disabled={submitting}>
-                  <SelectTrigger id="category">
+                  <SelectTrigger id="category" className={cn(
+                    !category && submitting ? "border-red-500 focus:border-red-500" : ""
+                  )}>
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -385,6 +424,12 @@ export function CreateKnowledgeDialog({
                     ))}
                   </SelectContent>
                 </Select>
+                {!category && submitting && (
+                  <p className="text-sm text-red-500 flex items-center gap-1">
+                    <AlertCircle className="h-4 w-4" />
+                    Please select a category
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">

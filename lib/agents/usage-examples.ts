@@ -393,7 +393,6 @@ export async function runAllExamples() {
         success: false,
         error: errorMessage
       };
-      const errorMessage = error instanceof Error ? error.message : String(error);
       console.log(`❌ Example ${exampleName} failed: ${errorMessage}`);
     }
     

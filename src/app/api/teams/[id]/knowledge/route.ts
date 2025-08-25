@@ -22,9 +22,13 @@ const createKnowledgeSchema = z.object({
 // Knowledge update schema
 const updateKnowledgeSchema = z.object({
   title: z.string().min(1).max(200).optional(),
-  content: z.string().min(1).optional(),
-  tags: z.array(z.string()).optional(),
-  url: z.string().url().optional(),
+  description: z.string().optional().nullable(),
+  content: z.string().optional().nullable(),
+  type: z.enum(['DOCUMENT', 'LINK', 'NOTE', 'PRESENTATION', 'SPREADSHEET', 'CODE', 'IMAGE', 'VIDEO', 'OTHER']).optional(),
+  category: z.string().optional().nullable(),
+  tags: z.array(z.string()).optional().nullable(),
+  url: z.string().optional().nullable(),
+  is_public: z.boolean().optional(),
   metadata: z.record(z.unknown()).optional(),
   is_pinned: z.boolean().optional(),
 });
@@ -126,7 +130,22 @@ export async function GET(
 
     const knowledge = await prisma.team_knowledge.findMany({
       where,
-      include: {
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        content: true,
+        type: true,
+        category: true,
+        tags: true,
+        url: true,
+        is_pinned: true,
+        is_public: true,
+        metadata: true,
+        created_at: true,
+        updated_at: true,
+        created_by: true,
+        created_by_staff_id: true,
         staff: {
           include: {
             users: {
@@ -151,19 +170,20 @@ export async function GET(
       ]
     });
 
-    // Track view for analytics
-    if (knowledge.length > 0 && staff) {
-      await prisma.team_knowledge_view.createMany({
-        data: knowledge.slice(0, 5).map(k => ({
-          knowledge_id: k.id,
-          user_id: user.id,
-          viewed_at: new Date(),
-        })),
-        skipDuplicates: true,
-      }).catch(() => {
-        // Ignore duplicate view errors
-      });
-    }
+    // Track view for analytics - Disabled until table exists
+    // TODO: Enable when team_knowledge_view table is added to schema
+    // if (knowledge.length > 0 && staff) {
+    //   await prisma.team_knowledge_view.createMany({
+    //     data: knowledge.slice(0, 5).map(k => ({
+    //       knowledge_id: k.id,
+    //       user_id: user.id,
+    //       viewed_at: new Date(),
+    //     })),
+    //     skipDuplicates: true,
+    //   }).catch(() => {
+    //     // Ignore duplicate view errors
+    //   });
+    // }
 
     return NextResponse.json({
       knowledge,
@@ -256,8 +276,10 @@ export async function POST(
         id: randomBytes(16).toString('hex'),
         team_id: teamId,
         title: validatedData.title,
+        description: validatedData.description,
         content: validatedData.content,
         type: validatedData.type,
+        category: validatedData.category,
         tags: validatedData.tags || [],
         url: validatedData.url,
         metadata: validatedData.metadata || {},
@@ -340,7 +362,7 @@ export async function PUT(
     const teamId = resolvedParams.id;
 
     // Get knowledge ID from query params
-    const { _searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const knowledgeId = searchParams.get('knowledge_id');
 
     if (!knowledgeId) {
@@ -370,7 +392,7 @@ export async function PUT(
     const knowledge = await prisma.team_knowledge.findUnique({
       where: { id: knowledgeId },
       include: {
-        team: {
+        teams: {
           include: {
             team_members: true
           }
@@ -387,7 +409,7 @@ export async function PUT(
 
     // Check permissions: creator, team lead, or admin can edit
     const isCreator = knowledge.created_by === user.id;
-    const isTeamLead = knowledge.team.team_members.some(
+    const isTeamLead = knowledge.teams.team_members.some(
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
     const isAdmin = user.is_system_admin || (user as Record<string, unknown>).is_school_admin;
@@ -404,9 +426,13 @@ export async function PUT(
       where: { id: knowledgeId },
       data: {
         ...(validatedData.title && { title: validatedData.title }),
-        ...(validatedData.content && { content: validatedData.content }),
-        ...(validatedData.tags && { tags: validatedData.tags }),
+        ...(validatedData.description !== undefined && { description: validatedData.description }),
+        ...(validatedData.content !== undefined && { content: validatedData.content }),
+        ...(validatedData.type && { type: validatedData.type }),
+        ...(validatedData.category !== undefined && { category: validatedData.category }),
+        ...(validatedData.tags !== undefined && { tags: validatedData.tags || [] }),
         ...(validatedData.url !== undefined && { url: validatedData.url }),
+        ...(validatedData.is_public !== undefined && { is_public: validatedData.is_public }),
         ...(validatedData.metadata && { metadata: validatedData.metadata }),
         ...(validatedData.is_pinned !== undefined && { is_pinned: validatedData.is_pinned }),
         updated_at: new Date(),
@@ -484,7 +510,7 @@ export async function DELETE(
     const teamId = resolvedParams.id;
 
     // Get knowledge ID from query params
-    const { _searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const knowledgeId = searchParams.get('knowledge_id');
 
     if (!knowledgeId) {
@@ -510,7 +536,7 @@ export async function DELETE(
     const knowledge = await prisma.team_knowledge.findUnique({
       where: { id: knowledgeId },
       include: {
-        team: {
+        teams: {
           include: {
             team_members: true
           }
@@ -527,7 +553,7 @@ export async function DELETE(
 
     // Check permissions: creator, team lead, or admin can delete
     const isCreator = knowledge.created_by === user.id;
-    const isTeamLead = knowledge.team.team_members.some(
+    const isTeamLead = knowledge.teams.team_members.some(
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
     const isAdmin = user.is_system_admin || (user as Record<string, unknown>).is_school_admin;

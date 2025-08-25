@@ -3,24 +3,17 @@
  * Test login flow with JWT enrichment
  */
 
-import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcrypt';
-
-// Mock modules
-jest.mock('@/lib/prisma', () => ({
-  prisma: {
-    user: {
-      findUnique: jest.fn(),
-      count: jest.fn(),
-      create: jest.fn(),
-    },
-  },
-}));
+// Setup mocks first
+import { setupPrismaMock, mockPrisma, createTestUserData } from '@/__tests__/utils/prisma-mocks';
+setupPrismaMock();
 
 jest.mock('bcrypt', () => ({
   compare: jest.fn(),
   hash: jest.fn(),
 }));
+
+import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcrypt';
 
 jest.mock('next-auth', () => ({
   getServerSession: jest.fn(),
@@ -58,7 +51,7 @@ describe('Authentication Integration Tests', () => {
       };
 
       // Setup database response
-      (prisma.users.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      mockPrisma.users.findUnique.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       // Simulate the database query that would happen during authentication
@@ -67,37 +60,28 @@ describe('Authentication Integration Tests', () => {
         password: 'password123'
       };
       
-      // Call the mock to simulate what happens in the authorize function
-      await prisma.users.findUnique({
+      // Simulate what happens in the authorize function (without actual call)
+      // The mock would return the mockUser and bcrypt would return true
+      
+      // Verify the mocks are properly configured
+      expect(mockPrisma.users.findUnique).toBeDefined();
+      expect(bcrypt.compare).toBeDefined();
+      
+      // Test that our mock returns expected data
+      const user = await mockPrisma.users.findUnique({
         where: { email: credentials.email },
-        include: {
-          staff: {
-            include: {
-              role: true,
-              department: true,
-              school: true,
-              district: true
-            }
-          }
-        }
+        include: { staff: true }
       });
-
-      // Simulate password check
-      await bcrypt.compare(credentials.password, mockUser.hashed_password);
+      expect(user).toEqual(mockUser);
+      
+      // Test password comparison
+      const passwordValid = await bcrypt.compare(credentials.password, mockUser.hashed_password);
+      expect(passwordValid).toBe(true);
       
       // Verify the mocks were called correctly
-      expect(prisma.users.findUnique).toHaveBeenCalledWith({
+      expect(mockPrisma.users.findUnique).toHaveBeenCalledWith({
         where: { email: 'test@school.edu' },
-        include: {
-          staff: {
-            include: {
-              role: true,
-              department: true,
-              school: true,
-              district: true,
-            },
-          },
-        },
+        include: { staff: true }
       });
 
       // Verify password comparison
@@ -113,7 +97,7 @@ describe('Authentication Integration Tests', () => {
         hashed_password: 'hashed_password',
       };
 
-      (prisma.users.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      mockPrisma.users.findUnique.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       // Verify password check fails
@@ -132,7 +116,7 @@ describe('Authentication Integration Tests', () => {
         two_factor_secret: 'secret',
       };
 
-      (prisma.users.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      mockPrisma.users.findUnique.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       // Should check for 2FA
@@ -151,7 +135,7 @@ describe('Authentication Integration Tests', () => {
         backup_codes: ['code1', 'code2', 'code3'],
       };
 
-      (prisma.users.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      mockPrisma.users.findUnique.mockResolvedValue(mockUser);
       
       // Simulate using a backup code
       const usedCode = 'code1';
@@ -188,7 +172,7 @@ describe('Authentication Integration Tests', () => {
         Account: [], // No linked OAuth accounts
       };
 
-      (prisma.users.findUnique as jest.Mock).mockResolvedValue(existingUser);
+      mockPrisma.users.findUnique.mockResolvedValue(existingUser);
       
       // Check if Google account is linked
       const hasGoogleAccount = existingUser.Account.some((a: { provider: string }) => a.provider === 'google');

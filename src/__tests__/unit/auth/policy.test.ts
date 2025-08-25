@@ -9,7 +9,7 @@ import { prisma } from '@/lib/prisma';
 // Mock Prisma
 jest.mock('@/lib/prisma', () => ({
   prisma: {
-    user: {
+    users: {
       findUnique: jest.fn(),
     },
   },
@@ -120,12 +120,12 @@ describe('Policy Unit Tests', () => {
       };
 
       // Should deny system pages
-      expect(canAccessRoute(regularusers, '/dashboard/system')).toBe(false);
-      expect(canAccessRoute(regularusers, '/dashboard/monitoring')).toBe(false);
+      expect(canAccessRoute(regularUser, '/dashboard/system')).toBe(false);
+      expect(canAccessRoute(regularUser, '/dashboard/monitoring')).toBe(false);
       
       // Should allow unmapped dashboard routes (default allow)
-      expect(canAccessRoute(regularusers, '/dashboard')).toBe(true);
-      expect(canAccessRoute(regularusers, '/dashboard/profile')).toBe(true);
+      expect(canAccessRoute(regularUser, '/dashboard')).toBe(true);
+      expect(canAccessRoute(regularUser, '/dashboard/profile')).toBe(true);
     });
   });
 
@@ -147,11 +147,11 @@ describe('Policy Unit Tests', () => {
       };
 
       // Should deny dev endpoints
-      expect(canAccessApi(regularusers, '/api/dev/debug')).toBe(false);
-      expect(canAccessApi(regularusers, '/api/system/health')).toBe(false);
+      expect(canAccessApi(regularUser, '/api/dev/debug')).toBe(false);
+      expect(canAccessApi(regularUser, '/api/system/health')).toBe(false);
       
       // Should allow unmapped authenticated endpoints (default allow for authenticated users)
-      expect(canAccessApi(regularusers, '/api/some-random-endpoint')).toBe(true);
+      expect(canAccessApi(regularUser, '/api/some-random-endpoint')).toBe(true);
     });
   });
 

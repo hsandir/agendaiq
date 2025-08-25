@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       // Direct from database
       role: userWithRole?.staff?.[0]?.role?.key ?? null,
       roleKey: userWithRole?.staff?.[0]?.role?.key,
-      permissions: userWithRole?.staff?.[0]?.role?.permission ?? [],
+      permissions: userWithRole?.staff?.[0]?.role?.permissions ?? [],
       
       // Check specific capabilities
       hasOpsBackup: capabilities.includes('ops:backup'),
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
       
       // Debug info
       debugInfo: {
-        sessionCapabilities: (user as Record<string, unknown>).capabilities ?? [],
+        sessionCapabilities: user.capabilities ?? [],
         computedCapabilities: capabilities,
         match: JSON.stringify(user?.capabilities) === JSON.stringify(capabilities)
       }

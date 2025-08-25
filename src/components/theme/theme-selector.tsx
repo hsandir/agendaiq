@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useTheme } from '@/lib/theme/theme-provider';
 import { themes } from '@/lib/theme/themes';
 import { Check, Palette, Monitor, Moon, Sun, Eye, Leaf } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
 
 interface ThemeSelectorProps {
   className?: string;
@@ -21,12 +22,12 @@ const ThemeIcons = {
   'nature-green': Leaf,
 } as const;
 
-export function ThemeSelector({ 
+function ThemeSelectorInternal({ 
   className = '', 
   showDescription = true, 
   variant = 'grid' 
 }: ThemeSelectorProps) {
-  const { theme: _currentTheme, _setTheme } = useTheme();
+  const { theme: currentTheme, setTheme } = useTheme();
   const [isChanging, setIsChanging] = useState(false);
 
   const handleThemeChange = async (themeId: string) => {
@@ -47,7 +48,7 @@ export function ThemeSelector({
 
   const ThemeCard = ({ theme }: { theme: typeof themes[0] }) => {
     const Icon = ThemeIcons[theme.id as keyof typeof ThemeIcons] || Palette;
-    const isSelected = currentTheme.id === theme.id;
+    const isSelected = currentTheme?.id === theme.id;
     
     // Rely on theme tokens instead of hardcoded palettes
     const cardColors = 'bg-card border border-border hover:border-primary';
@@ -123,7 +124,7 @@ export function ThemeSelector({
         ))}
       </div>
       
-      {currentTheme && (
+      {currentTheme && showDescription && variant === 'grid' && (
         <div className="mt-8 p-4 bg-primary border border-primary-dark rounded-lg">
           <h4 className="font-semibold text-primary-foreground mb-1">
             Current Theme: {currentTheme.name}
@@ -134,5 +135,19 @@ export function ThemeSelector({
         </div>
       )}
     </div>
+  );
+}
+
+export function ThemeSelector(props: ThemeSelectorProps) {
+  return (
+    <ErrorBoundary
+      title="Theme Selector Error"
+      showDetails={false}
+      onError={(error, errorInfo) => {
+        console.error('ThemeSelector error:', error, errorInfo);
+      }}
+    >
+      <ThemeSelectorInternal {...props} />
+    </ErrorBoundary>
   );
 }
