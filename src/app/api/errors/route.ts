@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     
     // Log error to console since SystemError model doesn't exist
     console.error('System error reported:', body);

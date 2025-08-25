@@ -367,7 +367,7 @@ export default function LintErrorManagementPage() {
             onClick={handleAutoFix}
             variant="outline"
             size="sm"
-            disabled={fixing || !lintStatus ?? lintStatus.summary.totalErrors === 0}
+            disabled={fixing || !lintStatus || lintStatus.summary.totalErrors === 0}
           >
             {fixing ? (
               <>

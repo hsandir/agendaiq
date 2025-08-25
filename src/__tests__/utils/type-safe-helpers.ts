@@ -27,7 +27,7 @@ export interface RequestBuilderOptions {
   searchParams?: Record<string, string>;
 }
 
-export class TypeSafeRequestBuilder {
+class TypeSafeRequestBuilderClass {
   static create<T = unknown>(options: RequestBuilderOptions): NextRequest {
     const { method, url, body, headers = {}, cookies = {}, searchParams = {} } = options;
 
@@ -96,19 +96,19 @@ export class TypeSafeRequestBuilder {
 // Type-Safe Mock Factories
 // ============================================================================
 
-export class TypeSafeMockFactory {
+class TypeSafeMockFactoryClass {
   static user: MockFactory<users> = {
     create: (overrides: Partial<users> = {}): users => ({
-      id: 'user-' + Math.random().toString(36).substring(7),
+      id: Math.floor(Math.random() * 1000000),
       email: `test-${Math.random().toString(36).substring(7)}@example.com`,
       name: 'Test User',
       hashed_password: '$2a$10$hashedpassword',
       email_verified: new Date(),
-      is_active: true,
-      google_id: null,
+      // is_active: true, // Field doesn't exist in users schema
+      // google_id: null, // Field doesn't exist in users schema
       preferences: {},
       created_at: new Date(),
-      updated_at: new Date(),
+      // updated_at: new Date(), // Field doesn't exist in users schema
       failed_login_attempts: 0,
       last_failed_login: null,
       account_locked_until: null,
@@ -133,27 +133,27 @@ export class TypeSafeMockFactory {
 
   static staff: MockFactory<staff> = {
     create: (overrides: Partial<staff> = {}): staff => ({
-      id: 'staff-' + Math.random().toString(36).substring(7),
-      user_id: overrides.user_id || 'user-' + Math.random().toString(36).substring(7),
-      role_id: overrides.role_id || 'role-' + Math.random().toString(36).substring(7),
-      department_id: overrides.department_id || 'dept-' + Math.random().toString(36).substring(7),
-      school_id: overrides.school_id || 'school-' + Math.random().toString(36).substring(7),
-      district_id: overrides.district_id || 'district-' + Math.random().toString(36).substring(7),
-      employee_number: `EMP${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
+      id: Math.floor(Math.random() * 1000000),
+      user_id: Number(overrides.user_id) || Math.floor(Math.random() * 1000000),
+      role_id: Number(overrides.role_id) || Math.floor(Math.random() * 1000),
+      department_id: Number(overrides.department_id) || Math.floor(Math.random() * 1000),
+      school_id: Number(overrides.school_id) || Math.floor(Math.random() * 1000),
+      district_id: Number(overrides.district_id) || Math.floor(Math.random() * 1000),
+      // employee_number: `EMP${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`, // Field doesn't exist in staff schema
       hire_date: new Date(),
-      phone: '555-0123',
-      office_location: 'Office 101',
+      // phone: '555-0123', // Field doesn't exist in staff schema
+      // office_location: 'Office 101', // Field doesn't exist in staff schema
       is_active: true,
-      is_on_leave: false,
-      subjects: ['Mathematics'],
-      bio: 'Test staff member',
-      specializations: [],
+      // is_on_leave: false, // Field doesn't exist in staff schema
+      // subjects: ['Mathematics'], // Field doesn't exist in staff schema
+      // bio: 'Test staff member', // Field doesn't exist in staff schema
+      // specializations: [], // Field doesn't exist in staff schema
       flags: [],
       endorsements: [],
       extension: null,
       room: null,
       created_at: new Date(),
-      updated_at: new Date(),
+      // updated_at: new Date(), // Field doesn't exist in staff schema
       ...overrides,
     }),
 
@@ -174,14 +174,14 @@ export class TypeSafeMockFactory {
 
   static role: MockFactory<role> = {
     create: (overrides: Partial<role> = {}): role => ({
-      id: 'role-' + Math.random().toString(36).substring(7),
+      id: Math.floor(Math.random() * 1000),
       title: overrides.title ?? 'Teacher',
       is_leadership: overrides.is_leadership ?? false,
       priority: overrides.priority ?? 6,
-      description: null,
-      permissions: null,
+      // description: null, // Field doesn't exist in role schema
+      // permissions: null, // Field doesn't exist in role schema
       created_at: new Date(),
-      updated_at: new Date(),
+      // updated_at: new Date(), // Field doesn't exist in role schema
       ...overrides,
     }),
 
@@ -196,15 +196,15 @@ export class TypeSafeMockFactory {
 
   static department: MockFactory<department> = {
     create: (overrides: Partial<department> = {}): department => ({
-      id: 'dept-' + Math.random().toString(36).substring(7),
+      id: Math.floor(Math.random() * 1000),
       name: overrides.name || 'Mathematics Department',
       code: overrides.code ?? 'MATH',
-      school_id: overrides.school_id || 'school-' + Math.random().toString(36).substring(7),
-      description: null,
-      head_staff_id: null,
-      budget: null,
+      school_id: Number(overrides.school_id) || Math.floor(Math.random() * 1000),
+      // description: null, // Field doesn't exist in department schema
+      // head_staff_id: null, // Field doesn't exist in department schema
+      // budget: null, // Field doesn't exist in department schema
       created_at: new Date(),
-      updated_at: new Date(),
+      // updated_at: new Date(), // Field doesn't exist in department schema
       ...overrides,
     }),
 
@@ -219,19 +219,19 @@ export class TypeSafeMockFactory {
 
   static school: MockFactory<school> = {
     create: (overrides: Partial<school> = {}): school => ({
-      id: 'school-' + Math.random().toString(36).substring(7),
+      id: Math.floor(Math.random() * 1000),
       name: overrides.name || 'Test High School',
       code: overrides.code ?? 'THS',
-      district_id: overrides.district_id || 'district-' + Math.random().toString(36).substring(7),
+      district_id: Number(overrides.district_id) || Math.floor(Math.random() * 1000),
       address: '123 Test Street',
-      phone: '555-0123',
-      email: 'test@school.edu',
-      website: null,
-      principal_staff_id: null,
-      student_count: null,
-      established_date: null,
+      // phone: '555-0123', // Field doesn't exist in school schema
+      // email: 'test@school.edu', // Field doesn't exist in school schema
+      // website: null, // Field doesn't exist in school schema
+      // principal_staff_id: null, // Field doesn't exist in school schema
+      // student_count: null, // Field doesn't exist in school schema
+      // established_date: null, // Field doesn't exist in school schema
       created_at: new Date(),
-      updated_at: new Date(),
+      // updated_at: new Date(), // Field doesn't exist in school schema
       ...overrides,
     }),
 
@@ -246,19 +246,19 @@ export class TypeSafeMockFactory {
 
   static district: MockFactory<district> = {
     create: (overrides: Partial<district> = {}): district => ({
-      id: 'district-' + Math.random().toString(36).substring(7),
+      id: Math.floor(Math.random() * 1000),
       name: overrides.name || 'Test School District',
       code: overrides.code ?? 'TSD',
       address: '456 District Avenue',
-      phone: '555-0456',
-      email: 'admin@testdistrict.edu',
-      website: null,
-      superintendent_staff_id: null,
-      total_schools: null,
-      total_students: null,
-      established_date: null,
+      // phone: '555-0456', // Field doesn't exist in district schema
+      // email: 'admin@testdistrict.edu', // Field doesn't exist in district schema
+      // website: null, // Field doesn't exist in district schema
+      // superintendent_staff_id: null, // Field doesn't exist in district schema
+      // total_schools: null, // Field doesn't exist in district schema
+      // total_students: null, // Field doesn't exist in district schema
+      // established_date: null, // Field doesn't exist in district schema
       created_at: new Date(),
-      updated_at: new Date(),
+      // updated_at: new Date(), // Field doesn't exist in district schema
       ...overrides,
     }),
 
@@ -278,15 +278,15 @@ export class TypeSafeMockFactory {
       description: 'Test meeting description',
       start_time: new Date(),
       end_time: new Date(Date.now() + 60 * 60 * 1000), // 1 hour later
-      organizer_id: overrides.organizer_id || 'staff-' + Math.random().toString(36).substring(7),
-      department_id: overrides.department_id || 'dept-' + Math.random().toString(36).substring(7),
-      school_id: overrides.school_id || 'school-' + Math.random().toString(36).substring(7),
-      district_id: overrides.district_id || 'district-' + Math.random().toString(36).substring(7),
+      organizer_id: Number(overrides.organizer_id) || Math.floor(Math.random() * 1000),
+      department_id: Number(overrides.department_id) || Math.floor(Math.random() * 1000),
+      school_id: Number(overrides.school_id) || Math.floor(Math.random() * 1000),
+      district_id: Number(overrides.district_id) || Math.floor(Math.random() * 1000),
       status: 'draft',
       meeting_type: 'REGULAR',
       zoom_meeting_id: null,
       zoom_join_url: null,
-      zoom_password: null,
+      // zoom_password: null, // Field doesn't exist in meeting schema
       location: null,
       max_attendees: null,
       is_recurring: false,
@@ -294,7 +294,7 @@ export class TypeSafeMockFactory {
       parent_meeting_id: null,
       tags: null,
       created_at: new Date(),
-      updated_at: new Date(),
+      // updated_at: new Date(), // Field doesn't exist in meeting schema
       ...overrides,
     }),
 
@@ -307,7 +307,7 @@ export class TypeSafeMockFactory {
     },
   };
 
-  static session(userOverrides: Partial<User> = {}): Session {
+  static session(userOverrides: Partial<users> = {}): Session {
     const user = this.user.create(userOverrides);
     return {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
@@ -319,27 +319,27 @@ export class TypeSafeMockFactory {
         is_active: (user as Record<string, unknown>).is_active,
         staff: {
           id: 'staff-test',
-          user_id: parseInt(user.id.split('-')[1], 36),
+          user_id: Number(user.id),
           role_id: 1,
           department_id: 1,
           school_id: 1,
           district_id: 1,
           role: {
-            id: '1',
+            id: 1,
             title: 'Teacher',
             is_leadership: false,
             priority: 6,
           },
           department: {
-            id: '1',
+            id: 1,
             name: 'Mathematics',
           },
           school: {
-            id: '1',
+            id: 1,
             name: 'Test School',
           },
           district: {
-            id: '1',
+            id: 1,
             name: 'Test District',
           },
         },
@@ -359,7 +359,7 @@ export class TypeSafeMockFactory {
 // Type-Safe Database Helpers
 // ============================================================================
 
-export class TypeSafeTestDB {
+class TypeSafeTestDB {
   constructor(private prisma: PrismaClient) {}
 
   async createTestSeed(): Promise<TestDataSeed> {
@@ -429,7 +429,7 @@ export class TypeSafeTestDB {
         department_id: department.id,
         school_id: school.id,
         district_id: district.id,
-        employee_number: 'ADMIN001',
+        // employee_number: 'ADMIN001', // Field doesn't exist in staff schema
       }),
     });
 
@@ -440,7 +440,7 @@ export class TypeSafeTestDB {
         department_id: department.id,
         school_id: school.id,
         district_id: district.id,
-        employee_number: 'TEACH001',
+        // employee_number: 'TEACH001', // Field doesn't exist in staff schema
       }),
     });
 
@@ -461,9 +461,9 @@ export class TypeSafeTestDB {
       this.prisma.meeting_attendee.deleteMany(),
       this.prisma.meeting_notes.deleteMany(),
       this.prisma.meeting_action_items.deleteMany(),
-      this.prisma.agendaItemComment.deleteMany(),
-      this.prisma.agendaItemAttachment.deleteMany(),
-      this.prisma.meetingAgendaItem.deleteMany(),
+      this.prisma.agenda_item_comments.deleteMany(),
+      this.prisma.agenda_item_attachments.deleteMany(),
+      this.prisma.meeting_agenda_items.deleteMany(),
       this.prisma.meeting.deleteMany(),
       this.prisma.staff.deleteMany(),
       this.prisma.users.deleteMany(),
@@ -485,7 +485,6 @@ export class TypeSafeTestDB {
         throw new Error('ROLLBACK'); // Force rollback
       });
     } catch (error) {
-    if (error instanceof Error) {
       if (error instanceof Error && error.message === 'ROLLBACK') {
         // Expected rollback
         return;
@@ -696,10 +695,11 @@ export class TypeSafeMockUtilities {
 // Export All Utilities
 // ============================================================================
 
+export const TypeSafeRequestBuilder = TypeSafeRequestBuilderClass;
+export const TypeSafeMockFactory = TypeSafeMockFactoryClass;
+export { TypeSafeTestDB };
+
 export {
-  TypeSafeRequestBuilder,
-  TypeSafeMockFactory,
-  TypeSafeTestDB,
   TypeSafeValidators,
   TypeSafeMockUtilities,
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from 'next-auth/react';
-import { Capability, RoleKey, can, isRole } from '@/lib/auth/policy';
+import { Capability, RoleKey, can, isRole } from '../lib/auth/policy';
 
 export interface UseAuthorizationResult {
   is: (role: RoleKey) => boolean;
@@ -11,7 +11,7 @@ export interface UseAuthorizationResult {
 }
 
 export function useAuthorization(): UseAuthorizationResult {
-  const { data: _session, _status } = useSession();
+  const { data: session, status } = useSession();
 
   const isFn = (role: RoleKey): boolean => {
     return isRole(session?.user as unknown as any, role);

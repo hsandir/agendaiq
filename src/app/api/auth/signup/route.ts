@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
-import { prisma } from "@/lib/prisma";
-import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
+import { prisma } from "../../../../lib/prisma";
+import { RateLimiters, getClientIdentifier } from "../../../../lib/utils/rate-limit";
 import { z } from "zod";
 
 export async function POST(request: Request) {
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return RateLimiters.registration.createErrorResponse(rateLimitResult);
     }
 
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
 
     // SECURITY FIX: Add input validation schema
     const signupSchema = z.object({
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { _email, _password } = validationResult.data;
+    const { email, password } = validationResult.data;
 
     // Check if user already exists
     const existingUser = await prisma.users.findUnique({
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     }
 
     // Hash password
-    const hashedPassword = await hash(password, 12);
+    const hashed_password = await hash(password, 12);
 
     // Check if this is the first user
     const userCount = await prisma.users.count();
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
     const user = await prisma.users.create({
       data: {
         email,
-        hashedPassword,
+        hashed_password,
       },
     });
 

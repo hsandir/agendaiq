@@ -27,6 +27,8 @@ export default function MeetingsPageClient() {
     try {
       setLoading(true);
       setError(null);
+      console.log('🔄 Fetching meetings from /api/meetings');
+      
       const response = await fetch('/api/meetings', {
         credentials: 'include',
         headers: {
@@ -34,13 +36,19 @@ export default function MeetingsPageClient() {
         },
       });
       
+      console.log('📡 Response status:', response.status, response.statusText);
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch meetings');
+        const errorText = await response.text();
+        console.log('❌ Error response:', errorText);
+        throw new Error(`Failed to fetch meetings: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
+      console.log('✅ Meetings data received:', data);
       setMeetings(data.meetings ?? []);
     } catch (err: unknown) {
+      console.error('🚨 Fetch error:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch meetings');
     } finally {
       setLoading(false);

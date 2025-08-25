@@ -8,7 +8,7 @@ import { withAuth } from '@/lib/auth/api-auth';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string; knowledgeId: string } }
+  { params }: { params: Promise<{ id: string; knowledgeId: string }> }
 ) {
   try {
     const auth = await withAuth(request, { requireAuth: true });
@@ -17,8 +17,9 @@ export async function POST(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const teamId = params.id;
-    const knowledgeId = parseInt(params.knowledgeId);
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
+    const knowledgeId = parseInt(resolvedParams.knowledgeId);
 
     // Update download count
     const knowledge = await prisma.team_knowledge.update({

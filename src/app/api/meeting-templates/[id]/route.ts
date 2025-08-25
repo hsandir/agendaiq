@@ -89,7 +89,7 @@ export async function PUT(
       );
     }
 
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const { _name, _description, _duration, _agenda, _attendees, _is_active  } = body;
 
     const template = await prisma.meetingTemplate.update({

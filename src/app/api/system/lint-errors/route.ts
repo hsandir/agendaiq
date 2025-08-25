@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const { _action, _filePath, _fixes } = body;
 
     if (action === 'fix') {

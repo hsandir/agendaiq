@@ -81,15 +81,28 @@ export function TeamList() {
   const fetchTeams = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/teams');
+      console.log('🔄 Fetching teams from /api/teams');
+      
+      const response = await fetch('/api/teams', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      console.log('📡 Teams response status:', response.status, response.statusText);
       
       if (!response.ok) {
-        throw new Error('Failed to fetch teams');
+        const errorText = await response.text();
+        console.log('❌ Teams error response:', errorText);
+        throw new Error(`Failed to fetch teams: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
+      console.log('✅ Teams data received:', data);
       setTeams(data.teams);
     } catch (err) {
+      console.error('🚨 Teams fetch error:', err);
       if (err instanceof Error) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       }
@@ -102,6 +115,7 @@ export function TeamList() {
     try {
       const response = await fetch('/api/teams', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },

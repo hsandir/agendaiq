@@ -12,13 +12,13 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
-import { createTestContext } from '@/__tests__/helpers/test-db';
+import { createTestContext } from '../helpers/test-db';
 import { 
   TypeSafeRequestBuilder, 
   TypeSafeMockFactory, 
   TypeSafeTestDB
-} from '@/__tests__/utils/type-safe-helpers';
-import type { TestContext } from '@/__tests__/types/test-context';
+} from '../utils/type-safe-helpers';
+import type { TestContext } from '../types/test-context';
 
 // Import required API route handlers
 // REPLACE WITH ACTUAL ROUTE IMPORTS
@@ -410,7 +410,7 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
           startTime: new Date(Date.now() + 60 * 60 * 1000), // 1 hour from now
           endTime: new Date(Date.now() + 2 * 60 * 60 * 1000), // 2 hours from now
         },
-        attendees: [context.teacherusers.id],
+        attendees: [context.teacherUser.id],
         agendaItems: [
           {
             title: 'Opening Discussion',
@@ -452,7 +452,7 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
           startTime: new Date(Date.now() + 60 * 60 * 1000),
           endTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
         },
-        attendees: [context.teacherusers.id],
+        attendees: [context.teacherUser.id],
         agendaItems: [],
       };
 
@@ -480,7 +480,7 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
           startTime: new Date(Date.now() + 60 * 60 * 1000),
           endTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
         },
-        attendees: [context.teacherusers.id],
+        attendees: [context.teacherUser.id],
         agendaItems: [
           {
             title: 'Consistency Test Item',
@@ -652,7 +652,7 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
           startTime: new Date(Date.now() + 60 * 60 * 1000),
           endTime: new Date(Date.now() + 2 * 60 * 60 * 1000),
         },
-        attendees: [context.teacherusers.id],
+        attendees: [context.teacherUser.id],
         agendaItems: Array.from({ length: 10 }, (_, i) => ({
           title: `Performance Item ${i + 1}`,
           description: `Test agenda item ${i + 1} for performance`,
@@ -674,7 +674,9 @@ describe('[INTEGRATION_NAME] Integration Workflow', () => {
   });
 });
 
-// Usage instructions and template documentation follow as comments
+/* 
+ * Usage instructions and template documentation follow as comments
+ */
 // This is a template file for integration tests
 
 // ============================================================================

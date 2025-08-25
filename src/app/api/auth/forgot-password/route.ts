@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../../../../lib/prisma";
 import crypto from "crypto";
-import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
-import { Logger } from '@/lib/utils/logger';
+import { RateLimiters, getClientIdentifier } from "../../../../lib/utils/rate-limit";
+import { Logger } from '../../../../lib/utils/logger';
 
 export async function POST(request: Request) {
   try {
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return RateLimiters.passwordReset.createErrorResponse(rateLimitResult);
     }
 
-    const { _email } = (await request.json()) as Record<_string, unknown>;
+    const { email } = (await request.json()) as Record<string, unknown>;
 
     if (!email) {
       return new NextResponse("Email is required", { status: 400 });
@@ -48,11 +48,11 @@ export async function POST(request: Request) {
     const resetUrl = `${process.env?.NEXTAUTH_URL}/auth/reset-password?token=${resetToken}`;
     
     // Import email service
-    const { _sendEmail, _getPasswordResetHtml } = await import('@/lib/email/email-service');
+    const { sendEmail, getPasswordResetHtml } = await import('../../../../lib/email/email-service');
     
     // Send password reset email
     const emailResult = await sendEmail({
-      to: user?.email,
+      to: user.email,
       subject: "AgendaIQ - Password Reset Request",
       html: getPasswordResetHtml(resetUrl)
     });

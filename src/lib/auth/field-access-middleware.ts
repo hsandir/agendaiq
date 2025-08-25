@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { User } from "next-auth";
+import { users } from "@prisma/client";
 import { 
   canReadField, 
   canWriteField, 
@@ -72,7 +73,7 @@ export const GET = withFieldAccess(
       return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
     }
 
-    const users = await prisma.user.findMany();
+    const users = await prisma.users.findMany();
     return NextResponse.json({ data: users });
   },
   'User'

@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Not authenticated" }, { status: auth.statusCode || 401 });
     }
 
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const { _role } = body;
 
     if (!role || !['admin', 'user'].includes(role)) {
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    if (!user || !(user.staff ?? user.staff.length === 0)) {
+    if (!user || !user.staff || user.staff.length === 0) {
       return NextResponse.json(
         { error: "User staff record not found" },
         { status: 404 }

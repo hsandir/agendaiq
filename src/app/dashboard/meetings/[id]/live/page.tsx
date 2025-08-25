@@ -73,7 +73,7 @@ export default async function MeetingLivePage(props: Props) {
   });
 
   // Fetch agenda items separately with less nesting
-  const agendaItems = await prisma.meetingAgendaItem.findMany({
+  const agendaItems = await prisma.meeting_agenda_items.findMany({
     where: { meeting_id: meetingId },
     select: {
       id: true,
@@ -93,8 +93,8 @@ export default async function MeetingLivePage(props: Props) {
       },
       _count: {
         select: {
-          comments: true,
-          action_items: true
+          agenda_item_comments: true,
+          meeting_action_items: true
         }
       }
     },
@@ -104,7 +104,7 @@ export default async function MeetingLivePage(props: Props) {
   });
 
   // Fetch action items separately
-  const actionItems = await prisma.meetingActionItem.findMany({
+  const actionItems = await prisma.meeting_action_items.findMany({
     where: { meeting_id: meetingId },
     include: {
       AssignedTo: {

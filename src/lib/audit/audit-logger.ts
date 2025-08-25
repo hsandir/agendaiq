@@ -27,7 +27,7 @@ export interface AuditLogData {
 export class AuditLogger {
   static async log(data: AuditLogData) {
     try {
-      await prisma.auditLog.create({
+      await prisma.audit_logs.create({
         data: {
           table_name: data.tableName,
           record_id: data.recordId,
@@ -179,7 +179,7 @@ export class AuditLogger {
       if (filters.endDate) where.created_at.lte = filters.endDate;
     }
 
-    return prisma.auditLog.findMany({
+    return prisma.audit_logs.findMany({
       where,
       include: {
         users: {
@@ -206,26 +206,26 @@ export class AuditLogger {
 
     const [totalLogs, operationStats, tableStats, userStats] = await Promise.all([
       // Total logs count
-      prisma.auditLog.count({
+      prisma.audit_logs.count({
         where: { created_at: { gte: startDate } }
       }),
 
       // Operations breakdown
-      prisma.auditLog.groupBy({
+      prisma.audit_logs.groupBy({
         by: ['operation'],
         where: { created_at: { gte: startDate } },
         _count: { operation: true }
       }),
 
       // Tables breakdown
-      prisma.auditLog.groupBy({
+      prisma.audit_logs.groupBy({
         by: ['table_name'],
         where: { created_at: { gte: startDate } },
         _count: { table_name: true }
       }),
 
       // Top users
-      prisma.auditLog.groupBy({
+      prisma.audit_logs.groupBy({
         by: ['user_id'],
         where: { 
           created_at: { gte: startDate },

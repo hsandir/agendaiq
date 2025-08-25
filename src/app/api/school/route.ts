@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from '@/lib/auth/api-auth';
-import { Capability } from '@/lib/auth/policy';
-import { prisma } from "@/lib/prisma";
+import { withAuth } from '../../../lib/auth/api-auth';
+import { Capability } from '../../../lib/auth/policy';
+import { prisma } from "../../../lib/prisma";
 
 // School update data interface
 interface SchoolUpdateData {
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    if (!userRecord || (!userRecord.staff ?? (userRecord.staff.length === 0))) {
+    if (!userRecord || !userRecord.staff || userRecord.staff.length === 0) {
       return NextResponse.json({ error: "User staff record not found" }, { status: 404 });
     }
 
@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
-    const { _name, _code, _address, _phone, _email, _district_id } = body;
+    const body = await request.json() as Record<string, unknown>;
+    const { name, code, address, phone, email, district_id } = body;
 
     if (!name || !code || !district_id) {
       return NextResponse.json(
@@ -141,8 +141,8 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
-    const { _id, _name, _code, _address, _phone, _email, _district_id } = body;
+    const body = await request.json() as Record<string, unknown>;
+    const { id, name, code, address, phone, email, district_id } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -192,12 +192,12 @@ export async function PUT(request: NextRequest) {
     }
 
     const updateData: SchoolUpdateData = {};
-    if (name !== undefined) updateData.name = name;
-    if (code !== undefined) updateData.code = code;
-    if (address !== undefined) updateData.address = address;
-    if (phone !== undefined) updateData.phone = phone;
-    if (email !== undefined) updateData.email = email;
-    if (district_id !== undefined) updateData.district_id = district_id;
+    if (name !== undefined) updateData.name = name as string;
+    if (code !== undefined) updateData.code = code as string;
+    if (address !== undefined) updateData.address = address as string;
+    if (phone !== undefined) updateData.phone = phone as string;
+    if (email !== undefined) updateData.email = email as string;
+    if (district_id !== undefined) updateData.district_id = district_id as number;
 
     const school = await prisma.school.update({
       where: { id: id as number },

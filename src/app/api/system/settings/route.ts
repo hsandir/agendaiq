@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const settings = await prisma.systemSetting.findMany({
+    const settings = await prisma.system_setting.findMany({
       orderBy: {
         key: 'asc'
       }
@@ -48,7 +48,7 @@ export async function PUT(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const { _settings } = body;
 
     if (!settings ?? typeof settings !== 'object') {
@@ -64,7 +64,7 @@ export async function PUT(request: NextRequest) {
     // Update each setting
     for (const [key, value] of Object.entries(settings)) {
       try {
-        const updatedSetting = await prisma.systemSetting.upsert({
+        const updatedSetting = await prisma.system_setting.upsert({
           where: { key },
           update: { value: value as Record<string, unknown> },
           create: { key, value: value as Record<string, unknown> }

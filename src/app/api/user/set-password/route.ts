@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from '@/lib/auth/api-auth';
+import { withAuth } from '../../../../lib/auth/api-auth';
 import { hash } from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../../../../lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,13 +11,13 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await request.json() as Record<string, unknown>;
-    const { _newPassword, _confirmPassword } = data;
+    const { newPassword, confirmPassword } = data;
 
-    if (newPassword !== confirmPassword) {
+    if ((newPassword as string) !== (confirmPassword as string)) {
       return new NextResponse("Passwords do not match", { status: 400 });
     }
 
-    if (newPassword.length < 8) {
+    if ((newPassword as string).length < 8) {
       return new NextResponse("Password must be at least 8 characters long", { status: 400 });
     }
 
@@ -30,10 +30,10 @@ export async function POST(request: NextRequest) {
       return new NextResponse("Password already set", { status: 400 });
     }
 
-    const hashedPassword = await hash(newPassword, 12);
+    const hashedPassword = await hash(newPassword as string, 12);
     await prisma.users.update({
       where: { email: auth.user.email! },
-      data: { hashedPassword },
+      data: { hashed_password: hashedPassword },
     });
 
     return new NextResponse("Password set successfully", { status: 200 });

@@ -45,15 +45,15 @@ export async function GET(request: NextRequest, props: Props) {
 
     const meetingId = parseInt(params.id);
 
-    const agendaItems = await prisma.meetingAgendaItem.findMany({
+    const agendaItems = await prisma.meeting_agenda_items.findMany({
       where: { meeting_id: meetingId },
       include: {
-        responsible_staff: {
+        staff: {
           include: {
             users: true
           }
         },
-        comments: {
+        agenda_item_comments: {
           include: {
             staff: {
               include: {
@@ -62,10 +62,10 @@ export async function GET(request: NextRequest, props: Props) {
             }
           }
         },
-        attachments: true,
-        action_items: {
+        agenda_item_attachments: true,
+        meeting_action_items: {
           include: {
-            AssignedTo: {
+            assigned_to: {
               include: {
                 users: true
               }
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest, props: Props) {
     const user = authResult.user!;
 
     const meetingId = parseInt(params.id);
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     
     const result = createAgendaItemsSchema.safeParse(body);
     if (!result.success) {
@@ -166,34 +166,34 @@ export async function POST(request: NextRequest, props: Props) {
     if (isSingleAddition) {
       // For single item addition, just add it without deleting existing items
       // Remove id field if it exists to avoid unique constraint error
-      const { _id, ..._itemData } = result.data.items[0];
-      const newItem = await prisma.meetingAgendaItem.create({
+      const { id: _id, ...itemData } = result.data.items[0];
+      const newItem = await prisma.meeting_agenda_items.create({
         data: {
           meeting_id: meetingId,
           ...itemData
         },
         include: {
-          responsible_staff: {
+          staff: {
             include: {
               users: true
             }
           },
-          comments: true,
-          action_items: true
+          agenda_item_comments: true,
+          meeting_action_items: true
         }
       });
       createdItems = [newItem];
     } else {
       // For bulk update, delete existing and create new
-      await prisma.meetingAgendaItem.deleteMany({
+      await prisma.meeting_agenda_items.deleteMany({
         where: { meeting_id: meetingId }
       });
 
       // Create new agenda items using createMany for better performance
       // Remove id field from each item to avoid unique constraint errors
-      await prisma.meetingAgendaItem.createMany({
+      await prisma.meeting_agenda_items.createMany({
         data: result.data.items.map(item => {
-          const { _id, ..._itemData } = item;
+          const { id: _id, ...itemData } = item;
           return {
             meeting_id: meetingId,
             ...itemData
@@ -202,16 +202,16 @@ export async function POST(request: NextRequest, props: Props) {
       });
 
       // Fetch the created items
-      createdItems = await prisma.meetingAgendaItem.findMany({
+      createdItems = await prisma.meeting_agenda_items.findMany({
         where: { meeting_id: meetingId },
         include: {
-          responsible_staff: {
+          staff: {
             include: {
               users: true
             }
           },
-          comments: true,
-          action_items: true
+          agenda_item_comments: true,
+          meeting_action_items: true
         },
         orderBy: { order_index: 'asc' }
       });
@@ -291,7 +291,7 @@ export async function PUT(request: NextRequest, props: Props) {
     const user = authResult.user!;
 
     const meetingId = parseInt(params.id);
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     
     const result = createAgendaItemsSchema.safeParse(body);
     if (!result.success) {
@@ -345,7 +345,7 @@ export async function PUT(request: NextRequest, props: Props) {
     }
 
     // Delete all existing agenda items for this meeting
-    await prisma.meetingAgendaItem.deleteMany({
+    await prisma.meeting_agenda_items.deleteMany({
       where: { meeting_id: meetingId }
     });
 
@@ -353,22 +353,22 @@ export async function PUT(request: NextRequest, props: Props) {
     const createdItems = await Promise.all(
       result.data.items.map(async (item, index) => {
         // Remove id field if it exists to avoid unique constraint error
-        const { _id, ..._itemData } = item as any;
+        const { id: _id, ...itemData } = item as any;
         
-        return prisma.meetingAgendaItem.create({
+        return prisma.meeting_agenda_items.create({
           data: {
             meeting_id: meetingId,
             ...itemData,
             order_index: index
           },
           include: {
-            responsible_staff: {
+            staff: {
               include: {
                 users: true
               }
             },
-            comments: true,
-            action_items: true
+            agenda_item_comments: true,
+            meeting_action_items: true
           }
         });
       })

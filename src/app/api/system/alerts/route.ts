@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
     const user = authResult.user!;
 
     // Parse request body
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
 
     // REQUIRED: Input validation
     if (!body.REQUIRED_FIELD) {
@@ -178,7 +178,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const user = authResult.user!;
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
 
     // Your update logic here
     // const result = await prisma.MODEL_NAME.update({

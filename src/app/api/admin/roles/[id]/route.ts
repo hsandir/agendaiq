@@ -5,17 +5,18 @@ import { Capability } from "@/lib/auth/policy";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { _id } = params;
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
   const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
 
   try {
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
-    const { _title, _priority, _category, _department_id } = body as { title?: string; priority?: number; category?: string; department_id?: number | string };
+    const body = await request.json() as Record<string, unknown>;
+    const { title, priority, category, department_id } = body as { title?: string; priority?: number; category?: string; department_id?: number | string };
 
     if (!title) {
       return NextResponse.json(
@@ -55,9 +56,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { _id } = params;
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
   const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });

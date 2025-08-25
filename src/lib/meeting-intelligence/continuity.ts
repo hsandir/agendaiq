@@ -11,7 +11,7 @@ export class MeetingContinuityService {
   static async getUnresolvedItems(meetingId: number): Promise<MeetingContinuityData> {
     const [agendaItems, actionItems] = await Promise.all([
       // Get unresolved agenda items
-      prisma.meetingAgendaItem.findMany({
+      prisma.meeting_agenda_items.findMany({
         where: {
           meeting_id: meetingId,
           status: {
@@ -19,13 +19,13 @@ export class MeetingContinuityService {
           }
         },
         include: {
-          responsible_staff: true,
+          staff: true,
           ResponsibleRole: true
         }
       }),
       
       // Get incomplete action items
-      prisma.meetingActionItem.findMany({
+      prisma.meeting_action_items.findMany({
         where: {
           meeting_id: meetingId,
           status: {
@@ -87,7 +87,7 @@ export class MeetingContinuityService {
 
       // Carry forward agenda items
       if (continuityData.carriedItems.length > 0) {
-        await tx.meetingAgendaItem.createMany({
+        await tx.meeting_agenda_items.createMany({
           data: continuityData.carriedItems.map((item, index) => ({
             meeting_id: newMeeting.id,
             topic: `[Carried Forward] ${item.topic}`,
@@ -231,7 +231,7 @@ export class MeetingContinuityService {
     countMeetings(chain.chain);
     
     if (stats.totalCarriedItems > 0) {
-      const items = await prisma.meetingAgendaItem.findMany({
+      const items = await prisma.meeting_agenda_items.findMany({
         where: { 
           meeting_id: meetingId,
           carried_forward: true

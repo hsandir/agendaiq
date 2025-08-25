@@ -37,7 +37,7 @@ export default function RoleHierarchyContent() {
         setStats({
           totalRoles,
           leadershipRoles,
-          totalstaff,
+          totalstaff: totalStaff,
           departments
         });
       } else {

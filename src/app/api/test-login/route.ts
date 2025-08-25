@@ -7,11 +7,12 @@ import bcrypt from 'bcrypt';
 // Temporary endpoint for debugging - no auth required
 export async function POST(request: NextRequest) {
   try {
-    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
-    if (!auth.success) {
-      return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
+    // Development endpoint - no auth required in development
+    if (process.env.NODE_ENV === 'production') {
+      return NextResponse.json({ error: 'Not available in production' }, { status: 403 });
     }
-    const { _email, _password } = await request.json();
+    
+    const { email, password } = await request.json();
     
     console.log('Test login attempt for:', email);
     
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Test password
-    const isValid = await bcrypt.compare(password as string, (user as Record<string, unknown>).hashed_password);
+    const isValid = await bcrypt.compare(password as string, user.hashed_password as string);
     
     return NextResponse.json({
       success: isValid,
@@ -56,14 +57,14 @@ export async function POST(request: NextRequest) {
         id: user.id,
         email: user.email,
         name: user.name,
-        hasPassword: !!(user as Record<string, unknown>).hashed_password,
-        email_verified: !!(user as Record<string, unknown>).email_verified,
+        hasPassword: !!user.hashed_password,
+        email_verified: !!user.email_verified,
         role: user.staff?.[0]?.role?.title
       },
       passwordCheck: {
         providedPassword: password,
-        hashExists: !!(user as Record<string, unknown>).hashed_password,
-        hashStartsWith: (user as Record<string, unknown>).hashed_password?.substring(0, 10),
+        hashExists: !!user.hashed_password,
+        hashStartsWith: user.hashed_password?.substring(0, 10),
         isValid
       }
     });

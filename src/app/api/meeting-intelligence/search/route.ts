@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     
     // Search agenda items
     if (type === 'all' || type === 'agenda') {
-      const agendaItems = await prisma.meetingAgendaItem.findMany({
+      const agendaItems = await prisma.meeting_agenda_items.findMany({
         where: {
           OR: [
             { topic: { contains: query, mode: 'insensitive' } },
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
     
     // Search action items
     if (type === 'all' || type === 'actions') {
-      const actionItems = await prisma.meetingActionItem.findMany({
+      const actionItems = await prisma.meeting_action_items.findMany({
         where: {
           OR: [
             { title: { contains: query, mode: 'insensitive' } },

@@ -2,7 +2,7 @@ import { LRUCache } from 'lru-cache';
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
-import type { User } from '@prisma/client';
+import type { users } from '@prisma/client';
 
 // Advanced rate limiting configuration
 export interface AdvancedRateLimitOptions {
@@ -195,8 +195,8 @@ export class AdvancedRateLimiter {
       return this.createAllowedResult(limit, limit);
     }
 
-    const { ___success, limit: ___redisLimit, ___remaining, ___reset  } = await redisRateLimiter.limit(
-      `${this.options.___customKeyPrefix}:${___token}`
+    const { success, limit: redisLimit, remaining, reset } = await redisRateLimiter.limit(
+      `${this.options.customKeyPrefix || 'default'}:${token}`
     );
 
     if (!success) {

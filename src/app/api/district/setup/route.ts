@@ -10,8 +10,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
-    const { _name, _address } = body;
+    const body = await request.json() as Record<string, unknown>;
+    const { name, _address } = body;
 
     if (!name) {
       return NextResponse.json(

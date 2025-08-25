@@ -42,7 +42,7 @@ export async function PATCH(
     }
 
     // Parse and validate request body
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const validationResult = updateSchema.safeParse(body);
 
     if (!validationResult.success) {
@@ -53,7 +53,7 @@ export async function PATCH(
     }
 
     // Check if agenda item exists and user has permission
-    const agendaItem = await prisma.meetingAgendaItem.findUnique({
+    const agendaItem = await prisma.meeting_agenda_items.findUnique({
       where: { id: itemId },
       include: {
         meeting: {
@@ -86,17 +86,17 @@ export async function PATCH(
     }
 
     // Update the agenda item
-    const updatedItem = await prisma.meetingAgendaItem.update({
+    const updatedItem = await prisma.meeting_agenda_items.update({
       where: { id: itemId },
       data: validationResult.data,
       include: {
-        responsible_staff: {
+        staff: {
           include: {
             users: true
           }
         },
-        comments: true,
-        action_items: true
+        agenda_item_comments: true,
+        meeting_action_items: true
       }
     });
 
@@ -156,7 +156,7 @@ export async function DELETE(
     }
 
     // Delete the agenda item
-    await prisma.meetingAgendaItem.delete({
+    await prisma.meeting_agenda_items.delete({
       where: { id: itemId }
     });
 

@@ -25,7 +25,7 @@ export function DashboardLayoutClient({
   isAdmin, 
   user, 
   currentrole, 
-  userWithStaff 
+  userWithstaff 
 }: DashboardLayoutClientProps) {
   // Start with a default layout to avoid hydration mismatch
   const [layoutId, setLayoutId] = useState(() => {
@@ -116,7 +116,7 @@ export function DashboardLayoutClient({
         <main className="flex flex-col min-h-screen">
           <header className="flex items-center justify-between px-4 sm:px-6 lg:px-12 py-4 sm:py-7 bg-background/95 backdrop-blur border-b border-border sticky top-0 z-10">
             <div className="flex items-center gap-4">
-              <MobileMenu user={user} currentRole={currentRole} isAdmin={isAdmin} />
+              <MobileMenu user={user} currentRole={currentrole} isAdmin={isAdmin} />
               <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
                 Dashboard - Meeting Intelligence Platform
               </h1>
@@ -138,7 +138,7 @@ export function DashboardLayoutClient({
               <div className="hidden lg:flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">{user.email}</span>
                 <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded-full font-medium">
-                  {currentRole?.title || 'No Role'}
+                  {currentrole?.title || 'No Role'}
                 </span>
               </div>
               <button
@@ -171,12 +171,12 @@ export function DashboardLayoutClient({
         <main className="flex-1 flex flex-col">
           <header className="flex items-center justify-between px-4 py-3 bg-card border-b border-border">
             <div className="flex items-center gap-3">
-              <MobileMenu user={user} currentRole={currentRole} isAdmin={isAdmin} />
+              <MobileMenu user={user} currentRole={currentrole} isAdmin={isAdmin} />
               <h1 className="text-lg font-semibold text-foreground">Dashboard - Meeting Intelligence Platform</h1>
             </div>
             <div className="hidden md:flex items-center gap-2">
               <span className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded font-medium">
-                {currentRole?.title || 'No Role'}
+                {currentrole?.title || 'No Role'}
               </span>
               <button
                 onClick={() => signOut({ callbackUrl: '/auth/signin' })}
@@ -201,7 +201,7 @@ export function DashboardLayoutClient({
       <div className="min-h-screen bg-background text-foreground" data-layout="minimal">
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-6 py-4 border-b border-border/30">
           <div className="flex items-center gap-4 sm:gap-6">
-            <MobileMenu user={user} currentRole={currentRole} isAdmin={isAdmin} />
+            <MobileMenu user={user} currentRole={currentrole} isAdmin={isAdmin} />
             <h1 className="text-lg sm:text-xl font-bold text-foreground">AgendaIQ</h1>
             
             {/* Minimal Navigation */}
@@ -272,7 +272,7 @@ export function DashboardLayoutClient({
           <div className="hidden md:flex items-center gap-3 mt-3 sm:mt-0">
             <span className="text-sm text-muted-foreground">{user.email}</span>
             <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">
-              {currentRole?.title || 'No Role'}
+              {currentrole?.title || 'No Role'}
             </span>
             <button
               onClick={() => signOut({ callbackUrl: '/auth/signin' })}
@@ -299,7 +299,7 @@ export function DashboardLayoutClient({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center gap-3 sm:gap-6">
-              <MobileMenu user={user} currentRole={currentRole} isAdmin={isAdmin} />
+              <MobileMenu user={user} currentRole={currentrole} isAdmin={isAdmin} />
               <Link
                 href="/dashboard"
                 className="flex items-center px-3 py-2 font-semibold text-primary hover:text-primary/80 transition-colors"
@@ -539,7 +539,7 @@ export function DashboardLayoutClient({
                   {user.email}
                 </span>
                 <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">
-                  {currentRole?.title || 'No Role'}
+                  {currentrole?.title || 'No Role'}
                 </span>
                 <button
                   onClick={() => signOut({ callbackUrl: '/auth/signin' })}

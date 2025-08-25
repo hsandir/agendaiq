@@ -31,7 +31,7 @@ export async function GET(
       );
     }
 
-    const comments = await prisma.agendaItemComment.findMany({
+    const comments = await prisma.agenda_item_comments.findMany({
       where: { agenda_item_id: itemId },
       include: {
         staff: {
@@ -83,7 +83,7 @@ export async function POST(
     }
 
     // Parse and validate request body
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const validationResult = createCommentSchema.safeParse(body);
 
     if (!validationResult.success) {
@@ -94,7 +94,7 @@ export async function POST(
     }
 
     // Check if user has access to this meeting
-    const agendaItem = await prisma.meetingAgendaItem.findUnique({
+    const agendaItem = await prisma.meeting_agenda_items.findUnique({
       where: { id: itemId },
       include: {
         meeting: {
@@ -127,7 +127,7 @@ export async function POST(
     }
 
     // Create the comment
-    const comment = await prisma.agendaItemComment.create({
+    const comment = await prisma.agenda_item_comments.create({
       data: {
         comment: validationResult.data.content,
         agenda_item_id: itemId,

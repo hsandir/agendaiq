@@ -52,10 +52,12 @@ const nextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
   },
   
+  // Typed Routes
+  typedRoutes: true,
+  
   // Performance optimizations
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'date-fns'],
-    typedRoutes: true,
     // clientTraceMetadata disabled - Sentry subscription expired
   },
   
@@ -134,6 +136,12 @@ const nextConfig = {
         tls: false,
       };
     }
+    
+    // Add path alias resolution for @/ imports
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': new URL('./src', import.meta.url).pathname,
+    };
     
     // Ignore Prisma instrumentation warnings
     config.module = {

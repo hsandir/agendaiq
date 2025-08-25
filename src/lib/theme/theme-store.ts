@@ -65,23 +65,23 @@ class ThemeStore {
   }
   
   getCustomTheme(): CustomTheme | null {
-    return this.custom_theme;
+    return this.customTheme;
   }
   
   setCustomTheme(theme: CustomTheme | null): void {
-    this.custom_theme = theme;
+    this.customTheme = theme;
   }
   
   needsSync(): boolean {
     const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
-    return !this.initialized ?? this.lastSyncTime < fiveMinutesAgo;
+    return !this.initialized || this.lastSyncTime < fiveMinutesAgo;
   }
   
   reset(): void {
     this.initialized = false;
     this.lastSyncTime = 0;
     this.currentTheme = null;
-    this.custom_theme = null;
+    this.customTheme = null;
   }
 }
 

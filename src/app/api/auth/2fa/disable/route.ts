@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     const user = authResult.user!;
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     
     if (!body?.token) {
       return NextResponse.json(

@@ -22,7 +22,7 @@ const updateKnowledgeSchema = z.object({
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string; knowledgeId: string } }
+  { params }: { params: Promise<{ id: string; knowledgeId: string }> }
 ) {
   try {
     const auth = await withAuth(request, { requireAuth: true });
@@ -31,8 +31,9 @@ export async function GET(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const teamId = params.id;
-    const knowledgeId = parseInt(params.knowledgeId);
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
+    const knowledgeId = parseInt(resolvedParams.knowledgeId);
 
     const knowledge = await prisma.team_knowledge.findUnique({
       where: {
@@ -79,7 +80,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string; knowledgeId: string } }
+  { params }: { params: Promise<{ id: string; knowledgeId: string }> }
 ) {
   try {
     const auth = await withAuth(request, { requireAuth: true });
@@ -88,15 +89,16 @@ export async function PUT(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const teamId = params.id;
-    const knowledgeId = parseInt(params.knowledgeId);
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
+    const knowledgeId = parseInt(resolvedParams.knowledgeId);
+    const body = await request.json() as Record<string, unknown>;
 
     // Validate input
     const validatedData = updateKnowledgeSchema.parse(body);
 
     // Check if user is team member
-    const { _user } = auth;
+    const { user } = auth;
     const staff = await prisma.staff.findFirst({
       where: { user_id: user.id }
     });
@@ -195,7 +197,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; knowledgeId: string } }
+  { params }: { params: Promise<{ id: string; knowledgeId: string }> }
 ) {
   try {
     const auth = await withAuth(request, { requireAuth: true });
@@ -204,11 +206,12 @@ export async function DELETE(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const teamId = params.id;
-    const knowledgeId = parseInt(params.knowledgeId);
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
+    const knowledgeId = parseInt(resolvedParams.knowledgeId);
 
     // Check if user is team member
-    const { _user } = auth;
+    const { user } = auth;
     const staff = await prisma.staff.findFirst({
       where: { user_id: user.id }
     });

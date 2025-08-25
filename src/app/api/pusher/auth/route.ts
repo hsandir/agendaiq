@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const user = authResult.user!;
 
     // Get the request body
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const socketId = body?.socket_id;
     const channel = body?.channel_name;
 

@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   try {
     // Get test history from audit logs or create a test_runs table in future
     // For now, we'll use audit logs to track test runs
-    const testLogs = await prisma.auditLog.findMany({
+    const testLogs = await prisma.audit_logs.findMany({
       where: {
         table_name: 'test_run',
         operation: 'CREATE'
@@ -56,11 +56,11 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const { _passed, _failed, _coverage, _duration  } = body;
 
     // Log test run in audit log
-    await prisma.auditLog.create({
+    await prisma.audit_logs.create({
       data: {
         table_name: 'test_run',
         record_id: Date.now().toString(),

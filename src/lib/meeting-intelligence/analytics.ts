@@ -54,7 +54,7 @@ export class MeetingAnalyticsService {
           }
         }
       }),
-      prisma.meetingActionItem.findMany({
+      prisma.meeting_action_items.findMany({
         where: {
           meeting: where
         },
@@ -93,7 +93,7 @@ export class MeetingAnalyticsService {
     const participationRate = totalMeetings > 0 ? totalAttendees / totalMeetings : 0;
 
     // Calculate carry forward rate
-    const meetingsWithCarriedItems = meetings.filter(m => m.MeetingAgendaItems.length > 0).length;
+    const meetingsWithCarriedItems = meetings.filter(m => m.meeting_agenda_items.length > 0).length;
     const carryForwardRate = totalMeetings > 0 ? (meetingsWithCarriedItems / totalMeetings) * 100 : 0;
 
     // Get department breakdown
@@ -134,7 +134,7 @@ export class MeetingAnalyticsService {
           select: { name: true }
         }),
         prisma.meeting.count({ where }),
-        prisma.meetingActionItem.findMany({
+        prisma.meeting_action_items.findMany({
           where: {
             meeting: where
           },
@@ -286,7 +286,7 @@ export class MeetingAnalyticsService {
       }
     }
 
-    const attendance = await prisma.meetingAttendee.findMany({
+    const attendance = await prisma.meeting_attendee.findMany({
       where,
       include: {
         staff: {
@@ -372,7 +372,7 @@ export class MeetingAnalyticsService {
       }
     }
 
-    const actionItems = await prisma.meetingActionItem.findMany({
+    const actionItems = await prisma.meeting_action_items.findMany({
       where,
       include: {
         assigned_to: {
@@ -490,8 +490,8 @@ export class MeetingAnalyticsService {
     }
 
     // Factor 2: Agenda completion
-    const totalAgendaItems = meeting.MeetingAgendaItems.length;
-    const resolvedItems = meeting.MeetingAgendaItems.filter(i => i.status === 'Resolved').length;
+    const totalAgendaItems = meeting.meeting_agenda_items.length;
+    const resolvedItems = meeting.meeting_agenda_items.filter(i => i.status === 'Resolved').length;
     if (totalAgendaItems > 0) {
       const completionRate = (resolvedItems / totalAgendaItems) * 20;
       score += completionRate;

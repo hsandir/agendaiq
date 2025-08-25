@@ -118,7 +118,7 @@ export async function POST(request: NextRequest, props: Props) {
       return NextResponse.json({ error: "Invalid meeting ID" }, { status: 400 });
     }
 
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const result = createNoteSchema.safeParse(body);
     if (!result.success) {
       return NextResponse.json(

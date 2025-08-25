@@ -18,7 +18,7 @@ describe('Meeting Creation Integration', () => {
     // Clean up test data using real database
     await prisma.meetingAttendee.deleteMany();
     await prisma.meetingAgendaItem.deleteMany();
-    await prisma.meetingActionItem.deleteMany();
+    await prisma.meeting_action_items.deleteMany();
     await prisma.meeting.deleteMany();
   });
 

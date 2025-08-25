@@ -32,7 +32,7 @@ export async function POST(
     }
 
     // Check if user has access
-    const agendaItem = await prisma.meetingAgendaItem.findUnique({
+    const agendaItem = await prisma.meeting_agenda_items.findUnique({
       where: { id: itemId },
       include: {
         meeting: {
@@ -94,7 +94,7 @@ export async function POST(
     await writeFile(filePath, buffer);
 
     // Create database record
-    const attachment = await prisma.agendaItemAttachment.create({
+    const attachment = await prisma.agenda_item_attachments.create({
       data: {
         agenda_item_id: itemId,
         file_name: file.name,
@@ -141,7 +141,7 @@ export async function GET(
       );
     }
 
-    const attachments = await prisma.agendaItemAttachment.findMany({
+    const attachments = await prisma.agenda_item_attachments.findMany({
       where: { agenda_item_id: itemId },
       include: {
         UploadedBy: {

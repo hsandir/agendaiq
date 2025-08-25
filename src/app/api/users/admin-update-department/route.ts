@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { withApiErrorHandling } from "@/lib/api/error-utils";
-import { withAuth } from "@/lib/auth/api-auth";
-import { Capability } from "@/lib/auth/policy";
+import { prisma } from "../../../../lib/prisma";
+import { withApiErrorHandling } from "../../../../lib/api/error-utils";
+import { withAuth } from "../../../../lib/auth/api-auth";
+import { Capability } from "../../../../lib/auth/policy";
 
 export async function PUT(request: NextRequest) {
   return withApiErrorHandling(async () => {
@@ -11,7 +11,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const { _userId, _departmentId } = (await request.json()) as Record<_string, unknown>;
+    const { userId, departmentId } = (await request.json()) as Record<string, unknown>;
     const userIdNum = Number(userId);
     if (!userIdNum || !departmentId) {
       return NextResponse.json(
@@ -29,7 +29,7 @@ export async function PUT(request: NextRequest) {
     // Update the staff's department
     const updatedStaff = await prisma.staff.update({
       where: { id: staff?.id },
-      data: { department_id: parseInt(departmentId) },
+      data: { department_id: parseInt(departmentId as string) },
       include: { role: true, department: true },
     });
 

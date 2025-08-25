@@ -24,7 +24,7 @@ interface Role {
 }
 
 export default function RoleHierarchyVisualizationContent() {
-  const [selectedrole, setSelectedRole] = useState<Role | null>(null);
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
   const handleRoleSelect = (role: Role) => {
     setSelectedRole(role);

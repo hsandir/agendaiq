@@ -182,8 +182,9 @@ export default function TeamSettingsPage() {
         }
       });
     } catch (err) {
-    if (err instanceof Error) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      if (err instanceof Error) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      }
     } finally {
       setLoading(false);
     }

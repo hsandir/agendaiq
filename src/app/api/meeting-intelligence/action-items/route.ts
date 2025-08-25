@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth/api-auth';
-import { prisma } from '@/lib/prisma';
+import { withAuth } from '../../../../lib/auth/api-auth';
+import { prisma } from '../../../../lib/prisma';
 
 export async function GET(request: NextRequest) {
   const authResult = await withAuth(request);
@@ -27,8 +27,8 @@ export async function GET(request: NextRequest) {
       const teamMembers = await prisma.staff.findMany({
         where: {
           OR: [
-            { department_id: parseInt(user).staff.department.id },
-            { manager_id: parseInt(user).staff.id }
+            { department_id: (user.staff as { department?: { id: number } })?.department?.id },
+            { manager_id: (user.staff as { id: number })?.id }
           ]
         },
         select: { id: true }
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Fetch action items
-    const actionItems = await prisma.meetingActionItem.findMany({
+    const actionItems = await prisma.meeting_action_items.findMany({
       where: whereConditions,
       include: {
         meeting: {
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
             role: true
           }
         },
-        AssignedTorole: true
+        assigned_to_role: true
       },
       orderBy: [
         { priority: 'desc' },
@@ -106,22 +106,22 @@ export async function GET(request: NextRequest) {
         dueDate: item.due_date?.toISOString(),
         created_at: item.created_at.toISOString(),
         completedAt: item.completed_at?.toISOString(),
-        assignedrole: item.AssignedToRole ? {
-          id: item.AssignedToRole.id,
-          label: item.AssignedToRole.key ?? 'UNASSIGNED'
+        assignedrole: item.assigned_to_role ? {
+          id: item.assigned_to_role.id,
+          label: item.assigned_to_role.key ?? 'UNASSIGNED'
         } : {
           id: 0,
           label: 'UNASSIGNED'
         },
-        assignedstaff: item.AssignedTo ? {
-          id: item.AssignedTo.id,
-          name: item.AssignedTo.users.name ?? 'Unknown',
-          email: item.AssignedTo.users.email
+        assignedstaff: item.assigned_to ? {
+          id: item.assigned_to.id,
+          name: item.assigned_to.users.name ?? 'Unknown',
+          email: item.assigned_to.users.email
         } : undefined,
-        meeting: item.Meeting ? {
+        meeting: item.meeting ? {
           id: item.meeting.id,
           title: item.meeting.title,
-          date: item.meeting.start_time?.toISOString() || new Date().toISOString()
+          date: item.meeting.start_time?.toISOString() ?? new Date().toISOString()
         } : undefined,
         carriedForwardCount: item.carry_forward_count ?? 0,
         parentItemId: item.parent_action_id
@@ -168,15 +168,15 @@ export async function PATCH(request: NextRequest) {
   }
 
   try {
-    const { _itemId, _status } = (await request.json()) as Record<_string, unknown>;
+    const { itemId, status } = (await request.json()) as Record<string, unknown>;
     
     const updateData: Record<string, unknown> = { status };
     if (status === 'completed') {
       updateData.completed_at = new Date();
     }
     
-    const updated = await prisma.meetingActionItem.update({
-      where: { id: itemId },
+    const updated = await prisma.meeting_action_items.update({
+      where: { id: itemId as number },
       data: updateData
     });
     

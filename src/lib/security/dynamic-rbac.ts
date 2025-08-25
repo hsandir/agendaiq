@@ -283,7 +283,7 @@ export class DynamicRBAC {
     const childRoles: string[] = [];
     
     try {
-      const hierarchy = await prisma.roleHierarchy.findMany({
+      const hierarchy = await prisma.role_hierarchy.findMany({
         where: { parent_role_id: parseInt(roleId) }
       });
 
@@ -305,7 +305,7 @@ export class DynamicRBAC {
     const parentRoles: string[] = [];
     
     try {
-      const hierarchy = await prisma.roleHierarchy.findMany({
+      const hierarchy = await prisma.role_hierarchy.findMany({
         where: { child_role_id: parseInt(roleId) }
       });
 

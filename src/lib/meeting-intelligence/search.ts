@@ -151,16 +151,16 @@ export class MeetingSearchService {
           excerpt = this.highlightText(meeting.action_items, searchTerm);
         }
         // Check agenda items
-        else if (meeting.MeetingAgendaItems.length > 0) {
+        else if (meeting.meeting_agenda_items.length > 0) {
           relevance += 5;
           matchedIn = 'agenda';
-          excerpt = meeting.MeetingAgendaItems[0].topic;
+          excerpt = meeting.meeting_agenda_items[0].topic;
         }
         // Check action items
-        else if (meeting.MeetingActionItems.length > 0) {
+        else if (meeting.meeting_action_items.length > 0) {
           relevance += 4;
           matchedIn = 'actions';
-          excerpt = meeting.MeetingActionItems[0].title;
+          excerpt = meeting.meeting_action_items[0].title;
         }
       } else {
         excerpt = meeting.description ?? meeting.title;
@@ -221,7 +221,7 @@ export class MeetingSearchService {
       };
     }
 
-    return await prisma.meetingAgendaItem.findMany({
+    return await prisma.meeting_agenda_items.findMany({
       where,
       include: {
         meeting: {
@@ -231,7 +231,7 @@ export class MeetingSearchService {
             start_time: true
           }
         },
-        responsible_staff: {
+        staff: {
           include: {
             users: {
               select: {
@@ -274,7 +274,7 @@ export class MeetingSearchService {
     // Extract keywords from title and agenda items
     const keywords = [
       ...meeting.title.toLowerCase().split(' '),
-      ...meeting.MeetingAgendaItems.flatMap(item => 
+      ...meeting.meeting_agenda_items.flatMap(item => 
         item.topic.toLowerCase().split(' ')
       )
     ].filter(word => word.length > 3);
@@ -340,7 +340,7 @@ export class MeetingSearchService {
       where.assigned_to_role = filters.assignedToRoleId;
     }
 
-    return await prisma.meetingActionItem.findMany({
+    return await prisma.meeting_action_items.findMany({
       where,
       include: {
         meeting: {
@@ -395,7 +395,7 @@ export class MeetingSearchService {
     }
 
     if (type === 'all' || type === 'agenda') {
-      const agendaItems = await prisma.meetingAgendaItem.findMany({
+      const agendaItems = await prisma.meeting_agenda_items.findMany({
         where: {
           topic: { contains: searchTerm, mode: 'insensitive' }
         },
@@ -407,7 +407,7 @@ export class MeetingSearchService {
     }
 
     if (type === 'all' || type === 'actions') {
-      const actionItems = await prisma.meetingActionItem.findMany({
+      const actionItems = await prisma.meeting_action_items.findMany({
         where: {
           title: { contains: searchTerm, mode: 'insensitive' }
         },

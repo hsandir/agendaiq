@@ -48,7 +48,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     globalThemeState.currentThemeId,
   );
   const [customTheme, setCustomTheme] = useState<CustomTheme | undefined>(
-    globalThemeState.custom_theme,
+    globalThemeState.customTheme,
   );
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -69,7 +69,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     if (savedCustomTheme) {
       try {
         const parsed = JSON.parse(savedCustomTheme);
-        globalThemeState.custom_theme = parsed;
+        globalThemeState.customTheme = parsed;
         setCustomTheme(parsed);
       } catch (e: unknown) {
         console.error("Failed to parse custom theme");
@@ -111,12 +111,12 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
             fetch("/api/user/custom-theme")
               .then((res) => (res.ok ? res.json() : null))
               .then((data) => {
-                if (data?.custom_theme) {
-                  globalThemeState.custom_theme = data.custom_theme;
-                  setCustomTheme(data.custom_theme);
+                if (data?.customTheme) {
+                  globalThemeState.customTheme = data.customTheme;
+                  setCustomTheme(data.customTheme);
                   localStorage.setItem(
                     "agendaiq-custom-theme",
-                    JSON.stringify(data.custom_theme),
+                    JSON.stringify(data.customTheme),
                   );
                 }
               })
@@ -139,7 +139,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
           id: "custom",
           name: customTheme.name || "Custom Theme",
           description: "Your personalized theme",
-          ...custom_theme,
+          ...customTheme,
         } satisfies Theme)
       : themes.find((t) => t.id === currentThemeId) || themes[0];
 
@@ -276,7 +276,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
   // Handle custom theme update
   const handleSetCustomTheme = useCallback((theme: CustomTheme) => {
     setCustomTheme(theme);
-    globalThemeState.custom_theme = theme;
+    globalThemeState.customTheme = theme;
     localStorage.setItem("agendaiq-custom-theme", JSON.stringify(theme));
 
     // Save to database in background
@@ -296,7 +296,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
           id: "custom",
           name: customTheme.name || "Custom Theme",
           description: "Your personalized theme",
-          ...custom_theme,
+          ...customTheme,
         } satisfies Theme)
       : themes.find((t) => t.id === currentThemeId) || themes[0];
 

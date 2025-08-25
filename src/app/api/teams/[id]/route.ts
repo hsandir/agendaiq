@@ -11,7 +11,7 @@ import { FEATURES } from '@/lib/features/feature-flags';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check feature flag
@@ -31,8 +31,9 @@ export async function GET(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
-    const teamId = params.id;
+    const { user } = auth;
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
 
     // Get user's staff record
     const staff = await prisma.staff.findFirst({
@@ -63,16 +64,12 @@ export async function GET(
         },
         team_knowledge: {
           include: {
-            created_by: {
-              include: {
-                users: {
-                  select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    image: true
-                  }
-                }
+            users: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true
               }
             }
           },
@@ -137,7 +134,7 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check feature flag
@@ -157,11 +154,12 @@ export async function PUT(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
-    const teamId = params.id;
+    const { user } = auth;
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
 
     // Parse request body
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     
     const updateSchema = z.object({
       name: z.string().min(1).max(100).optional(),
@@ -268,7 +266,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check feature flag
@@ -288,8 +286,9 @@ export async function DELETE(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
-    const teamId = params.id;
+    const { user } = auth;
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
 
     // Only admins can delete teams
     if (!user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {

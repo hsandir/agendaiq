@@ -47,10 +47,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
-    const { _name, ___address, ____city, ____state, ____zipCode, ____phone, ____website, ___logo  } = body;
+    const body = await request.json() as Record<string, unknown>;
+    const { name, address, city, state, zipCode, phone, website, logo } = body as { name?: string; address?: string; city?: string; state?: string; zipCode?: string; phone?: string; website?: string; logo?: string };
 
-    if ((!name ?? (typeof name !== "string")) || String(name).trim().length === 0) {
+    if (!name || typeof name !== "string" || String(name).trim().length === 0) {
       return new NextResponse("School name is required", { status: 400 });
     }
 

@@ -541,7 +541,7 @@ describe('Meetings CRUD API', () => {
               },
             },
           },
-          MeetingAgendaItems: {
+          meeting_agenda_items: {
             orderBy: {
               order_index: 'asc',
             },
@@ -551,9 +551,9 @@ describe('Meetings CRUD API', () => {
 
       expect(fetchedMeeting).toBeDefined();
       expect(fetchedMeeting?.title).toBe('Detailed Meeting');
-      expect(fetchedMeeting?.MeetingAttendee).toHaveLength(1);
-      expect(fetchedMeeting?.MeetingAgendaItems).toHaveLength(1);
-      expect(fetchedMeeting?.MeetingAgendaItems[0].topic).toBe('Opening Discussion');
+      expect(fetchedMeeting?.meeting_attendee).toHaveLength(1);
+      expect(fetchedMeeting?.meeting_agenda_items).toHaveLength(1);
+      expect(fetchedMeeting?.meeting_agenda_items[0].topic).toBe('Opening Discussion');
     });
 
     it('should return 404 for non-existent meeting', async () => {

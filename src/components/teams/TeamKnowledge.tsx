@@ -68,11 +68,13 @@ interface KnowledgeResource {
   metadata?: any;
   created_at: string;
   updated_at: string;
-  created_by_user: {
-    id: number;
-    name: string | null;
-    email: string;
-    image?: string | null;
+  created_by: {
+    users: {
+      id: number;
+      name: string | null;
+      email: string;
+      image?: string | null;
+    };
   };
   _count: {
     views: number;
@@ -94,7 +96,7 @@ const KNOWLEDGE_TYPES = [
 ];
 
 export function TeamKnowledge({ teamId, canEdit = false }: TeamKnowledgeProps) {
-  const { _toast } = useToast();
+  const { toast } = useToast();
   const [knowledge, setKnowledge] = useState<KnowledgeResource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -131,7 +133,6 @@ export function TeamKnowledge({ teamId, canEdit = false }: TeamKnowledgeProps) {
       const data = await response.json();
       setKnowledge(data.knowledge);
     } catch (err) {
-    if (err instanceof Error) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
@@ -663,13 +664,13 @@ function KnowledgeCard({
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-2">
             <Avatar className="h-5 w-5">
-              <AvatarImage src={resource.created_by_(user as Record<string, unknown>).image || undefined} />
+              <AvatarImage src={resource.created_by.users.image || undefined} />
               <AvatarFallback className="text-xs">
-                {resource.created_by_user.name?.charAt(0) || resource.created_by_user.email.charAt(0)}
+                {resource.created_by.users.name?.charAt(0) || resource.created_by.users.email.charAt(0)}
               </AvatarFallback>
             </Avatar>
             <span>
-              {resource.created_by_user.name || resource.created_by_user.email.split('@')[0]}
+              {resource.created_by.users.name || resource.created_by.users.email.split('@')[0]}
             </span>
           </div>
           <div className="flex items-center gap-1">

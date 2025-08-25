@@ -86,12 +86,12 @@ export function MeetingHistoryModal({
 }: MeetingHistoryModalProps) {
   const [activeTab, setActiveTab] = useState("recent");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selecteddepartment, setSelectedDepartment] = useState("all");
+  const [selectedDepartment, setSelectedDepartment] = useState("all");
   const [selectedTimeRange, setSelectedTimeRange] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedmeeting, setSelectedMeeting] = useState<Meeting | null>(null);
+  const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
   const [includeSubDepartments, setIncludeSubDepartments] = useState(true);
   const [onlyWithActionItems, setOnlyWithActionItems] = useState(false);
   const [selectedMeetingIds, setSelectedMeetingIds] = useState<Set<number>>(new Set());
@@ -102,14 +102,14 @@ export function MeetingHistoryModal({
     if (isOpen) {
       fetchMeetings();
     }
-  }, [isOpen, activeTab, selecteddepartment, selectedTimeRange, selectedStatus]);
+  }, [isOpen, activeTab, selectedDepartment, selectedTimeRange, selectedStatus]);
 
   const fetchMeetings = async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
         tab: activeTab,
-        department: selecteddepartment,
+        department: selectedDepartment,
         timeRange: selectedTimeRange,
         status: selectedStatus,
         search: searchQuery,

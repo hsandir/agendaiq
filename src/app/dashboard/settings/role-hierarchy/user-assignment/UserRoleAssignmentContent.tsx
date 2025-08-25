@@ -43,9 +43,9 @@ export default function UserRoleAssignmentContent() {
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   
   // Selection states
-  const [selectedusers, setSelectedUser] = useState<string>('');
-  const [selectedrole, setSelectedRole] = useState<string>('');
-  const [selecteddepartment, setSelectedDepartment] = useState<string>('');
+  const [selectedUser, setSelectedUser] = useState<string>('');
+  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('');
   
   // Search and filter states
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -138,8 +138,8 @@ export default function UserRoleAssignmentContent() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: selectedusers,
-          roleId: selectedrole,
+          userId: selectedUser,
+          roleId: selectedRole,
           departmentId: selectedDepartment ?? null
         })
       });

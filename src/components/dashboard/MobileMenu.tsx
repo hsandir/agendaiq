@@ -81,7 +81,7 @@ export function MobileMenu({ user, currentrole, isAdmin }: MobileMenuProps) {
               <h2 className="text-xl font-bold text-foreground">AgendaIQ</h2>
               <p className="text-sm text-muted-foreground">{user.email}</p>
               <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium inline-block mt-1">
-                {currentRole?.title || 'No Role'}
+                {currentrole?.title || 'No Role'}
               </span>
             </div>
             <button

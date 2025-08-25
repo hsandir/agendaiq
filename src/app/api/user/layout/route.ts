@@ -81,7 +81,7 @@ export async function PUT(request: NextRequest) {
   const user = auth.user;
 
   try {
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const validatedData = layoutSchema.parse(body);
     
     // Use layoutId if provided, otherwise use layout

@@ -104,12 +104,10 @@ interface TeamKnowledge {
   downloads_count: number;
   created_at: string;
   updated_at: string;
-  created_by: {
-    users: {
-      name: string | null;
-      email: string;
-      image?: string | null;
-    };
+  users?: {
+    name: string | null;
+    email: string;
+    image?: string | null;
   };
   metadata?: any;
 }
@@ -173,8 +171,9 @@ export default function TeamDetailPage() {
         setTeam(prev => prev ? { ...prev, team_knowledge: knowledgeData.knowledge } : null);
       }
     } catch (err) {
-    if (err instanceof Error) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      if (err instanceof Error) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      }
     } finally {
       setLoading(false);
     }
@@ -718,14 +717,14 @@ export default function TeamDetailPage() {
                           {/* Footer */}
                           <div className="flex items-center gap-2 mt-3 pt-3 border-t">
                             <Avatar className="h-6 w-6">
-                              <AvatarImage src={item.created_by.users.image || undefined} />
+                              <AvatarImage src={item.users?.image || undefined} />
                               <AvatarFallback className="text-xs">
-                                {item.created_by.users.name?.charAt(0) || item.created_by.users.email.charAt(0)}
+                                {item.users?.name?.charAt(0) || item.users?.email?.charAt(0)}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 min-w-0">
                               <p className="text-xs font-medium truncate">
-                                {item.created_by.users.name || item.created_by.users.email.split('@')[0]}
+                                {item.users?.name || item.users?.email?.split('@')[0]}
                               </p>
                               <p className="text-xs text-muted-foreground flex items-center gap-1">
                                 <Clock className="h-2 w-2" />

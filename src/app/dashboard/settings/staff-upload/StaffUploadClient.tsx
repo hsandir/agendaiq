@@ -575,7 +575,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
                           {record.actions.length > 0 && (
                             <div className="space-y-2">
                               <select
-                                value={recordActions.get(record.rowNumber) || record.actions[0]?.id ?? ''}
+                                value={recordActions.get(record.rowNumber) || (record.actions[0]?.id ?? '')}
                                 onChange={(e) => {
                                   const action = e.target.value;
                                   if (action === 'partial') {

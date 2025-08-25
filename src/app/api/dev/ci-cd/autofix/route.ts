@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const { ___suggestionId, ___errorType, ___errorMessage, dryRun = ___true, ___customSuggestion  } = body;
 
     // Use custom suggestion if provided, otherwise generate and find

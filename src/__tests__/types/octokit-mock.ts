@@ -51,7 +51,7 @@ export type MockOctokitConstructor = jest.MockedClass<new () => MockOctokit>;
  * Type-safe way to get the mocked Octokit constructor
  */
 export function getMockOctokit(): MockOctokitConstructor {
-  const mockModule = jest.requireMock('@octokit/rest') as Record<string, unknown> as Record<string, unknown> as { Octokit: MockOctokitConstructor };
+  const mockModule = jest.requireMock('@octokit/rest') as { Octokit: MockOctokitConstructor };
   return mockModule.Octokit;
 }
 

@@ -136,7 +136,7 @@ export function isUserAdmin(user: unknown): boolean {
   }
   
   // Check role-based admin
-  if (isUserWithStaff(user) && (user as Record<string, unknown>).Staff?.[0]?.Role) {
+  if (isUserWithStaff(user) && user.Staff?.[0]?.Role) {
     // Do not infer admin via title/priority; rely on flags/capabilities
     return false;
   }

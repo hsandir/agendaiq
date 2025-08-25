@@ -171,7 +171,7 @@ export async function GET(request: NextRequest) {
     response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
     return response;
   } catch (error: unknown) {
-    await Logger.error("Failed to fetch meetings", { error: String(error), userId: user.id, staffId: (user.staff as Record<string, unknown> | null)?.id }, "meetings");
+    await Logger.error("Failed to fetch meetings", { error: String(error), userId: user.id, staffId: user.staff?.id }, "meetings");
     return NextResponse.json({ error: "Failed to fetch meetings" }, { status: 500 });
   }
 }
@@ -200,7 +200,7 @@ export async function POST(request: NextRequest) {
 
     const staffRecord = user.staff;
 
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     
     // Validate request data
     const validationResult = createMeetingSchema.safeParse(body);
@@ -213,7 +213,7 @@ export async function POST(request: NextRequest) {
     
     // Sanitize input data
     const sanitizedData = sanitizeMeetingData(validationResult.data);
-    const { _title, _description, _startTime, _endTime, _zoomLink, _attendeeIds  } = sanitizedData as CreateMeetingRequest;
+    const { title, description, startTime, endTime, zoomLink, attendeeIds } = sanitizedData as CreateMeetingRequest;
 
     // Validate date/time
     const start = new Date(startTime);
@@ -345,11 +345,11 @@ export async function POST(request: NextRequest) {
     };
 
     // Audit log the meeting creation
-    await prisma.meetingAuditLog.create({
+    await prisma.meeting_audit_log.create({
       data: {
         meeting_id: completeeMeeting!.id,
         user_id: user.id,
-        staff_id: (user.staff as Record<string, unknown> | null)?.id,
+        staff_id: user.staff?.id,
         action: 'CREATE',
         details: `Created meeting: ${title}`,
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
@@ -361,7 +361,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ meeting: formattedMeeting }, { status: 201 });
   } catch (error: unknown) {
-    await Logger.error("Failed to create meeting", { error: String(error), userId: user.id, staffId: (user.staff as Record<string, unknown> | null)?.id }, "meetings");
+    await Logger.error("Failed to create meeting", { error: String(error), userId: user.id, staffId: user.staff?.id }, "meetings");
     return NextResponse.json({ error: "Failed to create meeting" }, { status: 500 });
   }
 } 

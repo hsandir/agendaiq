@@ -61,22 +61,23 @@ export class TestFactory {
     const school = overrides.school ?? department.school
     const district = overrides.district ?? school.district
 
+    const staffData = {
+      user_id: user.id,
+      role_id: role.id,
+      department_id: department.id,
+      school_id: school.id,
+      district_id: district.id,
+      hire_date: faker.date.past({ years: 5 }),
+      is_active: true,
+      flags: [],
+      endorsements: [],
+      extension: null,
+      room: null,
+      manager_id: null,
+    };
+
     return this.prisma.staff.create({
-      data: {
-        user_id: user.id,
-        role_id: role.id,
-        department_id: department.id,
-        school_id: school.id,
-        district_id: district.id,
-        hire_date: faker.date.past({ years: 5 }),
-        is_active: true,
-        flags: [],
-        endorsements: [],
-        extension: null,
-        room: null,
-        manager_id: null,
-        ...overrides,
-      },
+      data: staffData,
       include: {
         users: true,
         role: true,

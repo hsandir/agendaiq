@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     // If users exist, require authentication
     if (userCount > 0) {
       const authResult = await withAuth(request, {
-        requireAdminrole: true
+        requireAdminRole: true
       });
 
       if (!authResult?.success) {
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const validation = createAdminSchema.safeParse(body);
 
     if (!validation?.success) {
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { _userId, _password } = validation?.data;
+    const { userId, password } = validation?.data;
 
     // Check if user exists and doesn't have a password
     const user = await prisma.users.findUnique({

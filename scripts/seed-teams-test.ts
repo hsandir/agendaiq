@@ -32,9 +32,9 @@ async function main() {
           data: {
             email: `test.user${i}@school.edu`,
             name: `Test User ${i}`,
-            password: hashedPassword,
-            is_active: true,
-            email_verified_at: new Date()
+            hashed_password: hashedPassword,
+            email_verified: new Date(),
+            updated_at: new Date()
           }
         });
         testUsers.push(user);
@@ -46,7 +46,7 @@ async function main() {
       const role = await prisma.role.findFirst();
       const department = await prisma.department.findFirst();
       
-      if (!school || !district || !role) {
+      if (!school || !district || !role || !department) {
         console.error('Missing required organization data');
         return;
       }
@@ -58,7 +58,7 @@ async function main() {
             school_id: school.id,
             district_id: district.id,
             role_id: role.id,
-            department_id: department?.id,
+            department_id: department.id,
             is_active: true
           }
         });

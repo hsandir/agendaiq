@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from '@/lib/auth/api-auth';
-import { Capability } from '@/lib/auth/policy';
-import { prisma } from "@/lib/prisma";
+import { withAuth } from '../../../lib/auth/api-auth';
+import { Capability } from '../../../lib/auth/policy';
+import { prisma } from "../../../lib/prisma";
 
 // Role update data interface
 interface RoleUpdateData {
@@ -38,10 +38,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
-    const { _key, _priority, _is_leadership, _category, _description  } = body;
+    const body = await request.json() as Record<string, unknown>;
+    const { key, priority, is_leadership, category, description } = body;
 
-    if (!key ?? priority === undefined) {
+    if (!key || priority === undefined) {
       return NextResponse.json(
         { error: 'Role key and priority are required' },
         { status: 400 }
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     // Check if role with same key exists
     const existingRole = await prisma.role.findFirst({
-      where: { key }
+      where: { key: key as string }
     });
 
     if (existingRole) {
@@ -62,10 +62,10 @@ export async function POST(request: NextRequest) {
 
     const role = await prisma.role.create({
       data: {
-        key,
-        priority,
-        is_leadership: is_leadership ?? false,
-        category,
+        key: key as string,
+        priority: priority as number,
+        is_leadership: (is_leadership as boolean) ?? false,
+        category: category as string,
         // TODO: Add description field to Role model in schema
         // description
       }
@@ -86,8 +86,8 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
-    const { _id, _key, _priority, _is_leadership, _category, _description  } = body;
+    const body = await request.json() as Record<string, unknown>;
+    const { id, key, priority, is_leadership, category, description } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -98,7 +98,7 @@ export async function PUT(request: NextRequest) {
 
     // Check if role exists
     const existingRole = await prisma.role.findUnique({
-      where: { id }
+      where: { id: id as number }
     });
 
     if (!existingRole) {
@@ -108,10 +108,10 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // If title is being changed, check for conflicts
+    // If key is being changed, check for conflicts
     if (key && key !== existingRole.key) {
       const keyConflict = await prisma.role.findFirst({
-        where: { key }
+        where: { key: key as string }
       });
 
       if (keyConflict) {
@@ -123,15 +123,15 @@ export async function PUT(request: NextRequest) {
     }
 
     const updateData: RoleUpdateData = {};
-    if (key !== undefined) updateData.key = key;
-    if (priority !== undefined) updateData.priority = priority;
-    if (is_leadership !== undefined) updateData.is_leadership = is_leadership;
-    if (category !== undefined) updateData.category = category;
+    if (key !== undefined) updateData.key = key as string;
+    if (priority !== undefined) updateData.priority = priority as number;
+    if (is_leadership !== undefined) updateData.is_leadership = is_leadership as boolean;
+    if (category !== undefined) updateData.category = category as string;
     // TODO: Add description field to Role model in schema
     // if (description !== undefined) updateData.description = description;
 
     const role = await prisma.role.update({
-      where: { id },
+      where: { id: id as number },
       data: updateData
     });
 

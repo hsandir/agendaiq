@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     const user = authResult.user!;
 
     // Parse and validate request body
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const result = assignmentSchema.safeParse(body);
     
     if (!result.success) {

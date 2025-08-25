@@ -51,13 +51,13 @@ export interface ActionItemWithRelations extends Omit<meeting_action_items, 'ass
 // Type for agenda item with all relations
 export interface AgendaItemWithRelations extends meeting_agenda_items {
   meeting: MeetingWithRelations;
-  responsible_staff: StaffWithRelations | null;
-  Comments: CommentWithRelations[];
-  ActionItems: ActionItemWithRelations[];
-  Attachments: agenda_item_attachments[];
+  staff: StaffWithRelations | null;
+  agenda_item_comments: CommentWithRelations[];
+  meeting_action_items: ActionItemWithRelations[];
+  agenda_item_attachments: agenda_item_attachments[];
   _count?: {
-    Comments: number;
-    ActionItems: number;
+    agenda_item_comments: number;
+    meeting_action_items: number;
   };
 }
 

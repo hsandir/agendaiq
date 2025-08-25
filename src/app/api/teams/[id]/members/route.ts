@@ -22,7 +22,7 @@ const updateMemberSchema = z.object({
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check feature flag
@@ -42,8 +42,9 @@ export async function GET(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
-    const teamId = params.id;
+    const { user } = auth;
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
 
     // Check if team exists
     const team = await prisma.teams.findUnique({
@@ -114,7 +115,7 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check feature flag
@@ -134,11 +135,12 @@ export async function POST(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
-    const teamId = params.id;
+    const { user } = auth;
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
 
     // Parse and validate request body
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const validatedData = addMemberSchema.parse(body);
 
     // Get user's staff record
@@ -251,7 +253,7 @@ export async function POST(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check feature flag
@@ -271,11 +273,12 @@ export async function PUT(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
-    const teamId = params.id;
+    const { user } = auth;
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
 
     // Get member ID from query params
-    const { _searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const memberId = searchParams.get('member_id');
 
     if (!memberId) {
@@ -286,7 +289,7 @@ export async function PUT(
     }
 
     // Parse and validate request body
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const validatedData = updateMemberSchema.parse(body);
 
     // Get user's staff record
@@ -391,7 +394,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check feature flag
@@ -411,11 +414,12 @@ export async function DELETE(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
-    const teamId = params.id;
+    const { user } = auth;
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
 
     // Get member ID from query params
-    const { _searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const memberId = searchParams.get('member_id');
 
     if (!memberId) {

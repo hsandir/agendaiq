@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const { _schoolId } = body;
 
     if (!schoolId) {

@@ -107,7 +107,7 @@ export async function initializeTestData() {
 
     for (const userData of users) {
       // Create user
-      const user = await prisma.user.upsert({
+      const user = await prisma.users.upsert({
         where: { email: userData.email },
         update: {},
         create: {
@@ -126,8 +126,8 @@ export async function initializeTestData() {
         await prisma.staff.create({
           data: {
             user_id: user.id,
-            role_id: parseInt(userData).roleId,
-            department_id: parseInt(userData).departmentId,
+            role_id: userData.roleId,
+            department_id: userData.departmentId,
             school_id: school.id,
             district_id: district.id,
           },

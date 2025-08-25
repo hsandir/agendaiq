@@ -623,7 +623,7 @@ describe('Authentication Login API', () => {
   describe('Error Handling', () => {
     it('should handle database connection errors gracefully', async () => {
       // Mock database error
-      jest.spyOn(context.prisma.user, 'findUnique').mockRejectedValueOnce(
+      jest.spyOn(context.prisma.users, 'findUnique').mockRejectedValueOnce(
         new Error('Database connection failed')
       );
 

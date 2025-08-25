@@ -11,11 +11,11 @@ if (typeof window !== 'undefined') {
     autocapture: true,
     capture_heatmaps: true,
     capture_performance: true,
-    capture_console_errors: true, // Capture console errors
+    // capture_console_errors: true, // Property not available in current PostHog version
     capture_dead_clicks: true,
     session_recording: {
       maskAllInputs: true,
-      maskTextContent: false,
+      // maskTextContent: false, // Property not available in current PostHog version
     },
     debug: process.env.NODE_ENV === "development",
   });

@@ -41,9 +41,9 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
         }
       },
       department: true,
-      MeetingAgendaItems: {
+      meeting_agenda_items: {
         include: {
-          responsible_staff: {
+          staff: {
             include: {
               users: true,
               role: true

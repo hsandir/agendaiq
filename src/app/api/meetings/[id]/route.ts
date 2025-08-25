@@ -99,12 +99,12 @@ export async function GET(request: NextRequest, props: Props) {
         },
         meeting_agenda_items: {
           include: {
-            responsible_staff: {
+            staff: {
               include: {
                 users: true
               }
             },
-            comments: {
+            agenda_item_comments: {
               include: {
                 staff: {
                   include: {
@@ -113,7 +113,7 @@ export async function GET(request: NextRequest, props: Props) {
                 }
               }
             },
-            action_items: {
+            meeting_action_items: {
               include: {
                 assigned_to: {
                   include: {
@@ -161,7 +161,7 @@ export async function GET(request: NextRequest, props: Props) {
     }
 
     // Audit log the view
-    await prisma.meetingAuditLog.create({
+    await prisma.meeting_audit_logs.create({
       data: {
         meeting_id: meetingId,
         user_id: parseInt(user.id),
@@ -207,13 +207,13 @@ export async function PATCH(
       return NextResponse.json({ error: "Staff record not found" }, { status: 404 });
     }
 
-    const { _id } = params;
+    const { id } = params;
     const meetingId = parseInt(id);
     if (isNaN(meetingId)) {
       return NextResponse.json({ error: "Invalid meeting ID" }, { status: 400 });
     }
 
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     
     // Validate request data
     const validationResult = updateMeetingSchema.safeParse(body);
@@ -298,7 +298,7 @@ export async function PATCH(
     }
 
     // Create audit log entry for meeting update
-    await prisma.meetingAuditLog.create({
+    await prisma.meeting_audit_logs.create({
       data: {
         meeting_id: updatedMeeting.id,
         user_id: parseInt(user.id),

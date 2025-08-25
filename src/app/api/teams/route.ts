@@ -4,12 +4,14 @@ import { withAuth } from '@/lib/auth/api-auth';
 import { Capability } from '@/lib/auth/policy';
 import { z } from 'zod';
 import { FEATURES } from '@/lib/features/feature-flags';
+import { randomBytes } from 'crypto';
 
 // Team creation schema
 const createTeamSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
   type: z.enum(['DEPARTMENT', 'PROJECT', 'COMMITTEE', 'SUBJECT', 'GRADE_LEVEL', 'SPECIAL']),
+  purpose: z.string().min(1).max(500),
   metadata: z.record(z.unknown()).optional(),
 });
 
@@ -145,7 +147,7 @@ export async function POST(request: NextRequest) {
     const { user } = auth;
 
     // Parse and validate request body
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const validatedData = createTeamSchema.parse(body);
 
     // Get user's organization context
@@ -175,24 +177,34 @@ export async function POST(request: NextRequest) {
 
     // Create the team with a transaction
     const team = await prisma.$transaction(async (tx) => {
+      // Generate unique ID and code for the team
+      const teamId = randomBytes(16).toString('hex');
+      const teamCode = `TEAM_${Date.now()}_${randomBytes(4).toString('hex').toUpperCase()}`;
+
       // Create the team
-      const newTeam = await tx.team.create({
+      const newTeam = await tx.teams.create({
         data: {
+          id: teamId,
           name: validatedData.name,
+          code: teamCode,
           description: validatedData.description,
           type: validatedData.type,
+          purpose: validatedData.purpose,
           school_id: staff.school_id,
           district_id: staff.district_id,
           created_by: user.id,
           metadata: validatedData.metadata || {},
-          is_active: true
+          is_active: true,
+          updated_at: new Date()
         }
       });
 
       // Add the creator as a team lead
-      await tx.teamMember.create({
+      await tx.team_members.create({
         data: {
+          id: randomBytes(16).toString('hex'),
           team_id: newTeam.id,
+          user_id: user.id,
           staff_id: staff.id,
           role: 'LEAD',
           joined_at: new Date()
@@ -272,7 +284,7 @@ export async function PUT(request: NextRequest) {
     const { user } = auth;
 
     // Get team ID from query params
-    const { _searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const teamId = searchParams.get('id');
 
     if (!teamId) {
@@ -283,7 +295,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Parse and validate request body
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const validatedData = updateTeamSchema.parse(body);
 
     // Get user's staff record
@@ -402,7 +414,7 @@ export async function DELETE(request: NextRequest) {
     const { user } = auth;
 
     // Get team ID from query params
-    const { _searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const teamId = searchParams.get('id');
 
     if (!teamId) {

@@ -74,7 +74,7 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const validatedData = customThemeSchema.parse(body);
 
     // Save custom theme to user profile (optimized)

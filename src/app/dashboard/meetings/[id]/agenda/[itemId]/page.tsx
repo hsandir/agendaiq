@@ -20,7 +20,7 @@ export default async function AgendaItemPage(props: Props) {
   }
 
   // Fetch agenda item with all relations
-  const agendaItem = await prisma.meetingAgendaItem.findUnique({
+  const agendaItem = await prisma.meeting_agenda_items.findUnique({
     where: { id: itemId },
     include: {
       meeting: {
@@ -37,7 +37,7 @@ export default async function AgendaItemPage(props: Props) {
           }
         }
       },
-      responsible_staff: {
+      staff: {
         include: {
           users: true,
           role: true,

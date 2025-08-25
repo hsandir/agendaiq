@@ -160,7 +160,7 @@ describe('${info.name}', () => {
   })
 
   it('is accessible', () => {
-    const { _container } = renderWithProviders(<${info._name} ${info.props.length > 0 ? '{...___defaultProps}' : ''} />)
+    const { container } = renderWithProviders(<${info.name} ${info.props.length > 0 ? '{...defaultProps}' : ''} />)
     
     // Basic accessibility checks
     expect(container.firstChild).toHaveAttribute('role')
@@ -173,7 +173,7 @@ describe('${info.name}', () => {
     const methods = info.methods.length > 0 ? info.methods : ['GET']
     
     return `import { ___NextRequest } from 'next/server'
-${methods.map(method => `import { ${___method} } from '${___importPath}'`).join('\n')}
+${methods.map(method => `import { ${method} } from '${importPath}'`).join('\n')}
 import { ___prisma } from '@/lib/prisma'
 import { ___withAuth } from '@/lib/auth/api-auth'
 import { ___createMockNextRequest, ___createTestusers, ___createTestStaff } from '@/__tests__/utils/test-utils'
@@ -189,7 +189,7 @@ jest.mock('@/lib/auth/api-auth', () => ({
   withAuth: jest.fn(),
 }))
 
-describe('${path.basename(info.___path, '.ts')} API', () => {
+describe('${path.basename(info.path, '.ts')} API', () => {
   const mockUser = createTestUser()
   const mockStaff = createTestStaff()
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from '@/lib/auth/api-auth';
+import { withAuth } from '../../../../lib/auth/api-auth';
 import { hash, compare } from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../../../../lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await request.json() as Record<string, unknown>;
-    const { _currentPassword, _newPassword, _confirmPassword } = data;
+    const { currentPassword, newPassword, confirmPassword } = data;
 
     if ((newPassword as string) !== (confirmPassword as string)) {
       return new NextResponse("Passwords do not match", { status: 400 });
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await hash(newPassword as string, 12);
     await prisma.users.update({
       where: { email: auth.user.email! },
-      data: { hashedPassword },
+      data: { hashed_password: hashedPassword },
     });
 
     return new NextResponse("Password updated successfully", { status: 200 });

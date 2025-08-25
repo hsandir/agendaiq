@@ -404,7 +404,7 @@ export class DynamicRBAC {
 
     try {
       // Get role hierarchy relationships
-      const hierarchyRecords = await prisma.roleHierarchy.findMany({
+      const hierarchyRecords = await prisma.role_hierarchy.findMany({
         where: { child_role_id: parseInt(roleId) },
         select: { parent_role_id: true }
       });
@@ -527,7 +527,7 @@ export class DynamicRBAC {
   // Get child roles
   private async getChildRoles(roleId: string): Promise<string[]> {
     try {
-      const hierarchyRecords = await prisma.roleHierarchy.findMany({
+      const hierarchyRecords = await prisma.role_hierarchy.findMany({
         where: { parent_role_id: parseInt(roleId) },
         select: { child_role_id: true }
       });

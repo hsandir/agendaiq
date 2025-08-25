@@ -54,12 +54,12 @@ interface ExtendedMeeting extends Meeting {
       department: Department 
     } 
   })[];
-  MeetingAgendaItems: (MeetingAgendaItem & {
+  meeting_agenda_items: (MeetingAgendaItem & {
     ResponsibleStaff?: (Staff & { users: PrismaUser }) | null;
     Comments: Array<Record<string, unknown>>;
     ActionItems: Array<Record<string, unknown>>;
   })[];
-  MeetingActionItems: Array<Record<string, unknown>>;
+  meeting_action_items: Array<Record<string, unknown>>;
 }
 
 interface ExtendedStaff extends Staff {
@@ -84,7 +84,7 @@ export function MeetingLiveView({
   isAdmin
 }: Props) {
   const router = useRouter();
-  const [agendaItems, setAgendaItems] = useState(meeting.MeetingAgendaItems);
+  const [agendaItems, setAgendaItems] = useState(meeting.meeting_agenda_items);
   const [activeTab, setActiveTab] = useState("agenda");
   const [isConnected, setIsConnected] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);

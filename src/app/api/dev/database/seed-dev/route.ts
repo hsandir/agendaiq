@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Create logs in batches
-    await prisma.auditLog.createMany({
+    await prisma.audit_logs.createMany({
       data: auditLogs
     });
     
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       });
     }
     
-    await prisma.auditLog.createMany({
+    await prisma.audit_logs.createMany({
       data: testRuns
     });
     
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     });
     
     // Get counts
-    const logCount = await prisma.auditLog.count();
+    const logCount = await prisma.audit_logs.count();
     const userCount = await prisma.users.count();
     const staffCount = await prisma.staff.count();
     

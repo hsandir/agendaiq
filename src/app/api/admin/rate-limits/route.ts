@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
+    const body = await request.json() as Record<string, unknown>;
     const validation = updateSchema.safeParse(body);
 
     if (!validation.success) {

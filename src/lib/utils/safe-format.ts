@@ -24,7 +24,7 @@ export function safeFormat(
   try {
     const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
     
-    if (!date ?? isNaN(date.getTime())) {
+    if (!date || isNaN(date.getTime())) {
       return fallback;
     }
 
@@ -48,7 +48,7 @@ export function safeParseDate(dateValue: string | Date | null | undefined): Date
   try {
     const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
     
-    if (!date ?? isNaN(date.getTime())) {
+    if (!date || isNaN(date.getTime())) {
       return null;
     }
 
