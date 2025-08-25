@@ -11,14 +11,14 @@ export async function GET(request: NextRequest) {
   try {
     const auth = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETING_VIEW 
+      requireCapability: Capability.MEETINGS_VIEW 
     });
     
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
+    const { user } = auth;
 
     // Get user's organization context
     const currentStaff = await prisma.staff.findFirst({

@@ -1,5 +1,5 @@
 // Redirect to PostHog implementation
-import { User } from '@prisma/client';
+import { users } from '@prisma/client';
 import { 
   setPostHogUser, 
   clearPostHogUser, 
@@ -10,7 +10,7 @@ import {
 /**
  * Sets user context (now using PostHog)
  */
-export function setSentryUser(user: Partial<User> & { 
+export function setSentryUser(user: Partial<users> & { 
   staff?: { 
     id: string; 
     role: { title: string } 

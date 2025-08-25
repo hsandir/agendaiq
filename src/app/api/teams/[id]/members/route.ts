@@ -4,6 +4,7 @@ import { withAuth } from '@/lib/auth/api-auth';
 import { Capability } from '@/lib/auth/policy';
 import { z } from 'zod';
 import { FEATURES } from '@/lib/features/feature-flags';
+import { randomBytes } from 'crypto';
 
 // Member addition schema
 const addMemberSchema = z.object({
@@ -209,7 +210,9 @@ export async function POST(
     // Add the member
     const newMember = await prisma.team_members.create({
       data: {
+        id: randomBytes(16).toString('hex'),
         team_id: teamId,
+        user_id: staffToAdd.user_id,
         staff_id: validatedData.staff_id,
         role: validatedData.role,
         joined_at: new Date()

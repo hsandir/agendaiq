@@ -43,7 +43,6 @@ export default async function DashboardLayout({
     },
   });
 
-  const currentRole = userWithStaff?.staff?.[0]?.role ?? null;
   const isAdmin = isUserAdmin(userWithStaff);
 
   return (
@@ -56,7 +55,6 @@ export default async function DashboardLayout({
           name: user.name ?? undefined,
           staff_id: userWithStaff?.staff?.[0]?.id ?? null,
         }}
-        currentRole={currentRole}
         userWithStaff={userWithStaff}
       >
         {children}

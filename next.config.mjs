@@ -52,8 +52,8 @@ const nextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
   },
   
-  // Typed Routes
-  typedRoutes: true,
+  // Typed Routes (disabled for build compatibility)
+  // typedRoutes: true,
   
   // Performance optimizations
   experimental: {

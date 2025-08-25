@@ -81,34 +81,36 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
     redirect("/dashboard/meetings");
   }
 
-  // Get all staff for responsible person dropdown
-  const allStaff = (await prisma.staff.findMany({
+  // Get all staff for responsible person dropdown - only if user can edit
+  const allStaff = (hasAdminAccess || isOrganizer) ? (await prisma.staff.findMany({
     where: {
       OR: [
         // Same department
-        { department_id: parseInt(user).staff?.department?.id },
+        { department_id: user.staff?.department?.id },
         // Leadership roles from same school
         { 
-          school_id: parseInt(user).staff?.school?.id,
-          role: {
-            is_leadership: true
-          }
+          school_id: user.staff?.school?.id,
+          role: { is_leadership: true }
         },
         // Meeting attendees
-        {
-          id: {
-            in: meeting.meeting_attendee.map(a => a.staff_id)
-          }
-        }
+        { id: { in: meeting.meeting_attendee.map(a => a.staff_id) } }
       ]
     },
-    include: {
-      users: true,
-      role: true,
-      department: true
+    select: {
+      id: true,
+      users: {
+        select: { id: true, name: true, email: true }
+      },
+      role: {
+        select: { id: true, title: true }
+      },
+      department: {
+        select: { id: true, name: true }
+      }
     },
-    take: 200 // Limit for performance
-  }));
+    orderBy: { users: { name: 'asc' } },
+    take: 30 // Reduced limit for performance
+  })) : [];
 
   // Get past meetings for importing agenda items
   const pastMeetings = await prisma.meeting.findMany({
@@ -118,7 +120,7 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
       },
       OR: [
         { organizer_id: user.staff?.id },
-        { department_id: parseInt(user).staff?.department?.id },
+        { department_id: user.staff?.department?.id },
         {
           meeting_attendee: {
             some: {

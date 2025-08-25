@@ -8,7 +8,7 @@
  * 4. Cache ile performans optimizasyonu sağlar
  */
 
-import { AuthenticatedUser } from '../auth/auth-utils';
+import { AuthenticatedUser as _AuthenticatedUser } from '../auth/auth-utils';
 import { DynamicRBAC } from './dynamic-rbac';
 
 export interface MenuItem {
@@ -312,7 +312,7 @@ export class DynamicMenu {
   // Filter menu items based on user permissions
   private async filterMenuItems(
     items: MenuItem[],
-    user: _Authenticatedusers,
+    user: _AuthenticatedUser,
     userPermissions: Record<string, unknown>[]
   ): Promise<MenuItem[]> {
     const visibleItems: MenuItem[] = [];
@@ -339,7 +339,7 @@ export class DynamicMenu {
   // Check if menu item should be visible to user
   private async checkMenuVisibility(
     item: MenuItem,
-    user: _Authenticatedusers,
+    user: _AuthenticatedUser,
     userPermissions: Record<string, unknown>[]
   ): Promise<boolean> {
     // Check required permissions

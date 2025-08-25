@@ -70,16 +70,16 @@ interface ExtendedStaff extends Staff {
 
 interface Props {
   meeting: ExtendedMeeting;
-  currentusers: _AuthenticatedUser;
-  allstaff: ExtendedStaff[];
+  currentUser: AuthenticatedUser;
+  allStaff: ExtendedStaff[];
   isOrganizer: boolean;
   isAdmin: boolean;
 }
 
 export function MeetingLiveView({ 
   meeting, 
-  currentusers, 
-  allstaff,
+  currentUser, 
+  allStaff,
   isOrganizer,
   isAdmin
 }: Props) {
@@ -97,68 +97,85 @@ export function MeetingLiveView({
     setIsHydrated(true);
   }, []);
 
+  // Memoize event handlers to prevent unnecessary re-renders
+  const agendaItemUpdatedHandler = useCallback((data: unknown) => {
+    const typedData = data as Record<string, unknown>;
+    if (typeof typedData.itemId === 'number' && typedData.updates && typeof typedData.updates === 'object') {
+      setAgendaItems(prev => prev.map(item => 
+        item.id === typedData.itemId ? { ...item, ...(typedData.updates as Record<string, any>) } : item
+      ));
+      setLastUpdate(new Date());
+    }
+  }, []);
+
+  const agendaItemAddedHandler = useCallback((data: unknown) => {
+    const typedData = data as Record<string, unknown>;
+    if (typedData.item && typeof typedData.item === 'object') {
+      setAgendaItems(prev => [...prev, typedData.item as Record<string, unknown>]);
+      setLastUpdate(new Date());
+    }
+  }, []);
+
+  const agendaItemDeletedHandler = useCallback((data: unknown) => {
+    const typedData = data as Record<string, unknown>;
+    if (typeof typedData.itemId === 'number') {
+      setAgendaItems(prev => prev.filter(item => item.id !== typedData.itemId));
+      setLastUpdate(new Date());
+    }
+  }, []);
+
+  const userTypingHandler = useCallback((data: unknown) => {
+    const typedData = data as Record<string, unknown>;
+    if (typeof typedData.itemId === 'number' && typeof typedData.userId === 'number' && typeof typedData.userName === 'string') {
+      setTypingUsers(prev => {
+        const newMap = new Map(prev);
+        newMap.set(typedData.itemId as number, { userId: typedData.userId as number, userName: typedData.userName as string });
+        return newMap;
+      });
+    }
+  }, []);
+
+  const userStoppedTypingHandler = useCallback((data: unknown) => {
+    const typedData = data as Record<string, unknown>;
+    if (typeof typedData.itemId === 'number') {
+      setTypingUsers(prev => {
+        const newMap = new Map(prev);
+        newMap.delete(typedData.itemId as number);
+        return newMap;
+      });
+    }
+  }, []);
+
+  const commentAddedHandler = useCallback((data: unknown) => {
+    const typedData = data as Record<string, unknown>;
+    if (typeof typedData.itemId === 'number' && typedData.comment && typeof typedData.comment === 'object') {
+      setAgendaItems(prev => prev.map(item => 
+        item.id === typedData.itemId 
+          ? { ...item, Comments: [...(item.comments ?? []), typedData.comment as Record<string, unknown>] }
+          : item
+      ));
+    }
+  }, []);
+
+  const subscriptionSucceededHandler = useCallback(() => {
+    setIsConnected(true);
+  }, []);
+
+  const subscriptionErrorHandler = useCallback(() => {
+    setIsConnected(false);
+  }, []);
+
   // Set up real-time updates with Pusher
   const eventHandlers = useMemo(() => ({
-    [EVENTS.AGENDA_ITEM_UPDATED]: (data: unknown) => {
-      const typedData = data as Record<string, unknown>;
-      if (typeof typedData.itemId === 'number' && typedData.updates && typeof typedData.updates === 'object') {
-        setAgendaItems(prev => prev.map(item => 
-          item.id === typedData.itemId ? { ...item, ...(typedData.updates as Record<string, any>) } : item
-        ));
-        setLastUpdate(new Date());
-      }
-    },
-    [(EVENTS.AGENDA_ITEM_ADDED)]: (data: unknown) => {
-      const typedData = data as Record<string, unknown>;
-      if (typedData.item && typeof typedData.item === 'object') {
-        setAgendaItems(prev => [...prev, typedData.item as Record<string, unknown>]);
-        setLastUpdate(new Date());
-      }
-    },
-    [(EVENTS.AGENDA_ITEM_DELETED)]: (data: unknown) => {
-      const typedData = data as Record<string, unknown>;
-      if (typeof typedData.itemId === 'number') {
-        setAgendaItems(prev => prev.filter(item => item.id !== typedData.itemId));
-        setLastUpdate(new Date());
-      }
-    },
-    [(EVENTS.USER_TYPING)]: (data: unknown) => {
-      const typedData = data as Record<string, unknown>;
-      if (typeof typedData.itemId === 'number' && typeof typedData.userId === 'number' && typeof typedData.userName === 'string') {
-        setTypingUsers(prev => {
-          const newMap = new Map(prev);
-          newMap.set(typedData.itemId as number, { userId: typedData.userId as number, userName: typedData.userName as string });
-          return newMap;
-        });
-      }
-    },
-    [(EVENTS.USER_STOPPED_TYPING)]: (data: unknown) => {
-      const typedData = data as Record<string, unknown>;
-      if (typeof typedData.itemId === 'number') {
-        setTypingUsers(prev => {
-          const newMap = new Map(prev);
-          newMap.delete(typedData.itemId as number);
-          return newMap;
-        });
-      }
-    },
-    'comment-added': (data: unknown) => {
-      const typedData = data as Record<string, unknown>;
-      if (typeof typedData.itemId === 'number' && typedData.comment && typeof typedData.comment === 'object') {
-        setAgendaItems(prev => prev.map(item => 
-          item.id === typedData.itemId 
-            ? { ...item, Comments: [...(item.comments ?? []), typedData.comment as Record<string, unknown>] }
-            : item
-        ));
-      }
-    },
-    'pusher:subscription_succeeded': () => {
-      setIsConnected(true);
-    },
-    'pusher:subscription_error': () => {
-      setIsConnected(false);
-    }
-  }), []);
+    [EVENTS.AGENDA_ITEM_UPDATED]: agendaItemUpdatedHandler,
+    [EVENTS.AGENDA_ITEM_ADDED]: agendaItemAddedHandler,
+    [EVENTS.AGENDA_ITEM_DELETED]: agendaItemDeletedHandler,
+    [EVENTS.USER_TYPING]: userTypingHandler,
+    [EVENTS.USER_STOPPED_TYPING]: userStoppedTypingHandler,
+    'comment-added': commentAddedHandler,
+    'pusher:subscription_succeeded': subscriptionSucceededHandler,
+    'pusher:subscription_error': subscriptionErrorHandler
+  }), [agendaItemUpdatedHandler, agendaItemAddedHandler, agendaItemDeletedHandler, userTypingHandler, userStoppedTypingHandler, commentAddedHandler, subscriptionSucceededHandler, subscriptionErrorHandler]);
 
   const channel = usePusherChannel(
     CHANNELS.meeting(meeting.id),
@@ -171,7 +188,7 @@ export function MeetingLiveView({
     useMemo(() => ({}), [])
   );
 
-  const refreshMeeting = async () => {
+  const refreshMeeting = useCallback(async () => {
     try {
       const response = await fetch(`/api/meetings/${meeting.id}`);
       const data = await response.json();
@@ -183,9 +200,9 @@ export function MeetingLiveView({
     } catch (error: unknown) {
       console.error("Error refreshing meeting:", error);
     }
-  };
+  }, [meeting.id]);
 
-  const handleItemUpdate = async (itemId: number, updates: Record<string, unknown>) => {
+  const handleItemUpdate = useCallback(async (itemId: number, updates: Record<string, unknown>) => {
     // Optimistic update
     setAgendaItems(prev => prev.map(item => 
       item.id === itemId ? { ...item, ...updates } : item
@@ -207,14 +224,14 @@ export function MeetingLiveView({
       console.error("Error updating agenda item:", error);
       await refreshMeeting();
     }
-  };
+  }, [meeting.id, refreshMeeting]);
 
-  const handleAddAgendaItem = () => {
+  const handleAddAgendaItem = useCallback(() => {
     // Navigate to the agenda editing page instead of auto-adding
     router.push(`/dashboard/meetings/${meeting.id}/agenda`);
-  };
+  }, [meeting.id, router]);
 
-  const toggleItemExpanded = (itemId: number) => {
+  const toggleItemExpanded = useCallback((itemId: number) => {
     setExpandedItems(prev => {
       const newSet = new Set(prev);
       if (newSet.has(itemId)) {
@@ -224,10 +241,10 @@ export function MeetingLiveView({
       }
       return newSet;
     });
-  };
+  }, []);
 
-  // Meeting status
-  const getMeetingStatus = () => {
+  // Memoize meeting status calculation
+  const meetingStatus = useMemo(() => {
     const now = new Date();
     const start = getSafeDate(meeting.start_time);
     const end = getSafeDate(meeting.end_time);
@@ -236,9 +253,7 @@ export function MeetingLiveView({
     if (now < start) return { status: "upcoming", label: "Upcoming", color: "bg-primary text-primary-foreground" };
     if (now > end) return { status: "completed", label: "Completed", color: "bg-muted text-foreground" };
     return { status: "in-progress", label: "In Progress", color: "bg-green-100 text-green-700" };
-  };
-
-  const meetingStatus = getMeetingStatus();
+  }, [meeting.start_time, meeting.end_time]);
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
 

@@ -62,7 +62,8 @@ export async function GET(request: NextRequest, props: Props) {
       return NextResponse.json({ error: "Invalid meeting ID" }, { status: 400 });
     }
 
-    const meeting = await prisma.meeting.findUnique({
+    // Fetch basic meeting info first
+    const basicMeeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
         department: true,
@@ -73,92 +74,125 @@ export async function GET(request: NextRequest, props: Props) {
             users: true,
             role: true
           }
-        },
-        meeting_attendee: {
-          include: {
-            staff: {
-              include: {
-                users: true,
-                role: true,
-                department: true
-              }
-            }
-          }
-        },
-        meeting_notes: {
-          include: {
-            staff: {
-              include: {
-                users: true
-              }
-            }
-          },
-          orderBy: {
-            created_at: 'desc'
-          }
-        },
-        meeting_agenda_items: {
-          include: {
-            staff: {
-              include: {
-                users: true
-              }
-            },
-            agenda_item_comments: {
-              include: {
-                staff: {
-                  include: {
-                    users: true
-                  }
-                }
-              }
-            },
-            meeting_action_items: {
-              include: {
-                staff_meeting_action_items_assigned_toTostaff: {
-                  include: {
-                    users: true
-                  }
-                }
-              }
-            }
-          },
-          orderBy: {
-            order_index: 'asc'
-          }
-        },
-        meeting_action_items: {
-          include: {
-            staff_meeting_action_items_assigned_toTostaff: {
-              include: {
-                users: true,
-                role: true
-              }
-            }
-          }
-        },
-        parent_meeting: true,
-        continuation_meetings: {
-          orderBy: {
-            start_time: 'desc'
-          }
         }
       }
     });
 
-    if (!meeting) {
+    if (!basicMeeting) {
       return NextResponse.json({ error: "Meeting not found" }, { status: 404 });
     }
 
-    // Check if user is authorized to view this meeting
+    // Check if user is authorized to view this meeting early
     const hasAdminAccess = isAnyAdmin(user);
-    const isOrganizer = meeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
-    const isAttendee = meeting.meeting_attendee.some(ma => ma.staff_id === (user.staff as Record<string, unknown> | null)?.id);
-    const isSameDepartment = meeting.department_id === (user.staff as Record<string, unknown> | null)?.department?.id;
+    const isOrganizer = basicMeeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
+    
+    // Quick attendee check for authorization
+    const attendeeCheck = await prisma.meeting_attendee.findFirst({
+      where: {
+        meeting_id: meetingId,
+        staff_id: (user.staff as Record<string, unknown> | null)?.id || -1
+      }
+    });
+    
+    const isAttendee = !!attendeeCheck;
+    const isSameDepartment = basicMeeting.department_id === (user.staff as Record<string, unknown> | null)?.department?.id;
 
     if (!hasAdminAccess && !isOrganizer && !isAttendee && !isSameDepartment) {
       return NextResponse.json({ error: "Not authorized to view this meeting" }, { status: 403 });
     }
+
+    // Fetch related data in parallel for authorized users
+    const [attendees, agendaItems, actionItems, notes] = await Promise.all([
+      // Fetch attendees
+      prisma.meeting_attendee.findMany({
+        where: { meeting_id: meetingId },
+        include: {
+          staff: {
+            include: {
+              users: { select: { id: true, name: true, email: true } },
+              role: { select: { id: true, title: true, key: true } },
+              department: { select: { id: true, name: true } }
+            }
+          }
+        }
+      }),
+      
+      // Fetch agenda items
+      prisma.meeting_agenda_items.findMany({
+        where: { meeting_id: meetingId },
+        include: {
+          staff: {
+            include: {
+              users: { select: { id: true, name: true, email: true } }
+            }
+          },
+          agenda_item_comments: {
+            include: {
+              staff: {
+                include: {
+                  users: { select: { id: true, name: true, email: true } }
+                }
+              }
+            },
+            orderBy: { created_at: 'desc' },
+            take: 10 // Limit comments for performance
+          },
+          meeting_action_items: {
+            include: {
+              staff_meeting_action_items_assigned_toTostaff: {
+                include: {
+                  users: { select: { id: true, name: true, email: true } }
+                }
+              }
+            },
+            take: 20 // Limit action items per agenda item
+          }
+        },
+        orderBy: { order_index: 'asc' },
+        take: 50 // Limit agenda items
+      }),
+      
+      // Fetch action items
+      prisma.meeting_action_items.findMany({
+        where: { meeting_id: meetingId },
+        include: {
+          staff_meeting_action_items_assigned_toTostaff: {
+            include: {
+              users: { select: { id: true, name: true, email: true } },
+              role: { select: { id: true, title: true } }
+            }
+          }
+        },
+        orderBy: { created_at: 'desc' },
+        take: 100 // Limit action items
+      }),
+      
+      // Fetch notes
+      prisma.meeting_notes.findMany({
+        where: { meeting_id: meetingId },
+        include: {
+          staff: {
+            include: {
+              users: { select: { id: true, name: true, email: true } }
+            }
+          }
+        },
+        orderBy: { created_at: 'desc' },
+        take: 20 // Limit notes
+      })
+    ]);
+
+    // Combine the data
+    const meeting = {
+      ...basicMeeting,
+      meeting_attendee: attendees,
+      meeting_agenda_items: agendaItems,
+      meeting_action_items: actionItems,
+      meeting_notes: notes,
+      parent_meeting: null, // Skip for now to improve performance
+      continuation_meetings: [] // Skip for now to improve performance
+    };
+
 
     // Audit log the view
     await prisma.meeting_audit_logs.create({

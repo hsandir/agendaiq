@@ -153,7 +153,7 @@ export class AdvancedRateLimiter {
     request: Request,
     limit: number,
     token: string,
-    user?: User & { staff?: { role: { title: string } } }
+    user?: users & { staff?: { role: { title: string } } }
   ): Promise<EnhancedRateLimitResult> {
     try {
       // Extract IP for whitelist/blacklist checking

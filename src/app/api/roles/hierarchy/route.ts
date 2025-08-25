@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 // Role with included relations from Prisma query
 interface RoleWithRelations {
   id: number;
-  key: string | null;
+  title: string;
   level: number;
   is_leadership: boolean;
   category: string | null;
@@ -19,23 +19,44 @@ interface RoleWithRelations {
   staff: Array<{
     id: number;
     users: {
+      id: number;
       name: string | null;
       email: string;
+      image?: string | null;
     };
+    role_id: number;
+    department: {
+      id: number;
+      name: string;
+    } | null;
   }>;
 }
 
 // Hierarchical role structure for response
 interface HierarchicalRole {
   id: string;
-  key: string;
+  title: string;
   level: number;
   is_leadership: boolean;
   category: string;
+  priority: number;
   parent_id: number | null;
   department: { id: string; name: string } | null;
-  Children: HierarchicalRole[];
-  staff: Array<{ id: string; name: string; email: string }>;
+  children: HierarchicalRole[];
+  staff: Array<{ 
+    id: string; 
+    users: {
+      id: number;
+      name: string | null; 
+      email: string;
+      image?: string | null;
+    };
+    role_id: number;
+    department?: {
+      id: number;
+      name: string;
+    } | null;
+  }>;
 }
 
 // GET Method - Role hierarchy
@@ -61,8 +82,16 @@ export async function GET(request: NextRequest) {
           include: {
             users: {
               select: {
+                id: true,
                 name: true,
-                email: true
+                email: true,
+                image: true
+              }
+            },
+            department: {
+              select: {
+                id: true,
+                name: true
               }
             }
           }
@@ -80,22 +109,27 @@ export async function GET(request: NextRequest) {
     allRoles.forEach((role: RoleWithRelations) => {
       roleMap.set(role.id, {
         id: role.id.toString(),
-        key: role.key ?? 'UNKNOWN_ROLE',
+        title: role.title,
         level: role.level,
         is_leadership: role.is_leadership,
-        category: role.category ?? '',
+        category: role.category ?? 'General',
+        priority: role.priority,
         parent_id: role.parent_id,
         department: role.department ? {
           id: role.department.id.toString(),
           name: role.department.name
         } : null,
-        Children: [],
+        children: [],
         staff: role.staff?.map((staff) => ({
           id: staff.id.toString(),
           users: {
+            id: staff.users.id,
             name: staff.users.name,
-            email: staff.users.email
-          }
+            email: staff.users.email,
+            image: staff.users.image
+          },
+          role_id: staff.role_id,
+          department: staff.department
         })) || []
       });
     });
@@ -105,7 +139,7 @@ export async function GET(request: NextRequest) {
       if (role.parent_id) {
         const parent = roleMap.get(role.parent_id);
         if (parent) {
-          parent.Children.push(role);
+          parent.children.push(role);
         }
       }
     });

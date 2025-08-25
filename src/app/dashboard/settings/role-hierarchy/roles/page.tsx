@@ -23,7 +23,9 @@ export default async function RolePage() {
       department: true,
       staff: {
         include: {
-          users: true
+          users: true,
+          department: true,
+          role: true
         }
       }
     },
@@ -186,9 +188,10 @@ export default async function RolePage() {
               </div>
             </div>
 
-            {/* Department Role Distribution with Drag & Drop */}
+            {/* Role Staff Distribution with Drag & Drop */}
             <div>
-              <h4 className="text-sm font-medium text-foreground mb-3">Department Role Distribution</h4>
+              <h4 className="text-sm font-medium text-foreground mb-3">Staff Role Distribution</h4>
+              <p className="text-xs text-muted-foreground mb-4">Drag staff members between roles to change their assignments</p>
               <RolesPageClient departments={departments} roles={roles} />
             </div>
           </div>

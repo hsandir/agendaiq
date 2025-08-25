@@ -90,8 +90,16 @@ export function AddMemberDialog({
     setLoading(true);
     try {
       // Fetch all staff from the organization
-      const response = await fetch('/api/staff');
-      if (!response.ok) throw new Error('Failed to fetch staff');
+      const response = await fetch('/api/staff', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to fetch staff: ${response.status}`);
+      }
       
       const data = await response.json();
       
@@ -103,7 +111,7 @@ export function AddMemberDialog({
       setAvailableStaff(available);
     } catch (error) {
       console.error('Error fetching staff:', error);
-      toast.error('Failed to load available staff');
+      toast.error(`Failed to load available staff: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -122,6 +130,7 @@ export function AddMemberDialog({
       const promises = selectedStaff.map(staffId =>
         fetch(`/api/teams/${teamId}/members`, {
           method: 'POST',
+          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             staff_id: staffId,
@@ -230,13 +239,15 @@ export function AddMemberDialog({
                       {filteredStaff.map((staff) => (
                         <CommandItem
                           key={staff.id}
-                          onSelect={() => toggleStaffSelection(staff.id)}
                           className="cursor-pointer"
+                          onClick={() => toggleStaffSelection(staff.id)}
                         >
                           <div className="flex items-center w-full">
                             <Checkbox
                               checked={selectedStaff.includes(staff.id)}
                               className="mr-3"
+                              onClick={(e) => e.stopPropagation()}
+                              onCheckedChange={() => toggleStaffSelection(staff.id)}
                             />
                             <Avatar className="h-8 w-8 mr-3">
                               <AvatarImage src={staff.users.image || undefined} />

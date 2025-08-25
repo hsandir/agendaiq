@@ -8,7 +8,7 @@
  * 4. Cache ile performans optimizasyonu yapar
  */
 
-import { AuthenticatedUser } from '../auth/auth-utils';
+import { AuthenticatedUser as _AuthenticatedUser } from '../auth/auth-utils';
 import { prisma } from '../prisma';
 
 export interface RolePermission {
@@ -159,7 +159,7 @@ export class DynamicRBAC {
         }
       });
 
-      if (!staff?.Role) {
+      if (!staff?.role) {
         return [];
       }
 
@@ -210,7 +210,7 @@ export class DynamicRBAC {
 
   // Check inherited permissions from role hierarchy
   private async checkInheritedPermissions(
-    user: _Authenticatedusers,
+    user: _AuthenticatedUser,
     resource: string,
     action: string
   ): Promise<{ granted: boolean; reason?: string }> {
@@ -221,7 +221,7 @@ export class DynamicRBAC {
         include: { role: true }
       });
 
-      if (!staff?.Role) {
+      if (!staff?.role) {
         return { granted: false, reason: 'No role found' };
       }
 
@@ -400,7 +400,7 @@ export class DynamicRBAC {
 
   // Helper method to check if user has specific permission
   async hasPermission(
-    user: _Authenticatedusers,
+    user: _AuthenticatedUser,
     resource: string,
     action: string,
     targetId?: string

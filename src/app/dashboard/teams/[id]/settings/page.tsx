@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -241,6 +242,78 @@ export default function TeamSettingsPage() {
     }
   };
 
+  const handleExportJSON = async () => {
+    try {
+      const response = await fetch(`/api/teams/${params.id}/export?format=json`);
+      if (!response.ok) throw new Error('Export failed');
+      
+      const data = await response.json();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${team?.name || 'team'}-export-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast.success('Team data exported as JSON');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('Failed to export team data');
+    }
+  };
+
+  const handleExportCSV = async () => {
+    try {
+      const response = await fetch(`/api/teams/${params.id}/export?format=csv`);
+      if (!response.ok) throw new Error('Export failed');
+      
+      const csvData = await response.text();
+      const blob = new Blob([csvData], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${team?.name || 'team'}-export-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast.success('Team data exported as CSV');
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast.error('Failed to export team data');
+    }
+  };
+
+  const handleArchiveTeam = async () => {
+    try {
+      const response = await fetch(`/api/teams/${params.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          is_active: false,
+          metadata: {
+            ...formData.metadata,
+            archived_at: new Date().toISOString(),
+            archived_by: 'current_user' // This should be actual user ID
+          }
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to archive team');
+
+      toast.success('Team archived successfully');
+      router.push('/dashboard/teams');
+    } catch (error) {
+      console.error('Error archiving team:', error);
+      toast.error('Failed to archive team');
+    }
+  };
+
   const getTeamTypeIcon = (type: string) => {
     switch (type) {
       case 'DEPARTMENT':
@@ -301,14 +374,15 @@ export default function TeamSettingsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push(`/dashboard/teams/${team.id}`)}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Team
-          </Button>
+          <Link href={`/dashboard/teams/${team.id}`}>
+            <Button
+              variant="ghost"
+              size="sm"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Team
+            </Button>
+          </Link>
           <Separator orientation="vertical" className="h-6" />
           <div className="flex items-center gap-2">
             <div className={`p-2 rounded-lg ${getTeamTypeColor(team.type)}`}>
@@ -943,11 +1017,11 @@ export default function TeamSettingsPage() {
               </Alert>
               
               <div className="flex gap-3">
-                <Button variant="outline">
+                <Button variant="outline" onClick={handleExportJSON}>
                   <Download className="mr-2 h-4 w-4" />
                   Export as JSON
                 </Button>
-                <Button variant="outline">
+                <Button variant="outline" onClick={handleExportCSV}>
                   <Download className="mr-2 h-4 w-4" />
                   Export as CSV
                 </Button>
@@ -971,7 +1045,11 @@ export default function TeamSettingsPage() {
                   Archiving will hide the team from active views but preserve all data. You can restore it later.
                 </AlertDescription>
               </Alert>
-              <Button variant="outline" className="text-orange-600 border-orange-600 hover:bg-orange-50">
+              <Button 
+                variant="outline" 
+                className="text-orange-600 border-orange-600 hover:bg-orange-50"
+                onClick={handleArchiveTeam}
+              >
                 <Archive className="mr-2 h-4 w-4" />
                 Archive Team
               </Button>

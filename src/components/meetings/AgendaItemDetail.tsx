@@ -21,6 +21,7 @@ import {
   ArrowLeft, 
   Save, 
   X, 
+  User,
   users, 
   Calendar,
   Clock,
@@ -46,12 +47,12 @@ import { AgendaItemStatus, Purpose, SolutionType, DecisionType } from '@prisma/c
 interface Props {
   item: AgendaItemWithRelations;
   meeting: MeetingWithRelations;
-  currentusers: _AuthenticatedUser;
-  allstaff: StaffForAssignment[];
+  currentUser: AuthenticatedUser;
+  allStaff: StaffForAssignment[];
   canEdit: boolean;
 }
 
-export function AgendaItemDetail({ item, meeting, currentusers, allstaff, canEdit }: Props) {
+export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit }: Props) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);

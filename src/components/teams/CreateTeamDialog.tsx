@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -20,7 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Loader2, Users, UserCheck, Search } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 interface CreateTeamDialogProps {
@@ -34,6 +38,25 @@ interface TeamFormData {
   description?: string;
   type: string;
   purpose: string;
+  initial_members?: number[]; // staff_ids
+}
+
+interface StaffMember {
+  id: number;
+  users: {
+    id: number;
+    name: string | null;
+    email: string;
+    image?: string | null;
+  };
+  role: {
+    id: number;
+    title: string;
+  };
+  department: {
+    id: number;
+    name: string;
+  };
 }
 
 const TEAM_TYPES = [
@@ -52,12 +75,64 @@ export function CreateTeamDialog({
 }: CreateTeamDialogProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [staffLoading, setStaffLoading] = useState(false);
+  const [staff, setStaff] = useState<StaffMember[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  const [memberSearch, setMemberSearch] = useState('');
   const [formData, setFormData] = useState<TeamFormData>({
     name: '',
     description: '',
     type: 'DEPARTMENT',
     purpose: '',
+    initial_members: [],
   });
+
+  const fetchStaff = useCallback(async () => {
+    try {
+      setStaffLoading(true);
+      const response = await fetch('/api/users?include=staff');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch staff');
+      }
+
+      const data = await response.json() as { users: Array<{ staff: StaffMember[] }> };
+      setStaff(data.users.filter((user) => user.staff && user.staff.length > 0).map((user) => user.staff[0]));
+    } catch (error) {
+      console.error('Error fetching staff:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load staff members',
+        variant: 'destructive',
+      });
+    } finally {
+      setStaffLoading(false);
+    }
+  }, [toast]);
+
+  // Fetch staff when dialog opens
+  useEffect(() => {
+    if (open) {
+      void fetchStaff();
+    }
+  }, [open, fetchStaff]);
+
+
+  const toggleMember = (staffId: number) => {
+    setSelectedMembers(prev => 
+      prev.includes(staffId) 
+        ? prev.filter(id => id !== staffId)
+        : [...prev, staffId]
+    );
+  };
+
+  const filteredStaff = staff.filter(member => 
+    memberSearch === '' || 
+    (member.users.name?.toLowerCase().includes(memberSearch.toLowerCase()) ?? false) ||
+    member.users.email.toLowerCase().includes(memberSearch.toLowerCase()) ||
+    member.role.title.toLowerCase().includes(memberSearch.toLowerCase()) ||
+    member.department.name.toLowerCase().includes(memberSearch.toLowerCase())
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +157,13 @@ export function CreateTeamDialog({
 
     setLoading(true);
     try {
-      await onSubmit(formData);
+      // Include selected members in form data
+      const teamDataWithMembers = {
+        ...formData,
+        initial_members: selectedMembers.length > 0 ? selectedMembers : undefined,
+      };
+      
+      await onSubmit(teamDataWithMembers);
       toast({
         title: 'Success',
         description: 'Team created successfully',
@@ -93,9 +174,12 @@ export function CreateTeamDialog({
         description: '',
         type: 'DEPARTMENT',
         purpose: '',
+        initial_members: [],
       });
+      setSelectedMembers([]);
+      setMemberSearch('');
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to create team',
@@ -108,7 +192,7 @@ export function CreateTeamDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Team</DialogTitle>
           <DialogDescription>
@@ -175,6 +259,79 @@ export function CreateTeamDialog({
                 disabled={loading}
                 rows={3}
               />
+            </div>
+            <div className="grid gap-2">
+              <Label>Initial Team Members (Optional)</Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search members by name, email, role, or department..."
+                  value={memberSearch}
+                  onChange={(e) => setMemberSearch(e.target.value)}
+                  disabled={loading || staffLoading}
+                  className="pl-10"
+                />
+              </div>
+              {staffLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  <span className="ml-2 text-sm text-muted-foreground">Loading staff...</span>
+                </div>
+              ) : (
+                <>
+                  <ScrollArea className="h-48 border rounded-md p-2">
+                    <div className="space-y-2">
+                      {filteredStaff.length === 0 ? (
+                        <div className="flex items-center justify-center py-8">
+                          <div className="text-center">
+                            <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                            <p className="text-sm text-muted-foreground">
+                              {memberSearch ? 'No members found matching your search' : 'No staff members available'}
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        filteredStaff.map((member) => (
+                          <div
+                            key={member.id}
+                            className="flex items-center space-x-3 p-2 hover:bg-muted rounded-md cursor-pointer"
+                            onClick={() => toggleMember(member.id)}
+                          >
+                            <Checkbox
+                              checked={selectedMembers.includes(member.id)}
+                              onChange={() => toggleMember(member.id)}
+                              disabled={loading}
+                            />
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={member.users.image ?? undefined} />
+                              <AvatarFallback>
+                                {member.users.name?.charAt(0) ?? member.users.email.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">
+                                {member.users.name ?? member.users.email}
+                              </p>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {member.role.title} • {member.department.name}
+                              </p>
+                            </div>
+                            <Badge variant="outline" className="text-xs">
+                              {member.role.title}
+                            </Badge>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </ScrollArea>
+                  {selectedMembers.length > 0 && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <UserCheck className="h-4 w-4" />
+                      <span>{selectedMembers.length} member{selectedMembers.length === 1 ? '' : 's'} selected</span>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
           <DialogFooter>

@@ -119,17 +119,17 @@ export async function GET(request: NextRequest) {
         connected: true,
         message: `Connected to database with ${userCount} users`,
         details: {
-          host: urlParts?.[3] || 'unknown',
-          port: urlParts?.[4] || '5432',
-          database: urlParts?.[5]?.split('?')[0] || 'unknown',
+          host: urlParts?.[3] ?? 'unknown',
+          port: urlParts?.[4] ?? '5432',
+          database: urlParts?.[5]?.split('?')[0] ?? 'unknown',
           pooling: dbUrl.includes('pgbouncer') ? 'pgbouncer' : 'direct',
           userCount,
           roleCount,
           districtCount,
           schoolCount,
           fullUrl: dbUrl, // Show full database URL for debugging
-          directUrl: process.env.DIRECT_URL || 'not set',
-          urlParams: dbUrl.split('?')[1] || 'no params'
+          directUrl: process.env.DIRECT_URL ?? 'not set',
+          urlParams: dbUrl.split('?')[1] ?? 'no params'
         }
       };
       
@@ -176,13 +176,13 @@ export async function GET(request: NextRequest) {
       
       // Get all NextAuth-related environment variables
       const nextAuthEnv = {
-        NEXTAUTH_URL: process.env.NEXTAUTH_URL || '[NOT SET]',
-        NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || '[NOT SET]',
-        GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '[NOT SET]',
-        GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '[NOT SET]',
-        VERCEL_URL: process.env.VERCEL_URL || '[NOT SET]',
-        VERCEL_ENV: process.env.VERCEL_ENV || '[NOT SET]',
-        NODE_ENV: process.env.NODE_ENV || '[NOT SET]'
+        NEXTAUTH_URL: process.env.NEXTAUTH_URL ?? '[NOT SET]',
+        NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET ?? '[NOT SET]',
+        GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID ?? '[NOT SET]',
+        GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET ?? '[NOT SET]',
+        VERCEL_URL: process.env.VERCEL_URL ?? '[NOT SET]',
+        VERCEL_ENV: process.env.VERCEL_ENV ?? '[NOT SET]',
+        NODE_ENV: process.env.NODE_ENV ?? '[NOT SET]'
       };
       
       nextAuthStatus.configured = hasSecret && hasUrl;

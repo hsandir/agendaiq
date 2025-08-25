@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { withAuth } from '@/lib/auth/api-auth';
+import { withAuth, type APIAuthResult } from '@/lib/auth/api-auth';
 import { Capability } from '@/lib/auth/policy';
 import { z } from 'zod';
 import { FEATURES } from '@/lib/features/feature-flags';
@@ -12,6 +12,7 @@ const createTeamSchema = z.object({
   description: z.string().max(500).optional(),
   type: z.enum(['DEPARTMENT', 'PROJECT', 'COMMITTEE', 'SUBJECT', 'GRADE_LEVEL', 'SPECIAL']),
   purpose: z.string().min(1).max(500),
+  initial_members: z.array(z.number()).optional(),
   metadata: z.record(z.unknown()).optional(),
 });
 
@@ -37,7 +38,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const auth = await withAuth(request, { 
+     
+    const auth: APIAuthResult = await withAuth(request, { 
       requireAuth: true,
       requireCapability: Capability.MEETINGS_VIEW 
     });
@@ -102,7 +104,7 @@ export async function GET(request: NextRequest) {
       const isMember = team.team_members.some(member => member.staff_id === staff.id);
       
       // Admins can see all teams
-      const isAdmin = user.is_system_admin || (user as Record<string, unknown>).is_school_admin;
+      const isAdmin = user.is_system_admin ?? (user as Record<string, unknown>).is_school_admin;
       
       return isMember || isAdmin;
     });
@@ -135,7 +137,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const auth = await withAuth(request, { 
+     
+    const auth: APIAuthResult = await withAuth(request, { 
       requireAuth: true,
       requireCapability: Capability.MEETINGS_CREATE 
     });
@@ -193,7 +196,7 @@ export async function POST(request: NextRequest) {
           school_id: staff.school_id,
           district_id: staff.district_id,
           created_by: user.id,
-          metadata: validatedData.metadata || {},
+          metadata: validatedData.metadata ?? {},
           is_active: true,
           updated_at: new Date()
         }
@@ -210,6 +213,43 @@ export async function POST(request: NextRequest) {
           joined_at: new Date()
         }
       });
+
+      // Add initial members if provided
+      if (validatedData.initial_members && validatedData.initial_members.length > 0) {
+        // Get staff records for the provided staff IDs
+        const staffRecords = await tx.staff.findMany({
+          where: {
+            id: { in: validatedData.initial_members },
+            // Ensure they're from the same organization
+            OR: [
+              { school_id: staff.school_id },
+              { district_id: staff.district_id }
+            ]
+          },
+          include: {
+            users: true
+          }
+        });
+
+        // Create team memberships for initial members
+        const membershipPromises = staffRecords.map(async (memberStaff) => {
+          // Skip if this staff member is already the creator/lead
+          if (memberStaff.id === staff.id) return;
+
+          return tx.team_members.create({
+            data: {
+              id: randomBytes(16).toString('hex'),
+              team_id: newTeam.id,
+              user_id: memberStaff.users.id,
+              staff_id: memberStaff.id,
+              role: 'MEMBER',
+              joined_at: new Date()
+            }
+          });
+        });
+
+        await Promise.all(membershipPromises.filter(Boolean));
+      }
 
       return newTeam;
     });
@@ -272,7 +312,8 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const auth = await withAuth(request, { 
+     
+    const auth: APIAuthResult = await withAuth(request, { 
       requireAuth: true,
       requireCapability: Capability.MEETINGS_UPDATE 
     });
@@ -330,7 +371,7 @@ export async function PUT(request: NextRequest) {
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
 
-    if (!isTeamLead && !user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
+    if (!isTeamLead && !user.is_system_admin && !((user as Record<string, unknown>).is_school_admin)) {
       return NextResponse.json(
         { error: 'You do not have permission to update this team' },
         { status: 403 }
@@ -402,7 +443,8 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const auth = await withAuth(request, { 
+     
+    const auth: APIAuthResult = await withAuth(request, { 
       requireAuth: true,
       requireCapability: Capability.MEETINGS_DELETE 
     });
@@ -425,7 +467,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Only admins can delete teams
-    if (!user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
+    if (!user.is_system_admin && !((user as Record<string, unknown>).is_school_admin)) {
       return NextResponse.json(
         { error: 'You do not have permission to delete teams' },
         { status: 403 }

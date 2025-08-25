@@ -251,8 +251,8 @@ export class DynamicRBAC {
 
   // Check direct role permissions
   private async checkDirectRolePermissions(
-    user: _Authenticatedusers,
-    role: StaffWithRole['Role'],
+    user: _AuthenticatedUser,
+    role: StaffWithRole['role'],
     resource: string,
     action: string
   ): Promise<{ granted: boolean; reason?: string }> {
@@ -281,7 +281,7 @@ export class DynamicRBAC {
 
   // Check inherited permissions from role hierarchy
   private async checkInheritedPermissions(
-    role: StaffWithRole['Role'],
+    role: StaffWithRole['role'],
     resource: string,
     action: string
   ): Promise<{ granted: boolean; reason?: string }> {
@@ -302,7 +302,7 @@ export class DynamicRBAC {
         if (parentRole) {
           // Convert null to undefined for type compatibility
           const roleWithConvertedDeptId = {
-            ...parentrole,
+            ...parentRole,
             department_id: parentRole.department_id ?? undefined
           };
           
@@ -424,7 +424,7 @@ export class DynamicRBAC {
 
   // Get role-based permissions
   private getRoleBasedPermissions(
-    user: _Authenticatedusers,
+    user: _AuthenticatedUser,
     resource: string, 
     action: string
   ): { granted: boolean; reason?: string } {
@@ -447,7 +447,7 @@ export class DynamicRBAC {
 
   // Helper method to check if user has specific permission
   async hasPermission(
-    user: _Authenticatedusers,
+    user: _AuthenticatedUser,
     resource: string,
     action: string,
     targetId?: string,
@@ -583,7 +583,7 @@ export class DynamicRBAC {
   }
 
   // Generate permissions based on role
-  private generateRolePermissions(role: StaffWithRole['Role']): RolePermission[] {
+  private generateRolePermissions(role: StaffWithRole['role']): RolePermission[] {
     const permissions: RolePermission[] = [];
     const now = new Date();
 

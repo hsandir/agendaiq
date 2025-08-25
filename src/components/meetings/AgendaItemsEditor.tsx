@@ -118,16 +118,16 @@ interface PastMeeting {
 
 interface AgendaItemsEditorProps {
   meeting: Meeting
-  currentusers: _AuthenticatedUser
-  allstaff: StaffForAgenda[]
+  currentUser: AuthenticatedUser
+  allStaff: StaffForAgenda[]
   pastMeetings: PastMeeting[]
   canEdit: boolean
 }
 
 export function AgendaItemsEditor({
   meeting,
-  currentusers,
-  allstaff,
+  currentUser,
+  allStaff,
   pastMeetings,
   canEdit
 }: AgendaItemsEditorProps) {
@@ -310,7 +310,6 @@ export function AgendaItemsEditor({
 
       if (response.ok && data.success) {
         setSuccess('Agenda items saved successfully')
-        router.refresh()
       } else {
         setError(data.error || 'Failed to save agenda items')
       }

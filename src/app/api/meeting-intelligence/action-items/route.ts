@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     
     // Filter by ownership
     if (filter === 'my' && user.staff) {
-      whereConditions.assigned_to_id = user.staff.id;
+      whereConditions.assigned_to = user.staff.id;
     } else if (filter === 'team' && (user.staff as Record<string, unknown> | null)?.department) {
       // Get team members
       const teamMembers = await prisma.staff.findMany({
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         },
         select: { id: true }
       });
-      whereConditions.assigned_to_id = {
+      whereConditions.assigned_to = {
         in: teamMembers.map(m => m.id)
       };
     } else if (filter === 'overdue') {

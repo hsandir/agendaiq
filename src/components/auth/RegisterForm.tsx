@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { User as Fiusers, Mail as FiMail, Lock as FiLock, AlertCircle as FiAlertCircle } from 'lucide-react';
+import { User as FiUser, Mail as FiMail, Lock as FiLock, AlertCircle as FiAlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export function RegisterForm() {

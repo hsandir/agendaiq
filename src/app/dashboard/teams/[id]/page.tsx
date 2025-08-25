@@ -64,7 +64,7 @@ import {
   Lock,
   Unlock
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { useToast } from '@/components/ui/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { FEATURES } from '@/lib/features/feature-flags';
 
@@ -129,7 +129,21 @@ interface Team {
   };
 }
 
+interface TeamActivity {
+  id: string;
+  type: 'member_joined' | 'knowledge_added' | 'team_created';
+  timestamp: string;
+  user: {
+    id?: number;
+    name?: string | null;
+    email?: string;
+    image?: string | null;
+  } | null;
+  data: any;
+}
+
 export default function TeamDetailPage() {
+  const { toast } = useToast();
   const params = useParams();
   const router = useRouter();
   const [team, setTeam] = useState<Team | null>(null);
@@ -141,6 +155,8 @@ export default function TeamDetailPage() {
   const [knowledgeSearchQuery, setKnowledgeSearchQuery] = useState('');
   const [knowledgeTypeFilter, setKnowledgeTypeFilter] = useState<string>('all');
   const [knowledgeCategoryFilter, setKnowledgeCategoryFilter] = useState<string>('all');
+  const [activities, setActivities] = useState<TeamActivity[]>([]);
+  const [activitiesLoading, setActivitiesLoading] = useState(false);
 
   // Check feature flag
   if (!FEATURES.TEAMS.enabled) {
@@ -151,6 +167,12 @@ export default function TeamDetailPage() {
   useEffect(() => {
     fetchTeam();
   }, [params.id]);
+
+  useEffect(() => {
+    if (activeTab === 'activity' && team) {
+      fetchActivities();
+    }
+  }, [activeTab, team]);
 
   const fetchTeam = async () => {
     try {
@@ -179,6 +201,24 @@ export default function TeamDetailPage() {
     }
   };
 
+  const fetchActivities = async () => {
+    try {
+      setActivitiesLoading(true);
+      const response = await fetch(`/api/teams/${params.id}/activity`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch activities');
+      }
+
+      const data = await response.json();
+      setActivities(data.activities);
+    } catch (err) {
+      console.error('Error fetching activities:', err);
+    } finally {
+      setActivitiesLoading(false);
+    }
+  };
+
   const handleChangeRole = async (memberId: number, newRole: 'LEAD' | 'MEMBER') => {
     try {
       const response = await fetch(`/api/teams/${params.id}/members`, {
@@ -192,11 +232,21 @@ export default function TeamDetailPage() {
 
       if (!response.ok) throw new Error('Failed to update member role');
 
-      toast.success(`Member role updated to ${newRole === 'LEAD' ? 'Team Lead' : 'Member'}`);
+      toast({
+        title: "Success",
+        description: `Member role updated to ${newRole === 'LEAD' ? 'Team Lead' : 'Member'}`
+      });
       fetchTeam();
+      if (activeTab === 'activity') {
+        fetchActivities();
+      }
     } catch (error) {
       console.error('Error updating member role:', error);
-      toast.error('Failed to update member role');
+      toast({
+        title: "Error",
+        description: 'Failed to update member role',
+        variant: "destructive"
+      });
     }
   };
 
@@ -210,11 +260,21 @@ export default function TeamDetailPage() {
 
       if (!response.ok) throw new Error('Failed to remove member');
 
-      toast.success('Member removed from team');
+      toast({
+        title: "Success",
+        description: 'Member removed from team'
+      });
       fetchTeam();
+      if (activeTab === 'activity') {
+        fetchActivities();
+      }
     } catch (error) {
       console.error('Error removing member:', error);
-      toast.error('Failed to remove member');
+      toast({
+        title: "Error",
+        description: 'Failed to remove member',
+        variant: "destructive"
+      });
     }
   };
 
@@ -783,12 +843,120 @@ export default function TeamDetailPage() {
 
         <TabsContent value="activity" className="space-y-4">
           <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <Activity className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Activity Feed Coming Soon</h3>
-              <p className="text-muted-foreground text-center mb-4">
-                Track team updates, discussions, and important events
-              </p>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                Team Activity
+              </CardTitle>
+              <CardDescription>
+                Recent updates, member joins, and knowledge sharing
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {activitiesLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3, 4, 5].map(i => (
+                    <div key={i} className="flex items-start gap-3">
+                      <Skeleton className="h-10 w-10 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : activities.length > 0 ? (
+                <div className="space-y-6">
+                  {activities.map((activity, index) => {
+                    const getActivityIcon = () => {
+                      switch (activity.type) {
+                        case 'member_joined': return <UserPlus className="h-4 w-4 text-green-600" />;
+                        case 'knowledge_added': return <BookOpen className="h-4 w-4 text-blue-600" />;
+                        case 'team_created': return <Users className="h-4 w-4 text-purple-600" />;
+                        default: return <Activity className="h-4 w-4 text-gray-600" />;
+                      }
+                    };
+
+                    const getActivityText = () => {
+                      switch (activity.type) {
+                        case 'member_joined':
+                          return (
+                            <>
+                              <strong>{activity.user?.name || activity.user?.email?.split('@')[0]}</strong> joined the team
+                              {activity.data.role === 'LEAD' && <Badge variant="secondary" className="ml-2">Team Lead</Badge>}
+                            </>
+                          );
+                        case 'knowledge_added':
+                          return (
+                            <>
+                              <strong>{activity.user?.name || activity.user?.email?.split('@')[0]}</strong> added a new {activity.data.type.toLowerCase()} 
+                              <strong className="ml-1">"{activity.data.title}"</strong>
+                            </>
+                          );
+                        case 'team_created':
+                          return (
+                            <>
+                              Team <strong>"{activity.data.team_name}"</strong> was created
+                            </>
+                          );
+                        default:
+                          return 'Unknown activity';
+                      }
+                    };
+
+                    return (
+                      <div key={activity.id} className="relative">
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 mt-1 relative">
+                            <div className="flex items-center justify-center w-8 h-8 bg-background border-2 rounded-full z-10">
+                              {getActivityIcon()}
+                            </div>
+                            {index < activities.length - 1 && (
+                              <div className="absolute top-8 left-4 h-8 w-px bg-border -translate-x-1/2" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0 pb-6">
+                            <div className="flex items-start gap-3">
+                              {activity.user && (
+                                <Avatar className="h-8 w-8">
+                                  <AvatarImage src={activity.user.image || undefined} />
+                                  <AvatarFallback className="text-xs">
+                                    {activity.user.name?.charAt(0) || activity.user.email?.charAt(0)}
+                                  </AvatarFallback>
+                                </Avatar>
+                              )}
+                              <div className="flex-1">
+                                <p className="text-sm">
+                                  {getActivityText()}
+                                </p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <Clock className="h-3 w-3" />
+                                    {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}
+                                  </span>
+                                  {activity.data.staff_role && (
+                                    <Badge variant="outline" className="text-xs">
+                                      {activity.data.staff_role}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <Activity className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No Activity Yet</h3>
+                  <p className="text-muted-foreground">
+                    Team activity will appear here as members join and contribute
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -802,13 +970,23 @@ export default function TeamDetailPage() {
             onOpenChange={setShowAddMemberDialog}
             teamId={team.id}
             currentMembers={team.team_members.map(m => m.staff_id)}
-            onMembersAdded={fetchTeam}
+            onMembersAdded={() => {
+              fetchTeam();
+              if (activeTab === 'activity') {
+                fetchActivities();
+              }
+            }}
           />
           <CreateKnowledgeDialog
             open={showCreateKnowledgeDialog}
             onOpenChange={setShowCreateKnowledgeDialog}
             teamId={team.id}
-            onKnowledgeCreated={fetchTeam}
+            onKnowledgeCreated={() => {
+              fetchTeam();
+              if (activeTab === 'activity') {
+                fetchActivities();
+              }
+            }}
           />
         </>
       )}

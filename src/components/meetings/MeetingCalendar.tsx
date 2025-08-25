@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo, useCallback, memo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,38 +24,105 @@ interface MeetingCalendarProps {
   onRefresh: () => void;
 }
 
-export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendarProps) {
+// Memoize individual meeting day cell for performance
+const MeetingDayCell = memo(({ day, dayMeetings, isCurrentMonth, isTodayDate, selectedDate, onDateSelect, onMeetingClick }: {
+  day: Date;
+  dayMeetings: Meeting[];
+  isCurrentMonth: boolean;
+  isTodayDate: boolean;
+  selectedDate: Date | null;
+  onDateSelect: (date: Date) => void;
+  onMeetingClick: (meetingId: string) => void;
+}) => {
+  return (
+    <div
+      className={`border-r border-b p-2 min-h-[80px] cursor-pointer hover:bg-muted ${
+        !isCurrentMonth ? 'bg-muted text-muted-foreground' : ''
+      } ${isTodayDate ? 'bg-primary' : ''} ${
+        selectedDate && isSameDay(day, selectedDate) ? 'ring-2 ring-blue-500' : ''
+      }`}
+      onClick={() => onDateSelect(day)}
+    >
+      <div className="font-medium text-sm mb-1">
+        {format(day, 'd')}
+      </div>
+      {dayMeetings.slice(0, 2).map(meeting => (
+        <div
+          key={meeting.id}
+          className="text-xs bg-primary text-primary-foreground rounded px-1 py-0.5 mb-1 truncate cursor-pointer hover:bg-primary/80"
+          title={meeting.title}
+          onClick={(e) => {
+            e.stopPropagation();
+            onMeetingClick(meeting.id);
+          }}
+        >
+          {safeFormatTime(meeting.startTime)} {meeting.title}
+        </div>
+      ))}
+      {dayMeetings.length > 2 && (
+        <div className="text-xs text-muted-foreground">
+          +{dayMeetings.length - 2} more
+        </div>
+      )}
+    </div>
+  );
+});
+
+MeetingDayCell.displayName = 'MeetingDayCell';
+
+function MeetingCalendar({ meetings, onRefresh }: MeetingCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const router = useRouter();
 
-  const monthStart = startOfMonth(currentDate);
-  const monthEnd = endOfMonth(currentDate);
-  const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
-  
-  // Add padding days for calendar grid
-  const startPadding = getDay(monthStart);
-  const paddingDays = Array(startPadding).fill(null);
+  // Memoize calendar calculations
+  const calendarData = useMemo(() => {
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
+    const startPadding = getDay(monthStart);
+    const paddingDays = Array(startPadding).fill(null);
+    
+    return { monthStart, monthEnd, days, paddingDays };
+  }, [currentDate]);
 
-  const getMeetingsForDay = (date: Date) => {
-    return meetings.filter(meeting => {
+  // Memoize meetings by day for performance
+  const meetingsByDay = useMemo(() => {
+    const map = new Map<string, Meeting[]>();
+    meetings.forEach(meeting => {
       const meetingDate = new Date(meeting.startTime);
-      return isSameDay(meetingDate, date);
+      const dateKey = format(meetingDate, 'yyyy-MM-dd');
+      const existing = map.get(dateKey) || [];
+      map.set(dateKey, [...existing, meeting]);
     });
-  };
+    return map;
+  }, [meetings]);
 
-  const handlePreviousMonth = () => {
+  const getMeetingsForDay = useCallback((date: Date) => {
+    const dateKey = format(date, 'yyyy-MM-dd');
+    return meetingsByDay.get(dateKey) || [];
+  }, [meetingsByDay]);
+
+  const handlePreviousMonth = useCallback(() => {
     setCurrentDate(subMonths(currentDate, 1));
-  };
+  }, [currentDate]);
 
-  const handleNextMonth = () => {
+  const handleNextMonth = useCallback(() => {
     setCurrentDate(addMonths(currentDate, 1));
-  };
+  }, [currentDate]);
 
-  const handleToday = () => {
+  const handleToday = useCallback(() => {
     setCurrentDate(new Date());
-  };
+  }, []);
+
+  const handleDateSelect = useCallback((date: Date) => {
+    setSelectedDate(date);
+  }, []);
+
+  const handleMeetingClick = useCallback((meetingId: string) => {
+    router.push(`/dashboard/meetings/${meetingId}`);
+  }, [router]);
 
   if (viewMode === 'list') {
     return (
@@ -176,46 +243,25 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
               {day}
             </div>
           ))}
-          {paddingDays.map((_, index) => (
+          {calendarData.paddingDays.map((_, index) => (
             <div key={`padding-${index}`} className="border-r border-b p-2 min-h-[80px] bg-muted" />
           ))}
-          {days.map(day => {
+          {calendarData.days.map(day => {
             const dayMeetings = getMeetingsForDay(day);
             const isCurrentMonth = isSameMonth(day, currentDate);
             const isTodayDate = isToday(day);
             
             return (
-              <div
+              <MeetingDayCell
                 key={day.toISOString()}
-                className={`border-r border-b p-2 min-h-[80px] cursor-pointer hover:bg-muted ${
-                  !isCurrentMonth ? 'bg-muted text-muted-foreground' : ''
-                } ${isTodayDate ? 'bg-primary' : ''} ${
-                  selectedDate && isSameDay(day, selectedDate) ? 'ring-2 ring-blue-500' : ''
-                }`}
-                onClick={() => setSelectedDate(day)}
-              >
-                <div className="font-medium text-sm mb-1">
-                  {format(day, 'd')}
-                </div>
-                {dayMeetings.slice(0, 2).map(meeting => (
-                  <div
-                    key={meeting.id}
-                    className="text-xs bg-primary text-primary-foreground rounded px-1 py-0.5 mb-1 truncate cursor-pointer hover:bg-primary/80"
-                    title={meeting.title}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/dashboard/meetings/${meeting.id}`);
-                    }}
-                  >
-                    {safeFormatTime(meeting.startTime)} {meeting.title}
-                  </div>
-                ))}
-                {dayMeetings.length > 2 && (
-                  <div className="text-xs text-muted-foreground">
-                    +{dayMeetings.length - 2} more
-                  </div>
-                )}
-              </div>
+                day={day}
+                dayMeetings={dayMeetings}
+                isCurrentMonth={isCurrentMonth}
+                isTodayDate={isTodayDate}
+                selectedDate={selectedDate}
+                onDateSelect={handleDateSelect}
+                onMeetingClick={handleMeetingClick}
+              />
             );
           })}
         </div>
@@ -233,7 +279,7 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
                   <div 
                     key={meeting.id} 
                     className="bg-card p-2 rounded border cursor-pointer hover:bg-muted transition-colors"
-                    onClick={() => router.push(`/dashboard/meetings/${meeting.id}`)}
+                    onClick={() => handleMeetingClick(meeting.id)}
                   >
                     <div className="font-medium text-sm">{meeting.title}</div>
                     <div className="text-xs text-muted-foreground">
@@ -249,3 +295,5 @@ export default function MeetingCalendar({ meetings, onRefresh }: MeetingCalendar
     </Card>
   );
 }
+
+export default memo(MeetingCalendar);

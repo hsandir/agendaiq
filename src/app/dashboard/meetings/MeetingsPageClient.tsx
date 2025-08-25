@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, RefreshCw } from "lucide-react";
@@ -17,13 +17,13 @@ interface Meeting {
   status: string;
 }
 
-export default function MeetingsPageClient() {
+function MeetingsPageClient() {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const fetchMeetings = async () => {
+  const fetchMeetings = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -53,7 +53,7 @@ export default function MeetingsPageClient() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchMeetings();
@@ -112,3 +112,5 @@ export default function MeetingsPageClient() {
     </div>
   );
 }
+
+export default memo(MeetingsPageClient);

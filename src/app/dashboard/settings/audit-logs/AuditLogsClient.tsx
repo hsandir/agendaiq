@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Download as FiDownload, Eye as FiEye, Trash2 as FiTrash2, Edit as FiEdit, RefreshCw as FiRefreshCw, users as Fiusers, Database as FiDatabase, Activity as FiActivity, Shield as FiShield, AlertTriangle as FiAlertTriangle } from 'lucide-react';
+import { Download as FiDownload, Eye as FiEye, Trash2 as FiTrash2, Edit as FiEdit, RefreshCw as FiRefreshCw, User as FiUser, Users as FiUserIcon, Database as FiDatabase, Activity as FiActivity, Shield as FiShield, AlertTriangle as FiAlertTriangle } from 'lucide-react';
 import { isrole, RoleKey } from '@/lib/auth/policy';
 import type { UserWithstaff, SessionUser } from '@/types/auth';
 

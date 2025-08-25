@@ -3,7 +3,7 @@
  * Prisma field issues'ını çözmek için basit bir implementation
  */
 
-import { AuthenticatedUser } from '../auth/auth-utils';
+import { AuthenticatedUser as _AuthenticatedUser } from '../auth/auth-utils';
 
 export interface RolePermission {
   id: string;

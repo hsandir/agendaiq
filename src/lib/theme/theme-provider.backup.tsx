@@ -49,7 +49,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     // Get theme from store or localStorage after mount
     const storeTheme = themeStore.getCurrentTheme();
     const savedTheme = localStorage.getItem('agendaiq-theme');
-    const themeToUse = storeTheme ?? savedTheme || initialTheme ?? 'standard';
+    const themeToUse = storeTheme ?? (savedTheme || initialTheme) ?? 'standard';
     
     // Use singleton store to prevent re-initialization on every navigation
     if (themeStore.isInitialized()) {
@@ -143,7 +143,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
         id: 'custom',
         name: customTheme.name || 'Custom Theme',
         description: 'Your personalized theme',
-        ...custom_theme
+        ...(customTheme as Record<string, unknown>)
       } satisfies Theme;
     } else {
       theme = themes.find(t => t.id === currentThemeId) || themes.find(t => t.id === 'standard') || themes[0]; // Default to standard
@@ -281,7 +281,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
       id: 'custom',
       name: customTheme.name || 'Custom Theme',
       description: 'Your personalized theme',
-      ...custom_theme
+      ...(customTheme as Record<string, unknown>)
     } satisfies Theme;
   } else {
     currentTheme = themes.find(t => t.id === currentThemeId) || themes.find(t => t.id === 'standard') || themes[0];
