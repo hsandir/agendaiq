@@ -319,7 +319,7 @@ class HybridAuditSystem {
           select: { id: true, email: true, name: true }
         },
         staff: {
-          select: { id: true, Role: { select: { title: true } } }
+          select: { id: true, role: { select: { title: true } } }
         }
       },
       orderBy: {
@@ -345,7 +345,7 @@ class HybridAuditSystem {
           select: { id: true, email: true, name: true }
         },
         staff: {
-          select: { id: true, Role: { select: { title: true } } }
+          select: { id: true, role: { select: { title: true } } }
         }
       },
       orderBy: {

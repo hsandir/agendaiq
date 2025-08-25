@@ -121,7 +121,7 @@ export class MeetingAnalyticsService {
     const stats: DepartmentStats[] = [];
 
     for (const deptId of departmentIds) {
-      const where = { ...baseWhere, department_id: parseInt(deptId) };
+      const where = { ...baseWhere, department_id: deptId };
 
       const [
         department,
@@ -247,8 +247,8 @@ export class MeetingAnalyticsService {
       }
 
       trends[periodKey].meetings++;
-      trends[periodKey].actionItems += meeting.MeetingActionItems.length;
-      trends[periodKey].completedActions += meeting.MeetingActionItems.filter(
+      trends[periodKey].actionItems += meeting.meeting_action_items.length;
+      trends[periodKey].completedActions += meeting.meeting_action_items.filter(
         a => a.status === 'Completed'
       ).length;
     });
@@ -357,8 +357,8 @@ export class MeetingAnalyticsService {
     }
 
     if (options?.departmentId) {
-      where.Meeting = {
-        department_id: parseInt(options).departmentId
+      where.meeting = {
+        department_id: options.departmentId
       };
     }
 
@@ -503,7 +503,7 @@ export class MeetingAnalyticsService {
     }
 
     // Factor 3: Action items generated
-    const actionItemsCount = meeting.MeetingActionItems.length;
+    const actionItemsCount = meeting.meeting_action_items.length;
     if (actionItemsCount > 0) {
       score += Math.min(20, actionItemsCount * 4);
       factors.push({ 

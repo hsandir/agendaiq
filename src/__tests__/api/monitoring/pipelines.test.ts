@@ -34,11 +34,12 @@ describe('/api/monitoring/pipelines', () => {
   describe('Authentication', () => {
     it('should require staff authentication', async () => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
+      const authResult: AuthResult = {
         success: false,
         error: 'Authentication required',
         statusCode: 401
-      });
+      };
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce(authResult);
 
       const request = mockRequest();
       const response = await GET(request);
@@ -53,10 +54,11 @@ describe('/api/monitoring/pipelines', () => {
   describe('GitHub Integration', () => {
     beforeEach(() => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
+      const authResult: AuthResult = {
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
-      } as AuthResult);
+      };
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce(authResult);
     });
 
     it('should return empty runs when GitHub token is not configured', async () => {
@@ -139,10 +141,11 @@ describe('/api/monitoring/pipelines', () => {
   describe('Status Mapping', () => {
     beforeEach(() => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
+      const authResult: AuthResult = {
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
-      } as AuthResult);
+      };
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce(authResult);
     });
 
     it('should map GitHub statuses correctly', async () => {

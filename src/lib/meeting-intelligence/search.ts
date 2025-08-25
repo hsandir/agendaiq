@@ -36,7 +36,7 @@ export class MeetingSearchService {
     // Filter conditions
     if (query.filters) {
       if (query.filters.departmentId) {
-        whereConditions.push({ department_id: parseInt(query).filters.departmentId });
+        whereConditions.push({ department_id: query.filters.departmentId });
       }
       
       if (query.filters.staffId) {
@@ -216,8 +216,8 @@ export class MeetingSearchService {
     }
 
     if (filters?.departmentId) {
-      where.Meeting = {
-        department_id: parseInt(filters).departmentId
+      where.meeting = {
+        department_id: filters.departmentId
       };
     }
 

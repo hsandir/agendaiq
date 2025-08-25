@@ -74,7 +74,7 @@ interface Meeting {
     duration_minutes: number | null
     carried_forward: boolean
     carry_forward_count: number
-    responsible_staff: {
+    staff: {
       users: {
         name: string | null
         email: string | null
@@ -149,7 +149,7 @@ export function AgendaItemsEditor({
 
   // Initialize agenda items from meeting data
   useEffect(() => {
-    const items: AgendaItemFormData[] = meeting.MeetingAgendaItems.map(item => ({
+    const items: AgendaItemFormData[] = meeting.meeting_agenda_items.map(item => ({
       id: item.id,
       topic: item.topic,
       problem_statement: item.problem_statement ?? undefined,
@@ -483,7 +483,7 @@ export function AgendaItemsEditor({
                       <div className="flex justify-between items-center w-full">
                         <span>{pm.title}</span>
                         <span className="text-sm text-muted-foreground ml-2">
-                          ({pm._count.MeetingAgendaItems} items)
+                          ({pm._count.meeting_agenda_items} items)
                         </span>
                       </div>
                       <div className="text-xs text-muted-foreground">

@@ -33,6 +33,7 @@ interface TeamFormData {
   name: string;
   description?: string;
   type: string;
+  purpose: string;
 }
 
 const TEAM_TYPES = [
@@ -49,12 +50,13 @@ export function CreateTeamDialog({
   onOpenChange,
   onSubmit,
 }: CreateTeamDialogProps) {
-  const { _toast } = useToast();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<TeamFormData>({
     name: '',
     description: '',
     type: 'DEPARTMENT',
+    purpose: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,6 +66,15 @@ export function CreateTeamDialog({
       toast({
         title: 'Error',
         description: 'Team name is required',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!formData.purpose.trim()) {
+      toast({
+        title: 'Error',
+        description: 'Team purpose is required',
         variant: 'destructive',
       });
       return;
@@ -81,6 +92,7 @@ export function CreateTeamDialog({
         name: '',
         description: '',
         type: 'DEPARTMENT',
+        purpose: '',
       });
       onOpenChange(false);
     } catch (error) {
@@ -137,6 +149,19 @@ export function CreateTeamDialog({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="purpose">Purpose</Label>
+              <Textarea
+                id="purpose"
+                placeholder="What is the main purpose of this team?"
+                value={formData.purpose}
+                onChange={(e) =>
+                  setFormData({ ...formData, purpose: e.target.value })
+                }
+                disabled={loading}
+                rows={2}
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="description">Description (Optional)</Label>

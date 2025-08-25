@@ -51,8 +51,8 @@ export async function GET(request: NextRequest) {
     const meetings = await prisma.meeting.findMany({
       where: whereConditions,
       include: {
-        MeetingAgendaItems: true,
-        MeetingActionItems: true,
+        meeting_agenda_items: true,
+        meeting_action_items: true,
         meeting_attendee: true,
         department: true,
         staff: {
@@ -88,9 +88,9 @@ export async function GET(request: NextRequest) {
     const onTimeStartRate = 0; // Placeholder until we add actual_start_time to schema
     
     // Calculate action item completion rate
-    const totalActionItems = meetings.reduce((sum, m) => sum + m.MeetingActionItems.length, 0);
+    const totalActionItems = meetings.reduce((sum, m) => sum + m.meeting_action_items.length, 0);
     const completedActionItems = meetings.reduce((sum, m) => 
-      sum + m.MeetingActionItems.filter((a: { status: string }) => a.status === 'Completed').length, 0
+      sum + m.meeting_action_items.filter((a: { status: string }) => a.status === 'Completed').length, 0
     );
     const actionItemCompletionRate = totalActionItems > 0
       ? Math.round((completedActionItems / totalActionItems) * 100)
@@ -126,8 +126,8 @@ export async function GET(request: NextRequest) {
         if (m.start_time && m.end_time) {
           dept.totalDuration += (m.end_time.getTime() - m.start_time.getTime()) / 60000;
         }
-        dept.actionItems += m.MeetingActionItems.length;
-        dept.completedItems += m.MeetingActionItems.filter((a: { status: string }) => a.status === 'Completed').length;
+        dept.actionItems += m.meeting_action_items.length;
+        dept.completedItems += m.meeting_action_items.filter((a: { status: string }) => a.status === 'Completed').length;
       }
     });
     

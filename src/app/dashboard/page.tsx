@@ -310,8 +310,8 @@ export default async function DashboardPage() {
                 <div key={meeting.id} className="p-4 bg-background/30 rounded-lg border border-border/30">
                   <p className="font-medium text-foreground mb-1">{meeting.title}</p>
                   <ul className="text-sm text-muted-foreground space-y-1 pl-4">
-                    <li>• {meeting._count.MeetingAgendaItems} agenda items</li>
-                    <li>• {meeting._count.MeetingAttendee} attendees</li>
+                    <li>• {meeting._count.meeting_agenda_items} agenda items</li>
+                    <li>• {meeting._count.meeting_attendee} attendees</li>
                     <li>• Organized by {meeting.staff.users.name ?? meeting.staff.users.email}</li>
                   </ul>
                   <div className="text-xs text-muted-foreground mt-3 text-right">

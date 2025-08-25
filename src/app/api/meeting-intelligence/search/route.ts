@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
               title: true
             }
           },
-          assigned_to: {
+          staff_meeting_action_items_assigned_toTostaff: {
             include: {
               users: {
                 select: {
@@ -126,8 +126,8 @@ export async function GET(request: NextRequest) {
           id: item.meeting.id,
           title: item.meeting.title
         } : undefined,
-        assignedTo: item.AssignedTo ? {
-          name: item.AssignedTo.users.name ?? 'Unknown'
+        assignedTo: item.staff_meeting_action_items_assigned_toTostaff ? {
+          name: item.staff_meeting_action_items_assigned_toTostaff.users.name ?? 'Unknown'
         } : {
           name: 'Unassigned'
         }

@@ -127,7 +127,7 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
           }
         }
       ],
-      MeetingAgendaItems: {
+      meeting_agenda_items: {
         some: {} // Only meetings with agenda items
       }
     },
@@ -137,7 +137,7 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
       start_time: true,
       _count: {
         select: {
-          MeetingAgendaItems: true
+          meeting_agenda_items: true
         }
       }
     },

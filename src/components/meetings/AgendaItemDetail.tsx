@@ -491,14 +491,14 @@ export function AgendaItemDetail({ item, meeting, currentusers, allstaff, canEdi
                     </Select>
                   ) : (
                     <div className="mt-1">
-                      {item.responsible_staff ? (
+                      {item.staff ? (
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                             <User className="h-4 w-4 text-primary" />
                           </div>
                           <div>
-                            <p className="font-medium text-foreground">{item.responsible_staff.users.name ?? item.responsible_staff.users.email}</p>
-                            <p className="text-xs text-muted-foreground">{item.responsible_staff.role.title}</p>
+                            <p className="font-medium text-foreground">{item.staff.users.name ?? item.staff.users.email}</p>
+                            <p className="text-xs text-muted-foreground">{item.staff.role.title}</p>
                           </div>
                         </div>
                       ) : (

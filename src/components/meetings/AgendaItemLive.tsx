@@ -35,10 +35,10 @@ import { AgendaItemComments } from "./AgendaItemComments";
 import { CreateMeetingModal } from "./CreateMeetingModal";
 import Link from "next/link";
 
-interface ExtendedAgendaItem extends MeetingAgendaItem {
-  ResponsibleStaff?: (Staff & { users: PrismaUser }) | null;
-  Comments: Record<string, unknown>[];
-  ActionItems: Record<string, unknown>[];
+interface ExtendedAgendaItem extends meeting_agenda_items {
+  staff?: (staff & { users: users }) | null;
+  agenda_item_comments: Record<string, unknown>[];
+  meeting_action_items: Record<string, unknown>[];
 }
 
 interface Props {
@@ -282,11 +282,11 @@ export function AgendaItemLive({
               )}
               
               {/* Assigned User Pill */}
-              {item.responsible_staff && !isEditing && (
+              {item.staff && !isEditing && (
                 <div className="flex items-center gap-2 mt-2">
                   <div className="flex items-center gap-1.5 bg-primary text-primary-foreground px-2.5 py-1 rounded-full text-xs font-medium">
                     <User className="h-3 w-3" />
-                    <span>{item.responsible_staff.users.name}</span>
+                    <span>{item.staff.users.name}</span>
                   </div>
                 </div>
               )}
@@ -381,7 +381,7 @@ export function AgendaItemLive({
               <div className="mt-1 flex items-center space-x-2">
                 <User className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm">
-                  {item.responsible_staff ? item.responsible_staff.users.name : 'Unassigned'}
+                  {item.staff ? item.staff.users.name : 'Unassigned'}
                   {item.staff_initials && ` (${item.staff_initials})`}
                 </span>
               </div>

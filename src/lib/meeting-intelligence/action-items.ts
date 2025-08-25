@@ -115,8 +115,8 @@ export class ActionItemsService {
     }
 
     if (filterOptions?.departmentId) {
-      where.Meeting = {
-        department_id: parseInt(filterOptions).departmentId
+      where.meeting = {
+        department_id: filterOptions.departmentId
       };
     }
 
@@ -176,8 +176,8 @@ export class ActionItemsService {
     const where: Record<string, unknown> = { status };
 
     if (options?.departmentId) {
-      where.Meeting = {
-        department_id: parseInt(options).departmentId
+      where.meeting = {
+        department_id: options.departmentId
       };
     }
 
@@ -227,8 +227,8 @@ export class ActionItemsService {
     const where: Record<string, unknown> = {};
 
     if (filterOptions?.departmentId) {
-      where.Meeting = {
-        department_id: parseInt(filterOptions).departmentId
+      where.meeting = {
+        department_id: filterOptions.departmentId
       };
     }
 

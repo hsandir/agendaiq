@@ -209,7 +209,7 @@ describe('Meeting Creation Integration', () => {
         }
       });
 
-      expect(meeting.MeetingAttendee).toHaveLength(1);
+      expect(meeting.meeting_attendee).toHaveLength(1);
       expect(meeting.meeting_attendee[0].status).toBe('pending');
       expect(meeting.meeting_attendee[0].staff_id).toBe(attendee.id);
     });

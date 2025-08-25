@@ -193,15 +193,13 @@ export class TestFactory {
   private async getOrCreateRole(title: string = 'Teacher'): Promise<role> {
     let role = await this.prisma.role.findFirst({ where: { title } })
     
-    if (!role) {
-      role = await this.prisma.role.create({
+    role ??= await this.prisma.role.create({
         data: {
           title,
           is_leadership: ['Administrator', 'Principal', 'Vice Principal'].includes(title),
           priority: this.getRolePriority(title),
         },
       })
-    }
     
     return role
   }
@@ -266,15 +264,13 @@ export class TestFactory {
   private async getOrCreateDistrict(): Promise<district> {
     let district = await this.prisma.district.findFirst()
     
-    if (!district) {
-      district = await this.prisma.district.create({
+    district ??= await this.prisma.district.create({
         data: {
           name: faker.location.county() + ' District',
           code: faker.string.alphanumeric(6).toUpperCase(),
           address: faker.location.streetAddress(),
         },
       })
-    }
     
     return district
   }

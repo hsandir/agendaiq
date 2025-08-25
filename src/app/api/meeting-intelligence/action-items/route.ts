@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
             start_time: true
           }
         },
-        assigned_to: {
+        staff_meeting_action_items_assigned_toTostaff: {
           include: {
             users: {
               select: {
@@ -113,10 +113,10 @@ export async function GET(request: NextRequest) {
           id: 0,
           label: 'UNASSIGNED'
         },
-        assignedstaff: item.assigned_to ? {
-          id: item.assigned_to.id,
-          name: item.assigned_to.users.name ?? 'Unknown',
-          email: item.assigned_to.users.email
+        assignedstaff: item.staff_meeting_action_items_assigned_toTostaff ? {
+          id: item.staff_meeting_action_items_assigned_toTostaff.id,
+          name: item.staff_meeting_action_items_assigned_toTostaff.users.name ?? 'Unknown',
+          email: item.staff_meeting_action_items_assigned_toTostaff.users.email
         } : undefined,
         meeting: item.meeting ? {
           id: item.meeting.id,

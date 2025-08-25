@@ -47,17 +47,17 @@ import type { AuthenticatedUser } from '@/lib/auth/auth-utils';
 interface ExtendedMeeting extends Meeting {
   department: Department;
   staff: Staff & { users: PrismaUser; role: Role };
-  MeetingAttendee: (MeetingAttendee & { 
+  meeting_attendee: (meeting_attendee & { 
     staff: Staff & { 
       users: PrismaUser; 
       role: Role; 
       department: Department 
     } 
   })[];
-  meeting_agenda_items: (MeetingAgendaItem & {
-    ResponsibleStaff?: (Staff & { users: PrismaUser }) | null;
-    Comments: Array<Record<string, unknown>>;
-    ActionItems: Array<Record<string, unknown>>;
+  meeting_agenda_items: (meeting_agenda_items & {
+    staff?: (Staff & { users: PrismaUser }) | null;
+    agenda_item_comments: Array<Record<string, unknown>>;
+    meeting_action_items: Array<Record<string, unknown>>;
   })[];
   meeting_action_items: Array<Record<string, unknown>>;
 }
@@ -177,7 +177,7 @@ export function MeetingLiveView({
       const data = await response.json();
       
       if (data.success && data.meeting) {
-        setAgendaItems(data.meeting.MeetingAgendaItems);
+        setAgendaItems(data.meeting.meeting_agenda_items);
         setLastUpdate(new Date());
       }
     } catch (error: unknown) {

@@ -48,7 +48,7 @@ export default async function EditMeetingPage({ params }: PageProps) {
           }
         }
       },
-      MeetingAgendaItems: {
+      meeting_agenda_items: {
         orderBy: {
           order_index: 'asc'
         }
@@ -140,7 +140,7 @@ export default async function EditMeetingPage({ params }: PageProps) {
       email: attendee.staff.users.email ?? '',
       status: attendee.status ?? 'pending'
     })),
-    agendaItems: meeting.MeetingAgendaItems.map(item => ({
+    agendaItems: meeting.meeting_agenda_items.map(item => ({
       id: item.id.toString(),
       topic: item.topic,
       description: item.problem_statement ?? '',

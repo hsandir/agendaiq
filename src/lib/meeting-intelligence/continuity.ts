@@ -93,7 +93,7 @@ export class MeetingContinuityService {
             topic: `[Carried Forward] ${item.topic}`,
             problem_statement: item.problemStatement,
             responsible_staff_id: item.responsibleStaffId,
-            responsible_role_id: parseInt(item).responsibleRoleId,
+            responsible_role_id: item.responsibleRoleId,
             priority: item.priority,
             status: 'Pending',
             parent_item_id: item.parentItemId,
@@ -189,7 +189,7 @@ export class MeetingContinuityService {
     };
 
     return {
-      root: rootmeeting,
+      root: rootMeeting,
       chain: await getAllDescendants(rootMeeting.id),
       currentmeeting: meeting
     };
@@ -214,11 +214,11 @@ export class MeetingContinuityService {
     const countMeetings = (meetings: Record<string, unknown>[]): void => {
       for (const meeting of meetings) {
         stats.totalMeetingsInChain++;
-        stats.totalCarriedItems += meeting.MeetingAgendaItems?.length ?? 0;
-        stats.resolvedItems += meeting.MeetingAgendaItems?.filter(
+        stats.totalCarriedItems += meeting.meeting_agenda_items?.length ?? 0;
+        stats.resolvedItems += meeting.meeting_agenda_items?.filter(
           (i: Record<string, unknown>) => i.status === 'Resolved'
         ).length ?? 0;
-        stats.pendingItems += meeting.MeetingAgendaItems?.filter(
+        stats.pendingItems += meeting.meeting_agenda_items?.filter(
           (i: Record<string, unknown>) => i.status !== 'Resolved'
         ).length ?? 0;
         

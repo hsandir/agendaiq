@@ -86,7 +86,7 @@ export default async function MeetingLivePage(props: Props) {
       duration_minutes: true,
       priority: true,
       purpose: true,
-      responsible_staff: {
+      staff: {
         include: {
           users: true
         }
@@ -107,7 +107,7 @@ export default async function MeetingLivePage(props: Props) {
   const actionItems = await prisma.meeting_action_items.findMany({
     where: { meeting_id: meetingId },
     include: {
-      AssignedTo: {
+      staff_meeting_action_items_assigned_toTostaff: {
         include: {
           users: true,
           role: true
@@ -119,9 +119,9 @@ export default async function MeetingLivePage(props: Props) {
   // Combine the data
   const fullMeeting = {
     ...meeting,
-    MeetingAttendee: attendees,
-    MeetingAgendaItems: agendaItems,
-    MeetingActionItems: actionItems
+    meeting_attendee: attendees,
+    meeting_agenda_items: agendaItems,
+    meeting_action_items: actionItems
   };
 
   // Get only relevant staff for assignment dropdowns (same department/school)
