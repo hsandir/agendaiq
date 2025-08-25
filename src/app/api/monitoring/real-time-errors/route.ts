@@ -209,7 +209,7 @@ export async function PATCH(request: NextRequest) {
     for (const [page, errors] of errorStore.entries()) {
       const errorIndex = errors.findIndex(err => err.id === errorId);
       if (errorIndex !== -1) {
-        errors[errorIndex].resolved = resolved;
+        errors[errorIndex].resolved = Boolean(resolved);
         errors[errorIndex].resolvedAt = new Date().toISOString()
         errorStore.set(page, errors);
         break;

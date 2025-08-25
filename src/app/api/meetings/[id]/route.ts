@@ -84,18 +84,18 @@ export async function GET(request: NextRequest, props: Props) {
 
     // Check if user is authorized to view this meeting early
     const hasAdminAccess = isAnyAdmin(user);
-    const isOrganizer = basicMeeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
+    const isOrganizer = basicMeeting.organizer_id === Number((user.staff as any)?.id ?? 0);
     
     // Quick attendee check for authorization
     const attendeeCheck = await prisma.meeting_attendee.findFirst({
       where: {
         meeting_id: meetingId,
-        staff_id: (user.staff as Record<string, unknown> | null)?.id || -1
+        staff_id: Number((user.staff as any)?.id ?? 0) || -1
       }
     });
     
     const isAttendee = !!attendeeCheck;
-    const isSameDepartment = basicMeeting.department_id === (user.staff as Record<string, unknown> | null)?.department?.id;
+    const isSameDepartment = basicMeeting.department_id === (user.staff as any)?.department_id;
 
     if (!hasAdminAccess && !isOrganizer && !isAttendee && !isSameDepartment) {
       return NextResponse.json({ error: "Not authorized to view this meeting" }, { status: 403 });
@@ -198,8 +198,8 @@ export async function GET(request: NextRequest, props: Props) {
     await prisma.meeting_audit_logs.create({
       data: {
         meeting_id: meetingId,
-        user_id: parseInt(user.id),
-        staff_id: (user.staff as Record<string, unknown> | null)?.id,
+        user_id: user.id,
+        staff_id: Number((user.staff as any)?.id ?? 0),
         action: 'VIEW',
         details: 'Viewed meeting details',
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
@@ -241,7 +241,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Staff record not found" }, { status: 404 });
     }
 
-    const { _id } = params;
+    const { id } = params;
     const meetingId = parseInt(id);
     if (isNaN(meetingId)) {
       return NextResponse.json({ error: "Invalid meeting ID" }, { status: 400 });
@@ -272,7 +272,7 @@ export async function PATCH(
     }
 
     const hasAdminAccess = isAnyAdmin(user);
-    const isOrganizer = existingMeeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
+    const isOrganizer = existingMeeting.organizer_id === Number((user.staff as any)?.id ?? 0);
 
     if (!hasAdminAccess && !isOrganizer) {
       return NextResponse.json({ error: "Not authorized to edit this meeting" }, { status: 403 });
@@ -303,8 +303,8 @@ export async function PATCH(
     if (body.agenda !== undefined) updateData.agenda = body.agenda;
     if (body.notes !== undefined) updateData.notes = body.notes;
     if (body.status !== undefined) updateData.status = body.status;
-    if (body.start_time !== undefined) updateData.start_time = new Date(body.start_time);
-    if (body.end_time !== undefined) updateData.end_time = new Date(body.end_time);
+    if (body.start_time !== undefined) updateData.start_time = new Date(String(body.start_time));
+    if (body.end_time !== undefined) updateData.end_time = new Date(String(body.end_time));
 
     // Update meeting
     const updatedMeeting = await prisma.meeting.update({
@@ -335,8 +335,8 @@ export async function PATCH(
     await prisma.meeting_audit_logs.create({
       data: {
         meeting_id: updatedMeeting.id,
-        user_id: parseInt(user.id),
-        staff_id: (user.staff as Record<string, unknown> | null)?.id,
+        user_id: user.id,
+        staff_id: Number((user.staff as any)?.id ?? 0),
         action: 'UPDATE',
         details: `Updated meeting: ${updatedMeeting.title}`,
         changes: {

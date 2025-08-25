@@ -101,7 +101,8 @@ export async function POST(
         file_url: `/uploads/agenda-items/${fileName}`,
         file_size: file.size,
         content_type: file.type,
-        uploaded_by_id: user.staff!.id
+        uploaded_by_id: user.staff!.id,
+        updated_at: new Date()
       }
     });
 
@@ -144,7 +145,7 @@ export async function GET(
     const attachments = await prisma.agenda_item_attachments.findMany({
       where: { agenda_item_id: itemId },
       include: {
-        UploadedBy: {
+        staff: {
           include: {
             users: true
           }

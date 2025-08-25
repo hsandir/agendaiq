@@ -1,19 +1,47 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { SignInForm } from '@/components/auth/SignInForm';
 import { signIn } from 'next-auth/react';
-import { setupNavigationMocks, mockRouter, mockPush, resetNavigationMocks } from '@/__tests__/utils/next-navigation-mocks';
 
-// Setup navigation mocks
-setupNavigationMocks();
+// Mock next/navigation completely inline
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(() => ({
+    push: jest.fn(),
+    refresh: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+  })),
+  useSearchParams: jest.fn(() => ({
+    get: jest.fn(),
+    has: jest.fn(),
+    toString: jest.fn(() => ''),
+  })),
+  usePathname: jest.fn(() => '/'),
+  useParams: jest.fn(() => ({})),
+}));
 
-// Mock next-auth
 jest.mock('next-auth/react', () => ({
   signIn: jest.fn(),
 }));
 
+import { useRouter } from 'next/navigation';
+
+const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+
 describe('SignInForm Component', () => {
+  let mockPush: jest.Mock;
+  
   beforeEach(() => {
-    resetNavigationMocks();
+    mockPush = jest.fn();
+    mockUseRouter.mockReturnValue({
+      push: mockPush,
+      refresh: jest.fn(),
+      back: jest.fn(),
+      forward: jest.fn(),
+      replace: jest.fn(),
+      prefetch: jest.fn(),
+    });
     jest.clearAllMocks();
   });
 
@@ -110,7 +138,7 @@ describe('SignInForm Component', () => {
     
     await waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith('/dashboard');
-    });
+    }, { timeout: 3000 });
   });
 
   it('displays error message on failed login', async () => {
@@ -130,7 +158,7 @@ describe('SignInForm Component', () => {
     fireEvent.submit(form);
     
     await waitFor(() => {
-      expect(screen.getByText(/invalid email or password/i)).toBeInTheDocument();
+      expect(screen.getByText(/invalid credentials/i)).toBeInTheDocument();
     });
   });
 

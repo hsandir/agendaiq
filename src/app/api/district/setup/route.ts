@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json() as Record<string, unknown>;
-    const { _name, address } = body;
+    const { name, address } = body;
 
     if (!name) {
       return NextResponse.json(
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     const district = await prisma.district.create({
       data: {
         name: String(name).trim(),
-        address: address?.trim(),
+        address: String(address ?? '').trim() || null,
       },
     });
 

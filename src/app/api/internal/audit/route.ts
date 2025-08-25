@@ -29,48 +29,48 @@ export async function POST(request: NextRequest) {
     // Determine category and log appropriately
     if (category === 'AUTH') {
       await auditSystem.logAuth(
-        action,
-        metadata?.userId,
-        metadata?.staffId,
-        success,
-        { request: auditEvent }
+        String(action ?? 'unknown'),
+        (metadata as any)?.userId,
+        (metadata as any)?.staffId,
+        Boolean(success ?? false),
+        auditEvent as any
       );
     } else if (category === 'SECURITY') {
       await auditSystem.logSecurity(
-        action,
-        metadata?.userId,
-        metadata?.staffId,
-        errorMessage,
-        { request: auditEvent }
+        String(action ?? 'unknown'),
+        (metadata as any)?.userId,
+        (metadata as any)?.staffId,
+        String(errorMessage ?? ''),
+        auditEvent as any
       );
-    } else if (path?.startsWith('/api/admin/')) {
+    } else if (String(path ?? '').startsWith('/api/admin/')) {
       // Critical admin operations
       await auditSystem.logDataCritical(
-        action,
-        metadata?.userId,
-        metadata?.staffId,
-        metadata?.targetUserId,
-        metadata,
-        { request: auditEvent }
+        String(action ?? 'unknown'),
+        (metadata as any)?.userId,
+        (metadata as any)?.staffId,
+        (metadata as any)?.targetUserId,
+        metadata as any,
+        auditEvent as any
       );
-    } else if (path?.startsWith('/dashboard')) {
+    } else if (String(path ?? '').startsWith('/dashboard')) {
       // Page visits
       await auditSystem.logPageVisit(
-        path,
-        metadata?.userId,
-        metadata?.staffId,
-        metadata?.duration ?? 0,
-        { request: auditEvent }
+        String(path ?? 'unknown'),
+        (metadata as any)?.userId,
+        (metadata as any)?.staffId,
+        Number((metadata as any)?.duration ?? 0),
+        auditEvent as any
       );
     } else {
       // General API calls
       await auditSystem.logApiCall(
-        path ?? action,
-        method ?? 'GET',
-        metadata?.duration ?? 0,
-        metadata?.userId,
-        metadata?.staffId,
-        { request: auditEvent }
+        String(path ?? action ?? 'unknown'),
+        String(method ?? 'GET'),
+        Number((metadata as any)?.duration ?? 0),
+        (metadata as any)?.userId,
+        (metadata as any)?.staffId,
+        auditEvent as any
       );
     }
 

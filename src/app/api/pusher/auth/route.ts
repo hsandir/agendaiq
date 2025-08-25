@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { pusherServer } from '@/lib/pusher';
 import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from '@/lib/prisma';
-import { isrole, RoleKey } from '@/lib/auth/policy';
+import { isRole, RoleKey } from '@/lib/auth/policy';
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Extract meeting ID from channel name
-    const meetingIdMatch = channel.match(/meeting-(\d+)$/);
+    const meetingIdMatch = String(channel ?? '').match(/meeting-(\d+)$/);
     if (!meetingIdMatch) {
       return NextResponse.json(
         { error: 'Invalid channel name' },

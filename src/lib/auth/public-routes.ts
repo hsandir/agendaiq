@@ -50,6 +50,9 @@ export const PUBLIC_API_ROUTES = [
   // Error reporting (public for client-side error reporting)
   '/api/error-capture',
   '/api/errors',
+  
+  // Temporary admin password update (REMOVE AFTER USE!)
+  '/api/dev/admin/update-password',
 ] as const;
 
 // Helper types for TypeScript

@@ -20,7 +20,7 @@ interface ErrorIssue {
 export async function GET(request: NextRequest) {
   try {
     const authResult = await withAuth(request, {
-      requireCapability: Capability.SYSTEM_VIEW
+      requireCapability: Capability.DEV_DEBUG
     });
     
     if (!authResult.success) {

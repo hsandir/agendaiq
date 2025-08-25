@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   try {
     const auth: APIAuthResult = await withAuth(request, {
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_CREATE // Basic capability for email sending
+      requireCapability: Capability.MEETING_CREATE // Basic capability for email sending
     });
 
     if (!auth.success) {
@@ -22,10 +22,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json() as Record<string, unknown>;
-    const { _type, _data } = sendEmailSchema.parse(body);
+    const { type, data } = sendEmailSchema.parse(body);
 
     // Validate and send email based on type
-    await emailService.sendEmail(data as EmailTemplateData);
+    await emailService.sendEmail(data as unknown as EmailTemplateData);
 
     return NextResponse.json({
       success: true,

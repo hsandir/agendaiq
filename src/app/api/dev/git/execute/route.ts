@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     // Execute command
     const { stdout, stderr } = await execAsync(gitCommand, {
       cwd: process.cwd(),
-      timeout: __30000, // 30 second timeout
+      timeout: 30000, // 30 second timeout
       maxBuffer: 1024 * 1024 * 10 // 10MB buffer
     });
 

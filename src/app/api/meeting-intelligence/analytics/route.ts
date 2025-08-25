@@ -189,7 +189,7 @@ export async function GET(request: NextRequest) {
         onTimeStartRate,
         actionItemCompletionRate,
         meetingsByType,
-        meetingsBydepartment,
+        meetingsByDepartment,
         trendData,
         topContributors
       },

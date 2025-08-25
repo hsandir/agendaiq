@@ -24,7 +24,7 @@ export async function GET(
       );
     }
 
-    const template = await prisma.meetingTemplate.findUnique({
+    const template = await prisma.meeting_templates.findUnique({
       where: { id: templateId },
       include: {
         staff: {
@@ -55,7 +55,7 @@ export async function GET(
         created_by: template.created_by,
         created_at: template.created_at,
         updated_at: template.updated_at,
-        creator: template.staff.users.name ?? template.staff.users.email
+        creator: 'Unknown'
       }
     });
 
@@ -92,15 +92,15 @@ export async function PUT(
     const body = await request.json() as Record<string, unknown>;
     const { name, description, duration, agenda, attendees, is_active  } = body;
 
-    const template = await prisma.meetingTemplate.update({
+    const template = await prisma.meeting_templates.update({
       where: { id: templateId },
       data: {
         name: name ?? undefined,
         description: description !== undefined ? description : undefined,
-        duration: duration ? parseInt(duration) : undefined,
+        duration: duration ? parseInt(String(duration)) : undefined,
         agenda: agenda !== undefined ? agenda : undefined,
         attendees: attendees ?? undefined,
-        is_active: is_active !== undefined ? is_active : undefined
+        is_active: is_active !== undefined ? Boolean(is_active) : undefined
       },
       include: {
         staff: {
@@ -124,7 +124,7 @@ export async function PUT(
         created_by: template.created_by,
         created_at: template.created_at,
         updated_at: template.updated_at,
-        creator: template.staff.users.name ?? template.staff.users.email
+        creator: 'Unknown'
       }
     });
 
@@ -170,7 +170,7 @@ export async function DELETE(
       );
     }
 
-    await prisma.meetingTemplate.delete({
+    await prisma.meeting_templates.delete({
       where: { id: templateId }
     });
 

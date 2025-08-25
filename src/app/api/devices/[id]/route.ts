@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth/api-auth";
 import { prisma } from "@/lib/prisma";
 
-// Trust/untrust a device
+// Trust/untrust a devices
 export async function PUT(
   request: NextRequest,
   props: { params: Promise<{ id: string }> }
@@ -22,45 +22,45 @@ export async function PUT(
     const deviceId = params.id;
     const body = await request.json() as Record<string, unknown>;
 
-    // Verify device belongs to user
-    const device = await prisma.device.findFirst({
+    // Verify devices belongs to user
+    const devices = await prisma.devices.findFirst({
       where: {
-        id: deviceId,
-        user_id: parseInt(user.id)
+        id: parseInt(deviceId),
+        user_id: user.id
       }
     });
 
-    if (!device) {
+    if (!devices) {
       return NextResponse.json(
         { error: "Device not found" }, 
         { status: 404 }
       );
     }
 
-    // Update device trust status
-    const updatedDevice = await prisma.device.update({
-      where: { id: deviceId },
+    // Update devices trust status
+    const updatedDevice = await prisma.devices.update({
+      where: { id: parseInt(deviceId) },
       data: {
-        is_trusted: body.is_trusted,
+        is_trusted: Boolean(body.is_trusted),
         last_active: new Date()
       }
     });
 
     return NextResponse.json({ 
-      device: updatedDevice,
+      devices: updatedDevice,
       message: body.is_trusted ? "Device trusted" : "Device untrusted" 
     });
 
   } catch (error: unknown) {
     console.error('Update Device Error:', error);
     return NextResponse.json(
-      { error: "Failed to update device" }, 
+      { error: "Failed to update devices" }, 
       { status: 500 }
     );
   }
 }
 
-// Remove a device
+// Remove a devices
 export async function DELETE(
   request: NextRequest,
   props: { params: Promise<{ id: string }> }
@@ -79,24 +79,24 @@ export async function DELETE(
     const user = authResult.user!;
     const deviceId = params.id;
 
-    // Verify device belongs to user
-    const device = await prisma.device.findFirst({
+    // Verify devices belongs to user
+    const devices = await prisma.devices.findFirst({
       where: {
-        id: deviceId,
-        user_id: parseInt(user.id)
+        id: parseInt(deviceId),
+        user_id: user.id
       }
     });
 
-    if (!device) {
+    if (!devices) {
       return NextResponse.json(
         { error: "Device not found" }, 
         { status: 404 }
       );
     }
 
-    // Delete device
-    await prisma.device.delete({
-      where: { id: deviceId }
+    // Delete devices
+    await prisma.devices.delete({
+      where: { id: parseInt(deviceId) }
     });
 
     return NextResponse.json({ 
@@ -106,7 +106,7 @@ export async function DELETE(
   } catch (error: unknown) {
     console.error('Delete Device Error:', error);
     return NextResponse.json(
-      { error: "Failed to remove device" }, 
+      { error: "Failed to remove devices" }, 
       { status: 500 }
     );
   }

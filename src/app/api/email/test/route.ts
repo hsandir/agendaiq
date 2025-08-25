@@ -7,16 +7,16 @@ export async function POST(request: NextRequest) {
   try {
     const auth: APIAuthResult = await withAuth(request, {
       requireAuth: true,
-      requireCapability: Capability.SYSTEM_ADMIN // Only admins can test email
+      requireCapability: Capability.DEV_DEBUG // Only admins can test email
     });
 
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
+    const { user } = auth;
     const body = await request.json() as { email?: string };
-    const testEmail = body.email || auth.user.email;
+    const testEmail = body.email || auth.user!.email;
 
     // Test SMTP connection first
     const connectionOk = await emailService.verifyConnection();
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
   try {
     const auth: APIAuthResult = await withAuth(request, {
       requireAuth: true,
-      requireCapability: Capability.SYSTEM_ADMIN
+      requireCapability: Capability.DEV_DEBUG
     });
 
     if (!auth.success) {

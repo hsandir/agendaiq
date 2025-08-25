@@ -345,11 +345,11 @@ export async function POST(request: NextRequest) {
     };
 
     // Audit log the meeting creation
-    await prisma.meeting_audit_log.create({
+    await prisma.meeting_audit_logs.create({
       data: {
         meeting_id: completeeMeeting!.id,
         user_id: user.id,
-        staff_id: (user.staff as Record<string, unknown> | null)?.id,
+        staff_id: Number((user.staff as any)?.id ?? 0),
         action: 'CREATE',
         details: `Created meeting: ${title}`,
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),

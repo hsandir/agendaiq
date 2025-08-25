@@ -82,11 +82,11 @@ export async function POST(request: NextRequest) {
     let suggestion: AutofixSuggestion;
     
     if (customSuggestion) {
-      suggestion = customSuggestion;
+      suggestion = customSuggestion as AutofixSuggestion;
       console.log('Using custom suggestion:', suggestion.title);
     } else {
       // Generate suggestions and find the one to apply
-      const suggestions = await generateAutofixSuggestions(errorType ?? '', errorMessage ?? '');
+      const suggestions = await generateAutofixSuggestions(String(errorType ?? ''), String(errorMessage ?? ''));
       const found = suggestions.find(s => s.id === suggestionId);
       
       if (!found) {

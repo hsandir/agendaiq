@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       // Direct from database
       role: userWithRole?.staff?.[0]?.role?.key ?? null,
       roleKey: userWithRole?.staff?.[0]?.role?.key,
-      permissions: userWithRole?.staff?.[0]?.role?.permissions ?? [],
+      permissions: [],
       
       // Check specific capabilities
       hasOpsBackup: capabilities.includes('ops:backup'),

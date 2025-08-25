@@ -17,8 +17,8 @@ export async function GET(request: NextRequest) {
 
     const user = authResult.user!;
 
-    const devices = await prisma.device.findMany({
-      where: { user_id: parseInt(user.id) },
+    const devices = await prisma.devices.findMany({
+      where: { user_id: user.id },
       orderBy: { last_active: 'desc' }
     });
 
@@ -59,11 +59,11 @@ export async function POST(request: NextRequest) {
     // Generate unique device ID
     const deviceId = crypto.randomBytes(32).toString('hex');
 
-    const device = await prisma.device.create({
+    const device = await prisma.devices.create({
       data: {
-        user_id: parseInt(user.id),
+        user_id: user.id,
         device_id: deviceId,
-        device_name: body.device_name ?? `${deviceInfo.browser} on ${deviceInfo.os}`,
+        device_name: String(body.device_name ?? `${deviceInfo.browser} on ${deviceInfo.os}`),
         device_type: deviceInfo.type,
         device_os: deviceInfo.os,
         browser: deviceInfo.browser,

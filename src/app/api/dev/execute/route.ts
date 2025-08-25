@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     body = await request.json();
     const { command, cwd = process.cwd(), timeout = 30000  } = body;
 
-    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_EXECUTE ?? Capability.DEV_DEBUG });
+    const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_DEBUG });
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     const output = stdout ?? (stderr || 'Command executed successfully with no output');
     
     return NextResponse.json({
-      success: (!stderr) ?? (stderr.length === 0),
+      success: !stderr,
       command,
       output,
       error: stderr ?? undefined,

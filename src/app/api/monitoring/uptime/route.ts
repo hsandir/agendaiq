@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   // Verify API key
   const validApiKey = process.env?.MONITORING_API_KEY;
   
-  if (!validApiKey ?? apiKey !== validApiKey) {
+  if (!validApiKey || apiKey !== validApiKey) {
     return NextResponse.json(
       { error: 'Unauthorized - Invalid or missing API key' },
       { status: 401 }

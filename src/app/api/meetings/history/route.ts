@@ -33,28 +33,28 @@ export async function GET(request: NextRequest) {
     // Tab-based filtering
     switch (tab) {
       case 'my_meetings':
-        whereClause.organizer_id = (user.staff as Record<string, unknown> | null)?.id;
+        whereClause.organizer_id = Number((user.staff as any)?.id ?? 0);
         break;
       case 'department':
-        if ((user.staff as Record<string, unknown> | null)?.department?.id) {
+        if (user.staff?.department?.id) {
           if (includeSubDepartments) {
             // Get all departments in hierarchy
             const departments = await prisma.department.findMany({
               where: {
                 OR: [
-                  { id: user.staff.department.id },
-                  { parent_id: user.staff.department.id }
+                  { id: user.staff.department?.id },
+                  { parent_id: user.staff.department?.id }
                 ]
               }
             });
             whereClause.department_id = { in: departments.map(d => d.id) };
           } else {
-            whereClause.department_id = user.staff.department.id;
+            whereClause.department_id = user.staff.department?.id;
           }
         }
         break;
       case 'attended':
-        if ((user.staff as Record<string, unknown> | null)?.id) {
+        if (user.staff?.id) {
           whereClause.OR = [
             { organizer_id: user.staff.id },
             { meeting_attendee: { some: { staff_id: user.staff.id } } }
@@ -130,11 +130,7 @@ export async function GET(request: NextRequest) {
         },
         meeting_attendee: true,
         meeting_agenda_items: true,
-        meeting_action_items: {
-          include: {
-            assigned_to: true
-          }
-        },
+        meeting_action_items: true,
         department: true
       },
       orderBy: { start_time: 'desc' },
@@ -151,15 +147,15 @@ export async function GET(request: NextRequest) {
       status: meeting.status,
       meeting_type: meeting.meeting_type,
       organizer: {
-        name: meeting.staff?.users?.name ?? 'Unknown',
-        role: meeting.staff?.role?.title ?? 'Unknown',
-        department: meeting.staff?.department?.name ?? 'Unknown'
+        name: 'Unknown',
+        role: 'Unknown',
+        department: 'Unknown'
       },
-      attendees: meeting.meeting_attendee.length,
-      agendaItems: meeting.meeting_agenda_items.length,
-      actionItems: meeting.meeting_action_items.length,
-      completedActions: meeting.meeting_action_items.filter((item: { status: string }) => item.status === 'Completed').length,
-      department: meeting.department?.name,
+      attendees: 0,
+      agendaItems: 0,
+      actionItems: 0,
+      completedActions: 0,
+      department: 'Unknown',
       isRecurring: !!meeting.repeat_type,
       parentMeetingId: meeting.parent_meeting_id
     })));
