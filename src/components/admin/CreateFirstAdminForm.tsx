@@ -14,7 +14,7 @@ interface AdminUser {
   staff: {
     role: {
       title: string;
-      key: string | null;
+      key: string | null
     } | null;
   }[] | null;
 }
@@ -76,7 +76,7 @@ export function CreateFirstAdminForm({ adminUsers }: CreateFirstAdminFormProps) 
         router.push('/auth/signin');
       }, 2000);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsLoading(false);
     }
@@ -101,7 +101,7 @@ export function CreateFirstAdminForm({ adminUsers }: CreateFirstAdminFormProps) 
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (

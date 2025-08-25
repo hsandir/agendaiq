@@ -85,7 +85,7 @@ export function rateLimit({
           error: result.error || 'Too many requests',
           code: 'RATE_LIMIT_EXCEEDED',
           retryAfter: Math.ceil((result.reset - Date.now()) / 1000),
-          timestamp: new Date().toISOString();
+          timestamp: new Date().toISOString()
         },
         {
           status: 429,

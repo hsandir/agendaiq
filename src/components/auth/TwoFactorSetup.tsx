@@ -30,7 +30,7 @@ export function TwoFactorSetup() {
       setManualKey(data?.manualEntryKey);
       setStep('verify');
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : "An error occurred")
     } finally {
       setIsLoading(false);
     }
@@ -44,7 +44,7 @@ export function TwoFactorSetup() {
       const response = await fetch("/api/auth/2fa/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: verificationCode });
+        body: JSON.stringify({ token: verificationCode })
       });
 
       const data = await response.json();
@@ -56,7 +56,7 @@ export function TwoFactorSetup() {
       setBackupCodes(data?.backup_codes);
       setStep('complete');
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : "An error occurred")
     } finally {
       setIsLoading(false);
     }
@@ -163,7 +163,7 @@ export function TwoFactorSetup() {
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -204,5 +204,5 @@ export function TwoFactorSetup() {
         </div>
       </div>
     </div>
-  );
+  )
 }

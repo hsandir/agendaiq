@@ -374,5 +374,5 @@ export default async function ZoomUserPreferences() {
         </Button>
       </div>
     </div>
-  );
+  )
 } 

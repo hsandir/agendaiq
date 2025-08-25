@@ -88,7 +88,7 @@ export default async function NewMeetingPage() {
   console.log("Server: Found staff members:", users.length, "Current user staff:", !!currentStaff);
   
   if (users.length === 0) {
-    console.warn("Server: No users found! Check database query");
+    console.warn("Server: No users found! Check database query")
   }
 
   // Transform departments

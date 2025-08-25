@@ -69,7 +69,7 @@ export function createAuthErrorResponse(
     { 
       error,
       code: statusCode === 401 ? 'UNAUTHORIZED' : 'FORBIDDEN',
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     },
     { status: statusCode }
   );
@@ -100,7 +100,7 @@ export function withAPIAuth(
         { 
           error: error instanceof Error ? error.message : 'Internal server error',
           code: 'INTERNAL_ERROR',
-          timestamp: new Date().toISOString();
+          timestamp: new Date().toISOString()
         },
         { status: 500 }
       );
@@ -120,7 +120,7 @@ export function hasResourcePermission(
   
   // Admin can do everything - use capability-based check
   if (user.is_system_admin ?? user?.is_school_admin) {
-    return true;
+    return true
   }
 
   // No staff record = no permissions
@@ -172,7 +172,7 @@ export function hasResourcePermission(
       return can(user, [Capability.DISTRICT_MANAGE, Capability.USER_MANAGE]);
       
     default:
-      return false;
+      return false
   }
 }
 
@@ -186,7 +186,7 @@ export const APIAuthPatterns = {
   public: () => withAPIAuth(
     async (request: NextRequest, user: AuthenticatedUser) => {
       // This should not be reached as no auth is required
-      throw new Error('Invalid usage of public pattern');
+      throw new Error('Invalid usage of public pattern')
     },
     { requireAuth: false }
   ),
@@ -256,7 +256,7 @@ export function createValidationErrorResponse(
       error: message,
       code: 'VALIDATION_ERROR',
       missing,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     },
     { status: 400 }
   );

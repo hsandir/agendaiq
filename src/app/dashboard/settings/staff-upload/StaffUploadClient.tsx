@@ -7,20 +7,20 @@ interface ConflictItem {
   field: string;
   existing: unknown;
   new: unknown;
-  action: string;
+  action: string
 }
 
 interface ActionItem {
   id: string;
   label: string;
-  type: string;
+  type: string
 }
 
 interface ExistingData {
   name: string;
   staffId: string;
   role: string;
-  department: string;
+  department: string
 }
 
 interface ProcessedRecord {
@@ -43,7 +43,7 @@ interface PreviewSummary {
   total: number;
   valid: number;
   conflicts: number;
-  errors: number;
+  errors: number
 }
 
 export default function StaffUploadClient() {
@@ -121,7 +121,7 @@ export default function StaffUploadClient() {
 
       setSuccess(`Preview completed! Found ${data.summary?.total ?? 0} records - ${data.summary?.valid ?? 0} valid, ${data.summary?.conflicts ?? 0} with issues.`);
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Preview failed');
+      setError(error instanceof Error ? error.message : 'Preview failed')
     } finally {
       setIsLoading(false);
     }
@@ -174,7 +174,7 @@ export default function StaffUploadClient() {
       const fileInput = document.getElementById('file-upload') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Upload failed');
+      setError(error instanceof Error ? error.message : 'Upload failed')
     } finally {
       setIsLoading(false);
     }
@@ -255,7 +255,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-destructive/10 text-destructive">
           Error
         </span>
-      );
+      )
     }
     if (record.status === 'create') {
       return (

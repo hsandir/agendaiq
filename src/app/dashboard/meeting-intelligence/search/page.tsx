@@ -13,7 +13,7 @@ interface SearchResult {
   excerpt: string;
   relevance: number;
   date: string;
-  matchedIn: string;
+  matchedIn: string
 }
 
 interface AgendaItemResult {
@@ -36,10 +36,10 @@ interface ActionItemResult {
   dueDate?: string;
   meeting: {
     id: number;
-    title: string;
+    title: string
   };
   assignedTo: {
-    name: string;
+    name: string
   };
 }
 

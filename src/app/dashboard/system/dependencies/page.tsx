@@ -40,7 +40,7 @@ interface Dependency {
   lastUpdated: string;
   size: string;
   type: 'major' | 'minor' | 'patch';
-  compatibility: CompatibilityInfo;
+  compatibility: CompatibilityInfo
 }
 
 interface CompatibilityInfo {
@@ -71,7 +71,7 @@ interface BackupInfo {
   packageName: string;
   version: string;
   size: string;
-  type: 'pre-update' | 'manual';
+  type: 'pre-update' | 'manual'
 }
 
 export default function DependenciesPage() {
@@ -276,7 +276,7 @@ export default function DependenciesPage() {
         body: JSON.stringify({
           type: 'packages',
           packages: [dependency.name]
-        });
+        })
       });
       
       const result = await response.json();
@@ -318,7 +318,7 @@ export default function DependenciesPage() {
       
       Logger.error('Package update failed', { 
         packageName: dependency.name, 
-        error: String(error);
+        error: String(error)
       }, 'dependencies');
     } finally {
       setIsUpdating(false);
@@ -363,7 +363,7 @@ export default function DependenciesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'packages',
-          packages: packagesToUpdate.map(p => p.name);
+          packages: packagesToUpdate.map(p => p.name)
         })
       }));
       
@@ -429,7 +429,7 @@ export default function DependenciesPage() {
           type: 'packages',
           packages: [backup.packageName],
           targetVersion: backup.version
-        });
+        })
       });
       
       const result = await response.json();
@@ -578,7 +578,7 @@ export default function DependenciesPage() {
       case 'ok':
         return <Badge variant="outline" className="text-green-600 border-green-600">OK</Badge>;
       default:
-        return <Badge variant="outline">Unknown</Badge>;
+        return <Badge variant="outline">Unknown</Badge>
     }
   };
 
@@ -592,7 +592,7 @@ export default function DependenciesPage() {
       case 'ok':
         return <CheckCircle className="h-4 w-4 text-green-600" />;
       default:
-        return <Package className="h-4 w-4 text-muted-foreground" />;
+        return <Package className="h-4 w-4 text-muted-foreground" />
     }
   };
 
@@ -784,7 +784,7 @@ export default function DependenciesPage() {
                             const response = await fetch('/api/system/fix', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ action: 'install', package: dep.name });
+                              body: JSON.stringify({ action: 'install', package: dep.name })
                             });
                             if (response.ok) {
                               alert(`${dep.name} installed successfully`);
@@ -798,7 +798,7 @@ export default function DependenciesPage() {
                             const response = await fetch('/api/system/update', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ package: dep.name });
+                              body: JSON.stringify({ package: dep.name })
                             });
                             if (response.ok) {
                               alert(`${dep.name} updated successfully`);
@@ -837,7 +837,7 @@ export default function DependenciesPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                   action: 'install-multiple', 
-                  packages: missingDeps.map(d => d.name);
+                  packages: missingDeps.map(d => d.name)
                 })
               }));
               if (response.ok) {
@@ -845,7 +845,7 @@ export default function DependenciesPage() {
                 fetchDependencies();
               }
             } catch (error: unknown) {
-              alert('Failed to install missing dependencies');
+              alert('Failed to install missing dependencies')
             }
           }}
         >

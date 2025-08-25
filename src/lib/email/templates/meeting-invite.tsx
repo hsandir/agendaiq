@@ -3,7 +3,7 @@ import { BaseEmailTemplate } from './base';
 import { MeetingInviteData } from '../types';
 
 interface MeetingInviteTemplateProps {
-  data: MeetingInviteData;
+  data: MeetingInviteData
 }
 
 export function MeetingInviteTemplate({ data }: MeetingInviteTemplateProps) {

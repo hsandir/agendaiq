@@ -38,7 +38,7 @@ async function findManagerId(roleTitle: string, departmentId: number) {
       return admin?.user_id;
 
     default:
-      return null;
+      return null
   }
 }
 

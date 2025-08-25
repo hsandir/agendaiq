@@ -194,7 +194,7 @@ class ErrorTracker {
     // Ensure timestamp is always a valid ISO string
     const timestamp = errorInfo.timestamp && typeof errorInfo.timestamp === 'string' 
       ? errorInfo.timestamp 
-      : new Date().toISOString();
+      : new Date().toISOString()
       
     const error: ErrorDetail = {
       id: `error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,

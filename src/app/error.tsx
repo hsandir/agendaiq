@@ -9,7 +9,7 @@ export default function Error({
   reset,
 }: {
   error: Error & { digest?: string };
-  reset: () => void;
+  reset: () => void
 }) {
   useEffect(() => {
     // Log error to PostHog
@@ -107,5 +107,5 @@ export default function Error({
         </div>
       </div>
     </div>
-  );
+  )
 }

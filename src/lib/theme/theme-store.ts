@@ -16,10 +16,10 @@ interface CustomTheme {
     secondaryLight?: string;
     error: string;
     border: string;
-    inputBorder: string;
+    inputBorder: string
   };
   borderRadius?: {
-    md: string;
+    md: string
   };
 }
 
@@ -45,7 +45,7 @@ class ThemeStore {
   }
   
   setInitialized(value: boolean): void {
-    this.initialized = value;
+    this.initialized = value
   }
   
   getLastSyncTime(): number {
@@ -53,7 +53,7 @@ class ThemeStore {
   }
   
   setLastSyncTime(time: number): void {
-    this.lastSyncTime = time;
+    this.lastSyncTime = time
   }
   
   getCurrentTheme(): string | null {
@@ -61,7 +61,7 @@ class ThemeStore {
   }
   
   setCurrentTheme(theme: string): void {
-    this.currentTheme = theme;
+    this.currentTheme = theme
   }
   
   getCustomTheme(): CustomTheme | null {
@@ -69,7 +69,7 @@ class ThemeStore {
   }
   
   setCustomTheme(theme: CustomTheme | null): void {
-    this.customTheme = theme;
+    this.customTheme = theme
   }
   
   needsSync(): boolean {

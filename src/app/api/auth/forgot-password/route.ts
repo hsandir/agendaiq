@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     const emailResult = await sendEmail({
       to: user.email,
       subject: "AgendaIQ - Password Reset Request",
-      html: getPasswordResetHtml(resetUrl);
+      html: getPasswordResetHtml(resetUrl)
     });
 
     if (!emailResult?.success) {

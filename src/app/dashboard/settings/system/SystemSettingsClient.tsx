@@ -25,7 +25,7 @@ interface SystemSettings {
   sender_email: string;
   automatic_backups_enabled: boolean;
   backup_frequency: string;
-  backup_retention_days: number;
+  backup_retention_days: number
 }
 
 export default function SystemSettingsClient({ initialSettings }: SystemSettingsClientProps) {

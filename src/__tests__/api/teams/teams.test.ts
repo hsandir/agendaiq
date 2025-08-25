@@ -9,7 +9,7 @@ import { authenticateApiRequest } from '@/lib/auth/api-auth';
 
 // Mock auth
 jest.mock('@/lib/auth/api-auth', () => ({
-  authenticateApiRequest: jest.fn();
+  authenticateApiRequest: jest.fn()
 }));
 
 // Mock Prisma
@@ -20,26 +20,26 @@ jest.mock('@/lib/prisma', () => ({
       findUnique: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
-      delete: jest.fn();
+      delete: jest.fn()
     },
     team_members: {
       findMany: jest.fn(),
       findFirst: jest.fn(),
       create: jest.fn(),
       delete: jest.fn(),
-      count: jest.fn();
+      count: jest.fn()
     },
     team_knowledge: {
       findMany: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
-      delete: jest.fn();
+      delete: jest.fn()
     },
     users: {
-      findUnique: jest.fn();
+      findUnique: jest.fn()
     },
     staff: {
-      findFirst: jest.fn();
+      findFirst: jest.fn()
     }
   }
 }));
@@ -122,7 +122,7 @@ describe('Teams API', () => {
         status: 'ACTIVE',
         purpose: 'New project',
         created_at: new Date(),
-        updated_at: new Date();
+        updated_at: new Date()
       };
       
       (prisma.teams.create as jest.Mock).mockResolvedValue(newTeam);
@@ -134,7 +134,7 @@ describe('Teams API', () => {
           name: 'New Team',
           type: 'PROJECT',
           purpose: 'New project'
-        });
+        })
       });
       
       const response = await POST(request);
@@ -152,7 +152,7 @@ describe('Teams API', () => {
       
       const request = new NextRequest('http://localhost:3000/api/teams', {
         method: 'POST',
-        body: JSON.stringify({});
+        body: JSON.stringify({})
       });
       
       const response = await POST(request);
@@ -195,7 +195,7 @@ describe('Teams API', () => {
             title: 'Team Guidelines',
             type: 'DOCUMENT',
             url: 'https://example.com/doc',
-            created_at: new Date();
+            created_at: new Date()
           }
         ],
         _count: { team_members: 1, team_knowledge: 1 }
@@ -247,7 +247,7 @@ describe('Teams API', () => {
         is_active: true,
         metadata: { updated: true },
         created_at: new Date(),
-        updated_at: new Date();
+        updated_at: new Date()
       };
       
       (prisma.teams.update as jest.Mock).mockResolvedValue(updatedTeam);
@@ -258,7 +258,7 @@ describe('Teams API', () => {
           name: 'Updated Team Name',
           purpose: 'Updated purpose',
           description: 'Updated description'
-        });
+        })
       });
       
       const response = await PUT_TEAM(request, { params: { id: 'team1' } });
@@ -278,7 +278,7 @@ describe('Teams API', () => {
       
       const request = new NextRequest('http://localhost:3000/api/teams/team1', {
         method: 'PUT',
-        body: JSON.stringify({ name: 'New Name' });
+        body: JSON.stringify({ name: 'New Name' })
       });
       
       const response = await PUT_TEAM(request, { params: { id: 'team1' } });
@@ -393,7 +393,7 @@ describe('Team Members API', () => {
         user_id: 3,
         staff_id: 3,
         role: 'MEMBER',
-        joined_at: new Date();
+        joined_at: new Date()
       };
       
       (prisma.team_members.create as jest.Mock).mockResolvedValue(newMember);
@@ -403,7 +403,7 @@ describe('Team Members API', () => {
         body: JSON.stringify({
           user_id: 3,
           role: 'MEMBER'
-        });
+        })
       });
       
       const response = await POST_MEMBER(request, { params: { id: 'team1' } });
@@ -442,7 +442,7 @@ describe('Team Members API', () => {
         body: JSON.stringify({
           user_id: 2,
           role: 'MEMBER'
-        });
+        })
       });
       
       const response = await POST_MEMBER(request, { params: { id: 'team1' } });
@@ -572,7 +572,7 @@ describe('Team Knowledge API', () => {
         downloads_count: 0,
         created_by_staff_id: 1,
         created_at: new Date(),
-        updated_at: new Date();
+        updated_at: new Date()
       };
       
       (prisma.team_knowledge.create as jest.Mock).mockResolvedValue(newKnowledge);
@@ -584,7 +584,7 @@ describe('Team Knowledge API', () => {
           type: 'LINK',
           url: 'https://example.com/new',
           description: 'New resource description'
-        });
+        })
       });
       
       const response = await POST_KNOWLEDGE(request, { params: { id: 'team1' } });
@@ -606,7 +606,7 @@ describe('Team Knowledge API', () => {
           title: 'New Resource',
           type: 'LINK',
           url: 'https://example.com/new'
-        });
+        })
       });
       
       const response = await POST_KNOWLEDGE(request, { params: { id: 'team1' } });

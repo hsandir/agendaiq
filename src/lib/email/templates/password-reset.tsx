@@ -3,7 +3,7 @@ import { BaseEmailTemplate } from './base';
 import { PasswordResetData } from '../types';
 
 interface PasswordResetTemplateProps {
-  data: PasswordResetData;
+  data: PasswordResetData
 }
 
 export function PasswordResetTemplate({ data }: PasswordResetTemplateProps) {

@@ -18,17 +18,17 @@ interface AuthUser {
       key?: string;  // Legacy RoleKey - optional
       label: string;
       priority: number;
-      is_leadership: boolean;
+      is_leadership: boolean
     };
     department: {
-      name: string;
+      name: string
     };
   };
 }
 
 // Component props interface
 interface AuditLogsClientProps {
-  user: AuthUser;
+  user: AuthUser
 }
 
 // Enhanced error handling types
@@ -109,7 +109,7 @@ const categorizeError = (error: unknown, context: string): AuditError => {
   return {
     category: ErrorCategory.CLIENT,
     message: `Unknown error ${context}`,
-    details: String(error);
+    details: String(error)
   };
 };
 
@@ -167,11 +167,11 @@ type AuditLog = LegacyAuditLog | CriticalAuditLog;
 
 // Type guards
 function isCriticalLog(log: AuditLog): log is CriticalAuditLog {
-  return 'category' in log && 'risk_score' in log;
+  return 'category' in log && 'risk_score' in log
 }
 
 function isLegacyLog(log: AuditLog): log is LegacyAuditLog {
-  return 'table_name' in log && 'operation' in log;
+  return 'table_name' in log && 'operation' in log
 }
 
 interface AuditSummary {
@@ -189,7 +189,7 @@ interface HighRiskStats {
   ipDistribution: Record<string, number>;
   timeRange: {
     from: string;
-    to: string;
+    to: string
   };
 }
 
@@ -205,7 +205,7 @@ interface Filters {
   endDate: string;
   minRiskScore: string;
   success: string;
-  search: string;
+  search: string
 }
 
 export default function AuditLogsClient({ user }: AuditLogsClientProps) {
@@ -393,7 +393,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-US');
+    return new Date(dateString).toLocaleString('en-US')
   };
 
   // Permission validation helper

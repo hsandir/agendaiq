@@ -76,7 +76,7 @@ export default function TestDashboard() {
       const response = await fetch('/api/tests/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ suite: suitePath, coverage: true });
+        body: JSON.stringify({ suite: suitePath, coverage: true })
       })
       
       if (!response.ok) throw new Error('Failed to run tests');

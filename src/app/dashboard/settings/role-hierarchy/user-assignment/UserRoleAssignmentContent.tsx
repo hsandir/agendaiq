@@ -13,11 +13,11 @@ interface User {
     id: string;
     Role?: {
       id: number;
-      title: string;
+      title: string
     };
     Department?: {
       id: number;
-      name: string;
+      name: string
     };
   }>;
 }
@@ -27,13 +27,13 @@ interface Role {
   title: string;
   Department?: {
     id: number;
-    name: string;
+    name: string
   };
 }
 
 interface Department {
   id: number;
-  name: string;
+  name: string
 }
 
 export default function UserRoleAssignmentContent() {
@@ -141,7 +141,7 @@ export default function UserRoleAssignmentContent() {
           userId: selectedUser,
           roleId: selectedRole,
           departmentId: selectedDepartment ?? null
-        });
+        })
       });
 
       if (response.ok) {

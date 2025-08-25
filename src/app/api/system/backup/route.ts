@@ -92,7 +92,7 @@ async function createBackup(message: string = 'Manual backup') {
       message: message,
       type: 'manual',
       changes: status.split('\n').filter(line => String(line).trim()).length,
-      files: await getProjectFiles();
+      files: await getProjectFiles()
     };
 
     // Stage all changes
@@ -133,7 +133,7 @@ async function createBackup(message: string = 'Manual backup') {
 
 async function pushToGitHub(message: string = 'Automated backup') {
   try {
-    const timestamp = new Date().toISOString();
+    const timestamp = new Date().toISOString()
     
     // Get current branch
     const { stdout: currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
@@ -180,7 +180,7 @@ async function pushToGitHub(message: string = 'Automated backup') {
         message: message,
         type: 'github-failed',
         pushed: false,
-        error: pushError instanceof Error ? pushError.message : String(pushError);
+        error: pushError instanceof Error ? pushError.message : String(pushError)
       };
 
       await saveBackupMetadata(backupInfo);
@@ -204,7 +204,7 @@ async function pushToGitHub(message: string = 'Automated backup') {
 
 async function autoBackup(triggerReason: string = 'System update') {
   try {
-    const timestamp = new Date().toISOString();
+    const timestamp = new Date().toISOString()
     const branchName = `backup/auto-${timestamp.replace(/[:.]/g, '-')}`;
     
     // Get project status
@@ -287,7 +287,7 @@ async function restoreBackup(backupBranch: string) {
       timestamp: new Date().toISOString(),
       restoredFrom: backupBranch,
       restorePoint: restorePoint,
-      currentBranch: String(currentBranch).trim();
+      currentBranch: String(currentBranch).trim()
     };
 
     await saveBackupMetadata({
@@ -411,7 +411,7 @@ async function getBackupStatus() {
         lastCommit: String(lastCommit).trim(),
         githubStatus,
         backupCount,
-        diskUsage: await getDiskUsage();
+        diskUsage: await getDiskUsage()
       }
     });
 

@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     Logger.error('System status error', { error: String(error) }, 'system-status');
     return NextResponse.json({
       error: 'Failed to get system status',
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     }, { status: 500 });
   }
 }
@@ -161,7 +161,7 @@ async function getDatabaseStatus() {
     return {
       connected: false,
       status: 'Disconnected',
-      error: error instanceof Error ? error.message : String(error);
+      error: error instanceof Error ? error.message : String(error)
     };
   }
 } 

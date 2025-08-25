@@ -15,7 +15,7 @@ test.describe('Meeting Management', () => {
   test('should display meetings list', async ({ page }) => {
     await expect(page.locator('h1')).toContainText('Meetings');
     await expect(page.locator('[data-testid="meetings-list"]')).toBeVisible();
-    await expect(page.locator('button:has-text("New Meeting")')).toBeVisible();
+    await expect(page.locator('button:has-text("New Meeting")')).toBeVisible()
   })
 
   test('should create a new meeting', async ({ page }) => {
@@ -103,7 +103,7 @@ test.describe('Meeting Management', () => {
     await page.fill('input[name="duration"]', '15');
     await page.locator('button:has-text("Add Item")').click();
     // Verify agenda item added
-    await expect(page.locator('text=Discussion: Budget Review')).toBeVisible();
+    await expect(page.locator('text=Discussion: Budget Review')).toBeVisible()
   })
 
   test('should export meeting details', async ({ page }) => {
@@ -127,7 +127,7 @@ test.describe('Meeting Permissions', () => {
     await page.locator('button[type="submit"]').click();
     await page.goto('/dashboard/meetings');
     // New Meeting button should not be visible
-    await expect(page.locator('button:has-text("New Meeting")')).not.toBeVisible();
+    await expect(page.locator('button:has-text("New Meeting")')).not.toBeVisible()
   })
 
   test('user can only see meetings they are invited to', async ({ page }) => {

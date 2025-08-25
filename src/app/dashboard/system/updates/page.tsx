@@ -30,7 +30,7 @@ interface PackageUpdate {
   current: string;
   wanted: string;
   latest: string;
-  type: 'major' | 'minor' | 'patch';
+  type: 'major' | 'minor' | 'patch'
 }
 
 interface UpdateResult {
@@ -56,7 +56,7 @@ interface CompatibilityInfo {
   risk: 'low' | 'medium' | 'high';
   recommendation: 'safe' | 'caution' | 'avoid';
   reason: string;
-  details: string;
+  details: string
 }
 
 export default function UpdatesPage() {
@@ -73,7 +73,7 @@ export default function UpdatesPage() {
     cacheStatus: 'clean' | 'corrupted' | 'unknown';
     nodeModulesStatus: 'clean' | 'corrupted' | 'unknown';
     lastCacheClean: string;
-    suggestion: string;
+    suggestion: string
   }>({
     cacheStatus: 'unknown',
     nodeModulesStatus: 'unknown', 
@@ -176,7 +176,7 @@ export default function UpdatesPage() {
       case 'avoid':
         return <Badge variant="destructive" className="bg-destructive/10">Avoid</Badge>;
       default:
-        return <Badge variant="outline">Unknown</Badge>;
+        return <Badge variant="outline">Unknown</Badge>
     }
   };
 
@@ -189,7 +189,7 @@ export default function UpdatesPage() {
       case 'avoid':
         return <XCircle className="h-4 w-4 text-destructive" />;
       default:
-        return <Info className="h-4 w-4 text-muted-foreground" />;
+        return <Info className="h-4 w-4 text-muted-foreground" />
     }
   };
 
@@ -220,7 +220,7 @@ export default function UpdatesPage() {
       const response = await fetch('/api/system/fix', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'check' });
+        body: JSON.stringify({ action: 'check' })
       });
       
       if (response.ok) {
@@ -238,7 +238,7 @@ export default function UpdatesPage() {
       const response = await fetch('/api/system/fix', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'fix' });
+        body: JSON.stringify({ action: 'fix' })
       });
       
       if (response.ok) {
@@ -279,7 +279,7 @@ export default function UpdatesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           type: 'packages',
-          packages: packages ?? Array.from(selectedUpdates);
+          packages: packages ?? Array.from(selectedUpdates)
         })
       });
       
@@ -348,7 +348,7 @@ export default function UpdatesPage() {
       case 'patch':
         return <Badge variant="outline" className="text-green-600 border-green-600">Patch</Badge>;
       default:
-        return <Badge variant="outline">Unknown</Badge>;
+        return <Badge variant="outline">Unknown</Badge>
     }
   };
 
@@ -361,7 +361,7 @@ export default function UpdatesPage() {
       case 'patch':
         return <CheckCircle className="h-4 w-4 text-green-600" />;
       default:
-        return <Package className="h-4 w-4 text-muted-foreground" />;
+        return <Package className="h-4 w-4 text-muted-foreground" />
     }
   };
 

@@ -25,7 +25,7 @@ interface AgendaItem {
   duration_minutes: number;
   responsible_staff_id: string | null;
   status: string;
-  order_index: number;
+  order_index: number
 }
 
 interface MeetingEditFormProps {
@@ -47,7 +47,7 @@ interface MeetingEditFormProps {
       id: string;
       name: string;
       email: string;
-      status: string;
+      status: string
     }>;
     agendaItems?: AgendaItem[];
   };
@@ -56,10 +56,10 @@ interface MeetingEditFormProps {
     name: string;
     email: string;
     role: string;
-    department: string;
+    department: string
   }>;
   meetingId: number;
-  isStep2: boolean;
+  isStep2: boolean
 }
 
 export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingEditFormProps) {
@@ -83,7 +83,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   const [startTime, setStartTime] = useState(() => {
     if (meeting.startTime) {
       const date = new Date(meeting.startTime);
-      return format(date, 'HH:mm');
+      return format(date, 'HH:mm')
     }
     return '';
   });
@@ -97,7 +97,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   const [endTime, setEndTime] = useState(() => {
     if (meeting.endTime) {
       const date = new Date(meeting.endTime);
-      return format(date, 'HH:mm');
+      return format(date, 'HH:mm')
     }
     return '';
   });
@@ -126,7 +126,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   };
   
   const removeAgendaItem = (id: string) => {
-    setAgendaItems(agendaItems.filter(item => item.id !== id));
+    setAgendaItems(agendaItems.filter(item => item.id !== id))
   };
   
   const updateAgendaItem = (id: string, field: keyof AgendaItem, value: unknown) => {

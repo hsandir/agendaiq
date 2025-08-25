@@ -135,7 +135,7 @@ export async function initializeLogging() {
       metadata: {
         transports: auditLogger['transports'].map(t => t.name),
         environment: process.env.NODE_ENV,
-        timestamp: new Date().toISOString();
+        timestamp: new Date().toISOString()
       }
     }
   );

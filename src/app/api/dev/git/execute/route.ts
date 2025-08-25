@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
       success: (!stderr) || (command === 'diff'), // diff uses stderr for output
       command: gitCommand,
       output,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
   } catch (error: unknown) {
     console.error('Git execute error:', error);
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
         success: false,
         error: errorMessage,
         command: body?.command,
-        timestamp: new Date().toISOString();
+        timestamp: new Date().toISOString()
       },
       { status: 500 }
     );

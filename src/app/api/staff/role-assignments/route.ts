@@ -7,7 +7,7 @@ import { z } from 'zod';
 const assignmentSchema = z.object({
   assignments: z.array(z.object({
     staffId: z.number(),
-    newRoleId: z.number();
+    newRoleId: z.number()
   }))
 });
 
@@ -110,7 +110,7 @@ export async function PUT(request: NextRequest) {
           where: { id: assignment.staffId },
           data: { 
             role_id: assignment.newRoleId,
-            updated_at: new Date();
+            updated_at: new Date()
           },
           include: {
             users: {

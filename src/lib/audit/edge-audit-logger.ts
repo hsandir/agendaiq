@@ -57,7 +57,7 @@ export class EdgeAuditLogger {
   private static performPeriodicCleanup(currentTime: number): void {
     // Only cleanup periodically to avoid performance impact
     if (currentTime - this.lastCleanup < this.CLEANUP_INTERVAL_MS) {
-      return;
+      return
     }
 
     this.lastCleanup = currentTime;
@@ -120,7 +120,7 @@ export class EdgeAuditLogger {
     currentSize: number; 
     maxSize: number; 
     oldestEventAge: number | null;
-    memoryUsage: string;
+    memoryUsage: string
   } {
     const now = Date.now();
     let oldestAge: number | null = null;
@@ -163,7 +163,7 @@ export class EdgeAuditLogger {
       success,
       errorMessage,
       ...metadata,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     };
   }
 }

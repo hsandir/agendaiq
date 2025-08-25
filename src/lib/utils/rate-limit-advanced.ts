@@ -25,7 +25,7 @@ export interface RateLimitMetrics {
   allowedRequests: number;
   uniqueClients: number;
   averageResponseTime: number;
-  peakRequestsPerMinute: number;
+  peakRequestsPerMinute: number
 }
 
 export interface EnhancedRateLimitResult {
@@ -336,7 +336,7 @@ export class AdvancedRateLimiter {
   }
 
   private getMetrics(token: string): RateLimitMetrics | undefined {
-    return metricsCache.get(token);
+    return metricsCache.get(token)
   }
 
   private extractClientIP(request: Request): string {
@@ -413,22 +413,22 @@ export class AdvancedRateLimiter {
 
   // Add IP to blacklist
   addToBlacklist(ip: string): void {
-    this.blacklistedIPs.add(ip);
+    this.blacklistedIPs.add(ip)
   }
 
   // Remove IP from blacklist
   removeFromBlacklist(ip: string): void {
-    this.blacklistedIPs.delete(ip);
+    this.blacklistedIPs.delete(ip)
   }
 
   // Add IP to whitelist
   addToWhitelist(ip: string): void {
-    this.whitelistedIPs.add(ip);
+    this.whitelistedIPs.add(ip)
   }
 
   // Remove IP from whitelist
   removeFromWhitelist(ip: string): void {
-    this.whitelistedIPs.delete(ip);
+    this.whitelistedIPs.delete(ip)
   }
 }
 

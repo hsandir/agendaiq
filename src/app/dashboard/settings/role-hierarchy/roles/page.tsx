@@ -58,7 +58,7 @@ export default async function RolePage() {
   const roleDistribution = (departments.map(dept => ({
     name: dept.name,
     count: dept.staff.length,
-    roles: dept.staff.map(staff => staff.role?.title).filter(Boolean);
+    roles: dept.staff.map(staff => staff.role?.title).filter(Boolean)
   })));
 
   // Leadership hierarchy

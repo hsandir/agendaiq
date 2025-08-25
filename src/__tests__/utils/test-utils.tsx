@@ -118,7 +118,7 @@ export const createMockNextRequest = (
   } as Request & {
     json: () => Promise<unknown>;
     text: () => Promise<string>;
-    formData: () => Promise<FormData>;
+    formData: () => Promise<FormData>
   }
 }
 

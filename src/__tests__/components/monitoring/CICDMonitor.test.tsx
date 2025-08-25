@@ -285,7 +285,7 @@ describe('CICDMonitor Component', () => {
       fireEvent.click(pipelineRow!);
 
       expect(screen.getByText('Pipeline Details:')).toBeInTheDocument();
-      expect(screen.getByText('Branch: main • Commit: abc123')).toBeInTheDocument();
+      expect(screen.getByText('Branch: main • Commit: abc123')).toBeInTheDocument()
     });
 
     it('should close pipeline details when close button is clicked', async () => {
@@ -301,7 +301,7 @@ describe('CICDMonitor Component', () => {
       const closeButton = screen.getByRole('button', { name: /Close/i });
       fireEvent.click(closeButton);
 
-      expect(screen.queryByText('Pipeline Details:')).not.toBeInTheDocument();
+      expect(screen.queryByText('Pipeline Details:')).not.toBeInTheDocument()
     });
   });
 

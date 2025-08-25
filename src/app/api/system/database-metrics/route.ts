@@ -11,26 +11,26 @@ interface DatabaseMetrics {
     database: string;
     username: string;
     connected: boolean;
-    uptime: string;
+    uptime: string
   };
   statistics: {
     tables: number;
     totalRecords: number;
     totalSize: string;
     activeConnections: number;
-    maxConnections: number;
+    maxConnections: number
   };
   performance: {
     avgQueryTime: number;
     slowQueries: number;
     queriesPerSecond: number;
-    cacheHitRatio: number;
+    cacheHitRatio: number
   };
   tables: Array<{
     name: string;
     rows: number;
     size: string;
-    lastAccess: string;
+    lastAccess: string
   }>;
 }
 
@@ -136,7 +136,7 @@ export async function GET(request: NextRequest) {
           name: 'Staff',
           rows: staffCount,
           size: `${Math.max(1, Math.floor(staffCount * 1.0))} KB`,
-          lastAccess: new Date(Date.now() - Math.random() * 60 * 60 * 1000).toISOString();
+          lastAccess: new Date(Date.now() - Math.random() * 60 * 60 * 1000).toISOString()
         },
         {
           name: 'Meeting',
@@ -148,25 +148,25 @@ export async function GET(request: NextRequest) {
           name: 'Department',
           rows: departmentCount,
           size: `${Math.max(1, Math.floor(departmentCount * 0.1))} KB`,
-          lastAccess: new Date(Date.now() - Math.random() * 2 * 60 * 60 * 1000).toISOString();
+          lastAccess: new Date(Date.now() - Math.random() * 2 * 60 * 60 * 1000).toISOString()
         },
         {
           name: 'Role',
           rows: roleCount,
           size: `${Math.max(1, Math.floor(roleCount * 0.1))} KB`,
-          lastAccess: new Date(Date.now() - Math.random() * 3 * 60 * 60 * 1000).toISOString();
+          lastAccess: new Date(Date.now() - Math.random() * 3 * 60 * 60 * 1000).toISOString()
         },
         {
           name: 'School',
           rows: schoolCount,
           size: `${Math.max(1, Math.floor(schoolCount * 1.0))} KB`,
-          lastAccess: new Date(Date.now() - Math.random() * 4 * 60 * 60 * 1000).toISOString();
+          lastAccess: new Date(Date.now() - Math.random() * 4 * 60 * 60 * 1000).toISOString()
         },
         {
           name: 'District',
           rows: districtCount,
           size: `${Math.max(1, Math.floor(districtCount * 0.5))} KB`,
-          lastAccess: new Date(Date.now() - Math.random() * 6 * 60 * 60 * 1000).toISOString();
+          lastAccess: new Date(Date.now() - Math.random() * 6 * 60 * 60 * 1000).toISOString()
         },
         {
           name: 'Session',

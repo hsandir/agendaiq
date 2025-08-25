@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
       success: true,
       logs,
       stats,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
     console.error('Error generating monitoring logs:', error);

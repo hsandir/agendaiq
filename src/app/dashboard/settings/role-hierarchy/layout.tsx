@@ -31,7 +31,7 @@ const submenuItems = [
 export default function RoleHierarchyLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   const pathname = usePathname();
 

@@ -261,7 +261,7 @@ export class RoleBasedAssignmentService {
         },
         due_date: {
           lte: futureDate,
-          gte: new Date();
+          gte: new Date()
         }
       },
       include: {

@@ -122,7 +122,7 @@ export function usePresenceChannel(
     });
 
     channelRef.current.bind('pusher:member_removed', (member: PresenceMember) => {
-      setMembers(prev => prev.filter(m => m.id !== member.id));
+      setMembers(prev => prev.filter(m => m.id !== member.id))
     });
 
     // Create stable handler functions

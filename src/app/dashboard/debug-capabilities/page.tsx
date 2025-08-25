@@ -156,5 +156,5 @@ export default async function DebugCapabilitiesPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

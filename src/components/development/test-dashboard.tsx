@@ -140,7 +140,7 @@ export default function TestDashboard() {
           suite: suitePath,
           coverage: options.coverage,
           watch: options.watch
-        });
+        })
       })
       
       if (!response.ok) {
@@ -211,7 +211,7 @@ export default function TestDashboard() {
       const response = await fetch('/api/tests/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filePath });
+        body: JSON.stringify({ filePath })
       })
       
       const data = await response.json();
@@ -398,10 +398,10 @@ export default function TestDashboard() {
                         />
                         <div className="flex justify-between text-xs mt-1">
                           <span className="text-green-600">{suite.passed} passed</span>
-                          {suite.failed && suite.failed > 0 && <span className="text-destructive">{suite.failed} failed</span>}
+                          {suite.failed && suite.failed > 0 && <span className="text-destructive">{suite.failed} failed</span>;}
                         </div>
                       </div>
-                    )}
+                    );}
                     <Button
                       size="sm"
                       className="mt-2 w-full"

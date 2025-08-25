@@ -12,7 +12,7 @@ interface ErrorContext {
     type: 'mobile' | 'tablet' | 'desktop';
     os: string;
     browser: string;
-    viewport: string;
+    viewport: string
   };
 }
 
@@ -362,7 +362,7 @@ class GlobalErrorTracker {
   private async captureError(error: TrackedError) {
     if (this.isOnline) {
       try {
-        await this.sendErrorToServer(error);
+        await this.sendErrorToServer(error)
       } catch (e: unknown) {
         // If sending fails, queue the error
         this.errorQueue.push(error);
@@ -391,7 +391,7 @@ class GlobalErrorTracker {
         deviceInfo: error.context.deviceInfo,
         breadcrumbs: error.breadcrumbs,
         customData: error.customData
-      });
+      })
     });
 
     if (!response.ok) {
@@ -425,7 +425,7 @@ class GlobalErrorTracker {
     try {
       return JSON.stringify(arg, null, 2);
     } catch (e: unknown) {
-      return String(arg);
+      return String(arg)
     }
   }
 

@@ -38,7 +38,7 @@ interface BackupData {
   totalSize: string;
   lastBackup: string;
   nextScheduled: string;
-  status: 'healthy' | 'warning' | 'error';
+  status: 'healthy' | 'warning' | 'error'
 }
 
 interface BackupComponent {
@@ -51,7 +51,7 @@ interface BackupComponent {
 }
 
 interface BackupClientProps {
-  initialBackupData: BackupData | null;
+  initialBackupData: BackupData | null
 }
 
 export default function BackupClient({ initialBackupData }: BackupClientProps) {
@@ -155,7 +155,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
         body: JSON.stringify({ 
           type: 'full-system',
           components: selectedComponents
-        });
+        })
       });
 
       if (!response.ok) {
@@ -224,7 +224,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
   const toggleComponent = (componentId: string) => {
     setSelectedComponents(prev => {
       if (prev.includes(componentId)) {
-        return prev.filter(id => id !== componentId);
+        return prev.filter(id => id !== componentId)
       } else {
         return [...prev, componentId];
       }
@@ -275,7 +275,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
       case 'failed':
         return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Failed</Badge>;
       default:
-        return <Badge variant="secondary">Unknown</Badge>;
+        return <Badge variant="secondary">Unknown</Badge>
     }
   };
 
@@ -288,7 +288,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
       case 'full-system':
         return <Badge variant="outline" className="text-secondary border-purple-600">Full System</Badge>;
       default:
-        return <Badge variant="secondary">Unknown</Badge>;
+        return <Badge variant="secondary">Unknown</Badge>
     }
   };
 

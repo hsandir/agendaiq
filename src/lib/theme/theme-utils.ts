@@ -122,7 +122,7 @@ export function mediaQuery(breakpoint: keyof typeof breakpoints): string {
 
 // Check if theme is dark
 export function isDarkTheme(theme: Theme): boolean {
-  return theme.id.includes('dark') || theme.id === 'modern-purple' || theme.id === 'high-contrast';
+  return theme.id.includes('dark') || theme.id === 'modern-purple' || theme.id === 'high-contrast'
 }
 
 // Get contrast color
@@ -160,7 +160,7 @@ export function getSystemThemePreference(): 'light' | 'dark' {
   
   return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
     ? 'dark'
-    : 'light';
+    : 'light'
 }
 
 // Listen for system theme changes

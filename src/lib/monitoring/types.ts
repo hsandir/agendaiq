@@ -171,21 +171,21 @@ export interface PerformancePaintTiming {
   name: string;
   entryType: string;
   startTime: number;
-  duration: number;
+  duration: number
 }
 
 export interface PerformanceMeasure {
   name: string;
   entryType: string;
   startTime: number;
-  duration: number;
+  duration: number
 }
 
 export interface PerformanceMark {
   name: string;
   entryType: string;
   startTime: number;
-  duration: number;
+  duration: number
 }
 
 export interface Alert {

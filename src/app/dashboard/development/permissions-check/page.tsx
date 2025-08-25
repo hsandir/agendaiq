@@ -591,5 +591,5 @@ export default function PermissionsCheckPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

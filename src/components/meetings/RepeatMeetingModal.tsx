@@ -38,15 +38,15 @@ export interface RepeatConfig {
   includeAgenda: boolean; // Whether to copy agenda to all meetings
   exceptions?: string[]; // Dates to skip (holidays, etc)
 }
-
+;
 interface RepeatMeetingModalProps {
   isOpen: boolean;
   onClose: () => void;
   startDate: string;
   endDate: string;
-  onConfirm: (config: RepeatConfig) => void;
+  onConfirm: (config: RepeatConfig) => void
 }
-
+;
 const WEEKDAYS = [
   { value: 1, label: 'Monday', short: 'Mon' },
   { value: 2, label: 'Tuesday', short: 'Tue' },
@@ -92,7 +92,7 @@ export function RepeatMeetingModal({
     if (config.enabled) {
       const dates = calculateMeetingDates(startDate, config);
       setPreviewDates(dates.slice(0, 10)); // Show first 10 occurrences
-    }
+    };
   }, [config, startDate]);
 
   const calculateMeetingDates = (start: string, conf: RepeatConfig): Date[] => {
@@ -107,12 +107,12 @@ export function RepeatMeetingModal({
       if (isNaN(currentDate.getTime())) {
         console.error('Invalid start date:', start);
         return dates;
-      }
+      };
     } catch (error: unknown) {
       console.error('Error parsing start date:', error);
       return dates;
     }
-    
+    ;
     const maxDates = conf.endType === 'after' ? (conf.occurrences ?? 10) : 52; // Max 52 for preview
     let endDateLimit: Date | null = null;
     
@@ -121,12 +121,12 @@ export function RepeatMeetingModal({
         endDateLimit = new Date(conf.endDate);
         if (isNaN(endDateLimit.getTime())) {
           endDateLimit = null;
-        }
+        };
       } catch {
         endDateLimit = null;
-      }
+      };
     }
-
+;
     for (let i = 0; i < maxDates; i++) {
       if (endDateLimit && currentDate > endDateLimit) break;
 
@@ -137,13 +137,13 @@ export function RepeatMeetingModal({
           return !isNaN(exDate.getTime()) && isSameDay(exDate, currentDate);
         } catch {
           return false;
-        }
+        };
       });
       
       if (!isException) {
         dates.push(new Date(currentDate));
       }
-
+;
       // Calculate next date based on pattern
       switch (conf.pattern) {
         case 'daily':
@@ -163,7 +163,7 @@ export function RepeatMeetingModal({
             currentDate = getMonthlyWeekdayDate(currentDate, conf.monthWeek, conf.monthWeekDay);
           } else {
             currentDate = addMonths(currentDate, 1);
-          }
+          };
           break;
         case 'custom':
           if (conf.weekDays && conf.weekDays.length > 0) {
@@ -175,19 +175,18 @@ export function RepeatMeetingModal({
                 currentDate = nextDate;
                 found = true;
                 break;
-              }
-            }
+              };
+            };
             if (!found) currentDate = addWeeks(currentDate, 1);
           } else {
             currentDate = addDays(currentDate, conf.interval ?? 1);
-          }
+          };
           break;
-      }
+      };
     }
-
+;
     return dates;
   };
-
   const getMonthlyWeekdayDate = (date: Date, week: number, weekday: number): Date => {
     const nextMonth = addMonths(date, 1);
     const firstDay = startOfMonth(nextMonth);
@@ -197,7 +196,7 @@ export function RepeatMeetingModal({
       const lastDay = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
       for (let d = lastDay; d >= firstDay; d = addDays(d, -1)) {
         if (getDay(d) === weekday) return d;
-      }
+      };
     } else {
       // Nth occurrence of weekday in month
       let count = 0;
@@ -205,13 +204,12 @@ export function RepeatMeetingModal({
         if (getDay(d) === weekday) {
           count++;
           if (count === week) return d;
-        }
-      }
+        };
+      };
     }
-    
+    ;
     return nextMonth;
   };
-
   const handleConfirm = () => {
     onConfirm({
       ...config,
@@ -348,7 +346,7 @@ export function RepeatMeetingModal({
                         ...config, 
                         monthDay: undefined,
                         monthWeek: Math.ceil(date.getDate() / 7),
-                        monthWeekDay: getDay(date);
+                        monthWeekDay: getDay(date)
                       });
                     }
                   }}

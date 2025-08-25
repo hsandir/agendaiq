@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       ipDistribution: {} as Record<string, number>,
       timeRange: {
         from: new Date(Date.now() - hoursBack * 60 * 60 * 1000).toISOString(),
-        to: new Date().toISOString();
+        to: new Date().toISOString()
       }
     };
 

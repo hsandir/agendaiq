@@ -17,12 +17,12 @@ interface PostHogMetrics {
   topErrors: Array<{
     message: string;
     count: number;
-    lastSeen: string;
+    lastSeen: string
   }>;
   userActivity: Array<{
     event: string;
     count: number;
-    percentage: number;
+    percentage: number
   }>;
 }
 

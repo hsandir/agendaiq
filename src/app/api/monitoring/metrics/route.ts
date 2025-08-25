@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     const metricWithTime: WebVitalsMetric & {
       timestamp: string;
       userAgent: string;
-      ip: string;
+      ip: string
     } = {
       ...metrics,
       timestamp: new Date().toISOString(),

@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       remote: boolean;
       lastCommit: string;
       ahead: number;
-      behind: number;
+      behind: number
     }> = [];
     const lines = branchList.split('\n').filter(Boolean);
     
@@ -84,14 +84,14 @@ export async function GET(request: NextRequest) {
       branches,
       current: String(currentBranch).trim(),
       total: branches?.length,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
   } catch (error: unknown) {
     console.error('Git branches error:', error);
     return NextResponse.json(
       { 
         error: 'Failed to get branches',
-        details: error instanceof Error ? error.message : String(error);
+        details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
     );

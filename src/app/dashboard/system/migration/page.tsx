@@ -44,7 +44,7 @@ interface MigrationStatus {
     lastRun: string;
     totalIssues: number;
     resolved: number;
-    pending: number;
+    pending: number
   };
 }
 

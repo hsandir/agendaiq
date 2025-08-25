@@ -65,7 +65,7 @@ interface ExtendedMeeting extends Meeting {
 interface ExtendedStaff extends Staff {
   users: PrismaUser;
   role: Role;
-  department: Department;
+  department: Department
 }
 
 interface Props {
@@ -73,7 +73,7 @@ interface Props {
   currentUser: AuthenticatedUser;
   allStaff: ExtendedStaff[];
   isOrganizer: boolean;
-  isAdmin: boolean;
+  isAdmin: boolean
 }
 
 export function MeetingLiveView({ 
@@ -213,7 +213,7 @@ export function MeetingLiveView({
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(updates);
+        body: JSON.stringify(updates)
       });
 
       if (!response.ok) {

@@ -82,10 +82,10 @@ interface TeamMember {
       image?: string | null;
     };
     role: {
-      title: string;
+      title: string
     };
     department?: {
-      name: string;
+      name: string
     };
   };
 }
@@ -125,7 +125,7 @@ interface Team {
   team_knowledge?: TeamKnowledge[];
   _count: {
     team_members: number;
-    team_knowledge: number;
+    team_knowledge: number
   };
 }
 
@@ -139,7 +139,7 @@ interface TeamActivity {
     email?: string;
     image?: string | null;
   } | null;
-  data: any;
+  data: any
 }
 
 export default function TeamDetailPage() {
@@ -290,7 +290,7 @@ export default function TeamDetailPage() {
       case 'CODE': return <FileCode className="h-4 w-4" />;
       case 'IMAGE': return <Image className="h-4 w-4" />;
       case 'VIDEO': return <Video className="h-4 w-4" />;
-      default: return <FileText className="h-4 w-4" />;
+      default: return <FileText className="h-4 w-4" />
     }
   };
 
@@ -304,7 +304,7 @@ export default function TeamDetailPage() {
       case 'CODE': return 'pink';
       case 'IMAGE': return 'yellow';
       case 'VIDEO': return 'red';
-      default: return 'gray';
+      default: return 'gray'
     }
   };
 
@@ -320,7 +320,7 @@ export default function TeamDetailPage() {
       case 'GRADE_LEVEL':
         return <BookOpen className="h-5 w-5" />;
       default:
-        return <Users className="h-5 w-5" />;
+        return <Users className="h-5 w-5" />
     }
   };
 
@@ -337,7 +337,7 @@ export default function TeamDetailPage() {
       case 'GRADE_LEVEL':
         return 'bg-pink-100 text-pink-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
   };
 
@@ -875,7 +875,7 @@ export default function TeamDetailPage() {
                         case 'member_joined': return <UserPlus className="h-4 w-4 text-green-600" />;
                         case 'knowledge_added': return <BookOpen className="h-4 w-4 text-blue-600" />;
                         case 'team_created': return <Users className="h-4 w-4 text-purple-600" />;
-                        default: return <Activity className="h-4 w-4 text-gray-600" />;
+                        default: return <Activity className="h-4 w-4 text-gray-600" />
                       }
                     };
 
@@ -902,7 +902,7 @@ export default function TeamDetailPage() {
                             </>
                           );
                         default:
-                          return 'Unknown activity';
+                          return 'Unknown activity'
                       }
                     };
 

@@ -107,7 +107,7 @@ export function DateTimePicker({
 
   // When date changes (inside popover)
   const handleDateChange = (date: string) => {
-    setTempDate(date);
+    setTempDate(date)
   };
 
   // When time is selected (inside popover)
@@ -161,10 +161,10 @@ export function DateTimePicker({
       try {
         const dateTime = new Date(`${selectedDate}T${selectedTime}`);
         if (isValid(dateTime)) {
-          return format(dateTime, "MMM dd, yyyy 'at' HH:mm");
+          return format(dateTime, "MMM dd, yyyy 'at' HH:mm")
         }
       } catch (e: unknown) {
-        return "";
+        return ""
       }
     }
     return "";

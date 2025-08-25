@@ -16,12 +16,12 @@ interface Meeting {
   startTime: string;
   endTime: string;
   zoomLink?: string;
-  status: string;
+  status: string
 }
 
 interface MeetingCalendarProps {
   meetings: Meeting[];
-  onRefresh: () => void;
+  onRefresh: () => void
 }
 
 // Memoize individual meeting day cell for performance
@@ -32,7 +32,7 @@ const MeetingDayCell = memo(({ day, dayMeetings, isCurrentMonth, isTodayDate, se
   isTodayDate: boolean;
   selectedDate: Date | null;
   onDateSelect: (date: Date) => void;
-  onMeetingClick: (meetingId: string) => void;
+  onMeetingClick: (meetingId: string) => void
 }) => {
   return (
     <div
@@ -117,7 +117,7 @@ function MeetingCalendar({ meetings, onRefresh }: MeetingCalendarProps) {
   }, []);
 
   const handleDateSelect = useCallback((date: Date) => {
-    setSelectedDate(date);
+    setSelectedDate(date)
   }, []);
 
   const handleMeetingClick = useCallback((meetingId: string) => {

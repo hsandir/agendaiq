@@ -23,18 +23,18 @@ interface MeetingTemplate {
   created_by: number;
   created_at: string;
   updated_at: string;
-  creator: string;
+  creator: string
 }
 
 interface Role {
   id: number;
   title: string;
-  is_leadership: boolean;
+  is_leadership: boolean
 }
 
 interface Department {
   id: number;
-  name: string;
+  name: string
 }
 
 interface MeetingTemplatesClientProps {
@@ -137,7 +137,7 @@ export default function MeetingTemplatesClient({
 
   const handleDelete = async (templateId: number) => {
     if (!confirm('Are you sure you want to delete this template?')) {
-      return;
+      return
     }
 
     setIsLoading(true);
@@ -277,7 +277,7 @@ export default function MeetingTemplatesClient({
                           } else {
                             setFormData(prev => ({
                               ...prev,
-                              attendees: prev.attendees.filter(a => a !== attendee.value);
+                              attendees: prev.attendees.filter(a => a !== attendee.value)
                             }));
                           }
                         }}

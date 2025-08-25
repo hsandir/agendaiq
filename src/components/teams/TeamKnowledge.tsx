@@ -77,7 +77,7 @@ interface KnowledgeResource {
     };
   };
   _count: {
-    views: number;
+    views: number
   };
 }
 
@@ -229,7 +229,7 @@ export function TeamKnowledge({ teamId, canEdit = false }: TeamKnowledgeProps) {
 
   const handleDelete = async (id: number) => {
     if (!confirm('Are you sure you want to delete this resource?')) {
-      return;
+      return
     }
 
     try {
@@ -324,7 +324,7 @@ export function TeamKnowledge({ teamId, canEdit = false }: TeamKnowledgeProps) {
       case 'POLICY':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
   };
 
@@ -561,7 +561,7 @@ function KnowledgeCard({
   canEdit: boolean;
   onEdit: () => void;
   onDelete: () => void;
-  onPin: () => void;
+  onPin: () => void
 }) {
   const getTypeIcon = (type: string) => {
     const typeConfig = KNOWLEDGE_TYPES.find(t => t.value === type);
@@ -584,7 +584,7 @@ function KnowledgeCard({
       case 'POLICY':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
   };
 

@@ -10,7 +10,7 @@ export interface LayoutPreference {
   gridSystem: 'classic' | 'modern' | 'compact' | 'dashboard';
   navigationStyle: 'sidebar' | 'topbar' | 'hybrid' | 'minimal';
   contentLayout: 'single-column' | 'two-column' | 'three-column' | 'grid';
-  spacing: 'compact' | 'normal' | 'spacious';
+  spacing: 'compact' | 'normal' | 'spacious'
 }
 
 // Predefined Layout Options

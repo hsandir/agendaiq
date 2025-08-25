@@ -21,13 +21,13 @@ interface LintError {
   endColumn?: number;
   fix?: {
     range: [number, number];
-    text: string;
+    text: string
   };
   suggestions?: Array<{
     desc: string;
     fix: {
       range: [number, number];
-      text: string;
+      text: string
     };
   }>;
 }
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 async function getLintSummary() {
   try {
     const { stdout, stderr } = await execAsync('npx eslint src/ --format json', { 
-      cwd: process.cwd();
+      cwd: process.cwd()
     });
     
     const results: LintResult[] = JSON.parse(stdout || '[]');
@@ -154,7 +154,7 @@ async function getLintSummary() {
       success: true,
       summary,
       topErrors,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
 
   } catch (error: unknown) {
@@ -187,7 +187,7 @@ async function getLintSummary() {
         success: true,
         summary,
         topErrors: [],
-        timestamp: new Date().toISOString();
+        timestamp: new Date().toISOString()
       });
     } catch {
       throw error;
@@ -198,7 +198,7 @@ async function getLintSummary() {
 async function getLintDetails(severity: string, limit: number, offset: number) {
   try {
     const { stdout } = await execAsync('npx eslint src/ --format json', { 
-      cwd: process.cwd();
+      cwd: process.cwd()
     });
     
     const results: LintResult[] = JSON.parse(stdout || '[]');
@@ -236,7 +236,7 @@ async function getLintDetails(severity: string, limit: number, offset: number) {
         hasNext: offset + limit < allErrors.length,
         hasPrevious: offset > 0
       },
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
 
   } catch (error: unknown) {
@@ -268,7 +268,7 @@ async function getLintDetails(severity: string, limit: number, offset: number) {
           hasNext: offset + limit < allErrors.length,
           hasPrevious: offset > 0
         },
-        timestamp: new Date().toISOString();
+        timestamp: new Date().toISOString()
       });
     } catch {
       throw error;
@@ -279,7 +279,7 @@ async function getLintDetails(severity: string, limit: number, offset: number) {
 async function getFixableErrors() {
   try {
     const { stdout } = await execAsync('npx eslint src/ --format json', { 
-      cwd: process.cwd();
+      cwd: process.cwd()
     });
     
     const results: LintResult[] = JSON.parse(stdout || '[]');
@@ -300,7 +300,7 @@ async function getFixableErrors() {
       success: true,
       fixableErrors,
       count: fixableErrors.length,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
 
   } catch (error: unknown) {
@@ -323,7 +323,7 @@ async function getFixableErrors() {
         success: true,
         fixableErrors,
         count: fixableErrors.length,
-        timestamp: new Date().toISOString();
+        timestamp: new Date().toISOString()
       });
     } catch {
       throw error;
@@ -335,7 +335,7 @@ async function autoFixErrors() {
   try {
     // Run ESLint with --fix flag
     const { stdout, stderr } = await execAsync('npx eslint src/ --fix --format json', { 
-      cwd: process.cwd();
+      cwd: process.cwd()
     });
     
     // Get remaining errors after auto-fix
@@ -346,7 +346,7 @@ async function autoFixErrors() {
     await logError('LINT_AUTO_FIX', 'Auto-fix completed', {
       remainingErrors,
       remainingWarnings,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
 
     return NextResponse.json({
@@ -354,7 +354,7 @@ async function autoFixErrors() {
       message: 'Auto-fix completed successfully',
       remainingErrors,
       remainingWarnings,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
 
   } catch (error: unknown) {
@@ -370,7 +370,7 @@ async function autoFixErrors() {
         message: 'Auto-fix completed with some remaining issues',
         remainingErrors,
         remainingWarnings,
-        timestamp: new Date().toISOString();
+        timestamp: new Date().toISOString()
       });
     } catch {
       throw error;
@@ -407,13 +407,13 @@ async function fixLintErrors(filePath: string, fixes: Array<Record<string, unkno
     await logError('LINT_MANUAL_FIX', 'Manual fixes applied', {
       filePath,
       fixCount: fixes.length,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
 
     return NextResponse.json({
       success: true,
       message: `Applied ${fixes.length} fixes to ${filePath}`,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
 
   } catch (error: unknown) {
@@ -438,7 +438,7 @@ async function reportErrorsToAdmin(errors: Array<Record<string, unknown>>) {
     return NextResponse.json({
       success: true,
       message: `Reported ${errors.length} lint errors to system administrators`,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
 
   } catch (error: unknown) {
@@ -459,7 +459,7 @@ async function getTypeCastingViolations() {
       content: string;
       severity: 'critical';
       type: 'DANGEROUS_TYPE_CASTING';
-      suggestion: string;
+      suggestion: string
     }> = [];
 
     if (stdout) {
@@ -510,9 +510,9 @@ async function getTypeCastingViolations() {
       count: violations.length,
       summary: {
         critical: violations.length,
-        mostCommonPatterns: getPatternSummary(violations);
+        mostCommonPatterns: getPatternSummary(violations)
       },
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
 
   } catch (error: unknown) {
@@ -591,7 +591,7 @@ async function getDangerousPatterns() {
         'Avoid chained type assertions completely',
         'Define specific types instead of using "any"'
       ],
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
 
   } catch (error: unknown) {

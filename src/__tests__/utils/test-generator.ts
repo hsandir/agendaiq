@@ -43,7 +43,7 @@ export interface IntegrationWorkflowInfo {
   steps: Array<{
     name: string;
     type: 'api' | 'component' | 'database';
-    target: string;
+    target: string
   }>;
 }
 
@@ -209,7 +209,7 @@ export class TestGenerator {
     apiTests: string[];
     componentTests: string[];
     integrationTests: string[];
-    coverageReport: string;
+    coverageReport: string
   }> {
     const apiTests = await this.generateAPIRoutesFromDirectory(
       join(projectPath, 'src/app/api');
@@ -601,22 +601,22 @@ ${properties}
 
   private addWorkflowStepImplementations(template: string, workflow: IntegrationWorkflowInfo): string {
     // Add step-specific implementations
-    return template;
+    return template
   }
 
   private addErrorRecoveryTests(template: string, workflow: IntegrationWorkflowInfo): string {
     // Add error recovery test cases
-    return template;
+    return template
   }
 
   private addAccessibilityTests(template: string, component: ComponentInfo): string {
     // Add accessibility-specific tests
-    return template;
+    return template
   }
 
   private addResponsiveTests(template: string, component: ComponentInfo): string {
     // Add responsive design tests
-    return template;
+    return template
   }
 
   private generateVariantTests(variants?: Record<string, unknown>): string {

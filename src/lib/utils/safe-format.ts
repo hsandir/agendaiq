@@ -18,7 +18,7 @@ export function safeFormat(
   fallback: string = 'Invalid date'
 ): string {
   if (!dateValue) {
-    return fallback;
+    return fallback
   }
 
   try {
@@ -42,7 +42,7 @@ export function safeFormat(
  */
 export function safeParseDate(dateValue: string | Date | null | undefined): Date | null {
   if (!dateValue) {
-    return null;
+    return null
   }
 
   try {

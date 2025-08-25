@@ -161,7 +161,7 @@ export function KnowledgeDetailModal({
       const response = await fetch(`/api/teams/${teamId}/knowledge?category=${knowledge.category}&limit=5`);
       if (response.ok) {
         const data = await response.json();
-        setRelatedResources(data.knowledge.filter((k: TeamKnowledge) => k.id !== knowledge.id));
+        setRelatedResources(data.knowledge.filter((k: TeamKnowledge) => k.id !== knowledge.id))
       }
     } catch (error) {
       console.error('Error loading related resources:', error);
@@ -274,7 +274,7 @@ Link: ${window.location.origin}/dashboard/teams/${teamId}/knowledge/${knowledge.
       case 'restricted':
         return <Badge variant="destructive"><Lock className="h-3 w-3 mr-1" />Restricted</Badge>;
       default:
-        return null;
+        return null
     }
   };
 

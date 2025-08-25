@@ -11,7 +11,7 @@ export class AuditClient {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(event);
+          body: JSON.stringify(event)
         });
 
         if (!response.ok) {
@@ -40,7 +40,7 @@ export class AuditClient {
       errorMessage,
       category: 'AUTH',
       metadata: { userId, staffId },
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     };
 
     await this.sendToAuditAPI(event);
@@ -63,7 +63,7 @@ export class AuditClient {
       errorMessage,
       category: 'SECURITY',
       metadata: { userId, staffId },
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     };
 
     await this.sendToAuditAPI(event);

@@ -74,7 +74,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
             setCustomTheme(parsedCustom);
             setCurrentThemeId('custom');
           } catch (e: unknown) {
-            console.error('Failed to parse custom theme from localStorage');
+            console.error('Failed to parse custom theme from localStorage')
           }
         }
       } else if (themes.find(t => t.id === savedTheme)) {
@@ -255,7 +255,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     try {
       localStorage.setItem('agendaiq-theme', themeId);
     } catch (err: unknown) {
-      console.debug('localStorage not available');
+      console.debug('localStorage not available')
     }
 
     // Save to database asynchronously (don't block UI)

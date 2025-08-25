@@ -7,7 +7,7 @@ export interface UseAuthorizationResult {
   is: (role: RoleKey) => boolean;
   can: (capability: Capability | Capability[]) => boolean;
   loading: boolean;
-  user: unknown;
+  user: unknown
 }
 
 export function useAuthorization(): UseAuthorizationResult {

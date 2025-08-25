@@ -25,14 +25,14 @@ import { safeFormatDateTime } from '@/lib/utils/safe-date';
 interface User {
   id: number;
   name: string | null;
-  email: string;
+  email: string
 }
 
 interface MeetingAttendee {
   id: string;
   status: string | null;
   staff: {
-    user: User;
+    user: User
   };
 }
 
@@ -46,7 +46,7 @@ interface Meeting {
   status: string;
   organizer: User;
   attendees: MeetingAttendee[];
-  isOrganizer: boolean;
+  isOrganizer: boolean
 }
 
 interface AgendaItem {
@@ -54,21 +54,21 @@ interface AgendaItem {
   title: string;
   description?: string;
   completed: boolean;
-  order: number;
+  order: number
 }
 
 interface Note {
   id: string;
   content: string;
   author: string;
-  timestamp: string;
+  timestamp: string
 }
 
 interface MeetingDetailsProps {
   meeting: Meeting;
   isOrganizer: boolean;
   canRespond: boolean;
-  onRespond?: (status: "ACCEPTED" | "DECLINED") => Promise<void>;
+  onRespond?: (status: "ACCEPTED" | "DECLINED") => Promise<void>
 }
 
 export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: MeetingDetailsProps) {
@@ -135,7 +135,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            content: newNote.trim();
+            content: newNote.trim()
           }),
         });
 
@@ -197,7 +197,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
   };
 
   const deleteAgendaItem = (id: string) => {
-    setAgendaItems(items => items.filter(item => item.id !== id));
+    setAgendaItems(items => items.filter(item => item.id !== id))
   };
 
   const getStatusBadge = (status: string | null) => {
@@ -207,7 +207,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
       case 'declined':
         return <Badge className="bg-destructive/10 text-destructive">Declined</Badge>;
       default:
-        return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
     }
   };
 

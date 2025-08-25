@@ -7,14 +7,14 @@ export interface EmailConfig {
     secure: boolean;
     auth: {
       user: string;
-      pass: string;
+      pass: string
     };
   };
   from: {
     name: string;
-    address: string;
+    address: string
   };
-  replyTo: string;
+  replyTo: string
 }
 
 export const emailConfig: EmailConfig = {

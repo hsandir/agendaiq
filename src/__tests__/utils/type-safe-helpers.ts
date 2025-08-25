@@ -190,7 +190,7 @@ class TypeSafeMockFactoryClass {
     },
 
     createWithRelations: (): role => {
-      return TypeSafeMockFactory.role.create();
+      return TypeSafeMockFactory.role.create()
     },
   };
 
@@ -267,7 +267,7 @@ class TypeSafeMockFactoryClass {
     },
 
     createWithRelations: (): district => {
-      return TypeSafeMockFactory.district.create();
+      return TypeSafeMockFactory.district.create()
     },
   };
 
@@ -475,7 +475,7 @@ class TypeSafeTestDB {
   }
 
   async transaction<T>(fn: (tx: PrismaClient) => Promise<T>): Promise<T> {
-    return this.prisma.$transaction(fn);
+    return this.prisma.$transaction(fn)
   }
 
   async rollbackTransaction<T>(fn: (tx: PrismaClient) => Promise<T>): Promise<void> {
@@ -642,7 +642,7 @@ export class TypeSafeMockUtilities {
       text: async () => JSON.stringify(responseData),
       blob: async () => new Blob([JSON.stringify(responseData)]),
       arrayBuffer: async () => new ArrayBuffer(0),
-      clone: function() { return this; },
+      clone: function() { return this },
     } as Response);
   }
 

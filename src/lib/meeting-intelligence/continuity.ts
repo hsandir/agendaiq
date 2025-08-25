@@ -101,7 +101,7 @@ export class MeetingContinuityService {
             carry_forward_count: item.carryForwardCount,
             order_index: index,
             purpose: 'Discussion',
-            created_at: new Date();
+            created_at: new Date()
           }))
         });
       }
@@ -120,7 +120,7 @@ export class MeetingContinuityService {
             status: action.status,
             parent_action_id: action.parentActionId,
             carry_forward_count: action.carryForwardCount,
-            created_at: new Date();
+            created_at: new Date()
           }))
         });
       }

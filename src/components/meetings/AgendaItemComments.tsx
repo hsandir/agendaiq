@@ -15,11 +15,11 @@ interface Comment {
     users: {
       id: number;
       name: string | null;
-      email: string;
+      email: string
     }
     Role?: {
       id: number;
-      title: string;
+      title: string
     }
   }
 }
@@ -28,7 +28,7 @@ interface Props {
   itemId: number;
   comments: Comment[];
   onAddComment: (content: string) => void;
-  canComment: boolean;
+  canComment: boolean
 }
 
 export function AgendaItemComments({ itemId, comments, onAddComment, canComment }: Props) {
@@ -100,7 +100,7 @@ export function AgendaItemComments({ itemId, comments, onAddComment, canComment 
                     <span className="text-xs text-muted-foreground">
                       {(() => {
                         const date = getSafeDate(comment.created_at);
-                        return date ? format(date, "MMM d, h:mm a") : 'Unknown time';
+                        return date ? format(date, "MMM d, h:mm a") : 'Unknown time'
                       })()}
                     </span>
                   </div>

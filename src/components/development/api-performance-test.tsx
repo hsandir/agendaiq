@@ -42,7 +42,7 @@ export function ApiPerformanceTest() {
         endpoint: url,
         time: performance.now() - start,
         status: 0,
-        error: error instanceof Error ? error.message : String(error);
+        error: error instanceof Error ? error.message : String(error)
       }
     }
   }

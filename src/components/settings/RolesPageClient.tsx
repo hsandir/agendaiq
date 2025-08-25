@@ -11,12 +11,12 @@ interface StaffMember {
     name: string | null;
     email: string;
     image?: string | null;
-    email_verified: boolean;
+    email_verified: boolean
   };
   role_id: number;
   department: {
     id: number;
-    name: string;
+    name: string
   } | null;
 }
 

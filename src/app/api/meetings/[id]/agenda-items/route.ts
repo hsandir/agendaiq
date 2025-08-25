@@ -19,11 +19,11 @@ const agendaItemSchema = z.object({
   status: z.enum(['Ongoing', 'Resolved', 'Assigned_to_local', 'Pending', 'Deferred']),
   future_implications: z.boolean().optional().nullable(),
   duration_minutes: z.number().optional().nullable(),
-  order_index: z.number();
+  order_index: z.number()
 });
 
 const createAgendaItemsSchema = z.object({
-  items: z.array(agendaItemSchema);
+  items: z.array(agendaItemSchema)
 });
 
 interface Props {
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest, props: Props) {
         data: {
           meeting_id: meetingId,
           ...itemData,
-          updated_at: new Date();
+          updated_at: new Date()
         },
         include: {
           staff: {
@@ -198,7 +198,7 @@ export async function POST(request: NextRequest, props: Props) {
           return {
             meeting_id: meetingId,
             ...itemData,
-            updated_at: new Date();
+            updated_at: new Date()
           };
         })
       });
@@ -243,7 +243,7 @@ export async function POST(request: NextRequest, props: Props) {
             name: user.name,
             email: user.email
           },
-          timestamp: new Date().toISOString();
+          timestamp: new Date().toISOString()
         }
       );
     } else if (createdItems.length > 1) {
@@ -258,7 +258,7 @@ export async function POST(request: NextRequest, props: Props) {
             name: user.name,
             email: user.email
           },
-          timestamp: new Date().toISOString();
+          timestamp: new Date().toISOString()
         }
       );
     }
@@ -362,7 +362,7 @@ export async function PUT(request: NextRequest, props: Props) {
             meeting_id: meetingId,
             ...itemData,
             order_index: index,
-            updated_at: new Date();
+            updated_at: new Date()
           },
           include: {
             staff: {
@@ -399,7 +399,7 @@ export async function PUT(request: NextRequest, props: Props) {
           name: user.name,
           email: user.email
         },
-        timestamp: new Date().toISOString();
+        timestamp: new Date().toISOString()
       }
     );
     

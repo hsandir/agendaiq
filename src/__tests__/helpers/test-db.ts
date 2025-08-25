@@ -6,7 +6,7 @@ type UserWithStaff = users & {
     role: role;
     department: unknown;
     school: unknown;
-    district: unknown;
+    district: unknown
   })[]
 }
 
@@ -118,7 +118,7 @@ export async function createTestContext() {
     factory,
     ...seededData,
     cleanup: async () => {
-      await resetTestDatabase();
+      await resetTestDatabase()
     }
   }
 }

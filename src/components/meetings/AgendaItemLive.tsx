@@ -203,7 +203,7 @@ export function AgendaItemLive({
       const response = await fetch(`/api/meetings/${meetingId}/agenda-items/${item.id}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content });
+        body: JSON.stringify({ content })
       });
 
       if (!response.ok) {
@@ -229,7 +229,7 @@ export function AgendaItemLive({
       case 'High': return 'bg-destructive/10 text-destructive';
       case 'Medium': return 'bg-yellow-100 text-yellow-700';
       case 'Low': return 'bg-green-100 text-green-700';
-      default: return 'bg-muted text-foreground';
+      default: return 'bg-muted text-foreground'
     }
   };
 
@@ -240,7 +240,7 @@ export function AgendaItemLive({
       case 'Pending': return 'bg-muted text-foreground';
       case 'Assigned_to_local': return 'bg-primary text-primary-foreground';
       case 'Deferred': return 'bg-orange-100 text-orange-700';
-      default: return 'bg-muted text-foreground';
+      default: return 'bg-muted text-foreground'
     }
   };
 
@@ -362,7 +362,7 @@ export function AgendaItemLive({
                 value={editData.responsible_staff_id?.toString() ?? 'none'}
                 onValueChange={(value) => setEditData({ 
                   ...editData, 
-                  responsible_staff_id: value === 'none' ? null : parseInt(value);
+                  responsible_staff_id: value === 'none' ? null : parseInt(value)
                 })}
               >
                 <SelectTrigger className="mt-1">

@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         error: "Failed to retrieve lint status",
-        timestamp: new Date().toISOString();
+        timestamp: new Date().toISOString()
       }, 
       { status: 500 }
     );
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         error: "Failed to run auto-fix",
-        timestamp: new Date().toISOString();
+        timestamp: new Date().toISOString()
       }, 
       { status: 500 }
     );

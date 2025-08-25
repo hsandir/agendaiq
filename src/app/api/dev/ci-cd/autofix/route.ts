@@ -33,7 +33,7 @@ interface AutofixSuggestion {
     action: 'create' | 'modify' | 'delete';
     content?: string;
   }>;
-  preventive: boolean;
+  preventive: boolean
 }
 
 // GET /api/dev/ci-cd/autofix - Get autofix suggestions for an error

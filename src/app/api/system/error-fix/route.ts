@@ -49,7 +49,7 @@ async function fixReactVersionMismatch() {
         body: JSON.stringify({ 
           type: 'auto-backup', 
           message: 'Pre-React fix backup' 
-        });
+        })
       });
     } catch (error: unknown) {
       console.warn('Auto-backup failed:', error);
@@ -298,7 +298,7 @@ async function autoFixAllErrors() {
         body: JSON.stringify({ 
           type: 'auto-backup', 
           message: 'Pre-auto-fix comprehensive backup' 
-        });
+        })
       });
     } catch (error: unknown) {
       console.warn('Auto-backup failed:', error);
@@ -314,7 +314,7 @@ async function autoFixAllErrors() {
       reactFix: FixResult | null;
       nodeFix: FixResult | null;
       tailwindFix: FixResult | null;
-      cacheFix: FixResult | null;
+      cacheFix: FixResult | null
     } = {
       reactFix: null,
       nodeFix: null,

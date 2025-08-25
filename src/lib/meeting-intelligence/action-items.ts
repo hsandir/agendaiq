@@ -102,7 +102,7 @@ export class ActionItemsService {
         in: ['Pending', 'InProgress']
       },
       due_date: {
-        lt: new Date();
+        lt: new Date()
       }
     };
 

@@ -42,7 +42,7 @@ export interface MenuVisibility {
 export interface MenuCondition {
   type: 'role' | 'permission' | 'custom';
   operator: 'equals' | 'contains' | 'not_equals';
-  value: unknown;
+  value: unknown
 }
 
 export interface MenuStructure {
@@ -410,7 +410,7 @@ export class DynamicMenu {
         return true;
         
       default:
-        return true;
+        return true
     }
   }
 
@@ -424,7 +424,7 @@ export class DynamicMenu {
       case 'not_equals':
         return actual !== expected;
       default:
-        return true;
+        return true
     }
   }
 
@@ -486,7 +486,7 @@ export class DynamicMenu {
 
   // Check if cache is still valid
   private isCacheValid(generatedAt: Date): boolean {
-    return Date.now() - generatedAt.getTime() < this.cacheExpiry;
+    return Date.now() - generatedAt.getTime() < this.cacheExpiry
   }
 
   // Clear menu cache
@@ -505,7 +505,7 @@ export class DynamicMenu {
     const findInItems = (items: MenuItem[], targetPath: string): MenuItem | null => {
       for (const item of items) {
         if (item.href === targetPath) {
-          return item;
+          return item
         }
         
         if (item.children) {
@@ -526,7 +526,7 @@ export class DynamicMenu {
     const findMenuItem = (items: MenuItem[], targetId: string): MenuItem | null => {
       for (const item of items) {
         if (item.id === targetId) {
-          return item;
+          return item
         }
         
         if (item.children) {

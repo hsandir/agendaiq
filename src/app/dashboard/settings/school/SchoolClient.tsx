@@ -11,11 +11,11 @@ interface School {
   state: string | null;
   zipCode: string | null;
   phone: string | null;
-  website: string | null;
+  website: string | null
 }
 
 interface SchoolClientProps {
-  initialschool: School | null;
+  initialschool: School | null
 }
 
 export default function SchoolClient({ initialSchool }: SchoolClientProps) {
@@ -40,7 +40,7 @@ export default function SchoolClient({ initialSchool }: SchoolClientProps) {
 
         setSchool(data);
       } catch (error: unknown) {
-        setError(error instanceof Error ? error.message : 'Failed to load school data');
+        setError(error instanceof Error ? error.message : 'Failed to load school data')
       } finally {
         setIsLoading(false);
       }
@@ -85,7 +85,7 @@ export default function SchoolClient({ initialSchool }: SchoolClientProps) {
       setSchool(data);
       setSuccess('School information updated successfully');
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to update school information');
+      setError(error instanceof Error ? error.message : 'Failed to update school information')
     } finally {
       setIsSaving(false);
     }

@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/user/layout - Update user's layout preference (for compatibility)
 export async function POST(request: NextRequest) {
-  return PUT(request);
+  return PUT(request)
 }
 
 // PUT /api/user/layout - Update user's layout preference

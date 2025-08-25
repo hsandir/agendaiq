@@ -163,7 +163,7 @@ export default function EnhancedLiveMonitor({
     switch (source) {
       case 'dev': return <Terminal className="h-4 w-4" />;
       case 'audit': return <Shield className="h-4 w-4" />;
-      default: return <Activity className="h-4 w-4" />;
+      default: return <Activity className="h-4 w-4" />
     }
   };
 
@@ -174,7 +174,7 @@ export default function EnhancedLiveMonitor({
       case 'high': return <AlertTriangle className="h-4 w-4 text-orange-500" />;
       case 'medium': return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
       case 'low': return <CheckCircle className="h-4 w-4 text-blue-500" />;
-      default: return <Activity className="h-4 w-4 text-gray-500" />;
+      default: return <Activity className="h-4 w-4 text-gray-500" />
     }
   };
 
@@ -196,7 +196,7 @@ export default function EnhancedLiveMonitor({
 
   // Format timestamp
   const formatTimestamp = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString();
+    return new Date(timestamp).toLocaleTimeString()
   };
 
   return (

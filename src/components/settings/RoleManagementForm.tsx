@@ -13,12 +13,12 @@ import { Loader2 } from 'lucide-react';
 interface Department {
   id: string;
   code: string;
-  name: string;
+  name: string
 }
 
 interface Role {
   id: string;
-  name: string;
+  name: string
 }
 
 interface User {
@@ -33,7 +33,7 @@ interface User {
   rememberDevices: boolean;
   suspiciousAlerts: boolean;
   two_factor_enabled: boolean;
-  schoolId: string | null;
+  schoolId: string | null
 }
 
 export function RoleManagementForm() {

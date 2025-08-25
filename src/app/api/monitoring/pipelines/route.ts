@@ -14,7 +14,7 @@ interface GitHubWorkflowRun {
   conclusion: string | null;
   created_at: string;
   updated_at: string;
-  run_started_at: string | null;
+  run_started_at: string | null
 }
 
 interface GitHubWorkflowRunsResponse {
@@ -24,7 +24,7 @@ interface GitHubWorkflowRunsResponse {
 interface PipelineStage {
   name: string;
   status: string;
-  duration: number;
+  duration: number
 }
 
 // GitHub Actions API integration for real pipeline data
@@ -84,7 +84,7 @@ function mapGitHubStatus(status: string, conclusion: string | null): string {
       case 'success': return 'success';
       case 'failure': return 'failed';
       case 'cancelled': return 'cancelled';
-      default: return 'failed';
+      default: return 'failed'
     }
   }
   if (status === 'in_progress') return 'running';
@@ -188,7 +188,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       runs,
       source: runs.length > 0 ? 'github' : 'none',
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
   } catch (error: unknown) {
     console.error('Error fetching pipelines:', error);

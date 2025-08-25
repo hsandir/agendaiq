@@ -15,32 +15,32 @@ interface ServerMetrics {
     nodeVersion: string;
     nextVersion: string;
     uptime: string;
-    hostname: string;
+    hostname: string
   };
   performance: {
     memory: {
       total: number;
       used: number;
       free: number;
-      usage: number;
+      usage: number
     };
     cpu: {
       usage: number;
       cores: number;
-      model: string;
+      model: string
     };
     disk: {
       total: number;
       used: number;
       free: number;
-      usage: number;
+      usage: number
     };
   };
   network: {
     protocol: string;
     host: string;
     port: number;
-    status: string;
+    status: string
   };
   health: {
     overall: 'healthy' | 'warning' | 'critical';
@@ -135,7 +135,7 @@ export async function GET(request: NextRequest) {
         nodeVersion: process?.version,
         nextVersion: "14.2.5", // Would need to get from package.json
         uptime: uptimeString,
-        hostname: os.hostname();
+        hostname: os.hostname()
       },
       performance: {
         memory: {

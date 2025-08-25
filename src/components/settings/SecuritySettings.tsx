@@ -12,7 +12,7 @@ interface Device {
   browser: string;
   ip_address: string;
   last_active: string;
-  is_trusted: boolean;
+  is_trusted: boolean
 }
 
 export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
@@ -43,7 +43,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
       const response = await fetch(`/api/devices/${deviceId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_trusted: trust });
+        body: JSON.stringify({ is_trusted: trust })
       });
 
       if (response.ok) {
@@ -78,7 +78,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
       const response = await fetch("/api/auth/2fa/disable", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: twoFactorCode });
+        body: JSON.stringify({ token: twoFactorCode })
       });
 
       if (response.ok) {
@@ -254,5 +254,5 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
         </div>
       </section>
     </div>
-  );
+  )
 }

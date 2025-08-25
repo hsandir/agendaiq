@@ -25,7 +25,7 @@ function PreloadResources() {
 export default async function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   const user = await requireAuth(AuthPresets.requireAuth);
 

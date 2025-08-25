@@ -35,7 +35,7 @@ interface TeamMember {
       image?: string | null;
     };
     role: {
-      title: string;
+      title: string
     };
   };
 }
@@ -51,7 +51,7 @@ interface Team {
   team_members: TeamMember[];
   _count: {
     team_members: number;
-    team_knowledge: number;
+    team_knowledge: number
   };
 }
 
@@ -147,7 +147,7 @@ export function TeamList() {
       case 'GRADE_LEVEL':
         return <BookOpen className="h-4 w-4" />;
       default:
-        return <Users className="h-4 w-4" />;
+        return <Users className="h-4 w-4" />
     }
   };
 
@@ -164,7 +164,7 @@ export function TeamList() {
       case 'GRADE_LEVEL':
         return 'bg-pink-100 text-pink-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
   };
 

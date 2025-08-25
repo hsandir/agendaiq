@@ -108,7 +108,7 @@ export function withErrorHandler<T extends (...args: Record<string, unknown>[]) 
 ): T {
   return (async (...args: Parameters<T>) => {
     try {
-      return await handler(...args);
+      return await handler(...args)
     } catch (error: unknown) {
       const request = args[0] as NextRequest;
       return handleServerError(error, request, defaultOptions);

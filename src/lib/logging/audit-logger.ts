@@ -26,7 +26,7 @@ export class AuditLogger {
   private async writeToTransports(entry: AuditLogEntry): Promise<void> {
     const writePromises = this.transports.map(transport => {
       try {
-        return transport.write(entry);
+        return transport.write(entry)
       } catch (error: unknown) {
         console.error(`Audit transport ${transport.name} failed:`, error);
         return Promise.resolve();
@@ -422,7 +422,7 @@ export class AuditLogger {
       blockedActions: blockedActions.filter(a => a.result === 'blocked').length,
       timeRange: {
         start: oneDayAgo.toISOString(),
-        end: new Date().toISOString();
+        end: new Date().toISOString()
       }
     };
   }

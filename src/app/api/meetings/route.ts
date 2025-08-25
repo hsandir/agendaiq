@@ -159,7 +159,7 @@ export async function GET(request: NextRequest) {
         page,
         limit,
         total: totalCount,
-        totalPages: Math.ceil(totalCount / limit);
+        totalPages: Math.ceil(totalCount / limit)
       }
     };
     

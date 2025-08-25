@@ -28,13 +28,13 @@ interface RoleData {
   is_leadership: boolean;
   Department?: {
     id: number;
-    name: string;
+    name: string
   };
   Staff?: Array<{
     id: number;
     users: {
       name: string | null;
-      email: string;
+      email: string
     };
   }>;
 }

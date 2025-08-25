@@ -42,7 +42,7 @@ interface CustomTheme {
   name: string;
   colors: Record<string, string>;
   isDark: boolean;
-  created_at: string;
+  created_at: string
 }
 
 const presetPalettes = [
@@ -316,7 +316,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
       name: themeName,
       colors: colors,
       isDark: isDark,
-      created_at: new Date().toISOString();
+      created_at: new Date().toISOString()
     };
 
     const updated = [...savedThemes, newTheme];
@@ -393,7 +393,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
       name: themeName,
       colors: colors,
       isDark: isDark,
-      exportedAt: new Date().toISOString();
+      exportedAt: new Date().toISOString()
     };
     
     const blob = new Blob([JSON.stringify(themeData, null, 2)], { type: 'application/json' });
@@ -406,7 +406,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
   };
 
   const copyThemeCode = () => {
-    const cssVariables = Object.entries(colors);
+    const cssVariables = Object.entries(colors)
       .map(([key, value]) => `  --${key}: ${value};`)
       .join('\n');
     

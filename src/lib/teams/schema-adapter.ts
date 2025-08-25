@@ -19,7 +19,7 @@ interface LegacyTeam {
   district_id?: number | null;
   created_by: number;
   created_at: Date;
-  updated_at: Date;
+  updated_at: Date
 }
 
 interface ModernTeam {
@@ -33,7 +33,7 @@ interface ModernTeam {
   metadata?: any;
   _count?: {
     team_members: number;
-    team_knowledge: number;
+    team_knowledge: number
   };
 }
 

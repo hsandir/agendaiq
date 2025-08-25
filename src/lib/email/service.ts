@@ -107,23 +107,23 @@ export class EmailService {
   }
 
   async sendMeetingInvite(data: MeetingInviteData): Promise<void> {
-    await this.sendEmail(data);
+    await this.sendEmail(data)
   }
 
   async sendTeamNotification(data: TeamNotificationData): Promise<void> {
-    await this.sendEmail(data);
+    await this.sendEmail(data)
   }
 
   async sendPasswordReset(data: PasswordResetData): Promise<void> {
-    await this.sendEmail(data);
+    await this.sendEmail(data)
   }
 
   async sendVerificationEmail(data: VerificationEmailData): Promise<void> {
-    await this.sendEmail(data);
+    await this.sendEmail(data)
   }
 
   async sendNotification(data: EmailNotificationData): Promise<void> {
-    await this.sendEmail(data);
+    await this.sendEmail(data)
   }
 
   async verifyConnection(): Promise<boolean> {

@@ -19,10 +19,10 @@ global.fetch = jest.fn() as any;
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),
-    refresh: jest.fn();
+    refresh: jest.fn()
   }),
   useSearchParams: () => ({
-    get: jest.fn();
+    get: jest.fn()
   })
 }));
 
@@ -166,7 +166,7 @@ describe('CreateTeamDialog Component', () => {
           type: 'PROJECT',
           purpose: 'Test purpose',
           description: 'Test description'
-        });
+        })
       }));
       expect(onSuccess).toHaveBeenCalled();
     });
@@ -377,7 +377,7 @@ describe('AddMemberDialog Component', () => {
         body: JSON.stringify({
           user_id: 3,
           role: 'MEMBER'
-        });
+        })
       }));
       expect(onSuccess).toHaveBeenCalled();
     });

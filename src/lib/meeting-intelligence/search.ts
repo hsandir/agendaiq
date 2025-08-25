@@ -10,7 +10,7 @@ export class MeetingSearchService {
    */
   static async searchMeetings(query: MeetingSearchQuery): Promise<{
     results: MeetingSearchResult[];
-    total: number;
+    total: number
   }> {
     const searchTerm = query.query.toLowerCase();
     const limit = query.limit ?? 20;

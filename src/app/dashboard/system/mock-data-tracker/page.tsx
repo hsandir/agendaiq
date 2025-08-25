@@ -29,7 +29,7 @@ interface MockDataUsage {
   mockDataLines: string[];
   apiEndpoint?: string;
   lastChecked: string;
-  priority: 'high' | 'medium' | 'low';
+  priority: 'high' | 'medium' | 'low'
 }
 
 interface MockDataReport {
@@ -38,7 +38,7 @@ interface MockDataReport {
   mixedFiles: number;
   apiFallbackFiles: number;
   usage: MockDataUsage[];
-  timestamp: string;
+  timestamp: string
 }
 
 export default function MockDataTrackerPage() {
@@ -99,7 +99,7 @@ export default function MockDataTrackerPage() {
       case 'mixed':
         return <Badge variant="outline" className="text-primary border-blue-600"><Code className="w-3 h-3 mr-1" />Mixed</Badge>;
       default:
-        return <Badge variant="secondary">Unknown</Badge>;
+        return <Badge variant="secondary">Unknown</Badge>
     }
   };
 
@@ -112,7 +112,7 @@ export default function MockDataTrackerPage() {
       case 'low':
         return <Badge variant="outline">Low</Badge>;
       default:
-        return <Badge variant="secondary">Unknown</Badge>;
+        return <Badge variant="secondary">Unknown</Badge>
     }
   };
 
@@ -125,7 +125,7 @@ export default function MockDataTrackerPage() {
       case 'api':
         return <Database className="w-4 h-4" />;
       default:
-        return <FileText className="w-4 h-4" />;
+        return <FileText className="w-4 h-4" />
     }
   };
 

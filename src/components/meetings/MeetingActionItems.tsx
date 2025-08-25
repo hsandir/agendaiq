@@ -128,7 +128,7 @@ export function MeetingActionItems({
       case "high": return "bg-orange-100 text-orange-800";
       case "medium": return "bg-yellow-100 text-yellow-800";
       case "low": return "bg-green-100 text-green-800";
-      default: return "bg-muted text-foreground";
+      default: return "bg-muted text-foreground"
     }
   };
 
@@ -137,7 +137,7 @@ export function MeetingActionItems({
       case "completed": return <CheckCircle className="h-4 w-4 text-green-500" />;
       case "in_progress": return <Clock className="h-4 w-4 text-yellow-500" />;
       case "cancelled": return <AlertCircle className="h-4 w-4 text-destructive" />;
-      default: return <Target className="h-4 w-4 text-muted-foreground" />;
+      default: return <Target className="h-4 w-4 text-muted-foreground" />
     }
   };
 

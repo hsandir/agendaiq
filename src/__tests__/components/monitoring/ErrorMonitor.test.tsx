@@ -160,7 +160,7 @@ describe('ErrorMonitor Component', () => {
       render(<ErrorMonitor />);
 
       await waitFor(() => {
-        expect(screen.getByText('TypeError: Cannot read property')).toBeInTheDocument();
+        expect(screen.getByText('TypeError: Cannot read property')).toBeInTheDocument()
       });
 
       // Change filter to errors only
@@ -279,7 +279,7 @@ describe('ErrorMonitor Component', () => {
       render(<ErrorMonitor />);
 
       await waitFor(() => {
-        expect(screen.getByText('TypeError: Cannot read property')).toBeInTheDocument();
+        expect(screen.getByText('TypeError: Cannot read property')).toBeInTheDocument()
       });
 
       const issueRow = screen.getByText('TypeError: Cannot read property').closest('div[class*="cursor-pointer"]');
@@ -296,7 +296,7 @@ describe('ErrorMonitor Component', () => {
       render(<ErrorMonitor />);
 
       await waitFor(() => {
-        expect(screen.getByText('TypeError: Cannot read property')).toBeInTheDocument();
+        expect(screen.getByText('TypeError: Cannot read property')).toBeInTheDocument()
       });
 
       const issueRow = screen.getByText('TypeError: Cannot read property').closest('div[class*="cursor-pointer"]');
@@ -305,7 +305,7 @@ describe('ErrorMonitor Component', () => {
       const closeButton = screen.getByRole('button', { name: /Close/i });
       fireEvent.click(closeButton);
 
-      expect(screen.queryByText('Issue Details:')).not.toBeInTheDocument();
+      expect(screen.queryByText('Issue Details:')).not.toBeInTheDocument()
     });
   });
 

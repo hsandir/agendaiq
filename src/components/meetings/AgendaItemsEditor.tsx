@@ -273,7 +273,7 @@ export function AgendaItemsEditor({
         setSuccess(`Imported ${imported.length} agenda items`);
       }
     } catch (error: unknown) {
-      setError('Failed to import agenda items');
+      setError('Failed to import agenda items')
     }
   }
 
@@ -313,7 +313,7 @@ export function AgendaItemsEditor({
         setError(data.error || 'Failed to save agenda items');
       }
     } catch (error: unknown) {
-      setError('An error occurred while saving');
+      setError('An error occurred while saving')
     } finally {
       setIsSubmitting(false);
     }

@@ -8,7 +8,7 @@ import { AuditLogger } from '@/lib/audit/audit-logger';
 const assignmentSchema = z.object({
   assignments: z.array(z.object({
     roleId: z.number(),
-    departmentId: z.number().nullable();
+    departmentId: z.number().nullable()
   }))
 });
 

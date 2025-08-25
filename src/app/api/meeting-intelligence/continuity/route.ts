@@ -12,16 +12,16 @@ interface MeetingNode {
   agendaItems: {
     total: number;
     resolved: number;
-    carriedForward: number;
+    carriedForward: number
   };
   actionItems: {
     total: number;
     completed: number;
     pending: number;
-    overdue: number;
+    overdue: number
   };
   attendeeCount: number;
-  duration: number;
+  duration: number
 }
 
 export async function GET(request: NextRequest) {

@@ -11,12 +11,12 @@ export class DatabaseTransport implements LogTransport {
   level: LogLevel;
 
   constructor(level: LogLevel = LogLevel.INFO) {
-    this.level = level;
+    this.level = level
   }
 
   async write(entry: BaseLogEntry): Promise<void> {
     if (entry.level < this.level) {
-      return;
+      return
     }
 
     try {
@@ -240,7 +240,7 @@ export class DatabaseTransport implements LogTransport {
         logsByCategory: {}, // TODO: Implement category stats
         timeRange: {
           start: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          end: new Date().toISOString();
+          end: new Date().toISOString()
         }
       };
     } catch (error: unknown) {
@@ -258,7 +258,7 @@ export class DatabaseTransport implements LogTransport {
         logsByCategory: {},
         timeRange: {
           start: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          end: new Date().toISOString();
+          end: new Date().toISOString()
         }
       };
     }

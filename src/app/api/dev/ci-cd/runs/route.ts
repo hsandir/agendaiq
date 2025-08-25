@@ -30,11 +30,11 @@ interface WorkflowRun {
   updated_at: string;
   actor: {
     login: string;
-    avatar_url: string;
+    avatar_url: string
   };
   run_number: number;
   event: string;
-  run_attempt: number;
+  run_attempt: number
 }
 
 interface WorkflowJob {
@@ -49,11 +49,11 @@ interface WorkflowJob {
     conclusion: string | null;
     number: number;
     started_at: string | null;
-    completed_at: string | null;
+    completed_at: string | null
   }>;
   started_at: string;
   completed_at: string | null;
-  html_url: string;
+  html_url: string
 }
 
 // Removed mock data - require real GitHub token

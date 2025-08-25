@@ -5,7 +5,7 @@ import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 
 interface ErrorFallbackProps {
   error: Error;
-  resetErrorBoundary: () => void;
+  resetErrorBoundary: () => void
 }
 
 function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
@@ -70,7 +70,7 @@ function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 interface ErrorBoundaryProps {

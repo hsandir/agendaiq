@@ -25,7 +25,7 @@ interface MeetingChain {
     id: number;
     title: string;
     date: string;
-    status: string;
+    status: string
   };
   totalMeetings: number;
   totalAgendaItems: number;
@@ -46,16 +46,16 @@ interface MeetingNode {
   agendaItems: {
     total: number;
     resolved: number;
-    carriedForward: number;
+    carriedForward: number
   };
   actionItems: {
     total: number;
     completed: number;
     pending: number;
-    overdue: number;
+    overdue: number
   };
   attendeeCount: number;
-  duration: number;
+  duration: number
 }
 
 interface ContinuityStats {
@@ -64,7 +64,7 @@ interface ContinuityStats {
   longestChain: number;
   totalCarriedItems: number;
   resolutionRate: number;
-  averageResolutionTime: number;
+  averageResolutionTime: number
 }
 
 export default function MeetingContinuityPage() {
@@ -125,7 +125,7 @@ export default function MeetingContinuityPage() {
       case 'completed': return <CheckCircle className="h-4 w-4 text-green-600" />;
       case 'in_progress': return <Clock className="h-4 w-4 text-blue-600" />;
       case 'scheduled': return <Calendar className="h-4 w-4 text-yellow-600" />;
-      default: return <AlertCircle className="h-4 w-4 text-gray-600" />;
+      default: return <AlertCircle className="h-4 w-4 text-gray-600" />
     }
   };
 

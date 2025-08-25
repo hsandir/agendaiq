@@ -16,7 +16,7 @@ interface DashboardLayoutClientProps {
   children: React.ReactNode;
   isAdmin: boolean;
   user: { email: string; name?: string; staff_id?: number | null; [key: string]: any };
-  userWithstaff: any;
+  userWithstaff: any
 }
 
 export function DashboardLayoutClient({ 

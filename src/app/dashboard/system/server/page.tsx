@@ -29,32 +29,32 @@ interface ServerMetrics {
     nodeVersion: string;
     nextVersion: string;
     uptime: string;
-    hostname: string;
+    hostname: string
   };
   performance: {
     memory: {
       total: number;
       used: number;
       free: number;
-      usage: number;
+      usage: number
     };
     cpu: {
       usage: number;
       cores: number;
-      model: string;
+      model: string
     };
     disk: {
       total: number;
       used: number;
       free: number;
-      usage: number;
+      usage: number
     };
   };
   network: {
     protocol: string;
     host: string;
     port: number;
-    status: string;
+    status: string
   };
   health: {
     overall: 'healthy' | 'warning' | 'critical';
@@ -125,7 +125,7 @@ export default function ServerManagementPage() {
       case 'critical':
         return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Critical</Badge>;
       default:
-        return <Badge variant="secondary">Unknown</Badge>;
+        return <Badge variant="secondary">Unknown</Badge>
     }
   };
 

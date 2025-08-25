@@ -38,19 +38,19 @@ export const DebugLogger = {
   
   table: (data: unknown) => {
     if (isDevelopment ?? isDebugEnabled) {
-      console.table(data);
+      console.table(data)
     }
   },
   
   group: (label: string) => {
     if (isDevelopment ?? isDebugEnabled) {
-      console.group(label);
+      console.group(label)
     }
   },
   
   groupEnd: () => {
     if (isDevelopment ?? isDebugEnabled) {
-      console.groupEnd();
+      console.groupEnd()
     }
   }
 };

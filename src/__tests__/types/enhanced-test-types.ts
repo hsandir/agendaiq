@@ -17,7 +17,7 @@ export interface APITestContext {
   response: NextResponse;
   session: Session | null;
   prisma: PrismaClient;
-  cleanup: () => Promise<void>;
+  cleanup: () => Promise<void>
 }
 
 export interface APITestCase<TInput = unknown, TOutput = unknown> {
@@ -72,7 +72,7 @@ export interface ComponentTestProps<T = Record<string, unknown>> {
     shouldDisplayData: boolean;
     shouldBeAccessible: boolean;
     shouldHandleErrors: boolean;
-    shouldHandleLoading: boolean;
+    shouldHandleLoading: boolean
   };
   interactions?: ComponentInteraction[];
   accessibility?: AccessibilityTest[];
@@ -91,7 +91,7 @@ export interface AccessibilityTest {
   name: string;
   rule: string;
   target?: string;
-  expectedViolations: number;
+  expectedViolations: number
 }
 
 export interface ComponentTestSuite<T = Record<string, unknown>> {
@@ -147,7 +147,7 @@ export interface DatabaseTestContext {
   seed: TestDataSeed;
   factory: TestFactory;
   transaction: <T>(fn: (tx: PrismaClient) => Promise<T>) => Promise<T>;
-  cleanup: () => Promise<void>;
+  cleanup: () => Promise<void>
 }
 
 export interface TestFactory {
@@ -156,7 +156,7 @@ export interface TestFactory {
   role: MockFactory<role>;
   department: MockFactory<department>;
   school: MockFactory<school>;
-  district: MockFactory<district>;
+  district: MockFactory<district>
 }
 
 // ============================================================================
@@ -184,14 +184,14 @@ export interface E2ETestScenario {
   user: {
     email: string;
     password: string;
-    role: string;
+    role: string
   };
   steps: Array<{
     action: string;
     page: string;
     selector?: string;
     input?: string;
-    expected: string | RegExp;
+    expected: string | RegExp
   }>;
   setup?: () => Promise<void>;
   cleanup?: () => Promise<void>;
@@ -212,7 +212,7 @@ export interface TestResult {
     file: string;
     suite: string;
     startTime: number;
-    endTime: number;
+    endTime: number
   };
 }
 
@@ -220,7 +220,7 @@ export interface TestError {
   message: string;
   stack?: string;
   code?: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: 'low' | 'medium' | 'high' | 'critical'
 }
 
 export interface TestWarning {
@@ -240,7 +240,7 @@ export interface TestSuiteResult {
     lines: number;
     functions: number;
     branches: number;
-    statements: number;
+    statements: number
   };
   results: TestResult[];
 }
@@ -270,10 +270,10 @@ export interface PerformanceTestResult {
   memoryUsage: {
     min: number;
     max: number;
-    average: number;
+    average: number
   };
   iterations: number;
-  passed: boolean;
+  passed: boolean
 }
 
 // ============================================================================
@@ -296,7 +296,7 @@ export interface SecurityTestResult {
   response: number;
   details: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
-  passed: boolean;
+  passed: boolean
 }
 
 // ============================================================================
@@ -308,7 +308,7 @@ export interface TestConfig {
   database: {
     url: string;
     reset: boolean;
-    seed: boolean;
+    seed: boolean
   };
   coverage: {
     threshold: {
@@ -316,7 +316,7 @@ export interface TestConfig {
         branches: number;
         functions: number;
         lines: number;
-        statements: number;
+        statements: number
       };
     };
     reportFormat: string[];
@@ -324,11 +324,11 @@ export interface TestConfig {
   timeout: {
     unit: number;
     integration: number;
-    e2e: number;
+    e2e: number
   };
   parallel: boolean;
   maxWorkers: number;
-  verbose: boolean;
+  verbose: boolean
 }
 
 // ============================================================================
@@ -357,7 +357,7 @@ export interface TestMetadata {
 export interface ValidationRule<T> {
   name: string;
   validator: (value: T) => boolean;
-  message: string;
+  message: string
 }
 
 export interface ValidationSchema<T> {
@@ -373,7 +373,7 @@ export interface ValidationSchema<T> {
 export interface TestErrorHandler {
   handle: (error: Error, context: TestContext) => Promise<void>;
   shouldRetry: (error: Error) => boolean;
-  maxRetries: number;
+  maxRetries: number
 }
 
 export interface TestContext {
@@ -381,7 +381,7 @@ export interface TestContext {
   test: string;
   environment: TestEnvironment;
   config: TestConfig;
-  startTime: number;
+  startTime: number
 }
 
 // ============================================================================

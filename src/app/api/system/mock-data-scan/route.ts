@@ -13,7 +13,7 @@ interface MockDataUsage {
   mockDataLines: string[];
   apiEndpoint?: string;
   lastChecked: string;
-  priority: 'high' | 'medium' | 'low';
+  priority: 'high' | 'medium' | 'low'
 }
 
 interface MockDataReport {
@@ -22,7 +22,7 @@ interface MockDataReport {
   mixedFiles: number;
   apiFallbackFiles: number;
   usage: MockDataUsage[];
-  timestamp: string;
+  timestamp: string
 }
 
 export async function GET(request: NextRequest) {
@@ -192,7 +192,7 @@ export async function GET(request: NextRequest) {
         }
         return statusOrder[a?.status] - statusOrder[b?.status];
       }),
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     };
 
     console.log(`Mock data scan completed: Found ${totalFiles} files with mock data usage`);

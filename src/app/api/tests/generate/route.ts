@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
 
     // Find existing tests
     const testFiles = await glob('src/tests__/**/*.test.{ts,tsx,js,jsx}', {
-      cwd: process.cwd();
+      cwd: process.cwd()
     })
 
     // Create a map of tested files

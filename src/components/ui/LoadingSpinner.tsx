@@ -93,7 +93,7 @@ export function Skeleton({ className, width, height }: SkeletonProps) {
 interface LoadingButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading: boolean;
   loadingText?: string;
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export function LoadingButton({ 

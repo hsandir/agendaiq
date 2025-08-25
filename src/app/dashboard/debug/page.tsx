@@ -113,7 +113,7 @@ export default function DebugDashboard() {
       case 'unhandledRejection':
         return <AlertCircle className="h-5 w-5 text-orange-500" />;
       default:
-        return <Info className="h-5 w-5 text-gray-500" />;
+        return <Info className="h-5 w-5 text-gray-500" />
     }
   };
 
@@ -126,7 +126,7 @@ export default function DebugDashboard() {
       case 'network':
         return 'outline';
       default:
-        return 'default';
+        return 'default'
     }
   };
 

@@ -172,7 +172,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       metrics,
       apiEndpoints,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
   } catch (error: unknown) {
     console.error('Failed to fetch metrics:', error);

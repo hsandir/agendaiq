@@ -182,5 +182,5 @@ export default function RoleHierarchyContent() {
         </div>
       </div>
     </>
-  );
+  )
 } 

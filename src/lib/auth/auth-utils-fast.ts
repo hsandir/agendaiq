@@ -11,7 +11,7 @@ export interface FastUser {
   email: string;
   name?: string | null;
   staff?: {
-    id: number;
+    id: number
   };
 }
 

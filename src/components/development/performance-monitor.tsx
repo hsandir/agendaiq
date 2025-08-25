@@ -182,7 +182,7 @@ export default function PerformanceMonitor() {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({ theme: themeId });
+            body: JSON.stringify({ theme: themeId })
           })
           
           if (response.ok && typeof setTheme === 'function') {
@@ -206,7 +206,7 @@ export default function PerformanceMonitor() {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ theme: originalTheme });
+          body: JSON.stringify({ theme: originalTheme })
         })
         setTheme(originalTheme);
       } catch (error: unknown) {
@@ -229,7 +229,7 @@ export default function PerformanceMonitor() {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({ layout: layoutId });
+            body: JSON.stringify({ layout: layoutId })
           })
           if (!response.ok) {
             console.warn(`Layout API returned ${response.status}`);

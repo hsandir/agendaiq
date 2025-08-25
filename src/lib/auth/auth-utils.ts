@@ -30,17 +30,17 @@ export interface AuthenticatedUser extends UserWithCapabilities {
     department?: {
       id: number;
       name: string;
-      code: string;
+      code: string
     };
     school?: {
       id: number;
       name: string;
-      code: string | null;
+      code: string | null
     };
     district?: {
       id: number;
       name: string;
-      code: string | null;
+      code: string | null
     };
   };
 }

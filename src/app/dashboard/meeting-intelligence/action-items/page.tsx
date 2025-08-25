@@ -36,12 +36,12 @@ interface ActionItem {
   assignedStaff?: {
     id: number;
     name: string;
-    email: string;
+    email: string
   };
   meeting?: {
     id: number;
     title: string;
-    date: string;
+    date: string
   };
   carriedForwardCount: number;
   parentItemId?: number;
@@ -60,7 +60,7 @@ interface ActionItemStats {
     urgent: number;
     high: number;
     medium: number;
-    low: number;
+    low: number
   };
 }
 
@@ -110,7 +110,7 @@ export default function ActionItemsTrackingPage() {
       const response = await fetch(`/api/meeting-intelligence/action-items/${itemId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus });
+        body: JSON.stringify({ status: newStatus })
       });
       
       if (response.ok) {
@@ -127,7 +127,7 @@ export default function ActionItemsTrackingPage() {
       case 'high': return 'text-orange-600 bg-orange-50 border-orange-200';
       case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       case 'low': return 'text-gray-600 bg-gray-50 border-gray-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      default: return 'text-gray-600 bg-gray-50 border-gray-200'
     }
   };
 
@@ -137,7 +137,7 @@ export default function ActionItemsTrackingPage() {
       case 'in_progress': return <Clock className="h-4 w-4 text-blue-600" />;
       case 'overdue': return <AlertCircle className="h-4 w-4 text-red-600" />;
       case 'cancelled': return <XCircle className="h-4 w-4 text-gray-600" />;
-      default: return <Clock className="h-4 w-4 text-yellow-600" />;
+      default: return <Clock className="h-4 w-4 text-yellow-600" />
     }
   };
 
@@ -147,7 +147,7 @@ export default function ActionItemsTrackingPage() {
       case 'in_progress': return 'text-blue-600 bg-blue-50';
       case 'overdue': return 'text-red-600 bg-red-50';
       case 'cancelled': return 'text-gray-600 bg-gray-50';
-      default: return 'text-yellow-600 bg-yellow-50';
+      default: return 'text-yellow-600 bg-yellow-50'
     }
   };
 

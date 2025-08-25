@@ -42,7 +42,7 @@ interface WorkflowRun {
   updated_at: string;
   actor: {
     login: string;
-    avatar_url: string;
+    avatar_url: string
   };
   run_number: number;
   event: string;
@@ -54,7 +54,7 @@ interface WorkflowRun {
     logs?: string;
     failedSteps?: Array<{
       name: string;
-      conclusion: string;
+      conclusion: string
     }>;
   }>;
 }
@@ -67,9 +67,9 @@ interface AutofixSuggestion {
   commands: string[];
   files: Array<{
     path: string;
-    action: string;
+    action: string
   }>;
-  preventive: boolean;
+  preventive: boolean
 }
 
 interface Stats {
@@ -282,7 +282,7 @@ export default function CICDMonitor() {
     const errorLines = lines.filter((line: string) => 
       line.includes('Error:') || 
       line.includes('ERROR') || 
-      line.includes('Failed');
+      line.includes('Failed')
     );
     
     return errorLines.slice(0, 3).join('\n');

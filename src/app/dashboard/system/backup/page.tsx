@@ -44,7 +44,7 @@ interface BackupStatus {
   lastCommit: string;
   githubStatus: 'connected' | 'disconnected' | 'unknown';
   backupCount: number;
-  diskUsage: string;
+  diskUsage: string
 }
 
 export default function BackupManagementPage() {
@@ -103,7 +103,7 @@ export default function BackupManagementPage() {
         body: JSON.stringify({ 
           type: 'create', 
           message: backupMessage 
-        });
+        })
       });
 
       if (response.ok) {
@@ -133,7 +133,7 @@ export default function BackupManagementPage() {
         body: JSON.stringify({ 
           type: 'github-push', 
           message: 'Manual GitHub backup' 
-        });
+        })
       });
 
       if (response.ok) {
@@ -166,7 +166,7 @@ export default function BackupManagementPage() {
         body: JSON.stringify({ 
           type: 'restore', 
           restore: branchName 
-        });
+        })
       });
 
       if (response.ok) {
@@ -225,7 +225,7 @@ export default function BackupManagementPage() {
       case 'disconnected':
         return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Disconnected</Badge>;
       default:
-        return <Badge variant="secondary">Unknown</Badge>;
+        return <Badge variant="secondary">Unknown</Badge>
     }
   };
 

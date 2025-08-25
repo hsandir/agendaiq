@@ -154,7 +154,7 @@ export async function POST(
           name: user.name,
           email: user.email
         },
-        timestamp: new Date().toISOString();
+        timestamp: new Date().toISOString()
       }
     );
 

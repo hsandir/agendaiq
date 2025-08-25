@@ -74,7 +74,7 @@ interface EditKnowledgeDialogProps {
   onOpenChange: (open: boolean) => void;
   teamId: string;
   knowledge: TeamKnowledge;
-  onKnowledgeUpdated: () => void;
+  onKnowledgeUpdated: () => void
 }
 
 const RESOURCE_TYPES = {
@@ -199,7 +199,7 @@ export function EditKnowledgeDialog({
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
+    setTags(tags.filter(tag => tag !== tagToRemove))
   };
 
   const validateForm = (): boolean => {
@@ -246,7 +246,7 @@ export function EditKnowledgeDialog({
       const updatedMetadata = {
         ...metadata,
         editHistory: [...(metadata.editHistory || []), editEntry],
-        lastModified: new Date().toISOString();
+        lastModified: new Date().toISOString()
       };
       
       const updateData = {

@@ -377,7 +377,7 @@ describe('Authentication Security Tests', () => {
           // If registration succeeds, name should be sanitized
           if (data.user?.name) {
             expect(data.user.name).not.toContain('<script');
-            expect(data.user.name).not.toContain('javascript:');
+            expect(data.user.name).not.toContain('javascript:')
           }
         }
       }

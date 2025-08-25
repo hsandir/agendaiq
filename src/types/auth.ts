@@ -44,7 +44,7 @@ export interface SchoolInfo {
   name: string;
   code?: string;
   address?: string;
-  district_id: number;
+  district_id: number
 }
 
 // Staff with role information
@@ -123,7 +123,7 @@ export function isUserWithStaff(user: unknown): user is UserWithStaff {
          'Staff' in user && 
          Array.isArray((user as UserWithStaff).Staff) &&
          (user as UserWithStaff).Staff !== null &&
-         (user as UserWithStaff).Staff!.length > 0;
+         (user as UserWithStaff).Staff!.length > 0
 }
 
 // Check if user is admin
@@ -186,7 +186,7 @@ export function safeAccess<T, K extends keyof T>(
 // Type assertion with validation
 export function assertUser(user: unknown): asserts user is UserWithAuth {
   if (!user || typeof user !== 'object') {
-    throw new Error('Invalid user object');
+    throw new Error('Invalid user object')
   }
   const userObj = user as Record<string, unknown>;
   if (!userObj.id || !userObj.email) {
@@ -197,7 +197,7 @@ export function assertUser(user: unknown): asserts user is UserWithAuth {
 // Type assertion for staff
 export function assertStaff(staff: unknown): asserts staff is StaffWithRole {
   if (!staff || typeof staff !== 'object') {
-    throw new Error('Invalid staff object');
+    throw new Error('Invalid staff object')
   }
   const staffObj = staff as Record<string, unknown>;
   if (!staffObj.id || !staffObj.user_id || !staffObj.role_id) {

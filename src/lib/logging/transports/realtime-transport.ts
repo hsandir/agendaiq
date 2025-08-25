@@ -29,7 +29,7 @@ export class RealtimeTransport implements LogTransport {
       category: isDev ? (entry as DevLogEntry).category : (entry as AuditLogEntry).category,
       severity,
       tags,
-      correlationId: this.generateCorrelationId(entry);
+      correlationId: this.generateCorrelationId(entry)
     };
   }
 
@@ -104,7 +104,7 @@ export class RealtimeTransport implements LogTransport {
 
   async write(entry: BaseLogEntry): Promise<void> {
     if (entry.level < this.level) {
-      return;
+      return
     }
 
     try {

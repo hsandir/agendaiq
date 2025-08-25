@@ -108,7 +108,7 @@ function AuthErrorContent() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
 
 export default function AuthErrorPage() {

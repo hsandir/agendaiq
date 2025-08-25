@@ -26,5 +26,5 @@ export default function MeetingHelpDocumentation() {
         <p>For further assistance, contact <a href="mailto:support@school.edu" className="text-primary underline">support@school.edu</a>.</p>
       </section>
     </div>
-  );
+  )
 } 

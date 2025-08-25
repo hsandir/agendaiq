@@ -230,14 +230,14 @@ export class ErrorHandler {
       case 'P2022':
         return 'Column does not exist';
       default:
-        return error.message || 'Database operation failed';
+        return error.message || 'Database operation failed'
     }
   }
 
   // Utility method for safe error extraction
   static extractErrorMessage(error: unknown): string {
     if (error instanceof Error) {
-      return error.message;
+      return error.message
     }
     if (typeof error === 'string') {
       return error;

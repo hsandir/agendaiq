@@ -312,7 +312,7 @@ export default function PageSelectionPage() {
         body: JSON.stringify({ 
           configs: pageConfigs,
           environment 
-        });
+        })
       })
       
       if (response.ok) {
@@ -338,7 +338,7 @@ export default function PageSelectionPage() {
         body: JSON.stringify({ 
           configs: pageConfigs,
           environment 
-        });
+        })
       })
       
       if (response.ok) {

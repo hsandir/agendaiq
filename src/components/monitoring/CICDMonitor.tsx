@@ -58,7 +58,7 @@ interface DeploymentInfo {
   deployedAt: Date;
   deployedBy: string;
   url?: string;
-  rollbackAvailable: boolean;
+  rollbackAvailable: boolean
 }
 
 interface BuildMetrics {
@@ -69,7 +69,7 @@ interface BuildMetrics {
   testsPassed: number;
   testsFailed: number;
   codeCoverage: number;
-  vulnerabilities: number;
+  vulnerabilities: number
 }
 
 export function CICDMonitor() {
@@ -132,7 +132,7 @@ export function CICDMonitor() {
       case 'cancelled':
         return <StopCircle className="h-5 w-5 text-gray-500" />;
       default:
-        return <AlertCircle className="h-5 w-5 text-gray-400" />;
+        return <AlertCircle className="h-5 w-5 text-gray-400" />
     }
   };
 

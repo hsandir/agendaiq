@@ -36,7 +36,7 @@ export function RegisterForm() {
       // Redirect to sign in page after successful registration
       router.push('/auth/signin');
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
       setIsLoading(false);
     }
@@ -140,5 +140,5 @@ export function RegisterForm() {
         </div>
       </form>
     </div>
-  );
+  )
 } 

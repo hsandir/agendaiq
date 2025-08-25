@@ -3,7 +3,7 @@ import { BaseEmailTemplate } from './base';
 import { TeamNotificationData } from '../types';
 
 interface TeamNotificationTemplateProps {
-  data: TeamNotificationData;
+  data: TeamNotificationData
 }
 
 export function TeamNotificationTemplate({ data }: TeamNotificationTemplateProps) {
@@ -23,7 +23,7 @@ export function TeamNotificationTemplate({ data }: TeamNotificationTemplateProps
       case 'member_added': return '👋';
       case 'member_removed': return '👋';
       case 'role_changed': return '🔄';
-      default: return '📝';
+      default: return '📝'
     }
   };
 

@@ -337,7 +337,7 @@ export async function GET(request: NextRequest) {
         id: `alert-${metric.id}`,
         type: 'error' as const,
         message: `${metric.name} is critical: ${metric.value}${metric.unit}`,
-        timestamp: new Date();
+        timestamp: new Date()
       })
     })
     
@@ -346,7 +346,7 @@ export async function GET(request: NextRequest) {
         id: `alert-${check.id}`,
         type: 'error' as const,
         message: `${check.name} check is failing`,
-        timestamp: new Date();
+        timestamp: new Date()
       })
     })
     
@@ -365,7 +365,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         error: 'Failed to retrieve health data',
-        details: error instanceof Error ? error.message : String(error);
+        details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
     )

@@ -9,7 +9,7 @@ export interface TestUser extends users {
     role: role;
     department: department;
     school: school;
-    district: district;
+    district: district
   }>;
 }
 
@@ -17,18 +17,18 @@ export interface TestStaff extends staff {
   role: role;
   department: department;
   school: school;
-  district: district;
+  district: district
 }
 
 export interface SeededTestData {
   adminUser: TestUser;
   teacherUser: TestUser;
   adminStaff: TestStaff;
-  teacherStaff: TestStaff;
+  teacherStaff: TestStaff
 }
 
 export interface TestContext extends SeededTestData {
   prisma: PrismaClient;
   factory: unknown; // Factory type to be defined later if needed
-  cleanup: () => Promise<void>;
+  cleanup: () => Promise<void>
 }

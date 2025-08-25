@@ -13,6 +13,6 @@ export async function GET() {
     
     // IMPORTANT: Return false on error to prevent showing create account page
     // This prevents the app from showing create account when DB is unavailable
-    return NextResponse.json(false);
+    return NextResponse.json(false)
   }
 } 

@@ -19,7 +19,7 @@ interface Staff {
   role_id: number;
   department?: {
     id: number;
-    name: string;
+    name: string
   } | null;
 }
 
@@ -32,14 +32,14 @@ interface Role {
   priority: number;
   department?: {
     id: string;
-    name: string;
+    name: string
   };
   children?: Role[];
   staff?: Staff[];
 }
 
 interface RoleHierarchyVisualizationProps {
-  onRoleSelect?: (role: Role) => void;
+  onRoleSelect?: (role: Role) => void
 }
 
 export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarchyVisualizationProps) {
@@ -66,7 +66,7 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
       const leadershipIds = data.roles?.filter((r: Role) => r.is_leadership).map((r: Role) => r.id) || [];
       setExpandedRoles(new Set(leadershipIds));
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to load hierarchy');
+      setError(error instanceof Error ? error.message : 'Failed to load hierarchy')
     } finally {
       setLoading(false);
     }
@@ -400,5 +400,5 @@ export default function RoleHierarchyVisualization({ onRoleSelect }: RoleHierarc
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }

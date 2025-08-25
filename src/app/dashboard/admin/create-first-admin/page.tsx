@@ -52,7 +52,7 @@ export default async function CreateFirstAdminPage() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   // Get pre-created admin users from database

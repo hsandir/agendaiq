@@ -55,7 +55,7 @@ export class TestGenerator {
       props,
       hasState: content.includes('useState'),
       hasEffects: content.includes('useEffect'),
-      isAsync: content.includes('async') && content.includes('await');
+      isAsync: content.includes('async') && content.includes('await')
     }
   }
 
@@ -70,7 +70,7 @@ export class TestGenerator {
       path: filePath,
       methods,
       requiresAuth: content.includes('withAuth') || content.includes('requireAuth'),
-      requiresAdmin: content.includes('requireAdminRole: true') || content.includes('requireAdmin');
+      requiresAdmin: content.includes('requireAdminRole: true') || content.includes('requireAdmin')
     }
   }
 

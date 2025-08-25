@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     await prisma.staff.update({
       where: { id: staffRecord?.id },
       data: { 
-        role_id: parseInt(targetRole?.id);
+        role_id: parseInt(targetRole?.id)
       }
     });
 

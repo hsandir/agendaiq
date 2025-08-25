@@ -14,7 +14,7 @@ interface Meeting {
   startTime: string;
   endTime: string;
   zoomLink?: string;
-  status: string;
+  status: string
 }
 
 function MeetingsPageClient() {

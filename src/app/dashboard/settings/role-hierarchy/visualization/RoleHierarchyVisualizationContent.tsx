@@ -11,14 +11,14 @@ interface Role {
   category: string;
   Department?: {
     id: string;
-    name: string;
+    name: string
   };
   Children?: Role[];
   Staff?: Array<{
     id: string;
     users: {
       name: string;
-      email: string;
+      email: string
     };
   }>;
 }
@@ -27,7 +27,7 @@ export default function RoleHierarchyVisualizationContent() {
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
   const handleRoleSelect = (role: Role) => {
-    setSelectedRole(role);
+    setSelectedRole(role)
   };
 
   return (

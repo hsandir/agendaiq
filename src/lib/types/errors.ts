@@ -14,7 +14,7 @@ export interface APIError {
   message: string;
   code: string;
   details?: Record<string, unknown>;
-  timestamp: string;
+  timestamp: string
 }
 
 export interface ValidationErrorDetail {
@@ -56,7 +56,7 @@ export function createSystemError(
     code,
     details,
     context,
-    timestamp: new Date().toISOString();
+    timestamp: new Date().toISOString()
   };
 }
 
@@ -71,7 +71,7 @@ export function createAPIError(
     message,
     code,
     details,
-    timestamp: new Date().toISOString();
+    timestamp: new Date().toISOString()
   };
 }
 
@@ -89,7 +89,7 @@ export function createDatabaseError(
     table,
     operation,
     details,
-    timestamp: new Date().toISOString();
+    timestamp: new Date().toISOString()
   };
 }
 
@@ -107,7 +107,7 @@ export function createAuthError(
     sessionId,
     ipAddress,
     details,
-    timestamp: new Date().toISOString();
+    timestamp: new Date().toISOString()
   };
 }
 
@@ -121,7 +121,7 @@ export function createValidationError(
     message,
     validationErrors,
     details,
-    timestamp: new Date().toISOString();
+    timestamp: new Date().toISOString()
   };
 }
 
@@ -131,19 +131,19 @@ export function isSystemError(error: unknown): error is SystemError {
          error !== null && 
          'type' in error && 
          'message' in error && 
-         'timestamp' in error;
+         'timestamp' in error
 }
 
 export function isDatabaseError(error: SystemError): error is DatabaseError {
-  return error.type === 'DATABASE_ERROR';
+  return error.type === 'DATABASE_ERROR'
 }
 
 export function isAuthError(error: SystemError): error is AuthError {
-  return error.type === 'AUTH_ERROR';
+  return error.type === 'AUTH_ERROR'
 }
 
 export function isValidationError(error: SystemError): error is ValidationError {
-  return error.type === 'VALIDATION_ERROR';
+  return error.type === 'VALIDATION_ERROR'
 }
 
 // Error severity levels
@@ -167,6 +167,6 @@ export function getErrorSeverity(error: SystemError): ErrorSeverity {
     case 'UNKNOWN_ERROR':
       return ErrorSeverity.CRITICAL;
     default:
-      return ErrorSeverity.MEDIUM;
+      return ErrorSeverity.MEDIUM
   }
 }

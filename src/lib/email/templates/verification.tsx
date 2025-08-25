@@ -3,7 +3,7 @@ import { BaseEmailTemplate } from './base';
 import { VerificationEmailData } from '../types';
 
 interface VerificationTemplateProps {
-  data: VerificationEmailData;
+  data: VerificationEmailData
 }
 
 export function VerificationTemplate({ data }: VerificationTemplateProps) {

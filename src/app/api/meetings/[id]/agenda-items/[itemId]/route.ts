@@ -112,7 +112,7 @@ export async function PATCH(
           name: user.name,
           email: user.email
         },
-        timestamp: new Date().toISOString();
+        timestamp: new Date().toISOString()
       }
     );
 
@@ -171,7 +171,7 @@ export async function DELETE(
           name: user.name,
           email: user.email
         },
-        timestamp: new Date().toISOString();
+        timestamp: new Date().toISOString()
       }
     );
 

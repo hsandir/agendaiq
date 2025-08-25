@@ -61,7 +61,7 @@ function TwoFactorFormContent({ userId, onSuccess }: TwoFactorFormProps) {
         }
       }
     } catch (error: unknown) {
-      setError('An error occurred. Please try again.');
+      setError('An error occurred. Please try again.')
     } finally {
       setIsLoading(false);
     }
@@ -97,7 +97,7 @@ function TwoFactorFormContent({ userId, onSuccess }: TwoFactorFormProps) {
         setSuccessMessage('New code sent!');
       }
     } catch (error: unknown) {
-      setError('An error occurred. Please try again.');
+      setError('An error occurred. Please try again.')
     } finally {
       setIsResending(false);
     }

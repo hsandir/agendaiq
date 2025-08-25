@@ -41,7 +41,7 @@ interface LoginOutput {
     id: string;
     email: string;
     name: string;
-    role: string;
+    role: string
   };
   requiresTwoFactor?: boolean;
   error?: string;

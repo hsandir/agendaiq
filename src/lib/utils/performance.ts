@@ -13,7 +13,7 @@ interface PerformanceMetrics {
     rss: number;
     heapTotal: number;
     heapUsed: number;
-    external: number;
+    external: number
   };
 }
 

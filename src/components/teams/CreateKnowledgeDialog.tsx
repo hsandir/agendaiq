@@ -55,7 +55,7 @@ interface CreateKnowledgeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   teamId: string;
-  onKnowledgeCreated: () => void;
+  onKnowledgeCreated: () => void
 }
 
 const RESOURCE_TYPES = {
@@ -124,7 +124,7 @@ export function CreateKnowledgeDialog({
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter(tag => tag !== tagToRemove));
+    setTags(tags.filter(tag => tag !== tagToRemove))
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -36,7 +36,7 @@ interface DepartmentPerformance {
   avgDuration: number;
   actionItems: number;
   completionRate: number;
-  efficiency: number;
+  efficiency: number
 }
 
 export default function MeetingAnalyticsPage() {
@@ -361,5 +361,5 @@ export default function MeetingAnalyticsPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

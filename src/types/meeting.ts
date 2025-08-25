@@ -24,7 +24,7 @@ export interface StaffWithRelations extends staff {
 
 // Type for meeting attendee with relations
 export interface AttendeeWithRelations extends meeting_attendee {
-  staff: StaffWithRelations;
+  staff: StaffWithRelations
 }
 
 // Type for meeting with all relations
@@ -40,12 +40,12 @@ export interface MeetingWithRelations extends meeting {
 
 // Type for agenda item comment with relations
 export interface CommentWithRelations extends agenda_item_comments {
-  staff: StaffWithRelations;
+  staff: StaffWithRelations
 }
 
 // Type for action item with relations
 export interface ActionItemWithRelations extends Omit<meeting_action_items, 'assigned_to'> {
-  assigned_to: StaffWithRelations | null;
+  assigned_to: StaffWithRelations | null
 }
 
 // Type for agenda item with all relations
@@ -57,7 +57,7 @@ export interface AgendaItemWithRelations extends meeting_agenda_items {
   agenda_item_attachments: agenda_item_attachments[];
   _count?: {
     agenda_item_comments: number;
-    meeting_action_items: number;
+    meeting_action_items: number
   };
 }
 
@@ -67,15 +67,15 @@ export interface StaffForAssignment {
   users: {
     id: number;  // Changed from string to number to match Prisma schema
     name: string | null;
-    email: string;
+    email: string
   };
   role: {
     id: number;
-    title: string;
+    title: string
   };
   Department?: {
     id: number;
-    name: string;
+    name: string
   } | null;
 }
 
@@ -95,14 +95,14 @@ export interface MeetingResponse {
     id: number;
     name: string | null;
     email: string;
-    role: string;
+    role: string
   };
   attendees: {
     id: number;
     name: string | null;
     email: string;
     role: string;
-    status: string;
+    status: string
   }[];
 }
 

@@ -32,7 +32,7 @@ interface CreateMeetingModalProps {
     priority?: string;
     purpose?: string;
   };
-  onSuccess?: (meetingId: number) => void;
+  onSuccess?: (meetingId: number) => void
 }
 
 export function CreateMeetingModal({ 
@@ -101,7 +101,7 @@ export function CreateMeetingModal({
             order_index: 0,
             parent_item_id: agendaItem.id // Link to original item
           }]
-        });
+        })
       });
       
       if (!agendaResponse.ok) {

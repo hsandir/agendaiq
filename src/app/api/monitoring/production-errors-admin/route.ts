@@ -9,7 +9,7 @@ interface ProductionError {
   stack?: string;
   url: string;
   userAgent: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: 'low' | 'medium' | 'high' | 'critical'
 }
 
 interface DebugCheckData {
@@ -23,7 +23,7 @@ interface DebugData {
   summary: {
     ok: number;
     error: number;
-    degraded: number;
+    degraded: number
   };
   checks: Record<string, DebugCheckData>;
 }
@@ -180,7 +180,7 @@ export async function GET(request: NextRequest) {
       success: false,
       error: 'Failed to fetch production errors',
       errors: [],
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     }, { status: 500 });
   }
 }

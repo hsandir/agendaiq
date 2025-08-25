@@ -30,7 +30,7 @@ import { useToast } from '@/components/ui/use-toast';
 interface CreateTeamDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: TeamFormData) => Promise<void>;
+  onSubmit: (data: TeamFormData) => Promise<void>
 }
 
 interface TeamFormData {
@@ -51,11 +51,11 @@ interface StaffMember {
   };
   role: {
     id: number;
-    title: string;
+    title: string
   };
   department: {
     id: number;
-    name: string;
+    name: string
   };
 }
 
@@ -120,8 +120,8 @@ export function CreateTeamDialog({
 
   const toggleMember = (staffId: number) => {
     setSelectedMembers(prev => 
-      prev.includes(staffId);
-        ? prev.filter(id => id !== staffId);
+      prev.includes(staffId)
+        ? prev.filter(id => id !== staffId)
         : [...prev, staffId]
     );
   };

@@ -217,7 +217,7 @@ export async function PUT(
         ...(validatedData.description !== undefined && { description: validatedData.description }),
         ...(validatedData.is_active !== undefined && { is_active: validatedData.is_active }),
         ...(validatedData.metadata && { metadata: validatedData.metadata }),
-        updated_at: new Date();
+        updated_at: new Date()
       },
       include: {
         team_members: {
@@ -315,7 +315,7 @@ export async function DELETE(
       where: { id: teamId },
       data: {
         is_active: false,
-        updated_at: new Date();
+        updated_at: new Date()
       }
     });
 

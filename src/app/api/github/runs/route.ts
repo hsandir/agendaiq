@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
         head_branch: string;
         head_sha: string;
         run_number: number;
-        event: string;
+        event: string
       }) => ({
         id: run.id,
         name: run.name,

@@ -225,7 +225,7 @@ function checkRoleAccess(user: User | AuthenticatedUser, roleTitle: string): boo
       }
       
       // Fallback: return false for unknown roles (secure by default)
-      return false;
+      return false
   }
 }
 

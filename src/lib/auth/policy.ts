@@ -224,11 +224,11 @@ export interface UserWithCapabilities {
     };
     department?: {
       id: number;
-      name: string;
+      name: string
     };
     school?: {
       id: number;
-      name: string;
+      name: string
     };
   };
 }
@@ -260,7 +260,7 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
         cap.startsWith('ops:') || 
         cap.includes('manage') || 
         cap.includes('view') ||
-        cap.startsWith('meeting:');
+        cap.startsWith('meeting:')
       );
     }
     
@@ -310,7 +310,7 @@ export function can(
         capability.includes('manage') || 
         capability.includes('view') ||
         capability.startsWith('meeting:')) {
-      return true;
+      return true
     }
   }
   
@@ -351,7 +351,7 @@ export function isOpsAdmin(user: UserWithCapabilities | null | undefined): boole
 }
 
 export function isAnyAdmin(user: UserWithCapabilities | null | undefined): boolean {
-  return isDevAdmin(user) || isOpsAdmin(user);
+  return isDevAdmin(user) || isOpsAdmin(user)
 }
 
 // Canonical RoleKey check helper

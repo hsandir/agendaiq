@@ -23,7 +23,7 @@ interface ThemeContextValue {
   availableThemes: Theme[];
   isLoading: boolean;
   customTheme?: CustomTheme;
-  setCustomTheme?: (theme: CustomTheme) => void;
+  setCustomTheme?: (theme: CustomTheme) => void
 }
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
@@ -72,7 +72,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
         globalThemeState.customTheme = parsed;
         setCustomTheme(parsed);
       } catch (e: unknown) {
-        console.error("Failed to parse custom theme");
+        console.error("Failed to parse custom theme")
       }
     }
 
@@ -92,7 +92,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
         // Delayed fetch to not block initial render
         // This is fire-and-forget - we don't wait for it
         setTimeout(() => {
-          fetch("/api/user/theme");
+          fetch("/api/user/theme")
             .then((res) => (res.ok ? res.json() : null))
             .then((data) => {
               if (data?.theme && data.theme !== savedTheme) {

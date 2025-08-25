@@ -42,7 +42,7 @@ async function updatePackages(specificPackages?: string[]) {
         body: JSON.stringify({ 
           type: 'auto-backup', 
           message: 'Pre-update backup' 
-        });
+        })
       });
       
       if (backupResponse.ok) {

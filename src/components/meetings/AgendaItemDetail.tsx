@@ -50,7 +50,7 @@ interface Props {
   meeting: MeetingWithRelations;
   currentUser: AuthenticatedUser;
   allStaff: StaffForAssignment[];
-  canEdit: boolean;
+  canEdit: boolean
 }
 
 export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit }: Props) {
@@ -92,7 +92,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
       const response = await fetch(`/api/meetings/${meeting.id}/agenda-items/${item.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editData);
+        body: JSON.stringify(editData)
       });
 
       if (response.ok) {
@@ -134,7 +134,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           agendaItem: editData
-        });
+        })
       });
       
       if (!response.ok) {
@@ -169,7 +169,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
       const response = await fetch(`/api/meetings/${meeting.id}/agenda-items/${item.id}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content });
+        body: JSON.stringify({ content })
       });
 
       if (response.ok) {
@@ -208,7 +208,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
       case 'High': return 'bg-destructive/10 text-destructive';
       case 'Medium': return 'bg-yellow-100 text-yellow-700';
       case 'Low': return 'bg-green-100 text-green-700';
-      default: return 'bg-muted text-foreground';
+      default: return 'bg-muted text-foreground'
     }
   };
 
@@ -217,7 +217,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
       case 'Resolved': return <CheckCircle className="h-5 w-5 text-green-600" />;
       case 'Ongoing': return <Clock className="h-5 w-5 text-yellow-600" />;
       case 'Deferred': return <XCircle className="h-5 w-5 text-destructive" />;
-      default: return <AlertCircle className="h-5 w-5 text-muted-foreground" />;
+      default: return <AlertCircle className="h-5 w-5 text-muted-foreground" />
     }
   };
 
@@ -482,7 +482,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                       value={editData.responsible_staff_id?.toString() ?? 'none'}
                       onValueChange={(value) => setEditData({ 
                         ...editData, 
-                        responsible_staff_id: value === 'none' ? null : parseInt(value);
+                        responsible_staff_id: value === 'none' ? null : parseInt(value)
                       })}
                     >
                       <SelectTrigger className="mt-1">

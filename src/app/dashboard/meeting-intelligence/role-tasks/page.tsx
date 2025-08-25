@@ -44,11 +44,11 @@ interface RoleTask {
   meeting: {
     id: number;
     title: string;
-    date: string;
+    date: string
   };
   previousHolder?: {
     name: string;
-    transitionDate: string;
+    transitionDate: string
   };
 }
 
@@ -63,14 +63,14 @@ interface RoleStats {
     urgent: number;
     high: number;
     medium: number;
-    low: number;
+    low: number
   };
 }
 
 interface RoleWithTasks {
   role: Role;
   tasks: RoleTask[];
-  stats: RoleStats;
+  stats: RoleStats
 }
 
 export default function RoleTasksPage() {
@@ -130,7 +130,7 @@ export default function RoleTasksPage() {
       case 'completed': return 'text-green-600 bg-green-50';
       case 'in_progress': return 'text-blue-600 bg-blue-50';
       case 'overdue': return 'text-red-600 bg-red-50';
-      default: return 'text-yellow-600 bg-yellow-50';
+      default: return 'text-yellow-600 bg-yellow-50'
     }
   };
 
@@ -139,13 +139,13 @@ export default function RoleTasksPage() {
       case 'urgent': return 'text-red-600 bg-red-50 border-red-200';
       case 'high': return 'text-orange-600 bg-orange-50 border-orange-200';
       case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      default: return 'text-gray-600 bg-gray-50 border-gray-200'
     }
   };
 
   const getRoleIcon = (role: Role) => {
     if (role.isLeadership) {
-      return <Award className="h-5 w-5 text-yellow-500" />;
+      return <Award className="h-5 w-5 text-yellow-500" />
     }
     return <Users className="h-5 w-5 text-primary" />;
   };
@@ -444,5 +444,5 @@ export default function RoleTasksPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

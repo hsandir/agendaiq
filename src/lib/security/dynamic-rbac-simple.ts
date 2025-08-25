@@ -12,7 +12,7 @@ export interface RolePermission {
   action: string;
   scope?: string;
   priority: number;
-  granted: boolean;
+  granted: boolean
 }
 
 export interface AccessContext {
@@ -27,7 +27,7 @@ export interface AccessResult {
   reason: string;
   appliedRules: string[];
   context: AccessContext;
-  timestamp: Date;
+  timestamp: Date
 }
 
 export class DynamicRBAC {
@@ -51,7 +51,7 @@ export class DynamicRBAC {
           reason: 'Admin user - full access',
           appliedRules: ['admin_access'],
           context,
-          timestamp: new Date();
+          timestamp: new Date()
         };
       }
 
@@ -61,7 +61,7 @@ export class DynamicRBAC {
         reason: 'Basic access granted',
         appliedRules: ['basic_access'],
         context,
-        timestamp: new Date();
+        timestamp: new Date()
       };
 
     } catch (error: unknown) {
@@ -71,7 +71,7 @@ export class DynamicRBAC {
         reason: 'Error during access check',
         appliedRules: [],
         context,
-        timestamp: new Date();
+        timestamp: new Date()
       };
     }
   }
@@ -126,7 +126,7 @@ export class DynamicRBAC {
 
   // Helper method to check if user is admin
   async isAdmin(user: _AuthenticatedUser): Promise<boolean> {
-    return user.email?.includes('admin') ?? false;
+    return user.email?.includes('admin') ?? false
   }
 
   // Helper method to check if user is staff

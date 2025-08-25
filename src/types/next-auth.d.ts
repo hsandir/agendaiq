@@ -10,7 +10,7 @@ declare module 'next-auth' {
       id: number;
       role: { 
         title: string;
-        is_leadership: boolean;
+        is_leadership: boolean
       };
       department: { name: string };
       school: { name: string };
@@ -25,7 +25,7 @@ declare module 'next-auth' {
         id: number;
         role: { 
           title: string;
-          is_leadership: boolean;
+          is_leadership: boolean
         };
         department: { name: string };
         school: { name: string };

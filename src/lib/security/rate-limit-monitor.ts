@@ -128,7 +128,7 @@ export class RateLimitMonitor {
    * Clear old violations (maintenance function)
    */
   static clearOldViolations(olderThan: Date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)): void {
-    this.violations = this.violations.filter(v => v.timestamp > olderThan);
+    this.violations = this.violations.filter(v => v.timestamp > olderThan)
   }
 
   /**

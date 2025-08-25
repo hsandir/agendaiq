@@ -173,7 +173,7 @@ class HybridAuditSystem {
         metadata: { 
           eventCategory: event.category,
           eventAction: event.action,
-          error: error instanceof Error ? error.message : String(error);
+          error: error instanceof Error ? error.message : String(error)
         }
       });
     }

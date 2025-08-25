@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/user/theme - Update user's theme preference (for compatibility)
 export async function POST(request: NextRequest) {
-  return PUT(request);
+  return PUT(request)
 }
 
 // PUT /api/user/theme - Update user's theme preference

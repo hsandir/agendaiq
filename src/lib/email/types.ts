@@ -21,7 +21,7 @@ export interface MeetingInviteData extends BaseEmailData {
   location?: string;
   organizer: {
     name: string;
-    email: string;
+    email: string
   };
   attendees: Array<{
     name: string;
@@ -41,7 +41,7 @@ export interface TeamNotificationData extends BaseEmailData {
   actionType: 'created' | 'updated' | 'member_added' | 'member_removed' | 'role_changed';
   actor: {
     name: string;
-    email: string;
+    email: string
   };
   teamUrl: string;
   message?: string;
@@ -51,13 +51,13 @@ export interface TeamNotificationData extends BaseEmailData {
 export interface PasswordResetData extends BaseEmailData {
   userName: string;
   resetUrl: string;
-  expiresIn: string;
+  expiresIn: string
 }
 
 export interface VerificationEmailData extends BaseEmailData {
   userName: string;
   verificationUrl: string;
-  expiresIn: string;
+  expiresIn: string
 }
 
 export interface EmailNotificationData extends BaseEmailData {
@@ -65,7 +65,7 @@ export interface EmailNotificationData extends BaseEmailData {
   message: string;
   actionUrl?: string;
   actionText?: string;
-  priority: 'low' | 'normal' | 'high' | 'urgent';
+  priority: 'low' | 'normal' | 'high' | 'urgent'
 }
 
 export type EmailTemplateData = 

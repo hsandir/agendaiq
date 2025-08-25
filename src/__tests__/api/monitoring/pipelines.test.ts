@@ -15,7 +15,7 @@ jest.mock('@octokit/rest');
 
 describe('/api/monitoring/pipelines', () => {
   const mockRequest = (url: string = 'http://localhost:3000/api/monitoring/pipelines') => {
-    return new NextRequest(url);
+    return new NextRequest(url)
   };
 
   beforeEach(() => {

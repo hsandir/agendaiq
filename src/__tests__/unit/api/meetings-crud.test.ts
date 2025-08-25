@@ -44,19 +44,19 @@ interface MeetingOutput {
   organizer: {
     id: string;
     name: string;
-    email: string;
+    email: string
   };
   attendees?: Array<{
     id: string;
     name: string;
     email: string;
-    status: 'PENDING' | 'ACCEPTED' | 'DECLINED';
+    status: 'PENDING' | 'ACCEPTED' | 'DECLINED'
   }>;
   agenda_items?: Array<{
     id: number;
     topic: string;
     duration_minutes: number;
-    order_index: number;
+    order_index: number
   }>;
 }
 

@@ -18,7 +18,7 @@ const agendaItemSchema = z.object({
   duration_minutes: z.number().optional(),
   responsible_staff_id: z.number().nullable().optional(),
   status: z.string().optional(),
-  order_index: z.number();
+  order_index: z.number()
 });
 
 // Validation schema for updating meetings
@@ -36,7 +36,7 @@ const updateMeetingSchema = z.object({
   notes: z.string().optional(),
   status: z.string().optional(),
   attendeeIds: z.array(z.string().transform(id => parseInt(id, 10))).optional(),
-  agendaItems: z.array(agendaItemSchema).optional();
+  agendaItems: z.array(agendaItemSchema).optional()
 });
 
 interface Props {

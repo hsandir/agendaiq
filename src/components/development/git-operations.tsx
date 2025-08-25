@@ -52,7 +52,7 @@ interface Commit {
   message: string;
   files: number;
   insertions: number;
-  deletions: number;
+  deletions: number
 }
 
 interface Branch {
@@ -61,14 +61,14 @@ interface Branch {
   remote: boolean;
   lastCommit: string;
   ahead: number;
-  behind: number;
+  behind: number
 }
 
 interface FileChange {
   path: string;
   status: 'M' | 'A' | 'D' | 'R' | 'U' | '??';
   additions: number;
-  deletions: number;
+  deletions: number
 }
 
 export default function GitOperations() {
@@ -130,7 +130,7 @@ export default function GitOperations() {
       const response = await fetch('/api/dev/git/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ command, args });
+        body: JSON.stringify({ command, args })
       });
       
       const data = await response.json();

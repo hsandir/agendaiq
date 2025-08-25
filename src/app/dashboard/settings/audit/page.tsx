@@ -60,11 +60,11 @@ export default async function AuditPage() {
     action: string;
     created_at: string;
     meeting: {
-      title: string;
+      title: string
     };
     users: {
       name?: string | null;
-      email: string;
+      email: string
     };
     details?: Record<string, unknown>;
   }

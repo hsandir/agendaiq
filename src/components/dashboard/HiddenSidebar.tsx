@@ -129,7 +129,7 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsOpen(false);
+        setIsOpen(false)
       }
     };
 

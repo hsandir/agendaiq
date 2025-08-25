@@ -9,7 +9,7 @@ export interface User {
   school: string | null;
   isActive: boolean;
   created_at: Date;
-  updated_at: Date;
+  updated_at: Date
 }
 
 export interface Meeting {
@@ -22,7 +22,7 @@ export interface Meeting {
   status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled';
   organizerId: string;
   created_at: Date;
-  updated_at: Date;
+  updated_at: Date
 }
 
 export interface Role {
@@ -31,7 +31,7 @@ export interface Role {
   description: string | null;
   permissions: string[];
   created_at: Date;
-  updated_at: Date;
+  updated_at: Date
 }
 
 export interface Department {
@@ -40,7 +40,7 @@ export interface Department {
   description: string | null;
   school: string | null;
   created_at: Date;
-  updated_at: Date;
+  updated_at: Date
 }
 
 export interface ApiResponse<T = Record<string, unknown>> {
@@ -56,7 +56,7 @@ export interface SessionUser {
   name: string | null;
   role: string;
   department: string | null;
-  school: string | null;
+  school: string | null
 }
 
 // API request types
@@ -127,19 +127,19 @@ export interface UserWithRelations {
       id: string;
       title: string;
       is_leadership: boolean;
-      priority: number;
+      priority: number
     };
     department?: {
       id: string;
-      name: string;
+      name: string
     };
     school?: {
       id: string;
-      name: string;
+      name: string
     };
     district?: {
       id: string;
-      name: string;
+      name: string
     };
   };
 }
@@ -157,7 +157,7 @@ export interface MockUser extends UserWithRelations {
 
 export interface MockSession {
   user: MockUser;
-  expires: string;
+  expires: string
 }
 
 // Audit log types
@@ -176,7 +176,7 @@ export interface AuditRecord {
     email: string;
     name?: string;
   };
-  created_at: Date;
+  created_at: Date
 }
 
 export interface SortableAuditRecord extends AuditRecord {

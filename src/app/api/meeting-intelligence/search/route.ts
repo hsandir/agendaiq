@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
         meeting: item.Meeting ? {
           id: item.meeting.id,
           title: item.meeting.title,
-          startTime: item.meeting.start_time?.toISOString();
+          startTime: item.meeting.start_time?.toISOString()
         } : undefined
       }));
     } else {

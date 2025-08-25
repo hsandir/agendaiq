@@ -33,7 +33,7 @@ global.fetch = jest.fn();
 
 describe('Error Monitoring APIs', () => {
   const mockRequest = (url: string) => {
-    return new NextRequest(url);
+    return new NextRequest(url)
   };
 
   beforeEach(() => {

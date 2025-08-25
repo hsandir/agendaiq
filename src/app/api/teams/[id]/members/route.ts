@@ -215,7 +215,7 @@ export async function POST(
         user_id: staffToAdd.user_id,
         staff_id: validatedData.staff_id,
         role: validatedData.role,
-        joined_at: new Date();
+        joined_at: new Date()
       },
       include: {
         staff: {
@@ -311,7 +311,7 @@ export async function PUT(
     const teamMember = await prisma.team_members.findFirst({
       where: {
         team_id: teamId,
-        id: parseInt(memberId);
+        id: parseInt(memberId)
       },
       include: {
         team: {
@@ -448,7 +448,7 @@ export async function DELETE(
     const teamMember = await prisma.team_members.findFirst({
       where: {
         team_id: teamId,
-        id: parseInt(memberId);
+        id: parseInt(memberId)
       },
       include: {
         team: {

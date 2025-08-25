@@ -115,7 +115,7 @@ export function withLogging(
       {
         requestId,
         responseSize: response.headers.get('content-length'),
-        contentType: response.headers.get('content-type');
+        contentType: response.headers.get('content-type')
       }
     );
 
@@ -124,7 +124,7 @@ export function withLogging(
       await logAuditTrail(method, path, statusCode, context, {
         requestId,
         duration,
-        ip: getClientIP(request);
+        ip: getClientIP(request)
       });
     }
 
@@ -155,7 +155,7 @@ function extractRequestContext(request: NextRequest): RequestContext {
 function getClientIP(request: NextRequest): string {
   return request.headers.get('x-forwarded-for') ||
          request.headers.get('x-real-ip') ||
-         request.headers.get('cf-connecting-ip') ?? 'unknown';
+         request.headers.get('cf-connecting-ip') ?? 'unknown'
 }
 
 /**

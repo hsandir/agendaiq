@@ -47,7 +47,7 @@ interface Meeting {
   organizer: {
     name: string;
     role: string;
-    department: string;
+    department: string
   };
   attendees: number;
   agendaItems: number;
@@ -60,7 +60,7 @@ interface Meeting {
 
 interface ImportOptions {
   importAgendaItems: boolean;
-  importAttendees: boolean;
+  importAttendees: boolean
 }
 
 interface MeetingHistoryModalProps {
@@ -71,7 +71,7 @@ interface MeetingHistoryModalProps {
   currentDepartment?: string;
   currentRole?: string;
   multiSelect?: boolean;
-  onSelectMultipleMeetings?: (meetings: Meeting[], options: ImportOptions) => void;
+  onSelectMultipleMeetings?: (meetings: Meeting[], options: ImportOptions) => void
 }
 
 export function MeetingHistoryModal({
@@ -114,7 +114,7 @@ export function MeetingHistoryModal({
         status: selectedStatus,
         search: searchQuery,
         includeSubDepartments: includeSubDepartments.toString(),
-        onlyWithActionItems: onlyWithActionItems.toString();
+        onlyWithActionItems: onlyWithActionItems.toString()
       });
 
       const response = await fetch(`/api/meetings/history?${params}`);
@@ -139,7 +139,7 @@ export function MeetingHistoryModal({
       case "in_progress":
         return <AlertCircle className="h-4 w-4 text-yellow-500" />;
       default:
-        return <Clock className="h-4 w-4 text-muted-foreground" />;
+        return <Clock className="h-4 w-4 text-muted-foreground" />
     }
   };
 
@@ -154,7 +154,7 @@ export function MeetingHistoryModal({
       case "all_hands":
         return "bg-orange-100 text-orange-800";
       default:
-        return "bg-muted text-foreground";
+        return "bg-muted text-foreground"
     }
   };
 

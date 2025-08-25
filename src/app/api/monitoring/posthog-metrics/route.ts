@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         startDate.setDate(startDate.getDate() - 30);
         break;
       default: // 24h
-        startDate.setDate(startDate.getDate() - 1);
+        startDate.setDate(startDate.getDate() - 1)
     }
     
     // Return empty/zero metrics - no mock data

@@ -113,7 +113,7 @@ export default function AuthDebugPage() {
           details: { 
             email: testEmail, 
             password: testPassword,
-            timestamp: new Date().toISOString();
+            timestamp: new Date().toISOString()
           }
         })
       });
@@ -134,7 +134,7 @@ export default function AuthDebugPage() {
           email: testEmail,
           password: testPassword,
           csrfToken: csrfToken
-        });
+        })
       });
 
       // Log the NextAuth response
@@ -168,7 +168,7 @@ export default function AuthDebugPage() {
           level: sessionData?.user ? 'info' : 'warning',
           message: sessionData?.user ? 'Session created successfully' : 'No session after sign-in',
           details: sessionData
-        });
+        })
       });
 
       await fetchLogs();
@@ -240,7 +240,7 @@ export default function AuthDebugPage() {
         body: JSON.stringify({ 
           suite: 'src/tests__/unit/components/tabs.test.tsx',
           coverage: false 
-        });
+        })
       });
       
       const data = await response.json();
@@ -291,7 +291,7 @@ export default function AuthDebugPage() {
           tests.push({
             ...endpoint,
             status: 'error',
-            error: String(err);
+            error: String(err)
           });
         }
       }
@@ -346,7 +346,7 @@ export default function AuthDebugPage() {
       case 'callback': return <Code className="h-4 w-4" />;
       case 'database': return <Database className="h-4 w-4" />;
       case 'env_check': return <Server className="h-4 w-4" />;
-      default: return <AlertCircle className="h-4 w-4" />;
+      default: return <AlertCircle className="h-4 w-4" />
     }
   };
 

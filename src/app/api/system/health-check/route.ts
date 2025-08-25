@@ -93,7 +93,7 @@ async function quickHealthCheck() {
       type: 'quick',
       summary,
       results,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
 
   } catch (error: unknown) {
@@ -135,7 +135,7 @@ async function fullHealthCheck() {
       summary,
       results,
       systemChecks,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
 
   } catch (error: unknown) {
@@ -167,7 +167,7 @@ async function apiHealthCheck() {
       type: 'api-only',
       summary,
       results,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
 
   } catch (error: unknown) {
@@ -201,7 +201,7 @@ async function customHealthCheck(customPages: string[]) {
       type: 'custom',
       summary,
       results,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     });
 
   } catch (error: unknown) {
@@ -310,7 +310,7 @@ async function checkPage(url: string, name: string) {
       responseTime,
       contentType,
       details,
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     };
 
   } catch (error: unknown) {
@@ -323,7 +323,7 @@ async function checkPage(url: string, name: string) {
       responseTime: 0,
       contentType: 'unknown',
       details: { error: error instanceof Error ? error.message : String(error) },
-      timestamp: new Date().toISOString();
+      timestamp: new Date().toISOString()
     };
   }
 }

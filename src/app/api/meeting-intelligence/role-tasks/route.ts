@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       roleWhereConditions.action_items = {
         some: {
           due_date: {
-            lt: new Date();
+            lt: new Date()
           },
           status: {
             not: 'Completed'
@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
           meeting: item.Meeting ? {
             id: item.meeting.id,
             title: item.meeting.title,
-            date: item.meeting.start_time?.toISOString() || new Date().toISOString();
+            date: item.meeting.start_time?.toISOString() || new Date().toISOString()
           } : undefined,
           previousHolder: undefined // Would need transition history tracking
         };

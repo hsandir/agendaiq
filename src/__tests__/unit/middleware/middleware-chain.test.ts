@@ -104,7 +104,7 @@ describe('Middleware Chain Tests', () => {
         url: 'http://localhost:3000/dashboard',
         headers: new Headers(),
         method: 'GET',
-        nextUrl: new URL('http://localhost:3000/dashboard');
+        nextUrl: new URL('http://localhost:3000/dashboard')
       } as unknown as NextRequest;
       
       const { getToken } = await import('next-auth/jwt');

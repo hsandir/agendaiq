@@ -50,7 +50,7 @@ export default async function PermissionsPage() {
         "View user details",
         "Deactivate user accounts"
       ],
-      roles: roles.filter(role => role.is_leadership);
+      roles: roles.filter(role => role.is_leadership)
     },
     {
       name: "Role Management",
@@ -76,7 +76,7 @@ export default async function PermissionsPage() {
         "Manage department hierarchy",
         "View department statistics"
       ],
-      roles: roles.filter(role => role.is_leadership);
+      roles: roles.filter(role => role.is_leadership)
     },
     {
       name: "System Administration",
@@ -89,7 +89,7 @@ export default async function PermissionsPage() {
         "View system logs",
         "Manage integrations"
       ],
-      roles: roles.filter(role => role.id === RoleID.OPS_ADMIN || role.id === RoleID.DEV_ADMIN);
+      roles: roles.filter(role => role.id === RoleID.OPS_ADMIN || role.id === RoleID.DEV_ADMIN)
     }
   ];
 

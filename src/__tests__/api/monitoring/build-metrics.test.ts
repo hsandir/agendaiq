@@ -29,7 +29,7 @@ interface MetricsResponse {
     errorRate: number;
     crashFreeUsers: number;
     p95Latency: number;
-    activeIssues: number;
+    activeIssues: number
   };
   error?: string;
 }
@@ -44,7 +44,7 @@ global.fetch = jest.fn();
 
 describe('/api/monitoring/build-metrics', () => {
   const mockRequest = (url: string = 'http://localhost:3000/api/monitoring/build-metrics') => {
-    return new NextRequest(url);
+    return new NextRequest(url)
   };
 
   beforeEach(() => {

@@ -77,7 +77,7 @@ export interface DevLogEntry extends BaseLogEntry {
     cpuUsage?: number;
     queryCount?: number;
   };
-  environment: 'development' | 'staging' | 'production';
+  environment: 'development' | 'staging' | 'production'
 }
 
 // Security/Audit Log Entry
@@ -132,18 +132,18 @@ export interface LogStats {
   logsByCategory: Record<string, number>;
   timeRange: {
     start: string;
-    end: string;
+    end: string
   };
   topErrors?: Array<{
     message: string;
     count: number;
-    lastSeen: string;
+    lastSeen: string
   }>;
   performanceMetrics?: {
     averageResponseTime: number;
     slowestEndpoints: Array<{
       path: string;
-      averageTime: number;
+      averageTime: number
     }>;
   };
 }
@@ -194,7 +194,7 @@ export interface LogAlert {
     type: 'email' | 'webhook' | 'notification';
     config: Record<string, unknown>;
   }>;
-  enabled: boolean;
+  enabled: boolean
 }
 
 // Export main types

@@ -29,7 +29,7 @@ import { cn } from '@/lib/utils';
 
 interface MobileMenuProps {
   user: Record<string, any>;
-  isAdmin: boolean;
+  isAdmin: boolean
 }
 
 export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
@@ -38,7 +38,7 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
   const pathname = usePathname();
 
   const toggleSection = (section: string) => {
-    setExpandedSection(expandedSection === section ? null : section);
+    setExpandedSection(expandedSection === section ? null : section)
   };
 
   const closeMenu = () => {
@@ -294,7 +294,7 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
                   });
                 } catch (error: unknown) {
                   // Fallback to direct navigation if signOut fails
-                  window.location.href = '/auth/signin';
+                  window.location.href = '/auth/signin'
                 }
               }}
               className="flex items-center gap-3 w-full px-3 py-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
@@ -306,5 +306,5 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
         </nav>
       </div>
     </>
-  );
+  )
 }

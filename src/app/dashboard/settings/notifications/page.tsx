@@ -362,5 +362,5 @@ export default async function NotificationsPage() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 } 

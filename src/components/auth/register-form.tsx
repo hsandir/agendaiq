@@ -79,7 +79,7 @@ export default function RegisterForm() {
         router.push(`/auth/verify-email?email=${encodeURIComponent(formData.email)}` as Record<string, unknown>);
       }
     } catch (error: unknown) {
-      setError('An error occurred. Please try again.');
+      setError('An error occurred. Please try again.')
     } finally {
       setIsLoading(false);
     }

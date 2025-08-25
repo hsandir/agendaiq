@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
       where: { email },
       data: {
         hashed_password: hashedPassword,
-        email_verified: new Date();
+        email_verified: new Date()
       },
       include: {
         staff: {

@@ -305,10 +305,10 @@ describe('Comprehensive Component Tests', () => {
         status: string;
         organizer: {
           name: string;
-          email: string;
+          email: string
         };
         attendeeCount: number;
-        agendaItemCount: number;
+        agendaItemCount: number
       };
       onEdit?: (id: number) => void;
       onDelete?: (id: number) => void;
@@ -459,7 +459,7 @@ describe('Comprehensive Component Tests', () => {
           ...mockmeeting,
           title: 'A'.repeat(100),
           description: 'B'.repeat(500),
-          location: 'C'.repeat(50);
+          location: 'C'.repeat(50)
         };
 
         render(<MockMeetingCard meeting={longMeeting} />);
@@ -484,7 +484,7 @@ describe('Comprehensive Component Tests', () => {
         completedMeetings: number;
         totalStaff: number;
         activeUsers: number;
-        pendingAgendaItems: number;
+        pendingAgendaItems: number
       };
       loading?: boolean;
       error?: string | null;

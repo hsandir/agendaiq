@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
       debugInfo: {
         sessionCapabilities: (user as Record<string, unknown>).capabilities ?? [],
         computedCapabilities: capabilities,
-        match: JSON.stringify(user?.capabilities) === JSON.stringify(capabilities);
+        match: JSON.stringify(user?.capabilities) === JSON.stringify(capabilities)
       }
     }, { status: 200 });
   } catch (error: unknown) {

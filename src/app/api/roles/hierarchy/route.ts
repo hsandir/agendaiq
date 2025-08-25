@@ -14,7 +14,7 @@ interface RoleWithRelations {
   priority: number;
   department: {
     id: number;
-    name: string;
+    name: string
   } | null;
   staff: Array<{
     id: number;
@@ -27,7 +27,7 @@ interface RoleWithRelations {
     role_id: number;
     department: {
       id: number;
-      name: string;
+      name: string
     } | null;
   }>;
 }
@@ -54,7 +54,7 @@ interface HierarchicalRole {
     role_id: number;
     department?: {
       id: number;
-      name: string;
+      name: string
     } | null;
   }>;
 }
@@ -158,7 +158,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         error: "Internal server error",
-        timestamp: new Date().toISOString();
+        timestamp: new Date().toISOString()
       }, 
       { status: 500 }
     );

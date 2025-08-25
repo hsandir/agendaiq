@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     console.error('Test login error:', error);
     return NextResponse.json({ 
       error: 'Internal error',
-      message: error instanceof Error ? error.message : String(error);
+      message: error instanceof Error ? error.message : String(error)
     }, { status: 500 });
   }
 }

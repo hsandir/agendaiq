@@ -40,13 +40,13 @@ interface User {
   name: string;
   email: string;
   department: string;
-  role: string;
+  role: string
 }
 
 interface Department {
   id: number;
   name: string;
-  code: string;
+  code: string
 }
 
 interface Role {

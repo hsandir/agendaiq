@@ -30,15 +30,15 @@ interface Staff {
     id: number;
     name: string | null;
     email: string;
-    image: string | null;
+    image: string | null
   };
   role: {
     id: number;
-    title: string;
+    title: string
   };
   department?: {
     id: number;
-    name: string;
+    name: string
   };
 }
 
@@ -47,7 +47,7 @@ interface AddMemberDialogProps {
   onOpenChange: (open: boolean) => void;
   teamId: string;
   currentMembers: number[]; // Array of staff IDs already in team
-  onMembersAdded: () => void;
+  onMembersAdded: () => void
 }
 
 export function AddMemberDialog({

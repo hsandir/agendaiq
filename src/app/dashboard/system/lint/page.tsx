@@ -27,7 +27,7 @@ interface LintStatus {
     warningFiles: number;
     cleanFiles: number;
     totalErrors: number;
-    totalWarnings: number;
+    totalWarnings: number
   };
   files: Array<{
     name: string;
@@ -39,7 +39,7 @@ interface LintStatus {
       column: number;
       severity: 'error' | 'warning';
       message: string;
-      rule: string;
+      rule: string
     }>;
   }>;
   recentFixes: Array<{
@@ -236,7 +236,7 @@ export default function LintErrorManagementPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ action: 'autofix-type-casting' });
+        body: JSON.stringify({ action: 'autofix-type-casting' })
       });
       
       if (!response.ok) {

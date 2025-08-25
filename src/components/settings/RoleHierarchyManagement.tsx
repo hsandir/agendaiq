@@ -11,14 +11,14 @@ interface Role {
   department_id?: string;
   Department?: {
     id: string;
-    name: string;
+    name: string
   };
   Staff?: Array<{
     id: string;
     users: {
       id: string;
       name: string | null;
-      email: string;
+      email: string
     };
   }>;
 }
@@ -43,7 +43,7 @@ export function RoleHierarchyManagement() {
       const data = await res.json();
       setRoles(data);
     } catch (error: unknown) {
-      setError('Failed to fetch roles');
+      setError('Failed to fetch roles')
     }
   };
 
@@ -69,7 +69,7 @@ export function RoleHierarchyManagement() {
       setSuccess('Default roles initialized successfully');
       fetchRoles(); // Refresh the roles list
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to initialize roles');
+      setError(error instanceof Error ? error.message : 'Failed to initialize roles')
     } finally {
       setIsLoading(false);
     }
@@ -102,7 +102,7 @@ export function RoleHierarchyManagement() {
       setSelectedSubordinates([]);
       fetchRoles(); // Refresh the roles list
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to add role');
+      setError(error instanceof Error ? error.message : 'Failed to add role')
     } finally {
       setIsLoading(false);
     }
@@ -126,7 +126,7 @@ export function RoleHierarchyManagement() {
       setSuccess(`Successfully deleted role: ${roleTitle}`);
       fetchRoles(); // Refresh the roles list
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to delete role');
+      setError(error instanceof Error ? error.message : 'Failed to delete role')
     } finally {
       setIsLoading(false);
     }

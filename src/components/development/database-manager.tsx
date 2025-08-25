@@ -133,7 +133,7 @@ export default function DatabaseManager() {
       const response = await fetch('/api/dev/database/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query });
+        body: JSON.stringify({ query })
       })
       const data = await response.json();
       setQueryResults(data);

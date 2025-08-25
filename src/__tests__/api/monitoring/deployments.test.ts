@@ -28,7 +28,7 @@ global.fetch = jest.fn();
 
 describe('/api/monitoring/deployments', () => {
   const mockRequest = (url: string = 'http://localhost:3000/api/monitoring/deployments') => {
-    return new NextRequest(url);
+    return new NextRequest(url)
   };
 
   beforeEach(() => {

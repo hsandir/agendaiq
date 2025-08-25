@@ -10,24 +10,24 @@ import { LucideIcon } from 'lucide-react';
 interface User {
   id: number;
   name: string;
-  email: string;
+  email: string
 }
 
 interface UserWithStaff extends User {
   staff?: {
     id: number;
     role: {
-      title: string;
+      title: string
     };
     school?: {
       name: string;
-      code: string | null;
+      code: string | null
     };
   } | null;
   Staff?: Array<{
     id: number;
     role: {
-      title: string;
+      title: string
     };
     school: {
       name: string;
@@ -49,7 +49,7 @@ interface Meeting {
 interface QuickStat {
   name: string;
   value: number;
-  icon: LucideIcon;
+  icon: LucideIcon
 }
 
 interface DashboardContentProps {

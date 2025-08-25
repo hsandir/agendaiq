@@ -82,7 +82,7 @@ interface Team {
   metadata?: any;
   _count: {
     team_members: number;
-    team_knowledge: number;
+    team_knowledge: number
   };
 }
 
@@ -328,7 +328,7 @@ export default function TeamSettingsPage() {
       case 'GRADE_LEVEL':
         return <GraduationCap className="h-5 w-5" />;
       default:
-        return <Users className="h-5 w-5" />;
+        return <Users className="h-5 w-5" />
     }
   };
 
@@ -345,7 +345,7 @@ export default function TeamSettingsPage() {
       case 'GRADE_LEVEL':
         return 'bg-pink-100 text-pink-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
   };
 
