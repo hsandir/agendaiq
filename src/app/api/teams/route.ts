@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
+    const { user } = auth;
 
     // Get user's organization context
     const staff = await prisma.staff.findFirst({
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch teams based on user's organization level
-    const teams = await prisma.team.findMany({
+    const teams = await prisma.teams.findMany({
       where: {
         OR: [
           { school_id: staff.school_id },
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
+    const { user } = auth;
 
     // Parse and validate request body
     const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
@@ -203,7 +203,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Fetch the complete team with relations
-    const completeTeam = await prisma.team.findUnique({
+    const completeTeam = await prisma.teams.findUnique({
       where: { id: team.id },
       include: {
         team_members: {
@@ -269,7 +269,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
+    const { user } = auth;
 
     // Get team ID from query params
     const { _searchParams } = new URL(request.url);
@@ -299,7 +299,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Check if team exists and user has permission
-    const team = await prisma.team.findUnique({
+    const team = await prisma.teams.findUnique({
       where: { id: teamId },
       include: {
         team_members: true
@@ -326,7 +326,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Update the team
-    const updatedTeam = await prisma.team.update({
+    const updatedTeam = await prisma.teams.update({
       where: { id: teamId },
       data: {
         ...(validatedData.name && { name: validatedData.name }),
@@ -399,7 +399,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
+    const { user } = auth;
 
     // Get team ID from query params
     const { _searchParams } = new URL(request.url);
@@ -421,7 +421,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Check if team exists
-    const team = await prisma.team.findUnique({
+    const team = await prisma.teams.findUnique({
       where: { id: teamId }
     });
 
@@ -433,7 +433,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Soft delete the team
-    await prisma.team.update({
+    await prisma.teams.update({
       where: { id: teamId },
       data: {
         is_active: false,

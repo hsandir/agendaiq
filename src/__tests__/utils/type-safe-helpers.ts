@@ -118,11 +118,11 @@ export class TypeSafeMockFactory {
     }),
 
     createMany: (count: number, overrides: Partial<users> = {}): users[] => {
-      return Array.from({ length: count }, () => TypeSafeMockFactory.(user as Record<string, unknown>).create(overrides));
+      return Array.from({ length: count }, () => TypeSafeMockFactory.user.create(overrides));
     },
 
     createWithRelations: (relations: { staff?: Partial<staff> } = {}): users => {
-      const user = TypeSafeMockFactory.(user as Record<string, unknown>).create();
+      const user = TypeSafeMockFactory.user.create();
       if (relations.staff) {
         // This would be implemented with proper relations
         // For now, return the base user
@@ -308,7 +308,7 @@ export class TypeSafeMockFactory {
   };
 
   static session(userOverrides: Partial<User> = {}): Session {
-    const user = this.(user as Record<string, unknown>).create(userOverrides);
+    const user = this.user.create(userOverrides);
     return {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       user: {
@@ -408,14 +408,14 @@ export class TypeSafeTestDB {
 
     // Create test users
     const adminUser = await this.prisma.users.create({
-      data: TypeSafeMockFactory.(user as Record<string, unknown>).create({
+      data: TypeSafeMockFactory.user.create({
         email: 'admin@test.com',
         name: 'Test Admin',
       }),
     });
 
     const teacherUser = await this.prisma.users.create({
-      data: TypeSafeMockFactory.(user as Record<string, unknown>).create({
+      data: TypeSafeMockFactory.user.create({
         email: 'teacher@test.com',
         name: 'Test Teacher',
       }),

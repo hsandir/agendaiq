@@ -58,7 +58,7 @@ describe('Authentication Integration Tests', () => {
       };
 
       // Setup database response
-      (prisma.(user as Record<string, unknown>).findUnique as jest.Mock).mockResolvedValue(mockUser);
+      (prisma.users.findUnique as jest.Mock).mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       // Simulate the database query that would happen during authentication
@@ -68,7 +68,7 @@ describe('Authentication Integration Tests', () => {
       };
       
       // Call the mock to simulate what happens in the authorize function
-      await prisma.(user as Record<string, unknown>).findUnique({
+      await prisma.users.findUnique({
         where: { email: credentials.email },
         include: {
           staff: {
@@ -86,7 +86,7 @@ describe('Authentication Integration Tests', () => {
       await bcrypt.compare(credentials.password, mockUser.hashed_password);
       
       // Verify the mocks were called correctly
-      expect(prisma.(user as Record<string, unknown>).findUnique).toHaveBeenCalledWith({
+      expect(prisma.users.findUnique).toHaveBeenCalledWith({
         where: { email: 'test@school.edu' },
         include: {
           staff: {
@@ -113,7 +113,7 @@ describe('Authentication Integration Tests', () => {
         hashed_password: 'hashed_password',
       };
 
-      (prisma.(user as Record<string, unknown>).findUnique as jest.Mock).mockResolvedValue(mockUser);
+      (prisma.users.findUnique as jest.Mock).mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       // Verify password check fails
@@ -132,7 +132,7 @@ describe('Authentication Integration Tests', () => {
         two_factor_secret: 'secret',
       };
 
-      (prisma.(user as Record<string, unknown>).findUnique as jest.Mock).mockResolvedValue(mockUser);
+      (prisma.users.findUnique as jest.Mock).mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       // Should check for 2FA
@@ -151,7 +151,7 @@ describe('Authentication Integration Tests', () => {
         backup_codes: ['code1', 'code2', 'code3'],
       };
 
-      (prisma.(user as Record<string, unknown>).findUnique as jest.Mock).mockResolvedValue(mockUser);
+      (prisma.users.findUnique as jest.Mock).mockResolvedValue(mockUser);
       
       // Simulate using a backup code
       const usedCode = 'code1';
@@ -188,7 +188,7 @@ describe('Authentication Integration Tests', () => {
         Account: [], // No linked OAuth accounts
       };
 
-      (prisma.(user as Record<string, unknown>).findUnique as jest.Mock).mockResolvedValue(existingUser);
+      (prisma.users.findUnique as jest.Mock).mockResolvedValue(existingUser);
       
       // Check if Google account is linked
       const hasGoogleAccount = existingUser.Account.some((a: { provider: string }) => a.provider === 'google');

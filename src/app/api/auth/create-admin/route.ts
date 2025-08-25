@@ -35,10 +35,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { _email, _password } = validationResult.data;
+    const { email, password } = validationResult.data;
     
     // Check if user exists and has admin role
-    const existingUser = await prisma.(user as Record<string, unknown>).findUnique({
+    const existingUser = await prisma.users.findUnique({
       where: { email },
       include: {
         staff: {
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await hash(password, 12);
     
     // Update the user with the new password
-    const updatedUser = await prisma.(user as Record<string, unknown>).update({
+    const updatedUser = await prisma.users.update({
       where: { email },
       data: {
         hashed_password: hashedPassword,

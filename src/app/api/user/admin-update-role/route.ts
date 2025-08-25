@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Get updated user with staff
-    const updatedUser = await prisma.(user as Record<string, unknown>).findUnique({
+    const updatedUser = await prisma.users.findUnique({
       where: { id: userId },
       include: { staff: { include: { role: true, department: true } } },
     });

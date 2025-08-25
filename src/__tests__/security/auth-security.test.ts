@@ -99,7 +99,7 @@ describe('Authentication Security Tests', () => {
         const response = await POST(request);
 
       if (response.ok) {
-        const user = await prisma.(user as Record<string, unknown>).findUnique({
+        const user = await prisma.users.findUnique({
           where: { email }
         });
 
@@ -472,7 +472,7 @@ describe('Authentication Security Tests', () => {
       }
 
       // Cleanup
-      await prisma.(user as Record<string, unknown>).deleteMany({
+      await prisma.users.deleteMany({
         where: {
           email: {
             in: ['teacher@agendaiq.com', 'admin@agendaiq.com']

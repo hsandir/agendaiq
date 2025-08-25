@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
-    const user = await prisma.(user as Record<string, unknown>).findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: auth.user.id },
       include: { staff: { include: { school: true } } },
     });
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Get updated user with staff
-    const updatedUser = await prisma.(user as Record<string, unknown>).findUnique({
+    const updatedUser = await prisma.users.findUnique({
       where: { id: auth.user.id },
       include: { staff: { include: { school: true } } },
     });

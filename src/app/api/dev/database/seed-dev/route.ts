@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     
     // Get counts
     const logCount = await prisma.auditLog.count();
-    const userCount = await prisma.(user as Record<string, unknown>).count();
+    const userCount = await prisma.users.count();
     const staffCount = await prisma.staff.count();
     
     return NextResponse.json({

@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
-    const user = await prisma.(user as Record<string, unknown>).findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: auth.user.email! },
       select: { email_verified: true, email: true },
     });

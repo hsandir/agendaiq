@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get theme preference using Prisma client (avoids case/permission issues)
-    const userData = await prisma.(user as Record<string, unknown>).findUnique({
+    const userData = await prisma.users.findUnique({
       where: { id: user.id },
       select: { theme_preference: true },
     });
@@ -89,7 +89,7 @@ export async function PUT(request: NextRequest) {
     const themeToSave = validatedData.themeId ?? validatedData.theme ?? 'standard';
 
     // Update user's theme preference (optimized query)
-    await prisma.(user as Record<string, unknown>).update({
+    await prisma.users.update({
       where: { id: user.id },
       data: { theme_preference: themeToSave },
       select: { id: true }, // Only select what we need

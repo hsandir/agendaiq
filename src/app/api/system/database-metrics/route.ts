@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
       districtCount,
       sessionCount
     ] = await Promise.all([
-      prisma.(user as Record<string, unknown>).count(),
+      prisma.users.count(),
       prisma.staff.count(),
       prisma.meeting.count(),
       prisma.department.count(),

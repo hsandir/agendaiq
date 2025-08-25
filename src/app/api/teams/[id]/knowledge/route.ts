@@ -67,7 +67,7 @@ export async function GET(
     }
 
     // Check if team exists and user has access
-    const team = await prisma.team.findUnique({
+    const team = await prisma.teams.findUnique({
       where: { id: teamId },
       include: {
         team_members: true
@@ -119,7 +119,7 @@ export async function GET(
       };
     }
 
-    const knowledge = await prisma.teamKnowledge.findMany({
+    const knowledge = await prisma.team_knowledge.findMany({
       where,
       include: {
         created_by_user: {
@@ -144,7 +144,7 @@ export async function GET(
 
     // Track view for analytics
     if (knowledge.length > 0 && staff) {
-      await prisma.teamKnowledgeView.createMany({
+      await prisma.team_knowledge_view.createMany({
         data: knowledge.slice(0, 5).map(k => ({
           knowledge_id: k.id,
           user_id: user.id,
@@ -216,7 +216,7 @@ export async function POST(
     }
 
     // Check if team exists and user is a member
-    const team = await prisma.team.findUnique({
+    const team = await prisma.teams.findUnique({
       where: { id: teamId },
       include: {
         team_members: true
@@ -241,7 +241,7 @@ export async function POST(
     }
 
     // Create the knowledge resource
-    const knowledge = await prisma.teamKnowledge.create({
+    const knowledge = await prisma.team_knowledge.create({
       data: {
         team_id: teamId,
         title: validatedData.title,
@@ -348,7 +348,7 @@ export async function PUT(
     }
 
     // Check if knowledge exists
-    const knowledge = await prisma.teamKnowledge.findUnique({
+    const knowledge = await prisma.team_knowledge.findUnique({
       where: { id: knowledgeId },
       include: {
         team: {
@@ -381,7 +381,7 @@ export async function PUT(
     }
 
     // Update the knowledge resource
-    const updatedKnowledge = await prisma.teamKnowledge.update({
+    const updatedKnowledge = await prisma.team_knowledge.update({
       where: { id: knowledgeId },
       data: {
         ...(validatedData.title && { title: validatedData.title }),
@@ -483,7 +483,7 @@ export async function DELETE(
     }
 
     // Check if knowledge exists
-    const knowledge = await prisma.teamKnowledge.findUnique({
+    const knowledge = await prisma.team_knowledge.findUnique({
       where: { id: knowledgeId },
       include: {
         team: {
@@ -516,12 +516,12 @@ export async function DELETE(
     }
 
     // Delete associated views first
-    await prisma.teamKnowledgeView.deleteMany({
+    await prisma.team_knowledge_view.deleteMany({
       where: { knowledge_id: knowledgeId }
     });
 
     // Delete the knowledge resource
-    await prisma.teamKnowledge.delete({
+    await prisma.team_knowledge.delete({
       where: { id: knowledgeId }
     });
 

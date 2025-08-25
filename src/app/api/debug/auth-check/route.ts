@@ -31,8 +31,8 @@ export async function GET(request: NextRequest) {
 
   try {
     // 1. Test database connection
-    const userCount = await prisma.(user as Record<string, unknown>).count();
-    const adminCount = await prisma.(user as Record<string, unknown>).count({ where: { is_admin: true } });
+    const userCount = await prisma.user.count();
+    const adminCount = await prisma.user.count({ where: { is_admin: true } });
     
     debugInfo.database.connected = true;
     debugInfo.database.userCount = userCount;

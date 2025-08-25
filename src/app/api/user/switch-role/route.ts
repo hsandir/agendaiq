@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find the user and their staff record
-    const user = await prisma.(user as Record<string, unknown>).findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: auth.user.email },
       include: {
         staff: {

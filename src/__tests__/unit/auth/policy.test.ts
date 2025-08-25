@@ -157,7 +157,7 @@ describe('Policy Unit Tests', () => {
 
   describe('AUTH-POL-06: getUserCapabilities()', () => {
     it('should return all capabilities for system admin', async () => {
-      (prisma.(user as Record<string, unknown>).findUnique as jest.Mock).mockResolvedValue({
+      (prisma.users.findUnique as jest.Mock).mockResolvedValue({
         id: 1,
         is_system_admin: true,
         is_school_admin: false,
@@ -174,7 +174,7 @@ describe('Policy Unit Tests', () => {
     });
 
     it('should filter dev capabilities for school admin', async () => {
-      (prisma.(user as Record<string, unknown>).findUnique as jest.Mock).mockResolvedValue({
+      (prisma.users.findUnique as jest.Mock).mockResolvedValue({
         id: 2,
         is_system_admin: false,
         is_school_admin: true,
@@ -193,7 +193,7 @@ describe('Policy Unit Tests', () => {
     });
 
     it('should map role permissions to capabilities', async () => {
-      (prisma.(user as Record<string, unknown>).findUnique as jest.Mock).mockResolvedValue({
+      (prisma.users.findUnique as jest.Mock).mockResolvedValue({
         id: 3,
         is_system_admin: false,
         is_school_admin: false,

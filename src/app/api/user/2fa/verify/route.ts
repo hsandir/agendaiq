@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     // TODO: Add twoFactorSecret field to User model in schema
     // Get user's 2FA secret
-    // const user = await prisma.(user as Record<string, unknown>).findUnique({
+    // const user = await prisma.users.findUnique({
     //   where: { id: session.user.id as string },
     //   select: { two_factor_secret: true },
     // });
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     // }
 
     // Enable 2FA
-    // await prisma.(user as Record<string, unknown>).update({
+    // await prisma.users.update({
     //   where: { id: session.user.id as string },
     //   data: { two_factor_enabled: true },
     // });

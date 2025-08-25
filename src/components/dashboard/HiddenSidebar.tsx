@@ -218,7 +218,7 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
         >
           <nav className="px-6 space-y-8" aria-label="Settings navigation">
             {validNavigation.map((section) => {
-              if (!section ?? section.adminOnly && !isAdmin) return null;
+              if (!section || (section.adminOnly && !isAdmin)) return null;
 
               return (
                 <div key={section.title}>

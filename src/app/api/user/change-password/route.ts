@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse("Password must be at least 8 characters long", { status: 400 });
     }
 
-    const user = await prisma.(user as Record<string, unknown>).findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: auth.user.email! },
       select: { hashed_password: true },
     });
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     const hashedPassword = await hash(newPassword as string, 12);
-    await prisma.(user as Record<string, unknown>).update({
+    await prisma.users.update({
       where: { email: auth.user.email! },
       data: { hashedPassword },
     });

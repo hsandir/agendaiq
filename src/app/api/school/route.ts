@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Get user and check role through staff
-    const userRecord = await prisma.(user as Record<string, unknown>).findUnique({
+    const userRecord = await prisma.users.findUnique({
       where: { email: user.email },
       include: { 
         staff: {

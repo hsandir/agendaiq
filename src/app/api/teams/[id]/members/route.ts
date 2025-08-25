@@ -46,7 +46,7 @@ export async function GET(
     const teamId = params.id;
 
     // Check if team exists
-    const team = await prisma.team.findUnique({
+    const team = await prisma.teams.findUnique({
       where: { id: teamId },
       include: {
         team_members: {
@@ -154,7 +154,7 @@ export async function POST(
     }
 
     // Check if team exists
-    const team = await prisma.team.findUnique({
+    const team = await prisma.teams.findUnique({
       where: { id: teamId },
       include: {
         team_members: true
@@ -205,7 +205,7 @@ export async function POST(
     }
 
     // Add the member
-    const newMember = await prisma.teamMember.create({
+    const newMember = await prisma.team_members.create({
       data: {
         team_id: teamId,
         staff_id: validatedData.staff_id,
@@ -302,7 +302,7 @@ export async function PUT(
     }
 
     // Check if team and member exist
-    const teamMember = await prisma.teamMember.findFirst({
+    const teamMember = await prisma.team_members.findFirst({
       where: {
         team_id: teamId,
         id: parseInt(memberId)
@@ -347,7 +347,7 @@ export async function PUT(
     }
 
     // Update the member
-    const updatedMember = await prisma.teamMember.update({
+    const updatedMember = await prisma.team_members.update({
       where: { id: parseInt(memberId) },
       data: {
         role: validatedData.role
@@ -438,7 +438,7 @@ export async function DELETE(
     }
 
     // Check if team and member exist
-    const teamMember = await prisma.teamMember.findFirst({
+    const teamMember = await prisma.team_members.findFirst({
       where: {
         team_id: teamId,
         id: parseInt(memberId)
@@ -484,7 +484,7 @@ export async function DELETE(
     }
 
     // Remove the member
-    await prisma.teamMember.delete({
+    await prisma.team_members.delete({
       where: { id: parseInt(memberId) }
     });
 

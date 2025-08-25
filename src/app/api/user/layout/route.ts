@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get layout preference using Prisma client (avoids case/permission issues)
-    const userData = await prisma.(user as Record<string, unknown>).findUnique({
+    const userData = await prisma.users.findUnique({
       where: { id: user.id },
       select: { layout_preference: true },
     });
@@ -88,7 +88,7 @@ export async function PUT(request: NextRequest) {
     const layoutToSave = validatedData.layoutId ?? validatedData.layout ?? 'modern';
 
     // Update user's layout preference (optimized query)
-    await prisma.(user as Record<string, unknown>).update({
+    await prisma.users.update({
       where: { id: user.id },
       data: { layout_preference: layoutToSave },
       select: { id: true }, // Only select what we need

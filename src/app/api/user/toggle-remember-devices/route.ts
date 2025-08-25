@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
     // TODO: Add rememberDevices field to User model in schema
     // Get current user settings
-    const user = await prisma.(user as Record<string, unknown>).findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: auth.user.id },
       select: { 
         id: true,
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     // TODO: Toggle remember devices setting once field is added
-    // const updatedUser = await prisma.(user as Record<string, unknown>).update({
+    // const updatedUser = await prisma.users.update({
     //   where: { id: auth.user.id },
     //   data: { rememberDevices: !user?.rememberDevices },
     // });

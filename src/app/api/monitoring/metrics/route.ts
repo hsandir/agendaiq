@@ -22,7 +22,7 @@ const MAX_BUFFER_SIZE = 1000;
 
 export async function POST(request: Request) {
   try {
-    const metrics = await request.json() as Record<string, unknown>; as WebVitalsMetric;
+    const metrics = await request.json() as WebVitalsMetric;
     
     // Add timestamp
     const userAgent = request.headers.get('user-agent') ?? 'unknown';
@@ -132,7 +132,7 @@ async function getApplicationMetrics() {
 async function getDatabaseMetrics() {
   try {
     const [userCount, meetingCount, sessionCount] = await Promise.all([
-      prisma.(user as Record<string, unknown>).count(),
+      prisma.user.count(),
       prisma.meeting.count(),
       prisma.session.count(),
     ]);

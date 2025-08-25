@@ -258,7 +258,7 @@ describe('Comprehensive API Route Tests', () => {
         }
 
         // Create a user first
-        const user = await prisma.(user as Record<string, unknown>).create({
+        const user = await prisma.users.create({
           data: {
             email: 'newstaff@agendaiq.com',
             name: 'New Staff Member'
@@ -288,7 +288,7 @@ describe('Comprehensive API Route Tests', () => {
           await prisma.staff.delete({ where: { id: data.staff.id } });
         }
 
-        await prisma.(user as Record<string, unknown>).delete({ where: { id: user.id } });
+        await prisma.users.delete({ where: { id: user.id } });
       });
     });
   });

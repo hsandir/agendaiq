@@ -72,7 +72,7 @@ export const GET = withFieldAccess(
       return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
     }
 
-    const users = await prisma.(user as Record<string, unknown>).findMany();
+    const users = await prisma.user.findMany();
     return NextResponse.json({ data: users });
   },
   'User'

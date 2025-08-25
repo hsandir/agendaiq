@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const capabilities = await getUserCapabilities(user.id);
     
     // Get user's role permissions
-    const userWithRole = await prisma.(user as Record<string, unknown>).findUnique({
+    const userWithRole = await prisma.user.findUnique({
       where: { id: user?.id },
       include: {
         staff: {

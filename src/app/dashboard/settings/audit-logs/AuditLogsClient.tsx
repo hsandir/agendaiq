@@ -821,7 +821,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                     <td className="px-6 py-4 text-sm text-foreground">
                       <div className="max-w-xs truncate">
                         {isCritical ? (
-                          log.error_message ?? log.description || 'No description'
+                          log.error_message ?? (log.description || 'No description')
                         ) : (
                           log.description || 'No description'
                         )}
