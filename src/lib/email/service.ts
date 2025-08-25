@@ -10,10 +10,10 @@ import {
   BaseEmailData
 } from './types';
 // Dynamic imports to avoid build issues
-const getMeetingInviteTemplate = () => import('./templates/meeting-invite').then(m => m.MeetingInviteTemplate);
-const getTeamNotificationTemplate = () => import('./templates/team-notification').then(m => m.TeamNotificationTemplate);
-const getPasswordResetTemplate = () => import('./templates/password-reset').then(m => m.PasswordResetTemplate);
-const getVerificationTemplate = () => import('./templates/verification').then(m => m.VerificationTemplate);
+const getMeetingInviteTemplate = () => import('./templates/meeting-invite.tsx').then(m => m.MeetingInviteTemplate);
+const getTeamNotificationTemplate = () => import('./templates/team-notification.tsx').then(m => m.TeamNotificationTemplate);
+const getPasswordResetTemplate = () => import('./templates/password-reset.tsx').then(m => m.PasswordResetTemplate);
+const getVerificationTemplate = () => import('./templates/verification.tsx').then(m => m.VerificationTemplate);
 
 export class EmailService {
   private static instance: EmailService;

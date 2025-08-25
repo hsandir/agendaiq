@@ -10,8 +10,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
     }
 
-    const { _searchParams } = new URL(request?.url);
-    const days = searchParams.get('days') ? parseInt(searchParams.get('days')!) : 30;
+    const { searchParams } = new URL(request?.url);
+    const days = searchParams.get('days') ? parseInt(searchParams.get('days') as string) : 30;
 
     const summary = await AuditLogger.getAuditSummary(days);
 

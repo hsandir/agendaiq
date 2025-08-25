@@ -100,14 +100,13 @@ export function AddMemberDialog({
     }
   };
 
-  // Convert staff to MultiSelect options
-  const staffOptions: MultiSelectOption[] = availableStaff.map(staff => ({
+  // Transform staff to MultiSelectOptions (same as MeetingFormStep1)
+  const attendeeOptions: MultiSelectOption[] = availableStaff.map(staff => ({
     value: staff.id.toString(),
     label: staff.users.name || staff.users.email,
     email: staff.users.email,
-    department: staff.department?.name,
-    role: staff.role.title,
-    avatar: staff.users.image || undefined,
+    department: staff.department?.name || null,
+    role: staff.role.title || null
   }));
 
   const handleAddMembers = async () => {
@@ -173,18 +172,18 @@ export function AddMemberDialog({
               </div>
             ) : (
               <MultiSelect
-                label="Select Team Members"
-                placeholder="Choose staff members to add to the team"
-                options={staffOptions}
+                options={attendeeOptions}
                 selected={selectedStaffIds}
-                onChange={setSelectedStaffIds}
+                onChange={(newSelection) => {
+                  console.log("Staff selected:", newSelection);
+                  setSelectedStaffIds(newSelection);
+                }}
+                placeholder="Select staff members..."
+                label="Team Members"
                 showSearch={true}
-                showDepartmentFilter={true}
-                showRoleFilter={true}
-                departments={Array.from(new Set(staffOptions.map(s => s.department).filter(Boolean)))}
-                roles={Array.from(new Set(staffOptions.map(s => s.role).filter(Boolean)))}
+                showDepartmentFilter={false}
+                showRoleFilter={false}
                 maxHeight="300px"
-                className="w-full"
               />
             )}
           </div>
