@@ -133,7 +133,7 @@ export function validateEnvironment(): { isValid: boolean; errors: string[] } {
 export function getEnvironmentInfo() {
   return {
     environment: ENV.NODE_ENV,
-    features: Object.entries(FEATURES);
+    features: Object.entries(FEATURES)
       .filter(([, enabled]) => enabled)
       .map(([feature]) => feature),
     nextAuthUrl: ENV.NEXTAUTH_URL,

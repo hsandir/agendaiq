@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
       const [roleCount, districtCount, schoolCount] = await Promise.all([
         prisma.role.count(),
         prisma.district.count(),
-        prisma.school.count();
+        prisma.school.count()
       ]);
       
       databaseStatus = {

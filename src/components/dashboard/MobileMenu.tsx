@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -29,7 +29,7 @@ import { cn } from '@/lib/utils';
 
 interface MobileMenuProps {
   user: Record<string, any>;
-  isAdmin: boolean
+  isAdmin: boolean;
 }
 
 export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
@@ -38,7 +38,7 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
   const pathname = usePathname();
 
   const toggleSection = (section: string) => {
-    setExpandedSection(expandedSection === section ? null : section)
+    setExpandedSection(expandedSection === section ? null : section);
   };
 
   const closeMenu = () => {
@@ -49,7 +49,7 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
   const isActive = (href: string) => pathname === href;
 
   return (
-    <>
+    <div>
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -99,7 +99,7 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
               onClick={closeMenu}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
-                isActive("/dashboard");
+                isActive("/dashboard")
                   ? "bg-primary text-primary-foreground" 
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
@@ -113,7 +113,7 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
               onClick={closeMenu}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
-                isActive("/dashboard/meetings");
+                isActive("/dashboard/meetings")
                   ? "bg-primary text-primary-foreground" 
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
@@ -127,7 +127,7 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
               onClick={closeMenu}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
-                isActive("/dashboard/teams");
+                isActive("/dashboard/teams")
                   ? "bg-primary text-primary-foreground" 
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
@@ -257,7 +257,7 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
                   </Link>
                   
                   {isAdmin && (
-                    <>
+                    <div>
                       <div className="border-t border-border my-2" />
                       <Link
                         href="/dashboard/settings/role-hierarchy"
@@ -275,7 +275,7 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
                         <Settings className="h-4 w-4 inline mr-2" />
                         System Settings
                       </Link>
-                    </>
+                    </div>
                   )}
                 </div>
               )}
@@ -294,7 +294,7 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
                   });
                 } catch (error: unknown) {
                   // Fallback to direct navigation if signOut fails
-                  window.location.href = '/auth/signin'
+                  window.location.href = '/auth/signin';
                 }
               }}
               className="flex items-center gap-3 w-full px-3 py-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
@@ -305,6 +305,6 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
           </div>
         </nav>
       </div>
-    </>
-  )
+    </div>
+  );
 }

@@ -63,7 +63,7 @@ export class CSRFProtection {
     // Compare tokens
     return crypto.timingSafeEqual(
       Buffer.from(cookieToken),
-      Buffer.from(requestToken);
+      Buffer.from(requestToken)
     );
   }
   

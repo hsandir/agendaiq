@@ -316,7 +316,7 @@ export async function GET(request: NextRequest) {
       inProgress: runs.filter(r => r.status === 'in_progress').length,
       queued: runs.filter(r => r.status === 'queued').length,
       successRate: runs.length > 0 
-        ? ((runs.filter(r => r.conclusion === 'success').length / runs.length) * 100).toFixed(1);
+        ? ((runs.filter(r => r.conclusion === 'success').length / runs.length) * 100).toFixed(1)
         : 0,
       averageDuration: calculateAverageDuration(runs),
       commonErrors: errorPatterns,

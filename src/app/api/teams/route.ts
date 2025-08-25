@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
+    const { user } = auth;
 
     // Get user's organization context
     const staff = await prisma.staff.findFirst({
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
+    const { user } = auth;
 
     // Parse and validate request body
     const body = await request.json() as Record<string, unknown>;
@@ -322,7 +322,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
+    const { user } = auth;
 
     // Get team ID from query params
     const { _searchParams } = new URL(request.url);
@@ -453,7 +453,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
+    const { user } = auth;
 
     // Get team ID from query params
     const { _searchParams } = new URL(request.url);

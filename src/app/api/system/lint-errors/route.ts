@@ -147,7 +147,7 @@ async function getLintSummary() {
 
     const topErrors = (Array.from(errorTypes.entries())
       .sort(([,a], [,b]) => b - a)
-      .slice(0, 10);
+      .slice(0, 10)
       .map(([rule, count]) => ({ rule, count })));
 
     return NextResponse.json({

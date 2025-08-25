@@ -497,7 +497,7 @@ export default function PageSelectionPage() {
               <CardContent>
                 <div className="space-y-4">
                   {pageConfigs
-                    .filter(config => config.category === category.key);
+                    .filter(config => config.category === category.key)
                     .map(config => (
                       <div key={config.path} className="space-y-2">
                         <div className="flex items-center justify-between p-3 border rounded-lg">

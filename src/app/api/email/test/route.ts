@@ -45,7 +45,6 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    if (error instanceof Error) {
     console.error('Email test error:', error);
     return NextResponse.json(
       { 

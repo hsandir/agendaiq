@@ -164,7 +164,7 @@ export default function LiveMonitor() {
 
     console.error = (...args) => {
       const message = (args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg) : String(arg);
+        typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
       ).join(' '));
 
       const errorEvent: ErrorEvent = {
@@ -183,7 +183,7 @@ export default function LiveMonitor() {
 
     console.warn = (...args) => {
       const message = (args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg) : String(arg);
+        typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
       ).join(' '));
 
       const errorEvent: ErrorEvent = {

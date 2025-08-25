@@ -180,7 +180,7 @@ export async function checkAuthRequirements(requirements: AuthRequirements = {})
     
     // Check role requirement (canonical RoleKey)
     if (requirements.requireRole) {
-      const roles = Array.isArray(requirements.requireRole);
+      const roles = Array.isArray(requirements.requireRole)
         ? requirements.requireRole
         : [requirements.requireRole];
       const ok = roles.some((r) => isRole(user, r));

@@ -315,7 +315,7 @@ export async function GET(request: NextRequest) {
   try {
     const [metrics, systemChecks] = await Promise.all([
       getHealthMetrics(),
-      runSystemChecks();
+      runSystemChecks()
     ])
     
     const overallHealth = calculateOverallHealth(metrics, systemChecks);

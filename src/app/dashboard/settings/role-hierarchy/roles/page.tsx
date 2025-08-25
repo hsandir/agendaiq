@@ -63,7 +63,7 @@ export default async function RolePage() {
 
   // Leadership hierarchy
   const leadershipHierarchy = (roles
-    .filter(role => role.is_leadership);
+    .filter(role => role.is_leadership)
     .sort((a, b) => a.priority - b.priority)
     .map(role => ({
       title: role.title,

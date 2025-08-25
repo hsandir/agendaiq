@@ -89,7 +89,7 @@ async function getRealPackageStatus() {
       current: info.current,
       wanted: info.wanted,
       latest: info.latest,
-      type: getUpdateType(info.current, info.latest);
+      type: getUpdateType(info.current, info.latest)
     })));
 
     // Get total package count
@@ -113,7 +113,7 @@ async function getRealPackageStatus() {
           current: info.current,
           wanted: info.wanted,
           latest: info.latest,
-          type: getUpdateType(info.current, info.latest);
+          type: getUpdateType(info.current, info.latest)
         })));
         
         return {

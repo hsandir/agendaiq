@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -32,24 +32,24 @@ import {
 } from 'lucide-react'
 
 interface TestSuite {
-  name: string
-  path: string
-  tests: number
-  passed?: number
-  failed?: number
-  skipped?: number
-  duration?: number
-  status: 'idle' | 'running' | 'passed' | 'failed'
+  name: string;
+  path: string;
+  tests: number;
+  passed?: number;
+  failed?: number;
+  skipped?: number;
+  duration?: number;
+  status: 'idle' | 'running' | 'passed' | 'failed';
   category: 'unit' | 'integration' | 'e2e' | 'performance';
 }
 
 interface TestResult {
-  suite: string
-  test: string
-  status: 'passed' | 'failed' | 'skipped'
-  duration: number
-  error?: string
-  file?: string
+  suite: string;
+  test: string;
+  status: 'passed' | 'failed' | 'skipped';
+  duration: number;
+  error?: string;
+  file?: string;
   line?: number;
 }
 
@@ -70,31 +70,31 @@ interface CoverageReport {
 }
 
 interface TestHistory {
-  date: string
-  passed: number
-  failed: number
-  coverage: number
-  duration: number
-;}
+  date: string;
+  passed: number;
+  failed: number;
+  coverage: number;
+  duration: number;
+}
 
 export default function TestDashboard() {
-  const [testSuites, setTestSuites] = useState<TestSuite[]>([])
-  const [selectedSuite, setSelectedSuite] = useState<string | null>(null)
-  const [testResults, setTestResults] = useState<TestResult[]>([])
-  const [coverage, setCoverage] = useState<CoverageReport | null>(null)
+  const [testSuites, setTestSuites] = useState<TestSuite[]>([]);
+  const [selectedSuite, setSelectedSuite] = useState<string | null>(null);
+  const [testResults, setTestResults] = useState<TestResult[]>([]);
+  const [coverage, setCoverage] = useState<CoverageReport | null>(null);
   const [isRunning, setIsRunning] = useState(false);
-  const [output, setOutput] = useState<string[]>([])
-  const [filter, setFilter] = useState<string>('')
-  const [categoryFilter, setCategoryFilter] = useState<string>('all')
-  const [testHistory, setTestHistory] = useState<TestHistory[]>([])
-  const [untestedFiles, setUntestedFiles] = useState<{ components: string[], apis: string[] }>({ components: [], apis: [] })
+  const [output, setOutput] = useState<string[]>([]);
+  const [filter, setFilter] = useState<string>('');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [testHistory, setTestHistory] = useState<TestHistory[]>([]);
+  const [untestedFiles, setUntestedFiles] = useState<{ components: string[], apis: string[] }>({ components: [], apis: [] });
   const [activeTab, setActiveTab] = useState('results');
   const [showAutofixModal, setShowAutofixModal] = useState(false);
   useEffect(() => {
     loadTestSuites();
     loadTestHistory();
     loadUntestedFiles();
-  }, [])
+  }, []);
 
   const loadTestSuites = async () => {
     try {
@@ -104,7 +104,7 @@ export default function TestDashboard() {
     } catch (error: unknown) {
       console.error('Failed to load test suites:', error);
     }
-  }
+  };
 
   const loadTestHistory = async () => {
     try {
@@ -116,7 +116,7 @@ export default function TestDashboard() {
       console.error('Failed to load test history:', error);
       setTestHistory([]);
     }
-  }
+  };
 
   const loadUntestedFiles = async () => {
     try {
@@ -126,7 +126,7 @@ export default function TestDashboard() {
     } catch (error: unknown) {
       console.error('Failed to load untested files:', error);
     }
-  }
+  };
 
   const runTests = async (suitePath?: string, options: { coverage?: boolean, watch?: boolean } = {}) => {
     setIsRunning(true);
@@ -239,7 +239,7 @@ export default function TestDashboard() {
       }
     }
     
-    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' ;})
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url
@@ -294,7 +294,7 @@ export default function TestDashboard() {
             </div>
             <div className="flex space-x-2">
               <Button
-                onClick={() => runTests(undefined, { coverage: true ;})}
+                onClick={() => runTests(undefined, { coverage: true })}
                 disabled={isRunning}
                 variant="default"
               >
@@ -374,7 +374,7 @@ export default function TestDashboard() {
                       selectedSuite === suite.path
                         ? 'border-primary bg-primary/5 shadow-sm'
                         : 'hover:bg-muted hover:shadow-sm'
-                    ;}`}
+                    }`}
                     onClick={() => setSelectedSuite(suite.path)}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -398,10 +398,10 @@ export default function TestDashboard() {
                         />
                         <div className="flex justify-between text-xs mt-1">
                           <span className="text-green-600">{suite.passed} passed</span>
-                          {suite.failed && suite.failed > 0 && <span className="text-destructive">{suite.failed} failed</span>;}
+                          {suite.failed && suite.failed > 0 && <span className="text-destructive">{suite.failed} failed</span>}
                         </div>
                       </div>
-                    );}
+                    )}
                     <Button
                       size="sm"
                       className="mt-2 w-full"
@@ -564,7 +564,7 @@ export default function TestDashboard() {
                     {output.length === 0 ? (
                       <span className="text-muted-foreground">No output yet...</span>
                     ) : (
-                      output.join('\n');
+                      output.join('\n')
                     )}
                   </pre>
                 </ScrollArea>
@@ -602,7 +602,7 @@ export default function TestDashboard() {
                     <div className="space-y-2">
                       {testHistory
                         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                        .slice(0, 10);
+                        .slice(0, 10)
                         .map((run, index) => (
                         <div key={index} className="p-3 border rounded-lg">
                           <div className="flex justify-between items-center">

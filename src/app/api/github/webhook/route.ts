@@ -11,7 +11,7 @@ function verifySignature(payload: string, signature: string | null): boolean {
   
   return crypto.timingSafeEqual(
     Buffer.from(signature),
-    Buffer.from(digest);
+    Buffer.from(digest)
   );
 }
 

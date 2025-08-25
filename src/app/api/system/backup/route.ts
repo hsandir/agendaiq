@@ -316,7 +316,7 @@ async function listBackups() {
     // Get all backup branches
     const { stdout: branches  } = await execAsync('git branch -a', { cwd: process.cwd() });
     const backupBranches = (branches
-      .split('\n');
+      .split('\n')
       .map(branch => String(branch).trim().replace(/^\*\s*/, ''))
       .filter(branch => branch.includes('backup/'))
       .slice(0, 20)); // Limit to 20 most recent

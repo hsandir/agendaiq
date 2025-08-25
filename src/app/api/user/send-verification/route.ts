@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate verification token
-    const token = createHash('sha256');
+    const token = createHash('sha256')
       .update(`${user?.email}-${Date.now()}`)
       .digest('hex');
 

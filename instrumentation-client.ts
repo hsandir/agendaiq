@@ -1,24 +1,33 @@
 import posthog from "posthog-js";
 
 // Initialize PostHog on the client
-if (typeof window !== 'undefined') {
-  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
-    api_host: "/ingest",
-    ui_host: "https://us.posthog.com",
-    person_profiles: 'identified_only', // Updated from 'defaults'
-    capture_pageleave: true,
-    capture_pageview: false, // We handle this manually in PostHogProvider
-    autocapture: true,
-    capture_heatmaps: true,
-    capture_performance: true,
-    // capture_console_errors: true, // Property not available in current PostHog version
-    capture_dead_clicks: true,
-    session_recording: {
-      maskAllInputs: true,
-      // maskTextContent: false, // Property not available in current PostHog version
-    },
-    debug: process.env.NODE_ENV === "development",
-  });
+if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
+  try {
+    posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
+      api_host: "/ingest",
+      ui_host: "https://us.posthog.com",
+      person_profiles: 'identified_only',
+      capture_pageleave: true,
+      capture_pageview: false, // We handle this manually in PostHogProvider
+      autocapture: process.env.NODE_ENV === "production",
+      capture_heatmaps: process.env.NODE_ENV === "production",
+      capture_performance: process.env.NODE_ENV === "production",
+      capture_dead_clicks: process.env.NODE_ENV === "production",
+      session_recording: {
+        maskAllInputs: true,
+      },
+      debug: false, // Disable debug to reduce console noise
+      loaded: (posthog) => {
+        if (process.env.NODE_ENV === "development") {
+          console.log("PostHog loaded successfully");
+        }
+      }
+    });
+  } catch (error) {
+    console.warn("PostHog initialization failed:", error);
+  }
+} else {
+  console.warn("PostHog key not found, analytics disabled");
 }
 
 // Export for compatibility

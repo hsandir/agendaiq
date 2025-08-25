@@ -83,7 +83,7 @@ export async function PUT(request: NextRequest) {
             { department_id: null } // Global roles
           ]
         }
-      });
+      })
     ]);
 
     // Validate that all staff and roles exist within the user's scope

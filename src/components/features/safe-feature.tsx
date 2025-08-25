@@ -30,19 +30,19 @@ export class FeatureErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error(`Feature error in ${this.(props as Record<string, unknown>).feature}:`, error, errorInfo);
+    console.error(`Feature error in ${(this.props as Record<string, unknown>).feature}:`, error, errorInfo);
   }
 
   public render() {
     if (this.state.hasError) {
-      if (this.(props as Record<string, unknown>).fallback) {
-        return <>{this.(props as Record<string, unknown>).fallback}</>;
+      if ((this.props as Record<string, unknown>).fallback) {
+        return <>{(this.props as Record<string, unknown>).fallback}</>;
       }
       
-      return <FeatureError feature={this.(props as Record<string, unknown>).feature} error={this.state.error} />;
+      return <FeatureError feature={(this.props as Record<string, unknown>).feature} error={this.state.error} />;
     }
 
-    return this.(props as Record<string, unknown>).children;
+    return (this.props as Record<string, unknown>).children;
   }
 }
 

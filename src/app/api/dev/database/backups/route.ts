@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
           return {
             name: file,
             size: `${(stats.size / (1024 * 1024)).toFixed(1)} MB`,
-            date: stats.mtime.toISOString().replace('T', ' ').slice(0, 16);
+            date: stats.mtime.toISOString().replace('T', ' ').slice(0, 16)
           };
         })
       );

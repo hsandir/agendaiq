@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
       prisma.role.count(),
       prisma.school.count(),
       prisma.district.count(),
-      prisma.session.count();
+      prisma.session.count()
     ]);
 
     // Calculate total records

@@ -39,7 +39,7 @@ export class PerformanceMonitor {
     const startTime = Date.now();
     const startMemory = process.memoryUsage();
 
-    return handler();
+    return handler()
       .then((result) => {
         const duration = Date.now() - startTime;
         const endMemory = process.memoryUsage();
@@ -88,7 +88,7 @@ export class PerformanceMonitor {
   ): Promise<T> {
     const startTime = Date.now();
 
-    return handler();
+    return handler()
       .then((result) => {
         const duration = Date.now() - startTime;
         

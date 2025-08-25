@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -921,7 +921,7 @@ export default function TeamDetailPage() {
                             <div className="flex items-start gap-3">
                               {activity.user && (
                                 <Avatar className="h-8 w-8">
-                                  <AvatarImage src={activity.(user as Record<string, unknown>).image || undefined} />
+                                  <AvatarImage src={(activity.user as Record<string, unknown>).image as string || undefined} />
                                   <AvatarFallback className="text-xs">
                                     {activity.user.name?.charAt(0) || activity.user.email?.charAt(0)}
                                   </AvatarFallback>

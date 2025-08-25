@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     // SECURITY FIX: Add input validation schema
     const signupSchema = z.object({
       email: z.string().email("Invalid email format").toLowerCase(),
-      password: z.string().min(8, "Password must be at least 8 characters");
+      password: z.string().min(8, "Password must be at least 8 characters")
     });
 
     const validationResult = signupSchema.safeParse(body);

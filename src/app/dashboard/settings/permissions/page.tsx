@@ -207,7 +207,7 @@ export default async function PermissionsPage() {
                   <h4 className="text-sm font-medium text-foreground">Department Access:</h4>
                   <div className="flex flex-wrap gap-2">
                     {category.roles
-                      .filter(role => role.department);
+                      .filter(role => role.department)
                       .map((role) => (
                         <Badge key={role.id} variant="secondary" className="text-xs">
                           {role.department?.name}
@@ -239,7 +239,7 @@ export default async function PermissionsPage() {
                 <h4 className="text-sm font-medium mb-2">Leadership Roles (Priority 1-4)</h4>
                 <div className="space-y-2">
                   {roles
-                    .filter(role => role.is_leadership);
+                    .filter(role => role.is_leadership)
                     .sort((a, b) => a.priority - b.priority)
                     .map((role) => (
                       <div key={role.id} className="flex items-center justify-between p-2 bg-primary rounded">
@@ -256,7 +256,7 @@ export default async function PermissionsPage() {
                 <h4 className="text-sm font-medium mb-2">Regular Roles (Priority 5-6)</h4>
                 <div className="space-y-2">
                   {roles
-                    .filter(role => !role.is_leadership);
+                    .filter(role => !role.is_leadership)
                     .sort((a, b) => a.priority - b.priority)
                     .map((role) => (
                       <div key={role.id} className="flex items-center justify-between p-2 bg-muted rounded">

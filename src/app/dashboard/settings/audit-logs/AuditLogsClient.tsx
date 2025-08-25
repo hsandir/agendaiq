@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Download as FiDownload, Eye as FiEye, Trash2 as FiTrash2, Edit as FiEdit, RefreshCw as FiRefreshCw, User as FiUser, Users as FiUserIcon, Database as FiDatabase, Activity as FiActivity, Shield as FiShield, AlertTriangle as FiAlertTriangle } from 'lucide-react';
 import { isrole, RoleKey } from '@/lib/auth/policy';
 import type { UserWithstaff, SessionUser } from '@/types/auth';
@@ -781,7 +781,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        isCritical ? 'bg-muted text-foreground' : getOperationBadge(log.operation);
+                        isCritical ? 'bg-muted text-foreground' : getOperationBadge(log.operation)
                       }`}>
                         {isCritical ? log.action : log.operation}
                       </span>
@@ -857,7 +857,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                       )}
                     </td>
                   </tr>
-                );
+                )
               })}
             </tbody>
           </table>

@@ -242,7 +242,7 @@ async function getDetailedPackageStatus() {
       current: info.current,
       wanted: info.wanted,
       latest: info.latest,
-      type: getUpdateType(info.current, info.latest);
+      type: getUpdateType(info.current, info.latest)
     })));
 
     return {
@@ -258,7 +258,7 @@ async function getDetailedPackageStatus() {
           current: info.current,
           wanted: info.wanted,
           latest: info.latest,
-          type: getUpdateType(info.current, info.latest);
+          type: getUpdateType(info.current, info.latest)
         })));
         return { outdated: outdatedList, total: outdatedList.length };
       } catch {

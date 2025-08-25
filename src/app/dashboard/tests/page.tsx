@@ -310,7 +310,7 @@ export default function TestDashboard() {
                     {output.length === 0 ? (
                       <span className="text-muted-foreground">No output yet...</span>
                     ) : (
-                      output.join('\n');
+                      output.join('\n')
                     )}
                   </pre>
                 </ScrollArea>

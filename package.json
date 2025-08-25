@@ -59,7 +59,15 @@
     "fix:agendaiq": "node .claude/agendaiq-eslint-agent.js",
     "fix:agendaiq:watch": "node .claude/agendaiq-eslint-agent.js --watch",
     "lock:list": "node .claude/file-lock-manager.js list",
-    "lock:cleanup": "node .claude/file-lock-manager.js cleanup"
+    "lock:cleanup": "node .claude/file-lock-manager.js cleanup",
+    "safe-lint": "node scripts/safe-lint-enforcer.js",
+    "safe-lint:dry-run": "node scripts/safe-lint-enforcer.js --dry-run",
+    "safe-lint:jsx": "node scripts/safe-lint-enforcer.js --mode jsx",
+    "safe-lint:casting": "node scripts/safe-lint-enforcer.js --mode casting",
+    "safe-lint:imports": "node scripts/safe-lint-enforcer.js --mode imports",
+    "safe-lint:production": "node scripts/safe-lint-enforcer.js --max-files 3 --allow-errors 0",
+    "safe-lint:components": "node scripts/safe-lint-enforcer.js --pattern 'src/components/**/*.{ts,tsx}'",
+    "safe-lint:api": "node scripts/safe-lint-enforcer.js --pattern 'src/app/api/**/*.ts'"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",

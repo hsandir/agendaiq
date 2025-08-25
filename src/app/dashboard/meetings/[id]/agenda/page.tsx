@@ -153,7 +153,7 @@ export default async function MeetingAgendaPage({ params }: PageProps) {
   const staffForAgenda = (allStaff.map(staff => ({
     id: staff.id,
     name: staff.users.name ?? staff.users.email ?? 'Unknown',
-    initials: staff.users.name?.split(' ').map(n => n[0]).join('').toUpperCase();
+    initials: staff.users.name?.split(' ').map(n => n[0]).join('').toUpperCase()
   })));
 
   return (

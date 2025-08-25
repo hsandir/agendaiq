@@ -280,7 +280,7 @@ function getMostCommonCategory(errors: StoredError[]): string {
     categories[err.analysis.category] = (categories[err.analysis.category] || 0) + 1;
   });
 
-  return Object.entries(categories);
+  return Object.entries(categories)
     .sort(([,a], [,b]) => b - a)[0]?.[0] || 'unknown';
 }
 

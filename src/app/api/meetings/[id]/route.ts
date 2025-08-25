@@ -179,7 +179,7 @@ export async function GET(request: NextRequest, props: Props) {
         },
         orderBy: { created_at: 'desc' },
         take: 20 // Limit notes
-      });
+      })
     ]);
 
     // Combine the data

@@ -61,7 +61,7 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
           // Only auto-expand if the current path is a child of this item
           if (item.children && item.children.length > 0) {
             const isChildActive = item.children.some(child => 
-              pathname === child.href || pathname.startsWith(child.href + '/');
+              pathname === child.href || pathname.startsWith(child.href + '/')
             );
             
             if (isChildActive && !newExpanded.has(item.href)) {
@@ -72,7 +72,7 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
               item.children.forEach(child => {
                 if (child.children && child.children.length > 0) {
                   const isNestedChildActive = child.children.some(nested => 
-                    pathname === nested.href || pathname.startsWith(nested.href + '/');
+                    pathname === nested.href || pathname.startsWith(nested.href + '/')
                   );
                   if (isNestedChildActive && !newExpanded.has(child.href)) {
                     newExpanded.add(child.href);

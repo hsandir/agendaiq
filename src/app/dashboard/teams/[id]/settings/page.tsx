@@ -183,9 +183,10 @@ export default function TeamSettingsPage() {
         }
       });
     } catch (err) {
-    if (err instanceof Error) {
       if (err instanceof Error) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err.message);
+      } else {
+        setError('An error occurred');
       }
     } finally {
       setLoading(false);
@@ -1134,5 +1135,4 @@ export default function TeamSettingsPage() {
       </Dialog>
     </div>
   );
-}
 }
