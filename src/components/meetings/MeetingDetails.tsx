@@ -85,7 +85,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
         // Try to fetch agenda items and notes from API
         const [agendaResponse, notesResponse] = await Promise.all([
           fetch(`/api/meetings/${meeting.id}/agenda`),
-          fetch(`/api/meetings/${meeting.id}/notes`);
+          fetch(`/api/meetings/${meeting.id}/notes`)
         ]);
 
         if (agendaResponse.ok) {
@@ -124,7 +124,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
     };
 
     fetchMeetingData();
-  }, [(meeting.id)]);
+  }, [meeting.id]);
 
   const addNote = async () => {
     if (newNote.trim()) {
@@ -192,7 +192,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
     setAgendaItems(items =>
       items.map(item =>
         item.id === id ? { ...item, completed: !item.completed } : item
-      );
+      )
     );
   };
 
@@ -275,13 +275,13 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Start Time</label>
                     <p className="text-sm text-foreground">
-                      {safeFormatDateTime(meeting.start_time, undefined, 'No start time')}
+                      {safeFormatDateTime(meeting.startTime, undefined, 'No start time')}
                     </p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">End Time</label>
                     <p className="text-sm text-foreground">
-                      {safeFormatDateTime(meeting.end_time, undefined, 'No end time')}
+                      {safeFormatDateTime(meeting.endTime, undefined, 'No end time')}
                     </p>
                   </div>
                   <div>

@@ -98,7 +98,7 @@ interface TabsContentProps {
 }
 
 const TabsContent = ({ value, children, className }: TabsContentProps) => {
-  const { value: _selectedValue } = useTabsContext();
+  const { value: selectedValue } = useTabsContext();
   
   if (selectedValue !== value) {
     return null;

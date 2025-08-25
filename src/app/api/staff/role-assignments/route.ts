@@ -25,7 +25,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const { _user } = authResult;
+    const { user } = authResult;
 
     // Only system admins and school admins can modify role assignments
     if (!user.is_system_admin && !(user as any).is_school_admin) {

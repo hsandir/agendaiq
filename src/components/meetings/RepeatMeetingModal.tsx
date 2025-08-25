@@ -308,7 +308,7 @@ export function RepeatMeetingModal({
                               ...config,
                               weekDays: checked
                                 ? [...days, day.value]
-                                : days.filter(d => d !== day.value);
+                                : days.filter(d => d !== day.value)
                             });
                           }}
                         />

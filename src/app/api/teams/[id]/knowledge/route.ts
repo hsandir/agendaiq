@@ -52,7 +52,7 @@ export async function GET(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
+    const { user } = auth;
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
 
@@ -202,7 +202,7 @@ export async function POST(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
+    const { user } = auth;
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
 
@@ -332,7 +332,7 @@ export async function PUT(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
+    const { user } = auth;
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
 
@@ -476,7 +476,7 @@ export async function DELETE(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { _user } = auth;
+    const { user } = auth;
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
 

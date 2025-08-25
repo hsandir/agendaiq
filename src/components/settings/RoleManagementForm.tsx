@@ -69,7 +69,7 @@ export function RoleManagementForm() {
           headers: {
             'Content-Type': 'application/json',
           },
-        });
+        })
       ]);
 
       if (!deptRes.ok || !rolesRes.ok || !usersRes.ok) {
@@ -79,7 +79,7 @@ export function RoleManagementForm() {
       const [deptData, rolesData, usersData] = await Promise.all([
         deptRes.json(),
         rolesRes.json(),
-        usersRes.json();
+        usersRes.json()
       ]);
 
       // Handle APIResponse format for each endpoint

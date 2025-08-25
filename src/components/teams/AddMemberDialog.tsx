@@ -93,9 +93,10 @@ export function AddMemberDialog({
       
       setAvailableStaff(available);
     } catch (error) {
-    if (error instanceof Error) {
-      console.error('Error fetching staff:', error);
-      toast.error(`Failed to load available staff: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      if (error instanceof Error) {
+        console.error('Error fetching staff:', error);
+        toast.error(`Failed to load available staff: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
     } finally {
       setLoading(false);
     }

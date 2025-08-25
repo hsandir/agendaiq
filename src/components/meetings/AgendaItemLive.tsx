@@ -492,7 +492,7 @@ export function AgendaItemLive({
                 id="future-implications"
                 checked={editData.future_implications}
                 onCheckedChange={(checked) => 
-                  setEditData({ ...editData, future_implications: checked as boolean });
+                  setEditData({ ...editData, future_implications: checked as boolean })
                 }
               />
               <label 
