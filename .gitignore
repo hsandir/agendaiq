@@ -133,6 +133,25 @@ migrations/
 MIGRATION_*.md
 SUPABASE_*.txt
 LOCAL_*.sql
+
+# All SQL files with sensitive data
+backup_*.sql
+restore*.sql
+supabase*.sql
+*backup*.sql
+create-*.sql
+migrate-*.sql
+add-*.sql
+*.sql
+!prisma/schema.prisma
+!.env.example
+
+# Environment files with credentials  
+.env.production
+.env.vercel.check
+.env.local
+.env.development
+.env.test
 organization_structure*.json
 postcss.config*.js
 prisma/migrations/migration_lock*.toml
