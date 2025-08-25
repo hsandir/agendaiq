@@ -80,7 +80,7 @@ export class EmailService {
   async sendEmail(data: EmailTemplateData): Promise<void> {
     try {
       const transporter = await this.getTransporter();
-      const { html, text } = await this.renderTemplate(data);
+      const { _html, _text } = await this.renderTemplate(data);
 
       const mailOptions = {
         from: {
@@ -100,6 +100,7 @@ export class EmailService {
       const result = await transporter.sendMail(mailOptions);
       console.log('Email sent successfully:', result.messageId);
     } catch (error) {
+    if (error instanceof Error) {
       console.error('Failed to send email:', error);
       throw new Error(`Email sending failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }

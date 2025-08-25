@@ -62,7 +62,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: auth.error || 'Auth required' }, { status: auth.statusCode || 401 });
     }
     
-    const { _layout } = (await request.json()) as Record<_string, unknown>;
+    const { __layout } = (await request.json()) as Record<__string, unknown>;
     if (!layout) {
       return NextResponse.json({ error: 'Layout required' }, { status: 400 });
     }

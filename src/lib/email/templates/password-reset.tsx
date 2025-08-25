@@ -7,7 +7,7 @@ interface PasswordResetTemplateProps {
 }
 
 export function PasswordResetTemplate({ data }: PasswordResetTemplateProps) {
-  const { userName, resetUrl, expiresIn } = data;
+  const { _userName, _resetUrl, _expiresIn } = data;
 
   return (
     <BaseEmailTemplate

@@ -143,7 +143,7 @@ interface TeamActivity {
 }
 
 export default function TeamDetailPage() {
-  const { toast } = useToast();
+  const { _toast } = useToast();
   const params = useParams();
   const router = useRouter();
   const [team, setTeam] = useState<Team | null>(null);
@@ -194,7 +194,9 @@ export default function TeamDetailPage() {
       }
     } catch (err) {
       if (err instanceof Error) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        setError(err.message);
+      } else {
+        setError('An error occurred');
       }
     } finally {
       setLoading(false);
@@ -919,7 +921,7 @@ export default function TeamDetailPage() {
                             <div className="flex items-start gap-3">
                               {activity.user && (
                                 <Avatar className="h-8 w-8">
-                                  <AvatarImage src={activity.user.image || undefined} />
+                                  <AvatarImage src={activity.(user as Record<string, unknown>).image || undefined} />
                                   <AvatarFallback className="text-xs">
                                     {activity.user.name?.charAt(0) || activity.user.email?.charAt(0)}
                                   </AvatarFallback>

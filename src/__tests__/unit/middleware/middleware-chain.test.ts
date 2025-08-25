@@ -40,7 +40,7 @@ describe('Middleware Chain Tests', () => {
         }
       } as unknown as NextRequest;
       
-      const { _RateLimiters } = await import('@/lib/utils/rate-limit');
+      const { __RateLimiters } = await import('@/lib/utils/rate-limit');
       (RateLimiters.api.check as jest.Mock).mockResolvedValue({ success: true });
       
       const result = await rateLimitMiddleware(request);
@@ -59,7 +59,7 @@ describe('Middleware Chain Tests', () => {
         }
       } as unknown as NextRequest;
       
-      const { _RateLimiters } = await import('@/lib/utils/rate-limit');
+      const { __RateLimiters } = await import('@/lib/utils/rate-limit');
       (RateLimiters.api.check as jest.Mock).mockResolvedValue({ 
         success: false, 
         error: 'Rate limit exceeded' 
@@ -107,7 +107,7 @@ describe('Middleware Chain Tests', () => {
         nextUrl: new URL('http://localhost:3000/dashboard')
       } as unknown as NextRequest;
       
-      const { _getToken } = await import('next-auth/jwt');
+      const { __getToken } = await import('next-auth/jwt');
       (getToken as jest.Mock).mockResolvedValue({
         id: '1',
         email: 'test@test.com',
@@ -134,7 +134,7 @@ describe('Middleware Chain Tests', () => {
         '/api/setup/check',
       ];
       
-      const { _getToken } = await import('next-auth/jwt');
+      const { __getToken } = await import('next-auth/jwt');
       (getToken as jest.Mock).mockResolvedValue(null);
       
       for (const path of publicPaths) {
@@ -161,7 +161,7 @@ describe('Middleware Chain Tests', () => {
         '/api/test-sentry', // Should require DEV_DEBUG capability
       ];
       
-      const { _getToken } = await import('next-auth/jwt');
+      const { __getToken } = await import('next-auth/jwt');
       (getToken as jest.Mock).mockResolvedValue(null);
       
       for (let i = 0; i < protectedPaths.length; i++) {

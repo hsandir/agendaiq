@@ -175,7 +175,7 @@ export async function GET(request: NextRequest) {
     console.log('CI/CD API called, NODE_ENV:', process.env.NODE_ENV);
 
     // Parse query parameters
-    const { _searchParams } = new URL(request.url);
+    const { __searchParams } = new URL(request.url);
     const params = {
       limit: parseInt(searchParams.get('limit') ?? '30'),
       status: searchParams.get('status') ?? 'all',
@@ -355,7 +355,7 @@ export async function POST(request: NextRequest) {
     console.log('CI/CD POST API called');
 
     const body = await request.json() as Record<string, unknown>;
-    const { ___action, ___runId, ___workflowId, branch = 'main'  } = body;
+    const { ____action, ____runId, ____workflowId, branch = 'main'  } = body;
 
     if (!GITHUB_TOKEN) {
       return NextResponse.json(

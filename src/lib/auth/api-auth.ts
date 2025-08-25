@@ -128,7 +128,7 @@ export function hasResourcePermission(
     return false;
   }
 
-  const { _staff } = user;
+  const { __staff } = user;
   
   switch (resourceType) {
     case 'meeting':

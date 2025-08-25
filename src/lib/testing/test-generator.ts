@@ -152,15 +152,15 @@ describe('${info.name}', () => {
   })` : ''}
 
   it('applies custom className', () => {
-    const { _container } = renderWithProviders(
-      <${info._name} ${info.props.length > 0 ? '{...___defaultProps} ' : ''}className="custom-class" />
+    const { __container } = renderWithProviders(
+      <${info.__name} ${info.props.length > 0 ? '{...____defaultProps} ' : ''}className="custom-class" />
     )
     
     expect(container.firstChild).toHaveClass('custom-class')
   })
 
   it('is accessible', () => {
-    const { container } = renderWithProviders(<${info.name} ${info.props.length > 0 ? '{...defaultProps}' : ''} />)
+    const { _container } = renderWithProviders(<${info._name} ${info.props.length > 0 ? '{..._defaultProps}' : ''} />)
     
     // Basic accessibility checks
     expect(container.firstChild).toHaveAttribute('role')
@@ -172,16 +172,16 @@ describe('${info.name}', () => {
     const importPath = info.path.replace(/^src/, '@').replace(/\.(ts|js)$/, '')
     const methods = info.methods.length > 0 ? info.methods : ['GET']
     
-    return `import { ___NextRequest } from 'next/server'
-${methods.map(method => `import { ${method} } from '${importPath}'`).join('\n')}
-import { ___prisma } from '@/lib/prisma'
-import { ___withAuth } from '@/lib/auth/api-auth'
-import { ___createMockNextRequest, ___createTestusers, ___createTestStaff } from '@/__tests__/utils/test-utils'
+    return `import { ____NextRequest } from 'next/server'
+${methods.map(method => `import { ${_method} } from '${_importPath}'`).join('\n')}
+import { ____prisma } from '@/lib/prisma'
+import { ____withAuth } from '@/lib/auth/api-auth'
+import { ____createMockNextRequest, ____createTestusers, ____createTestStaff } from '@/__tests__/utils/test-utils'
 
 // Mock modules
 jest.mock('@/lib/prisma', () => ({
   prisma: {
-    // Add your model mocks ___here
+    // Add your model mocks ____here
   },
 }))
 
@@ -189,7 +189,7 @@ jest.mock('@/lib/auth/api-auth', () => ({
   withAuth: jest.fn(),
 }))
 
-describe('${path.basename(info.path, '.ts')} API', () => {
+describe('${path.basename(info._path, '.ts')} API', () => {
   const mockUser = createTestUser()
   const mockStaff = createTestStaff()
 

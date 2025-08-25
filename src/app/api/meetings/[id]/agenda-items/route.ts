@@ -166,7 +166,7 @@ export async function POST(request: NextRequest, props: Props) {
     if (isSingleAddition) {
       // For single item addition, just add it without deleting existing items
       // Remove id field if it exists to avoid unique constraint error
-      const { id: _id, ...itemData } = result.data.items[0];
+      const { id: __id, ..._itemData } = result.data.items[0];
       const newItem = await prisma.meeting_agenda_items.create({
         data: {
           meeting_id: meetingId,
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest, props: Props) {
       // Remove id field from each item to avoid unique constraint errors
       await prisma.meeting_agenda_items.createMany({
         data: result.data.items.map(item => {
-          const { id: _id, ...itemData } = item;
+          const { id: __id, ..._itemData } = item;
           return {
             meeting_id: meetingId,
             ...itemData,
@@ -355,7 +355,7 @@ export async function PUT(request: NextRequest, props: Props) {
     const createdItems = await Promise.all(
       result.data.items.map(async (item, index) => {
         // Remove id field if it exists to avoid unique constraint error
-        const { id: _id, ...itemData } = item as any;
+        const { id: __id, ..._itemData } = item as any;
         
         return prisma.meeting_agenda_items.create({
           data: {

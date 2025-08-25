@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json() as Record<string, unknown>;
-    const { name, _address } = body;
+    const { _name, __address } = body;
 
     if (!name) {
       return NextResponse.json(

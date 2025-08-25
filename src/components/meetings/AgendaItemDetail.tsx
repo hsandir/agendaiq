@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { getSafeDate, safeFormatDate } from '@/lib/utils/safe-date';
+import { toast } from 'sonner';
 import type { 
   AgendaItemWithRelations, 
   MeetingWithRelations, 
@@ -96,6 +97,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
 
       if (response.ok) {
         setIsEditing(false);
+        toast.success('Agenda item updated successfully');
         
         // Handle ongoing status actions
         if (editData.status === 'Ongoing' && ongoingChoice) {
@@ -108,10 +110,15 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
           }
         }
         
-        router.refresh();
+        // Redirect back to agenda items list
+        router.push(`/dashboard/meetings/${meeting.id}/agenda`);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        toast.error(errorData.error || 'Failed to update agenda item');
       }
     } catch (error: unknown) {
       console.error('Error saving:', error);
+      toast.error('Failed to update agenda item');
     } finally {
       setIsSaving(false);
       setShowOngoingDialog(false);
@@ -352,7 +359,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
             <div className="bg-card rounded-xl shadow-sm border border-border p-6">
               <AgendaItemComments
                 itemId={item.id}
-                comments={item.comments ?? []}
+                comments={item.agenda_item_comments ?? []}
                 onAddComment={handleAddComment}
                 canComment={true}
               />
@@ -559,9 +566,9 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                 )}
               </div>
               
-              {item.attachments?.length > 0 ? (
+              {item.agenda_item_attachments?.length > 0 ? (
                 <div className="space-y-2">
-                  {item.attachments.map((attachment) => (
+                  {item.agenda_item_attachments.map((attachment) => (
                     <div key={attachment.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted">
                       <FileText className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm text-foreground">{attachment.file_name}</span>

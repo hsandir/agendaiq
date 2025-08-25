@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const { _type, _message, _restore, _components  } = (await request.json()) as Record<_string, unknown>;
+    const { __type, __message, __restore, __components  } = (await request.json()) as Record<__string, unknown>;
 
     if (type === 'create') {
       return await createBackup(message);
@@ -81,8 +81,8 @@ async function createBackup(message: string = 'Manual backup') {
     const branchName = `backup/manual-${timestamp}`;
     
     // Get current branch and status
-    const { stdout: _currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
-    const { stdout: ___status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: ____status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
     
     // Create backup info
     const backupInfo = {
@@ -136,12 +136,12 @@ async function pushToGitHub(message: string = 'Automated backup') {
     const timestamp = new Date().toISOString();
     
     // Get current branch
-    const { stdout: _currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
     
     // Stage and commit all changes
     await execAsync('git add -A', { cwd: process.cwd() });
     
-    const { stdout: ___status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    const { stdout: ____status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
     if (String(status).trim()) {
       // Sanitize commit message to prevent command injection
       const sanitizedMessage = message.replace(/[^a-zA-Z0-9\s\-_.]/g, '').substring(0, 100);
@@ -150,9 +150,9 @@ async function pushToGitHub(message: string = 'Automated backup') {
 
     // Try to push to GitHub
     try {
-      const { stdout: ___pushOutput  } = await execAsync(`git push origin ${String(currentBranch).trim()}`, { 
+      const { stdout: ____pushOutput  } = await execAsync(`git push origin ${String(currentBranch).trim()}`, { 
         cwd: process.cwd(),
-        timeout: ___30000 
+        timeout: ____30000 
       });
 
       const backupInfo = {
@@ -208,7 +208,7 @@ async function autoBackup(triggerReason: string = 'System update') {
     const branchName = `backup/auto-${timestamp.replace(/[:.]/g, '-')}`;
     
     // Get project status
-    const { stdout: ___status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    const { stdout: ____status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
     
     if (!String(status).trim()) {
       return NextResponse.json({
@@ -225,7 +225,7 @@ async function autoBackup(triggerReason: string = 'System update') {
     await execAsync(`git commit -m "Auto-backup: ${sanitizedReason} - ${timestamp}"`, { cwd: process.cwd() });
     
     // Create backup branch
-    const { stdout: _currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
     await execAsync(`git branch ${branchName}`, { cwd: process.cwd() });
 
     const backupInfo: Record<string, unknown> = {
@@ -269,7 +269,7 @@ async function autoBackup(triggerReason: string = 'System update') {
 async function restoreBackup(backupBranch: string) {
   try {
     // Get current status
-    const { stdout: _currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
     
     // Checkout to backup branch
     await execAsync(`git checkout ${backupBranch}`, { cwd: process.cwd() });
@@ -314,7 +314,7 @@ async function restoreBackup(backupBranch: string) {
 async function listBackups() {
   try {
     // Get all backup branches
-    const { stdout: ___branches  } = await execAsync('git branch -a', { cwd: process.cwd() });
+    const { stdout: ____branches  } = await execAsync('git branch -a', { cwd: process.cwd() });
     const backupBranches = (branches
       .split('\n')
       .map(branch => String(branch).trim().replace(/^\*\s*/, ''))
@@ -385,9 +385,9 @@ async function listBackups() {
 
 async function getBackupStatus() {
   try {
-    const { stdout: _currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
-    const { stdout: ___status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
-    const { stdout: ___lastCommit  } = await execAsync('git log -1 --format="%H %s %ad" --date=iso', { cwd: process.cwd() });
+    const { stdout: __currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
+    const { stdout: ____status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    const { stdout: ____lastCommit  } = await execAsync('git log -1 --format="%H %s %ad" --date=iso', { cwd: process.cwd() });
     
     // Check GitHub connection
     let githubStatus = 'unknown';
@@ -399,7 +399,7 @@ async function getBackupStatus() {
     }
 
     // Get backup count
-    const { stdout: ___branches  } = await execAsync('git branch -a', { cwd: process.cwd() });
+    const { stdout: ____branches  } = await execAsync('git branch -a', { cwd: process.cwd() });
     const backupCount = branches.split('\n').filter(branch => branch.includes('backup/')).length;
 
     return NextResponse.json({
@@ -448,7 +448,7 @@ async function saveBackupMetadata(backupInfo: Record<string, unknown>) {
 
 async function getProjectFiles() {
   try {
-    const { _stdout } = await execAsync('find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.json" | grep -v node_modules | grep -v .next | head -20', { cwd: process.cwd() });
+    const { __stdout } = await execAsync('find . -type f -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.json" | grep -v node_modules | grep -v .next | head -20', { cwd: process.cwd() });
     return stdout.split('\n').filter(line => String(line).trim()).length;
   } catch {
     return 0;
@@ -457,7 +457,7 @@ async function getProjectFiles() {
 
 async function getDiskUsage() {
   try {
-    const { _stdout } = await execAsync('du -sh .', { cwd: process.cwd() });
+    const { __stdout } = await execAsync('du -sh .', { cwd: process.cwd() });
     return stdout.split('\t')[0];
   } catch {
     return 'Unknown';

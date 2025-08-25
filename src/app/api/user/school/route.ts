@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json() as Record<string, unknown>;
-    const { _schoolId } = body;
+    const { __schoolId } = body;
 
     if (!schoolId) {
       return new NextResponse("School ID is required", { status: 400 });

@@ -73,7 +73,7 @@ export function CreateTeamDialog({
   onOpenChange,
   onSubmit,
 }: CreateTeamDialogProps) {
-  const { toast } = useToast();
+  const { _toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [staffLoading, setStaffLoading] = useState(false);
   const [staff, setStaff] = useState<StaffMember[]>([]);

@@ -20,12 +20,12 @@ export async function GET(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
-    const { _searchParams } = new URL(request?.url);
+    const { __searchParams } = new URL(request?.url);
     const limit = searchParams.get('limit') ?? '50';
     
     // Get commit history with stats
-    const { _stdout } = await execAsync(
-      `git log --pretty=format:'%H|%h|%an|%ar|%s' --stat -n ${___limit}`
+    const { __stdout } = await execAsync(
+      `git log --pretty=format:'%H|%h|%an|%ar|%s' --stat -n ${____limit}`
     );
     
     const commits: Array<{

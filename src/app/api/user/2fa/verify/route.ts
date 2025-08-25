@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
-    const { _code } = (await request.json()) as Record<_string, unknown>;
+    const { __code } = (await request.json()) as Record<__string, unknown>;
 
     if (!code) {
       return new NextResponse("Verification code is required", { status: 400 });

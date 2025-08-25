@@ -15,9 +15,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.statusCode });
     }
     // Get list of test files from Jest
-    const { stdout } = await execAsync('npm test -- --listTests', {
+    const { _stdout } = await execAsync('npm test -- --listTests', {
       cwd: process.cwd(),
-      env: { ...process.env, CI: 'true' }
+      env: { ...process._env, CI: 'true' }
     });
 
     // Parse test files from output
@@ -132,6 +132,7 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
+    if (error instanceof Error) {
     console.error('Error discovering test suites:', error);
     
     // Return empty array if Jest is not configured or no tests found

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest, props: Props) {
       );
     }
 
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const format = searchParams.get('format') || 'json';
     const teamId = params.id;
 

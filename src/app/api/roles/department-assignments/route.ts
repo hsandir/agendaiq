@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { _assignments } = result.data;
+    const { __assignments } = result.data;
 
     // Update role department assignments in database
     const updatePromises = assignments.map(async ({ roleId, departmentId }) => {

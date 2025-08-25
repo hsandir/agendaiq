@@ -44,7 +44,7 @@ export default async function AgendaItemPage(props: Props) {
           department: true
         }
       },
-      comments: {
+      agenda_item_comments: {
         include: {
           staff: {
             include: {
@@ -57,7 +57,7 @@ export default async function AgendaItemPage(props: Props) {
           created_at: 'desc'
         }
       },
-      action_items: {
+      meeting_action_items: {
         include: {
           staff_meeting_action_items_assigned_toTostaff: {
             include: {
@@ -67,7 +67,7 @@ export default async function AgendaItemPage(props: Props) {
           }
         }
       },
-      attachments: true
+      agenda_item_attachments: true
     }
   });
 
@@ -97,7 +97,7 @@ export default async function AgendaItemPage(props: Props) {
   return (
     <AgendaItemDetail
       item={agendaItem as Record<string, unknown>}
-      meeting={agendaItem.Meeting as Record<string, unknown>}
+      meeting={agendaItem.meeting as Record<string, unknown>}
       currentUser={user}
       allStaff={allStaff as Record<string, unknown>}
       canEdit={isOrganizer ?? (hasAdminAccess || isResponsible)}

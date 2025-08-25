@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
-    const { _type } = (await request.json()) as Record<_string, unknown>;
+    const { __type } = (await request.json()) as Record<__string, unknown>;
 
     if (type === 'react-version-mismatch') {
       return await fixReactVersionMismatch();
@@ -68,9 +68,9 @@ async function fixReactVersionMismatch() {
     for (const command of fixCommands) {
       try {
         console.log(`Running: ${command}`);
-        const { _stdout, _stderr } = await execAsync(___command, { 
+        const { __stdout, __stderr } = await execAsync(____command, { 
           cwd: process.cwd(),
-          timeout: 120000 // 2 ___minutes
+          timeout: 120000 // 2 ____minutes
         });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
@@ -137,7 +137,7 @@ async function fixNodeModulesIssues() {
     const results = [];
     for (const command of fixCommands) {
       try {
-        const { _stdout } = await execAsync(___command, { cwd: process.cwd(), timeout: ___120000 });
+        const { __stdout } = await execAsync(____command, { cwd: process.cwd(), timeout: ____120000 });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
@@ -230,7 +230,7 @@ module.exports = {
     const results = [];
     for (const command of commands) {
       try {
-        const { _stdout } = await execAsync(___command, { cwd: process.cwd(), timeout: ___60000 });
+        const { __stdout } = await execAsync(____command, { cwd: process.cwd(), timeout: ____60000 });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
@@ -264,7 +264,7 @@ async function fixNextCacheIssues() {
     const results = [];
     for (const command of commands) {
       try {
-        const { _stdout } = await execAsync(___command, { cwd: process.cwd(), timeout: ___30000 });
+        const { __stdout } = await execAsync(____command, { cwd: process.cwd(), timeout: ____30000 });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });

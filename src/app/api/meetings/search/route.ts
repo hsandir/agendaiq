@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Staff record not found" }, { status: 404 });
     }
 
-    const { _searchParams } = new URL(request.url);
+    const { __searchParams } = new URL(request.url);
     const query = searchParams.get('q') ?? '';
 
     if (query.length < 2) {

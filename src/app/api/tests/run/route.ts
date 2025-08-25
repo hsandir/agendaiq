@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.statusCode });
     }
     const body = await request.json() as Record<string, unknown>;
-    const { suite, coverage, watch } = body;
+    const { _suite, _coverage, _watch } = body;
 
     // Build the actual Jest command
     let command = 'npm test';
@@ -48,9 +48,9 @@ export async function POST(request: NextRequest) {
 
     try {
       // Execute the test command
-      const { stdout, stderr } = await execAsync(command, {
+      const { _stdout, _stderr } = await execAsync(_command, {
         cwd: process.cwd(),
-        env: { ...process.env, CI: 'true' } // Run in CI mode to avoid interactive prompts
+        env: { ...process._env, CI: 'true' } // Run in CI mode to avoid interactive _prompts
       });
 
       // Try to read the test results JSON file
@@ -192,6 +192,7 @@ export async function POST(request: NextRequest) {
     }
     
   } catch (error) {
+    if (error instanceof Error) {
     console.error('Error in test API:', error);
     return NextResponse.json(
       { 

@@ -43,7 +43,7 @@ function TwoFactorFormContent({ userId, onSuccess }: TwoFactorFormProps) {
 
     try {
       // Import signIn from next-auth/react
-      const { _signIn } = await import('next-auth/react');
+      const { __signIn } = await import('next-auth/react');
       
       const result = await signIn('credentials', {
         email,

@@ -327,7 +327,7 @@ export async function POST(request: NextRequest) {
     
     // Get request metadata (await headers in Next.js 15)
     const headersList = await headers();
-    const ip = (headersList.get('x-forwarded-for') || headersList.get('x-real-ip')) ?? 'unknown';
+    const ip = (headersList.get('x-forwarded-for') ?? headersList.get('x-real-ip')) ?? 'unknown';
     const userAgent = headersList.get('user-agent') ?? 'unknown';
     
     // Enhanced logging for sign-in attempts
@@ -448,7 +448,7 @@ export async function POST(request: NextRequest) {
         ...body,
         ip,
         userAgent,
-        sessionId: request.cookies.get('next-auth.session-token')?.value?.substring(0, 10) || null
+        sessionId: request.cookies.get('next-auth.session-token')?.value?.substring(0, 10) ?? null
       });
     }
     

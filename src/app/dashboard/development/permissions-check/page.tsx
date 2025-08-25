@@ -292,7 +292,7 @@ const API_ROUTES = [
 ];
 
 export default function PermissionsCheckPage() {
-  const { _user, loading: _authLoading, _can, _is } = useAuthorization();
+  const { __user, loading: __authLoading, __can, __is } = useAuthorization();
   const [userCapabilities, setUserCapabilities] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');

@@ -130,7 +130,7 @@ export async function GET(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.statusCode });
     }
-    const { _searchParams } = new URL(request.url);
+    const { __searchParams } = new URL(request.url);
     const pageContext = searchParams.get('page');
     const severity = searchParams.get('severity');
     const category = searchParams.get('category');
@@ -203,7 +203,7 @@ export async function PATCH(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.statusCode });
     }
-    const { _errorId, _resolved } = (await request.json()) as Record<_string, unknown>;
+    const { __errorId, __resolved } = (await request.json()) as Record<__string, unknown>;
     
     // Find and update error in all pages
     for (const [page, errors] of errorStore.entries()) {

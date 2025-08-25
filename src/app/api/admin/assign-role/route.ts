@@ -11,7 +11,7 @@ async function findManagerId(roleTitle: string, departmentId: number) {
       const departmentChair = await prisma.staff.findFirst({
         where: {
           role: { title: 'Department Chair' },
-          department_id: parseInt(departmentId),
+          department_id: departmentId,
         },
         include: { users: true },
       });

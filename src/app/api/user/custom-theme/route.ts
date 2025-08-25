@@ -93,7 +93,7 @@ export async function PUT(request: NextRequest) {
       recordId: auth.user.id.toString(),
       operation: 'UPDATE',
       userId: auth.user.id,
-      staffId: auth.user.staff?.id,
+      staffId: (auth.user.staff as Record<string, unknown> | null)?.id,
       source: 'WEB_UI',
       description: `Custom theme "${validatedData.name}" saved`,
     }).catch(err => console.error('Audit log failed:', err));
@@ -152,7 +152,7 @@ export async function DELETE(request: NextRequest) {
       recordId: auth.user.id.toString(),
       operation: 'UPDATE',
       userId: auth.user.id,
-      staffId: auth.user.staff?.id,
+      staffId: (auth.user.staff as Record<string, unknown> | null)?.id,
       source: 'WEB_UI',
       description: 'Custom theme deleted',
     }).catch(err => console.error('Audit log failed:', err));

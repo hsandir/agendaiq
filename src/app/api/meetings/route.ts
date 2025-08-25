@@ -145,8 +145,8 @@ export async function GET(request: NextRequest) {
       id: meeting.id,
       title: meeting.title,
       description: meeting.description,
-      startTime: meeting.start_time?.toISOString() || new Date().toISOString(),
-      endTime: meeting.end_time?.toISOString() || new Date().toISOString(),
+      startTime: meeting.start_time?.toISOString() ?? new Date().toISOString(),
+      endTime: meeting.end_time?.toISOString() ?? new Date().toISOString(),
       zoomLink: meeting.zoom_join_url ?? null,
       status: meeting.status,
       organizerName: meeting.staff.users.name ?? meeting.staff.users.email ?? 'Unknown',
@@ -171,7 +171,7 @@ export async function GET(request: NextRequest) {
     response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
     return response;
   } catch (error: unknown) {
-    await Logger.error("Failed to fetch meetings", { error: String(error), userId: user.id, staffId: user.staff?.id }, "meetings");
+    await Logger.error("Failed to fetch meetings", { error: String(error), userId: user.id, staffId: (user.staff as Record<string, unknown> | null)?.id }, "meetings");
     return NextResponse.json({ error: "Failed to fetch meetings" }, { status: 500 });
   }
 }
@@ -325,8 +325,8 @@ export async function POST(request: NextRequest) {
       id: completeeMeeting!.id,
       title: completeeMeeting!.title,
       description: completeeMeeting!.description,
-      startTime: completeeMeeting!.start_time?.toISOString() || new Date().toISOString(),
-      endTime: completeeMeeting!.end_time?.toISOString() || new Date().toISOString(),
+      startTime: completeeMeeting!.start_time?.toISOString() ?? new Date().toISOString(),
+      endTime: completeeMeeting!.end_time?.toISOString() ?? new Date().toISOString(),
       zoomLink: completeeMeeting!.zoom_join_url ?? null,
       status: completeeMeeting!.status,
       organizer: {
@@ -349,7 +349,7 @@ export async function POST(request: NextRequest) {
       data: {
         meeting_id: completeeMeeting!.id,
         user_id: user.id,
-        staff_id: user.staff?.id,
+        staff_id: (user.staff as Record<string, unknown> | null)?.id,
         action: 'CREATE',
         details: `Created meeting: ${title}`,
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
@@ -361,7 +361,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ meeting: formattedMeeting }, { status: 201 });
   } catch (error: unknown) {
-    await Logger.error("Failed to create meeting", { error: String(error), userId: user.id, staffId: user.staff?.id }, "meetings");
+    await Logger.error("Failed to create meeting", { error: String(error), userId: user.id, staffId: (user.staff as Record<string, unknown> | null)?.id }, "meetings");
     return NextResponse.json({ error: "Failed to create meeting" }, { status: 500 });
   }
 } 

@@ -10,7 +10,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const { _userId, _roleId } = (await request.json()) as Record<_string, unknown>;
+    const { __userId, __roleId } = (await request.json()) as Record<__string, unknown>;
     const userIdNum = Number(userId);
     if (!userIdNum || !roleId) {
       return NextResponse.json(

@@ -25,7 +25,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const { user } = authResult;
+    const { _user } = authResult;
 
     // Only system admins and school admins can modify role assignments
     if (!user.is_system_admin && !(user as any).is_school_admin) {
@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> as Record<string, unknown>;
     const validatedData = assignmentSchema.parse(body);
 
     // Get current user's context for security

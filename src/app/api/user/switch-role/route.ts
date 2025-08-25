@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json() as Record<string, unknown>;
-    const { _role } = body;
+    const { __role } = body;
 
     if (!role || !['admin', 'user'].includes(role)) {
       return NextResponse.json(

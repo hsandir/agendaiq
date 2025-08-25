@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return RateLimiters.passwordReset.createErrorResponse(rateLimitResult);
     }
 
-    const { email } = (await request.json()) as Record<string, unknown>;
+    const { _email } = (await request.json()) as Record<_string, unknown>;
 
     if (!email) {
       return new NextResponse("Email is required", { status: 400 });
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     const resetUrl = `${process.env?.NEXTAUTH_URL}/auth/reset-password?token=${resetToken}`;
     
     // Import email service
-    const { sendEmail, getPasswordResetHtml } = await import('../../../../lib/email/email-service');
+    const { _sendEmail, _getPasswordResetHtml } = await import('../../../../lib/email/email-service');
     
     // Send password reset email
     const emailResult = await sendEmail({

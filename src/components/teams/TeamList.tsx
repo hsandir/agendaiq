@@ -102,9 +102,11 @@ export function TeamList() {
       console.log('✅ Teams data received:', data);
       setTeams(data.teams);
     } catch (err) {
-      console.error('🚨 Teams fetch error:', err);
       if (err instanceof Error) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
+        console.error('🚨 Teams fetch error:', err);
+        setError(err.message);
+      } else {
+        setError('An error occurred');
       }
     } finally {
       setLoading(false);

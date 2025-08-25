@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { _action, _ip } = validation.data;
+    const { action, ip } = validation.data;
 
     // Get all rate limiter instances
     const rateLimiters = [
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
           const limiter = (await import('@/lib/utils/rate-limit-advanced')).EnhancedRateLimiters[
             limiterName as keyof typeof import('@/lib/utils/rate-limit-advanced').EnhancedRateLimiters
           ];
-          limiter.addToBlacklist(ip);
+          limiter.addToBlacklist(ip as string);
         }
         
         return NextResponse.json({
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
           const limiter = (await import('@/lib/utils/rate-limit-advanced')).EnhancedRateLimiters[
             limiterName as keyof typeof import('@/lib/utils/rate-limit-advanced').EnhancedRateLimiters
           ];
-          limiter.removeFromBlacklist(ip);
+          limiter.removeFromBlacklist(ip as string);
         }
         
         return NextResponse.json({
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
           const limiter = (await import('@/lib/utils/rate-limit-advanced')).EnhancedRateLimiters[
             limiterName as keyof typeof import('@/lib/utils/rate-limit-advanced').EnhancedRateLimiters
           ];
-          limiter.addToWhitelist(ip);
+          limiter.addToWhitelist(ip as string);
         }
         
         return NextResponse.json({
@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
           const limiter = (await import('@/lib/utils/rate-limit-advanced')).EnhancedRateLimiters[
             limiterName as keyof typeof import('@/lib/utils/rate-limit-advanced').EnhancedRateLimiters
           ];
-          limiter.removeFromWhitelist(ip);
+          limiter.removeFromWhitelist(ip as string);
         }
         
         return NextResponse.json({

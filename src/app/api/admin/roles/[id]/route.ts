@@ -8,7 +8,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const resolvedParams = await params;
-  const { id } = resolvedParams;
+  const { _id } = resolvedParams;
   const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
@@ -59,7 +59,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const resolvedParams = await params;
-  const { id } = resolvedParams;
+  const { _id } = resolvedParams;
   const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });

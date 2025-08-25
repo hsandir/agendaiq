@@ -96,7 +96,7 @@ const KNOWLEDGE_TYPES = [
 ];
 
 export function TeamKnowledge({ teamId, canEdit = false }: TeamKnowledgeProps) {
-  const { toast } = useToast();
+  const { _toast } = useToast();
   const [knowledge, setKnowledge] = useState<KnowledgeResource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -133,6 +133,7 @@ export function TeamKnowledge({ teamId, canEdit = false }: TeamKnowledgeProps) {
       const data = await response.json();
       setKnowledge(data.knowledge);
     } catch (err) {
+    if (err instanceof Error) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);

@@ -14,9 +14,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const body = await request.json() as { email?: string };
-    const testEmail = body.email || user.email;
+    const testEmail = body.email || auth.user.email;
 
     // Test SMTP connection first
     const connectionOk = await emailService.verifyConnection();
@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
+    if (error instanceof Error) {
     console.error('Email test error:', error);
     return NextResponse.json(
       { 

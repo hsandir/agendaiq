@@ -12,9 +12,9 @@ export async function PATCH(
   }
 
   try {
-    const { _id } = await params;
+    const { __id } = await params;
     const itemId = parseInt(id);
-    const { _status } = (await request.json()) as Record<_string, unknown>;
+    const { __status } = (await request.json()) as Record<__string, unknown>;
     
     const updateData: Record<string, unknown> = { status };
     if (status === 'completed') {

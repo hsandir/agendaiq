@@ -16,14 +16,15 @@ export async function POST(request: NextRequest) {
     const auditEvent = await request.json() as Record<string, unknown>;
     
     // Extract event data
-    const { ___action,
-      ___path,
-      ___method,
-      ___success,
-      ___errorMessage,
-      ___metadata,
-      _category
-     } = auditEvent;
+    const { 
+      action,
+      path,
+      method,
+      success,
+      errorMessage,
+      metadata,
+      category
+    } = auditEvent;
 
     // Determine category and log appropriately
     if (category === 'AUTH') {

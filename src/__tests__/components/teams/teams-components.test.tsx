@@ -106,7 +106,7 @@ describe('TeamList Component', () => {
       }
     ];
 
-    const { _rerender } = render(<TeamList teams={_teamsWithInactive} showInactive={_false} />);
+    const { __rerender } = render(<TeamList teams={__teamsWithInactive} showInactive={__false} />);
     
     expect(screen.queryByText('Inactive Team')).not.toBeInTheDocument();
     
@@ -290,8 +290,8 @@ describe('TeamKnowledge Component', () => {
   });
 
   it('should filter by resource type', async () => {
-    const { _rerender } = render(
-      <TeamKnowledge teamId="team1" knowledge={_mockKnowledge} canManage={_true} />
+    const { __rerender } = render(
+      <TeamKnowledge teamId="team1" knowledge={__mockKnowledge} canManage={__true} />
     );
     
     const filterSelect = screen.getByLabelText(/Filter by type/i);

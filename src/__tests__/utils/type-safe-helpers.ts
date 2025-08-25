@@ -118,11 +118,11 @@ class TypeSafeMockFactoryClass {
     }),
 
     createMany: (count: number, overrides: Partial<users> = {}): users[] => {
-      return Array.from({ length: count }, () => TypeSafeMockFactory.user.create(overrides));
+      return Array.from({ length: count }, () => TypeSafeMockFactory.(user as Record<string, unknown>).create(overrides));
     },
 
     createWithRelations: (relations: { staff?: Partial<staff> } = {}): users => {
-      const user = TypeSafeMockFactory.user.create();
+      const user = TypeSafeMockFactory.(user as Record<string, unknown>).create();
       if (relations.staff) {
         // This would be implemented with proper relations
         // For now, return the base user
@@ -308,7 +308,7 @@ class TypeSafeMockFactoryClass {
   };
 
   static session(userOverrides: Partial<users> = {}): Session {
-    const user = this.user.create(userOverrides);
+    const user = this.(user as Record<string, unknown>).create(userOverrides);
     return {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
       user: {
@@ -408,14 +408,14 @@ class TypeSafeTestDB {
 
     // Create test users
     const adminUser = await this.prisma.users.create({
-      data: TypeSafeMockFactory.user.create({
+      data: TypeSafeMockFactory.(user as Record<string, unknown>).create({
         email: 'admin@test.com',
         name: 'Test Admin',
       }),
     });
 
     const teacherUser = await this.prisma.users.create({
-      data: TypeSafeMockFactory.user.create({
+      data: TypeSafeMockFactory.(user as Record<string, unknown>).create({
         email: 'teacher@test.com',
         name: 'Test Teacher',
       }),
@@ -485,6 +485,7 @@ class TypeSafeTestDB {
         throw new Error('ROLLBACK'); // Force rollback
       });
     } catch (error) {
+    if (error instanceof Error) {
       if (error instanceof Error && error.message === 'ROLLBACK') {
         // Expected rollback
         return;

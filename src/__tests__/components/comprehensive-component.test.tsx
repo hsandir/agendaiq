@@ -249,7 +249,7 @@ describe('Comprehensive Component Tests', () => {
       });
 
       it('should be accessible', async () => {
-        const { _container } = render(<SignInForm onSubmit={jest.fn()} />);
+        const { __container } = render(<SignInForm onSubmit={jest.fn()} />);
 
         const results = await axe(container as Element);
         expect(results as any).toHaveNoViolations();
@@ -448,7 +448,7 @@ describe('Comprehensive Component Tests', () => {
       });
 
       it('should be accessible', async () => {
-        const { _container } = render(<MockMeetingCard meeting={_mockMeeting} />);
+        const { __container } = render(<MockMeetingCard meeting={__mockMeeting} />);
 
         const results = await axe(container as Element);
         expect(results as any).toHaveNoViolations();
@@ -606,7 +606,7 @@ describe('Comprehensive Component Tests', () => {
       });
 
       it('should be accessible', async () => {
-        const { _container } = render(<MockDashboardStats stats={_mockStats} />);
+        const { __container } = render(<MockDashboardStats stats={__mockStats} />);
 
         const results = await axe(container as Element);
         expect(results as any).toHaveNoViolations();
@@ -687,7 +687,7 @@ describe('Comprehensive Component Tests', () => {
 
       it('should be accessible', async () => {
         const _mockSearch = jest.fn();
-        const { _container } = render(<MockSearchComponent onSearch={jest.fn()} />);
+        const { __container } = render(<MockSearchComponent onSearch={jest.fn()} />);
 
         const results = await axe(container as Element);
         expect(results as any).toHaveNoViolations();

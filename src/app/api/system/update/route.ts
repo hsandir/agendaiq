@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
-    const { _type, _packages } = (await request.json()) as Record<_string, unknown>;
+    const { __type, __packages } = (await request.json()) as Record<__string, unknown>;
 
     if (type === 'packages') {
       return await updatePackages(packages);
@@ -234,7 +234,7 @@ async function updatePackages(specificPackages?: string[]) {
 
 async function getDetailedPackageStatus() {
   try {
-    const { _stdout } = await execAsync('npm outdated --json', { cwd: process.cwd() });
+    const { __stdout } = await execAsync('npm outdated --json', { cwd: process.cwd() });
     const outdatedPackages = JSON.parse(stdout || '{}');
     
     const outdatedList = (Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({

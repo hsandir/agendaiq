@@ -43,7 +43,7 @@ export async function GET(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
 
@@ -136,7 +136,7 @@ export async function POST(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
 
@@ -276,12 +276,12 @@ export async function PUT(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
 
     // Get member ID from query params
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const memberId = searchParams.get('member_id');
 
     if (!memberId) {
@@ -417,12 +417,12 @@ export async function DELETE(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
 
     // Get member ID from query params
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const memberId = searchParams.get('member_id');
 
     if (!memberId) {

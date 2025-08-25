@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -93,6 +93,7 @@ export function AddMemberDialog({
       
       setAvailableStaff(available);
     } catch (error) {
+    if (error instanceof Error) {
       console.error('Error fetching staff:', error);
       toast.error(`Failed to load available staff: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {

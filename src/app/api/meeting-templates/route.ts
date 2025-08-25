@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json() as Record<string, unknown>;
-    const { _name, _description, _duration, _agenda, _attendees  } = body;
+    const { __name, __description, __duration, __agenda, __attendees  } = body;
 
     if (!name || !duration) {
       return NextResponse.json(

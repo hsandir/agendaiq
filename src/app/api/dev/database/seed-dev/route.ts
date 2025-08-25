@@ -35,8 +35,8 @@ export async function POST(request: NextRequest) {
           before: { field: 'old_value' },
           after: { field: 'new_value' }
         },
-        ip_address: request.headers.get('x-forwarded-for') || '127.0.0.1',
-        user_agent: request.headers.get('user-agent') || 'Development Seeder',
+        ip_address: request.headers.get('x-forwarded-for') ?? '127.0.0.1',
+        user_agent: request.headers.get('user-agent') ?? 'Development Seeder',
         description: `${operation} operation on ${tableName}`,
         created_at: new Date(Date.now() - Math.random() * 86400000 * 7) // Random time in last 7 days
       });
@@ -68,8 +68,8 @@ export async function POST(request: NextRequest) {
           coverage,
           duration
         },
-        ip_address: request.headers.get('x-forwarded-for') || '127.0.0.1',
-        user_agent: request.headers.get('user-agent') || 'Test Runner',
+        ip_address: request.headers.get('x-forwarded-for') ?? '127.0.0.1',
+        user_agent: request.headers.get('user-agent') ?? 'Test Runner',
         description: `Test run completed: ${passed} passed, ${failed} failed`,
         created_at: new Date(Date.now() - i * 86400000) // One per day going back
       });

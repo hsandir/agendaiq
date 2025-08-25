@@ -49,7 +49,7 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json() as Record<string, unknown>;
-    const { _settings } = body;
+    const { __settings } = body;
 
     if (!settings ?? typeof settings !== 'object') {
       return NextResponse.json(

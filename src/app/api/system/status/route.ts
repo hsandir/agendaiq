@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
 // Get real package status from npm
 async function getRealPackageStatus() {
   try {
-    const { _stdout } = await execAsync('npm outdated --json', { cwd: process.cwd() });
+    const { __stdout } = await execAsync('npm outdated --json', { cwd: process.cwd() });
     const outdatedPackages = JSON.parse(stdout || '{}');
     
     const outdatedList = (Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({
@@ -93,7 +93,7 @@ async function getRealPackageStatus() {
     })));
 
     // Get total package count
-    const { stdout: ___lsOutput  } = await execAsync('npm ls --json --depth=0', { cwd: process.cwd() });
+    const { stdout: ____lsOutput  } = await execAsync('npm ls --json --depth=0', { cwd: process.cwd() });
     const lsData = JSON.parse(lsOutput || '{}');
     const totalPackages = Object.keys(lsData.dependencies ?? {}).length;
 

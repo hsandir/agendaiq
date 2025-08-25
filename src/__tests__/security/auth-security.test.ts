@@ -73,7 +73,7 @@ describe('Authentication Security Tests', () => {
           }),
         });
 
-        const { _POST } = await import('@/app/api/auth/register/route');
+        const { __POST } = await import('@/app/api/auth/register/route');
         const response = await POST(request);
         const data = await response.json() as { error?: string };
 
@@ -95,7 +95,7 @@ describe('Authentication Security Tests', () => {
         }),
       });
 
-      const { _POST } = await import('@/app/api/auth/register/route');
+      const { __POST } = await import('@/app/api/auth/register/route');
         const response = await POST(request);
 
       if (response.ok) {
@@ -342,7 +342,7 @@ describe('Authentication Security Tests', () => {
 
         // The auth system should safely handle these inputs
         // without executing SQL injection
-        const { _POST } = await import('@/app/api/auth/[...nextauth]/route');
+        const { __POST } = await import('@/app/api/auth/[...nextauth]/route');
         const response = await POST(request);
         
         // Should either return 401 (invalid credentials) or 400 (bad request)
@@ -369,7 +369,7 @@ describe('Authentication Security Tests', () => {
           }),
         });
 
-        const { _POST } = await import('@/app/api/auth/register/route');
+        const { __POST } = await import('@/app/api/auth/register/route');
         const response = await POST(request);
         
         if (response.ok) {
@@ -404,7 +404,7 @@ describe('Authentication Security Tests', () => {
           }),
         });
 
-        const { _POST } = await import('@/app/api/auth/register/route');
+        const { __POST } = await import('@/app/api/auth/register/route');
         const response = await POST(request);
         const data = await response.json() as { error?: string };
 

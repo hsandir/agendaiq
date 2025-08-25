@@ -98,7 +98,7 @@ export async function PUT(
     const validatedData = updateKnowledgeSchema.parse(body);
 
     // Check if user is team member
-    const { user } = auth;
+    const { _user } = auth;
     const staff = await prisma.staff.findFirst({
       where: { user_id: user.id }
     });
@@ -211,7 +211,7 @@ export async function DELETE(
     const knowledgeId = parseInt(resolvedParams.knowledgeId);
 
     // Check if user is team member
-    const { user } = auth;
+    const { _user } = auth;
     const staff = await prisma.staff.findFirst({
       where: { user_id: user.id }
     });

@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json() as Record<string, unknown>;
-    const { type, data } = sendEmailSchema.parse(body);
+    const { _type, _data } = sendEmailSchema.parse(body);
 
     // Validate and send email based on type
     await emailService.sendEmail(data as EmailTemplateData);

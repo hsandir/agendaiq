@@ -8,12 +8,12 @@ interface TeamNotificationTemplateProps {
 
 export function TeamNotificationTemplate({ data }: TeamNotificationTemplateProps) {
   const {
-    teamName,
-    actionType,
-    actor,
-    teamUrl,
-    message,
-    details
+    _teamName,
+    _actionType,
+    _actor,
+    _teamUrl,
+    _message,
+    _details
   } = data;
 
   const getActionIcon = () => {

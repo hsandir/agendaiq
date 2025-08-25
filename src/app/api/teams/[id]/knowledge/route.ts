@@ -52,7 +52,7 @@ export async function GET(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
 
@@ -95,7 +95,7 @@ export async function GET(
     }
 
     // Get knowledge resources with search and filtering
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const search = searchParams.get('search');
     const type = searchParams.get('type');
     const tags = searchParams.get('tags')?.split(',');
@@ -202,7 +202,7 @@ export async function POST(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
 
@@ -332,12 +332,12 @@ export async function PUT(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
 
     // Get knowledge ID from query params
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const knowledgeId = searchParams.get('knowledge_id');
 
     if (!knowledgeId) {
@@ -476,12 +476,12 @@ export async function DELETE(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const { user } = auth;
+    const { _user } = auth;
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
 
     // Get knowledge ID from query params
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const knowledgeId = searchParams.get('knowledge_id');
 
     if (!knowledgeId) {
