@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
           escape(riskScore),
           escape(success),
           escape(errorMessage),
-          escape(description);
+          escape(description)
         ].join(',');
       });
 

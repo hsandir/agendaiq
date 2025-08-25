@@ -108,7 +108,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
 
           // Fetch custom theme if needed
           if (savedTheme === "custom" || globalThemeState.currentThemeId === "custom") {
-            fetch("/api/user/custom-theme");
+            fetch("/api/user/custom-theme")
               .then((res) => (res.ok ? res.json() : null))
               .then((data) => {
                 if (data?.customTheme) {

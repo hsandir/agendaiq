@@ -66,9 +66,9 @@ export async function GET(request: NextRequest) {
 
     // Limit distributions to top entries
     stats.userDistribution = Object.fromEntries(
-      Object.entries(stats.userDistribution);
+      Object.entries(stats.userDistribution)
         .sort(([,a], [,b]) => (b as number) - (a as number))
-        .slice(0, 10);
+        .slice(0, 10)
     );
 
     stats.ipDistribution = Object.fromEntries(

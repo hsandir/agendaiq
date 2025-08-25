@@ -40,7 +40,7 @@ interface TestSuite {
   skipped?: number
   duration?: number
   status: 'idle' | 'running' | 'passed' | 'failed'
-  category: 'unit' | 'integration' | 'e2e' | 'performance'
+  category: 'unit' | 'integration' | 'e2e' | 'performance';
 }
 
 interface TestResult {
@@ -50,20 +50,20 @@ interface TestResult {
   duration: number
   error?: string
   file?: string
-  line?: number
-}
+  line?: number;
+;}
 
 interface CoverageReport {
-  statements: { total: number; covered: number; percentage: number }
-  branches: { total: number; covered: number; percentage: number }
-  functions: { total: number; covered: number; percentage: number }
-  lines: { total: number; covered: number; percentage: number }
+  statements: { total: number; covered: number; percentage: number ;}
+  branches: { total: number; covered: number; percentage: number ;}
+  functions: { total: number; covered: number; percentage: number ;}
+  lines: { total: number; covered: number; percentage: number ;}
   files?: {
     [key: string]: {
-      statements: { total: number; covered: number; percentage: number }
-      branches: { total: number; covered: number; percentage: number }
-      functions: { total: number; covered: number; percentage: number }
-      lines: { total: number; covered: number; percentage: number }
+      statements: { total: number; covered: number; percentage: number ;}
+      branches: { total: number; covered: number; percentage: number ;}
+      functions: { total: number; covered: number; percentage: number ;}
+      lines: { total: number; covered: number; percentage: number ;}
       uncoveredLines?: number[]
     }
   }
@@ -75,7 +75,7 @@ interface TestHistory {
   failed: number
   coverage: number
   duration: number
-}
+;}
 
 export default function TestDashboard() {
   const [testSuites, setTestSuites] = useState<TestSuite[]>([])
@@ -87,7 +87,7 @@ export default function TestDashboard() {
   const [filter, setFilter] = useState<string>('')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [testHistory, setTestHistory] = useState<TestHistory[]>([])
-  const [untestedFiles, setUntestedFiles] = useState<{ components: string[], apis: string[] }>({ components: [], apis: [] })
+  const [untestedFiles, setUntestedFiles] = useState<{ components: string[], apis: string[] ;}>({ components: [], apis: [] ;})
   const [activeTab, setActiveTab] = useState('results');
   const [showAutofixModal, setShowAutofixModal] = useState(false);
   useEffect(() => {
@@ -122,7 +122,7 @@ export default function TestDashboard() {
     try {
       const response = await fetch('/api/tests/generate');
       const data = await response.json();
-      setUntestedFiles(data.untested || { components: [], apis: [] });
+      setUntestedFiles(data.untested || { components: [], apis: [] ;});
     } catch (error: unknown) {
       console.error('Failed to load untested files:', error);
     }
@@ -140,7 +140,7 @@ export default function TestDashboard() {
           suite: suitePath,
           coverage: options.coverage,
           watch: options.watch
-        })
+        ;})
       })
       
       if (!response.ok) {
@@ -169,7 +169,7 @@ export default function TestDashboard() {
                 error: test.failureMessages ? test.failureMessages.join('\n') : undefined,
                 file: suite.name,
                 line: 0
-              })
+              ;})
             })
           }
         })
@@ -192,7 +192,7 @@ export default function TestDashboard() {
               failed: data.results?.failed || 0,
               skipped: data.results?.skipped || 0,
               duration: data.results?.duration || 0
-            }
+            ;}
           }
           return suite
         }))
@@ -239,7 +239,7 @@ export default function TestDashboard() {
       }
     }
     
-    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' })
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' ;})
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url
@@ -257,7 +257,7 @@ export default function TestDashboard() {
         return <Loader2Icon className="h-4 w-4 animate-spin text-primary" />
       default:
         return <ClockIcon className="h-4 w-4 text-muted-foreground" />
-    }
+    ;}
   }
 
   const getCoverageColor = (percentage: number) => {
@@ -273,7 +273,7 @@ export default function TestDashboard() {
       case 'e2e': return 'outline'
       case 'performance': return 'destructive'
       default: return 'default'
-    }
+    ;}
   }
 
   const filteredSuites = testSuites.filter(suite => {
@@ -294,7 +294,7 @@ export default function TestDashboard() {
             </div>
             <div className="flex space-x-2">
               <Button
-                onClick={() => runTests(undefined, { coverage: true })}
+                onClick={() => runTests(undefined, { coverage: true ;})}
                 disabled={isRunning}
                 variant="default"
               >
@@ -374,7 +374,7 @@ export default function TestDashboard() {
                       selectedSuite === suite.path
                         ? 'border-primary bg-primary/5 shadow-sm'
                         : 'hover:bg-muted hover:shadow-sm'
-                    }`}
+                    ;}`}
                     onClick={() => setSelectedSuite(suite.path)}
                   >
                     <div className="flex items-center justify-between mb-2">

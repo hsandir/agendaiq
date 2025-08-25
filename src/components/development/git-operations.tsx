@@ -52,7 +52,7 @@ interface Commit {
   message: string;
   files: number;
   insertions: number;
-  deletions: number
+  deletions: number;
 }
 
 interface Branch {
@@ -61,14 +61,14 @@ interface Branch {
   remote: boolean;
   lastCommit: string;
   ahead: number;
-  behind: number
+  behind: number;
 }
 
 interface FileChange {
   path: string;
   status: 'M' | 'A' | 'D' | 'R' | 'U' | '??';
   additions: number;
-  deletions: number
+  deletions: number;
 }
 
 export default function GitOperations() {
@@ -568,7 +568,7 @@ export default function GitOperations() {
                       key={branch.name}
                       className={`p-3 border rounded-lg ${
                         branch.current ? 'border-blue-500 bg-primary' : 'hover:bg-muted'
-                      }`}
+                      ;}`}
                     >
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
