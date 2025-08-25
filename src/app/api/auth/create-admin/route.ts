@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
   try {
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const validationResult = createAdminSchema.safeParse(body);
     
     if (!validationResult.success) {
@@ -38,12 +38,12 @@ export async function POST(request: NextRequest) {
     const { email, password } = validationResult.data;
     
     // Check if user exists and has admin role
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await prisma.users.findUnique({
       where: { email },
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: true
+            role: true
           }
         }
       }
@@ -57,8 +57,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user has admin role
-    const hasAdminRole = existingUser.Staff.some(staff => 
-      staff.Role?.title === 'Administrator'
+    const hasAdminRole = existingUser.staff.some(staff => 
+      staff.role?.title === 'Administrator'
     );
 
     if (!hasAdminRole) {
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user already has a password
-    if (existingUser.hashedPassword) {
+    if (existingUser.hashed_password) {
       return NextResponse.json(
         { error: "Admin user already has a password set" },
         { status: 400 }
@@ -79,25 +79,25 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await hash(password, 12);
     
     // Update the user with the new password
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.users.update({
       where: { email },
       data: {
-        hashedPassword: hashedPassword,
-        emailVerified: new Date()
+        hashed_password: hashedPassword,
+        email_verified: new Date()
       },
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: true,
-            Department: true,
-            School: true,
-            District: true
+            role: true,
+            department: true,
+            school: true,
+            district: true
           }
         }
       }
     });
 
-    const staff = updatedUser.Staff.find(s => s.Role?.title === 'Administrator');
+    const staff = updatedUser.staff.find(s => s.role?.title === 'Administrator');
 
     return NextResponse.json({
       success: true,
@@ -109,10 +109,10 @@ export async function POST(request: NextRequest) {
       },
       staff: staff ? {
         id: staff.id,
-        role: staff.Role?.title,
-        department: staff.Department?.name,
-        school: staff.School?.name,
-        district: staff.District?.name
+        role: staff.role?.title,
+        department: staff.department?.name,
+        school: staff.school?.name,
+        district: staff.district?.name
       } : null
     });
   } catch (error: unknown) {

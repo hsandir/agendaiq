@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -29,11 +29,10 @@ import { cn } from '@/lib/utils';
 
 interface MobileMenuProps {
   user: Record<string, any>;
-  currentRole: Record<string, any> | null;
   isAdmin: boolean;
 }
 
-export function MobileMenu({ user, currentRole, isAdmin }: MobileMenuProps) {
+export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const pathname = usePathname();
@@ -50,7 +49,7 @@ export function MobileMenu({ user, currentRole, isAdmin }: MobileMenuProps) {
   const isActive = (href: string) => pathname === href;
 
   return (
-    <>
+    <div>
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -80,9 +79,6 @@ export function MobileMenu({ user, currentRole, isAdmin }: MobileMenuProps) {
             <div>
               <h2 className="text-xl font-bold text-foreground">AgendaIQ</h2>
               <p className="text-sm text-muted-foreground">{user.email}</p>
-              <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium inline-block mt-1">
-                {currentRole?.title || 'No Role'}
-              </span>
             </div>
             <button
               onClick={closeMenu}
@@ -103,7 +99,7 @@ export function MobileMenu({ user, currentRole, isAdmin }: MobileMenuProps) {
               onClick={closeMenu}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
-                isActive("/dashboard") 
+                isActive("/dashboard")
                   ? "bg-primary text-primary-foreground" 
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
@@ -117,13 +113,27 @@ export function MobileMenu({ user, currentRole, isAdmin }: MobileMenuProps) {
               onClick={closeMenu}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
-                isActive("/dashboard/meetings") 
+                isActive("/dashboard/meetings")
                   ? "bg-primary text-primary-foreground" 
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
               <Calendar className="h-5 w-5" />
               Meetings
+            </Link>
+
+            <Link
+              href="/dashboard/teams"
+              onClick={closeMenu}
+              className={cn(
+                "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
+                isActive("/dashboard/teams")
+                  ? "bg-primary text-primary-foreground" 
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              )}
+            >
+              <Users className="h-5 w-5" />
+              Teams
             </Link>
 
             {/* Meeting Intelligence Section */}
@@ -247,7 +257,7 @@ export function MobileMenu({ user, currentRole, isAdmin }: MobileMenuProps) {
                   </Link>
                   
                   {isAdmin && (
-                    <>
+                    <div>
                       <div className="border-t border-border my-2" />
                       <Link
                         href="/dashboard/settings/role-hierarchy"
@@ -265,7 +275,7 @@ export function MobileMenu({ user, currentRole, isAdmin }: MobileMenuProps) {
                         <Settings className="h-4 w-4 inline mr-2" />
                         System Settings
                       </Link>
-                    </>
+                    </div>
                   )}
                 </div>
               )}
@@ -295,6 +305,6 @@ export function MobileMenu({ user, currentRole, isAdmin }: MobileMenuProps) {
           </div>
         </nav>
       </div>
-    </>
+    </div>
   );
 }

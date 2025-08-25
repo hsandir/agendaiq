@@ -8,24 +8,24 @@ export interface SentryHealthData {
   crashFreeUsers: number;
   healthData: unknown[];
   totalEvents: number;
-  newGroups: number;
+  newGroups: number
 }
 
 export interface UptimeData {
   uptime: number;
   status: 'healthy' | 'degraded' | 'down';
   lastCheck: string;
-  responseTime: number;
+  responseTime: number
 }
 
 export interface PusherAuthRequest {
   socket_id: string;
-  channel_name: string;
+  channel_name: string
 }
 
 export interface DepartmentAssignmentRequest {
   userId: string;
-  departmentId: string;
+  departmentId: string
 }
 
 export interface HierarchyRole {

@@ -13,7 +13,7 @@ export function apiError(message: string, status: number = 400) {
 // Try/catch wrapper for API handlers
 export async function withApiErrorHandling<T>(fn: () => Promise<T | Response>) {
   try {
-    return await fn();
+    return await fn()
   } catch (error: unknown) {
     if (error instanceof Error) {
       return apiError(error?.message, 500);

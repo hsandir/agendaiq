@@ -98,7 +98,7 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
   }, [pathname, isInitialized, expandedItems]);
 
   const isActive = (path: string) => {
-    return pathname === path ?? pathname?.startsWith(path + "/");
+    return pathname === path ?? pathname?.startsWith(path + "/")
   };
 
   const toggleExpanded = (href: string) => {
@@ -137,7 +137,7 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
                 });
               } catch (error: unknown) {
                 // Fallback to direct navigation if signOut fails
-                window.location.href = '/auth/signin';
+                window.location.href = '/auth/signin'
               }
             }}
             className="w-full flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-muted-foreground hover:bg-muted hover:text-foreground"

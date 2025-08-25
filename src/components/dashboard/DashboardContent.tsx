@@ -10,26 +10,26 @@ import { LucideIcon } from 'lucide-react';
 interface User {
   id: number;
   name: string;
-  email: string;
+  email: string
 }
 
 interface UserWithStaff extends User {
   staff?: {
     id: number;
     role: {
-      title: string;
+      title: string
     };
     school?: {
       name: string;
-      code: string | null;
+      code: string | null
     };
   } | null;
   Staff?: Array<{
     id: number;
-    Role: {
-      title: string;
+    role: {
+      title: string
     };
-    School: {
+    school: {
       name: string;
       address?: string;
     };
@@ -49,12 +49,12 @@ interface Meeting {
 interface QuickStat {
   name: string;
   value: number;
-  icon: LucideIcon;
+  icon: LucideIcon
 }
 
 interface DashboardContentProps {
   user: User;
-  userWithStaff: UserWithStaff;
+  userWithstaff: UserWithStaff;
   upcomingMeetings: Meeting[];
   quickStats: QuickStat[];
   safeFormatDateTime: (date: string | Date, format?: string, fallback?: string) => string;
@@ -62,7 +62,7 @@ interface DashboardContentProps {
 
 export function DashboardContent({ 
   user, 
-  userWithStaff, 
+  userWithstaff, 
   upcomingMeetings, 
   quickStats, 
   safeFormatDateTime 
@@ -87,13 +87,13 @@ export function DashboardContent({
   const renderWelcomeHeader = () => (
     <div className="mb-8">
       <h1 className="text-2xl font-bold text-foreground mb-2">Welcome back, {user.name}</h1>
-      {(userWithStaff?.staff?.school ?? userWithStaff?.Staff?.[0]?.School) && (
+      {(userWithStaff?.staff?.school ?? userWithStaff?.staff?.[0]?.school) && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>{(userWithStaff as any).staff?.school?.name ?? userWithStaff.Staff?.[0]?.School?.name}</span>
-          {((userWithStaff as any).staff?.school?.code ?? userWithStaff.Staff?.[0]?.School?.address) && (
+          <span>{(userWithStaff as any).staff?.school?.name ?? userWithStaff.staff?.[0]?.school?.name}</span>
+          {((userWithStaff as any).staff?.school?.code ?? userWithStaff.staff?.[0]?.school?.address) && (
             <>
               <span>•</span>
-              <span>{(userWithStaff as any).staff?.school?.code ?? userWithStaff.Staff?.[0]?.School?.address}</span>
+              <span>{(userWithStaff as any).staff?.school?.code ?? userWithStaff.staff?.[0]?.school?.address}</span>
             </>
           )}
         </div>

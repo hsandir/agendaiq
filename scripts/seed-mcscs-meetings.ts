@@ -7,13 +7,13 @@ async function seedMCSCSMeetings() {
   try {
     // Get staff members
     const nsStaff = await prisma.staff.findFirst({
-      where: { User: { email: 'ns@agendaiq.com' } }
+      where: { users: { email: 'ns@agendaiq.com' } }
     });
     const acStaff = await prisma.staff.findFirst({
-      where: { User: { email: 'ac@agendaiq.com' } }
+      where: { users: { email: 'ac@agendaiq.com' } }
     });
     const tmStaff = await prisma.staff.findFirst({
-      where: { User: { email: 'tm@agendaiq.com' } }
+      where: { users: { email: 'tm@agendaiq.com' } }
     });
 
     if (!nsStaff || !acStaff || !tmStaff) {
@@ -43,14 +43,14 @@ async function seedMCSCSMeetings() {
         department_id: adminDept.id,
         school_id: adminDept.school_id,
         district_id: nsStaff.district_id,
-        MeetingAttendee: {
+        meeting_attendee: {
           create: [
             { staff_id: nsStaff.id, status: "attended" },
             { staff_id: acStaff.id, status: "attended" },
             { staff_id: tmStaff.id, status: "attended" }
           ]
         },
-        MeetingAgendaItems: {
+        meeting_agenda_items: {
           create: [
             {
               topic: "Meeting Scope",
@@ -65,7 +65,8 @@ async function seedMCSCSMeetings() {
               decision_type: "Technical" as DecisionType,
               status: "Resolved" as AgendaItemStatus,
               future_implications: false,
-              order_index: 0
+              order_index: 0,
+              updated_at: new Date()
             },
             {
               topic: "Meeting Norms",
@@ -80,7 +81,8 @@ async function seedMCSCSMeetings() {
               decision_type: "Adaptive" as DecisionType,
               status: "Resolved" as AgendaItemStatus,
               future_implications: false,
-              order_index: 1
+              order_index: 1,
+              updated_at: new Date()
             },
             {
               topic: "Dismissal Time",
@@ -95,7 +97,8 @@ async function seedMCSCSMeetings() {
               decision_type: "Adaptive" as DecisionType,
               status: "Assigned_to_local" as AgendaItemStatus,
               future_implications: false,
-              order_index: 2
+              order_index: 2,
+              updated_at: new Date()
             },
             {
               topic: "Intervention Plan",
@@ -110,7 +113,8 @@ async function seedMCSCSMeetings() {
               decision_type: "Adaptive" as DecisionType,
               status: "Assigned_to_local" as AgendaItemStatus,
               future_implications: false,
-              order_index: 3
+              order_index: 3,
+              updated_at: new Date()
             },
             {
               topic: "College Counselling",
@@ -125,7 +129,8 @@ async function seedMCSCSMeetings() {
               decision_type: "Adaptive" as DecisionType,
               status: "Assigned_to_local" as AgendaItemStatus,
               future_implications: false,
-              order_index: 4
+              order_index: 4,
+              updated_at: new Date()
             },
             {
               topic: "Aftercare",
@@ -140,7 +145,8 @@ async function seedMCSCSMeetings() {
               decision_type: "Technical" as DecisionType,
               status: "Assigned_to_local" as AgendaItemStatus,
               future_implications: false,
-              order_index: 5
+              order_index: 5,
+              updated_at: new Date()
             }
           ]
         }
@@ -160,14 +166,14 @@ async function seedMCSCSMeetings() {
         department_id: adminDept.id,
         school_id: adminDept.school_id,
         district_id: nsStaff.district_id,
-        MeetingAttendee: {
+        meeting_attendee: {
           create: [
             { staff_id: nsStaff.id, status: "pending" },
             { staff_id: acStaff.id, status: "pending" },
             { staff_id: tmStaff.id, status: "pending" }
           ]
         },
-        MeetingAgendaItems: {
+        meeting_agenda_items: {
           create: [
             {
               topic: "Attandance",
@@ -182,7 +188,8 @@ async function seedMCSCSMeetings() {
               decision_type: "Technical" as DecisionType,
               status: "Ongoing" as AgendaItemStatus,
               future_implications: false,
-              order_index: 0
+              order_index: 0,
+              updated_at: new Date()
             },
             {
               topic: "Transportation",
@@ -197,7 +204,8 @@ async function seedMCSCSMeetings() {
               decision_type: "Technical" as DecisionType,
               status: "Resolved" as AgendaItemStatus,
               future_implications: false,
-              order_index: 1
+              order_index: 1,
+              updated_at: new Date()
             },
             {
               topic: "Contact Information",
@@ -212,7 +220,8 @@ async function seedMCSCSMeetings() {
               decision_type: "Both" as DecisionType,
               status: "Ongoing" as AgendaItemStatus,
               future_implications: false,
-              order_index: 2
+              order_index: 2,
+              updated_at: new Date()
             },
             {
               topic: "Phone system",
@@ -227,7 +236,8 @@ async function seedMCSCSMeetings() {
               decision_type: "Both" as DecisionType,
               status: "Ongoing" as AgendaItemStatus,
               future_implications: false,
-              order_index: 3
+              order_index: 3,
+              updated_at: new Date()
             }
           ]
         }

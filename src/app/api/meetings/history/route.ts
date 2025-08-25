@@ -33,10 +33,10 @@ export async function GET(request: NextRequest) {
     // Tab-based filtering
     switch (tab) {
       case 'my_meetings':
-        whereClause.organizer_id = user.staff?.id;
+        whereClause.organizer_id = (user.staff as Record<string, unknown> | null)?.id;
         break;
       case 'department':
-        if (user.staff?.department?.id) {
+        if ((user.staff as Record<string, unknown> | null)?.department?.id) {
           if (includeSubDepartments) {
             // Get all departments in hierarchy
             const departments = await prisma.department.findMany({
@@ -54,15 +54,15 @@ export async function GET(request: NextRequest) {
         }
         break;
       case 'attended':
-        if (user.staff?.id) {
+        if ((user.staff as Record<string, unknown> | null)?.id) {
           whereClause.OR = [
             { organizer_id: user.staff.id },
-            { MeetingAttendee: { some: { staff_id: user.staff.id } } }
+            { meeting_attendee: { some: { staff_id: user.staff.id } } }
           ];
         }
         break;
       case 'with_actions':
-        whereClause.MeetingActionItems = { some: {} };
+        whereClause.meeting_action_items = { some: {} };
         break;
     }
 
@@ -114,28 +114,28 @@ export async function GET(request: NextRequest) {
 
     // Action items filter
     if (onlyWithActionItems) {
-      whereClause.MeetingActionItems = { some: {} };
+      whereClause.meeting_action_items = { some: {} };
     }
 
     // Fetch meetings
     const meetings = await prisma.meeting.findMany({
       where: whereClause,
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true,
-            Role: true,
-            Department: true
+            users: true,
+            role: true,
+            department: true
           }
         },
-        MeetingAttendee: true,
-        MeetingAgendaItems: true,
-        MeetingActionItems: {
+        meeting_attendee: true,
+        meeting_agenda_items: true,
+        meeting_action_items: {
           include: {
-            AssignedTo: true
+            assigned_to: true
           }
         },
-        Department: true
+        department: true
       },
       orderBy: { start_time: 'desc' },
       take: 50
@@ -151,15 +151,15 @@ export async function GET(request: NextRequest) {
       status: meeting.status,
       meeting_type: meeting.meeting_type,
       organizer: {
-        name: meeting.Staff?.User?.name ?? 'Unknown',
-        role: meeting.Staff?.Role?.title ?? 'Unknown',
-        department: meeting.Staff?.Department?.name ?? 'Unknown'
+        name: meeting.staff?.users?.name ?? 'Unknown',
+        role: meeting.staff?.role?.title ?? 'Unknown',
+        department: meeting.staff?.department?.name ?? 'Unknown'
       },
-      attendees: meeting.MeetingAttendee.length,
-      agendaItems: meeting.MeetingAgendaItems.length,
-      actionItems: meeting.MeetingActionItems.length,
-      completedActions: meeting.MeetingActionItems.filter((item: { status: string }) => item.status === 'Completed').length,
-      department: meeting.Department?.name,
+      attendees: meeting.meeting_attendee.length,
+      agendaItems: meeting.meeting_agenda_items.length,
+      actionItems: meeting.meeting_action_items.length,
+      completedActions: meeting.meeting_action_items.filter((item: { status: string }) => item.status === 'Completed').length,
+      department: meeting.department?.name,
       isRecurring: !!meeting.repeat_type,
       parentMeetingId: meeting.parent_meeting_id
     })));

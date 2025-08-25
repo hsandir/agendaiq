@@ -22,14 +22,14 @@ export async function GET(
     const currentUser = authResult.user!;
     const userId = params.id;
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: userId },
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: true,
-            Department: true,
-            School: true
+            role: true,
+            department: true,
+            school: true
           }
         }
       }
@@ -43,7 +43,7 @@ export async function GET(
     }
 
     // Apply field-level filtering
-    const filteredUser = filterFields(currentUser, 'User', user, user);
+    const filteredUser = filterFields(currentusers, 'User', user, user);
 
     return NextResponse.json({ user: filteredUser });
 
@@ -74,10 +74,10 @@ export async function PUT(
 
     const currentUser = authResult.user!;
     const userId = params.id;
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
 
     // Get existing user
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await prisma.users.findUnique({
       where: { id: userId }
     });
 
@@ -89,7 +89,7 @@ export async function PUT(
     }
 
     // Validate field-level write access
-    const validation = validateWrite(currentUser, 'User', body, existingUser);
+    const validation = validateWrite(currentusers, 'User', body, existingUser);
     
     if (!validation.valid) {
       return NextResponse.json(
@@ -102,7 +102,7 @@ export async function PUT(
     }
 
     // Update user
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.users.update({
       where: { id: userId },
       data: {
         ...(body.name !== undefined && { name: body.name }),
@@ -121,10 +121,10 @@ export async function PUT(
     });
 
     // Apply field-level filtering to response
-    const filteredUser = filterFields(currentUser, 'User', updatedUser, updatedUser);
+    const filteredUser = filterFields(currentusers, 'User', updatedusers, updatedUser);
 
     return NextResponse.json({ 
-      user: filteredUser,
+      user: filteredusers,
       message: "User updated successfully" 
     });
 

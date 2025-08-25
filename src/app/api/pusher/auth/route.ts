@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { pusherServer } from '@/lib/pusher';
 import { withAuth } from '@/lib/auth/api-auth';
 import { prisma } from '@/lib/prisma';
-import { isRole, RoleKey } from '@/lib/auth/policy';
+import { isrole, RoleKey } from '@/lib/auth/policy';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const user = authResult.user!;
 
     // Get the request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const socketId = body?.socket_id;
     const channel = body?.channel_name;
 
@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        MeetingAttendee: {
-          where: { staff_id: user.staff?.id || -1 }
+        meeting_attendee: {
+          where: { staff_id: (user.staff as Record<string, unknown> | null)?.id || -1 }
         }
       }
     });
@@ -57,8 +57,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is authorized
-    const isOrganizer = meeting.organizer_id === user.staff?.id;
-    const isAttendee = meeting.MeetingAttendee.length > 0;
+    const isOrganizer = meeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
+    const isAttendee = meeting.meeting_attendee.length > 0;
     const isAdmin = isRole(user, RoleKey.OPS_ADMIN);
 
     if (!isOrganizer && !isAttendee && !isAdmin) {
@@ -78,8 +78,8 @@ export async function POST(request: NextRequest) {
         user_info: {
           name: user?.name,
           email: user?.email,
-          staff_id: user.staff?.id,
-          role: user.staff?.role?.key,
+          staff_id: (user.staff as Record<string, unknown> | null)?.id,
+          role: (user.staff as Record<string, unknown> | null)?.role?.key,
         }
       };
       authResponse = pusherServer.authorizeChannel(socketId, channel, presenceData);

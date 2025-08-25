@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { withAuth } from '@/lib/auth/api-auth';
+import { withAuth, type APIAuthResult } from '@/lib/auth/api-auth';
 import { Capability } from '@/lib/auth/policy';
 import { z } from 'zod';
 import { FEATURES } from '@/lib/features/feature-flags';
+import { randomBytes } from 'crypto';
 
 // Team creation schema
 const createTeamSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
   type: z.enum(['DEPARTMENT', 'PROJECT', 'COMMITTEE', 'SUBJECT', 'GRADE_LEVEL', 'SPECIAL']),
+  purpose: z.string().min(1).max(500),
+  initial_members: z.array(z.number()).optional(),
   metadata: z.record(z.unknown()).optional(),
 });
 
@@ -35,7 +38,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const auth = await withAuth(request, { 
+     
+    const auth: APIAuthResult = await withAuth(request, { 
       requireAuth: true,
       requireCapability: Capability.MEETINGS_VIEW 
     });
@@ -63,7 +67,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch teams based on user's organization level
-    const teams = await prisma.team.findMany({
+    const teams = await prisma.teams.findMany({
       where: {
         OR: [
           { school_id: staff.school_id },
@@ -100,7 +104,7 @@ export async function GET(request: NextRequest) {
       const isMember = team.team_members.some(member => member.staff_id === staff.id);
       
       // Admins can see all teams
-      const isAdmin = user.is_system_admin || user.is_school_admin;
+      const isAdmin = user.is_system_admin ?? (user as Record<string, unknown>).is_school_admin;
       
       return isMember || isAdmin;
     });
@@ -133,7 +137,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const auth = await withAuth(request, { 
+     
+    const auth: APIAuthResult = await withAuth(request, { 
       requireAuth: true,
       requireCapability: Capability.MEETINGS_CREATE 
     });
@@ -145,7 +150,7 @@ export async function POST(request: NextRequest) {
     const { user } = auth;
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const validatedData = createTeamSchema.parse(body);
 
     // Get user's organization context
@@ -166,7 +171,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Only leadership or admins can create teams
-    if (!staff.role.is_leadership && !user.is_system_admin && !user.is_school_admin) {
+    if (!staff.role.is_leadership && !user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to create teams' },
         { status: 403 }
@@ -175,35 +180,82 @@ export async function POST(request: NextRequest) {
 
     // Create the team with a transaction
     const team = await prisma.$transaction(async (tx) => {
+      // Generate unique ID and code for the team
+      const teamId = randomBytes(16).toString('hex');
+      const teamCode = `TEAM_${Date.now()}_${randomBytes(4).toString('hex').toUpperCase()}`;
+
       // Create the team
-      const newTeam = await tx.team.create({
+      const newTeam = await tx.teams.create({
         data: {
+          id: teamId,
           name: validatedData.name,
+          code: teamCode,
           description: validatedData.description,
           type: validatedData.type,
+          purpose: validatedData.purpose,
           school_id: staff.school_id,
           district_id: staff.district_id,
           created_by: user.id,
-          metadata: validatedData.metadata || {},
-          is_active: true
+          metadata: validatedData.metadata ?? {},
+          is_active: true,
+          updated_at: new Date()
         }
       });
 
       // Add the creator as a team lead
-      await tx.teamMember.create({
+      await tx.team_members.create({
         data: {
+          id: randomBytes(16).toString('hex'),
           team_id: newTeam.id,
+          user_id: user.id,
           staff_id: staff.id,
           role: 'LEAD',
           joined_at: new Date()
         }
       });
 
+      // Add initial members if provided
+      if (validatedData.initial_members && validatedData.initial_members.length > 0) {
+        // Get staff records for the provided staff IDs
+        const staffRecords = await tx.staff.findMany({
+          where: {
+            id: { in: validatedData.initial_members },
+            // Ensure they're from the same organization
+            OR: [
+              { school_id: staff.school_id },
+              { district_id: staff.district_id }
+            ]
+          },
+          include: {
+            users: true
+          }
+        });
+
+        // Create team memberships for initial members
+        const membershipPromises = staffRecords.map(async (memberStaff) => {
+          // Skip if this staff member is already the creator/lead
+          if (memberStaff.id === staff.id) return;
+
+          return tx.team_members.create({
+            data: {
+              id: randomBytes(16).toString('hex'),
+              team_id: newTeam.id,
+              user_id: memberStaff.users.id,
+              staff_id: memberStaff.id,
+              role: 'MEMBER',
+              joined_at: new Date()
+            }
+          });
+        });
+
+        await Promise.all(membershipPromises.filter(Boolean));
+      }
+
       return newTeam;
     });
 
     // Fetch the complete team with relations
-    const completeTeam = await prisma.team.findUnique({
+    const completeTeam = await prisma.teams.findUnique({
       where: { id: team.id },
       include: {
         team_members: {
@@ -260,7 +312,8 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const auth = await withAuth(request, { 
+     
+    const auth: APIAuthResult = await withAuth(request, { 
       requireAuth: true,
       requireCapability: Capability.MEETINGS_UPDATE 
     });
@@ -272,7 +325,7 @@ export async function PUT(request: NextRequest) {
     const { user } = auth;
 
     // Get team ID from query params
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const teamId = searchParams.get('id');
 
     if (!teamId) {
@@ -283,7 +336,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const validatedData = updateTeamSchema.parse(body);
 
     // Get user's staff record
@@ -299,8 +352,8 @@ export async function PUT(request: NextRequest) {
     }
 
     // Check if team exists and user has permission
-    const team = await prisma.team.findUnique({
-      where: { id: parseInt(teamId) },
+    const team = await prisma.teams.findUnique({
+      where: { id: teamId },
       include: {
         team_members: true
       }
@@ -318,7 +371,7 @@ export async function PUT(request: NextRequest) {
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
 
-    if (!isTeamLead && !user.is_system_admin && !user.is_school_admin) {
+    if (!isTeamLead && !user.is_system_admin && !((user as Record<string, unknown>).is_school_admin)) {
       return NextResponse.json(
         { error: 'You do not have permission to update this team' },
         { status: 403 }
@@ -326,8 +379,8 @@ export async function PUT(request: NextRequest) {
     }
 
     // Update the team
-    const updatedTeam = await prisma.team.update({
-      where: { id: parseInt(teamId) },
+    const updatedTeam = await prisma.teams.update({
+      where: { id: teamId },
       data: {
         ...(validatedData.name && { name: validatedData.name }),
         ...(validatedData.description !== undefined && { description: validatedData.description }),
@@ -390,7 +443,8 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const auth = await withAuth(request, { 
+     
+    const auth: APIAuthResult = await withAuth(request, { 
       requireAuth: true,
       requireCapability: Capability.MEETINGS_DELETE 
     });
@@ -402,7 +456,7 @@ export async function DELETE(request: NextRequest) {
     const { user } = auth;
 
     // Get team ID from query params
-    const { searchParams } = new URL(request.url);
+    const { _searchParams } = new URL(request.url);
     const teamId = searchParams.get('id');
 
     if (!teamId) {
@@ -413,7 +467,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Only admins can delete teams
-    if (!user.is_system_admin && !user.is_school_admin) {
+    if (!user.is_system_admin && !((user as Record<string, unknown>).is_school_admin)) {
       return NextResponse.json(
         { error: 'You do not have permission to delete teams' },
         { status: 403 }
@@ -421,8 +475,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Check if team exists
-    const team = await prisma.team.findUnique({
-      where: { id: parseInt(teamId) }
+    const team = await prisma.teams.findUnique({
+      where: { id: teamId }
     });
 
     if (!team) {
@@ -433,8 +487,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Soft delete the team
-    await prisma.team.update({
-      where: { id: parseInt(teamId) },
+    await prisma.teams.update({
+      where: { id: teamId },
       data: {
         is_active: false,
         updated_at: new Date()

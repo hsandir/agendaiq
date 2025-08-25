@@ -130,7 +130,7 @@ export async function GET(request: NextRequest) {
     //       tests_failed: metrics.testsFailed,
     //       code_coverage: metrics.codeCoverage,
     //       vulnerabilities: metrics.vulnerabilities,
-    //       recorded_at: new Date()
+    //       recorded_at: new Date();
     //     }
     //   });
     // } catch (dbError: unknown) {

@@ -1,25 +1,19 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { SignInForm } from '@/components/auth/SignInForm';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { setupNavigationMocks, mockRouter, mockPush, resetNavigationMocks } from '@/__tests__/utils/next-navigation-mocks';
+
+// Setup navigation mocks
+setupNavigationMocks();
 
 // Mock next-auth
 jest.mock('next-auth/react', () => ({
   signIn: jest.fn(),
 }));
 
-// Mock next/navigation
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-}));
-
 describe('SignInForm Component', () => {
-  const mockPush = jest.fn();
-  
   beforeEach(() => {
-    (useRouter as jest.Mock).mockReturnValue({
-      push: mockPush,
-    });
+    resetNavigationMocks();
     jest.clearAllMocks();
   });
 

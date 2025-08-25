@@ -12,7 +12,7 @@ const createAdminSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // Check if there are any users in the system first
-    const userCount = await prisma.user.count();
+    const userCount = await prisma.users.count();
     
     // If users exist, require authentication
     if (userCount > 0) {
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const validation = createAdminSchema.safeParse(body);
 
     if (!validation?.success) {
@@ -41,15 +41,15 @@ export async function POST(request: NextRequest) {
     const { userId, password } = validation?.data;
 
     // Check if user exists and doesn't have a password
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: userId },
       select: {
         id: true,
         email: true,
-        hashedPassword: true,
-        Staff: {
+        hashed_password: true,
+        staff: {
           select: {
-            Role: {
+            role: {
               select: {
                 key: true,
                 is_leadership: true
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (user?.hashedPassword) {
+    if (user?.hashed_password) {
       return NextResponse.json(
         { error: 'User already has a password set' },
         { status: 400 }
@@ -78,10 +78,10 @@ export async function POST(request: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Update the user with the password
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prisma.users.update({
       where: { id: userId },
       data: {
-        hashedPassword: hashedPassword,
+        hashed_password: hashedPassword,
         is_admin: true, // Ensure admin flag is set
         updated_at: new Date()
       },

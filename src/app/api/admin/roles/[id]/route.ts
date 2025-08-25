@@ -5,16 +5,17 @@ import { Capability } from "@/lib/auth/policy";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
   const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
 
   try {
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const { title, priority, category, department_id } = body as { title?: string; priority?: number; category?: string; department_id?: number | string };
 
     if (!title) {
@@ -26,7 +27,7 @@ export async function PUT(
 
     // Update the role
     const updatedRole = await prisma.role.update({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(resolvedParams.id) },
       data: {
         title,
         priority: typeof priority === 'number' ? priority : undefined,
@@ -34,10 +35,10 @@ export async function PUT(
         department_id: typeof department_id === 'string' ? parseInt(department_id) : (typeof department_id === 'number' ? department_id : undefined),
       },
       include: {
-        Department: true,
-        Staff: {
+        department: true,
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       }
@@ -55,9 +56,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const resolvedParams = await params;
+  const { id } = resolvedParams;
   const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
@@ -66,7 +68,7 @@ export async function DELETE(
   try {
     // Delete the role
     await prisma.role.delete({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(resolvedParams.id) },
     });
 
     return NextResponse.json({ message: "Role deleted successfully" });

@@ -38,23 +38,21 @@ interface SavedRequest {
 }
 
 export default function ApiTester() {
-  const [method, setMethod] = useState('GET')
-  const [url, setUrl] = useState('/api/')
+  const [method, setMethod] = useState('GET');
+  const [url, setUrl] = useState('/api/');
   const [headers, setHeaders] = useState<Record<string, string>>({
     'Content-Type': 'application/json',
   })
-  const [body, setBody] = useState('')
+  const [body, setBody] = useState('');
   const [response, setResponse] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   const [history, setHistory] = useState<RequestHistory[]>([])
   const [savedRequests, setSavedRequests] = useState<SavedRequest[]>([])
-  const [activeTab, setActiveTab] = useState('headers')
-  const [responseTab, setResponseTab] = useState('body')
-
+  const [activeTab, setActiveTab] = useState('headers');
+  const [responseTab, setResponseTab] = useState('body');
   const sendRequest = async () => {
-    setIsLoading(true)
-    const startTime = Date.now()
-
+    setIsLoading(true);
+    const startTime = Date.now();
     try {
       const options: RequestInit = {
         method,
@@ -69,10 +67,9 @@ export default function ApiTester() {
         options.body = body
       }
 
-      const res = await fetch(url, options)
+      const res = await fetch(url, options);
       const duration = Date.now() - startTime
-      const data = await res.json()
-
+      const data = await res.json();
       const result = {
         status: res.status,
         statusText: res.statusText,
@@ -81,8 +78,7 @@ export default function ApiTester() {
         duration,
       }
 
-      setResponse(result)
-
+      setResponse(result);
       // Add to history
       const historyItem: RequestHistory = {
         id: Date.now().toString(),
@@ -99,12 +95,12 @@ export default function ApiTester() {
         duration: Date.now() - startTime,
       })
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
   const saveRequest = () => {
-    const name = prompt('Enter a name for this request:')
+    const name = prompt('Enter a name for this request:');
     if (!name) return
 
     const savedRequest: SavedRequest = {
@@ -116,28 +112,28 @@ export default function ApiTester() {
       body,
     }
 
-    setSavedRequests([...savedRequests, savedRequest])
+    setSavedRequests([...savedRequests, savedRequest]);
   }
 
   const loadRequest = (request: SavedRequest) => {
-    setMethod(request.method)
-    setUrl(request.url)
-    setHeaders(request.headers)
-    setBody(request.body ?? '')
+    setMethod(request.method);
+    setUrl(request.url);
+    setHeaders(request.headers);
+    setBody(request.body ?? '');
   }
 
   const addHeader = () => {
-    const key = prompt('Header name:')
-    const value = prompt('Header value:')
+    const key = prompt('Header name:');
+    const value = prompt('Header value:');
     if (key && value) {
-      setHeaders({ ...headers, [key]: value })
+      setHeaders({ ...headers, [key]: value });
     }
   }
 
   const removeHeader = (key: string) => {
     const newHeaders = { ...headers }
     delete newHeaders[key]
-    setHeaders(newHeaders)
+    setHeaders(newHeaders);
   }
 
   const getStatusBadgeVariant = (status: number) => {

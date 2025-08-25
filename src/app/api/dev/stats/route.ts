@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // Get test coverage from recent test runs
-    const latestTestRun = await prisma.auditLog.findFirst({
+    const latestTestRun = await prisma.audit_logs.findFirst({
       where: {
         table_name: 'test_run',
         operation: 'CREATE'
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     const testCoverage = latestTestRun?.field_changes?.coverage as number ?? 0;
     
     // Get previous coverage for comparison
-    const previousTestRun = await prisma.auditLog.findFirst({
+    const previousTestRun = await prisma.audit_logs.findFirst({
       where: {
         table_name: 'test_run',
         operation: 'CREATE',
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
       0;
     
     // Check API health by counting recent errors
-    const recentErrors = await prisma.auditLog.count({
+    const recentErrors = await prisma.audit_logs.count({
       where: {
         operation: 'ERROR',
         created_at: {
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
                      recentErrors < 5 ? 'degraded' : 'down';
     
     // Count active errors (recent errors that haven't been resolved)
-    const activeErrors = await prisma.auditLog.count({
+    const activeErrors = await prisma.audit_logs.count({
       where: {
         operation: 'ERROR',
         created_at: {

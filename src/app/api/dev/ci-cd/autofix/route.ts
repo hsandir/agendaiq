@@ -33,7 +33,7 @@ interface AutofixSuggestion {
     action: 'create' | 'modify' | 'delete';
     content?: string;
   }>;
-  preventive: boolean;
+  preventive: boolean
 }
 
 // GET /api/dev/ci-cd/autofix - Get autofix suggestions for an error
@@ -75,8 +75,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const body = await request.json();
-    const { __suggestionId, __errorType, __errorMessage, dryRun = __true, __customSuggestion  } = body;
+    const body = await request.json() as Record<string, unknown>;
+    const { suggestionId, errorType, errorMessage, dryRun = true, customSuggestion  } = body;
 
     // Use custom suggestion if provided, otherwise generate and find
     let suggestion: AutofixSuggestion;
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     for (const command of suggestion.commands) {
       try {
         if (!dryRun) {
-          const { stdout, stderr } = await execAsync(__command, {
+          const { stdout, stderr } = await execAsync(command, {
             cwd: process.cwd(),
           });
           results.applied.push(`Command: ${command}\nOutput: ${stdout ?? stderr}`);

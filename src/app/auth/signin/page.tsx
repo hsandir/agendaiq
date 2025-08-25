@@ -82,7 +82,7 @@ function SignInContent() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function SignInPageWrapper() {

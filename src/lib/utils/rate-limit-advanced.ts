@@ -2,7 +2,7 @@ import { LRUCache } from 'lru-cache';
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
-import type { User } from '@prisma/client';
+import type { users } from '@prisma/client';
 
 // Advanced rate limiting configuration
 export interface AdvancedRateLimitOptions {
@@ -25,7 +25,7 @@ export interface RateLimitMetrics {
   allowedRequests: number;
   uniqueClients: number;
   averageResponseTime: number;
-  peakRequestsPerMinute: number;
+  peakRequestsPerMinute: number
 }
 
 export interface EnhancedRateLimitResult {
@@ -153,7 +153,7 @@ export class AdvancedRateLimiter {
     request: Request,
     limit: number,
     token: string,
-    user?: User & { staff?: { role: { title: string } } }
+    user?: users & { staff?: { role: { title: string } } }
   ): Promise<EnhancedRateLimitResult> {
     try {
       // Extract IP for whitelist/blacklist checking
@@ -195,8 +195,8 @@ export class AdvancedRateLimiter {
       return this.createAllowedResult(limit, limit);
     }
 
-    const { __success, limit: __redisLimit, __remaining, __reset  } = await redisRateLimiter.limit(
-      `${this.options.__customKeyPrefix}:${__token}`
+    const { _success, limit: _redisLimit, _remaining, _reset } = await redisRateLimiter.limit(
+      `${this.options.customKeyPrefix || 'default'}:${_token}`
     );
 
     if (!success) {
@@ -336,7 +336,7 @@ export class AdvancedRateLimiter {
   }
 
   private getMetrics(token: string): RateLimitMetrics | undefined {
-    return metricsCache.get(token);
+    return metricsCache.get(token)
   }
 
   private extractClientIP(request: Request): string {
@@ -413,22 +413,22 @@ export class AdvancedRateLimiter {
 
   // Add IP to blacklist
   addToBlacklist(ip: string): void {
-    this.blacklistedIPs.add(ip);
+    this.blacklistedIPs.add(ip)
   }
 
   // Remove IP from blacklist
   removeFromBlacklist(ip: string): void {
-    this.blacklistedIPs.delete(ip);
+    this.blacklistedIPs.delete(ip)
   }
 
   // Add IP to whitelist
   addToWhitelist(ip: string): void {
-    this.whitelistedIPs.add(ip);
+    this.whitelistedIPs.add(ip)
   }
 
   // Remove IP from whitelist
   removeFromWhitelist(ip: string): void {
-    this.whitelistedIPs.delete(ip);
+    this.whitelistedIPs.delete(ip)
   }
 }
 

@@ -9,7 +9,7 @@ export default function RoleHierarchyContent() {
   const [stats, setStats] = useState({
     totalRoles: 7,
     leadershipRoles: 5,
-    totalStaff: 0,
+    totalstaff: 0,
     departments: 0
   });
   const [loading, setLoading] = useState(true);
@@ -31,13 +31,13 @@ export default function RoleHierarchyContent() {
         
         const totalRoles = roles.length ?? 0;
         const leadershipRoles = roles.filter((role: { is_leadership?: boolean }) => role.is_leadership === true).length ?? 0;
-        const totalStaff = roles.reduce((acc: number, role: { Staff?: Array<unknown> }) => acc + (role.Staff?.length ?? 0), 0);
-        const departments = new Set(roles.map((role: { Department?: { id: string } }) => role.Department?.id).filter(Boolean)).size;
+        const totalStaff = roles.reduce((acc: number, role: { Staff?: Array<unknown> }) => acc + (role.staff?.length ?? 0), 0);
+        const departments = new Set(roles.map((role: { Department?: { id: string } }) => role.department?.id).filter(Boolean)).size;
 
         setStats({
           totalRoles,
           leadershipRoles,
-          totalStaff,
+          totalstaff: totalStaff,
           departments
         });
       } else {
@@ -182,5 +182,5 @@ export default function RoleHierarchyContent() {
         </div>
       </div>
     </>
-  );
+  )
 } 

@@ -35,15 +35,15 @@ export async function POST(request: NextRequest) {
           before: { field: 'old_value' },
           after: { field: 'new_value' }
         },
-        ip_address: request.headers.get('x-forwarded-for') || '127.0.0.1',
-        user_agent: request.headers.get('user-agent') || 'Development Seeder',
+        ip_address: request.headers.get('x-forwarded-for') ?? '127.0.0.1',
+        user_agent: request.headers.get('user-agent') ?? 'Development Seeder',
         description: `${operation} operation on ${tableName}`,
         created_at: new Date(Date.now() - Math.random() * 86400000 * 7) // Random time in last 7 days
       });
     }
     
     // Create logs in batches
-    await prisma.auditLog.createMany({
+    await prisma.audit_logs.createMany({
       data: auditLogs
     });
     
@@ -68,14 +68,14 @@ export async function POST(request: NextRequest) {
           coverage,
           duration
         },
-        ip_address: request.headers.get('x-forwarded-for') || '127.0.0.1',
-        user_agent: request.headers.get('user-agent') || 'Test Runner',
+        ip_address: request.headers.get('x-forwarded-for') ?? '127.0.0.1',
+        user_agent: request.headers.get('user-agent') ?? 'Test Runner',
         description: `Test run completed: ${passed} passed, ${failed} failed`,
         created_at: new Date(Date.now() - i * 86400000) // One per day going back
       });
     }
     
-    await prisma.auditLog.createMany({
+    await prisma.audit_logs.createMany({
       data: testRuns
     });
     
@@ -91,8 +91,8 @@ export async function POST(request: NextRequest) {
     });
     
     // Get counts
-    const logCount = await prisma.auditLog.count();
-    const userCount = await prisma.user.count();
+    const logCount = await prisma.audit_logs.count();
+    const userCount = await prisma.users.count();
     const staffCount = await prisma.staff.count();
     
     return NextResponse.json({

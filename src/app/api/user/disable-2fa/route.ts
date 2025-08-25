@@ -11,11 +11,11 @@ export async function POST(request: NextRequest) {
 
     // Disable 2FA and remove secret
     // TODO: Add twoFactorEnabled and twoFactorSecret fields to User model in schema
-    // await prisma.user.update({
+    // await prisma.users.update({
     //   where: { email: auth.user.email! },
     //   data: {
-    //     twoFactorEnabled: false,
-    //     twoFactorSecret: null,
+    //     two_factor_enabled: false,
+    //     two_factor_secret: null,
     //   },
     // });
     

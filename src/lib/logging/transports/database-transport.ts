@@ -11,12 +11,12 @@ export class DatabaseTransport implements LogTransport {
   level: LogLevel;
 
   constructor(level: LogLevel = LogLevel.INFO) {
-    this.level = level;
+    this.level = level
   }
 
   async write(entry: BaseLogEntry): Promise<void> {
     if (entry.level < this.level) {
-      return;
+      return
     }
 
     try {

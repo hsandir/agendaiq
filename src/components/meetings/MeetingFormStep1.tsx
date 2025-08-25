@@ -32,7 +32,7 @@ const MeetingHistoryModal = dynamic(
   }
 );
 import { Search, Users, Calendar, Video, Repeat, Link, CalendarDays, FolderOpen } from "lucide-react";
-import { addMinutes, format } from "date-fns";
+import { addMinutes, format, addDays, addWeeks, addMonths } from "date-fns";
 import { safeFormatDate, isValidDate, getSafeDate } from '@/lib/utils/safe-date';
 
 interface User {
@@ -40,13 +40,13 @@ interface User {
   name: string;
   email: string;
   department: string;
-  role: string;
+  role: string
 }
 
 interface Department {
   id: number;
   name: string;
-  code: string;
+  code: string
 }
 
 interface Role {
@@ -74,6 +74,38 @@ interface MeetingFormStep1Props {
     isContinuation: boolean;
     parentMeetingId?: number;
   }) => Promise<any>;
+}
+
+// Helper function to calculate end date from occurrences and frequency
+function calculateEndDateFromOccurrences(startTime: string, config: any): string {
+  try {
+    const start = new Date(startTime);
+    if (isNaN(start.getTime())) return '';
+    
+    let currentDate = new Date(start);
+    const occurrences = config.occurrences || 10;
+    
+    // Calculate the final date based on pattern and occurrences
+    for (let i = 1; i < occurrences; i++) {
+      switch (config.pattern) {
+        case 'daily':
+          currentDate = addDays(currentDate, config.interval || 1);
+          break;
+        case 'weekly':
+          currentDate = addWeeks(currentDate, config.interval || 1);
+          break;
+        case 'monthly':
+          currentDate = addMonths(currentDate, config.interval || 1);
+          break;
+        default:
+          currentDate = addWeeks(currentDate, 1); // Default to weekly
+      }
+    }
+    
+    return currentDate.toISOString().split('T')[0]; // Return YYYY-MM-DD format
+  } catch {
+    return '';
+  }
 }
 
 export function MeetingFormStep1({ users, departments, roles, onSubmit }: MeetingFormStep1Props) {
@@ -106,15 +138,15 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
   const [showRepeatModal, setShowRepeatModal] = useState(false);
   const [repeatConfig, setRepeatConfig] = useState<RepeatConfig | null>(null);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [selectedPreviousMeeting, setSelectedPreviousMeeting] = useState<any>(null);
+  const [selectedPreviousmeeting, setSelectedPreviousMeeting] = useState<any>(null);
 
   // Transform users to MultiSelectOptions
   const attendeeOptions: MultiSelectOption[] = users.map(user => ({
     value: user.id,
     label: user.name,
     email: user.email,
-    department: 'department' in user ? user.department : null,
-    role: 'role' in user ? user.role : null
+    department: 'department' in user ? (user as Record<string, unknown>).department : null,
+    role: 'role' in user ? (user as Record<string, unknown>).role : null
   }));
   
   console.log("Attendee options created:", attendeeOptions.length, "options");
@@ -285,9 +317,16 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       return;
     }
 
-    if (repeatType !== "none" && !repeatEndDate) {
-      alert("Please select an end date for the repeat series.");
-      return;
+    // Auto-calculate end date for repeating meetings with occurrences
+    let calculatedEndDate = repeatEndDate;
+    if (repeatType !== "none") {
+      if (repeatConfig?.endType === 'after' && repeatConfig.occurrences) {
+        // Calculate end date based on occurrences and frequency
+        calculatedEndDate = calculateEndDateFromOccurrences(startTime, repeatConfig);
+      } else if (!repeatEndDate) {
+        alert("Please select an end date for the repeat series.");
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -299,7 +338,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
         startTime,
         endTime,
         repeatType,
-        repeatEndDate,
+        repeatEndDate: calculatedEndDate,
         repeatConfig,
         calendarIntegration,
         meetingType,

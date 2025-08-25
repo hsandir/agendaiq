@@ -35,8 +35,8 @@ export async function GET() {
     checks.checks.memory = `healthy (${Math.round(memUsage.heapUsed / 1024 / 1024)}MB used)`;
   }
 
-  // Overall status
-  const statusCode = checks.status === 'healthy' ? 200 : 503;
+  // Overall status - return 200 even for degraded status to indicate API is working
+  const statusCode = checks.status === 'unhealthy' ? 503 : 200;
 
   return NextResponse.json(checks, { status: statusCode });
 }

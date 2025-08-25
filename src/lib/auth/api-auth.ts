@@ -112,7 +112,7 @@ export function withAPIAuth(
  * Check if user has permission for specific resource
  */
 export function hasResourcePermission(
-  user: AuthenticatedUser,
+  user: Authenticatedusers,
   resourceType: 'meeting' | 'user' | 'school' | 'department' | 'district',
   resourceId: number,
   action: 'read' | 'write' | 'delete' | 'admin'
@@ -120,7 +120,7 @@ export function hasResourcePermission(
   
   // Admin can do everything - use capability-based check
   if (user.is_system_admin ?? user?.is_school_admin) {
-    return true;
+    return true
   }
 
   // No staff record = no permissions
@@ -172,7 +172,7 @@ export function hasResourcePermission(
       return can(user, [Capability.DISTRICT_MANAGE, Capability.USER_MANAGE]);
       
     default:
-      return false;
+      return false
   }
 }
 
@@ -186,7 +186,7 @@ export const APIAuthPatterns = {
   public: () => withAPIAuth(
     async (request: NextRequest, user: AuthenticatedUser) => {
       // This should not be reached as no auth is required
-      throw new Error('Invalid usage of public pattern');
+      throw new Error('Invalid usage of public pattern')
     },
     { requireAuth: false }
   ),

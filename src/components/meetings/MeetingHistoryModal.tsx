@@ -29,7 +29,7 @@ import {
   ChevronRight,
   Filter,
   FolderOpen,
-  User,
+  users,
   Hash,
   CheckCircle,
   XCircle,
@@ -47,7 +47,7 @@ interface Meeting {
   organizer: {
     name: string;
     role: string;
-    department: string;
+    department: string
   };
   attendees: number;
   agendaItems: number;
@@ -60,27 +60,27 @@ interface Meeting {
 
 interface ImportOptions {
   importAgendaItems: boolean;
-  importAttendees: boolean;
+  importAttendees: boolean
 }
 
 interface MeetingHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectMeeting: (meeting: Meeting) => void;
+  onSelectmeeting: (meeting: Meeting) => void;
   currentUserId?: string;
   currentDepartment?: string;
   currentRole?: string;
   multiSelect?: boolean;
-  onSelectMultipleMeetings?: (meetings: Meeting[], options: ImportOptions) => void;
+  onSelectMultipleMeetings?: (meetings: Meeting[], options: ImportOptions) => void
 }
 
 export function MeetingHistoryModal({
   isOpen,
   onClose,
-  onSelectMeeting,
+  onSelectmeeting,
   currentUserId,
-  currentDepartment,
-  currentRole,
+  currentdepartment,
+  currentrole,
   multiSelect = false,
   onSelectMultipleMeetings
 }: MeetingHistoryModalProps) {
@@ -139,7 +139,7 @@ export function MeetingHistoryModal({
       case "in_progress":
         return <AlertCircle className="h-4 w-4 text-yellow-500" />;
       default:
-        return <Clock className="h-4 w-4 text-muted-foreground" />;
+        return <Clock className="h-4 w-4 text-muted-foreground" />
     }
   };
 
@@ -154,7 +154,7 @@ export function MeetingHistoryModal({
       case "all_hands":
         return "bg-orange-100 text-orange-800";
       default:
-        return "bg-muted text-foreground";
+        return "bg-muted text-foreground"
     }
   };
 

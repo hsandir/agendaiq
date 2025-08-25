@@ -14,7 +14,7 @@ import { safeFormat } from "@/lib/utils/safe-format";
 import {
   Plus,
   Trash2,
-  User,
+  users,
   Calendar,
   Clock,
   AlertCircle,
@@ -87,7 +87,7 @@ export function MeetingActionItems({
     const selectedAttendee = attendees.find(a => a.id === newItem.assignedTo);
     const item: ActionItem = {
       ...newItem as ActionItem,
-      assignedToRole: selectedAttendee?.role,
+      assignedTorole: selectedAttendee?.role,
       department: selectedAttendee?.department
     };
 
@@ -128,7 +128,7 @@ export function MeetingActionItems({
       case "high": return "bg-orange-100 text-orange-800";
       case "medium": return "bg-yellow-100 text-yellow-800";
       case "low": return "bg-green-100 text-green-800";
-      default: return "bg-muted text-foreground";
+      default: return "bg-muted text-foreground"
     }
   };
 
@@ -137,7 +137,7 @@ export function MeetingActionItems({
       case "completed": return <CheckCircle className="h-4 w-4 text-green-500" />;
       case "in_progress": return <Clock className="h-4 w-4 text-yellow-500" />;
       case "cancelled": return <AlertCircle className="h-4 w-4 text-destructive" />;
-      default: return <Target className="h-4 w-4 text-muted-foreground" />;
+      default: return <Target className="h-4 w-4 text-muted-foreground" />
     }
   };
 
@@ -193,7 +193,7 @@ export function MeetingActionItems({
                   <SelectItem value="all">All Assignees</SelectItem>
                   {attendees.map(attendee => (
                     <SelectItem key={attendee.id} value={attendee.id}>
-                      {attendee.name} ({attendee.role})
+                      {attendee.name} ({attendee.role});
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -273,7 +273,7 @@ export function MeetingActionItems({
                   <SelectContent>
                     {attendees.map(attendee => (
                       <SelectItem key={attendee.id} value={attendee.id}>
-                        {attendee.name} - {attendee.role} ({attendee.department})
+                        {attendee.name} - {attendee.role} ({attendee.department});
                       </SelectItem>
                     ))}
                   </SelectContent>

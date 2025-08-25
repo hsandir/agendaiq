@@ -44,7 +44,7 @@ export interface SchoolInfo {
   name: string;
   code?: string;
   address?: string;
-  district_id: number;
+  district_id: number
 }
 
 // Staff with role information
@@ -111,8 +111,9 @@ export function isUserWithPassword(user: unknown): user is UserWithAuth & { hash
   return user !== null && user !== undefined && 
          typeof user === 'object' && 
          'hashedPassword' in user && 
-         typeof (user as any).hashedPassword === 'string' &&
-         (user as any).hashedPassword.length > 0;
+         typeof (user as UserWithAuth).hashedPassword === 'string' &&
+         (user as UserWithAuth).hashedPassword !== null &&
+         (user as UserWithAuth).hashedPassword!.length > 0;
 }
 
 // Check if user has staff
@@ -120,23 +121,24 @@ export function isUserWithStaff(user: unknown): user is UserWithStaff {
   return user !== null && user !== undefined && 
          typeof user === 'object' && 
          'Staff' in user && 
-         Array.isArray((user as any).Staff) &&
-         (user as any).Staff.length > 0;
+         Array.isArray((user as UserWithStaff).Staff) &&
+         (user as UserWithStaff).Staff !== null &&
+         (user as UserWithStaff).Staff!.length > 0
 }
 
 // Check if user is admin
 export function isUserAdmin(user: unknown): boolean {
   if (!user || typeof user !== 'object') return false;
   
-  const userObj = user as any;
+  const userObj = user as Partial<UserWithAuth>;
   
   // Check admin flags
-  if (userObj.is_system_admin || userObj.is_school_admin || userObj.is_admin) {
+  if (userObj.is_system_admin ?? userObj.is_school_admin ?? userObj.is_admin) {
     return true;
   }
   
   // Check role-based admin
-  if (isUserWithStaff(user) && user.Staff?.[0]?.Role) {
+  if (isUserWithStaff(user) && (user as Record<string, unknown>).Staff?.[0]?.Role) {
     // Do not infer admin via title/priority; rely on flags/capabilities
     return false;
   }
@@ -148,13 +150,13 @@ export function isUserAdmin(user: unknown): boolean {
 export function hasCapability(user: unknown, capability: string): boolean {
   if (!user || typeof user !== 'object') return false;
   
-  const userObj = user as any;
+  const userObj = user as Partial<AuthenticatedUser>;
   
   // System admin has all capabilities
-  if (userObj.is_system_admin) return true;
+  if (userObj.is_system_admin === true) return true;
   
   // School admin has all ops capabilities
-  if (userObj.is_school_admin && capability.startsWith('ops:')) return true;
+  if (userObj.is_school_admin === true && capability.startsWith('ops:')) return true;
   
   // Check capabilities array
   if (Array.isArray(userObj.capabilities)) {
@@ -169,8 +171,8 @@ export function hasStaff(obj: unknown): obj is { staff: StaffWithRole } {
   return obj !== null && obj !== undefined && 
          typeof obj === 'object' && 
          'staff' in obj && 
-         (obj as any).staff !== null &&
-         typeof (obj as any).staff === 'object';
+         (obj as { staff: unknown }).staff !== null &&
+         typeof (obj as { staff: unknown }).staff === 'object';
 }
 
 // Safe property access helper
@@ -184,9 +186,9 @@ export function safeAccess<T, K extends keyof T>(
 // Type assertion with validation
 export function assertUser(user: unknown): asserts user is UserWithAuth {
   if (!user || typeof user !== 'object') {
-    throw new Error('Invalid user object');
+    throw new Error('Invalid user object')
   }
-  const userObj = user as any;
+  const userObj = user as Record<string, unknown>;
   if (!userObj.id || !userObj.email) {
     throw new Error('User missing required fields');
   }
@@ -195,9 +197,9 @@ export function assertUser(user: unknown): asserts user is UserWithAuth {
 // Type assertion for staff
 export function assertStaff(staff: unknown): asserts staff is StaffWithRole {
   if (!staff || typeof staff !== 'object') {
-    throw new Error('Invalid staff object');
+    throw new Error('Invalid staff object')
   }
-  const staffObj = staff as any;
+  const staffObj = staff as Record<string, unknown>;
   if (!staffObj.id || !staffObj.user_id || !staffObj.role_id) {
     throw new Error('Staff missing required fields');
   }

@@ -16,10 +16,10 @@ export async function PUT(
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const body = await request.json();
-    const { name, __address, ___city, ___state, ___zipCode, ___phone, ___website, __logo  } = body;
+    const body = await request.json() as Record<string, unknown>;
+    const { _name, _address, _city, _state, _zipCode, _phone, _website, _logo } = body as { name?: string; address?: string; city?: string; state?: string; zipCode?: string; phone?: string; website?: string; logo?: string };
 
-    if ((!name ?? (typeof name !== "string")) || String(name).trim().length === 0) {
+    if (!name || typeof name !== "string" || String(name).trim().length === 0) {
       return new NextResponse("School name is required", { status: 400 });
     }
 

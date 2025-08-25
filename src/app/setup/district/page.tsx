@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { DistrictSetup } from "@/components/setup/DistrictSetup";
 import { requireAuth } from '@/lib/auth/auth-utils';
-import { isRole, RoleKey } from '@/lib/auth/policy';
+import { isrole, RoleKey } from '@/lib/auth/policy';
 
 export default async function DistrictSetupPage() {
   const user = await requireAuth({ requireAuth: true });

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import type { UserWithStaff, SessionUser } from '@/types/auth';
+import type { UserWithstaff, SessionUser } from '@/types/auth';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,7 +25,7 @@ interface AgendaItem {
   duration_minutes: number;
   responsible_staff_id: string | null;
   status: string;
-  order_index: number;
+  order_index: number
 }
 
 interface MeetingEditFormProps {
@@ -47,7 +47,7 @@ interface MeetingEditFormProps {
       id: string;
       name: string;
       email: string;
-      status: string;
+      status: string
     }>;
     agendaItems?: AgendaItem[];
   };
@@ -56,10 +56,10 @@ interface MeetingEditFormProps {
     name: string;
     email: string;
     role: string;
-    department: string;
+    department: string
   }>;
   meetingId: number;
-  isStep2: boolean;
+  isStep2: boolean
 }
 
 export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingEditFormProps) {
@@ -83,7 +83,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   const [startTime, setStartTime] = useState(() => {
     if (meeting.startTime) {
       const date = new Date(meeting.startTime);
-      return format(date, 'HH:mm');
+      return format(date, 'HH:mm')
     }
     return '';
   });
@@ -97,7 +97,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   const [endTime, setEndTime] = useState(() => {
     if (meeting.endTime) {
       const date = new Date(meeting.endTime);
-      return format(date, 'HH:mm');
+      return format(date, 'HH:mm')
     }
     return '';
   });
@@ -126,7 +126,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
   };
   
   const removeAgendaItem = (id: string) => {
-    setAgendaItems(agendaItems.filter(item => item.id !== id));
+    setAgendaItems(agendaItems.filter(item => item.id !== id))
   };
   
   const updateAgendaItem = (id: string, field: keyof AgendaItem, value: unknown) => {
@@ -169,8 +169,8 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
     value: user.id,
     label: user.name,
     email: user.email,
-    role: user.Staff?.[0]?.Role?.title,
-    department: 'department' in user ? user.department : null
+    role: user.staff?.[0]?.role?.title,
+    department: 'department' in user ? (user as Record<string, unknown>).department : null
   }));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -584,7 +584,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
                         <SelectItem value="none">None</SelectItem>
                         {users.map(user => (
                           <SelectItem key={user.id} value={user.id}>
-                            {user.name} ({user.Staff?.[0]?.Role?.title || "No role"})
+                            {user.name} ({user.staff?.[0]?.role?.title || "No role"});
                           </SelectItem>
                         ))}
                       </SelectContent>

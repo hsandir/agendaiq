@@ -1,81 +1,81 @@
 import type { 
-  Meeting, 
-  MeetingAgendaItem, 
-  MeetingAttendee,
-  MeetingActionItem,
-  AgendaItemComment,
-  AgendaItemAttachment,
-  Staff,
-  User,
-  Role,
-  Department,
-  District,
-  School
+  meeting, 
+  meeting_agenda_items, 
+  meeting_attendee,
+  meeting_action_items,
+  agenda_item_comments,
+  agenda_item_attachments,
+  staff,
+  users,
+  role,
+  department,
+  district,
+  school
 } from '@prisma/client';
 
 // Type for staff with related data
-export interface StaffWithRelations extends Staff {
-  User: User;
-  Role: Role;
-  Department?: Department | null;
-  School?: School | null;
-  District?: District | null;
+export interface StaffWithRelations extends staff {
+  users: users;
+  role: role;
+  department?: department | null;
+  school?: school | null;
+  district?: district | null;
 }
 
 // Type for meeting attendee with relations
-export interface AttendeeWithRelations extends MeetingAttendee {
-  Staff: StaffWithRelations;
+export interface AttendeeWithRelations extends meeting_attendee {
+  staff: StaffWithRelations
 }
 
 // Type for meeting with all relations
-export interface MeetingWithRelations extends Meeting {
-  Staff: StaffWithRelations;
-  MeetingAttendee: AttendeeWithRelations[];
-  MeetingAgendaItems?: AgendaItemWithRelations[];
-  MeetingActionItems?: ActionItemWithRelations[];
-  Department?: Department | null;
-  School?: School | null;
-  District?: District | null;
+export interface MeetingWithRelations extends meeting {
+  staff: StaffWithRelations;
+  meeting_attendee: AttendeeWithRelations[];
+  meeting_agenda_items?: AgendaItemWithRelations[];
+  meeting_action_items?: ActionItemWithRelations[];
+  department?: department | null;
+  school?: school | null;
+  district?: district | null;
 }
 
 // Type for agenda item comment with relations
-export interface CommentWithRelations extends AgendaItemComment {
-  Staff: StaffWithRelations;
+export interface CommentWithRelations extends agenda_item_comments {
+  staff: StaffWithRelations
 }
 
 // Type for action item with relations
-export interface ActionItemWithRelations extends MeetingActionItem {
-  AssignedTo: StaffWithRelations | null;
+export interface ActionItemWithRelations extends Omit<meeting_action_items, 'assigned_to'> {
+  assigned_to: StaffWithRelations | null
 }
 
 // Type for agenda item with all relations
-export interface AgendaItemWithRelations extends MeetingAgendaItem {
-  Meeting: MeetingWithRelations;
-  ResponsibleStaff: StaffWithRelations | null;
-  Comments: CommentWithRelations[];
-  ActionItems: ActionItemWithRelations[];
-  Attachments: AgendaItemAttachment[];
+export interface AgendaItemWithRelations extends meeting_agenda_items {
+  meeting: MeetingWithRelations;
+  staff: StaffWithRelations | null;
+  agenda_item_comments: CommentWithRelations[];
+  meeting_action_items: ActionItemWithRelations[];
+  agenda_item_attachments: agenda_item_attachments[];
   _count?: {
-    Comments: number;
-    ActionItems: number;
+    agenda_item_comments: number;
+    meeting_action_items: number
   };
 }
 
 // Simple staff for dropdowns/assignment
 export interface StaffForAssignment {
   id: number;
-  User: {
+  users: {
     id: number;  // Changed from string to number to match Prisma schema
     name: string | null;
-    email: string;
+    email: string
   };
-  Role: {
+  role: {
     id: number;
-    title: string;
+    title: string
   };
   Department?: {
     id: number;
-    name: string;
+    name: string
   } | null;
 }
 
@@ -95,14 +95,14 @@ export interface MeetingResponse {
     id: number;
     name: string | null;
     email: string;
-    role: string;
+    role: string
   };
   attendees: {
     id: number;
     name: string | null;
     email: string;
     role: string;
-    status: string;
+    status: string
   }[];
 }
 

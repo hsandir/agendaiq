@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     if (!authResult.success) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
-    const errorData = await request.json();
+    const errorData = await request.json() as Record<string, unknown>;
     
     const capturedError: ErrorData = {
       message: errorData?.message || 'Unknown error',

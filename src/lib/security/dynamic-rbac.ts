@@ -8,7 +8,7 @@
  * 4. Cache ile performans optimizasyonu yapar
  */
 
-import { AuthenticatedUser } from '../auth/auth-utils';
+import { AuthenticatedUser as _AuthenticatedUser } from '../auth/auth-utils';
 import { prisma } from '../prisma';
 
 export interface RolePermission {
@@ -20,8 +20,8 @@ export interface RolePermission {
   conditions?: Record<string, unknown>;
   priority: number;
   granted: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date
 }
 
 export interface AccessContext {
@@ -37,7 +37,7 @@ export interface AccessResult {
   reason: string;
   appliedRules: string[];
   context: AccessContext;
-  timestamp: Date;
+  timestamp: Date
 }
 
 export interface RoleHierarchy {
@@ -45,7 +45,7 @@ export interface RoleHierarchy {
   parentRoleId?: string;
   level: number;
   priority: number;
-  inheritsPermissions: boolean;
+  inheritsPermissions: boolean
 }
 
 // ===== DYNAMIC RBAC CLASS =====
@@ -155,16 +155,16 @@ export class DynamicRBAC {
       const staff = await prisma.staff.findFirst({
         where: { user_id: user.id },
         include: {
-          Role: true
+          role: true
         }
       });
 
-      if (!staff?.Role) {
+      if (!staff?.role) {
         return [];
       }
 
       // Get all role IDs in hierarchy
-      const roleIds = await this.getRoleHierarchy(staff.Role.id.toString());
+      const roleIds = await this.getRoleHierarchy(staff.role.id.toString());
       
       // Get permissions for all roles
       const permissions: RolePermission[] = [];
@@ -218,15 +218,15 @@ export class DynamicRBAC {
       // Get user's role hierarchy
       const staff = await prisma.staff.findFirst({
         where: { user_id: user.id },
-        include: { Role: true }
+        include: { role: true }
       });
 
-      if (!staff?.Role) {
+      if (!staff?.role) {
         return { granted: false, reason: 'No role found' };
       }
 
       // Get parent roles
-      const parentRoles = await this.getParentRoles(staff.Role.id.toString());
+      const parentRoles = await this.getParentRoles(staff.role.id.toString());
       
       for (const parentRoleId of parentRoles) {
         const parentPermissions = await this.getRolePermissions(parentRoleId);
@@ -283,7 +283,7 @@ export class DynamicRBAC {
     const childRoles: string[] = [];
     
     try {
-      const hierarchy = await prisma.roleHierarchy.findMany({
+      const hierarchy = await prisma.role_hierarchy.findMany({
         where: { parent_role_id: parseInt(roleId) }
       });
 
@@ -305,7 +305,7 @@ export class DynamicRBAC {
     const parentRoles: string[] = [];
     
     try {
-      const hierarchy = await prisma.roleHierarchy.findMany({
+      const hierarchy = await prisma.role_hierarchy.findMany({
         where: { child_role_id: parseInt(roleId) }
       });
 
@@ -345,8 +345,8 @@ export class DynamicRBAC {
         scope: 'own',
         priority: 1,
         granted: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       },
       {
         id: `${roleId}_update_own`,
@@ -356,8 +356,8 @@ export class DynamicRBAC {
         scope: 'own',
         priority: 1,
         granted: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       }
     ];
 
@@ -371,8 +371,8 @@ export class DynamicRBAC {
           action: '*',
           priority: 10,
           granted: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          created_at: new Date(),
+          updated_at: new Date()
         }
       );
     }

@@ -31,7 +31,7 @@ export class DevLogger {
   private async writeToTransports(entry: DevLogEntry): Promise<void> {
     const writePromises = this.transports.map(transport => {
       try {
-        return transport.write(entry);
+        return transport.write(entry)
       } catch (error: unknown) {
         console.error(`Transport ${transport.name} failed:`, error);
         return Promise.resolve();

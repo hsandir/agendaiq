@@ -3,7 +3,7 @@
  * Prisma field issues'ını çözmek için basit bir implementation
  */
 
-import { AuthenticatedUser } from '../auth/auth-utils';
+import { AuthenticatedUser as _AuthenticatedUser } from '../auth/auth-utils';
 
 export interface RolePermission {
   id: string;
@@ -12,7 +12,7 @@ export interface RolePermission {
   action: string;
   scope?: string;
   priority: number;
-  granted: boolean;
+  granted: boolean
 }
 
 export interface AccessContext {
@@ -27,7 +27,7 @@ export interface AccessResult {
   reason: string;
   appliedRules: string[];
   context: AccessContext;
-  timestamp: Date;
+  timestamp: Date
 }
 
 export class DynamicRBAC {
@@ -108,7 +108,7 @@ export class DynamicRBAC {
 
   // Helper method to check if user has specific permission
   async hasPermission(
-    user: _AuthenticatedUser,
+    user: _Authenticatedusers,
     resource: string,
     action: string,
     targetId?: string
@@ -126,7 +126,7 @@ export class DynamicRBAC {
 
   // Helper method to check if user is admin
   async isAdmin(user: _AuthenticatedUser): Promise<boolean> {
-    return user.email?.includes('admin') ?? false;
+    return user.email?.includes('admin') ?? false
   }
 
   // Helper method to check if user is staff

@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const { userId, roleId } = body;
 
     if (!userId || !roleId) {
@@ -40,9 +40,9 @@ export async function POST(request: NextRequest) {
     });
 
     // Get updated user with staff
-    const updatedUser = await prisma.user.findUnique({
+    const updatedUser = await prisma.users.findUnique({
       where: { id: userId },
-      include: { Staff: { include: { Role: true, Department: true } } },
+      include: { staff: { include: { role: true, department: true } } },
     });
 
     return NextResponse.json(updatedUser);

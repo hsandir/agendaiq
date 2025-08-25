@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageSquare, Send, User } from "lucide-react";
+import { MessageSquare, Send, users } from "lucide-react";
 import { format } from "date-fns";
 import { getSafeDate } from '@/lib/utils/safe-date';
 
@@ -11,15 +11,15 @@ interface Comment {
   id: number;
   comment: string;
   created_at: string | Date;  // Support both string and Date
-  Staff: {
-    User: {
+  staff: {
+    users: {
       id: number;
       name: string | null;
-      email: string;
+      email: string
     }
     Role?: {
       id: number;
-      title: string;
+      title: string
     }
   }
 }
@@ -28,7 +28,7 @@ interface Props {
   itemId: number;
   comments: Comment[];
   onAddComment: (content: string) => void;
-  canComment: boolean;
+  canComment: boolean
 }
 
 export function AgendaItemComments({ itemId, comments, onAddComment, canComment }: Props) {
@@ -95,12 +95,12 @@ export function AgendaItemComments({ itemId, comments, onAddComment, canComment 
                 <div className="flex-1">
                   <div className="flex items-baseline gap-2">
                     <span className="font-medium text-sm">
-                      {comment.Staff.User.name ?? comment.Staff.User.email}
+                      {comment.staff.users.name ?? comment.staff.users.email}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       {(() => {
                         const date = getSafeDate(comment.created_at);
-                        return date ? format(date, "MMM d, h:mm a") : 'Unknown time';
+                        return date ? format(date, "MMM d, h:mm a") : 'Unknown time'
                       })()}
                     </span>
                   </div>

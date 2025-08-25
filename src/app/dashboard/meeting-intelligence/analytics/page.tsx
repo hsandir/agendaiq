@@ -25,7 +25,7 @@ interface MeetingMetrics {
   onTimeStartRate: number;
   actionItemCompletionRate: number;
   meetingsByType: { type: string; count: number }[];
-  meetingsByDepartment: { department: string; count: number; efficiency: number }[];
+  meetingsBydepartment: { department: string; count: number; efficiency: number }[];
   trendData: { month: string; meetings: number; efficiency: number }[];
   topContributors: { name: string; role: string; contributions: number }[];
 }
@@ -36,7 +36,7 @@ interface DepartmentPerformance {
   avgDuration: number;
   actionItems: number;
   completionRate: number;
-  efficiency: number;
+  efficiency: number
 }
 
 export default function MeetingAnalyticsPage() {
@@ -361,5 +361,5 @@ export default function MeetingAnalyticsPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

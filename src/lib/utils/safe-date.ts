@@ -5,7 +5,7 @@
 export interface SafeDateResult {
   isValid: boolean;
   date: Date | null;
-  formatted: string;
+  formatted: string
 }
 
 /**
@@ -55,7 +55,7 @@ export function safeFormatDate(
   try {
     return result.date.toLocaleDateString('en-US', options);
   } catch (error: unknown) {
-    return fallback;
+    return fallback
   }
 }
 
@@ -76,7 +76,7 @@ export function safeFormatDateTime(
   try {
     return result.date.toLocaleString('en-US', options);
   } catch (error: unknown) {
-    return fallback;
+    return fallback
   }
 }
 
@@ -97,7 +97,7 @@ export function safeFormatTime(
   try {
     return result.date.toLocaleTimeString('en-US', options);
   } catch (error: unknown) {
-    return fallback;
+    return fallback
   }
 }
 
@@ -105,14 +105,14 @@ export function safeFormatTime(
  * Check if a date input is valid
  */
 export function isValidDate(input: string | Date | number | null | undefined): boolean {
-  return safeDate(input).isValid;
+  return safeDate(input).isValid
 }
 
 /**
  * Get a safe Date object or null
  */
 export function getSafeDate(input: string | Date | number | null | undefined): Date | null {
-  return safeDate(input).date;
+  return safeDate(input).date
 }
 
 /**

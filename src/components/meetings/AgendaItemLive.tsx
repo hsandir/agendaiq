@@ -28,22 +28,22 @@ import {
   MessageSquare,
   Paperclip
 } from "lucide-react";
-import type { MeetingAgendaItem, Staff, User as PrismaUser } from "@prisma/client";
+import type { meeting_agenda_items, staff, users as PrismaUser } from "@prisma/client";
 import { usePusherChannel } from "@/hooks/usePusher";
 import { CHANNELS, EVENTS } from "@/lib/pusher";
 import { AgendaItemComments } from "./AgendaItemComments";
 import { CreateMeetingModal } from "./CreateMeetingModal";
 import Link from "next/link";
 
-interface ExtendedAgendaItem extends MeetingAgendaItem {
-  ResponsibleStaff?: (Staff & { User: PrismaUser }) | null;
-  Comments: Record<string, unknown>[];
-  ActionItems: Record<string, unknown>[];
+interface ExtendedAgendaItem extends meeting_agenda_items {
+  staff?: (staff & { users: PrismaUser }) | null;
+  agenda_item_comments: Record<string, unknown>[];
+  meeting_action_items: Record<string, unknown>[];
 }
 
 interface Props {
   item: ExtendedAgendaItem;
-  staff: (Staff & { User: PrismaUser })[];
+  staff: (Staff & { users: PrismaUser })[];
   isExpanded: boolean;
   onToggleExpand: () => void;
   onUpdate: (updates: Partial<MeetingAgendaItem>) => void;
@@ -229,7 +229,7 @@ export function AgendaItemLive({
       case 'High': return 'bg-destructive/10 text-destructive';
       case 'Medium': return 'bg-yellow-100 text-yellow-700';
       case 'Low': return 'bg-green-100 text-green-700';
-      default: return 'bg-muted text-foreground';
+      default: return 'bg-muted text-foreground'
     }
   };
 
@@ -240,7 +240,7 @@ export function AgendaItemLive({
       case 'Pending': return 'bg-muted text-foreground';
       case 'Assigned_to_local': return 'bg-primary text-primary-foreground';
       case 'Deferred': return 'bg-orange-100 text-orange-700';
-      default: return 'bg-muted text-foreground';
+      default: return 'bg-muted text-foreground'
     }
   };
 
@@ -282,11 +282,11 @@ export function AgendaItemLive({
               )}
               
               {/* Assigned User Pill */}
-              {item.ResponsibleStaff && !isEditing && (
+              {item.staff && !isEditing && (
                 <div className="flex items-center gap-2 mt-2">
                   <div className="flex items-center gap-1.5 bg-primary text-primary-foreground px-2.5 py-1 rounded-full text-xs font-medium">
                     <User className="h-3 w-3" />
-                    <span>{item.ResponsibleStaff.User.name}</span>
+                    <span>{item.staff.users.name}</span>
                   </div>
                 </div>
               )}
@@ -362,7 +362,7 @@ export function AgendaItemLive({
                 value={editData.responsible_staff_id?.toString() ?? 'none'}
                 onValueChange={(value) => setEditData({ 
                   ...editData, 
-                  responsible_staff_id: value === 'none' ? null : parseInt(value) 
+                  responsible_staff_id: value === 'none' ? null : parseInt(value)
                 })}
               >
                 <SelectTrigger className="mt-1">
@@ -372,7 +372,7 @@ export function AgendaItemLive({
                   <SelectItem value="none">None</SelectItem>
                   {staff.map((s) => (
                     <SelectItem key={s.id} value={s.id.toString()}>
-                      {s.User.name} ({s.User.email})
+                      {s.users.name} ({s.users.email})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -381,7 +381,7 @@ export function AgendaItemLive({
               <div className="mt-1 flex items-center space-x-2">
                 <User className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm">
-                  {item.ResponsibleStaff ? item.ResponsibleStaff.User.name : 'Unassigned'}
+                  {item.staff ? item.staff.users.name : 'Unassigned'}
                   {item.staff_initials && ` (${item.staff_initials})`}
                 </span>
               </div>
@@ -575,11 +575,11 @@ export function AgendaItemLive({
                   onClick={() => setShowComments(!showComments)}
                 >
                   <MessageSquare className="h-4 w-4" />
-                  <span>{item.Comments?.length ?? 0} Comments</span>
+                  <span>{item.comments?.length ?? 0} Comments</span>
                 </button>
                 <div className="flex items-center space-x-1">
                   <Paperclip className="h-4 w-4" />
-                  <span>{item.ActionItems?.length ?? 0}</span>
+                  <span>{item.action_items?.length ?? 0}</span>
                 </div>
                 {item.future_implications && !isEditing && (
                   <div className="flex items-center space-x-1 text-yellow-600">
@@ -608,7 +608,7 @@ export function AgendaItemLive({
               <div className="mt-4 pt-4 border-t">
                 <AgendaItemComments
                   itemId={item.id}
-                  comments={item.Comments ?? []}
+                  comments={item.comments ?? []}
                   onAddComment={handleAddComment}
                   canComment={canEdit}
                 />

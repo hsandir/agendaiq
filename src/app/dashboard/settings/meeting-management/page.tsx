@@ -10,27 +10,27 @@ import { safeFormatDateTime } from '@/lib/utils/safe-date';
 export default async function MeetingManagementDashboard() {
   const user = await requireAuth(AuthPresets.requireAuth);
 
-  const userDetails = await prisma.user.findUnique({
+  const userDetails = await prisma.users.findUnique({
     where: { email: user.email },
     include: { 
-      Staff: {
+      staff: {
         include: {
-          Role: true
+          role: true
         }
       }
     }
   });
 
-  if (!userDetails || (userDetails.Staff?.[0]?.Role?.title !== "Administrator")) {
+  if (!userDetails || (userDetails.staff?.[0]?.role?.title !== "Administrator")) {
     redirect("/dashboard");
   }
 
   // Fetch all meetings for admin view
   const meetings = await prisma.meeting.findMany({
     include: {
-      Staff: {
+      staff: {
         include: {
-          User: {
+          users: {
             select: {
               id: true,
               name: true,
@@ -39,11 +39,11 @@ export default async function MeetingManagementDashboard() {
           },
         },
       },
-      MeetingAttendee: {
+      meeting_attendee: {
         include: {
-          Staff: {
+          staff: {
             include: {
-              User: {
+              users: {
                 select: {
                   id: true,
                   name: true,
@@ -109,10 +109,10 @@ export default async function MeetingManagementDashboard() {
                       {safeFormatDateTime(meeting.start_time, undefined, 'TBD')}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-foreground">
-                      {meeting.Staff.User.name ?? meeting.Staff.User.email}
+                      {meeting.staff.users.name ?? meeting.staff.users.email}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-foreground">
-                      {meeting.MeetingAttendee.length} attendees
+                      {meeting.meeting_attendee.length} attendees
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm font-medium">
                       <Link href={`/dashboard/meetings/${meeting.id}`} className="text-primary hover:text-primary mr-3">
@@ -167,10 +167,10 @@ export default async function MeetingManagementDashboard() {
                       {safeFormatDateTime(meeting.start_time, undefined, 'TBD')}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-foreground">
-                      {meeting.Staff.User.name ?? meeting.Staff.User.email}
+                      {meeting.staff.users.name ?? meeting.staff.users.email}
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm text-foreground">
-                      {meeting.MeetingAttendee.length} attendees
+                      {meeting.meeting_attendee.length} attendees
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-sm font-medium">
                       <Link href={`/dashboard/meetings/${meeting.id}`} className="text-primary hover:text-primary">

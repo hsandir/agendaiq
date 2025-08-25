@@ -17,7 +17,7 @@ import Link from "next/link";
 interface HealthCheck {
   name: string;
   status: 'pass' | 'warning' | 'fail';
-  lastCheck: string;
+  lastCheck: string
 }
 
 interface HealthChecks {
@@ -244,5 +244,5 @@ export default function HealthOverviewPage() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 } 

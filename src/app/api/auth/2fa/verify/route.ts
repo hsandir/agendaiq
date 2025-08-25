@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     }
 
     const user = authResult.user!;
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     
     if (!body?.token) {
       return NextResponse.json(
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user with secret
-    const dbUser = await prisma.user.findUnique({
+    const dbUser = await prisma.users.findUnique({
       where: { id: user?.id }
     });
 
@@ -49,9 +49,9 @@ export async function POST(request: NextRequest) {
 
     // Verify the token
     const verified = speakeasy.totp.verify({
-      secret: dbUser?.two_factor_secret,
-      encoding: 'base32',
-      token: body?.token,
+      secret: dbUser.two_factor_secret,
+      encoding: 'base32' as const,
+      token: String(body.token),
       window: 2
     });
 
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     const backupCodes = generateBackupCodes();
 
     // Enable 2FA and save backup codes
-    await prisma.user.update({
+    await prisma.users.update({
       where: { id: user?.id },
       data: {
         two_factor_enabled: true,
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       message: "2FA enabled successfully",
-      backupCodes: backupCodes
+      backup_codes: backupCodes
     });
 
   } catch (error: unknown) {

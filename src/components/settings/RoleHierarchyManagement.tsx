@@ -11,14 +11,14 @@ interface Role {
   department_id?: string;
   Department?: {
     id: string;
-    name: string;
+    name: string
   };
   Staff?: Array<{
     id: string;
-    User: {
+    users: {
       id: string;
       name: string | null;
-      email: string;
+      email: string
     };
   }>;
 }
@@ -43,7 +43,7 @@ export function RoleHierarchyManagement() {
       const data = await res.json();
       setRoles(data);
     } catch (error: unknown) {
-      setError('Failed to fetch roles');
+      setError('Failed to fetch roles')
     }
   };
 
@@ -69,7 +69,7 @@ export function RoleHierarchyManagement() {
       setSuccess('Default roles initialized successfully');
       fetchRoles(); // Refresh the roles list
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to initialize roles');
+      setError(error instanceof Error ? error.message : 'Failed to initialize roles')
     } finally {
       setIsLoading(false);
     }
@@ -102,7 +102,7 @@ export function RoleHierarchyManagement() {
       setSelectedSubordinates([]);
       fetchRoles(); // Refresh the roles list
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to add role');
+      setError(error instanceof Error ? error.message : 'Failed to add role')
     } finally {
       setIsLoading(false);
     }
@@ -126,7 +126,7 @@ export function RoleHierarchyManagement() {
       setSuccess(`Successfully deleted role: ${roleTitle}`);
       fetchRoles(); // Refresh the roles list
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to delete role');
+      setError(error instanceof Error ? error.message : 'Failed to delete role')
     } finally {
       setIsLoading(false);
     }
@@ -183,14 +183,14 @@ export function RoleHierarchyManagement() {
               <div>
                 <h4 className="font-medium">{role.title}</h4>
                 <p className="text-sm text-muted-foreground">
-                  Department: {role.Department?.name ?? 'None'}
+                  department: {role.department?.name ?? 'None'}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Priority: {role.priority || 'Not set'}
                 </p>
-                {role.Staff && role.Staff.length > 0 && (
+                {role.staff && role.staff.length > 0 && (
                   <p className="text-sm text-muted-foreground">
-                    Staff: {role.Staff.length} member{role.Staff.length !== 1 ? 's' : ''}
+                    staff: {role.staff.length} member{role.staff.length !== 1 ? 's' : ''}
                   </p>
                 )}
               </div>

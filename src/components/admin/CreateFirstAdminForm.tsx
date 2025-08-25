@@ -4,17 +4,17 @@ import { useState } from 'react';
 import type { UserWithAuth } from '@/types/auth';
 
 import { useRouter } from 'next/navigation';
-import { Lock, Mail, User, AlertCircle, CheckCircle } from 'lucide-react';
+import { Lock, Mail, UserPlus, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface AdminUser {
   id: number;
   email: string;
   name: string | null;
-  hashedPassword: string | null;
-  Staff: {
-    Role: {
+  hashed_password: string | null;
+  staff: {
+    role: {
       title: string;
-      key: string | null;
+      key: string | null
     } | null;
   }[] | null;
 }
@@ -76,14 +76,14 @@ export function CreateFirstAdminForm({ adminUsers }: CreateFirstAdminFormProps) 
         router.push('/auth/signin');
       }, 2000);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
       setIsLoading(false);
     }
   };
 
   // Filter out users that already have passwords
-  const availableUsers = adminUsers.filter(user => !user.hashedPassword);
+  const availableUsers = adminUsers.filter(user => !(user as Record<string, unknown>).hashed_password);
 
   if (availableUsers.length === 0) {
     return (
@@ -101,7 +101,7 @@ export function CreateFirstAdminForm({ adminUsers }: CreateFirstAdminFormProps) 
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -120,7 +120,7 @@ export function CreateFirstAdminForm({ adminUsers }: CreateFirstAdminFormProps) 
           <option value="">-- Select an admin user --</option>
           {availableUsers.map((user) => (
             <option key={user.id} value={user.id}>
-              {user.name || 'No Name'} ({user.email}) - {user.Staff?.[0]?.Role?.title ?? 'Admin'}
+              {user.name || 'No Name'} ({user.email}) - {user.staff?.[0]?.role?.title ?? 'Admin'}
             </option>
           ))}
         </select>

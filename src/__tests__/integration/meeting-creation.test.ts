@@ -16,9 +16,9 @@ describe('Meeting Creation Integration', () => {
 
   beforeEach(async () => {
     // Clean up test data using real database
-    await prisma.meetingAttendee.deleteMany();
-    await prisma.meetingAgendaItem.deleteMany();
-    await prisma.meetingActionItem.deleteMany();
+    await prisma.meeting_attendee.deleteMany();
+    await prisma.meeting_agenda_items.deleteMany();
+    await prisma.meeting_action_items.deleteMany();
     await prisma.meeting.deleteMany();
   });
 
@@ -197,7 +197,7 @@ describe('Meeting Creation Integration', () => {
           department_id: organizer.department_id,
           school_id: organizer.school_id,
           district_id: organizer.district_id,
-          MeetingAttendee: {
+          meeting_attendee: {
             create: [{
               staff_id: attendee.id,
               status: 'pending',
@@ -205,13 +205,13 @@ describe('Meeting Creation Integration', () => {
           }
         },
         include: {
-          MeetingAttendee: true
+          meeting_attendee: true
         }
       });
 
-      expect(meeting.MeetingAttendee).toHaveLength(1);
-      expect(meeting.MeetingAttendee[0].status).toBe('pending');
-      expect(meeting.MeetingAttendee[0].staff_id).toBe(attendee.id);
+      expect(meeting.meeting_attendee).toHaveLength(1);
+      expect(meeting.meeting_attendee[0].status).toBe('pending');
+      expect(meeting.meeting_attendee[0].staff_id).toBe(attendee.id);
     });
   });
 });

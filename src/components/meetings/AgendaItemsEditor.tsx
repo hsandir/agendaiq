@@ -29,7 +29,7 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  User,
+  users,
   Target,
   Flag,
   Lightbulb,
@@ -44,19 +44,19 @@ interface Meeting {
   id: number
   title: string
   start_time: Date | null
-  Staff: {
-    User: {
+  staff: {
+    users: {
       name: string | null
       email: string | null
     }
-    Role: {
+    role: {
       title: string
     }
   }
-  Department: {
+  department: {
     name: string
   } | null
-  MeetingAgendaItems: Array<{
+  meeting_agenda_items: Array<{
     id: number
     topic: string
     problem_statement: string | null
@@ -74,27 +74,27 @@ interface Meeting {
     duration_minutes: number | null
     carried_forward: boolean
     carry_forward_count: number
-    ResponsibleStaff: {
-      User: {
+    staff: {
+      users: {
         name: string | null
         email: string | null
       }
-      Role: {
+      role: {
         title: string
       }
     } | null
   }>
-  MeetingAttendee: Array<{
+  meeting_attendee: Array<{
     staff_id: number
-    Staff: {
-      User: {
+    staff: {
+      users: {
         name: string | null
         email: string | null
       }
-      Role: {
+      role: {
         title: string
       }
-      Department: {
+      department: {
         name: string
       } | null
     }
@@ -112,13 +112,13 @@ interface PastMeeting {
   title: string
   start_time: Date | null
   _count: {
-    MeetingAgendaItems: number
+    meeting_agenda_items: number
   }
 }
 
 interface AgendaItemsEditorProps {
   meeting: Meeting
-  currentUser: _AuthenticatedUser
+  currentUser: AuthenticatedUser
   allStaff: StaffForAgenda[]
   pastMeetings: PastMeeting[]
   canEdit: boolean
@@ -131,25 +131,27 @@ export function AgendaItemsEditor({
   pastMeetings,
   canEdit
 }: AgendaItemsEditorProps) {
-  const router = useRouter()
+  const router = useRouter();
   const [agendaItems, setAgendaItems] = useState<AgendaItemFormData[]>([])
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   
   // Import dialog state
-  const [showImportDialog, setShowImportDialog] = useState(false)
+  const [showImportDialog, setShowImportDialog] = useState(false);
   const [selectedPastMeeting, setSelectedPastMeeting] = useState<number | null>(null)
   const [importedItems, setImportedItems] = useState<AgendaItemFormData[]>([])
   const [importedMeetingId, setImportedMeetingId] = useState<number | null>(null)
-  const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false)
-
+  const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false);
   // State to track if we should auto-add a new item
   const [hasAutoAddedNewItem, setHasAutoAddedNewItem] = useState(false);
 
-  // Initialize agenda items from meeting data
+  // Initialize agenda items from meeting data - only run once on mount
   useEffect(() => {
-    const items: AgendaItemFormData[] = meeting.MeetingAgendaItems.map(item => ({
+    // Only initialize if agendaItems is empty to prevent re-initialization
+    if (agendaItems.length > 0) return;
+    
+    const items: AgendaItemFormData[] = meeting.meeting_agenda_items.map(item => ({
       id: item.id,
       topic: item.topic,
       problem_statement: item.problem_statement ?? undefined,
@@ -173,8 +175,8 @@ export function AgendaItemsEditor({
     const sortedItems = items.sort((a, b) => b.order_index - a.order_index);
     setAgendaItems(sortedItems);
     
-    // Auto-add a new item if the list is empty or if we haven't auto-added yet
-    if (!hasAutoAddedNewItem && canEdit) {
+    // Auto-add a new item if the list is empty and user can edit
+    if (sortedItems.length === 0 && canEdit && !hasAutoAddedNewItem) {
       const newItem: AgendaItemFormData = {
         topic: '',
         priority: 'Medium',
@@ -184,12 +186,12 @@ export function AgendaItemsEditor({
         future_implications: false,
         carried_forward: false,
         carry_forward_count: 0,
-        order_index: sortedItems.length
+        order_index: 0
       };
-      setAgendaItems([newItem, ...sortedItems]);
+      setAgendaItems([newItem]);
       setHasAutoAddedNewItem(true);
     }
-  }, [meeting, hasAutoAddedNewItem, canEdit])
+  }, [])
 
   const addAgendaItem = () => {
     const newItem: AgendaItemFormData = {
@@ -204,13 +206,13 @@ export function AgendaItemsEditor({
       order_index: agendaItems.length
     }
     // Add new item at the beginning (newest first)
-    setAgendaItems([newItem, ...agendaItems])
+    setAgendaItems([newItem, ...agendaItems]);
   }
 
   const updateAgendaItem = (index: number, item: AgendaItemFormData) => {
     const newItems = [...agendaItems]
     newItems[index] = item
-    setAgendaItems(newItems)
+    setAgendaItems(newItems);
   }
 
   const removeAgendaItem = (index: number) => {
@@ -234,16 +236,15 @@ export function AgendaItemsEditor({
       item.order_index = idx
     })
 
-    setAgendaItems(newItems)
+    setAgendaItems(newItems);
   }
 
   const handleImportFromPastMeeting = async () => {
     if (!selectedPastMeeting) return
 
     try {
-      const response = await fetch(`/api/meetings/${selectedPastMeeting}/agenda-items`)
-      const data = await response.json()
-
+      const response = await fetch(`/api/meetings/${selectedPastMeeting}/agenda-items`);
+      const data = await response.json();
       if (data.success && data.items) {
         const imported: AgendaItemFormData[] = data.items.map((item: Record<string, unknown>, index: number) => ({
           topic: item.topic,
@@ -265,11 +266,11 @@ export function AgendaItemsEditor({
           parent_item_id: item.id // Link to original item
         }))
 
-        setImportedItems(imported)
-        setImportedMeetingId(selectedPastMeeting)
-        setAgendaItems([...agendaItems, ...imported])
-        setShowImportDialog(false)
-        setSuccess(`Imported ${imported.length} agenda items`)
+        setImportedItems(imported);
+        setImportedMeetingId(selectedPastMeeting);
+        setAgendaItems([...agendaItems, ...imported]);
+        setShowImportDialog(false);
+        setSuccess(`Imported ${imported.length} agenda items`);
       }
     } catch (error: unknown) {
       setError('Failed to import agenda items')
@@ -279,18 +280,17 @@ export function AgendaItemsEditor({
   const handleRemoveImportedItems = () => {
     if (importedMeetingId) {
       setAgendaItems(agendaItems.filter(item => !importedItems.includes(item)))
-      setImportedItems([])
-      setImportedMeetingId(null)
-      setShowRemoveConfirmation(false)
-      setSuccess('Removed imported items')
+      setImportedItems([]);
+      setImportedMeetingId(null);
+      setShowRemoveConfirmation(false);
+      setSuccess('Removed imported items');
     }
   }
 
   const handleSubmit = async () => {
-    setIsSubmitting(true)
-    setError(null)
-    setSuccess(null)
-
+    setIsSubmitting(true);
+    setError(null);
+    setSuccess(null);
     try {
       const response = await fetch(`/api/meetings/${meeting.id}/agenda-items`, {
         method: 'PUT',
@@ -306,18 +306,16 @@ export function AgendaItemsEditor({
         }),
       })
 
-      const data = await response.json()
-
+      const data = await response.json();
       if (response.ok && data.success) {
-        setSuccess('Agenda items saved successfully')
-        router.refresh()
+        setSuccess('Agenda items saved successfully');
       } else {
-        setError(data.error || 'Failed to save agenda items')
+        setError(data.error || 'Failed to save agenda items');
       }
     } catch (error: unknown) {
       setError('An error occurred while saving')
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -328,7 +326,7 @@ export function AgendaItemsEditor({
         <div>
           <h1 className="text-3xl font-bold text-foreground">Edit Agenda Items</h1>
           <p className="text-muted-foreground mt-2">
-            Meeting: {meeting.title} • {safeFormatDate(meeting.start_time)}
+            meeting: {meeting.title} • {safeFormatDate(meeting.start_time)}
           </p>
         </div>
         <Button
@@ -349,15 +347,15 @@ export function AgendaItemsEditor({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <p className="text-sm text-muted-foreground">Organizer</p>
-              <p className="font-medium">{meeting.Staff.User.name ?? meeting.Staff.User.email}</p>
+              <p className="font-medium">{meeting.staff.users.name ?? meeting.staff.users.email}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Department</p>
-              <p className="font-medium">{meeting.Department?.name || 'N/A'}</p>
+              <p className="font-medium">{meeting.department?.name || 'N/A'}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Attendees</p>
-              <p className="font-medium">{meeting.MeetingAttendee.length} people</p>
+              <p className="font-medium">{meeting.meeting_attendee.length} people</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Agenda Items</p>
@@ -483,7 +481,7 @@ export function AgendaItemsEditor({
                       <div className="flex justify-between items-center w-full">
                         <span>{pm.title}</span>
                         <span className="text-sm text-muted-foreground ml-2">
-                          ({pm._count.MeetingAgendaItems} items)
+                          ({pm._count.meeting_agenda_items} items)
                         </span>
                       </div>
                       <div className="text-xs text-muted-foreground">

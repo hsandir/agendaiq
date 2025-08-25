@@ -293,7 +293,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
     success: boolean;
     output?: string;
     error?: string;
-    duration: number;
+    duration: number
   }> => {
     const startTime = Date.now();
     
@@ -465,7 +465,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
       case 'skipped':
         return <AlertCircle className="h-4 w-4 text-muted-foreground" />;
       default:
-        return <Clock className="h-4 w-4 text-muted-foreground" />;
+        return <Clock className="h-4 w-4 text-muted-foreground" />
     }
   };
 

@@ -10,7 +10,7 @@ export interface UltraFastUser {
   id: number;
   email: string;
   staff?: {
-    id: number;
+    id: number
   } | null;
 }
 
@@ -21,7 +21,7 @@ export interface UltraFastUser {
 // Cache the decoded user with timestamp
 interface CachedUser {
   user: UltraFastUser | null;
-  timestamp: number;
+  timestamp: number
 }
 
 let cachedUser: CachedUser | undefined = undefined;
@@ -99,7 +99,7 @@ class PreferenceCache {
   }
 
   clear(userId: number) {
-    this.cache.delete(userId);
+    this.cache.delete(userId)
   }
 }
 
@@ -132,7 +132,7 @@ class UserStaffCache {
   }
 
   clear(userId: number) {
-    this.cache.delete(userId);
+    this.cache.delete(userId)
   }
 
   clearAll() {

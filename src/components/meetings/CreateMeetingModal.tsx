@@ -32,7 +32,7 @@ interface CreateMeetingModalProps {
     priority?: string;
     purpose?: string;
   };
-  onSuccess?: (meetingId: number) => void;
+  onSuccess?: (meetingId: number) => void
 }
 
 export function CreateMeetingModal({ 
@@ -84,7 +84,7 @@ export function CreateMeetingModal({
         throw new Error('Failed to create meeting');
       }
       
-      const { data: __meeting  } = await meetingResponse.json();
+      const { data: meeting  } = await meetingResponse.json();
       
       // Add the agenda item to the new meeting
       const agendaResponse = await fetch(`/api/meetings/${meeting.id}/agenda-items`, {

@@ -88,5 +88,5 @@ function LoadingState() {
         </Card>
       </div>
     </div>
-  );
+  )
 }

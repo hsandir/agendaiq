@@ -5,18 +5,18 @@
 
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { NextRequest, NextResponse } from 'next/server';
-import { createTestContext } from '@/__tests__/helpers/test-db';
+import { createTestContext } from '@/tests__/helpers/test-db';
 import { 
   TypeSafeRequestBuilder, 
   TypeSafeMockFactory, 
   TypeSafeValidators,
   TypeSafeTestDB 
-} from '@/__tests__/utils/type-safe-helpers';
-import type { TestContext } from '@/__tests__/types/test-context';
+} from '@/tests__/utils/type-safe-helpers';
+import type { TestContext } from '@/tests__/types/test-context';
 
 // Import route handlers - Replace with actual imports
 // import { GET, POST } from '@/app/api/meetings/route';
-// import { GET as getMeeting, PUT, DELETE } from '@/app/api/meetings/[id]/route';
+// import { GET as getmeeting, PUT, DELETE } from '@/app/api/meetings/[id]/route';
 
 // Define input/output types
 interface CreateMeetingInput {
@@ -44,19 +44,19 @@ interface MeetingOutput {
   organizer: {
     id: string;
     name: string;
-    email: string;
+    email: string
   };
   attendees?: Array<{
     id: string;
     name: string;
     email: string;
-    status: 'PENDING' | 'ACCEPTED' | 'DECLINED';
+    status: 'PENDING' | 'ACCEPTED' | 'DECLINED'
   }>;
   agenda_items?: Array<{
     id: number;
     topic: string;
     duration_minutes: number;
-    order_index: number;
+    order_index: number
   }>;
 }
 
@@ -224,10 +224,10 @@ describe('Meetings CRUD API', () => {
       // Check if teacher has permission to create meetings
       const teacherStaff = await context.prisma.staff.findFirst({
         where: { user_id: context.teacherUser.id },
-        include: { Role: true },
+        include: { role: true },
       });
 
-      expect(teacherStaff?.Role.is_leadership).toBe(false);
+      expect(teacherStaff?.role.is_leadership).toBe(false);
       
       // Depending on business rules, this might be allowed or denied
       // For this test, assume teachers can create meetings in their department
@@ -311,9 +311,9 @@ describe('Meetings CRUD API', () => {
           organizer_id: context.adminStaff.id,
         },
         include: {
-          Staff: {
+          staff: {
             include: {
-              User: true,
+              users: true,
             },
           },
         },
@@ -503,7 +503,7 @@ describe('Meetings CRUD API', () => {
       });
 
       // Add agenda item
-      await context.prisma.meetingAgendaItem.create({
+      await context.prisma.meeting_agenda_items.create({
         data: {
           meeting_id: meeting.id,
           topic: 'Opening Discussion',
@@ -527,21 +527,21 @@ describe('Meetings CRUD API', () => {
       const fetchedMeeting = await context.prisma.meeting.findUnique({
         where: { id: meeting.id },
         include: {
-          Staff: {
+          staff: {
             include: {
-              User: true,
+              users: true,
             },
           },
-          MeetingAttendee: {
+          meeting_attendee: {
             include: {
-              Staff: {
+              staff: {
                 include: {
-                  User: true,
+                  users: true,
                 },
               },
             },
           },
-          MeetingAgendaItems: {
+          meeting_agenda_items: {
             orderBy: {
               order_index: 'asc',
             },
@@ -551,9 +551,9 @@ describe('Meetings CRUD API', () => {
 
       expect(fetchedMeeting).toBeDefined();
       expect(fetchedMeeting?.title).toBe('Detailed Meeting');
-      expect(fetchedMeeting?.MeetingAttendee).toHaveLength(1);
-      expect(fetchedMeeting?.MeetingAgendaItems).toHaveLength(1);
-      expect(fetchedMeeting?.MeetingAgendaItems[0].topic).toBe('Opening Discussion');
+      expect(fetchedMeeting?.meeting_attendee).toHaveLength(1);
+      expect(fetchedMeeting?.meeting_agenda_items).toHaveLength(1);
+      expect(fetchedMeeting?.meeting_agenda_items[0].topic).toBe('Opening Discussion');
     });
 
     it('should return 404 for non-existent meeting', async () => {
@@ -886,7 +886,7 @@ describe('Meetings CRUD API', () => {
       });
 
       const canDelete = 
-        meeting.organizer_id === teacherStaff?.id ?? teacherStaff?.Role?.is_leadership === true;
+        meeting.organizer_id === teacherStaff?.id ?? teacherStaff?.role?.is_leadership === true;
 
       expect(canDelete).toBe(false); // Teacher cannot delete admin's meeting
     });

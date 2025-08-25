@@ -3,7 +3,7 @@
 
 import { User } from "next-auth";
 import { AuthenticatedUser } from "./auth-utils";
-import { can, isRole, RoleKey, Capability } from "./policy";
+import { can, isrole, RoleKey, Capability } from "./policy";
 
 export interface FieldAccessRule {
   field: string;
@@ -23,7 +23,7 @@ export interface ModelAccessRules {
 
 // Define field-level access rules for each model
 export const ACCESS_RULES: ModelAccessRules = {
-  User: {
+  users: {
     defaults: {
       read: ['self'], // Users can read their own data
       write: ['self'] // Users can edit their own data
@@ -56,7 +56,7 @@ export const ACCESS_RULES: ModelAccessRules = {
       }
     ]
   },
-  Staff: {
+  staff: {
     defaults: {
       read: ['all'], // All staff can see basic staff info
       write: ['Administrator', 'HR']
@@ -79,7 +79,7 @@ export const ACCESS_RULES: ModelAccessRules = {
       }
     ]
   },
-  Meeting: {
+  meeting: {
     defaults: {
       read: ['attendees', 'organizer'], // Attendees and organizer can read
       write: ['organizer', 'Administrator']
@@ -97,7 +97,7 @@ export const ACCESS_RULES: ModelAccessRules = {
       }
     ]
   },
-  School: {
+  school: {
     defaults: {
       read: ['all'], // All can read basic school info
       write: ['Administrator', 'Principal']
@@ -225,7 +225,7 @@ function checkRoleAccess(user: User | AuthenticatedUser, roleTitle: string): boo
       }
       
       // Fallback: return false for unknown roles (secure by default)
-      return false;
+      return false
   }
 }
 

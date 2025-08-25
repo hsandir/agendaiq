@@ -61,7 +61,7 @@ export default function LoginForm() {
         router.push('/dashboard');
       }
     } catch (error: unknown) {
-      setError('An error occurred. Please try again.');
+      setError('An error occurred. Please try again.')
     } finally {
       setIsLoading(false);
     }
@@ -129,5 +129,5 @@ export default function LoginForm() {
         </a>
       </div>
     </form>
-  );
+  )
 }

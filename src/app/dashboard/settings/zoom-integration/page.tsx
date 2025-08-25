@@ -30,5 +30,5 @@ export default function ZoomIntegrationSettings() {
         <button className="px-4 py-2 bg-green-600 text-foreground rounded mt-2">Save Preferences</button>
       </section>
     </div>
-  );
+  )
 } 

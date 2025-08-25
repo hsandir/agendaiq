@@ -30,7 +30,7 @@ export function ForgotPasswordForm() {
 
       setSuccess(true);
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +55,7 @@ export function ForgotPasswordForm() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -113,5 +113,5 @@ export function ForgotPasswordForm() {
         </div>
       </form>
     </div>
-  );
+  )
 } 

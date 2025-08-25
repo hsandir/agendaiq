@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { RefreshCw, Trash2, Download, CheckCircle, XCircle, AlertCircle, Shield, Database, Server, Key, User, Activity, Bug, Code, Terminal, Eye, EyeOff, PlayIcon, TestTube2Icon } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Button } from '../../../components/ui/button';
+import { Alert, AlertDescription } from '../../../components/ui/alert';
+import { Badge } from '../../../components/ui/badge';
+import { RefreshCw, Trash2, Download, CheckCircle, XCircle, AlertCircle, Shield, Database, Server, Key, User, UserPlus, Activity, Bug, Code, Terminal, Eye, EyeOff, PlayIcon, TestTube2Icon } from 'lucide-react';
 
 interface AuthLog {
   id: string;
@@ -113,7 +113,7 @@ export default function AuthDebugPage() {
           details: { 
             email: testEmail, 
             password: testPassword,
-            timestamp: new Date().toISOString() 
+            timestamp: new Date().toISOString()
           }
         })
       });
@@ -238,7 +238,7 @@ export default function AuthDebugPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          suite: 'src/__tests__/unit/components/tabs.test.tsx',
+          suite: 'src/tests__/unit/components/tabs.test.tsx',
           coverage: false 
         })
       });
@@ -346,7 +346,7 @@ export default function AuthDebugPage() {
       case 'callback': return <Code className="h-4 w-4" />;
       case 'database': return <Database className="h-4 w-4" />;
       case 'env_check': return <Server className="h-4 w-4" />;
-      default: return <AlertCircle className="h-4 w-4" />;
+      default: return <AlertCircle className="h-4 w-4" />
     }
   };
 

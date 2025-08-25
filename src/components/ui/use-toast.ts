@@ -22,7 +22,7 @@ let count = 0
 
 function genId() {
   count = (count + 1) % Number.MAX_VALUE
-  return count.toString()
+  return count.toString();
 }
 
 type ActionType = typeof actionTypes
@@ -58,14 +58,14 @@ const addToRemoveQueue = (toastId: string) => {
   }
 
   const timeout = setTimeout(() => {
-    toastTimeouts.delete(toastId)
+    toastTimeouts.delete(toastId);
     dispatch({
       type: "REMOVE_TOAST",
       toastId: toastId,
-    })
+    });
   }, TOAST_REMOVE_DELAY)
 
-  toastTimeouts.set(toastId, timeout)
+  toastTimeouts.set(toastId, timeout);
 }
 
 export const reducer = (state: State, action: Action): State => {
@@ -88,10 +88,10 @@ export const reducer = (state: State, action: Action): State => {
       const { toastId } = action
 
       if (toastId) {
-        addToRemoveQueue(toastId)
+        addToRemoveQueue(toastId);
       } else {
         state.toasts.forEach((toast) => {
-          addToRemoveQueue(toast.id)
+          addToRemoveQueue(toast.id);
         })
       }
 
@@ -126,33 +126,30 @@ const listeners: Array<(state: State) => void> = []
 let memoryState: State = { toasts: [] }
 
 function dispatch(action: Action) {
-  memoryState = reducer(memoryState, action)
+  memoryState = reducer(memoryState, action);
   listeners.forEach((listener) => {
-    listener(memoryState)
+    listener(memoryState);
   })
 }
 
 type Toast = Omit<ToasterToast, "id">
 
 function toast({ ...props }: Toast) {
-  const id = genId()
-
+  const id = genId();
   const update = (props: ToasterToast) =>
     dispatch({
       type: "UPDATE_TOAST",
       id,
       toast: props,
-    })
-  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
-
+    });
+  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
   dispatch({
     type: "ADD_TOAST",
     toast: {
       ...props,
       id,
     },
-  })
-
+  });
   return {
     id: id,
     dismiss,
@@ -164,11 +161,11 @@ function useToast() {
   const [state, setState] = React.useState<State>(memoryState)
 
   React.useEffect(() => {
-    listeners.push(setState)
+    listeners.push(setState);
     return () => {
-      const index = listeners.indexOf(setState)
+      const index = listeners.indexOf(setState);
       if (index > -1) {
-        listeners.splice(index, 1)
+        listeners.splice(index, 1);
       }
     }
   }, [state])

@@ -13,14 +13,21 @@ function PostHogPageViewContent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (pathname && posthog) {
-      let url = window.origin + pathname;
-      if (searchParams && searchParams.toString()) {
-        url = url + '?' + searchParams.toString();
+    if (pathname && posthog && posthog.__loaded) {
+      try {
+        let url = window.origin + pathname;
+        if (searchParams && searchParams.toString()) {
+          url = url + '?' + searchParams.toString();
+        }
+        posthog.capture('$pageview', {
+          $current_url: url,
+        });
+      } catch (error) {
+        // Silently ignore PostHog errors in development
+        if (process.env.NODE_ENV === "development") {
+          console.debug("PostHog pageview capture failed:", error);
+        }
       }
-      posthog.capture('$pageview', {
-        $current_url: url,
-      });
     }
   }, [pathname, searchParams]);
 

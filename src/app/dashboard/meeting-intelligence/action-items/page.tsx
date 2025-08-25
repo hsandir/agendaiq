@@ -6,7 +6,7 @@ import {
   Clock, 
   AlertCircle, 
   Calendar,
-  User,
+  users,
   Filter,
   ChevronRight,
   Target,
@@ -27,21 +27,21 @@ interface ActionItem {
   status: 'pending' | 'in_progress' | 'completed' | 'overdue' | 'cancelled';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   dueDate?: string;
-  createdAt: string;
+  created_at: string;
   completedAt?: string;
-  assignedRole: {
+  assignedrole: {
     id: number;
     label: string; // role key label
   };
   assignedStaff?: {
     id: number;
     name: string;
-    email: string;
+    email: string
   };
   meeting?: {
     id: number;
     title: string;
-    date: string;
+    date: string
   };
   carriedForwardCount: number;
   parentItemId?: number;
@@ -60,7 +60,7 @@ interface ActionItemStats {
     urgent: number;
     high: number;
     medium: number;
-    low: number;
+    low: number
   };
 }
 
@@ -93,8 +93,8 @@ export default function ActionItemsTrackingPage() {
       const safeItems = (data.items ?? []).map((item: { meeting?: unknown; assignedRole?: { id: number; label: string }; assignedStaff?: unknown; [key: string]: unknown }) => ({
         ...item,
         meeting: item.meeting ?? undefined,
-        assignedRole: item.assignedRole || { id: 0, label: 'UNASSIGNED' },
-        assignedStaff: item.assignedStaff ?? undefined
+        assignedrole: item.assignedRole || { id: 0, label: 'UNASSIGNED' },
+        assignedstaff: item.assignedStaff ?? undefined
       }));
       setActionItems(safeItems);
       setStats(data.stats ?? null);
@@ -127,7 +127,7 @@ export default function ActionItemsTrackingPage() {
       case 'high': return 'text-orange-600 bg-orange-50 border-orange-200';
       case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
       case 'low': return 'text-gray-600 bg-gray-50 border-gray-200';
-      default: return 'text-gray-600 bg-gray-50 border-gray-200';
+      default: return 'text-gray-600 bg-gray-50 border-gray-200'
     }
   };
 
@@ -137,7 +137,7 @@ export default function ActionItemsTrackingPage() {
       case 'in_progress': return <Clock className="h-4 w-4 text-blue-600" />;
       case 'overdue': return <AlertCircle className="h-4 w-4 text-red-600" />;
       case 'cancelled': return <XCircle className="h-4 w-4 text-gray-600" />;
-      default: return <Clock className="h-4 w-4 text-yellow-600" />;
+      default: return <Clock className="h-4 w-4 text-yellow-600" />
     }
   };
 
@@ -147,7 +147,7 @@ export default function ActionItemsTrackingPage() {
       case 'in_progress': return 'text-blue-600 bg-blue-50';
       case 'overdue': return 'text-red-600 bg-red-50';
       case 'cancelled': return 'text-gray-600 bg-gray-50';
-      default: return 'text-yellow-600 bg-yellow-50';
+      default: return 'text-yellow-600 bg-yellow-50'
     }
   };
 
@@ -333,7 +333,7 @@ export default function ActionItemsTrackingPage() {
                     <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <User className="h-3 w-3" />
-                        <span>Role: {item.assignedRole.label}</span>
+                        <span>role: {item.assignedRole.label}</span>
                         {item.assignedStaff && (
                           <span className="ml-1">({item.assignedStaff.name})</span>
                         )}

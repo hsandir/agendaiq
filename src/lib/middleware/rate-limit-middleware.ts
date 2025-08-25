@@ -48,7 +48,7 @@ export async function rateLimitMiddleware(request: NextRequest): Promise<NextRes
  * Helper function to check if a route should be rate limited
  */
 export function shouldRateLimit(pathname: string): boolean {
-  return Object.keys(ROUTE_RATE_LIMITS).some(route => pathname.startsWith(route));
+  return Object.keys(ROUTE_RATE_LIMITS).some(route => pathname.startsWith(route))
 }
 
 /**

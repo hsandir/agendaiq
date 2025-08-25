@@ -1,12 +1,12 @@
-import { PrismaClient, User, Staff, Role } from '@prisma/client'
+import { PrismaClient, users, staff, role } from '@prisma/client'
 import { TestFactory } from '../fixtures/factory'
 
-type UserWithStaff = User & {
-  Staff: (Staff & {
-    Role: Role;
-    Department: unknown;
-    School: unknown;
-    District: unknown;
+type UserWithStaff = users & {
+  staff: (staff & {
+    role: role;
+    department: unknown;
+    school: unknown;
+    district: unknown
   })[]
 }
 
@@ -24,7 +24,7 @@ export function getTestPrismaClient(): PrismaClient {
         db: { url: databaseUrl }
       },
       log: process.env.DEBUG === 'true' ? ['query', 'info', 'warn', 'error'] : [],
-    })
+    });
   }
 
   return prisma
@@ -35,22 +35,21 @@ export function getTestFactory(): TestFactory {
 }
 
 export async function resetTestDatabase() {
-  const prisma = getTestPrismaClient()
-  
+  const prisma = getTestPrismaClient();
   // Clear all data in correct order
   await prisma.$transaction([
-    prisma.meetingAuditLog.deleteMany(),
-    prisma.meetingAttendee.deleteMany(),
-    prisma.meetingNote.deleteMany(),
-    prisma.meetingActionItem.deleteMany(),
-    prisma.agendaItemComment.deleteMany(),
-    prisma.agendaItemAttachment.deleteMany(),
-    prisma.meetingAgendaItem.deleteMany(),
+    prisma.meeting_audit_logs.deleteMany(),
+    prisma.meeting_attendee.deleteMany(),
+    prisma.meeting_notes.deleteMany(),
+    prisma.meeting_action_items.deleteMany(),
+    prisma.agenda_item_comments.deleteMany(),
+    prisma.agenda_item_attachments.deleteMany(),
+    prisma.meeting_agenda_items.deleteMany(),
     prisma.meeting.deleteMany(),
     // prisma.notification.deleteMany(), // Model doesn't exist
     // prisma.activityLog.deleteMany(), // Model doesn't exist
     prisma.staff.deleteMany(),
-    prisma.user.deleteMany(),
+    prisma.users.deleteMany(),
     prisma.role.deleteMany(),
     prisma.department.deleteMany(),
     prisma.school.deleteMany(),
@@ -59,39 +58,37 @@ export async function resetTestDatabase() {
 }
 
 export async function seedTestDatabase() {
-  const prisma = getTestPrismaClient()
-  
+  const prisma = getTestPrismaClient();
   // Use existing data from copied main database
-  const users: UserWithStaff[] = await prisma.user.findMany({
+  const users: UserWithStaff[] = await prisma.users.findMany({
     include: {
-      Staff: {
+      staff: {
         include: {
-          Role: true,
-          Department: true,
-          School: true,
-          District: true
+          role: true,
+          department: true,
+          school: true,
+          district: true
         }
       }
     }
-  })
-  
+  });
   if (users.length >= 2) {
-    const _adminUser = users.find(u => u.Staff?.[0]?.Role?.is_leadership) || users[0]
-    const teacherUser = users.find(u => !u.Staff?.[0]?.Role?.is_leadership) || users[1]
-    const _adminStaff = adminUser.Staff?.[0]
-    const teacherStaff = teacherUser.Staff?.[0]
+    const adminUser = users.find(u => u.staff?.[0]?.role?.is_leadership) || users[0]
+    const teacherUser = users.find(u => !u.staff?.[0]?.role?.is_leadership) || users[1]
+    const adminStaff = adminUser.staff?.[0]
+    const teacherStaff = teacherUser.staff?.[0]
     
     if (adminStaff && teacherStaff) {
       return { adminUser, teacherUser, adminStaff, teacherStaff }
     }
   }
   
-  throw new Error('Test database should have been seeded with data from main database')
+  throw new Error('Test database should have been seeded with data from main database');
 }
 
 export async function disconnectTestDatabase() {
   if (prisma) {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   }
 }
 
@@ -99,10 +96,9 @@ export async function disconnectTestDatabase() {
 export async function withTransaction<T>(
   fn: (tx: PrismaClient) => Promise<T>
 ): Promise<T> {
-  const prisma = getTestPrismaClient()
-  
+  const prisma = getTestPrismaClient();
   return prisma.$transaction(async (tx) => {
-    await fn(tx as PrismaClient)
+    await fn(tx as PrismaClient);
     throw new Error('Rollback') // Force rollback
   }).catch((error) => {
     if (error instanceof Error && error.message === 'Rollback') {
@@ -114,10 +110,9 @@ export async function withTransaction<T>(
 
 // Helper to create isolated test context
 export async function createTestContext() {
-  await resetTestDatabase()
-  const seededData = await seedTestDatabase()
-  const factory = getTestFactory()
-  
+  await resetTestDatabase();
+  const seededData = await seedTestDatabase();
+  const factory = getTestFactory();
   return {
     prisma: getTestPrismaClient(),
     factory,

@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       name: string;
       query: string;
       time: string;
-      success: boolean;
+      success: boolean
     }
     
     const metrics: {
@@ -41,8 +41,8 @@ export async function GET(request: NextRequest) {
 
     // Test 2: Simple user query
     const simpleQueryStart = performance.now();
-    await prisma.user.findUnique({
-      where: { id: typeof user?.id === 'string' ? user?.id : String(user?.id) },
+    await prisma.users.findUnique({
+      where: { id: user?.id },
       select: { id: true, email: true }
     });
     const simpleQueryTime = performance.now() - simpleQueryStart;
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
 
     // Test 3: Count query
     const countStart = performance.now();
-    const userCount = await prisma.user.count();
+    const userCount = await prisma.users.count();
     const countTime = performance.now() - countStart;
     metrics.tests.push({
       name: 'Count Query',
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     const complexStart = performance.now();
     await prisma.meeting.findFirst({
       include: {
-        MeetingAttendee: {
+        meeting_attendee: {
           take: 5
         }
       }
@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
     // Test 6: Transaction test
     const transactionStart = performance.now();
     await prisma.$transaction(async (tx) => {
-      await tx.user.findUnique({ where: { id: typeof user?.id === 'string' ? user?.id : String(user?.id) } });
+      await tx.users.findUnique({ where: { id: user?.id } });
       await tx.meeting.count();
     });
     const transactionTime = performance.now() - transactionStart;
@@ -181,7 +181,7 @@ export async function GET(request: NextRequest) {
 async function getConnectionPoolStatus() {
   try {
     // Get Prisma metrics
-    const metrics = await prisma.$metrics?.json();
+    const metrics = await (prisma as any).$metrics?.json?.() || null;
     
     return {
       status: 'active',

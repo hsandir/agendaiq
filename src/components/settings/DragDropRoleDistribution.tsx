@@ -9,7 +9,7 @@ interface Role {
   priority: number;
   is_leadership: boolean;
   _count?: {
-    Staff: number;
+    staff: number
   };
 }
 
@@ -136,7 +136,7 @@ export default function DragDropRoleDistribution({
                 <div>
                   <div className="font-medium">{role.title}</div>
                   <div className="text-sm text-muted-foreground">
-                    Priority: {role.priority} • {role._count?.Staff ?? 0} staff members
+                    Priority: {role.priority} • {role._count?.staff ?? 0} staff members
                   </div>
                 </div>
               </div>

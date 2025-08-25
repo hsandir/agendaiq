@@ -10,9 +10,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const users = await prisma.user.findMany({
+    const users = await prisma.users.findMany({
       include: {
-        Staff: { include: { Role: true, Department: true, School: true } },
+        staff: { include: { role: true, department: true, school: true } },
       },
       orderBy: {
         name: 'asc',

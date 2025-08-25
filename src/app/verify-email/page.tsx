@@ -58,9 +58,9 @@ export default async function VerifyEmailPage({ searchParams }: PageProps) {
     }
 
     // Update user's email verification status
-    await prisma.user.update({
+    await prisma.users.update({
       where: { email: verificationToken.identifier },
-      data: { emailVerified: new Date() },
+      data: { email_verified: new Date() },
     });
 
     // Delete used token

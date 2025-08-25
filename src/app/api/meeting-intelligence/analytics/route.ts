@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     };
     
     if (department !== 'all') {
-      whereConditions.Department = {
+      whereConditions.department = {
         name: department
       };
     }
@@ -51,14 +51,14 @@ export async function GET(request: NextRequest) {
     const meetings = await prisma.meeting.findMany({
       where: whereConditions,
       include: {
-        MeetingAgendaItems: true,
-        MeetingActionItems: true,
-        MeetingAttendee: true,
-        Department: true,
-        Staff: {
+        meeting_agenda_items: true,
+        meeting_action_items: true,
+        meeting_attendee: true,
+        department: true,
+        staff: {
           include: {
-            User: true,
-            Role: true
+            users: true,
+            role: true
           }
         }
       }
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
     
     const averageDuration = totalMeetings > 0 ? Math.round(totalDuration / totalMeetings) : 0;
     const averageAttendees = totalMeetings > 0 
-      ? Math.round(meetings.reduce((sum, m) => sum + m.MeetingAttendee.length, 0) / totalMeetings)
+      ? Math.round(meetings.reduce((sum, m) => sum + m.meeting_attendee.length, 0) / totalMeetings)
       : 0;
     
     // Calculate completion rates
@@ -88,9 +88,9 @@ export async function GET(request: NextRequest) {
     const onTimeStartRate = 0; // Placeholder until we add actual_start_time to schema
     
     // Calculate action item completion rate
-    const totalActionItems = meetings.reduce((sum, m) => sum + m.MeetingActionItems.length, 0);
+    const totalActionItems = meetings.reduce((sum, m) => sum + m.meeting_action_items.length, 0);
     const completedActionItems = meetings.reduce((sum, m) => 
-      sum + m.MeetingActionItems.filter((a: { status: string }) => a.status === 'Completed').length, 0
+      sum + m.meeting_action_items.filter((a: { status: string }) => a.status === 'Completed').length, 0
     );
     const actionItemCompletionRate = totalActionItems > 0
       ? Math.round((completedActionItems / totalActionItems) * 100)
@@ -110,8 +110,8 @@ export async function GET(request: NextRequest) {
     // Department performance
     const departmentMap = new Map();
     meetings.forEach(m => {
-      if (m.Department) {
-        const key = m.Department.name;
+      if (m.department) {
+        const key = m.department.name;
         if (!departmentMap.has(key)) {
           departmentMap.set(key, {
             department: key,
@@ -126,8 +126,8 @@ export async function GET(request: NextRequest) {
         if (m.start_time && m.end_time) {
           dept.totalDuration += (m.end_time.getTime() - m.start_time.getTime()) / 60000;
         }
-        dept.actionItems += m.MeetingActionItems.length;
-        dept.completedItems += m.MeetingActionItems.filter((a: { status: string }) => a.status === 'Completed').length;
+        dept.actionItems += m.meeting_action_items.length;
+        dept.completedItems += m.meeting_action_items.filter((a: { status: string }) => a.status === 'Completed').length;
       }
     });
     
@@ -163,12 +163,12 @@ export async function GET(request: NextRequest) {
     // Top contributors
     const contributorMap = new Map();
     meetings.forEach(m => {
-      if (m.Staff?.User) {
-        const key = m.Staff.User.id;
+      if (m.staff?.users) {
+        const key = m.staff.users.id;
         if (!contributorMap.has(key)) {
           contributorMap.set(key, {
-            name: m.Staff.User.name ?? 'Unknown',
-            role: m.Staff.Role?.title ?? 'Staff',
+            name: m.staff.users.name ?? 'Unknown',
+            role: m.staff.role?.title ?? 'Staff',
             contributions: 0
           });
         }
@@ -189,7 +189,7 @@ export async function GET(request: NextRequest) {
         onTimeStartRate,
         actionItemCompletionRate,
         meetingsByType,
-        meetingsByDepartment,
+        meetingsBydepartment,
         trendData,
         topContributors
       },

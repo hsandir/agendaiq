@@ -119,7 +119,7 @@ export function validateEnvironment(): { isValid: boolean; errors: string[] } {
     
     // Check NEXTAUTH_URL format
     if (ENV.NEXTAUTH_URL && !ENV.NEXTAUTH_URL.startsWith('https://')) {
-      errors.push('NEXTAUTH_URL must use HTTPS in production');
+      errors.push('NEXTAUTH_URL must use HTTPS in production')
     }
   }
   

@@ -8,7 +8,7 @@
  * 4. Cache ile performans optimizasyonu sağlar
  */
 
-import { AuthenticatedUser } from '../auth/auth-utils';
+import { AuthenticatedUser as _AuthenticatedUser } from '../auth/auth-utils';
 import { DynamicRBAC } from './dynamic-rbac';
 
 export interface MenuItem {
@@ -42,7 +42,7 @@ export interface MenuVisibility {
 export interface MenuCondition {
   type: 'role' | 'permission' | 'custom';
   operator: 'equals' | 'contains' | 'not_equals';
-  value: unknown;
+  value: unknown
 }
 
 export interface MenuStructure {
@@ -410,7 +410,7 @@ export class DynamicMenu {
         return true;
         
       default:
-        return true;
+        return true
     }
   }
 
@@ -424,14 +424,14 @@ export class DynamicMenu {
       case 'not_equals':
         return actual !== expected;
       default:
-        return true;
+        return true
     }
   }
 
   // Get user role
   private async getUserRole(user: _AuthenticatedUser): Promise<string | null> {
     try {
-      const isAdmin = await this.rbac.isAdmin(user);
+      const isAdmin = await this.rbac.is_admin(user);
       if (isAdmin) return 'admin';
       
       const isStaff = await this.rbac.isStaff(user);
@@ -486,7 +486,7 @@ export class DynamicMenu {
 
   // Check if cache is still valid
   private isCacheValid(generatedAt: Date): boolean {
-    return Date.now() - generatedAt.getTime() < this.cacheExpiry;
+    return Date.now() - generatedAt.getTime() < this.cacheExpiry
   }
 
   // Clear menu cache
@@ -499,13 +499,13 @@ export class DynamicMenu {
   }
 
   // Get menu by path
-  async getMenuByPath(user: _AuthenticatedUser, path: string): Promise<MenuItem | null> {
+  async getMenuByPath(user: _Authenticatedusers, path: string): Promise<MenuItem | null> {
     const menuStructure = await this.generateMenu(user);
     
     const findInItems = (items: MenuItem[], targetPath: string): MenuItem | null => {
       for (const item of items) {
         if (item.href === targetPath) {
-          return item;
+          return item
         }
         
         if (item.children) {
@@ -520,13 +520,13 @@ export class DynamicMenu {
   }
 
   // Check if user can access menu item
-  async canAccessMenu(user: _AuthenticatedUser, menuId: string): Promise<boolean> {
+  async canAccessMenu(user: _Authenticatedusers, menuId: string): Promise<boolean> {
     const menuStructure = await this.generateMenu(user);
     
     const findMenuItem = (items: MenuItem[], targetId: string): MenuItem | null => {
       for (const item of items) {
         if (item.id === targetId) {
-          return item;
+          return item
         }
         
         if (item.children) {
@@ -541,7 +541,7 @@ export class DynamicMenu {
   }
 
   // Get breadcrumb for path
-  async getBreadcrumb(user: _AuthenticatedUser, path: string): Promise<MenuItem[]> {
+  async getBreadcrumb(user: _Authenticatedusers, path: string): Promise<MenuItem[]> {
     const menuStructure = await this.generateMenu(user);
     const breadcrumb: MenuItem[] = [];
     

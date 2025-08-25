@@ -224,11 +224,11 @@ export interface UserWithCapabilities {
     };
     department?: {
       id: number;
-      name: string;
+      name: string
     };
     school?: {
       id: number;
-      name: string;
+      name: string
     };
   };
 }
@@ -236,16 +236,12 @@ export interface UserWithCapabilities {
 // Get user's capabilities from database
 export async function getUserCapabilities(userId: number): Promise<string[]> {
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: userId },
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: {
-              include: {
-                Permissions: true
-              }
-            }
+            role: true
           }
         }
       }
@@ -259,7 +255,7 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
     }
     
     // School admin gets ops and management capabilities
-    if (user.is_school_admin) {
+    if ((user as Record<string, unknown>).is_school_admin) {
       return Object.values(Capability).filter(cap => 
         cap.startsWith('ops:') || 
         cap.includes('manage') || 
@@ -269,7 +265,7 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
     }
     
     // Get capabilities from role permissions (type-safe)
-    const perms = user.Staff?.[0]?.Role?.Permissions;
+    const perms = user.staff?.[0]?.role?.permission;
     if (Array.isArray(perms)) {
       const result: string[] = [];
       for (const perm of perms) {
@@ -305,7 +301,7 @@ export function can(
   }
   
   // School admin special permissions
-  if (user.is_school_admin) {
+  if ((user as Record<string, unknown>).is_school_admin) {
     // School admin cannot access dev capabilities
     if (capability.startsWith('dev:')) return false;
     
@@ -319,7 +315,7 @@ export function can(
   }
   
   // Check user's specific capabilities
-  if (user.capabilities?.includes(capability)) {
+  if ((user as Record<string, unknown>).capabilities?.includes(capability)) {
     // Handle context-specific checks (e.g., own resources)
     if (capability === Capability.MEETING_EDIT_OWN && typeof context?.ownerId === 'number') {
       const ownerId = context.ownerId;
@@ -341,17 +337,17 @@ export function isDevAdmin(user: UserWithCapabilities | null | undefined): boole
   // Prefer canonical RoleKey if available
   if (user.staff?.role?.key === RoleKey.DEV_ADMIN) return true;
   // Legacy check for roleKey (will be removed)
-  return user.roleKey === RoleKey.DEV_ADMIN;
+  return (user as Record<string, unknown>).roleKey === RoleKey.DEV_ADMIN;
 }
 
 export function isOpsAdmin(user: UserWithCapabilities | null | undefined): boolean {
   if (!user) return false;
   // Check school admin flag first
-  if (user.is_school_admin === true) return true;
+  if ((user as Record<string, unknown>).is_school_admin === true) return true;
   // Prefer canonical RoleKey if available
   if (user.staff?.role?.key === RoleKey.OPS_ADMIN) return true;
   // Legacy check for roleKey (will be removed)
-  return user.roleKey === RoleKey.OPS_ADMIN;
+  return (user as Record<string, unknown>).roleKey === RoleKey.OPS_ADMIN;
 }
 
 export function isAnyAdmin(user: UserWithCapabilities | null | undefined): boolean {
@@ -366,9 +362,9 @@ export function isRole(
   if (!user) return false;
   const staffRoleKey = user.staff?.role?.key;
   if (typeof staffRoleKey === 'string' && staffRoleKey === role) return true;
-  if (typeof user.roleKey === 'string' && user.roleKey === role) return true; // legacy fallback
+  if (typeof (user as Record<string, unknown>).roleKey === 'string' && (user as Record<string, unknown>).roleKey === role) return true; // legacy fallback
   if (role === RoleKey.DEV_ADMIN && user.is_system_admin === true) return true;
-  if (role === RoleKey.OPS_ADMIN && user.is_school_admin === true) return true;
+  if (role === RoleKey.OPS_ADMIN && (user as Record<string, unknown>).is_school_admin === true) return true;
   return false;
 }
 
@@ -475,20 +471,20 @@ export async function enrichUserWithCapabilities(user: MinimalUserInput): Promis
           ? { id: user.staff.school.id, name: user.staff.school.name }
           : undefined,
       }
-    : user.Staff && user.Staff.length > 0
+    : user.staff && user.staff.length > 0
     ? {
-        id: user.Staff[0].id,
-        role: user.Staff[0].Role
+        id: user.staff[0].id,
+        role: user.staff[0].role
           ? {
-              id: typeof user.Staff[0].Role.id === 'number' ? user.Staff[0].Role.id : 0,
-              key: user.Staff[0].Role.key ?? undefined,
+              id: typeof user.staff[0].role.id === 'number' ? user.staff[0].role.id : 0,
+              key: user.staff[0].role.key ?? undefined,
             }
           : undefined,
-        department: user.Staff[0].Department
-          ? { id: user.Staff[0].Department.id, name: user.Staff[0].Department.name }
+        department: user.staff[0].department
+          ? { id: user.staff[0].department.id, name: user.staff[0].department.name }
           : undefined,
-        school: user.Staff[0].School
-          ? { id: user.Staff[0].School.id, name: user.Staff[0].School.name }
+        school: user.staff[0].school
+          ? { id: user.staff[0].school.id, name: user.staff[0].school.name }
           : undefined,
       }
     : undefined;
@@ -498,11 +494,11 @@ export async function enrichUserWithCapabilities(user: MinimalUserInput): Promis
     email: user.email,
     name: user.name ?? null,
     is_system_admin: user.is_system_admin,
-    is_school_admin: user.is_school_admin,
+    is_school_admin: (user as Record<string, unknown>).is_school_admin,
     capabilities,
     roleKey:
       (normalizedStaff?.role?.key) ||
-      (user.Staff?.[0]?.Role?.key) ||
+      (user.staff?.[0]?.role?.key) ||
       undefined,
     staff: normalizedStaff,
   };

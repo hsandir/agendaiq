@@ -132,7 +132,7 @@ class HybridAuditSystem {
       mergedEvent.riskScore = event.riskScore ?? this.calculateRiskScore(mergedEvent);
 
       // Store in database
-      await prisma.criticalAuditLog.create({
+      await prisma.critical_audit_logs.create({
         data: {
           timestamp: new Date(),
           category: mergedEvent.category,
@@ -309,17 +309,17 @@ class HybridAuditSystem {
    * Get recent critical events (for admin dashboard)
    */
   async getRecentCriticalEvents(limit: number = 50, category?: AuditCategory, userId?: number): Promise<any[]> {
-    return await prisma.criticalAuditLog.findMany({
+    return await prisma.critical_audit_logs.findMany({
       where: {
         ...(category && { category }),
         ...(userId && { user_id: userId })
       },
       include: {
-        User: {
+        users: {
           select: { id: true, email: true, name: true }
         },
-        Staff: {
-          select: { id: true, Role: { select: { title: true } } }
+        staff: {
+          select: { id: true, role: { select: { title: true } } }
         }
       },
       orderBy: {
@@ -335,17 +335,17 @@ class HybridAuditSystem {
   async getHighRiskEvents(minRiskScore: number = 50, hoursBack: number = 24): Promise<any[]> {
     const since = new Date(Date.now() - hoursBack * 60 * 60 * 1000);
     
-    return await prisma.criticalAuditLog.findMany({
+    return await prisma.critical_audit_logs.findMany({
       where: {
         risk_score: { gte: minRiskScore },
         timestamp: { gte: since }
       },
       include: {
-        User: {
+        users: {
           select: { id: true, email: true, name: true }
         },
-        Staff: {
-          select: { id: true, Role: { select: { title: true } } }
+        staff: {
+          select: { id: true, role: { select: { title: true } } }
         }
       },
       orderBy: {
@@ -361,7 +361,7 @@ class HybridAuditSystem {
     const cutoffDate = new Date(Date.now() - daysToKeep * 24 * 60 * 60 * 1000);
     
     // Clean database logs
-    await prisma.criticalAuditLog.deleteMany({
+    await prisma.critical_audit_logs.deleteMany({
       where: {
         timestamp: { lt: cutoffDate }
       }

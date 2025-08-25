@@ -93,7 +93,7 @@ async function getRealPackageStatus() {
     })));
 
     // Get total package count
-    const { stdout: __lsOutput  } = await execAsync('npm ls --json --depth=0', { cwd: process.cwd() });
+    const { stdout: lsOutput  } = await execAsync('npm ls --json --depth=0', { cwd: process.cwd() });
     const lsData = JSON.parse(lsOutput || '{}');
     const totalPackages = Object.keys(lsData.dependencies ?? {}).length;
 

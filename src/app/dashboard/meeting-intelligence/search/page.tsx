@@ -13,7 +13,7 @@ interface SearchResult {
   excerpt: string;
   relevance: number;
   date: string;
-  matchedIn: string;
+  matchedIn: string
 }
 
 interface AgendaItemResult {
@@ -36,10 +36,10 @@ interface ActionItemResult {
   dueDate?: string;
   meeting: {
     id: number;
-    title: string;
+    title: string
   };
   assignedTo: {
-    name: string;
+    name: string
   };
 }
 
@@ -130,7 +130,7 @@ export default function MeetingSearchPage() {
     if (!query) return text;
     const parts = text.split(new RegExp(`(${query})`, 'gi'));
     return parts.map((part, i) => 
-      part.toLowerCase() === query.toLowerCase() 
+      part.toLowerCase() === query.toLowerCase()
         ? <span key={i} className="bg-yellow-200 dark:bg-yellow-800 font-semibold">{part}</span>
         : part
     );
@@ -265,7 +265,7 @@ export default function MeetingSearchPage() {
                         </p>
                       )}
                       <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
-                        <span>Meeting: {item.meeting?.title ?? 'Unknown'}</span>
+                        <span>meeting: {item.meeting?.title ?? 'Unknown'}</span>
                         <span className={`px-2 py-1 rounded ${
                           item.status === 'Resolved' ? 'bg-green-100 text-green-700' :
                           item.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :

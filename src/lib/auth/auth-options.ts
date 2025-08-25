@@ -44,6 +44,10 @@ function isValidUserData(data: unknown): data is User {
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: "jwt",
+    maxAge: 8 * 60 * 60, // 8 hours - matches JWT
+  },
   jwt: {
     maxAge: 8 * 60 * 60, // 8 hours for JWT token
   },
@@ -106,53 +110,53 @@ export const authOptions: NextAuthOptions = {
           }
 
           console.log('🔍 Looking up user in database:', credentials.email);
-          const user = await prisma.user.findUnique({
+          const user = await prisma.users.findUnique({
             where: { email: credentials.email },
             include: {
-              Staff: {
+              staff: {
                 include: {
-                  Role: true,
-                  Department: true,
-                  School: true,
-                  District: true
+                  role: true,
+                  department: true,
+                  school: true,
+                  district: true
                 }
               }
             }
           });
-          console.log('🔍 User found:', !!user, user ? { id: user.id, email: user.email, hasPassword: !!user.hashedPassword } : null);
+          console.log('🔍 User found:', !!user, user ? { id: user.id, email: user.email, hasPassword: !!(user as Record<string, unknown>).hashed_password } : null);
 
           if (!user) {
             console.error('User not found:', credentials.email);
             return null; // Return null for security (don't reveal if user exists)
           }
           
-          if (!user.hashedPassword) {
+          if (!(user as Record<string, unknown>).hashed_password) {
             console.error('User has no password:', credentials.email);
             return null; // Return null instead of throwing
           }
 
           // Check password using bcrypt
           console.log('Checking password for user:', user.email);
-          const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
+          const isValid = await bcrypt.compare(credentials.password, (user as Record<string, unknown>).hashed_password);
           console.log('Password valid:', isValid);
           
           if (!isValid) {
             console.error('Invalid password for user:', user.email);
-            // // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, 'Password mismatch');
+            // // await AuditClient.logAuthEvent('login_failure', user.id, user.staff[0]?.id, req, 'Password mismatch');
             return null; // Return null for invalid password
           }
           
           console.log('✅ Password verified successfully for:', user.email);
 
           // Check 2FA if enabled
-          if (user.two_factor_enabled) {
+          if ((user as Record<string, unknown>).two_factor_enabled) {
             if (!credentials.twoFactorCode) {
               throw new Error("2FA_REQUIRED");
             }
 
             // Verify the 2FA code
             const isValidToken = speakeasy.totp.verify({
-              secret: user.two_factor_secret!,
+              secret: (user as Record<string, unknown>).two_factor_secret!,
               encoding: 'base32',
               token: credentials.twoFactorCode,
               window: 2
@@ -160,25 +164,25 @@ export const authOptions: NextAuthOptions = {
 
             // Check backup codes if TOTP fails
             if (!isValidToken) {
-              const isBackupCode = user.backup_codes.includes(credentials.twoFactorCode);
+              const isBackupCode = (user as Record<string, unknown>).backup_codes.includes(credentials.twoFactorCode);
               
               if (!isBackupCode) {
-                // // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, '2FA code invalid');
+                // // await AuditClient.logAuthEvent('login_failure', user.id, user.staff[0]?.id, req, '2FA code invalid');
                 console.error('Invalid 2FA code and not a backup code');
                 return null; // Return null for invalid 2FA
               }
 
               // Remove used backup code
-              await prisma.user.update({
+              await prisma.users.update({
                 where: { id: parseInt(user.id) },
                 data: {
-                  backup_codes: user.backup_codes.filter(code => code !== credentials.twoFactorCode)
+                  backup_codes: (user as Record<string, unknown>).backup_codes.filter(code => code !== credentials.twoFactorCode)
                 }
               });
             }
           }
 
-          const staff = user.Staff[0];
+          const staff = user.staff[0];
           const userData = {
             id: String(user.id), // Ensure string conversion for NextAuth
             email: user.email,
@@ -187,25 +191,25 @@ export const authOptions: NextAuthOptions = {
               staff: {
                 id: staff.id,
                 role: {
-                  id: staff.Role.id,
-                  key: staff.Role.key,
-                  category: staff.Role.category,
-                  is_leadership: staff.Role.is_leadership
+                  id: staff.role.id,
+                  key: staff.role.key,
+                  category: staff.role.category,
+                  is_leadership: staff.role.is_leadership
                 },
                 department: {
-                  id: staff.Department.id,
-                  name: staff.Department.name,
-                  code: staff.Department.code
+                  id: staff.department.id,
+                  name: staff.department.name,
+                  code: staff.department.code
                 },
                 school: {
-                  id: staff.School.id,
-                  name: staff.School.name,
-                  code: staff.School.code
+                  id: staff.school.id,
+                  name: staff.school.name,
+                  code: staff.school.code
                 },
                 district: {
-                  id: staff.District.id,
-                  name: staff.District.name,
-                  code: staff.District.code
+                  id: staff.district.id,
+                  name: staff.district.name,
+                  code: staff.district.code
                 }
               }
             })
@@ -259,13 +263,13 @@ export const authOptions: NextAuthOptions = {
           return '/auth/signin?error=unauthorized_domain';
         }
 
-        const existingUser = await prisma.user.findUnique({
+        const existingUser = await prisma.users.findUnique({
           where: { email: user.email! }
         });
 
         // If it's the first user ever, make them admin
         if (!existingUser) {
-          const userCount = await prisma.user.count();
+          const userCount = await prisma.users.count();
           if (userCount === 0) {
             // This will be the first user, they'll get admin privileges when created
             return true;
@@ -273,12 +277,12 @@ export const authOptions: NextAuthOptions = {
           
           // Check if there's an existing credentials account
           // This prevents OAuth takeover of credentials accounts
-          const credentialsUser = await prisma.user.findUnique({
+          const credentialsUser = await prisma.users.findUnique({
             where: { email: user.email! },
-            include: { Account: true }
+            include: { account: true }
           });
           
-          if (credentialsUser && !credentialsUser.Account?.some(a => a.provider === 'google')) {
+          if (credentialsUser && !credentialsUser.account?.some(a => a.provider === 'google')) {
             // User exists with credentials, needs to link accounts manually
             return '/auth/signin?error=account_linking_required';
           }
@@ -302,7 +306,7 @@ export const authOptions: NextAuthOptions = {
         }
         
         // Handle rememberMe and trustDevice flags
-        if ('rememberMe' in user && user.rememberMe) {
+        if ('rememberMe' in user && (user as Record<string, unknown>).rememberMe) {
           token.rememberMe = true;
           // Set longer expiry for remember me (7 days)
           const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
@@ -313,7 +317,7 @@ export const authOptions: NextAuthOptions = {
           token.exp = Math.floor(Date.now() / 1000) + maxAge;
         }
         
-        if ('trustDevice' in user && user.trustDevice) {
+        if ('trustDevice' in user && (user as Record<string, unknown>).trustDevice) {
           token.trustDevice = true;
         }
       }
@@ -329,19 +333,15 @@ export const authOptions: NextAuthOptions = {
 
       if (token.email && (trigger === 'signIn' || needsRefresh)) {
         try {
-          const dbUser = await prisma.user.findUnique({
+          const dbUser = await prisma.users.findUnique({
             where: { email: token.email },
             include: {
-              Staff: {
+              staff: {
                 include: {
-                  Role: {
-                    include: {
-                      Permissions: true
-                    }
-                  },
-                  Department: true,
-                  School: true,
-                  District: true
+                  role: true,
+                  department: true,
+                  school: true,
+                  district: true
                 }
               }
             }
@@ -358,29 +358,29 @@ export const authOptions: NextAuthOptions = {
             (token as unknown as { capsRefreshedAt?: number }).capsRefreshedAt = nowSec;
             
             // Add staff info if available
-            if (dbUser.Staff && dbUser.Staff.length > 0) {
-              const staff = dbUser.Staff[0];
+            if (dbUser.staff && dbUser.staff.length > 0) {
+              const staff = dbUser.staff[0];
               token.staff = {
                 id: staff.id,
                 role: {
-                  key: staff.Role.key,
-                  category: staff.Role.category,
-                  is_leadership: staff.Role.is_leadership
+                  key: staff.role.key,
+                  category: staff.role.category,
+                  is_leadership: staff.role.is_leadership
                 },
                 department: {
-                  id: staff.Department.id,
-                  name: staff.Department.name,
-                  code: staff.Department.code
+                  id: staff.department.id,
+                  name: staff.department.name,
+                  code: staff.department.code
                 },
                 school: {
-                  id: staff.School.id,
-                  name: staff.School.name,
-                  code: staff.School.code
+                  id: staff.school.id,
+                  name: staff.school.name,
+                  code: staff.school.code
                 },
                 district: {
-                  id: staff.District.id,
-                  name: staff.District.name,
-                  code: staff.District.code
+                  id: staff.district.id,
+                  name: staff.district.name,
+                  code: staff.district.code
                 }
               } satisfies Record<string, unknown>;
             }
@@ -403,8 +403,8 @@ export const authOptions: NextAuthOptions = {
       }
       // Add admin flags and capabilities to session
       session.user.is_system_admin = token.is_system_admin as boolean;
-      session.user.is_school_admin = token.is_school_admin as boolean;
-      session.user.capabilities = token.capabilities as string[];
+      (session.user as Record<string, unknown>).is_school_admin = token.is_school_admin as boolean;
+      (session.user as Record<string, unknown>).capabilities = token.capabilities as string[];
       
       // Handle remember me expiry
       if (token.rememberMe) {

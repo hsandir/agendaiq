@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     const user = authResult.user!;
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const result = assignmentSchema.safeParse(body);
     
     if (!result.success) {
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
         where: { id: roleId },
         data: { department_id: parseInt(departmentId) },
         include: {
-          Department: true
+          department: true
         }
       });
 
@@ -53,9 +53,9 @@ export async function POST(request: NextRequest) {
         recordId: roleId.toString(),
         operation: 'UPDATE',
         userId: user.id,
-        staffId: user.staff?.id,
+        staffId: (user.staff as Record<string, unknown> | null)?.id,
         source: 'SYSTEM', 
-        description: `Role "${role.key ?? 'UNKNOWN_ROLE'}" assigned to department: ${role.Department?.name ?? 'Unassigned'}`
+        description: `Role "${role.key ?? 'UNKNOWN_ROLE'}" assigned to department: ${role.department?.name ?? 'Unassigned'}`
       });
 
       return role;

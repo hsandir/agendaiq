@@ -14,7 +14,7 @@ export default async function SystemSettingsPage() {
   const user = await requireAuth({ requireAuth: true, requireCapability: Capability.OPS_HEALTH });
 
   // Fetch system settings from database
-  const settings = await prisma.systemSetting.findMany({
+  const settings = await prisma.system_setting.findMany({
     orderBy: {
       key: 'asc'
     }

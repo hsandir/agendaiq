@@ -15,7 +15,7 @@ import {
   PlayCircle,
   Clock,
   GitBranch,
-  User,
+  users,
   Zap,
   AlertTriangle,
   Settings,
@@ -42,7 +42,7 @@ interface WorkflowRun {
   updated_at: string;
   actor: {
     login: string;
-    avatar_url: string;
+    avatar_url: string
   };
   run_number: number;
   event: string;
@@ -54,7 +54,7 @@ interface WorkflowRun {
     logs?: string;
     failedSteps?: Array<{
       name: string;
-      conclusion: string;
+      conclusion: string
     }>;
   }>;
 }
@@ -67,9 +67,9 @@ interface AutofixSuggestion {
   commands: string[];
   files: Array<{
     path: string;
-    action: string;
+    action: string
   }>;
-  preventive: boolean;
+  preventive: boolean
 }
 
 interface Stats {

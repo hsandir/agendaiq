@@ -25,7 +25,7 @@ export default function TwoFactorSetupPage() {
       setQrCode(data.qrCode);
       setStep('qr');
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to enable 2FA');
+      setError(error instanceof Error ? error.message : 'Failed to enable 2FA')
     }
   };
 
@@ -46,7 +46,7 @@ export default function TwoFactorSetupPage() {
       setSuccess(true);
       setStep('verify');
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Invalid verification code');
+      setError(error instanceof Error ? error.message : 'Invalid verification code')
     }
   };
 

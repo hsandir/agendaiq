@@ -62,17 +62,17 @@ async function seedTestData(prisma: PrismaClient) {
   // Clear existing data
   await prisma.$transaction([
     prisma.meetingAuditLog.deleteMany(),
-    prisma.meetingAttendee.deleteMany(),
-    prisma.meetingNote.deleteMany(),
+    prisma.meeting_attendee.deleteMany(),
+    prisma.meeting_note.deleteMany(),
     prisma.meetingActionItems.deleteMany(),
     prisma.agendaItemComment.deleteMany(),
     prisma.agendaItemAttachment.deleteMany(),
-    prisma.meetingAgendaItems.deleteMany(),
+    prisma.meeting_agenda_items.deleteMany(),
     prisma.meeting.deleteMany(),
     prisma.notification.deleteMany(),
     prisma.activityLog.deleteMany(),
     prisma.staff.deleteMany(),
-    prisma.user.deleteMany(),
+    prisma.users.deleteMany(),
     prisma.role.deleteMany(),
     prisma.department.deleteMany(),
     prisma.school.deleteMany(),
@@ -131,7 +131,7 @@ async function seedTestData(prisma: PrismaClient) {
   const teacherRole = await prisma.role.findFirst({ where: { title: 'Teacher' } })
 
   // Create test users
-  const adminUser = await prisma.user.create({
+  const adminUser = await prisma.users.create({
     data: {
       email: 'admin@test.com',
       name: 'Test Admin',
@@ -154,7 +154,7 @@ async function seedTestData(prisma: PrismaClient) {
     include: { Staff: true }
   })
 
-  const teacherUser = await prisma.user.create({
+  const teacherUser = await prisma.users.create({
     data: {
       email: 'teacher@test.com',
       name: 'Test Teacher',

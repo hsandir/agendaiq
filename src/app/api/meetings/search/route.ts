@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
           { organizer_id: staffRecord.id },
           // Meetings they're invited to
           {
-            MeetingAttendee: {
+            meeting_attendee: {
               some: {
                 staff_id: staffRecord.id,
               },
@@ -114,26 +114,26 @@ export async function GET(request: NextRequest) {
     const meetings = await prisma.meeting.findMany({
       where: finalWhereClause,
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: {
+            users: {
               select: {
                 id: true,
                 name: true,
                 email: true,
               },
             },
-            Role: {
+            role: {
               select: { key: true }
             }
           },
         },
-        Department: true,
-        MeetingAttendee: {
+        department: true,
+        meeting_attendee: {
           include: {
-            Staff: {
+            staff: {
               include: {
-                User: {
+                users: {
                   select: {
                     id: true,
                     name: true,
@@ -160,15 +160,15 @@ export async function GET(request: NextRequest) {
       status: meeting.status,
       meeting_type: meeting.meeting_type,
       organizer: {
-        id: meeting.Staff.User.id,
-        name: meeting.Staff.User.name,
-        email: meeting.Staff.User.email,
-        roleKey: meeting.Staff.Role?.key ?? null
+        id: meeting.staff.users.id,
+        name: meeting.staff.users.name,
+        email: meeting.staff.users.email,
+        roleKey: meeting.staff.role?.key ?? null
       },
-      department: meeting.Department?.name,
-      attendee_count: meeting.MeetingAttendee.length,
-      attendees: meeting.MeetingAttendee.slice(0, 3).map(attendee => ({
-        name: attendee.Staff.User.name,
+      department: meeting.department?.name,
+      attendee_count: meeting.meeting_attendee.length,
+      attendees: meeting.meeting_attendee.slice(0, 3).map(attendee => ({
+        name: attendee.staff.users.name,
       })),
     })));
 

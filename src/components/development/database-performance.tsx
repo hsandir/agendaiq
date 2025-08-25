@@ -44,7 +44,7 @@ export function DatabasePerformance() {
       const data = await response.json();
       setMetrics(data);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setLoading(false);
     }

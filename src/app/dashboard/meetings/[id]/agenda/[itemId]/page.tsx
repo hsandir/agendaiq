@@ -10,7 +10,7 @@ interface Props {
 
 export default async function AgendaItemPage(props: Props) {
   const user = await requireAuth(AuthPresets.requireAuth);
-  const params = await props.params;
+  const params = await (props as Record<string, unknown>).params;
 
   const meetingId = parseInt(params.id);
   const itemId = parseInt(params.itemId);
@@ -20,36 +20,36 @@ export default async function AgendaItemPage(props: Props) {
   }
 
   // Fetch agenda item with all relations
-  const agendaItem = await prisma.meetingAgendaItem.findUnique({
+  const agendaItem = await prisma.meeting_agenda_items.findUnique({
     where: { id: itemId },
     include: {
-      Meeting: {
+      meeting: {
         include: {
-          Department: true,
-          Staff: {
+          department: true,
+          staff: {
             include: {
-              User: true,
-              Role: true
+              users: true,
+              role: true
             }
           },
-          MeetingAttendee: {
+          meeting_attendee: {
             where: { staff_id: user.staff?.id || -1 }
           }
         }
       },
-      ResponsibleStaff: {
+      staff: {
         include: {
-          User: true,
-          Role: true,
-          Department: true
+          users: true,
+          role: true,
+          department: true
         }
       },
-      Comments: {
+      agenda_item_comments: {
         include: {
-          Staff: {
+          staff: {
             include: {
-              User: true,
-              Role: true
+              users: true,
+              role: true
             }
           }
         },
@@ -57,17 +57,17 @@ export default async function AgendaItemPage(props: Props) {
           created_at: 'desc'
         }
       },
-      ActionItems: {
+      meeting_action_items: {
         include: {
-          AssignedTo: {
+          staff_meeting_action_items_assigned_toTostaff: {
             include: {
-              User: true,
-              Role: true
+              users: true,
+              role: true
             }
           }
         }
       },
-      Attachments: true
+      agenda_item_attachments: true
     }
   });
 
@@ -76,8 +76,8 @@ export default async function AgendaItemPage(props: Props) {
   }
 
   // Check permissions
-  const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
-  const isAttendee = agendaItem.Meeting.MeetingAttendee.length > 0;
+  const isOrganizer = agendaItem.meeting.organizer_id === user.staff?.id;
+  const isAttendee = agendaItem.meeting.meeting_attendee.length > 0;
   const hasAdminAccess = isAnyAdmin(user);
   const isResponsible = agendaItem.responsible_staff_id === user.staff?.id;
 
@@ -88,19 +88,19 @@ export default async function AgendaItemPage(props: Props) {
   // Get all staff for assignment
   const allStaff = await prisma.staff.findMany({
     include: {
-      User: true,
-      Role: true,
-      Department: true
+      users: true,
+      role: true,
+      department: true
     }
   });
 
   return (
     <AgendaItemDetail
       item={agendaItem as Record<string, unknown>}
-      meeting={agendaItem.Meeting as Record<string, unknown>}
+      meeting={agendaItem.meeting as Record<string, unknown>}
       currentUser={user}
       allStaff={allStaff as Record<string, unknown>}
-      canEdit={isOrganizer ?? hasAdminAccess || isResponsible}
+      canEdit={isOrganizer ?? (hasAdminAccess || isResponsible)}
     />
   );
 }

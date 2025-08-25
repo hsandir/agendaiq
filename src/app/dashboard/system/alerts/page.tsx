@@ -31,7 +31,7 @@ interface AlertRule {
   enabled: boolean;
   channels: string[];
   lastTriggered?: string;
-  triggerCount: number;
+  triggerCount: number
 }
 
 interface AlertChannel {
@@ -50,11 +50,11 @@ interface AlertsConfig {
     quietHours: {
       enabled: boolean;
       start: string;
-      end: string;
+      end: string
     };
     escalation: {
       enabled: boolean;
-      delay: number;
+      delay: number
     };
   };
 }
@@ -201,7 +201,7 @@ export default function AlertsConfigurationPage() {
       case 'info':
         return <CheckCircle className="w-4 h-4 text-primary" />;
       default:
-        return <Bell className="w-4 h-4 text-muted-foreground" />;
+        return <Bell className="w-4 h-4 text-muted-foreground" />
     }
   };
 
@@ -214,7 +214,7 @@ export default function AlertsConfigurationPage() {
       case 'sms':
         return <Smartphone className="w-4 h-4" />;
       default:
-        return <Bell className="w-4 h-4" />;
+        return <Bell className="w-4 h-4" />
     }
   };
 

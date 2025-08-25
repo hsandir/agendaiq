@@ -82,7 +82,7 @@ async function createBackup(message: string = 'Manual backup') {
     
     // Get current branch and status
     const { stdout: currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
-    const { stdout: __status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    const { stdout: status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
     
     // Create backup info
     const backupInfo = {
@@ -133,7 +133,7 @@ async function createBackup(message: string = 'Manual backup') {
 
 async function pushToGitHub(message: string = 'Automated backup') {
   try {
-    const timestamp = new Date().toISOString();
+    const timestamp = new Date().toISOString()
     
     // Get current branch
     const { stdout: currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
@@ -141,7 +141,7 @@ async function pushToGitHub(message: string = 'Automated backup') {
     // Stage and commit all changes
     await execAsync('git add -A', { cwd: process.cwd() });
     
-    const { stdout: __status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    const { stdout: status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
     if (String(status).trim()) {
       // Sanitize commit message to prevent command injection
       const sanitizedMessage = message.replace(/[^a-zA-Z0-9\s\-_.]/g, '').substring(0, 100);
@@ -150,9 +150,9 @@ async function pushToGitHub(message: string = 'Automated backup') {
 
     // Try to push to GitHub
     try {
-      const { stdout: __pushOutput  } = await execAsync(`git push origin ${String(currentBranch).trim()}`, { 
+      const { stdout: pushOutput  } = await execAsync(`git push origin ${String(currentBranch).trim()}`, { 
         cwd: process.cwd(),
-        timeout: __30000 
+        timeout: 30000 
       });
 
       const backupInfo = {
@@ -204,11 +204,11 @@ async function pushToGitHub(message: string = 'Automated backup') {
 
 async function autoBackup(triggerReason: string = 'System update') {
   try {
-    const timestamp = new Date().toISOString();
+    const timestamp = new Date().toISOString()
     const branchName = `backup/auto-${timestamp.replace(/[:.]/g, '-')}`;
     
     // Get project status
-    const { stdout: __status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    const { stdout: status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
     
     if (!String(status).trim()) {
       return NextResponse.json({
@@ -314,7 +314,7 @@ async function restoreBackup(backupBranch: string) {
 async function listBackups() {
   try {
     // Get all backup branches
-    const { stdout: __branches  } = await execAsync('git branch -a', { cwd: process.cwd() });
+    const { stdout: branches  } = await execAsync('git branch -a', { cwd: process.cwd() });
     const backupBranches = (branches
       .split('\n')
       .map(branch => String(branch).trim().replace(/^\*\s*/, ''))
@@ -386,8 +386,8 @@ async function listBackups() {
 async function getBackupStatus() {
   try {
     const { stdout: currentBranch  } = await execAsync('git branch --show-current', { cwd: process.cwd() });
-    const { stdout: __status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
-    const { stdout: __lastCommit  } = await execAsync('git log -1 --format="%H %s %ad" --date=iso', { cwd: process.cwd() });
+    const { stdout: status  } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    const { stdout: lastCommit  } = await execAsync('git log -1 --format="%H %s %ad" --date=iso', { cwd: process.cwd() });
     
     // Check GitHub connection
     let githubStatus = 'unknown';
@@ -399,7 +399,7 @@ async function getBackupStatus() {
     }
 
     // Get backup count
-    const { stdout: __branches  } = await execAsync('git branch -a', { cwd: process.cwd() });
+    const { stdout: branches  } = await execAsync('git branch -a', { cwd: process.cwd() });
     const backupCount = branches.split('\n').filter(branch => branch.includes('backup/')).length;
 
     return NextResponse.json({

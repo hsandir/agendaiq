@@ -15,16 +15,12 @@ export async function GET(request: NextRequest) {
     const capabilities = await getUserCapabilities(user.id);
     
     // Get user's role permissions
-    const userWithRole = await prisma.user.findUnique({
+    const userWithRole = await prisma.users.findUnique({
       where: { id: user?.id },
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: {
-              include: {
-                Permissions: true
-              }
-            }
+            role: true
           }
         }
       }
@@ -41,9 +37,9 @@ export async function GET(request: NextRequest) {
       capabilityCount: capabilities?.length,
       
       // Direct from database
-      role: userWithRole?.Staff?.[0]?.Role?.key ?? null,
-      roleKey: userWithRole?.Staff?.[0]?.Role?.key,
-      permissions: userWithRole?.Staff?.[0]?.Role?.Permissions ?? [],
+      role: userWithRole?.staff?.[0]?.role?.key ?? null,
+      roleKey: userWithRole?.staff?.[0]?.role?.key,
+      permissions: userWithRole?.staff?.[0]?.role?.permissions ?? [],
       
       // Check specific capabilities
       hasOpsBackup: capabilities.includes('ops:backup'),

@@ -36,20 +36,20 @@ interface ConflictItem {
   field: string;
   existing: string | number | boolean | null;
   new: string | number | boolean;
-  action: string;
+  action: string
 }
 
 interface ActionItem {
   id: string;
   label: string;
-  type: string;
+  type: string
 }
 
 interface ExistingData {
   name: string;
   staffId: string;
   role: string;
-  department: string;
+  department: string
 }
 
 interface ProcessedRecord {
@@ -77,8 +77,8 @@ const recordSchema = z.object({
   Email: z.string().email("Invalid email format"),
   Name: z.string().min(1, "Name is required"),
   StaffId: z.string().min(3, "Staff ID must be at least 3 characters").max(15, "Staff ID must be at most 15 characters"),
-  Role: z.string().min(1, "Role is required"),
-  Department: z.string().min(1, "Department is required"),
+  role: z.string().min(1, "Role is required"),
+  department: z.string().min(1, "Department is required"),
 });
 
 // Helper function to validate CSV headers
@@ -102,7 +102,7 @@ function validateCsvHeaders(headers: string[]): { isValid: boolean; errors: stri
   if (headers.length === requiredHeaders.length) {
     const isOrderCorrect = requiredHeaders.every((h, i) => headers[i] === h);
     if (!isOrderCorrect) {
-      errors.push('Column order must be: Email, Name, StaffId, Role, Department');
+      errors.push('Column order must be: Email, Name, StaffId, role, Department');
     }
   }
   
@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ 
         error: 'Invalid CSV format. Please check your file and try again.',
         details: error instanceof Error ? error.message : 'Unknown parsing error',
-        hint: 'Make sure your file uses comma separators and has the correct headers: Email,Name,StaffId,Role,Department'
+        hint: 'Make sure your file uses comma separators and has the correct headers: Email,Name,StaffId,role,Department'
       }, { status: 400 });
     }
 
@@ -214,10 +214,10 @@ export async function POST(request: NextRequest) {
         if (!record.StaffId || !staffIdSchema.safeParse(record.StaffId).success) {
           recordErrors.push('Staff ID must be 3-15 characters');
         }
-        if (!record.Role ?? record.String(Role).trim().length === 0) {
+        if (!record.role ?? record.String(Role).trim().length === 0) {
           recordErrors.push('Role is required');
         }
-        if (!record.Department ?? record.String(Department).trim().length === 0) {
+        if (!record.department ?? record.String(Department).trim().length === 0) {
           recordErrors.push('Department is required');
         }
 
@@ -229,23 +229,23 @@ export async function POST(request: NextRequest) {
         }
 
         // Validate role exists
-        if (record.Role && !validRoles.includes(record.Role)) {
-          recordErrors.push(`Invalid role "${record.Role}". Valid roles: ${validRoles.slice(0, 3).join(', ')}...`);
+        if (record.role && !validRoles.includes(record.role)) {
+          recordErrors.push(`Invalid role "${record.role}". Valid roles: ${validRoles.slice(0, 3).join(', ')}...`);
         }
 
         // Validate department exists
-        if (record.Department && !validDepartments.includes(record.Department)) {
-          recordErrors.push(`Invalid department "${record.Department}". Valid departments: ${validDepartments.slice(0, 3).join(', ')}...`);
+        if (record.department && !validDepartments.includes(record.department)) {
+          recordErrors.push(`Invalid department "${record.department}". Valid departments: ${validDepartments.slice(0, 3).join(', ')}...`);
         }
 
         // Check if email already exists in database
-        const existingUser = await prisma.user.findUnique({
+        const existingUser = await prisma.users.findUnique({
           where: { email: record.Email },
           include: { 
-            Staff: {
+            staff: {
               include: {
-                Role: true, 
-                Department: true
+                role: true, 
+                department: true
               }
             }
           }
@@ -254,15 +254,15 @@ export async function POST(request: NextRequest) {
         // Check if StaffId already exists (if not updating existing user)
         let existingStaffId = null;
         if (record.StaffId) {
-          existingStaffId = await prisma.user.findFirst({
+          existingStaffId = await prisma.users.findFirst({
             where: { 
               staff_id: record.StaffId,
               id: { not: existingUser?.id }
             },
             include: {
-              Staff: {
+              staff: {
                 include: {
-                  Role: true
+                  role: true
                 }
               }
             }
@@ -278,8 +278,8 @@ export async function POST(request: NextRequest) {
           email: record.Email,
           name: record.Name,
           staffId: record.StaffId,
-          role: record.Role,
-          department: record.Department,
+          role: record.role,
+          department: record.department,
           errors: recordErrors,
           warnings: recordWarnings,
           status: 'unknown',
@@ -292,14 +292,14 @@ export async function POST(request: NextRequest) {
         if (existingUser) {
           // User exists - check for conflicts
           processedRecord.status = 'update';
-          const existingStaff = existingUser.Staff.length > 0 ? existingUser.Staff[0] : null;
+          const existingStaff = existingUser.staff.length > 0 ? existingUser.staff[0] : null;
           
           if (existingStaff) {
             processedRecord.existingData = {
               name: existingUser.name ?? '',
               staffId: existingUser.staff_id ?? '',
-              role: existingStaff.Role.key ?? existingStaff.Role.id.toString(),
-              department: existingStaff.Department.name
+              role: existingStaff.role.key ?? existingStaff.role.id.toString(),
+              department: existingStaff.department.name
             };
 
             // Check for conflicts
@@ -320,19 +320,19 @@ export async function POST(request: NextRequest) {
                 action: 'update_staff_id'
               });
             }
-            if (record.Role !== (existingStaff.Role.key ?? existingStaff.Role.id.toString())) {
+            if (record.role !== (existingStaff.role.key ?? existingStaff.role.id.toString())) {
               conflicts.push({
                 field: 'role',
-                existing: existingStaff.Role.key ?? existingStaff.Role.id.toString(),
-                new: record.Role,
+                existing: existingStaff.role.key ?? existingStaff.role.id.toString(),
+                new: record.role,
                 action: 'change_role'
               });
             }
-            if (record.Department !== existingStaff.Department.name) {
+            if (record.department !== existingStaff.department.name) {
               conflicts.push({
                 field: 'department',
-                existing: existingStaff.Department.name,
-                new: record.Department,
+                existing: existingStaff.department.name,
+                new: record.department,
                 action: 'change_department'
               });
             }
@@ -452,14 +452,14 @@ export async function POST(request: NextRequest) {
             continue;
           }
 
-          const existingUser = await prisma.user.findUnique({
+          const existingUser = await prisma.users.findUnique({
             where: { email: record.email },
-            include: { Staff: true }
+            include: { staff: true }
           });
 
           if (existingUser) {
             // Update existing user
-            await prisma.user.update({
+            await prisma.users.update({
               where: { id: existingUser.id },
               data: { 
                 name: record.name,
@@ -467,9 +467,9 @@ export async function POST(request: NextRequest) {
               }
             });
 
-            if (existingUser.Staff.length > 0) {
+            if (existingUser.staff.length > 0) {
               await prisma.staff.update({
-                where: { id: existingUser.Staff[0].id },
+                where: { id: existingUser.staff[0].id },
                 data: {
                   role_id: parseInt(role.id),
                   department_id: parseInt(department.id)
@@ -499,12 +499,12 @@ export async function POST(request: NextRequest) {
             }
 
             // Create new user
-            const newUser = await prisma.user.create({
+            const newUser = await prisma.users.create({
               data: {
                 email: record.email,
                 name: record.name,
                 staff_id: record.staffId,
-                emailVerified: new Date()
+                email_verified: new Date()
               }
             });
 
@@ -530,7 +530,7 @@ export async function POST(request: NextRequest) {
         recordId: 'bulk',
         operation: 'BULK_CREATE',
         userId: user.id,
-        staffId: user.staff?.id,
+        staffId: (user.staff as Record<string, unknown> | null)?.id,
         source: 'BULK_UPLOAD',
         description: `Staff bulk upload: ${created + updated} records processed (${created} created, ${updated} updated)`,
         metadata: {

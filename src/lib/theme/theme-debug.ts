@@ -5,10 +5,10 @@ interface ThemeDebugInfo {
   localStorage: string | null;
   sessionStorage: {
     themeSynced: string | null;
-    layoutSynced: string | null;
+    layoutSynced: string | null
   };
   mounted: boolean;
-  timestamp: string;
+  timestamp: string
 }
 
 export function getThemeDebugInfo(): ThemeDebugInfo {

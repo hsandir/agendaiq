@@ -119,7 +119,7 @@ class PerformanceMonitor {
     // Log performance issues in development
     if (process.env.NODE_ENV === 'development') {
       if (name === 'page_load_time' && value > 150) {
-        console.warn(`🐌 Slow page load: ${value.toFixed(2)}ms (target: <150ms)`);
+        console.warn(`🐌 Slow page load: ${value.toFixed(2)}ms (target: <150ms)`)
       }
       if (name.startsWith('api_') && value > 100) {
         console.warn(`🐌 Slow API call: ${name} took ${value.toFixed(2)}ms`);

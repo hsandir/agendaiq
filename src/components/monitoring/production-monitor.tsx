@@ -34,7 +34,7 @@ interface ProductionError {
   userAgent: string;
   analysis: ErrorAnalysis;
   resolved?: boolean;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: 'low' | 'medium' | 'high' | 'critical'
 }
 
 interface RawProductionError {
@@ -219,7 +219,7 @@ export default function ProductionMonitor() {
       case 'high': return <XCircle className="h-4 w-4 text-orange-500" />;
       case 'medium': return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
       case 'low': return <CheckCircle className="h-4 w-4 text-blue-500" />;
-      default: return <AlertTriangle className="h-4 w-4 text-gray-500" />;
+      default: return <AlertTriangle className="h-4 w-4 text-gray-500" />
     }
   };
 

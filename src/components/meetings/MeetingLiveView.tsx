@@ -34,46 +34,46 @@ import { CHANNELS, EVENTS } from "@/lib/pusher";
 import Link from "next/link";
 import { safeFormatDate, safeFormatTime, getSafeDate } from '@/lib/utils/safe-date';
 import type { 
-  Meeting, 
-  MeetingAgendaItem, 
-  MeetingAttendee, 
-  Staff, 
+  meeting as Meeting, 
+  meeting_agenda_items, 
+  meeting_attendee, 
+  staff as Staff, 
   User as PrismaUser,
-  Department,
-  Role
+  department as Department,
+  role as Role
 } from "@prisma/client";
 import type { AuthenticatedUser } from '@/lib/auth/auth-utils';
 
 interface ExtendedMeeting extends Meeting {
-  Department: Department;
-  Staff: Staff & { User: PrismaUser; Role: Role };
-  MeetingAttendee: (MeetingAttendee & { 
-    Staff: Staff & { 
-      User: PrismaUser; 
-      Role: Role; 
-      Department: Department 
+  department: Department;
+  staff: Staff & { users: PrismaUser; role: Role };
+  meeting_attendee: (meeting_attendee & { 
+    staff: Staff & { 
+      users: PrismaUser; 
+      role: Role; 
+      department: Department 
     } 
   })[];
-  MeetingAgendaItems: (MeetingAgendaItem & {
-    ResponsibleStaff?: (Staff & { User: PrismaUser }) | null;
-    Comments: Array<Record<string, unknown>>;
-    ActionItems: Array<Record<string, unknown>>;
+  meeting_agenda_items: (meeting_agenda_items & {
+    staff?: (Staff & { users: PrismaUser }) | null;
+    agenda_item_comments: Array<Record<string, unknown>>;
+    meeting_action_items: Array<Record<string, unknown>>;
   })[];
-  MeetingActionItems: Array<Record<string, unknown>>;
+  meeting_action_items: Array<Record<string, unknown>>;
 }
 
 interface ExtendedStaff extends Staff {
-  User: PrismaUser;
-  Role: Role;
-  Department: Department;
+  users: PrismaUser;
+  role: Role;
+  department: Department
 }
 
 interface Props {
   meeting: ExtendedMeeting;
-  currentUser: _AuthenticatedUser;
+  currentUser: AuthenticatedUser;
   allStaff: ExtendedStaff[];
   isOrganizer: boolean;
-  isAdmin: boolean;
+  isAdmin: boolean
 }
 
 export function MeetingLiveView({ 
@@ -84,7 +84,7 @@ export function MeetingLiveView({
   isAdmin
 }: Props) {
   const router = useRouter();
-  const [agendaItems, setAgendaItems] = useState(meeting.MeetingAgendaItems);
+  const [agendaItems, setAgendaItems] = useState(meeting.meeting_agenda_items);
   const [activeTab, setActiveTab] = useState("agenda");
   const [isConnected, setIsConnected] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
@@ -97,68 +97,85 @@ export function MeetingLiveView({
     setIsHydrated(true);
   }, []);
 
+  // Memoize event handlers to prevent unnecessary re-renders
+  const agendaItemUpdatedHandler = useCallback((data: unknown) => {
+    const typedData = data as Record<string, unknown>;
+    if (typeof typedData.itemId === 'number' && typedData.updates && typeof typedData.updates === 'object') {
+      setAgendaItems(prev => prev.map(item => 
+        item.id === typedData.itemId ? { ...item, ...(typedData.updates as Record<string, any>) } : item
+      ));
+      setLastUpdate(new Date());
+    }
+  }, []);
+
+  const agendaItemAddedHandler = useCallback((data: unknown) => {
+    const typedData = data as Record<string, unknown>;
+    if (typedData.item && typeof typedData.item === 'object') {
+      setAgendaItems(prev => [...prev, typedData.item as Record<string, unknown>]);
+      setLastUpdate(new Date());
+    }
+  }, []);
+
+  const agendaItemDeletedHandler = useCallback((data: unknown) => {
+    const typedData = data as Record<string, unknown>;
+    if (typeof typedData.itemId === 'number') {
+      setAgendaItems(prev => prev.filter(item => item.id !== typedData.itemId));
+      setLastUpdate(new Date());
+    }
+  }, []);
+
+  const userTypingHandler = useCallback((data: unknown) => {
+    const typedData = data as Record<string, unknown>;
+    if (typeof typedData.itemId === 'number' && typeof typedData.userId === 'number' && typeof typedData.userName === 'string') {
+      setTypingUsers(prev => {
+        const newMap = new Map(prev);
+        newMap.set(typedData.itemId as number, { userId: typedData.userId as number, userName: typedData.userName as string });
+        return newMap;
+      });
+    }
+  }, []);
+
+  const userStoppedTypingHandler = useCallback((data: unknown) => {
+    const typedData = data as Record<string, unknown>;
+    if (typeof typedData.itemId === 'number') {
+      setTypingUsers(prev => {
+        const newMap = new Map(prev);
+        newMap.delete(typedData.itemId as number);
+        return newMap;
+      });
+    }
+  }, []);
+
+  const commentAddedHandler = useCallback((data: unknown) => {
+    const typedData = data as Record<string, unknown>;
+    if (typeof typedData.itemId === 'number' && typedData.comment && typeof typedData.comment === 'object') {
+      setAgendaItems(prev => prev.map(item => 
+        item.id === typedData.itemId 
+          ? { ...item, Comments: [...(item.comments ?? []), typedData.comment as Record<string, unknown>] }
+          : item
+      ));
+    }
+  }, []);
+
+  const subscriptionSucceededHandler = useCallback(() => {
+    setIsConnected(true);
+  }, []);
+
+  const subscriptionErrorHandler = useCallback(() => {
+    setIsConnected(false);
+  }, []);
+
   // Set up real-time updates with Pusher
   const eventHandlers = useMemo(() => ({
-    [EVENTS.AGENDA_ITEM_UPDATED]: (data: unknown) => {
-      const typedData = data as Record<string, unknown>;
-      if (typeof typedData.itemId === 'number' && typedData.updates && typeof typedData.updates === 'object') {
-        setAgendaItems(prev => prev.map(item => 
-          item.id === typedData.itemId ? { ...item, ...(typedData.updates as Record<string, any>) } : item
-        ));
-        setLastUpdate(new Date());
-      }
-    },
-    [(EVENTS.AGENDA_ITEM_ADDED)]: (data: unknown) => {
-      const typedData = data as Record<string, unknown>;
-      if (typedData.item && typeof typedData.item === 'object') {
-        setAgendaItems(prev => [...prev, typedData.item as Record<string, unknown>]);
-        setLastUpdate(new Date());
-      }
-    },
-    [(EVENTS.AGENDA_ITEM_DELETED)]: (data: unknown) => {
-      const typedData = data as Record<string, unknown>;
-      if (typeof typedData.itemId === 'number') {
-        setAgendaItems(prev => prev.filter(item => item.id !== typedData.itemId));
-        setLastUpdate(new Date());
-      }
-    },
-    [(EVENTS.USER_TYPING)]: (data: unknown) => {
-      const typedData = data as Record<string, unknown>;
-      if (typeof typedData.itemId === 'number' && typeof typedData.userId === 'number' && typeof typedData.userName === 'string') {
-        setTypingUsers(prev => {
-          const newMap = new Map(prev);
-          newMap.set(typedData.itemId as number, { userId: typedData.userId as number, userName: typedData.userName as string });
-          return newMap;
-        });
-      }
-    },
-    [(EVENTS.USER_STOPPED_TYPING)]: (data: unknown) => {
-      const typedData = data as Record<string, unknown>;
-      if (typeof typedData.itemId === 'number') {
-        setTypingUsers(prev => {
-          const newMap = new Map(prev);
-          newMap.delete(typedData.itemId as number);
-          return newMap;
-        });
-      }
-    },
-    'comment-added': (data: unknown) => {
-      const typedData = data as Record<string, unknown>;
-      if (typeof typedData.itemId === 'number' && typedData.comment && typeof typedData.comment === 'object') {
-        setAgendaItems(prev => prev.map(item => 
-          item.id === typedData.itemId 
-            ? { ...item, Comments: [...(item.Comments ?? []), typedData.comment as Record<string, unknown>] }
-            : item
-        ));
-      }
-    },
-    'pusher:subscription_succeeded': () => {
-      setIsConnected(true);
-    },
-    'pusher:subscription_error': () => {
-      setIsConnected(false);
-    }
-  }), []);
+    [EVENTS.AGENDA_ITEM_UPDATED]: agendaItemUpdatedHandler,
+    [EVENTS.AGENDA_ITEM_ADDED]: agendaItemAddedHandler,
+    [EVENTS.AGENDA_ITEM_DELETED]: agendaItemDeletedHandler,
+    [EVENTS.USER_TYPING]: userTypingHandler,
+    [EVENTS.USER_STOPPED_TYPING]: userStoppedTypingHandler,
+    'comment-added': commentAddedHandler,
+    'pusher:subscription_succeeded': subscriptionSucceededHandler,
+    'pusher:subscription_error': subscriptionErrorHandler
+  }), [agendaItemUpdatedHandler, agendaItemAddedHandler, agendaItemDeletedHandler, userTypingHandler, userStoppedTypingHandler, commentAddedHandler, subscriptionSucceededHandler, subscriptionErrorHandler]);
 
   const channel = usePusherChannel(
     CHANNELS.meeting(meeting.id),
@@ -171,21 +188,21 @@ export function MeetingLiveView({
     useMemo(() => ({}), [])
   );
 
-  const refreshMeeting = async () => {
+  const refreshMeeting = useCallback(async () => {
     try {
       const response = await fetch(`/api/meetings/${meeting.id}`);
       const data = await response.json();
       
       if (data.success && data.meeting) {
-        setAgendaItems(data.meeting.MeetingAgendaItems);
+        setAgendaItems(data.meeting.meeting_agenda_items);
         setLastUpdate(new Date());
       }
     } catch (error: unknown) {
       console.error("Error refreshing meeting:", error);
     }
-  };
+  }, [meeting.id]);
 
-  const handleItemUpdate = async (itemId: number, updates: Record<string, unknown>) => {
+  const handleItemUpdate = useCallback(async (itemId: number, updates: Record<string, unknown>) => {
     // Optimistic update
     setAgendaItems(prev => prev.map(item => 
       item.id === itemId ? { ...item, ...updates } : item
@@ -207,14 +224,14 @@ export function MeetingLiveView({
       console.error("Error updating agenda item:", error);
       await refreshMeeting();
     }
-  };
+  }, [meeting.id, refreshMeeting]);
 
-  const handleAddAgendaItem = () => {
+  const handleAddAgendaItem = useCallback(() => {
     // Navigate to the agenda editing page instead of auto-adding
     router.push(`/dashboard/meetings/${meeting.id}/agenda`);
-  };
+  }, [meeting.id, router]);
 
-  const toggleItemExpanded = (itemId: number) => {
+  const toggleItemExpanded = useCallback((itemId: number) => {
     setExpandedItems(prev => {
       const newSet = new Set(prev);
       if (newSet.has(itemId)) {
@@ -224,10 +241,10 @@ export function MeetingLiveView({
       }
       return newSet;
     });
-  };
+  }, []);
 
-  // Meeting status
-  const getMeetingStatus = () => {
+  // Memoize meeting status calculation
+  const meetingStatus = useMemo(() => {
     const now = new Date();
     const start = getSafeDate(meeting.start_time);
     const end = getSafeDate(meeting.end_time);
@@ -236,9 +253,7 @@ export function MeetingLiveView({
     if (now < start) return { status: "upcoming", label: "Upcoming", color: "bg-primary text-primary-foreground" };
     if (now > end) return { status: "completed", label: "Completed", color: "bg-muted text-foreground" };
     return { status: "in-progress", label: "In Progress", color: "bg-green-100 text-green-700" };
-  };
-
-  const meetingStatus = getMeetingStatus();
+  }, [meeting.start_time, meeting.end_time]);
 
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
 
@@ -285,11 +300,11 @@ export function MeetingLiveView({
                   </div>
                   <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-sm">
                     <Users className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-foreground">{meeting.MeetingAttendee.length} attendees</span>
+                    <span className="text-foreground">{meeting.meeting_attendee.length} attendees</span>
                   </div>
                   <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-sm">
                     <User className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-foreground">Host: {meeting.Staff.User.name}</span>
+                    <span className="text-foreground">Host: {meeting.staff.users.name}</span>
                   </div>
                 </div>
               </div>
@@ -448,15 +463,15 @@ export function MeetingLiveView({
                 Attendees
               </h3>
               <div className="space-y-3">
-                {meeting.MeetingAttendee.map((attendee) => (
+                {meeting.meeting_attendee.map((attendee) => (
                   <div key={attendee.id} className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-foreground text-sm font-medium">
-                        {attendee.Staff.User.name?.charAt(0) ?? 'U'}
+                        {attendee.staff.users.name?.charAt(0) ?? 'U'}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-foreground">{attendee.Staff.User.name}</p>
-                        <p className="text-xs text-muted-foreground">{attendee.Staff.Role.title}</p>
+                        <p className="text-sm font-medium text-foreground">{attendee.staff.users.name}</p>
+                        <p className="text-xs text-muted-foreground">{attendee.staff.role.title}</p>
                       </div>
                     </div>
                     <Badge 
@@ -475,7 +490,7 @@ export function MeetingLiveView({
             </div>
 
             {/* Live Users */}
-            {members.length > 0 && (
+            {members && members.length > 0 && (
               <div className="bg-card rounded-xl shadow-sm border border-border p-5">
                 <h3 className="font-semibold text-foreground mb-4 flex items-center">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2" />

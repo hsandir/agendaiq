@@ -20,13 +20,13 @@ export default async function ZoomUserPreferences() {
   const user = await requireAuth(AuthPresets.requireAuth);
 
   // Fetch user's Zoom integration status and preferences
-  const userWithZoom = await prisma.user.findUnique({
+  const userWithZoom = await prisma.users.findUnique({
     where: { email: user.email },
     include: {
-      Staff: {
+      staff: {
         include: {
-          Role: true,
-          Department: true
+          role: true,
+          department: true
         }
       }
     }
@@ -35,7 +35,7 @@ export default async function ZoomUserPreferences() {
   // Get user's meeting statistics for Zoom integration
   const userMeetings = await prisma.meeting.findMany({
     where: {
-      organizer_id: userWithZoom?.Staff?.[0]?.id
+      organizer_id: userWithZoom?.staff?.[0]?.id
     },
     orderBy: {
       start_time: 'desc'
@@ -159,7 +159,7 @@ export default async function ZoomUserPreferences() {
                   <div>
                     <p className="text-sm font-medium text-green-800">Zoom Account Connected</p>
                     <p className="text-xs text-green-600">
-                      Account: {zoomIntegration.accountEmail ?? 'Unknown'}
+                      account: {zoomIntegration.accountEmail ?? 'Unknown'}
                     </p>
                   </div>
                 </div>
@@ -374,5 +374,5 @@ export default async function ZoomUserPreferences() {
         </Button>
       </div>
     </div>
-  );
+  )
 } 

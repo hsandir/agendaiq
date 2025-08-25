@@ -19,7 +19,7 @@ export interface PaginatedResponse<T = unknown> extends APIResponse<T[]> {
     limit: number;
     total: number;
     hasMore: boolean;
-    totalPages: number;
+    totalPages: number
   };
 }
 

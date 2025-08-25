@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   let body: { command?: string; cwd?: string; timeout?: number } = {};
   try {
     body = await request.json();
-    const { __command, cwd = process.cwd(), timeout = __30000  } = body;
+    const { command, cwd = process.cwd(), timeout = 30000  } = body;
 
     const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.DEV_EXECUTE ?? Capability.DEV_DEBUG });
     if (!auth.success) {
@@ -36,13 +36,13 @@ export async function POST(request: NextRequest) {
     console.log('Executing command:', command);
 
     // Execute the command with timeout
-    const { stdout, stderr } = await execAsync(__command, {
-      __cwd,
-      __timeout,
-      maxBuffer: 1024 * 1024 * __10, // 10MB buffer
+    const { stdout, stderr } = await execAsync(command, {
+      cwd,
+      timeout,
+      maxBuffer: 1024 * 1024 * 10, // 10MB buffer
       env: {
-        ...process.__env,
-        FORCE_COLOR: '0', // Disable color output for cleaner __logs
+        ...process.env,
+        FORCE_COLOR: '0', // Disable color output for cleaner logs
       }
     });
 

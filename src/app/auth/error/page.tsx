@@ -4,8 +4,8 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { AlertCircle, Home, LogIn } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '../../../components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
 
 const errorMessages: Record<string, { title: string; description: string }> = {
   Configuration: {
@@ -28,11 +28,11 @@ const errorMessages: Record<string, { title: string; description: string }> = {
     title: 'OAuth Callback Error',
     description: 'There was an error processing the OAuth callback. Please try again.'
   },
-  OAuthCreateAccount: {
+  OAuthCreateaccount: {
     title: 'Account Creation Error',
     description: 'Could not create your account. You may already have an account with this email.'
   },
-  EmailCreateAccount: {
+  EmailCreateaccount: {
     title: 'Email Account Error',
     description: 'Could not create an account with this email address.'
   },
@@ -108,7 +108,7 @@ function AuthErrorContent() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }
 
 export default function AuthErrorPage() {

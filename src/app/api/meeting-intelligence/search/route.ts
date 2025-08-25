@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     
     // Search agenda items
     if (type === 'all' || type === 'agenda') {
-      const agendaItems = await prisma.meetingAgendaItem.findMany({
+      const agendaItems = await prisma.meeting_agenda_items.findMany({
         where: {
           OR: [
             { topic: { contains: query, mode: 'insensitive' } },
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
           ]
         },
         include: {
-          Meeting: {
+          meeting: {
             select: {
               id: true,
               title: true,
@@ -77,9 +77,9 @@ export async function GET(request: NextRequest) {
         problemStatement: item.problem_statement,
         status: item.status ?? 'Pending',
         meeting: item.Meeting ? {
-          id: item.Meeting.id,
-          title: item.Meeting.title,
-          startTime: item.Meeting.start_time?.toISOString()
+          id: item.meeting.id,
+          title: item.meeting.title,
+          startTime: item.meeting.start_time?.toISOString()
         } : undefined
       }));
     } else {
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
     
     // Search action items
     if (type === 'all' || type === 'actions') {
-      const actionItems = await prisma.meetingActionItem.findMany({
+      const actionItems = await prisma.meeting_action_items.findMany({
         where: {
           OR: [
             { title: { contains: query, mode: 'insensitive' } },
@@ -96,15 +96,15 @@ export async function GET(request: NextRequest) {
           ]
         },
         include: {
-          Meeting: {
+          meeting: {
             select: {
               id: true,
               title: true
             }
           },
-          AssignedTo: {
+          staff_meeting_action_items_assigned_toTostaff: {
             include: {
-              User: {
+              users: {
                 select: {
                   name: true
                 }
@@ -123,11 +123,11 @@ export async function GET(request: NextRequest) {
         status: item.status ?? 'pending',
         dueDate: item.due_date?.toISOString(),
         meeting: item.Meeting ? {
-          id: item.Meeting.id,
-          title: item.Meeting.title
+          id: item.meeting.id,
+          title: item.meeting.title
         } : undefined,
-        assignedTo: item.AssignedTo ? {
-          name: item.AssignedTo.User.name ?? 'Unknown'
+        assignedTo: item.staff_meeting_action_items_assigned_toTostaff ? {
+          name: item.staff_meeting_action_items_assigned_toTostaff.users.name ?? 'Unknown'
         } : {
           name: 'Unassigned'
         }

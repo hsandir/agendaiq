@@ -31,12 +31,12 @@ export async function GET(
       );
     }
 
-    const comments = await prisma.agendaItemComment.findMany({
+    const comments = await prisma.agenda_item_comments.findMany({
       where: { agenda_item_id: itemId },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       },
@@ -72,7 +72,7 @@ export async function POST(
     }
     const user = authResult.user!;
 
-    const meetingId = params.id;
+    const meetingId = parseInt(params.id);
     const itemId = parseInt(params.itemId);
 
     if (isNaN(meetingId) || isNaN(itemId)) {
@@ -83,7 +83,7 @@ export async function POST(
     }
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const validationResult = createCommentSchema.safeParse(body);
 
     if (!validationResult.success) {
@@ -94,20 +94,20 @@ export async function POST(
     }
 
     // Check if user has access to this meeting
-    const agendaItem = await prisma.meetingAgendaItem.findUnique({
+    const agendaItem = await prisma.meeting_agenda_items.findUnique({
       where: { id: itemId },
       include: {
-        Meeting: {
+        meeting: {
           include: {
-            MeetingAttendee: {
-              where: { staff_id: user.staff?.id || -1 }
+            meeting_attendee: {
+              where: { staff_id: (user.staff as Record<string, unknown> | null)?.id || -1 }
             }
           }
         }
       }
     });
 
-    if (!agendaItem ?? agendaItem.meeting_id !== meetingId) {
+    if (!agendaItem || agendaItem.meeting_id !== meetingId) {
       return NextResponse.json(
         { error: 'Agenda item not found' },
         { status: 404 }
@@ -115,8 +115,8 @@ export async function POST(
     }
 
     // Check permissions
-    const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
-    const isAttendee = agendaItem.Meeting.MeetingAttendee.length > 0;
+    const isOrganizer = agendaItem.meeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
+    const isAttendee = agendaItem.meeting.meeting_attendee.length > 0;
     const hasAdminAccess = isAnyAdmin(user);
 
     if (!isOrganizer && !isAttendee && !hasAdminAccess) {
@@ -127,16 +127,16 @@ export async function POST(
     }
 
     // Create the comment
-    const comment = await prisma.agendaItemComment.create({
+    const comment = await prisma.agenda_item_comments.create({
       data: {
         comment: validationResult.data.content,
         agenda_item_id: itemId,
         staff_id: user.staff!.id
       },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       }

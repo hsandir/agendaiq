@@ -3,7 +3,7 @@
  * This file should be imported in the root layout or _app.tsx
  */
 
-import { initMonitoring, setMonitoringUser, addBreadcrumb } from './index';
+import { initMonitoring, setMonitoringusers, addBreadcrumb } from './index';
 import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 
@@ -73,7 +73,7 @@ export function initClientMonitoring() {
  * Use this in your root component or auth provider
  */
 export function useMonitoringUser() {
-  const { data: session, __status  } = useSession();
+  const { data: session, status  } = useSession();
 
   useEffect(() => {
     if (status === 'loading') return;

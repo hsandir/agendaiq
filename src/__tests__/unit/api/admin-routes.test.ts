@@ -120,7 +120,7 @@ describe('Admin API Routes - Capability Tests', () => {
         const authResult = await withAuth(request, { requireDevAdmin: true });
         
         expect(authResult.success).toBe(true);
-        expect(authResult.user?.capabilities).toContain('dev:debug');
+        expect(authResult.user?.capabilities).toContain('dev:debug')
       }
     });
 
@@ -210,7 +210,7 @@ describe('Admin API Routes - Capability Tests', () => {
         });
         
         expect(authResult.success).toBe(true);
-        expect(authResult.user?.capabilities).toContain('ops:monitoring');
+        expect(authResult.user?.capabilities).toContain('ops:monitoring')
       }
     });
   });

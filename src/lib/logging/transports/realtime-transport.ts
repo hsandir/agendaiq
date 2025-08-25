@@ -104,7 +104,7 @@ export class RealtimeTransport implements LogTransport {
 
   async write(entry: BaseLogEntry): Promise<void> {
     if (entry.level < this.level) {
-      return;
+      return
     }
 
     try {

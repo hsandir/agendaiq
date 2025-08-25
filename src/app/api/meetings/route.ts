@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     if (hasAdminAccess) {
       // Admins can see all meetings in their district
       meetingWhereClause = {
-        Staff: {
+        staff: {
           school_id: staffRecord.school?.id
         }
       };
@@ -67,12 +67,12 @@ export async function GET(request: NextRequest) {
         OR: [
           { organizer_id: staffRecord.id },
           {
-            Staff: {
+            staff: {
               school_id: staffRecord.school?.id
             }
           },
           {
-            MeetingAttendee: {
+            meeting_attendee: {
               some: {
                 staff_id: staffRecord.id
               }
@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
         OR: [
           { organizer_id: staffRecord.id },
           {
-            MeetingAttendee: {
+            meeting_attendee: {
               some: {
                 staff_id: staffRecord.id
               }
@@ -118,9 +118,9 @@ export async function GET(request: NextRequest) {
         status: true,
         organizer_id: true,
         // Only get organizer name for display
-        Staff: {
+        staff: {
           select: {
-            User: {
+            users: {
               select: {
                 name: true,
                 email: true,
@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
         // Only count attendees, don't fetch all data
         _count: {
           select: {
-            MeetingAttendee: true
+            meeting_attendee: true
           }
         }
       },
@@ -145,12 +145,12 @@ export async function GET(request: NextRequest) {
       id: meeting.id,
       title: meeting.title,
       description: meeting.description,
-      startTime: meeting.start_time?.toISOString() || new Date().toISOString(),
-      endTime: meeting.end_time?.toISOString() || new Date().toISOString(),
+      startTime: meeting.start_time?.toISOString() ?? new Date().toISOString(),
+      endTime: meeting.end_time?.toISOString() ?? new Date().toISOString(),
       zoomLink: meeting.zoom_join_url ?? null,
       status: meeting.status,
-      organizerName: meeting.Staff.User.name ?? meeting.Staff.User.email ?? 'Unknown',
-      attendeeCount: meeting._count.MeetingAttendee
+      organizerName: meeting.staff.users.name ?? meeting.staff.users.email ?? 'Unknown',
+      attendeeCount: meeting._count.meeting_attendee
     })));
 
     const responseData = { 
@@ -171,7 +171,7 @@ export async function GET(request: NextRequest) {
     response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
     return response;
   } catch (error: unknown) {
-    await Logger.error("Failed to fetch meetings", { error: String(error), userId: user.id, staffId: user.staff?.id }, "meetings");
+    await Logger.error("Failed to fetch meetings", { error: String(error), userId: user.id, staffId: (user.staff as Record<string, unknown> | null)?.id }, "meetings");
     return NextResponse.json({ error: "Failed to fetch meetings" }, { status: 500 });
   }
 }
@@ -200,7 +200,7 @@ export async function POST(request: NextRequest) {
 
     const staffRecord = user.staff;
 
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     
     // Validate request data
     const validationResult = createMeetingSchema.safeParse(body);
@@ -213,7 +213,7 @@ export async function POST(request: NextRequest) {
     
     // Sanitize input data
     const sanitizedData = sanitizeMeetingData(validationResult.data);
-    const { title, description, startTime, endTime, zoomLink, attendeeIds  } = sanitizedData as CreateMeetingRequest;
+    const { title, description, startTime, endTime, zoomLink, attendeeIds } = sanitizedData as CreateMeetingRequest;
 
     // Validate date/time
     const start = new Date(startTime);
@@ -256,16 +256,16 @@ export async function POST(request: NextRequest) {
         school_id: staffRecord.school.id,
       },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: {
+            users: {
               select: {
                 id: true,
                 name: true,
                 email: true,
               },
             },
-            Role: true,
+            role: true,
           },
         },
       },
@@ -273,7 +273,7 @@ export async function POST(request: NextRequest) {
 
     // Add attendees if provided
     if (attendeeIds && attendeeIds.length > 0) {
-      await prisma.meetingAttendee.createMany({
+      await prisma.meeting_attendee.createMany({
         data: attendeeIds.map((staffId: number) => ({
           meeting_id: meeting.id,
           staff_id: staffId,
@@ -286,30 +286,30 @@ export async function POST(request: NextRequest) {
     const completeeMeeting = await prisma.meeting.findUnique({
       where: { id: meeting.id },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: {
+            users: {
               select: {
                 id: true,
                 name: true,
                 email: true,
               },
             },
-            Role: true,
+            role: true,
           },
         },
-        MeetingAttendee: {
+        meeting_attendee: {
           include: {
-            Staff: {
+            staff: {
               include: {
-                User: {
+                users: {
                   select: {
                     id: true,
                     name: true,
                     email: true,
                   },
                 },
-                Role: true,
+                role: true,
               },
             },
           },
@@ -325,31 +325,31 @@ export async function POST(request: NextRequest) {
       id: completeeMeeting!.id,
       title: completeeMeeting!.title,
       description: completeeMeeting!.description,
-      startTime: completeeMeeting!.start_time?.toISOString() || new Date().toISOString(),
-      endTime: completeeMeeting!.end_time?.toISOString() || new Date().toISOString(),
+      startTime: completeeMeeting!.start_time?.toISOString() ?? new Date().toISOString(),
+      endTime: completeeMeeting!.end_time?.toISOString() ?? new Date().toISOString(),
       zoomLink: completeeMeeting!.zoom_join_url ?? null,
       status: completeeMeeting!.status,
       organizer: {
-        id: completeeMeeting!.Staff.id,
-        name: completeeMeeting!.Staff.User.name,
-        email: completeeMeeting!.Staff.User.email,
-        role: completeeMeeting!.Staff.Role.key ?? 'UNKNOWN_ROLE',
+        id: completeeMeeting!.staff.id,
+        name: completeeMeeting!.staff.users.name,
+        email: completeeMeeting!.staff.users.email,
+        role: completeeMeeting!.staff.role.key ?? 'UNKNOWN_ROLE',
       },
-      attendees: completeeMeeting!.MeetingAttendee.map((attendee) => ({
-        id: attendee.Staff.id,
-        name: attendee.Staff.User.name,
-        email: attendee.Staff.User.email,
-        role: attendee.Staff.Role.key ?? 'UNKNOWN_ROLE',
+      attendees: completeeMeeting!.meeting_attendee.map((attendee) => ({
+        id: attendee.staff.id,
+        name: attendee.staff.users.name,
+        email: attendee.staff.users.email,
+        role: attendee.staff.role.key ?? 'UNKNOWN_ROLE',
         status: attendee.status ?? 'PENDING',
       })),
     };
 
     // Audit log the meeting creation
-    await prisma.meetingAuditLog.create({
+    await prisma.meeting_audit_log.create({
       data: {
         meeting_id: completeeMeeting!.id,
         user_id: user.id,
-        staff_id: user.staff?.id,
+        staff_id: (user.staff as Record<string, unknown> | null)?.id,
         action: 'CREATE',
         details: `Created meeting: ${title}`,
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
@@ -361,7 +361,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ meeting: formattedMeeting }, { status: 201 });
   } catch (error: unknown) {
-    await Logger.error("Failed to create meeting", { error: String(error), userId: user.id, staffId: user.staff?.id }, "meetings");
+    await Logger.error("Failed to create meeting", { error: String(error), userId: user.id, staffId: (user.staff as Record<string, unknown> | null)?.id }, "meetings");
     return NextResponse.json({ error: "Failed to create meeting" }, { status: 500 });
   }
 } 

@@ -27,7 +27,7 @@ interface LintStatus {
     warningFiles: number;
     cleanFiles: number;
     totalErrors: number;
-    totalWarnings: number;
+    totalWarnings: number
   };
   files: Array<{
     name: string;
@@ -39,7 +39,7 @@ interface LintStatus {
       column: number;
       severity: 'error' | 'warning';
       message: string;
-      rule: string;
+      rule: string
     }>;
   }>;
   recentFixes: Array<{
@@ -367,7 +367,7 @@ export default function LintErrorManagementPage() {
             onClick={handleAutoFix}
             variant="outline"
             size="sm"
-            disabled={fixing || !lintStatus ?? lintStatus.summary.totalErrors === 0}
+            disabled={fixing || !lintStatus || lintStatus.summary.totalErrors === 0}
           >
             {fixing ? (
               <>

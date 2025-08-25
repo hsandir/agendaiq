@@ -215,5 +215,5 @@ export function LayoutSettingsClient() {
         </div>
       </section>
     </div>
-  );
+  )
 }

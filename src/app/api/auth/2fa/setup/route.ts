@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const user = authResult.user!;
     
     // Check if 2FA is already enabled
-    const dbUser = await prisma.user.findUnique({
+    const dbUser = await prisma.users.findUnique({
       where: { id: user?.id }
     });
     
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Save the secret temporarily (not enabled yet)
-    await prisma.user.update({
+    await prisma.users.update({
       where: { id: user?.id },
       data: {
         two_factor_secret: secret?.base32

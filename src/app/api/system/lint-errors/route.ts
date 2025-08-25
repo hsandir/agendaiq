@@ -21,13 +21,13 @@ interface LintError {
   endColumn?: number;
   fix?: {
     range: [number, number];
-    text: string;
+    text: string
   };
   suggestions?: Array<{
     desc: string;
     fix: {
       range: [number, number];
-      text: string;
+      text: string
     };
   }>;
 }
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const { action, filePath, fixes } = body;
 
     if (action === 'fix') {
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 async function getLintSummary() {
   try {
     const { stdout, stderr } = await execAsync('npx eslint src/ --format json', { 
-      cwd: process.cwd() 
+      cwd: process.cwd()
     });
     
     const results: LintResult[] = JSON.parse(stdout || '[]');
@@ -198,7 +198,7 @@ async function getLintSummary() {
 async function getLintDetails(severity: string, limit: number, offset: number) {
   try {
     const { stdout } = await execAsync('npx eslint src/ --format json', { 
-      cwd: process.cwd() 
+      cwd: process.cwd()
     });
     
     const results: LintResult[] = JSON.parse(stdout || '[]');
@@ -279,7 +279,7 @@ async function getLintDetails(severity: string, limit: number, offset: number) {
 async function getFixableErrors() {
   try {
     const { stdout } = await execAsync('npx eslint src/ --format json', { 
-      cwd: process.cwd() 
+      cwd: process.cwd()
     });
     
     const results: LintResult[] = JSON.parse(stdout || '[]');
@@ -335,7 +335,7 @@ async function autoFixErrors() {
   try {
     // Run ESLint with --fix flag
     const { stdout, stderr } = await execAsync('npx eslint src/ --fix --format json', { 
-      cwd: process.cwd() 
+      cwd: process.cwd()
     });
     
     // Get remaining errors after auto-fix
@@ -459,7 +459,7 @@ async function getTypeCastingViolations() {
       content: string;
       severity: 'critical';
       type: 'DANGEROUS_TYPE_CASTING';
-      suggestion: string;
+      suggestion: string
     }> = [];
 
     if (stdout) {

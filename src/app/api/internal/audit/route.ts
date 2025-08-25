@@ -13,17 +13,18 @@ export async function POST(request: NextRequest) {
     if (!authResult.success) {
       return NextResponse.json({ success: false, error: authResult.error }, { status: authResult.statusCode });
     }
-    const auditEvent = await request.json();
+    const auditEvent = await request.json() as Record<string, unknown>;
     
     // Extract event data
-    const { __action,
-      __path,
-      __method,
-      __success,
-      __errorMessage,
-      __metadata,
+    const { 
+      action,
+      path,
+      method,
+      success,
+      errorMessage,
+      metadata,
       category
-     } = auditEvent;
+    } = auditEvent;
 
     // Determine category and log appropriately
     if (category === 'AUTH') {
