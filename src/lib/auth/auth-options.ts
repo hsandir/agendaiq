@@ -399,8 +399,8 @@ export const authOptions: NextAuthOptions = {
       }
       // Add admin flags and capabilities to session
       session.user.is_system_admin = token.is_system_admin as boolean;
-      session.user.is_school_admin = token.is_school_admin as boolean;
-      session.user.capabilities = token.capabilities as string[];
+      (session.user as Record<string, unknown>).is_school_admin = token.is_school_admin as boolean;
+      (session.user as Record<string, unknown>).capabilities = token.capabilities as string[];
       
       // Handle remember me expiry
       if (token.rememberMe) {
