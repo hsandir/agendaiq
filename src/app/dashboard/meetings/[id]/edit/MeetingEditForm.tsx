@@ -62,7 +62,7 @@ interface MeetingEditFormProps {
   isStep2: boolean;
 }
 
-export function MeetingEditForm({ meeting, UserPlus, meetingId, isStep2 }: MeetingEditFormProps) {
+export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingEditFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth/api-auth';
+import { Capability } from '@/lib/auth/policy';
+import { FEATURES } from '@/lib/features/feature-flags';
 import { prisma } from '@/lib/prisma';
 
 interface Props {
@@ -10,7 +12,17 @@ export async function GET(request: NextRequest, props: Props) {
   const params = await props.params;
   
   try {
-    const authResult = await withAuth(request);
+    // Check feature flag
+    if (!FEATURES.TEAMS.enabled) {
+      return NextResponse.json(
+        { error: 'Teams feature is not enabled' },
+        { status: 404 }
+      );
+    }
+    const authResult = await withAuth(request, {
+      requireAuth: true,
+      requireCapability: Capability.MEETINGS_VIEW
+    });
     if (!authResult.success) {
       return NextResponse.json(
         { error: authResult.error },
@@ -49,7 +61,7 @@ export async function GET(request: NextRequest, props: Props) {
       prisma.team_knowledge.findMany({
         where: { team_id: teamId },
         include: {
-          created_by_staff: {
+          staff: {
             include: {
               users: {
                 select: { id: true, name: true, email: true, image: true }

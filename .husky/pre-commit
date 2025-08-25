@@ -16,14 +16,20 @@ if grep -r "password\|secret\|token\|api_key" --include="*.env*" . 2>/dev/null; 
   exit 1
 fi
 
-# 2. Basic lint check (only syntax errors)
-echo "Running basic lint check..."
-npm run lint:basic || true
-echo "Basic lint check completed (non-blocking for now)"
+# 2. Strict ESLint check (blocking)
+echo "Running strict ESLint..."
+npm run lint
+if [ $? -ne 0 ]; then
+  echo "${RED}❌ ESLint errors found - must be fixed before commit${NC}"
+  exit 1
+fi
 
-# 3. Type check (use build config with excluded problematic files)
-echo "Running type check..."
-npx tsc --project tsconfig.build.json || true
-echo "Type check completed (non-blocking for now)"
+# 3. Strict TypeScript check (blocking)
+echo "Running strict TypeScript check..."
+npx tsc --project tsconfig.build.json
+if [ $? -ne 0 ]; then
+  echo "${RED}❌ TypeScript errors found - must be fixed before commit${NC}"
+  exit 1
+fi
 
 echo "${GREEN}✅ All pre-commit checks passed!${NC}"

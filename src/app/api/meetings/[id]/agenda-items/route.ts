@@ -170,7 +170,8 @@ export async function POST(request: NextRequest, props: Props) {
       const newItem = await prisma.meeting_agenda_items.create({
         data: {
           meeting_id: meetingId,
-          ...itemData
+          ...itemData,
+          updated_at: new Date()
         },
         include: {
           staff: {
@@ -196,7 +197,8 @@ export async function POST(request: NextRequest, props: Props) {
           const { id: _id, ...itemData } = item;
           return {
             meeting_id: meetingId,
-            ...itemData
+            ...itemData,
+            updated_at: new Date()
           };
         })
       });
@@ -359,7 +361,8 @@ export async function PUT(request: NextRequest, props: Props) {
           data: {
             meeting_id: meetingId,
             ...itemData,
-            order_index: index
+            order_index: index,
+            updated_at: new Date()
           },
           include: {
             staff: {

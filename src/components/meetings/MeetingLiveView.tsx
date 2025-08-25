@@ -34,13 +34,13 @@ import { CHANNELS, EVENTS } from "@/lib/pusher";
 import Link from "next/link";
 import { safeFormatDate, safeFormatTime, getSafeDate } from '@/lib/utils/safe-date';
 import type { 
-  meeting, 
+  meeting as Meeting, 
   meeting_agenda_items, 
   meeting_attendee, 
-  staff, 
-  User as Prismausers,
-  department,
-  Role
+  staff as Staff, 
+  User as PrismaUser,
+  department as Department,
+  role as Role
 } from "@prisma/client";
 import type { AuthenticatedUser } from '@/lib/auth/auth-utils';
 

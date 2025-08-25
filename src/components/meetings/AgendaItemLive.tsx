@@ -22,7 +22,7 @@ import {
   Edit2, 
   Save, 
   X,
-  users,
+  User,
   AlertCircle,
   Clock,
   MessageSquare,
@@ -36,7 +36,7 @@ import { CreateMeetingModal } from "./CreateMeetingModal";
 import Link from "next/link";
 
 interface ExtendedAgendaItem extends meeting_agenda_items {
-  staff?: (staff & { users: users }) | null;
+  staff?: (staff & { users: PrismaUser }) | null;
   agenda_item_comments: Record<string, unknown>[];
   meeting_action_items: Record<string, unknown>[];
 }

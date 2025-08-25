@@ -147,8 +147,11 @@ export function AgendaItemsEditor({
   // State to track if we should auto-add a new item
   const [hasAutoAddedNewItem, setHasAutoAddedNewItem] = useState(false);
 
-  // Initialize agenda items from meeting data
+  // Initialize agenda items from meeting data - only run once on mount
   useEffect(() => {
+    // Only initialize if agendaItems is empty to prevent re-initialization
+    if (agendaItems.length > 0) return;
+    
     const items: AgendaItemFormData[] = meeting.meeting_agenda_items.map(item => ({
       id: item.id,
       topic: item.topic,
@@ -173,8 +176,8 @@ export function AgendaItemsEditor({
     const sortedItems = items.sort((a, b) => b.order_index - a.order_index);
     setAgendaItems(sortedItems);
     
-    // Auto-add a new item if the list is empty or if we haven't auto-added yet
-    if (!hasAutoAddedNewItem && canEdit) {
+    // Auto-add a new item if the list is empty and user can edit
+    if (sortedItems.length === 0 && canEdit && !hasAutoAddedNewItem) {
       const newItem: AgendaItemFormData = {
         topic: '',
         priority: 'Medium',
@@ -184,12 +187,12 @@ export function AgendaItemsEditor({
         future_implications: false,
         carried_forward: false,
         carry_forward_count: 0,
-        order_index: sortedItems.length
+        order_index: 0
       };
-      setAgendaItems([newItem, ...sortedItems]);
+      setAgendaItems([newItem]);
       setHasAutoAddedNewItem(true);
     }
-  }, [meeting, hasAutoAddedNewItem, canEdit])
+  }, [])
 
   const addAgendaItem = () => {
     const newItem: AgendaItemFormData = {

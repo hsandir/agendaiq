@@ -4,6 +4,7 @@ import { withAuth } from '@/lib/auth/api-auth';
 import { Capability } from '@/lib/auth/policy';
 import { z } from 'zod';
 import { FEATURES } from '@/lib/features/feature-flags';
+import { randomBytes } from 'crypto';
 
 // Knowledge creation schema
 const createKnowledgeSchema = z.object({
@@ -123,7 +124,7 @@ export async function GET(
     const knowledge = await prisma.team_knowledge.findMany({
       where,
       include: {
-        created_by: {
+        staff: {
           include: {
             users: {
               select: {
@@ -137,7 +138,7 @@ export async function GET(
         },
         _count: {
           select: {
-            views: true,
+            team_knowledge_views: true,
           }
         }
       },
@@ -249,6 +250,7 @@ export async function POST(
     // Create the knowledge resource
     const knowledge = await prisma.team_knowledge.create({
       data: {
+        id: randomBytes(16).toString('hex'),
         team_id: teamId,
         title: validatedData.title,
         content: validatedData.content,
@@ -257,10 +259,13 @@ export async function POST(
         url: validatedData.url,
         metadata: validatedData.metadata || {},
         created_by: user.id,
+        created_by_staff_id: staff.id,
         is_pinned: false,
+        created_at: new Date(),
+        updated_at: new Date(),
       },
       include: {
-        created_by: {
+        staff: {
           include: {
             users: {
               select: {
@@ -274,7 +279,7 @@ export async function POST(
         },
         _count: {
           select: {
-            views: true,
+            team_knowledge_views: true,
           }
         }
       }
@@ -404,7 +409,7 @@ export async function PUT(
         updated_at: new Date(),
       },
       include: {
-        created_by: {
+        staff: {
           include: {
             users: {
               select: {
@@ -418,7 +423,7 @@ export async function PUT(
         },
         _count: {
           select: {
-            views: true,
+            team_knowledge_views: true,
           }
         }
       }
