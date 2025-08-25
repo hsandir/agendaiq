@@ -359,7 +359,7 @@ export default function PageSelectionPage() {
           ...config,
           children: config.children.map(child => 
             child.path === path ? { ...child, [field]: !child[field] } : child
-          );
+          )
         }
       }
       return config
