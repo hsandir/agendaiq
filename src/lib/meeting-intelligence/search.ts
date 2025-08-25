@@ -116,7 +116,7 @@ export class MeetingSearchService {
         skip: offset,
         take: limit
       }),
-      prisma.meeting.count({ where })
+      prisma.meeting.count({ where });
     ]);
 
     // Calculate relevance and format results
@@ -275,7 +275,7 @@ export class MeetingSearchService {
     const keywords = [
       ...meeting.title.toLowerCase().split(' '),
       ...meeting.meeting_agenda_items.flatMap(item => 
-        item.topic.toLowerCase().split(' ')
+        item.topic.toLowerCase().split(' ');
       )
     ].filter(word => word.length > 3);
 

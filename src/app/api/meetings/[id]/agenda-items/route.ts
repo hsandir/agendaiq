@@ -19,11 +19,11 @@ const agendaItemSchema = z.object({
   status: z.enum(['Ongoing', 'Resolved', 'Assigned_to_local', 'Pending', 'Deferred']),
   future_implications: z.boolean().optional().nullable(),
   duration_minutes: z.number().optional().nullable(),
-  order_index: z.number()
+  order_index: z.number();
 });
 
 const createAgendaItemsSchema = z.object({
-  items: z.array(agendaItemSchema)
+  items: z.array(agendaItemSchema);
 });
 
 interface Props {
@@ -166,12 +166,12 @@ export async function POST(request: NextRequest, props: Props) {
     if (isSingleAddition) {
       // For single item addition, just add it without deleting existing items
       // Remove id field if it exists to avoid unique constraint error
-      const { id: __id, ..._itemData } = result.data.items[0];
+      const { id: id, ..._itemData } = result.data.items[0];
       const newItem = await prisma.meeting_agenda_items.create({
         data: {
           meeting_id: meetingId,
           ...itemData,
-          updated_at: new Date()
+          updated_at: new Date();
         },
         include: {
           staff: {
@@ -194,11 +194,11 @@ export async function POST(request: NextRequest, props: Props) {
       // Remove id field from each item to avoid unique constraint errors
       await prisma.meeting_agenda_items.createMany({
         data: result.data.items.map(item => {
-          const { id: __id, ..._itemData } = item;
+          const { id: id, ..._itemData } = item;
           return {
             meeting_id: meetingId,
             ...itemData,
-            updated_at: new Date()
+            updated_at: new Date();
           };
         })
       });
@@ -243,7 +243,7 @@ export async function POST(request: NextRequest, props: Props) {
             name: user.name,
             email: user.email
           },
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString();
         }
       );
     } else if (createdItems.length > 1) {
@@ -258,7 +258,7 @@ export async function POST(request: NextRequest, props: Props) {
             name: user.name,
             email: user.email
           },
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString();
         }
       );
     }
@@ -355,14 +355,14 @@ export async function PUT(request: NextRequest, props: Props) {
     const createdItems = await Promise.all(
       result.data.items.map(async (item, index) => {
         // Remove id field if it exists to avoid unique constraint error
-        const { id: __id, ..._itemData } = item as any;
+        const { id: id, ..._itemData } = item as any;
         
         return prisma.meeting_agenda_items.create({
           data: {
             meeting_id: meetingId,
             ...itemData,
             order_index: index,
-            updated_at: new Date()
+            updated_at: new Date();
           },
           include: {
             staff: {
@@ -399,7 +399,7 @@ export async function PUT(request: NextRequest, props: Props) {
           name: user.name,
           email: user.email
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString();
       }
     );
     

@@ -21,10 +21,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
     // Get current branch
-    const { stdout: __currentBranch  } = await execAsync('git rev-parse --abbrev-ref HEAD');
+    const { stdout: currentBranch  } = await execAsync('git rev-parse --abbrev-ref HEAD');
     
     // Get all branches with last commit info
-    const { stdout: __branchList  } = await execAsync('git branch -a -v');
+    const { stdout: branchList  } = await execAsync('git branch -a -v');
     
     const branches: Array<{
       name: string;
@@ -69,8 +69,8 @@ export async function GET(request: NextRequest) {
     const current = branches.find(b => b?.current);
     if (current) {
       try {
-        const { stdout: __revList  } = await execAsync(
-          `git rev-list --left-right --count origin/${current?.__name}...HEAD`
+        const { stdout: revList  } = await execAsync(
+          `git rev-list --left-right --count origin/${current?.name}...HEAD`
         );
         const [behind, ahead] = String(revList).trim().split('\t');
         current.behind = parseInt(behind) ?? 0;
@@ -84,14 +84,14 @@ export async function GET(request: NextRequest) {
       branches,
       current: String(currentBranch).trim(),
       total: branches?.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     });
   } catch (error: unknown) {
     console.error('Git branches error:', error);
     return NextResponse.json(
       { 
         error: 'Failed to get branches',
-        details: error instanceof Error ? error.message : String(error) 
+        details: error instanceof Error ? error.message : String(error);
       },
       { status: 500 }
     );

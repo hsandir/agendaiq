@@ -107,7 +107,7 @@ interface PostHogMetrics {
 }
 
 export default function SystemManagementPage() {
-  const { __is, __user, loading: __authLoading } = useAuthorization();
+  const { is, user, loading: authLoading } = useAuthorization();
   const router = useRouter();
   const [status, setStatus] = useState<SystemStatus | null>(null);
   const [healthChecks, setHealthChecks] = useState<HealthChecks | null>(null);

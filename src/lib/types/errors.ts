@@ -56,7 +56,7 @@ export function createSystemError(
     code,
     details,
     context,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString();
   };
 }
 
@@ -71,7 +71,7 @@ export function createAPIError(
     message,
     code,
     details,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString();
   };
 }
 
@@ -89,7 +89,7 @@ export function createDatabaseError(
     table,
     operation,
     details,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString();
   };
 }
 
@@ -107,7 +107,7 @@ export function createAuthError(
     sessionId,
     ipAddress,
     details,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString();
   };
 }
 
@@ -121,7 +121,7 @@ export function createValidationError(
     message,
     validationErrors,
     details,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString();
   };
 }
 

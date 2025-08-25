@@ -43,7 +43,7 @@ export default async function NotificationsPage() {
   // Calculate notification statistics
   const totalMeetings = recentActivities.length;
   const upcomingMeetings = recentActivities.filter(meeting => 
-    meeting.start_time && new Date(meeting.start_time) > new Date()
+    meeting.start_time && new Date(meeting.start_time) > new Date();
   ).length;
   const pastMeetings = totalMeetings - upcomingMeetings;
 

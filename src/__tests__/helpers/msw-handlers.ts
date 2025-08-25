@@ -16,13 +16,13 @@ export const handlers = [
           role: 'Administrator',
         },
         token: 'mock-jwt-token',
-      })
+      });
     }
     
     return HttpResponse.json(
       { error: 'Invalid credentials' },
       { status: 401 }
-    )
+    );
   }),
 
   http.post('/api/auth/register', async ({ request }) => {
@@ -32,13 +32,13 @@ export const handlers = [
       return HttpResponse.json(
         { error: 'Email already exists' },
         { status: 400 }
-      )
+      );
     }
     
     return HttpResponse.json({
       success: true,
       message: 'Registration successful',
-    })
+    });
   }),
 
   // Meeting endpoints
@@ -97,18 +97,18 @@ export const handlers = [
       suites: [
         {
           name: 'Auth Tests',
-          path: 'src/__tests__/integration/auth',
+          path: 'src/tests__/integration/auth',
           tests: 15,
           status: 'idle',
         },
         {
           name: 'API Tests',
-          path: 'src/__tests__/unit/api',
+          path: 'src/tests__/unit/api',
           tests: 25,
           status: 'idle',
         },
       ],
-    })
+    });
   }),
 
   // Health check
@@ -126,20 +126,20 @@ export const errorHandlers = [
     return HttpResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
-    )
+    );
   }),
 
   http.post('/api/meetings', () => {
     return HttpResponse.json(
       { error: 'Rate limit exceeded' },
       { status: 429 }
-    )
+    );
   }),
 ]
 
 // Network error simulation
 export const networkErrorHandlers = [
   http.get('/api/meetings', () => {
-    return HttpResponse.error()
+    return HttpResponse.error();
   }),
 ]

@@ -102,7 +102,7 @@ export class ActionItemsService {
         in: ['Pending', 'InProgress']
       },
       due_date: {
-        lt: new Date()
+        lt: new Date();
       }
     };
 
@@ -257,7 +257,7 @@ export class ActionItemsService {
       prisma.meeting_action_items.count({ where: { ...where, status: 'Completed' } }),
       prisma.meeting_action_items.count({ where: { ...where, status: 'Overdue' } }),
       prisma.meeting_action_items.count({ where: { ...where, status: 'Cancelled' } }),
-      prisma.meeting_action_items.count({ where: { ...where, status: 'Deferred' } })
+      prisma.meeting_action_items.count({ where: { ...where, status: 'Deferred' } });
     ]);
 
     const completionRate = total > 0 ? (completed / total) * 100 : 0;

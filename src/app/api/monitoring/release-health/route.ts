@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
     console.error('Error in release health API:', {
       component: 'release-health-api',
       action: 'fetch-release',
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.message : String(error);
     });
 
     return NextResponse.json(

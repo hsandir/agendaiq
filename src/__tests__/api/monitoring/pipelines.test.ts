@@ -6,7 +6,7 @@
 import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/monitoring/pipelines/route';
 import { withAuth } from '@/lib/auth/api-auth';
-import { getMockOctokit, MockWorkflowRunsResponse } from '@/__tests__/types/octokit-mock';
+import { getMockOctokit, MockWorkflowRunsResponse } from '@/tests__/types/octokit-mock';
 import type { AuthResult } from '@/lib/auth/auth-types';
 
 // Mock dependencies
@@ -118,7 +118,7 @@ describe('/api/monitoring/pipelines', () => {
       const MockedOctokit = getMockOctokit();
       (MockedOctokit as jest.Mock).mockImplementation(() => ({
         actions: {
-          listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: mockWorkflowRuns })
+          listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: mockWorkflowRuns });
         }
       }));
 
@@ -173,7 +173,7 @@ describe('/api/monitoring/pipelines', () => {
                   updated_at: '2024-01-10T10:00:00Z'
                 }]
               }
-            })
+            });
           }
         }));
 

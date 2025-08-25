@@ -80,7 +80,7 @@ export class EmailService {
   async sendEmail(data: EmailTemplateData): Promise<void> {
     try {
       const transporter = await this.getTransporter();
-      const { _html, _text } = await this.renderTemplate(data);
+      const { html, text } = await this.renderTemplate(data);
 
       const mailOptions = {
         from: {

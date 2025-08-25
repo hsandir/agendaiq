@@ -75,7 +75,7 @@ export function DashboardLayoutClient({
       // Database sync in background - fire and forget
       // This won't block the UI and only happens once per session
       const dbSyncTimer = setTimeout(() => {
-        fetch('/api/user/layout')
+        fetch('/api/user/layout');
           .then(res => res.ok ? res.json() : null)
           .then(data => {
             if (data?.layout && data.layout !== savedLayout) {

@@ -53,7 +53,7 @@ import type { Authenticatedusers, StaffWithRelations } from '@/types';
 //     is_leadership: false,
 //     capabilities: [],
 //     created_at: new Date(),
-//     updated_at: new Date()
+//     updated_at: new Date();
 //   },
 //   Department: {
 //     id: 1,
@@ -61,7 +61,7 @@ import type { Authenticatedusers, StaffWithRelations } from '@/types';
 //     code: 'MATH',
 //     school_id: 1,
 //     created_at: new Date(),
-//     updated_at: new Date()
+//     updated_at: new Date();
 //   },
 //   School: {
 //     id: 1,
@@ -70,7 +70,7 @@ import type { Authenticatedusers, StaffWithRelations } from '@/types';
 //     district_id: 1,
 //     address: '123 School St',
 //     created_at: new Date(),
-//     updated_at: new Date()
+//     updated_at: new Date();
 //   },
 //   District: {
 //     id: 1,
@@ -78,7 +78,7 @@ import type { Authenticatedusers, StaffWithRelations } from '@/types';
 //     code: 'TD001',
 //     address: '123 District Ave',
 //     created_at: new Date(),
-//     updated_at: new Date()
+//     updated_at: new Date();
 //   },
 //   ...overrides
 }); */
@@ -249,7 +249,7 @@ describe('Comprehensive Component Tests', () => {
       });
 
       it('should be accessible', async () => {
-        const { __container } = render(<SignInForm onSubmit={jest.fn()} />);
+        const { container } = render(<SignInForm onSubmit={jest.fn()} />);
 
         const results = await axe(container as Element);
         expect(results as any).toHaveNoViolations();
@@ -448,7 +448,7 @@ describe('Comprehensive Component Tests', () => {
       });
 
       it('should be accessible', async () => {
-        const { __container } = render(<MockMeetingCard meeting={__mockMeeting} />);
+        const { container } = render(<MockMeetingCard meeting={mockMeeting} />);
 
         const results = await axe(container as Element);
         expect(results as any).toHaveNoViolations();
@@ -459,7 +459,7 @@ describe('Comprehensive Component Tests', () => {
           ...mockmeeting,
           title: 'A'.repeat(100),
           description: 'B'.repeat(500),
-          location: 'C'.repeat(50)
+          location: 'C'.repeat(50);
         };
 
         render(<MockMeetingCard meeting={longMeeting} />);
@@ -606,7 +606,7 @@ describe('Comprehensive Component Tests', () => {
       });
 
       it('should be accessible', async () => {
-        const { __container } = render(<MockDashboardStats stats={__mockStats} />);
+        const { container } = render(<MockDashboardStats stats={mockStats} />);
 
         const results = await axe(container as Element);
         expect(results as any).toHaveNoViolations();
@@ -687,7 +687,7 @@ describe('Comprehensive Component Tests', () => {
 
       it('should be accessible', async () => {
         const _mockSearch = jest.fn();
-        const { __container } = render(<MockSearchComponent onSearch={jest.fn()} />);
+        const { container } = render(<MockSearchComponent onSearch={jest.fn()} />);
 
         const results = await axe(container as Element);
         expect(results as any).toHaveNoViolations();

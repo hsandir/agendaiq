@@ -81,7 +81,7 @@ export async function GET(request: NextRequest, props: Props) {
           created_at: true,
           name: true
         }
-      })
+      });
     ]);
 
     // Combine all activities and sort by date

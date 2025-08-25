@@ -98,7 +98,7 @@ export class DynamicRBAC {
           reason: 'User is not staff member',
           appliedRules,
           context,
-          timestamp: new Date()
+          timestamp: new Date();
         };
       }
 
@@ -119,7 +119,7 @@ export class DynamicRBAC {
             reason: `Access granted through role id: ${staff.role.id}`,
             appliedRules,
             context,
-            timestamp: new Date()
+            timestamp: new Date();
           };
         }
 
@@ -137,7 +137,7 @@ export class DynamicRBAC {
             reason: `Access granted through role hierarchy: ${inheritedAccess.reason}`,
             appliedRules,
             context,
-            timestamp: new Date()
+            timestamp: new Date();
           };
         }
 
@@ -151,7 +151,7 @@ export class DynamicRBAC {
             reason: `Access granted through context: ${contextAccess.reason}`,
             appliedRules,
             context,
-            timestamp: new Date()
+            timestamp: new Date();
           };
         }
       }
@@ -161,7 +161,7 @@ export class DynamicRBAC {
         reason: 'No matching permissions found',
         appliedRules,
         context,
-        timestamp: new Date()
+        timestamp: new Date();
       };
 
     } catch (error: unknown) {
@@ -171,7 +171,7 @@ export class DynamicRBAC {
         reason: 'Error during access check',
         appliedRules: [],
         context,
-        timestamp: new Date()
+        timestamp: new Date();
       };
     }
   }

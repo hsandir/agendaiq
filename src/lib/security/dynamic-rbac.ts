@@ -85,7 +85,7 @@ export class DynamicRBAC {
           reason: 'Direct permission granted',
           appliedRules,
           context,
-          timestamp: new Date()
+          timestamp: new Date();
         };
       }
 
@@ -103,7 +103,7 @@ export class DynamicRBAC {
           reason: 'Inherited permission granted',
           appliedRules,
           context,
-          timestamp: new Date()
+          timestamp: new Date();
         };
       }
 
@@ -117,7 +117,7 @@ export class DynamicRBAC {
           reason: 'Contextual permission granted',
           appliedRules,
           context,
-          timestamp: new Date()
+          timestamp: new Date();
         };
       }
 
@@ -126,7 +126,7 @@ export class DynamicRBAC {
         reason: 'No matching permissions found',
         appliedRules,
         context,
-        timestamp: new Date()
+        timestamp: new Date();
       };
 
     } catch (error: unknown) {
@@ -136,7 +136,7 @@ export class DynamicRBAC {
         reason: 'Error during access check',
         appliedRules: [],
         context,
-        timestamp: new Date()
+        timestamp: new Date();
       };
     }
   }
@@ -346,7 +346,7 @@ export class DynamicRBAC {
         priority: 1,
         granted: true,
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date();
       },
       {
         id: `${roleId}_update_own`,
@@ -357,7 +357,7 @@ export class DynamicRBAC {
         priority: 1,
         granted: true,
         created_at: new Date(),
-        updated_at: new Date()
+        updated_at: new Date();
       }
     ];
 
@@ -372,7 +372,7 @@ export class DynamicRBAC {
           priority: 10,
           granted: true,
           created_at: new Date(),
-          updated_at: new Date()
+          updated_at: new Date();
         }
       );
     }

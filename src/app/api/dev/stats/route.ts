@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
         table_name: 'test_run',
         operation: 'CREATE',
         created_at: {
-          lt: latestTestRun?.created_at ?? new Date()
+          lt: latestTestRun?.created_at ?? new Date();
         }
       },
       orderBy: { created_at: 'desc' },

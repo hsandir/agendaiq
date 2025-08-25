@@ -51,7 +51,7 @@ export class DynamicRBAC {
           reason: 'Admin user - full access',
           appliedRules: ['admin_access'],
           context,
-          timestamp: new Date()
+          timestamp: new Date();
         };
       }
 
@@ -61,7 +61,7 @@ export class DynamicRBAC {
         reason: 'Basic access granted',
         appliedRules: ['basic_access'],
         context,
-        timestamp: new Date()
+        timestamp: new Date();
       };
 
     } catch (error: unknown) {
@@ -71,7 +71,7 @@ export class DynamicRBAC {
         reason: 'Error during access check',
         appliedRules: [],
         context,
-        timestamp: new Date()
+        timestamp: new Date();
       };
     }
   }

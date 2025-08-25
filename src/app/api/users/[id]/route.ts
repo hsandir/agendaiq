@@ -116,7 +116,7 @@ export async function PUT(
         ...(body.remember_devices_enabled !== undefined && { 
           remember_devices_enabled: body.remember_devices_enabled 
         }),
-        updated_at: new Date()
+        updated_at: new Date();
       }
     });
 

@@ -94,7 +94,7 @@ export default function DependenciesPage() {
 
   // Uyumluluk değerlendirmesi
   const assessCompatibility = (pkg: Record<string, unknown>): CompatibilityInfo => {
-    const { __name, __current, __latest, __type  } = pkg;
+    const { name, current, latest, type  } = pkg;
     
     // Kritik paketler
     const criticalPackages = [
@@ -276,7 +276,7 @@ export default function DependenciesPage() {
         body: JSON.stringify({
           type: 'packages',
           packages: [dependency.name]
-        })
+        });
       });
       
       const result = await response.json();
@@ -318,7 +318,7 @@ export default function DependenciesPage() {
       
       Logger.error('Package update failed', { 
         packageName: dependency.name, 
-        error: String(error) 
+        error: String(error);
       }, 'dependencies');
     } finally {
       setIsUpdating(false);
@@ -363,7 +363,7 @@ export default function DependenciesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'packages',
-          packages: packagesToUpdate.map(p => p.name)
+          packages: packagesToUpdate.map(p => p.name);
         })
       }));
       
@@ -429,7 +429,7 @@ export default function DependenciesPage() {
           type: 'packages',
           packages: [backup.packageName],
           targetVersion: backup.version
-        })
+        });
       });
       
       const result = await response.json();
@@ -784,7 +784,7 @@ export default function DependenciesPage() {
                             const response = await fetch('/api/system/fix', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ action: 'install', package: dep.name })
+                              body: JSON.stringify({ action: 'install', package: dep.name });
                             });
                             if (response.ok) {
                               alert(`${dep.name} installed successfully`);
@@ -798,7 +798,7 @@ export default function DependenciesPage() {
                             const response = await fetch('/api/system/update', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ package: dep.name })
+                              body: JSON.stringify({ package: dep.name });
                             });
                             if (response.ok) {
                               alert(`${dep.name} updated successfully`);
@@ -837,7 +837,7 @@ export default function DependenciesPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                   action: 'install-multiple', 
-                  packages: missingDeps.map(d => d.name) 
+                  packages: missingDeps.map(d => d.name);
                 })
               }));
               if (response.ok) {

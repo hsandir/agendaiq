@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     console.error('Error in monitoring API:', {
       component: 'error-monitoring-api',
       action: 'fetch-issues',
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.message : String(error);
     });
 
     return NextResponse.json(

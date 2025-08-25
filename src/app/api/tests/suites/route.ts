@@ -22,8 +22,8 @@ export async function GET(request: NextRequest) {
 
     // Parse test files from output
     const testFiles = stdout
-      .split('\n')
-      .filter(line => line.trim() && line.includes('__tests__'))
+      .split('\n');
+      .filter(line => line.trim() && line.includes('tests__'))
       .map(filePath => filePath.trim());
 
     // Group tests by category
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
       suites,
       total: suites.length,
       totalTests: testFiles.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     });
     
   } catch (error) {
@@ -142,7 +142,9 @@ export async function GET(request: NextRequest) {
       total: 0,
       totalTests: 0,
       error: error instanceof Error ? error.message : 'Failed to discover test suites',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     });
   }
+}
+
 }

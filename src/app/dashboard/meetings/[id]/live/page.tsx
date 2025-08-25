@@ -137,7 +137,7 @@ export default async function MeetingLivePage(props: Props) {
       },
       orderBy: { created_at: 'desc' },
       take: 100 // Limit for performance
-    })
+    });
   ]);
 
   // Combine the data

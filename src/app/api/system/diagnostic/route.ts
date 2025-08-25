@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
         'Follow auth patterns in .cursorrules',
         'Check system status via /api/system/status'
       ],
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     };
 
     return NextResponse.json({ 
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         error: "Internal server error",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString();
       }, 
       { status: 500 }
     );
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         error: "Internal server error",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString();
       }, 
       { status: 500 }
     );

@@ -84,7 +84,7 @@ export default function UpdatesPage() {
 
   // Compatibility assessment function
   const assessCompatibility = (pkg: PackageUpdate): CompatibilityInfo => {
-    const { __name, __type, __current, __latest  } = pkg;
+    const { name, type, current, latest  } = pkg;
     
     // Critical packages that need special attention
     const criticalPackages = [
@@ -220,7 +220,7 @@ export default function UpdatesPage() {
       const response = await fetch('/api/system/fix', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'check' })
+        body: JSON.stringify({ action: 'check' });
       });
       
       if (response.ok) {
@@ -238,7 +238,7 @@ export default function UpdatesPage() {
       const response = await fetch('/api/system/fix', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'fix' })
+        body: JSON.stringify({ action: 'fix' });
       });
       
       if (response.ok) {
@@ -279,7 +279,7 @@ export default function UpdatesPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           type: 'packages',
-          packages: packages ?? Array.from(selectedUpdates)
+          packages: packages ?? Array.from(selectedUpdates);
         })
       });
       

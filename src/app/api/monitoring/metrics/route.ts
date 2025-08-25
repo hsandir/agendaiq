@@ -99,10 +99,10 @@ export async function GET(request: NextRequest) {
 }
 
 function calculatePercentiles(metricName: string) {
-  const values = (webVitalsBuffer
+  const values = webVitalsBuffer
     .filter(m => m.name === metricName)
     .map(m => m?.value)
-    .sort((a, b) => a - b));
+    .sort((a, b) => a - b);
 
   if (values.length === 0) {
     return { p50: null, p75: null, p95: null, p99: null };

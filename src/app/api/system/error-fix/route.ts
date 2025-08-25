@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
-    const { __type } = (await request.json()) as Record<__string, unknown>;
+    const { type } = (await request.json()) as Record<string, unknown>;
 
     if (type === 'react-version-mismatch') {
       return await fixReactVersionMismatch();
@@ -49,7 +49,7 @@ async function fixReactVersionMismatch() {
         body: JSON.stringify({ 
           type: 'auto-backup', 
           message: 'Pre-React fix backup' 
-        })
+        });
       });
     } catch (error: unknown) {
       console.warn('Auto-backup failed:', error);
@@ -68,9 +68,9 @@ async function fixReactVersionMismatch() {
     for (const command of fixCommands) {
       try {
         console.log(`Running: ${command}`);
-        const { __stdout, __stderr } = await execAsync(____command, { 
+        const { stdout, stderr } = await execAsync(command, { 
           cwd: process.cwd(),
-          timeout: 120000 // 2 ____minutes
+          timeout: 120000 // 2 minutes
         });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
@@ -137,7 +137,7 @@ async function fixNodeModulesIssues() {
     const results = [];
     for (const command of fixCommands) {
       try {
-        const { __stdout } = await execAsync(____command, { cwd: process.cwd(), timeout: ____120000 });
+        const { stdout } = await execAsync(command, { cwd: process.cwd(), timeout: 120000 });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
@@ -230,7 +230,7 @@ module.exports = {
     const results = [];
     for (const command of commands) {
       try {
-        const { __stdout } = await execAsync(____command, { cwd: process.cwd(), timeout: ____60000 });
+        const { stdout } = await execAsync(command, { cwd: process.cwd(), timeout: 60000 });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
@@ -264,7 +264,7 @@ async function fixNextCacheIssues() {
     const results = [];
     for (const command of commands) {
       try {
-        const { __stdout } = await execAsync(____command, { cwd: process.cwd(), timeout: ____30000 });
+        const { stdout } = await execAsync(command, { cwd: process.cwd(), timeout: 30000 });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
@@ -298,7 +298,7 @@ async function autoFixAllErrors() {
         body: JSON.stringify({ 
           type: 'auto-backup', 
           message: 'Pre-auto-fix comprehensive backup' 
-        })
+        });
       });
     } catch (error: unknown) {
       console.warn('Auto-backup failed:', error);

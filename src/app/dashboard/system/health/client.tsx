@@ -82,30 +82,29 @@ export default function HealthClient({ user }: HealthClientProps) {
     },
     alerts: []
   })
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
-  const [autoRefresh, setAutoRefresh] = useState(true)
-  const [activeTab, setActiveTab] = useState('overview')
-
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [activeTab, setActiveTab] = useState('overview');
   const fetchHealthData = useCallback(async () => {
     try {
-      const response = await fetch('/api/system/health')
+      const response = await fetch('/api/system/health');
       if (response.ok) {
-        const data = await response.json()
-        setHealthData(data)
+        const data = await response.json();
+        setHealthData(data);
         setLastRefresh(new Date())
       } else {
-        console.error('Failed to fetch health data')
+        console.error('Failed to fetch health data');
       }
     } catch (error: unknown) {
-      console.error('Error fetching health data:', error)
+      console.error('Error fetching health data:', error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }, [])
 
   useEffect(() => {
-    fetchHealthData()
+    fetchHealthData();
   }, [fetchHealthData])
 
   useEffect(() => {
@@ -114,7 +113,7 @@ export default function HealthClient({ user }: HealthClientProps) {
       interval = setInterval(fetchHealthData, 30000) // Refresh every 30 seconds
     }
     return () => {
-      if (interval) clearInterval(interval)
+      if (interval) clearInterval(interval);
     }
   }, [autoRefresh, fetchHealthData])
 
@@ -164,8 +163,8 @@ export default function HealthClient({ user }: HealthClientProps) {
   }
 
   const handleRefresh = () => {
-    setIsLoading(true)
-    fetchHealthData()
+    setIsLoading(true);
+    fetchHealthData();
   }
 
   const formatDuration = (ms: number) => {

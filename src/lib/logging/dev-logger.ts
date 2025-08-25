@@ -263,7 +263,7 @@ export class DevLogger {
 
     // Remove duplicates based on ID
     const uniqueResults = results.filter((entry, index, self) => 
-      index === self.findIndex(e => e.id === entry.id)
+      index === self.findIndex(e => e.id === entry.id);
     );
 
     return uniqueResults;
@@ -298,7 +298,7 @@ export class DevLogger {
         logsByCategory: {},
         timeRange: {
           start: new Date().toISOString(),
-          end: new Date().toISOString()
+          end: new Date().toISOString();
         }
       };
     }

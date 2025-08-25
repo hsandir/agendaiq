@@ -131,19 +131,18 @@ export function AgendaItemsEditor({
   pastMeetings,
   canEdit
 }: AgendaItemsEditorProps) {
-  const router = useRouter()
+  const router = useRouter();
   const [agendaItems, setAgendaItems] = useState<AgendaItemFormData[]>([])
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   
   // Import dialog state
-  const [showImportDialog, setShowImportDialog] = useState(false)
+  const [showImportDialog, setShowImportDialog] = useState(false);
   const [selectedPastMeeting, setSelectedPastMeeting] = useState<number | null>(null)
   const [importedItems, setImportedItems] = useState<AgendaItemFormData[]>([])
   const [importedMeetingId, setImportedMeetingId] = useState<number | null>(null)
-  const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false)
-
+  const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false);
   // State to track if we should auto-add a new item
   const [hasAutoAddedNewItem, setHasAutoAddedNewItem] = useState(false);
 
@@ -207,13 +206,13 @@ export function AgendaItemsEditor({
       order_index: agendaItems.length
     }
     // Add new item at the beginning (newest first)
-    setAgendaItems([newItem, ...agendaItems])
+    setAgendaItems([newItem, ...agendaItems]);
   }
 
   const updateAgendaItem = (index: number, item: AgendaItemFormData) => {
     const newItems = [...agendaItems]
     newItems[index] = item
-    setAgendaItems(newItems)
+    setAgendaItems(newItems);
   }
 
   const removeAgendaItem = (index: number) => {
@@ -237,16 +236,15 @@ export function AgendaItemsEditor({
       item.order_index = idx
     })
 
-    setAgendaItems(newItems)
+    setAgendaItems(newItems);
   }
 
   const handleImportFromPastMeeting = async () => {
     if (!selectedPastMeeting) return
 
     try {
-      const response = await fetch(`/api/meetings/${selectedPastMeeting}/agenda-items`)
-      const data = await response.json()
-
+      const response = await fetch(`/api/meetings/${selectedPastMeeting}/agenda-items`);
+      const data = await response.json();
       if (data.success && data.items) {
         const imported: AgendaItemFormData[] = data.items.map((item: Record<string, unknown>, index: number) => ({
           topic: item.topic,
@@ -268,32 +266,31 @@ export function AgendaItemsEditor({
           parent_item_id: item.id // Link to original item
         }))
 
-        setImportedItems(imported)
-        setImportedMeetingId(selectedPastMeeting)
-        setAgendaItems([...agendaItems, ...imported])
-        setShowImportDialog(false)
-        setSuccess(`Imported ${imported.length} agenda items`)
+        setImportedItems(imported);
+        setImportedMeetingId(selectedPastMeeting);
+        setAgendaItems([...agendaItems, ...imported]);
+        setShowImportDialog(false);
+        setSuccess(`Imported ${imported.length} agenda items`);
       }
     } catch (error: unknown) {
-      setError('Failed to import agenda items')
+      setError('Failed to import agenda items');
     }
   }
 
   const handleRemoveImportedItems = () => {
     if (importedMeetingId) {
       setAgendaItems(agendaItems.filter(item => !importedItems.includes(item)))
-      setImportedItems([])
-      setImportedMeetingId(null)
-      setShowRemoveConfirmation(false)
-      setSuccess('Removed imported items')
+      setImportedItems([]);
+      setImportedMeetingId(null);
+      setShowRemoveConfirmation(false);
+      setSuccess('Removed imported items');
     }
   }
 
   const handleSubmit = async () => {
-    setIsSubmitting(true)
-    setError(null)
-    setSuccess(null)
-
+    setIsSubmitting(true);
+    setError(null);
+    setSuccess(null);
     try {
       const response = await fetch(`/api/meetings/${meeting.id}/agenda-items`, {
         method: 'PUT',
@@ -309,17 +306,16 @@ export function AgendaItemsEditor({
         }),
       })
 
-      const data = await response.json()
-
+      const data = await response.json();
       if (response.ok && data.success) {
-        setSuccess('Agenda items saved successfully')
+        setSuccess('Agenda items saved successfully');
       } else {
-        setError(data.error || 'Failed to save agenda items')
+        setError(data.error || 'Failed to save agenda items');
       }
     } catch (error: unknown) {
-      setError('An error occurred while saving')
+      setError('An error occurred while saving');
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 

@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json() as Record<string, unknown>;
-    const { _districtName, __schoolName, __address } = body;
+    const { _districtName, schoolName, address } = body;
 
     if (!districtName || !schoolName) {
       return NextResponse.json(
@@ -88,7 +88,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json() as Record<string, unknown>;
-    const { _districtName, __schoolName, __address } = body;
+    const { _districtName, schoolName, address } = body;
 
     if (!districtName || !schoolName) {
       return NextResponse.json(

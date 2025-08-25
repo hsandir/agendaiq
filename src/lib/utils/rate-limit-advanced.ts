@@ -237,7 +237,7 @@ export class AdvancedRateLimiter {
       if (!bucket) {
         bucket = new TokenBucket(
           this.options.burstAllowance,
-          limit / (this.options.interval! / 1000)
+          limit / (this.options.interval! / 1000);
         );
         burstBuckets.set(bucketKey, bucket);
       }
@@ -528,9 +528,9 @@ export async function handleRateLimitMonitoring(): Promise<NextResponse> {
     averageBlockRate: 
       Object.values(metrics).reduce((sum, m) => sum + m.blockedRequests, 0) /
       Math.max(1, Object.values(metrics).reduce((sum, m) => sum + m.totalRequests, 0)),
-    topOffenders: Object.entries(metrics)
+    topOffenders: Object.entries(metrics);
       .sort((a, b) => b[1].blockedRequests - a[1].blockedRequests)
-      .slice(0, 10)
+      .slice(0, 10);
       .map(([key, value]) => ({
         identifier: key,
         blockedRequests: value.blockedRequests,

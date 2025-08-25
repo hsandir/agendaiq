@@ -104,10 +104,10 @@ describe('Middleware Chain Tests', () => {
         url: 'http://localhost:3000/dashboard',
         headers: new Headers(),
         method: 'GET',
-        nextUrl: new URL('http://localhost:3000/dashboard')
+        nextUrl: new URL('http://localhost:3000/dashboard');
       } as unknown as NextRequest;
       
-      const { __getToken } = await import('next-auth/jwt');
+      const { getToken } = await import('next-auth/jwt');
       (getToken as jest.Mock).mockResolvedValue({
         id: '1',
         email: 'test@test.com',
@@ -134,7 +134,7 @@ describe('Middleware Chain Tests', () => {
         '/api/setup/check',
       ];
       
-      const { __getToken } = await import('next-auth/jwt');
+      const { getToken } = await import('next-auth/jwt');
       (getToken as jest.Mock).mockResolvedValue(null);
       
       for (const path of publicPaths) {
@@ -142,7 +142,7 @@ describe('Middleware Chain Tests', () => {
           url: `http://localhost:3000${path}`,
           headers: new Headers(),
           method: 'GET',
-          nextUrl: new URL(`http://localhost:3000${path}`)
+          nextUrl: new URL(`http://localhost:3000${path}`);
         } as unknown as NextRequest;
         const response = await middleware(request);
         
@@ -161,7 +161,7 @@ describe('Middleware Chain Tests', () => {
         '/api/test-sentry', // Should require DEV_DEBUG capability
       ];
       
-      const { __getToken } = await import('next-auth/jwt');
+      const { getToken } = await import('next-auth/jwt');
       (getToken as jest.Mock).mockResolvedValue(null);
       
       for (let i = 0; i < protectedPaths.length; i++) {
@@ -173,7 +173,7 @@ describe('Middleware Chain Tests', () => {
           url: `http://localhost:3000${path}`,
           headers,
           method: 'GET',
-          nextUrl: new URL(`http://localhost:3000${path}`)
+          nextUrl: new URL(`http://localhost:3000${path}`);
         } as unknown as NextRequest;
         const response = await middleware(request);
         

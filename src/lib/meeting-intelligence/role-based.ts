@@ -64,7 +64,7 @@ export class RoleBasedAssignmentService {
             assigned_to_role: data.roleId,
             assigned_to: data.toStaffId
           }
-        })
+        });
       ]);
 
       return {
@@ -159,7 +159,7 @@ export class RoleBasedAssignmentService {
           { due_date: 'asc' },
           { priority: 'desc' }
         ]
-      })
+      });
     ]);
 
     return {
@@ -261,7 +261,7 @@ export class RoleBasedAssignmentService {
         },
         due_date: {
           lte: futureDate,
-          gte: new Date()
+          gte: new Date();
         }
       },
       include: {

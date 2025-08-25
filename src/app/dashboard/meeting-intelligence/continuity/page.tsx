@@ -440,7 +440,7 @@ export default function MeetingContinuityPage() {
                       {chain.meetings.map(meeting => renderMeetingNode(meeting))}
                     </div>
                   ) : (
-                    renderTimelineView(chain)
+                    renderTimelineView(chain);
                   )}
                 </div>
               )}

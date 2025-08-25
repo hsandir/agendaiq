@@ -117,7 +117,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
   // Initialize selected components
   useEffect(() => {
     setSelectedComponents(
-      backupComponents.filter(comp => comp.enabled).map(comp => comp.id)
+      backupComponents.filter(comp => comp.enabled).map(comp => comp.id);
     );
   }, []);
 
@@ -155,7 +155,7 @@ export default function BackupClient({ initialBackupData }: BackupClientProps) {
         body: JSON.stringify({ 
           type: 'full-system',
           components: selectedComponents
-        })
+        });
       });
 
       if (!response.ok) {

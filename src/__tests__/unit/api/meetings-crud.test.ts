@@ -5,14 +5,14 @@
 
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { NextRequest, NextResponse } from 'next/server';
-import { createTestContext } from '@/__tests__/helpers/test-db';
+import { createTestContext } from '@/tests__/helpers/test-db';
 import { 
   TypeSafeRequestBuilder, 
   TypeSafeMockFactory, 
   TypeSafeValidators,
   TypeSafeTestDB 
-} from '@/__tests__/utils/type-safe-helpers';
-import type { TestContext } from '@/__tests__/types/test-context';
+} from '@/tests__/utils/type-safe-helpers';
+import type { TestContext } from '@/tests__/types/test-context';
 
 // Import route handlers - Replace with actual imports
 // import { GET, POST } from '@/app/api/meetings/route';

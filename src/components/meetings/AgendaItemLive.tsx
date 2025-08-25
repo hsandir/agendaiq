@@ -203,7 +203,7 @@ export function AgendaItemLive({
       const response = await fetch(`/api/meetings/${meetingId}/agenda-items/${item.id}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content })
+        body: JSON.stringify({ content });
       });
 
       if (!response.ok) {
@@ -362,7 +362,7 @@ export function AgendaItemLive({
                 value={editData.responsible_staff_id?.toString() ?? 'none'}
                 onValueChange={(value) => setEditData({ 
                   ...editData, 
-                  responsible_staff_id: value === 'none' ? null : parseInt(value) 
+                  responsible_staff_id: value === 'none' ? null : parseInt(value);
                 })}
               >
                 <SelectTrigger className="mt-1">
@@ -492,7 +492,7 @@ export function AgendaItemLive({
                 id="future-implications"
                 checked={editData.future_implications}
                 onCheckedChange={(checked) => 
-                  setEditData({ ...editData, future_implications: checked as boolean })
+                  setEditData({ ...editData, future_implications: checked as boolean });
                 }
               />
               <label 

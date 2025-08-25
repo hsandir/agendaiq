@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
           outgoing: '0 MB'
         }
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     };
 
     return NextResponse.json({ 
@@ -135,7 +135,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         error: "Failed to retrieve server metrics",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString();
       }, 
       { status: 500 }
     );

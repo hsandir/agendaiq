@@ -78,7 +78,7 @@ export function renderWithProviders(
     )
   }
 
-  return render(ui, { wrapper: Wrapper, ...renderOptions })
+  return render(ui, { wrapper: Wrapper, ...renderOptions });
 }
 
 // API test helpers
@@ -97,10 +97,10 @@ export const createMockRequest = (
   }
 
   if (body) {
-    init.body = JSON.stringify(body)
+    init.body = JSON.stringify(body);
   }
 
-  return new Request(url, init)
+  return new Request(url, init);
 }
 
 export const createMockNextRequest = (
@@ -108,7 +108,7 @@ export const createMockNextRequest = (
   body?: unknown,
   headers?: Record<string, string>
 ) => {
-  const request = createMockRequest(method, body, headers)
+  const request = createMockRequest(method, body, headers);
   return {
     ...request,
     json: async () => body,

@@ -170,7 +170,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         error: 'Database performance test failed',
-        details: error instanceof Error ? error.message : String(error)
+        details: error instanceof Error ? error.message : String(error);
       },
       { status: 500 }
     );

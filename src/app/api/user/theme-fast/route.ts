@@ -62,7 +62,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: auth.error || 'Auth required' }, { status: auth.statusCode || 401 });
     }
     
-    const { __theme } = (await request.json()) as Record<__string, unknown>;
+    const { theme } = (await request.json()) as Record<string, unknown>;
     if (!theme) {
       return NextResponse.json({ error: 'Theme required' }, { status: 400 });
     }

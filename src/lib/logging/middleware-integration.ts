@@ -115,7 +115,7 @@ export function withLogging(
       {
         requestId,
         responseSize: response.headers.get('content-length'),
-        contentType: response.headers.get('content-type')
+        contentType: response.headers.get('content-type');
       }
     );
 
@@ -124,7 +124,7 @@ export function withLogging(
       await logAuditTrail(method, path, statusCode, context, {
         requestId,
         duration,
-        ip: getClientIP(request)
+        ip: getClientIP(request);
       });
     }
 

@@ -152,7 +152,7 @@ export async function PUT(
       where: { id: knowledgeId },
       data: {
         ...validatedData,
-        updated_at: new Date()
+        updated_at: new Date();
       },
       include: {
         created_by: {

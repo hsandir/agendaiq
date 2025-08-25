@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ThemeSelector } from '/Users/hs/Project/agendaiq/src/components/theme/theme-selector'
-import { renderWithProviders } from '@/__tests__/utils/test-utils'
+import { renderWithProviders } from '@/tests__/utils/test-utils'
 
 describe('ThemeSelector', () => {
   const defaultProps = {
@@ -11,10 +11,9 @@ describe('ThemeSelector', () => {
   }
 
   it('renders without crashing', () => {
-    renderWithProviders(<ThemeSelector {...defaultProps} />)
-    
+    renderWithProviders(<ThemeSelector {...defaultProps} />);
     // Add specific assertions based on component content
-    expect(screen.getByRole('region')).toBeInTheDocument()
+    expect(screen.getByRole('region')).toBeInTheDocument();
   })
 
   
@@ -22,45 +21,39 @@ describe('ThemeSelector', () => {
   
 
   it('updates state correctly', async () => {
-    const user = userEvent.setup()
-    renderWithProviders(<ThemeSelector {...defaultProps} />)
-    
+    const user = userEvent.setup();
+    renderWithProviders(<ThemeSelector {...defaultProps} />);
     // Add state change interaction test
-    const input = screen.getByRole('textbox')
-    await (user as Record<string, unknown>).type(input, 'New Value')
-    
-    expect(input).toHaveValue('New Value')
+    const input = screen.getByRole('textbox');
+    await (user as Record<string, unknown>).type(input, 'New Value');
+    expect(input).toHaveValue('New Value');
   })
 
   
 
   it('handles loading state', () => {
-    renderWithProviders(<ThemeSelector {...defaultProps} />)
-    
-    expect(screen.getByText(/loading/i)).toBeInTheDocument()
+    renderWithProviders(<ThemeSelector {...defaultProps} />);
+    expect(screen.getByText(/loading/i)).toBeInTheDocument();
   })
 
   it('handles error state', async () => {
     // Mock error scenario
-    renderWithProviders(<ThemeSelector {...defaultProps} />)
-    
+    renderWithProviders(<ThemeSelector {...defaultProps} />);
     await waitFor(() => {
-      expect(screen.getByText(/error/i)).toBeInTheDocument()
+      expect(screen.getByText(/error/i)).toBeInTheDocument();
     })
   })
 
   it('applies custom className', () => {
     const { container } = renderWithProviders(
-      <ThemeSelector {...__defaultProps} className="custom-class" />
-    )
-    
-    expect(container.firstChild).toHaveClass('custom-class')
+      <ThemeSelector {...defaultProps} className="custom-class" />
+    );
+    expect(container.firstChild).toHaveClass('custom-class');
   })
 
   it('is accessible', () => {
-    const { container } = renderWithProviders(<ThemeSelector {...__defaultProps} />)
-    
+    const { container } = renderWithProviders(<ThemeSelector {...defaultProps} />);
     // Basic accessibility checks
-    expect(container.firstChild).toHaveAttribute('role')
+    expect(container.firstChild).toHaveAttribute('role');
   })
 })

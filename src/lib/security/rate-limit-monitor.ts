@@ -135,7 +135,7 @@ export class RateLimitMonitor {
    * Check if a client should be temporarily blocked
    */
   static shouldBlockClient(clientId: string): boolean {
-    const recentViolations = this.getViolationsByClient(clientId)
+    const recentViolations = this.getViolationsByClient(clientId);
       .filter(v => v.timestamp > new Date(Date.now() - 60 * 60 * 1000)); // Last hour
 
     // Block if more than 10 violations in the last hour

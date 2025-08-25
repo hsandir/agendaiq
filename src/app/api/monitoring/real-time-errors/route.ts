@@ -130,7 +130,7 @@ export async function GET(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.statusCode });
     }
-    const { __searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const pageContext = searchParams.get('page');
     const severity = searchParams.get('severity');
     const category = searchParams.get('category');
@@ -184,7 +184,7 @@ export async function GET(request: NextRequest) {
       errors: allErrors,
       report,
       pageAnalytics,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     });
 
   } catch (error: unknown) {
@@ -203,7 +203,7 @@ export async function PATCH(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.statusCode });
     }
-    const { __errorId, __resolved } = (await request.json()) as Record<__string, unknown>;
+    const { errorId, resolved } = (await request.json()) as Record<string, unknown>;
     
     // Find and update error in all pages
     for (const [page, errors] of errorStore.entries()) {
@@ -280,7 +280,7 @@ function getMostCommonCategory(errors: StoredError[]): string {
     categories[err.analysis.category] = (categories[err.analysis.category] || 0) + 1;
   });
 
-  return Object.entries(categories)
+  return Object.entries(categories);
     .sort(([,a], [,b]) => b - a)[0]?.[0] || 'unknown';
 }
 

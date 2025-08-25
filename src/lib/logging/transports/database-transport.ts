@@ -128,7 +128,7 @@ export class DatabaseTransport implements LogTransport {
         prisma.devLog.findMany({
           where: {
             ...where,
-            ...(query.category ? { category: { in: query.category } } : {})
+            ...(query.category ? { category: { in: query.category } } : {});
           },
           orderBy,
           take: query.limit ?? 100,
@@ -138,7 +138,7 @@ export class DatabaseTransport implements LogTransport {
         prisma.securityLog.findMany({
           where: {
             ...where,
-            ...(query.category ? { category: { in: query.category } } : {})
+            ...(query.category ? { category: { in: query.category } } : {});
           },
           orderBy,
           take: query.limit ?? 100,
@@ -240,7 +240,7 @@ export class DatabaseTransport implements LogTransport {
         logsByCategory: {}, // TODO: Implement category stats
         timeRange: {
           start: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          end: new Date().toISOString()
+          end: new Date().toISOString();
         }
       };
     } catch (error: unknown) {
@@ -258,7 +258,7 @@ export class DatabaseTransport implements LogTransport {
         logsByCategory: {},
         timeRange: {
           start: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          end: new Date().toISOString()
+          end: new Date().toISOString();
         }
       };
     }

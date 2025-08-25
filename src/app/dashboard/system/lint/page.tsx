@@ -236,7 +236,7 @@ export default function LintErrorManagementPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ action: 'autofix-type-casting' })
+        body: JSON.stringify({ action: 'autofix-type-casting' });
       });
       
       if (!response.ok) {

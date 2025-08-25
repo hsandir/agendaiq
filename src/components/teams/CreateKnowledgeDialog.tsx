@@ -229,7 +229,7 @@ export function CreateKnowledgeDialog({
         
         if (!uploadResponse.ok) throw new Error('Failed to upload file');
         
-        const { url: __fileUrl } = await uploadResponse.json();
+        const { url: fileUrl } = await uploadResponse.json();
         uploadedFileUrl = fileUrl;
       }
       

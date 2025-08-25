@@ -46,7 +46,7 @@ export default async function ZoomUserPreferences() {
   // Calculate Zoom-related statistics
   const totalMeetings = userMeetings.length;
   const upcomingMeetings = userMeetings.filter(meeting => 
-    meeting.start_time && new Date(meeting.start_time) > new Date()
+    meeting.start_time && new Date(meeting.start_time) > new Date();
   ).length;
   const pastMeetings = totalMeetings - upcomingMeetings;
 

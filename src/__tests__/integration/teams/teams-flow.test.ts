@@ -15,7 +15,7 @@ describe('Teams Integration Tests', () => {
         email: `test-${Date.now()}@example.com`,
         name: 'Test User',
         password: 'hashed_password',
-        emailVerified: new Date()
+        emailVerified: new Date();
       }
     });
 
@@ -74,7 +74,7 @@ describe('Teams Integration Tests', () => {
             created_by: 'integration_test'
           },
           created_at: new Date(),
-          updated_at: new Date()
+          updated_at: new Date();
         }
       });
 
@@ -92,7 +92,7 @@ describe('Teams Integration Tests', () => {
           user_id: testUser.id,
           staff_id: testStaff.id,
           role: 'LEADER',
-          joined_at: new Date()
+          joined_at: new Date();
         }
       });
 
@@ -113,7 +113,7 @@ describe('Teams Integration Tests', () => {
           email: `second-${Date.now()}@example.com`,
           name: 'Second User',
           password: 'hashed_password',
-          emailVerified: new Date()
+          emailVerified: new Date();
         }
       });
 
@@ -150,7 +150,7 @@ describe('Teams Integration Tests', () => {
           user_id: secondUser.id,
           staff_id: secondStaff.id,
           role: 'MEMBER',
-          joined_at: new Date()
+          joined_at: new Date();
         }
       });
 
@@ -229,7 +229,7 @@ describe('Teams Integration Tests', () => {
           downloads_count: 0,
           created_by_staff_id: testStaff.id,
           created_at: new Date(),
-          updated_at: new Date()
+          updated_at: new Date();
         }
       });
 
@@ -309,7 +309,7 @@ describe('Teams Integration Tests', () => {
             purpose: `Search test purpose ${i}`,
             is_active: i !== 2,
             created_at: new Date(),
-            updated_at: new Date()
+            updated_at: new Date();
           }
         });
         additionalTeams.push(team);

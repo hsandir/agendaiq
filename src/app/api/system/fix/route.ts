@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
-    const { __action } = (await request.json()) as Record<__string, unknown>;
+    const { action } = (await request.json()) as Record<string, unknown>;
 
     if (action === 'check') {
       return await checkSystemHealth();
@@ -47,8 +47,8 @@ async function checkSystemHealth() {
 
     // Check npm cache integrity
     try {
-      const { stdout: ____cacheVerify  } = await execAsync('npm cache verify', { cwd: process.cwd() });
-      if (String(__cacheVerify).includes('Cache verified and compressed')) {
+      const { stdout: cacheVerify  } = await execAsync('npm cache verify', { cwd: process.cwd() });
+      if (String(cacheVerify).includes('Cache verified and compressed')) {
         health.cacheStatus = 'clean';
       } else {
         health.cacheStatus = 'corrupted';
@@ -90,8 +90,8 @@ async function checkSystemHealth() {
 
     // Get last cache clean time
     try {
-      const { stdout: ____cacheInfo  } = await execAsync('npm config get cache', { cwd: process.cwd() });
-      if (String(__cacheInfo).trim()) {
+      const { stdout: cacheInfo  } = await execAsync('npm config get cache', { cwd: process.cwd() });
+      if (String(cacheInfo).trim()) {
         health.lastCacheClean = 'Available';
       }
     } catch (error: unknown) {
@@ -198,7 +198,7 @@ async function fixSystemIssues() {
       { 
         success: false,
         error: 'System fix failed', 
-        details: error instanceof Error ? error.message : String(error) 
+        details: error instanceof Error ? error.message : String(error);
       },
       { status: 500 }
     );

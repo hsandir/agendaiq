@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json() as Record<string, unknown>;
-    const { __role } = body;
+    const { role } = body;
 
     if (!role || !['admin', 'user'].includes(role)) {
       return NextResponse.json(
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     await prisma.staff.update({
       where: { id: staffRecord?.id },
       data: { 
-        role_id: parseInt(targetRole?.id)
+        role_id: parseInt(targetRole?.id);
       }
     });
 

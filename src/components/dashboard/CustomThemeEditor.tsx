@@ -113,7 +113,7 @@ interface CustomThemeEditorProps {
 }
 
 export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
-  const { ____customTheme, ____setCustomTheme, ____setTheme  } = useTheme();
+  const { customTheme, setCustomTheme, setTheme  } = useTheme();
   const [themeName, setThemeName] = useState('My Custom Theme');
   const [isDark, setIsDark] = useState(true);
   const [activeColorKey, setActiveColorKey] = useState<string | null>(null);
@@ -316,7 +316,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
       name: themeName,
       colors: colors,
       isDark: isDark,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString();
     };
 
     const updated = [...savedThemes, newTheme];
@@ -393,7 +393,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
       name: themeName,
       colors: colors,
       isDark: isDark,
-      exportedAt: new Date().toISOString()
+      exportedAt: new Date().toISOString();
     };
     
     const blob = new Blob([JSON.stringify(themeData, null, 2)], { type: 'application/json' });
@@ -406,7 +406,7 @@ export function CustomThemeEditor({ onClose }: CustomThemeEditorProps = {}) {
   };
 
   const copyThemeCode = () => {
-    const cssVariables = Object.entries(colors)
+    const cssVariables = Object.entries(colors);
       .map(([key, value]) => `  --${key}: ${value};`)
       .join('\n');
     

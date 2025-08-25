@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
     console.error('Error in error stats API:', {
       component: 'error-stats-api',
       action: 'fetch-stats',
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.message : String(error);
     });
 
     return NextResponse.json(

@@ -92,7 +92,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
         // Delayed fetch to not block initial render
         // This is fire-and-forget - we don't wait for it
         setTimeout(() => {
-          fetch("/api/user/theme")
+          fetch("/api/user/theme");
             .then((res) => (res.ok ? res.json() : null))
             .then((data) => {
               if (data?.theme && data.theme !== savedTheme) {
@@ -108,7 +108,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
 
           // Fetch custom theme if needed
           if (savedTheme === "custom" || globalThemeState.currentThemeId === "custom") {
-            fetch("/api/user/custom-theme")
+            fetch("/api/user/custom-theme");
               .then((res) => (res.ok ? res.json() : null))
               .then((data) => {
                 if (data?.customTheme) {

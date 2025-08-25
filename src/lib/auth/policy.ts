@@ -260,7 +260,7 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
         cap.startsWith('ops:') || 
         cap.includes('manage') || 
         cap.includes('view') ||
-        cap.startsWith('meeting:')
+        cap.startsWith('meeting:');
       );
     }
     

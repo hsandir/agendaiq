@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
       ipDistribution: {} as Record<string, number>,
       timeRange: {
         from: new Date(Date.now() - hoursBack * 60 * 60 * 1000).toISOString(),
-        to: new Date().toISOString()
+        to: new Date().toISOString();
       }
     };
 
@@ -66,15 +66,15 @@ export async function GET(request: NextRequest) {
 
     // Limit distributions to top entries
     stats.userDistribution = Object.fromEntries(
-      Object.entries(stats.userDistribution)
+      Object.entries(stats.userDistribution);
         .sort(([,a], [,b]) => (b as number) - (a as number))
-        .slice(0, 10)
+        .slice(0, 10);
     );
 
     stats.ipDistribution = Object.fromEntries(
-      Object.entries(stats.ipDistribution)
+      Object.entries(stats.ipDistribution);
         .sort(([,a], [,b]) => (b as number) - (a as number))
-        .slice(0, 10)
+        .slice(0, 10);
     );
 
     return NextResponse.json({

@@ -68,7 +68,7 @@ export class MeetingAnalyticsService {
           id: true,
           name: true
         }
-      })
+      });
     ]);
 
     // Calculate action item statistics
@@ -145,7 +145,7 @@ export class MeetingAnalyticsService {
           select: {
             meeting_attendee: true
           }
-        })
+        });
       ]);
 
       if (!department) continue;
@@ -254,7 +254,7 @@ export class MeetingAnalyticsService {
     });
 
     return Object.values(trends).sort((a, b) => 
-      a.period.localeCompare(b.period)
+      a.period.localeCompare(b.period);
     );
   }
 
@@ -443,7 +443,7 @@ export class MeetingAnalyticsService {
     const completedCount = metrics.byStatus.completed;
     if (completedCount > 0) {
       metrics.averageCompletionTime = Math.round(
-        totalCompletionTime / completedCount / (1000 * 60 * 60 * 24)
+        totalCompletionTime / completedCount / (1000 * 60 * 60 * 24);
       ); // in days
     }
 

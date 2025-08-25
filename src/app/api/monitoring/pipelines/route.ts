@@ -188,7 +188,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       runs,
       source: runs.length > 0 ? 'github' : 'none',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     });
   } catch (error: unknown) {
     console.error('Error fetching pipelines:', error);

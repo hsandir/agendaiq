@@ -120,8 +120,8 @@ export function CreateTeamDialog({
 
   const toggleMember = (staffId: number) => {
     setSelectedMembers(prev => 
-      prev.includes(staffId) 
-        ? prev.filter(id => id !== staffId)
+      prev.includes(staffId);
+        ? prev.filter(id => id !== staffId);
         : [...prev, staffId]
     );
   };
@@ -208,7 +208,7 @@ export function CreateTeamDialog({
                 placeholder="Enter team name"
                 value={formData.name}
                 onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
+                  setFormData({ ...formData, name: e.target.value });
                 }
                 disabled={loading}
               />
@@ -218,7 +218,7 @@ export function CreateTeamDialog({
               <Select
                 value={formData.type}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, type: value })
+                  setFormData({ ...formData, type: value });
                 }
                 disabled={loading}
               >
@@ -241,7 +241,7 @@ export function CreateTeamDialog({
                 placeholder="What is the main purpose of this team?"
                 value={formData.purpose}
                 onChange={(e) =>
-                  setFormData({ ...formData, purpose: e.target.value })
+                  setFormData({ ...formData, purpose: e.target.value });
                 }
                 disabled={loading}
                 rows={2}
@@ -254,7 +254,7 @@ export function CreateTeamDialog({
                 placeholder="Enter team description"
                 value={formData.description}
                 onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
+                  setFormData({ ...formData, description: e.target.value });
                 }
                 disabled={loading}
                 rows={3}

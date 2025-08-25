@@ -683,3 +683,4 @@ function KnowledgeCard({
     </Card>
   );
 }
+}

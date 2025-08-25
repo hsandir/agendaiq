@@ -99,7 +99,7 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
               onClick={closeMenu}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
-                isActive("/dashboard") 
+                isActive("/dashboard");
                   ? "bg-primary text-primary-foreground" 
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
@@ -113,7 +113,7 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
               onClick={closeMenu}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
-                isActive("/dashboard/meetings") 
+                isActive("/dashboard/meetings");
                   ? "bg-primary text-primary-foreground" 
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
@@ -127,7 +127,7 @@ export function MobileMenu({ user, isAdmin }: MobileMenuProps) {
               onClick={closeMenu}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
-                isActive("/dashboard/teams") 
+                isActive("/dashboard/teams");
                   ? "bg-primary text-primary-foreground" 
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}

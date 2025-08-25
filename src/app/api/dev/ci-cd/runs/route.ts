@@ -141,7 +141,7 @@ interface WorkflowJob {
 
   const successfulRuns = mockRuns.filter(r => r.conclusion !== 'failure');
   const allRuns = [...failedRuns, ...successfulRuns].sort((a, b) => 
-    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   );
 
   return {
@@ -175,7 +175,7 @@ export async function GET(request: NextRequest) {
     console.log('CI/CD API called, NODE_ENV:', process.env.NODE_ENV);
 
     // Parse query parameters
-    const { __searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const params = {
       limit: parseInt(searchParams.get('limit') ?? '30'),
       status: searchParams.get('status') ?? 'all',
@@ -316,7 +316,7 @@ export async function GET(request: NextRequest) {
       inProgress: runs.filter(r => r.status === 'in_progress').length,
       queued: runs.filter(r => r.status === 'queued').length,
       successRate: runs.length > 0 
-        ? ((runs.filter(r => r.conclusion === 'success').length / runs.length) * 100).toFixed(1)
+        ? ((runs.filter(r => r.conclusion === 'success').length / runs.length) * 100).toFixed(1);
         : 0,
       averageDuration: calculateAverageDuration(runs),
       commonErrors: errorPatterns,
@@ -355,7 +355,7 @@ export async function POST(request: NextRequest) {
     console.log('CI/CD POST API called');
 
     const body = await request.json() as Record<string, unknown>;
-    const { ____action, ____runId, ____workflowId, branch = 'main'  } = body;
+    const { action, runId, workflowId, branch = 'main'  } = body;
 
     if (!GITHUB_TOKEN) {
       return NextResponse.json(

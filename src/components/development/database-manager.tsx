@@ -21,92 +21,90 @@ import {
 } from 'lucide-react'
 
 export default function DatabaseManager() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [query, setQuery] = useState('')
+  const [isLoading, setIsLoading] = useState(false);
+  const [query, setQuery] = useState('');
   const [queryResults, setQueryResults] = useState<any>(null)
   const [backups, setBackups] = useState<Array<{name: string, size: string, date: string}>>([])
-  const [stats, setStats] = useState({ tables: 0, records: 0 })
-  const [activeTab, setActiveTab] = useState('operations')
-
+  const [stats, setStats] = useState({ tables: 0, records: 0 });
+  const [activeTab, setActiveTab] = useState('operations');
   useEffect(() => {
-    loadStats()
-    loadBackups()
+    loadStats();
+    loadBackups();
   }, [])
 
   const loadStats = async () => {
     try {
-      const response = await fetch('/api/dev/database/stats')
+      const response = await fetch('/api/dev/database/stats');
       if (response.ok) {
-        const data = await response.json()
-        setStats(data)
+        const data = await response.json();
+        setStats(data);
       }
     } catch (error: unknown) {
-      console.error('Failed to load stats:', error)
+      console.error('Failed to load stats:', error);
     }
   }
 
   const loadBackups = async () => {
     try {
-      const response = await fetch('/api/dev/database/backups')
+      const response = await fetch('/api/dev/database/backups');
       if (response.ok) {
-        const data = await response.json()
-        setBackups(data.backups ?? [])
+        const data = await response.json();
+        setBackups(data.backups ?? []);
       }
     } catch (error: unknown) {
-      console.error('Failed to load backups:', error)
+      console.error('Failed to load backups:', error);
     }
   }
 
   const runMigrations = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await fetch('/api/dev/database/migrate', {
         method: 'POST'
-      })
-      const data = await response.json()
-      console.log('Migration result:', data)
+      });
+      const data = await response.json();
+      console.log('Migration result:', data);
     } catch (error: unknown) {
-      console.error('Migration failed:', error)
+      console.error('Migration failed:', error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
   const seedDatabase = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await fetch('/api/dev/database/seed', {
         method: 'POST'
-      })
-      const data = await response.json()
-      console.log('Seed result:', data)
+      });
+      const data = await response.json();
+      console.log('Seed result:', data);
     } catch (error: unknown) {
-      console.error('Seed failed:', error)
+      console.error('Seed failed:', error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
   const seedDevData = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await fetch('/api/dev/database/seed-dev', {
         method: 'POST'
-      })
-      const data = await response.json()
-      
+      });
+      const data = await response.json();
       if (data.success) {
-        alert(`Development data seeded! Created ${data.counts.newLogs} new logs.`)
-        loadStats()
-        loadBackups()
+        alert(`Development data seeded! Created ${data.counts.newLogs} new logs.`);
+        loadStats();
+        loadBackups();
       } else {
-        alert('Failed to seed development data')
+        alert('Failed to seed development data');
       }
     } catch (error: unknown) {
-      console.error('Seed dev data failed:', error)
-      alert('Failed to seed development data')
+      console.error('Seed dev data failed:', error);
+      alert('Failed to seed development data');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -115,35 +113,35 @@ export default function DatabaseManager() {
       return
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await fetch('/api/dev/database/reset', {
         method: 'POST'
-      })
-      const data = await response.json()
-      console.log('Reset result:', data)
+      });
+      const data = await response.json();
+      console.log('Reset result:', data);
     } catch (error: unknown) {
-      console.error('Reset failed:', error)
+      console.error('Reset failed:', error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
   const executeQuery = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await fetch('/api/dev/database/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query })
+        body: JSON.stringify({ query });
       })
-      const data = await response.json()
-      setQueryResults(data)
+      const data = await response.json();
+      setQueryResults(data);
     } catch (error: unknown) {
-      console.error('Query failed:', error)
-      setQueryResults({ error: error instanceof Error ? error.message : 'An error occurred' })
+      console.error('Query failed:', error);
+      setQueryResults({ error: error instanceof Error ? error.message : 'An error occurred' });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 

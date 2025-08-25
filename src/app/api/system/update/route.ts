@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
-    const { __type, __packages } = (await request.json()) as Record<__string, unknown>;
+    const { type, packages } = (await request.json()) as Record<string, unknown>;
 
     if (type === 'packages') {
       return await updatePackages(packages);
@@ -42,7 +42,7 @@ async function updatePackages(specificPackages?: string[]) {
         body: JSON.stringify({ 
           type: 'auto-backup', 
           message: 'Pre-update backup' 
-        })
+        });
       });
       
       if (backupResponse.ok) {
@@ -234,7 +234,7 @@ async function updatePackages(specificPackages?: string[]) {
 
 async function getDetailedPackageStatus() {
   try {
-    const { __stdout } = await execAsync('npm outdated --json', { cwd: process.cwd() });
+    const { stdout } = await execAsync('npm outdated --json', { cwd: process.cwd() });
     const outdatedPackages = JSON.parse(stdout || '{}');
     
     const outdatedList = (Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({
@@ -242,7 +242,7 @@ async function getDetailedPackageStatus() {
       current: info.current,
       wanted: info.wanted,
       latest: info.latest,
-      type: getUpdateType(info.current, info.latest)
+      type: getUpdateType(info.current, info.latest);
     })));
 
     return {
@@ -258,7 +258,7 @@ async function getDetailedPackageStatus() {
           current: info.current,
           wanted: info.wanted,
           latest: info.latest,
-          type: getUpdateType(info.current, info.latest)
+          type: getUpdateType(info.current, info.latest);
         })));
         return { outdated: outdatedList, total: outdatedList.length };
       } catch {

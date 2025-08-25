@@ -472,7 +472,7 @@ export async function POST(request: NextRequest) {
                 where: { id: existingUser.staff[0].id },
                 data: {
                   role_id: parseInt(role.id),
-                  department_id: parseInt(department.id)
+                  department_id: parseInt(department.id);
                 }
               });
             } else {
@@ -504,7 +504,7 @@ export async function POST(request: NextRequest) {
                 email: record.email,
                 name: record.name,
                 staff_id: record.staffId,
-                email_verified: new Date()
+                email_verified: new Date();
               }
             });
 
@@ -558,7 +558,7 @@ export async function POST(request: NextRequest) {
     console.error('Staff upload error:', error);
     return NextResponse.json({
       error: 'Internal server error',
-      details: error instanceof Error ? error.message : String(error)
+      details: error instanceof Error ? error.message : String(error);
     }, { status: 500 });
   }
 } 

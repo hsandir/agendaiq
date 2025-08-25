@@ -6,34 +6,33 @@ import fs from 'fs/promises'
 import path from 'path'
 
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE })
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE });
   if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode })
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
 
   try {
-    const { filePath } = await request.json()
-
+    const { filePath } = await request.json();
     if (!filePath) {
       return NextResponse.json(
         { error: 'File path is required' },
         { status: 400 }
-      )
+      );
     }
 
     // Check if file exists
     const fullPath = path.join(process.cwd(), filePath)
     try {
-      await fs.access(fullPath)
+      await fs.access(fullPath);
     } catch {
       return NextResponse.json(
         { error: 'File not found' },
         { status: 404 }
-      )
+      );
     }
 
     // Generate test
-    const { testPath, content } = await TestGenerator.generateTestForFile(fullPath)
+    const { testPath, content } = await TestGenerator.generateTestForFile(fullPath);
     const fullTestPath = path.join(process.cwd(), testPath)
 
     // Create directory if it doesn't exist
@@ -42,7 +41,7 @@ export async function POST(request: NextRequest) {
     // Check if test already exists
     let exists = false
     try {
-      await fs.access(fullTestPath)
+      await fs.access(fullTestPath);
       exists = true
     } catch {
       // File doesn't exist, which is what we want
@@ -54,37 +53,35 @@ export async function POST(request: NextRequest) {
         message: 'Test file already exists',
         testPath,
         exists: true
-      })
+      });
     }
 
     // Write test file
-    await fs.writeFile(fullTestPath, content, 'utf-8')
-
+    await fs.writeFile(fullTestPath, content, 'utf-8');
     return NextResponse.json({
       success: true,
       message: 'Test generated successfully',
       testPath,
       content
-    })
+    });
   } catch (error: unknown) {
-    console.error('Failed to generate test:', error)
+    console.error('Failed to generate test:', error);
     return NextResponse.json(
       { error: 'Failed to generate test' },
       { status: 500 }
-    )
+    );
   }
 }
 
 // List files without tests
 export async function GET(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE })
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.USER_MANAGE });
   if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode })
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
 
   try {
-    const { glob } = await import('glob')
-    
+    const { glob } = await import('glob');
     // Find all component and API files
     const componentFiles = await glob('src/components/**/*.{tsx,jsx}', {
       cwd: process.cwd(),
@@ -97,8 +94,8 @@ export async function GET(request: NextRequest) {
     })
 
     // Find existing tests
-    const testFiles = await glob('src/__tests__/**/*.test.{ts,tsx,js,jsx}', {
-      cwd: process.cwd()
+    const testFiles = await glob('src/tests__/**/*.test.{ts,tsx,js,jsx}', {
+      cwd: process.cwd();
     })
 
     // Create a map of tested files
@@ -112,12 +109,12 @@ export async function GET(request: NextRequest) {
     // Filter untested files
     const untestedComponents = componentFiles.filter(file => {
       const baseName = path.basename(file).replace(/\.(tsx?|jsx?)$/, '')
-      return !testedFiles.has(baseName)
+      return !testedFiles.has(baseName);
     })
 
     const untestedApis = apiFiles.filter(file => {
       const dirName = path.dirname(file).split('/').pop() ?? ''
-      return !testedFiles.has(dirName) && !testedFiles.has('route')
+      return !testedFiles.has(dirName) && !testedFiles.has('route');
     })
 
     return NextResponse.json({
@@ -129,12 +126,12 @@ export async function GET(request: NextRequest) {
       tested: {
         total: testFiles.length
       }
-    })
+    });
   } catch (error: unknown) {
-    console.error('Failed to list untested files:', error)
+    console.error('Failed to list untested files:', error);
     return NextResponse.json(
       { error: 'Failed to list untested files' },
       { status: 500 }
-    )
+    );
   }
 }

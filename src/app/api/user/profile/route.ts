@@ -60,7 +60,7 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json() as Record<string, unknown>;
-    const { __name, __phone } = body;
+    const { name, phone } = body;
 
     const updateData: { name?: string; phone?: string } = {};
     if (name !== undefined) updateData.name = name;

@@ -114,7 +114,7 @@ export function MeetingHistoryModal({
         status: selectedStatus,
         search: searchQuery,
         includeSubDepartments: includeSubDepartments.toString(),
-        onlyWithActionItems: onlyWithActionItems.toString()
+        onlyWithActionItems: onlyWithActionItems.toString();
       });
 
       const response = await fetch(`/api/meetings/history?${params}`);

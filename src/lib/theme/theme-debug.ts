@@ -18,7 +18,7 @@ export function getThemeDebugInfo(): ThemeDebugInfo {
       localStorage: null,
       sessionStorage: { themeSynced: null, layoutSynced: null },
       mounted: false,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     };
   }
 
@@ -30,7 +30,7 @@ export function getThemeDebugInfo(): ThemeDebugInfo {
       layoutSynced: sessionStorage.getItem('agendaiq-layout-synced'),
     },
     mounted: true,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString();
   };
 }
 

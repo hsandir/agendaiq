@@ -150,7 +150,7 @@ describe('/api/monitoring/build-metrics', () => {
               { name: 'coverage-report', size: 2048 }
             ]
           }
-        })
+        });
       }));
 
       // Mock Sentry API responses
@@ -175,7 +175,7 @@ describe('/api/monitoring/build-metrics', () => {
     it('should fetch Sentry metrics when configured', async () => {
       const OctokitMock = getMockOctokit();
       (OctokitMock as jest.Mock).mockImplementation(() => createMockOctokitInstance({
-        listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
+        listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } });
       }));
 
       // Mock Sentry crash-free users response
@@ -242,7 +242,7 @@ describe('/api/monitoring/build-metrics', () => {
     it('should handle Sentry API errors gracefully', async () => {
       const OctokitMock = getMockOctokit();
       (OctokitMock as jest.Mock).mockImplementation(() => createMockOctokitInstance({
-        listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
+        listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } });
       }));
 
       (global.fetch as jest.Mock).mockRejectedValue(new Error('Sentry API error'));
@@ -275,7 +275,7 @@ describe('/api/monitoring/build-metrics', () => {
             component: 'build-metrics-api',
             action: 'fetch-metrics'
           }
-        })
+        });
       );
     });
   });
@@ -292,7 +292,7 @@ describe('/api/monitoring/build-metrics', () => {
     it('should return all required metric fields', async () => {
       const OctokitMock = getMockOctokit();
       (OctokitMock as jest.Mock).mockImplementation(() => createMockOctokitInstance({
-        listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } })
+        listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: { workflow_runs: [] } });
       }));
 
       (global.fetch as jest.Mock).mockResolvedValue({

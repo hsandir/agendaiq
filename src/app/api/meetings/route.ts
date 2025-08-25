@@ -17,7 +17,7 @@ const createMeetingSchema = z.object({
   startTime: z.string().datetime(),
   endTime: z.string().datetime(),
   zoomLink: z.string().url().optional(),
-  attendeeIds: z.array(z.number()).optional().default([])
+  attendeeIds: z.array(z.number()).optional().default([]);
 });
 
 // GET /api/meetings - Get meetings based on user role and hierarchy
@@ -159,7 +159,7 @@ export async function GET(request: NextRequest) {
         page,
         limit,
         total: totalCount,
-        totalPages: Math.ceil(totalCount / limit)
+        totalPages: Math.ceil(totalCount / limit);
       }
     };
     

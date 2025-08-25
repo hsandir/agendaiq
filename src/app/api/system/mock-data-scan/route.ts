@@ -136,14 +136,14 @@ export async function GET(request: NextRequest) {
           let routePath = normalizedPath;
           if (fileType === 'page') {
             routePath = normalizedPath
-              .replace('src/app', '')
-              .replace('/page.tsx', '')
+              .replace('src/app', '');
+              .replace('/page.tsx', '');
               .replace('/page.ts', '') || '/';
             if (routePath === '') routePath = '/';
           } else if (fileType === 'api') {
             routePath = normalizedPath
-              .replace('src/app', '')
-              .replace('/route.tsx', '')
+              .replace('src/app', '');
+              .replace('/route.tsx', '');
               .replace('/route.ts', '');
           }
 
@@ -192,7 +192,7 @@ export async function GET(request: NextRequest) {
         }
         return statusOrder[a?.status] - statusOrder[b?.status];
       }),
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     };
 
     console.log(`Mock data scan completed: Found ${totalFiles} files with mock data usage`);

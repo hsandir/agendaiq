@@ -66,7 +66,7 @@ describe('Theme System Tests', () => {
   describe('ThemeProvider', () => {
     it('should provide default theme', () => {
       const TestComponent = () => {
-        const { __theme } = useTheme();
+        const { theme } = useTheme();
         return <div>{theme.name}</div>;
       };
 
@@ -81,7 +81,7 @@ describe('Theme System Tests', () => {
 
     it('should accept initial theme', () => {
       const TestComponent = () => {
-        const { __theme } = useTheme();
+        const { theme } = useTheme();
         return <div>{theme.name}</div>;
       };
 
@@ -96,7 +96,7 @@ describe('Theme System Tests', () => {
 
     it('should persist theme to localStorage', () => {
       const TestComponent = () => {
-        const { __setTheme } = useTheme();
+        const { setTheme } = useTheme();
         return (
           <button onClick={() => setTheme('dark-mode')}>
             Change Theme
@@ -122,7 +122,7 @@ describe('Theme System Tests', () => {
       (localStorageMock.getItem as jest.Mock).mockReturnValue('nature-green');
 
       const TestComponent = () => {
-        const { __theme } = useTheme();
+        const { theme } = useTheme();
         return <div>{theme.name}</div>;
       };
 
@@ -137,7 +137,7 @@ describe('Theme System Tests', () => {
 
     it('should apply CSS variables to document', () => {
       const TestComponent = () => {
-        const { __setTheme } = useTheme();
+        const { setTheme } = useTheme();
         React.useEffect(() => {
           setTheme('modern-purple');
         }, [setTheme]);
@@ -183,7 +183,7 @@ describe('Theme System Tests', () => {
 
     it('should change theme on selection', () => {
       const TestComponent = () => {
-        const { __theme } = useTheme();
+        const { theme } = useTheme();
         return (
           <>
             <ThemeSelector />
@@ -206,7 +206,7 @@ describe('Theme System Tests', () => {
     });
 
     it('should render in different variants', () => {
-      const { __rerender } = render(
+      const { rerender } = render(
         <ThemeProvider>
           <ThemeSelector variant="grid" />
         </ThemeProvider>
@@ -296,7 +296,7 @@ describe('Theme System Tests', () => {
 
   describe('Theme Persistence', () => {
     it('should persist theme across page reloads', async () => {
-      const { __unmount } = render(
+      const { unmount } = render(
         <ThemeProvider initialTheme="nature-green">
           <div />
         </ThemeProvider>
@@ -315,7 +315,7 @@ describe('Theme System Tests', () => {
       (localStorageMock.getItem as jest.Mock).mockReturnValue('nature-green');
 
       const TestComponent = () => {
-        const { __theme } = useTheme();
+        const { theme } = useTheme();
         return <div>{theme.name}</div>;
       };
 
@@ -414,7 +414,7 @@ describe('Theme System Tests', () => {
 describe('Theme System Integration', () => {
   it('should apply theme consistently across all components', async () => {
     const ComponentA = () => {
-      const { __theme } = useTheme();
+      const { theme } = useTheme();
       return (
         <div style={{ color: theme.colors.primary }}>
           Component A
@@ -423,7 +423,7 @@ describe('Theme System Integration', () => {
     };
 
     const ComponentB = () => {
-      const { __theme } = useTheme();
+      const { theme } = useTheme();
       return (
         <div style={{ background: theme.colors.background }}>
           Component B
@@ -432,7 +432,7 @@ describe('Theme System Integration', () => {
     };
 
     const App = () => {
-      const { __setTheme, __theme } = useTheme();
+      const { setTheme, theme } = useTheme();
       return (
         <div>
           <button onClick={() => setTheme('dark-mode')}>

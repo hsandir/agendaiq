@@ -11,7 +11,7 @@ interface School {
 }
 
 export default function ProfilePage() {
-  const { __user, __loading } = useAuthorization();
+  const { user, loading } = useAuthorization();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -95,7 +95,7 @@ export default function ProfilePage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { __name, __value } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 

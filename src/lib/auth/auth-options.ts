@@ -172,7 +172,7 @@ export const authOptions: NextAuthOptions = {
               await prisma.users.update({
                 where: { id: parseInt(user.id) },
                 data: {
-                  backup_codes: (user as Record<string, unknown>).backup_codes.filter(code => code !== credentials.twoFactorCode)
+                  backup_codes: (user as Record<string, unknown>).backup_codes.filter(code => code !== credentials.twoFactorCode);
                 }
               });
             }

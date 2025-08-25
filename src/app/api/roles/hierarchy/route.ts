@@ -158,7 +158,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         error: "Internal server error",
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString();
       }, 
       { status: 500 }
     );

@@ -33,7 +33,7 @@ async function runSystemChecks(): Promise<SystemCheck[]> {
   const checks: SystemCheck[] = []
   
   // Database connectivity check
-  const dbCheckStart = performance.now()
+  const dbCheckStart = performance.now();
   try {
     await prisma.$queryRaw`SELECT 1`
     const dbCheckDuration = performance.now() - dbCheckStart
@@ -66,9 +66,9 @@ async function runSystemChecks(): Promise<SystemCheck[]> {
   }
   
   // Authentication system check
-  const authCheckStart = performance.now()
+  const authCheckStart = performance.now();
   try {
-    const userCount = await prisma.users.count()
+    const userCount = await prisma.users.count();
     const authCheckDuration = performance.now() - authCheckStart
     
     checks.push({
@@ -100,9 +100,9 @@ async function runSystemChecks(): Promise<SystemCheck[]> {
   }
   
   // File system check
-  const fsCheckStart = performance.now()
+  const fsCheckStart = performance.now();
   try {
-    const tmpDir = os.tmpdir()
+    const tmpDir = os.tmpdir();
     const fsCheckDuration = performance.now() - fsCheckStart
     
     checks.push({
@@ -134,9 +134,9 @@ async function runSystemChecks(): Promise<SystemCheck[]> {
   }
   
   // Memory check
-  const memoryUsage = process.memoryUsage()
-  const totalMemory = os.totalmem()
-  const freeMemory = os.freemem()
+  const memoryUsage = process.memoryUsage();
+  const totalMemory = os.totalmem();
+  const freeMemory = os.freemem();
   const usedMemory = totalMemory - freeMemory
   const memoryPercent = Math.round((usedMemory / totalMemory) * 100)
   
@@ -159,11 +159,10 @@ async function runSystemChecks(): Promise<SystemCheck[]> {
 
 async function getHealthMetrics(): Promise<HealthMetric[]> {
   const metrics: HealthMetric[] = []
-  const now = new Date()
-  
+  const now = new Date();
   // System resource metrics
-  const totalMemory = os.totalmem()
-  const freeMemory = os.freemem()
+  const totalMemory = os.totalmem();
+  const freeMemory = os.freemem();
   const usedMemory = totalMemory - freeMemory
   const memoryPercent = Math.round((usedMemory / totalMemory) * 100)
   
@@ -176,8 +175,7 @@ async function getHealthMetrics(): Promise<HealthMetric[]> {
     trend: 'stable',
     lastChecked: now,
     threshold: { warning: 75, critical: 90 }
-  })
-  
+  });
   // CPU usage simulation (in real app, you'd use a proper CPU monitor)
   const cpuUsage = Math.floor(Math.random() * 100)
   metrics.push({
@@ -189,8 +187,7 @@ async function getHealthMetrics(): Promise<HealthMetric[]> {
     trend: cpuUsage > 50 ? 'up' : 'down',
     lastChecked: now,
     threshold: { warning: 70, critical: 85 }
-  })
-  
+  });
   // Disk usage simulation
   const diskUsage = Math.floor(Math.random() * 100)
   metrics.push({
@@ -202,8 +199,7 @@ async function getHealthMetrics(): Promise<HealthMetric[]> {
     trend: 'stable',
     lastChecked: now,
     threshold: { warning: 80, critical: 90 }
-  })
-  
+  });
   // Performance metrics
   const responseTime = Math.floor(Math.random() * 500) + 50
   metrics.push({
@@ -215,8 +211,7 @@ async function getHealthMetrics(): Promise<HealthMetric[]> {
     trend: responseTime > 300 ? 'up' : 'down',
     lastChecked: now,
     threshold: { warning: 500, critical: 1000 }
-  })
-  
+  });
   const throughput = Math.floor(Math.random() * 1000) + 100
   metrics.push({
     id: 'throughput',
@@ -227,8 +222,7 @@ async function getHealthMetrics(): Promise<HealthMetric[]> {
     trend: throughput > 500 ? 'up' : 'stable',
     lastChecked: now,
     threshold: { warning: 100, critical: 50 }
-  })
-  
+  });
   const errorRate = Math.random() * 5
   metrics.push({
     id: 'error_rate',
@@ -252,8 +246,7 @@ async function getHealthMetrics(): Promise<HealthMetric[]> {
     trend: 'stable',
     lastChecked: now,
     threshold: { warning: 100, critical: 200 }
-  })
-  
+  });
   const apiLatency = Math.floor(Math.random() * 200) + 50
   metrics.push({
     id: 'external_apis',
@@ -264,8 +257,7 @@ async function getHealthMetrics(): Promise<HealthMetric[]> {
     trend: 'stable',
     lastChecked: now,
     threshold: { warning: 300, critical: 500 }
-  })
-  
+  });
   const cdnLatency = Math.floor(Math.random() * 150) + 20
   metrics.push({
     id: 'cdn_status',
@@ -276,8 +268,7 @@ async function getHealthMetrics(): Promise<HealthMetric[]> {
     trend: 'stable',
     lastChecked: now,
     threshold: { warning: 200, critical: 300 }
-  })
-  
+  });
   return metrics
 }
 
@@ -313,23 +304,21 @@ export async function GET(request: NextRequest) {
   const authResult = await withAuth(request, { 
     requireAuth: true, 
     requireCapability: Capability.OPS_MONITORING 
-  })
-  
+  });
   if (!authResult.success) {
     return NextResponse.json(
       { error: authResult.error },
       { status: authResult.statusCode }
-    )
+    );
   }
   
   try {
     const [metrics, systemChecks] = await Promise.all([
       getHealthMetrics(),
-      runSystemChecks()
+      runSystemChecks();
     ])
     
-    const overallHealth = calculateOverallHealth(metrics, systemChecks)
-    
+    const overallHealth = calculateOverallHealth(metrics, systemChecks);
     // Calculate uptime (simplified - in production you'd track actual uptime)
     const uptimeHours = Math.floor(Math.random() * 168) + 24 // 1-7 days
     const uptime = `${Math.floor(uptimeHours / 24)}d ${uptimeHours % 24}h`
@@ -341,15 +330,14 @@ export async function GET(request: NextRequest) {
       message: string
       timestamp: Date
     }> = []
-    const criticalMetrics = metrics.filter(m => m.status === 'critical')
-    const failingChecks = systemChecks.filter(c => c.status === 'failing')
-    
+    const criticalMetrics = metrics.filter(m => m.status === 'critical');
+    const failingChecks = systemChecks.filter(c => c.status === 'failing');
     criticalMetrics.forEach(metric => {
       alerts.push({
         id: `alert-${metric.id}`,
         type: 'error' as const,
         message: `${metric.name} is critical: ${metric.value}${metric.unit}`,
-        timestamp: new Date()
+        timestamp: new Date();
       })
     })
     
@@ -358,7 +346,7 @@ export async function GET(request: NextRequest) {
         id: `alert-${check.id}`,
         type: 'error' as const,
         message: `${check.name} check is failing`,
-        timestamp: new Date()
+        timestamp: new Date();
       })
     })
     
@@ -373,11 +361,11 @@ export async function GET(request: NextRequest) {
     })
     
   } catch (error: unknown) {
-    console.error('Health check error:', error)
+    console.error('Health check error:', error);
     return NextResponse.json(
       { 
         error: 'Failed to retrieve health data',
-        details: error instanceof Error ? error.message : String(error)
+        details: error instanceof Error ? error.message : String(error);
       },
       { status: 500 }
     )

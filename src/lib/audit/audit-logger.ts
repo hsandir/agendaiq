@@ -234,7 +234,7 @@ export class AuditLogger {
         _count: { user_id: true },
         orderBy: { _count: { user_id: 'desc' } },
         take: 10
-      })
+      });
     ]);
 
     return {

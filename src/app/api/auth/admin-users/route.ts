@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
 
     // Filter to only include users with Administrator role
     const filteredAdminUsers = adminUsers.filter(user => 
-      user.staff.some(staff => staff.role?.title === 'Administrator')
+      user.staff.some(staff => staff.role?.title === 'Administrator');
     );
 
     return NextResponse.json({

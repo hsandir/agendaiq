@@ -282,7 +282,7 @@ export default function CICDMonitor() {
     const errorLines = lines.filter((line: string) => 
       line.includes('Error:') || 
       line.includes('ERROR') || 
-      line.includes('Failed')
+      line.includes('Failed');
     );
     
     return errorLines.slice(0, 3).join('\n');

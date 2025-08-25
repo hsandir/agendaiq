@@ -58,7 +58,7 @@ export function sanitizeMeetingData(data: MeetingData): Partial<MeetingData> {
   if (data.status) sanitized.status = data.status;
   if (data.attendeeIds) {
     // Convert string[] to number[] if needed
-    sanitized.attendeeIds = Array.isArray(data.attendeeIds) 
+    sanitized.attendeeIds = Array.isArray(data.attendeeIds);
       ? data.attendeeIds.map(id => typeof id === 'string' ? parseInt(id, 10) : id)
       : data.attendeeIds;
   }

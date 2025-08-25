@@ -26,7 +26,7 @@ export async function PUT(
     const device = await prisma.device.findFirst({
       where: {
         id: deviceId,
-        user_id: parseInt(user.id)
+        user_id: parseInt(user.id);
       }
     });
 
@@ -42,7 +42,7 @@ export async function PUT(
       where: { id: deviceId },
       data: {
         is_trusted: body.is_trusted,
-        last_active: new Date()
+        last_active: new Date();
       }
     });
 
@@ -83,7 +83,7 @@ export async function DELETE(
     const device = await prisma.device.findFirst({
       where: {
         id: deviceId,
-        user_id: parseInt(user.id)
+        user_id: parseInt(user.id);
       }
     });
 

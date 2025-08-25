@@ -19,10 +19,10 @@ global.fetch = jest.fn() as any;
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
     push: jest.fn(),
-    refresh: jest.fn()
+    refresh: jest.fn();
   }),
   useSearchParams: () => ({
-    get: jest.fn()
+    get: jest.fn();
   })
 }));
 
@@ -106,7 +106,7 @@ describe('TeamList Component', () => {
       }
     ];
 
-    const { __rerender } = render(<TeamList teams={__teamsWithInactive} showInactive={__false} />);
+    const { rerender } = render(<TeamList teams={teamsWithInactive} showInactive={false} />);
     
     expect(screen.queryByText('Inactive Team')).not.toBeInTheDocument();
     
@@ -166,7 +166,7 @@ describe('CreateTeamDialog Component', () => {
           type: 'PROJECT',
           purpose: 'Test purpose',
           description: 'Test description'
-        })
+        });
       }));
       expect(onSuccess).toHaveBeenCalled();
     });
@@ -290,8 +290,8 @@ describe('TeamKnowledge Component', () => {
   });
 
   it('should filter by resource type', async () => {
-    const { __rerender } = render(
-      <TeamKnowledge teamId="team1" knowledge={__mockKnowledge} canManage={__true} />
+    const { rerender } = render(
+      <TeamKnowledge teamId="team1" knowledge={mockKnowledge} canManage={true} />
     );
     
     const filterSelect = screen.getByLabelText(/Filter by type/i);
@@ -377,7 +377,7 @@ describe('AddMemberDialog Component', () => {
         body: JSON.stringify({
           user_id: 3,
           role: 'MEMBER'
-        })
+        });
       }));
       expect(onSuccess).toHaveBeenCalled();
     });
@@ -468,7 +468,7 @@ describe('KnowledgeDetailModal Component', () => {
   it('should handle download action', async () => {
     (global.fetch as any).mockResolvedValue({
       ok: true,
-      blob: async () => new Blob(['file content'])
+      blob: async () => new Blob(['file content']);
     });
 
     render(

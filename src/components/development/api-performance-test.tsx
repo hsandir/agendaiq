@@ -16,11 +16,10 @@ interface TestResult {
 
 export function ApiPerformanceTest() {
   const [results, setResults] = useState<TestResult[]>([])
-  const [testing, setTesting] = useState(false)
-  const [testCount, setTestCount] = useState(0)
-
+  const [testing, setTesting] = useState(false);
+  const [testCount, setTestCount] = useState(0);
   const testEndpoint = async (url: string, method = 'GET', body?: Record<string, unknown>): Promise<TestResult> => {
-    const start = performance.now()
+    const start = performance.now();
     try {
       const response = await fetch(url, {
         method,
@@ -43,15 +42,14 @@ export function ApiPerformanceTest() {
         endpoint: url,
         time: performance.now() - start,
         status: 0,
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error);
       }
     }
   }
 
   const runTests = async () => {
-    setTesting(true)
-    setResults([])
-    
+    setTesting(true);
+    setResults([]);
     const newResults: TestResult[] = []
     
     // Test original theme API
@@ -78,13 +76,13 @@ export function ApiPerformanceTest() {
     newResults.push(await testEndpoint('/api/user/layout', 'PUT', { layout: 'modern' }))
     newResults.push(await testEndpoint('/api/user/layout-fast', 'PUT', { layout: 'modern' }))
     
-    setResults(newResults)
-    setTestCount(prev => prev + 1)
-    setTesting(false)
+    setResults(newResults);
+    setTestCount(prev => prev + 1);
+    setTesting(false);
   }
 
   const getAverageTime = (endpoint: string) => {
-    const endpointResults = results.filter(r => r.endpoint === endpoint && r.status === 200)
+    const endpointResults = results.filter(r => r.endpoint === endpoint && r.status === 200);
     if (endpointResults.length === 0) return null
     const avg = endpointResults.reduce((sum, r) => sum + r.time, 0) / endpointResults.length
     return Math.round(avg * 100) / 100

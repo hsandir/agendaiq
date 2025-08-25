@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
         purpose: 'To ensure our curriculum meets state standards and student learning objectives',
         created_by: staffMembers[0].id,
         created_at: new Date('2024-01-15'),
-        updated_at: new Date('2024-01-15')
+        updated_at: new Date('2024-01-15');
       }
     });
 
@@ -58,19 +58,19 @@ export async function GET(request: NextRequest) {
           team_id: team1.id,
           staff_id: staffMembers[0].id,
           role: 'LEAD',
-          joined_at: new Date('2024-01-15')
+          joined_at: new Date('2024-01-15');
         },
         {
           team_id: team1.id,
           staff_id: staffMembers[1].id,
           role: 'MEMBER',
-          joined_at: new Date('2024-01-16')
+          joined_at: new Date('2024-01-16');
         },
         {
           team_id: team1.id,
           staff_id: staffMembers[2].id,
           role: 'MEMBER',
-          joined_at: new Date('2024-01-17')
+          joined_at: new Date('2024-01-17');
         }
       ]
     });
@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
         purpose: 'To implement and optimize technology solutions for enhanced learning experiences',
         created_by: staffMembers[1].id,
         created_at: new Date('2024-02-01'),
-        updated_at: new Date('2024-02-01')
+        updated_at: new Date('2024-02-01');
       }
     });
 
@@ -94,19 +94,19 @@ export async function GET(request: NextRequest) {
           team_id: team2.id,
           staff_id: staffMembers[1].id,
           role: 'LEAD',
-          joined_at: new Date('2024-02-01')
+          joined_at: new Date('2024-02-01');
         },
         {
           team_id: team2.id,
           staff_id: staffMembers[3] ? staffMembers[3].id : staffMembers[0].id,
           role: 'MEMBER',
-          joined_at: new Date('2024-02-02')
+          joined_at: new Date('2024-02-02');
         },
         {
           team_id: team2.id,
           staff_id: staffMembers[4] ? staffMembers[4].id : staffMembers[2].id,
           role: 'MEMBER',
-          joined_at: new Date('2024-02-03')
+          joined_at: new Date('2024-02-03');
         }
       ]
     });
@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
         purpose: 'To develop and implement comprehensive wellness programs for student success',
         created_by: staffMembers[2].id,
         created_at: new Date('2024-03-01'),
-        updated_at: new Date('2024-03-01')
+        updated_at: new Date('2024-03-01');
       }
     });
 
@@ -130,19 +130,19 @@ export async function GET(request: NextRequest) {
           team_id: team3.id,
           staff_id: staffMembers[2].id,
           role: 'LEAD',
-          joined_at: new Date('2024-03-01')
+          joined_at: new Date('2024-03-01');
         },
         {
           team_id: team3.id,
           staff_id: staffMembers[0].id,
           role: 'MEMBER',
-          joined_at: new Date('2024-03-02')
+          joined_at: new Date('2024-03-02');
         },
         {
           team_id: team3.id,
           staff_id: staffMembers[5] ? staffMembers[5].id : staffMembers[1].id,
           role: 'MEMBER',
-          joined_at: new Date('2024-03-03')
+          joined_at: new Date('2024-03-03');
         }
       ]
     });
@@ -158,7 +158,7 @@ export async function GET(request: NextRequest) {
         team_id: team1.id,
         status: 'COMPLETED',
         created_at: new Date('2024-03-10'),
-        updated_at: new Date('2024-03-15')
+        updated_at: new Date('2024-03-15');
       }
     });
 
@@ -172,7 +172,7 @@ export async function GET(request: NextRequest) {
         team_id: team1.id,
         status: 'COMPLETED',
         created_at: new Date('2024-04-15'),
-        updated_at: new Date('2024-04-20')
+        updated_at: new Date('2024-04-20');
       }
     });
 
@@ -187,7 +187,7 @@ export async function GET(request: NextRequest) {
           duration: 30,
           status: 'DISCUSSED',
           responsible_staff_id: staffMembers[1].id,
-          created_at: new Date('2024-03-10')
+          created_at: new Date('2024-03-10');
         },
         {
           meeting_id: team1Meeting1.id,
@@ -197,7 +197,7 @@ export async function GET(request: NextRequest) {
           duration: 45,
           status: 'APPROVED',
           responsible_staff_id: staffMembers[2].id,
-          created_at: new Date('2024-03-10')
+          created_at: new Date('2024-03-10');
         },
         {
           meeting_id: team1Meeting1.id,
@@ -207,7 +207,7 @@ export async function GET(request: NextRequest) {
           duration: 45,
           status: 'PENDING',
           responsible_staff_id: staffMembers[0].id,
-          created_at: new Date('2024-03-10')
+          created_at: new Date('2024-03-10');
         }
       ]
     });
@@ -223,7 +223,7 @@ export async function GET(request: NextRequest) {
           duration: 40,
           status: 'APPROVED',
           responsible_staff_id: staffMembers[1].id,
-          created_at: new Date('2024-04-15')
+          created_at: new Date('2024-04-15');
         },
         {
           meeting_id: team1Meeting2.id,
@@ -233,7 +233,7 @@ export async function GET(request: NextRequest) {
           duration: 35,
           status: 'IN_PROGRESS',
           responsible_staff_id: staffMembers[2].id,
-          created_at: new Date('2024-04-15')
+          created_at: new Date('2024-04-15');
         }
       ]
     });
@@ -249,7 +249,7 @@ export async function GET(request: NextRequest) {
         team_id: team2.id,
         status: 'COMPLETED',
         created_at: new Date('2024-03-20'),
-        updated_at: new Date('2024-03-25')
+        updated_at: new Date('2024-03-25');
       }
     });
 
@@ -264,7 +264,7 @@ export async function GET(request: NextRequest) {
           duration: 45,
           status: 'APPROVED',
           responsible_staff_id: staffMembers[1].id,
-          created_at: new Date('2024-03-20')
+          created_at: new Date('2024-03-20');
         },
         {
           meeting_id: team2Meeting1.id,
@@ -274,7 +274,7 @@ export async function GET(request: NextRequest) {
           duration: 30,
           status: 'IN_PROGRESS',
           responsible_staff_id: staffMembers[3] ? staffMembers[3].id : staffMembers[0].id,
-          created_at: new Date('2024-03-20')
+          created_at: new Date('2024-03-20');
         }
       ]
     });
@@ -290,7 +290,7 @@ export async function GET(request: NextRequest) {
         team_id: team3.id,
         status: 'COMPLETED',
         created_at: new Date('2024-04-01'),
-        updated_at: new Date('2024-04-05')
+        updated_at: new Date('2024-04-05');
       }
     });
 
@@ -305,7 +305,7 @@ export async function GET(request: NextRequest) {
           duration: 40,
           status: 'APPROVED',
           responsible_staff_id: staffMembers[2].id,
-          created_at: new Date('2024-04-01')
+          created_at: new Date('2024-04-01');
         },
         {
           meeting_id: team3Meeting1.id,
@@ -315,7 +315,7 @@ export async function GET(request: NextRequest) {
           duration: 35,
           status: 'IN_PROGRESS',
           responsible_staff_id: staffMembers[0].id,
-          created_at: new Date('2024-04-01')
+          created_at: new Date('2024-04-01');
         }
       ]
     });
@@ -374,7 +374,7 @@ export async function GET(request: NextRequest) {
           is_pinned: true,
           views_count: 15,
           downloads_count: 3,
-          created_at: new Date('2024-01-20')
+          created_at: new Date('2024-01-20');
         },
         {
           team_id: team2.id,
@@ -387,7 +387,7 @@ export async function GET(request: NextRequest) {
           is_pinned: true,
           views_count: 22,
           downloads_count: 7,
-          created_at: new Date('2024-02-15')
+          created_at: new Date('2024-02-15');
         },
         {
           team_id: team3.id,
@@ -400,7 +400,7 @@ export async function GET(request: NextRequest) {
           is_pinned: true,
           views_count: 18,
           downloads_count: 4,
-          created_at: new Date('2024-03-05')
+          created_at: new Date('2024-03-05');
         }
       ]
     });

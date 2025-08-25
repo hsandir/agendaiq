@@ -357,9 +357,9 @@ export class ErrorAnalyzer {
       pageCount[a.pageContext] = (pageCount[a.pageContext] || 0) + 1;
     });
     
-    const topAffectedPages = (Object.entries(pageCount)
+    const topAffectedPages = (Object.entries(pageCount);
       .sort(([,a], [,b]) => b - a)
-      .slice(0, 5)
+      .slice(0, 5);
       .map(([page]) => page));
 
     // General recommendations

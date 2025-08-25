@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const registerSchema = z.object({
       email: z.string().email("Invalid email format").toLowerCase(),
       password: z.string().min(8, "Password must be at least 8 characters"),
-      name: z.string().min(1, "Name is required").optional()
+      name: z.string().min(1, "Name is required").optional();
     });
 
     const validationResult = registerSchema.safeParse(body);

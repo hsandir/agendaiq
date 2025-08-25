@@ -30,17 +30,16 @@ interface LogEntry {
 
 export default function LogViewer() {
   const [logs, setLogs] = useState<LogEntry[]>([])
-  const [filter, setFilter] = useState('')
+  const [filter, setFilter] = useState('');
   const [levelFilter, setLevelFilter] = useState<string>('all')
   const [contextFilter, setContextFilter] = useState<string>('all')
-  const [isLive, setIsLive] = useState(false)
-  const [isPaused, setIsPaused] = useState(false)
-
+  const [isLive, setIsLive] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   useEffect(() => {
-    loadLogs()
+    loadLogs();
     if (isLive && !isPaused) {
-      const interval = setInterval(loadLogs, 2000)
-      return () => clearInterval(interval)
+      const interval = setInterval(loadLogs, 2000);
+      return () => clearInterval(interval);
     }
   }, [isLive, isPaused, levelFilter, contextFilter])
 
@@ -51,13 +50,10 @@ export default function LogViewer() {
         context: contextFilter,
         limit: '100',
         offset: '0'
-      })
-      
-      const response = await fetch(`/api/dev/logs?${params}`)
-      if (!response.ok) throw new Error('Failed to fetch logs')
-      
-      const data = await response.json()
-      
+      });
+      const response = await fetch(`/api/dev/logs?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch logs');
+      const data = await response.json();
       if (isLive && !isPaused) {
         // In live mode, prepend new logs
         setLogs(prevLogs => {
@@ -67,25 +63,25 @@ export default function LogViewer() {
         })
       } else {
         // In normal mode, replace logs
-        setLogs(data.logs)
+        setLogs(data.logs);
       }
     } catch (error: unknown) {
-      console.error('Failed to load logs:', error)
+      console.error('Failed to load logs:', error);
     }
   }
 
   const clearLogs = () => {
-    setLogs([])
+    setLogs([]);
   }
 
   const exportLogs = () => {
-    const data = JSON.stringify(filteredLogs, null, 2)
-    const blob = new Blob([data], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
+    const data = JSON.stringify(filteredLogs, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
     a.href = url
     a.download = `logs-${new Date().toISOString()}.json`
-    a.click()
+    a.click();
   }
 
   const getLevelBadgeVariant = (level: string) => {

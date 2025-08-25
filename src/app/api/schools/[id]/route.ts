@@ -10,7 +10,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { __id } = await params;
+    const { id } = await params;
     const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.SCHOOL_MANAGE });
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
@@ -64,7 +64,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { __id } = await params;
+    const { id } = await params;
     const auth = await withAuth(request, { requireAuth: true, requireCapability: Capability.SCHOOL_MANAGE });
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });

@@ -94,7 +94,7 @@ class PreferenceCache {
     this.cache.set(userId, {
       ...existing,
       ...preferences,
-      timestamp: Date.now()
+      timestamp: Date.now();
     });
   }
 
@@ -127,7 +127,7 @@ class UserStaffCache {
   set(userId: number, data: Record<string, unknown>) {
     this.cache.set(userId, {
       data,
-      timestamp: Date.now()
+      timestamp: Date.now();
     });
   }
 

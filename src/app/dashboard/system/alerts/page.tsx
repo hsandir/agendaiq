@@ -156,7 +156,7 @@ export default function AlertsConfigurationPage() {
       ...prev!,
       rules: prev!.rules.map(rule =>
         rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
-      )
+      );
     }));
   };
 
@@ -167,7 +167,7 @@ export default function AlertsConfigurationPage() {
       ...prev!,
       channels: prev!.channels.map(channel =>
         channel.id === channelId ? { ...channel, enabled: !channel.enabled } : channel
-      )
+      );
     }));
   };
 

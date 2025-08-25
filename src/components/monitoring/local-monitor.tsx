@@ -151,7 +151,7 @@ export default function LocalMonitor() {
 
     console.error = (...args) => {
       const message = (args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+        typeof arg === 'object' ? JSON.stringify(arg) : String(arg);
       ).join(' '));
 
       // Only capture actual errors, not regular console.error usage
@@ -173,7 +173,7 @@ export default function LocalMonitor() {
 
     console.warn = (...args) => {
       const message = (args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+        typeof arg === 'object' ? JSON.stringify(arg) : String(arg);
       ).join(' '));
 
       // Only capture warnings that seem important

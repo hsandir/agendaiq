@@ -20,12 +20,12 @@ export async function GET(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
-    const { __searchParams } = new URL(request?.url);
+    const { searchParams } = new URL(request?.url);
     const limit = searchParams.get('limit') ?? '50';
     
     // Get commit history with stats
-    const { __stdout } = await execAsync(
-      `git log --pretty=format:'%H|%h|%an|%ar|%s' --stat -n ${____limit}`
+    const { stdout } = await execAsync(
+      `git log --pretty=format:'%H|%h|%an|%ar|%s' --stat -n ${limit}`
     );
     
     const commits: Array<{
@@ -87,14 +87,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       commits,
       total: commits?.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     });
   } catch (error: unknown) {
     console.error('Git commits error:', error);
     return NextResponse.json(
       { 
         error: 'Failed to get commit history',
-        details: error instanceof Error ? error.message : String(error) 
+        details: error instanceof Error ? error.message : String(error);
       },
       { status: 500 }
     );

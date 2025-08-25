@@ -112,7 +112,7 @@ export async function GET(request: NextRequest) {
       const [roleCount, districtCount, schoolCount] = await Promise.all([
         prisma.role.count(),
         prisma.district.count(),
-        prisma.school.count()
+        prisma.school.count();
       ]);
       
       databaseStatus = {
@@ -297,7 +297,7 @@ export async function GET(request: NextRequest) {
       authFlow: authFlowSteps,
       systemStatus,
       processInfo,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     });
   } catch (error: unknown) {
     // Even if everything fails, return whatever we can
@@ -357,7 +357,7 @@ export async function POST(request: NextRequest) {
             details: { 
               error: 'USER_NOT_FOUND',
               email: body.details.email,
-              timestamp: new Date().toISOString()
+              timestamp: new Date().toISOString();
             },
             ip,
             userAgent
@@ -393,7 +393,7 @@ export async function POST(request: NextRequest) {
               passwordValid: isValidPassword,
               hasStaff: !!(user.staff as Record<string, unknown> | null)?.length,
               staffRole: user.staff?.[0]?.role?.title,
-              timestamp: new Date().toISOString()
+              timestamp: new Date().toISOString();
             },
             ip,
             userAgent

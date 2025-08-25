@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
           created_by: user.id,
           metadata: validatedData.metadata ?? {},
           is_active: true,
-          updated_at: new Date()
+          updated_at: new Date();
         }
       });
 
@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
           user_id: user.id,
           staff_id: staff.id,
           role: 'LEAD',
-          joined_at: new Date()
+          joined_at: new Date();
         }
       });
 
@@ -243,7 +243,7 @@ export async function POST(request: NextRequest) {
               user_id: memberStaff.users.id,
               staff_id: memberStaff.id,
               role: 'MEMBER',
-              joined_at: new Date()
+              joined_at: new Date();
             }
           });
         });
@@ -386,7 +386,7 @@ export async function PUT(request: NextRequest) {
         ...(validatedData.description !== undefined && { description: validatedData.description }),
         ...(validatedData.is_active !== undefined && { is_active: validatedData.is_active }),
         ...(validatedData.metadata && { metadata: validatedData.metadata }),
-        updated_at: new Date()
+        updated_at: new Date();
       },
       include: {
         team_members: {
@@ -491,7 +491,7 @@ export async function DELETE(request: NextRequest) {
       where: { id: teamId },
       data: {
         is_active: false,
-        updated_at: new Date()
+        updated_at: new Date();
       }
     });
 

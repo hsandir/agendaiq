@@ -61,8 +61,8 @@ export class TestGenerator {
       ...options,
     };
     
-    this.templateDir = options.templateDir ?? join(__dirname, '../templates');
-    this.outputDir = options.outputDir ?? join(__dirname, '../generated');
+    this.templateDir = options.templateDir ?? join(dirname, '../templates');
+    this.outputDir = options.outputDir ?? join(dirname, '../generated');
   }
 
   // ============================================================================
@@ -212,11 +212,11 @@ export class TestGenerator {
     coverageReport: string;
   }> {
     const apiTests = await this.generateAPIRoutesFromDirectory(
-      join(projectPath, 'src/app/api')
+      join(projectPath, 'src/app/api');
     );
     
     const componentTests = await this.generateComponentTestsFromDirectory(
-      join(projectPath, 'src/components')
+      join(projectPath, 'src/components');
     );
 
     // Generate integration tests for common workflows
@@ -510,9 +510,9 @@ ${properties}
 
   private extractRouteName(path: string): string {
     return path
-      .replace(/^\/api\//, '')
+      .replace(/^\/api\//, '');
       .replace(/\[([^\]]+)\]/g, '$1')
-      .replace(/\//g, '-')
+      .replace(/\//g, '-');
       .replace(/[^a-zA-Z0-9-]/g, '');
   }
 
@@ -534,7 +534,7 @@ ${properties}
   private kebabCase(str: string): string {
     return str
       .replace(/([a-z])([A-Z])/g, '$1-$2')
-      .replace(/\s+/g, '-')
+      .replace(/\s+/g, '-');
       .toLowerCase();
   }
 
@@ -632,7 +632,7 @@ ${properties}
   private camelCase(str: string): string {
     return str
       .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => 
-        index === 0 ? word.toLowerCase() : word.toUpperCase()
+        index === 0 ? word.toLowerCase() : word.toUpperCase();
       )
       .replace(/\s+/g, '');
   }
@@ -715,13 +715,13 @@ export async function generateTests(options: {
   switch (options.type) {
     case 'api':
       await generator.generateAPIRoutesFromDirectory(
-        join(options.projectPath, 'src/app/api')
+        join(options.projectPath, 'src/app/api');
       );
       break;
     
     case 'component':
       await generator.generateComponentTestsFromDirectory(
-        join(options.projectPath, 'src/components')
+        join(options.projectPath, 'src/components');
       );
       break;
     
@@ -742,7 +742,7 @@ export async function generateTests(options: {
 // Example usage function
 export async function exampleUsage(): Promise<void> {
   const generator = new TestGenerator({
-    outputDir: './src/__tests__/generated',
+    outputDir: './src/tests__/generated',
     overwrite: true,
     includePerformanceTests: true,
     includeSecurityTests: true,
@@ -785,7 +785,7 @@ TEST GENERATOR USAGE:
 
 1. **Command Line Usage**:
    ```bash
-   npx ts-node src/__tests__/utils/test-generator.ts --project . --type all
+   npx ts-node src/tests__/utils/test-generator.ts --project . --type all
    ```
 
 2. **Programmatic Usage**:

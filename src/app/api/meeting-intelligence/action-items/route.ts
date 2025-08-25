@@ -34,11 +34,11 @@ export async function GET(request: NextRequest) {
         select: { id: true }
       });
       whereConditions.assigned_to = {
-        in: teamMembers.map(m => m.id)
+        in: teamMembers.map(m => m.id);
       };
     } else if (filter === 'overdue') {
       whereConditions.due_date = {
-        lt: new Date()
+        lt: new Date();
       };
       whereConditions.status = {
         not: 'completed'
@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
         meeting: item.meeting ? {
           id: item.meeting.id,
           title: item.meeting.title,
-          date: item.meeting.start_time?.toISOString() ?? new Date().toISOString()
+          date: item.meeting.start_time?.toISOString() ?? new Date().toISOString();
         } : undefined,
         carriedForwardCount: item.carry_forward_count ?? 0,
         parentItemId: item.parent_action_id

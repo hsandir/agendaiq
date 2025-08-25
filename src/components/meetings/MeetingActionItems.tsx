@@ -193,7 +193,7 @@ export function MeetingActionItems({
                   <SelectItem value="all">All Assignees</SelectItem>
                   {attendees.map(attendee => (
                     <SelectItem key={attendee.id} value={attendee.id}>
-                      {attendee.name} ({attendee.role})
+                      {attendee.name} ({attendee.role});
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -273,7 +273,7 @@ export function MeetingActionItems({
                   <SelectContent>
                     {attendees.map(attendee => (
                       <SelectItem key={attendee.id} value={attendee.id}>
-                        {attendee.name} - {attendee.role} ({attendee.department})
+                        {attendee.name} - {attendee.role} ({attendee.department});
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -447,7 +447,7 @@ export function MeetingActionItems({
                                       <Select
                                         value={item.priority}
                                         onValueChange={(value: Record<string, unknown>) => 
-                                          updateActionItem(item.originalIndex, { priority: value })
+                                          updateActionItem(item.originalIndex, { priority: value });
                                         }
                                       >
                                         <SelectTrigger className="h-8">
@@ -467,7 +467,7 @@ export function MeetingActionItems({
                                     <Textarea
                                       value={item.notes ?? ""}
                                       onChange={(e) => 
-                                        updateActionItem(item.originalIndex, { notes: e.target.value })
+                                        updateActionItem(item.originalIndex, { notes: e.target.value });
                                       }
                                       placeholder="Add notes..."
                                       rows={2}

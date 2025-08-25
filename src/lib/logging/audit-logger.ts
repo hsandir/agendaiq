@@ -380,7 +380,7 @@ export class AuditLogger {
 
     // Remove duplicates based on ID
     const uniqueResults = results.filter((entry, index, self) => 
-      index === self.findIndex(e => e.id === entry.id)
+      index === self.findIndex(e => e.id === entry.id);
     );
 
     return uniqueResults;
@@ -422,7 +422,7 @@ export class AuditLogger {
       blockedActions: blockedActions.filter(a => a.result === 'blocked').length,
       timeRange: {
         start: oneDayAgo.toISOString(),
-        end: new Date().toISOString()
+        end: new Date().toISOString();
       }
     };
   }

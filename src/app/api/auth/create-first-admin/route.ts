@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 const createAdminSchema = z.object({
   userId: z.number().positive(),
-  password: z.string().min(8)
+  password: z.string().min(8);
 });
 
 export async function POST(request: NextRequest) {
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
       data: {
         hashed_password: hashedPassword,
         is_admin: true, // Ensure admin flag is set
-        updated_at: new Date()
+        updated_at: new Date();
       },
       select: {
         id: true,

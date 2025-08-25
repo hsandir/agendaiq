@@ -8,7 +8,7 @@ import { AuditLogger } from '@/lib/audit/audit-logger';
 const assignmentSchema = z.object({
   assignments: z.array(z.object({
     roleId: z.number(),
-    departmentId: z.number().nullable()
+    departmentId: z.number().nullable();
   }))
 });
 
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { __assignments } = result.data;
+    const { assignments } = result.data;
 
     // Update role department assignments in database
     const updatePromises = assignments.map(async ({ roleId, departmentId }) => {

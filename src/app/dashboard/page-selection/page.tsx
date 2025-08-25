@@ -276,36 +276,35 @@ const defaultPageConfigs: PageConfig[] = [
 export default function PageSelectionPage() {
   const [pageConfigs, setPageConfigs] = useState<PageConfig[]>(defaultPageConfigs)
   const [environment, setEnvironment] = useState<'development' | 'production'>('production')
-  const [hasChanges, setHasChanges] = useState(false)
-  const [saving, setSaving] = useState(false)
+  const [hasChanges, setHasChanges] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info', text: string } | null>(null)
 
   // Load saved configuration
   useEffect(() => {
-    loadConfiguration()
+    loadConfiguration();
   }, [])
 
   const loadConfiguration = async () => {
     try {
-      const response = await fetch('/api/page-config')
+      const response = await fetch('/api/page-config');
       if (response.ok) {
-        const data = await response.json()
+        const data = await response.json();
         if (data.configs) {
-          setPageConfigs(data.configs)
+          setPageConfigs(data.configs);
         }
         if (data.environment) {
-          setEnvironment(data.environment)
+          setEnvironment(data.environment);
         }
       }
     } catch (error) {
-      console.error('Failed to load configuration:', error)
+      console.error('Failed to load configuration:', error);
     }
   }
 
   const saveConfiguration = async () => {
-    setSaving(true)
-    setMessage(null)
-    
+    setSaving(true);
+    setMessage(null);
     try {
       const response = await fetch('/api/page-config', {
         method: 'POST',
@@ -313,22 +312,21 @@ export default function PageSelectionPage() {
         body: JSON.stringify({ 
           configs: pageConfigs,
           environment 
-        })
+        });
       })
       
       if (response.ok) {
-        setMessage({ type: 'success', text: 'Configuration saved successfully!' })
-        setHasChanges(false)
-        
+        setMessage({ type: 'success', text: 'Configuration saved successfully!' });
+        setHasChanges(false);
         // Generate menu configuration
-        await generateMenuConfig()
+        await generateMenuConfig();
       } else {
-        setMessage({ type: 'error', text: 'Failed to save configuration' })
+        setMessage({ type: 'error', text: 'Failed to save configuration' });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Error saving configuration' })
+      setMessage({ type: 'error', text: 'Error saving configuration' });
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
   }
 
@@ -340,14 +338,14 @@ export default function PageSelectionPage() {
         body: JSON.stringify({ 
           configs: pageConfigs,
           environment 
-        })
+        });
       })
       
       if (response.ok) {
-        setMessage({ type: 'success', text: 'Menu configuration updated!' })
+        setMessage({ type: 'success', text: 'Menu configuration updated!' });
       }
     } catch (error) {
-      console.error('Failed to generate menu:', error)
+      console.error('Failed to generate menu:', error);
     }
   }
 
@@ -361,12 +359,12 @@ export default function PageSelectionPage() {
           ...config,
           children: config.children.map(child => 
             child.path === path ? { ...child, [field]: !child[field] } : child
-          )
+          );
         }
       }
       return config
     }))
-    setHasChanges(true)
+    setHasChanges(true);
   }
 
   const selectAllCategory = (category: string, field: 'isProduction' | 'isDevelopment') => {
@@ -376,7 +374,7 @@ export default function PageSelectionPage() {
       }
       return config
     }))
-    setHasChanges(true)
+    setHasChanges(true);
   }
 
   const deselectAllCategory = (category: string, field: 'isProduction' | 'isDevelopment') => {
@@ -386,18 +384,18 @@ export default function PageSelectionPage() {
       }
       return config
     }))
-    setHasChanges(true)
+    setHasChanges(true);
   }
 
   const exportConfig = () => {
-    const dataStr = JSON.stringify({ configs: pageConfigs, environment }, null, 2)
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr)
+    const dataStr = JSON.stringify({ configs: pageConfigs, environment }, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
     const exportFileDefaultName = `page-config-${environment}-${new Date().toISOString().split('T')[0]}.json`
     
-    const linkElement = document.createElement('a')
-    linkElement.setAttribute('href', dataUri)
-    linkElement.setAttribute('download', exportFileDefaultName)
-    linkElement.click()
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
   }
 
   const categories = [
@@ -499,7 +497,7 @@ export default function PageSelectionPage() {
               <CardContent>
                 <div className="space-y-4">
                   {pageConfigs
-                    .filter(config => config.category === category.key)
+                    .filter(config => config.category === category.key);
                     .map(config => (
                       <div key={config.path} className="space-y-2">
                         <div className="flex items-center justify-between p-3 border rounded-lg">

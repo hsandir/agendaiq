@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { __pages, __type } = (await request.json()) as Record<__string, unknown>;
+    const { pages, type } = (await request.json()) as Record<string, unknown>;
 
     if (type === 'custom' && pages) {
       return await customHealthCheck(pages);
@@ -93,7 +93,7 @@ async function quickHealthCheck() {
       type: 'quick',
       summary,
       results,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     });
 
   } catch (error: unknown) {
@@ -135,7 +135,7 @@ async function fullHealthCheck() {
       summary,
       results,
       systemChecks,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     });
 
   } catch (error: unknown) {
@@ -167,7 +167,7 @@ async function apiHealthCheck() {
       type: 'api-only',
       summary,
       results,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     });
 
   } catch (error: unknown) {
@@ -201,7 +201,7 @@ async function customHealthCheck(customPages: string[]) {
       type: 'custom',
       summary,
       results,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     });
 
   } catch (error: unknown) {
@@ -253,7 +253,7 @@ async function checkPage(url: string, name: string) {
           text.includes('500 - Internal Server Error') ||
           text.includes('This application has no explicit mapping for') ||
           text.includes('Whitelabel Error Page') ||
-          (text.includes('Error:') && !text.includes('__next_error')) ||
+          (text.includes('Error:') && !text.includes('next_error')) ||
           (text.includes('Exception:') && !text.includes('NotFound'));
 
         // Check for actual 404 pages (not Next.js dev components)
@@ -271,7 +271,7 @@ async function checkPage(url: string, name: string) {
         details.contentLength = text.length;
         details.hasTitle = text.includes('<title>');
         details.hasBody = text.includes('<body');
-        details.hasNextDevError = text.includes('__next_error') || text.includes('NotFound');
+        details.hasNextDevError = text.includes('next_error') || text.includes('NotFound');
       } catch {
         // If we can't read the text, that's ok for status check
       }
@@ -310,7 +310,7 @@ async function checkPage(url: string, name: string) {
       responseTime,
       contentType,
       details,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     };
 
   } catch (error: unknown) {
@@ -323,7 +323,7 @@ async function checkPage(url: string, name: string) {
       responseTime: 0,
       contentType: 'unknown',
       details: { error: error instanceof Error ? error.message : String(error) },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     };
   }
 }
@@ -354,7 +354,7 @@ async function performSystemChecks() {
 
   // Check disk space
   try {
-    const { __stdout } = await execAsync('df -h .', { cwd: process.cwd() });
+    const { stdout } = await execAsync('df -h .', { cwd: process.cwd() });
     const usage = stdout.split('\n')[1].split(/\s+/)[4]; // Get usage percentage
     
     checks.push({
@@ -395,7 +395,7 @@ async function performSystemChecks() {
 
   // Check Git status
   try {
-    const { __stdout } = await execAsync('git status --porcelain', { cwd: process.cwd() });
+    const { stdout } = await execAsync('git status --porcelain', { cwd: process.cwd() });
     const changes = stdout.split('\n').filter(line => String(line).trim()).length;
     
     checks.push({

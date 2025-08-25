@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       let rootId = meeting.id;
       let parentId = meeting.parent_meeting_id;
       
-      // Traverse up to find root (without ParentMeeting object)
+      // Traverse up to find root (without ParentMeeting object);
       while (parentId) {
         const parent = meetings.find(m => m.id === parentId);
         if (!parent) break;

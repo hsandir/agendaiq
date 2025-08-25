@@ -44,7 +44,7 @@ export function TwoFactorSetup() {
       const response = await fetch("/api/auth/2fa/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: verificationCode })
+        body: JSON.stringify({ token: verificationCode });
       });
 
       const data = await response.json();

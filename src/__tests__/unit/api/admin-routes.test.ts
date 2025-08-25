@@ -5,10 +5,10 @@
 
 // Mock modules first before imports
 jest.mock('@/lib/auth/api-auth', () => ({
-  withAuth: jest.fn()
+  withAuth: jest.fn();
 }));
 jest.mock('@/lib/auth/policy', () => ({
-  canAccessApi: jest.fn()
+  canAccessApi: jest.fn();
 }));
 jest.mock('@/lib/prisma', () => ({
   prisma: {
@@ -24,7 +24,7 @@ jest.mock('next/server', () => ({
       status: init?.status ?? 200,
       headers: new Headers(init?.headers),
       json: async () => body,
-      body: JSON.stringify(body)
+      body: JSON.stringify(body);
     }))
   }
 }));

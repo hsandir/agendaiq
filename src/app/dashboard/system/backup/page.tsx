@@ -103,7 +103,7 @@ export default function BackupManagementPage() {
         body: JSON.stringify({ 
           type: 'create', 
           message: backupMessage 
-        })
+        });
       });
 
       if (response.ok) {
@@ -133,7 +133,7 @@ export default function BackupManagementPage() {
         body: JSON.stringify({ 
           type: 'github-push', 
           message: 'Manual GitHub backup' 
-        })
+        });
       });
 
       if (response.ok) {
@@ -166,7 +166,7 @@ export default function BackupManagementPage() {
         body: JSON.stringify({ 
           type: 'restore', 
           restore: branchName 
-        })
+        });
       });
 
       if (response.ok) {

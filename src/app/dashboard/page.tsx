@@ -209,7 +209,7 @@ export default async function DashboardPage() {
       include: {
         meeting: true
       }
-    })
+    });
   ]) : [[], []];
 
   const quickStats = [

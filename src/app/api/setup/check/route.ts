@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const [districtCount, userCount, adminCount] = await Promise.all([
       prisma.district.count(),
       prisma.users.count(),
-      prisma.users.count({ where: { is_system_admin: true } })
+      prisma.users.count({ where: { is_system_admin: true } });
     ]);
 
     const setupStatus = {

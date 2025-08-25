@@ -49,45 +49,42 @@ export default function TestDashboard() {
   const [selectedSuite, setSelectedSuite] = useState<string | null>(null)
   const [testResults, setTestResults] = useState<TestResult[]>([])
   const [coverage, setCoverage] = useState<CoverageReport | null>(null)
-  const [isRunning, setIsRunning] = useState(false)
-  const [activeTab, setActiveTab] = useState("results")
+  const [isRunning, setIsRunning] = useState(false);
+  const [activeTab, setActiveTab] = useState("results");
   const [output, setOutput] = useState<string[]>([])
 
   // Load available test suites
   useEffect(() => {
-    loadTestSuites()
+    loadTestSuites();
   }, [])
 
   const loadTestSuites = async () => {
     try {
-      const response = await fetch('/api/tests/suites')
-      const data = await response.json()
-      setTestSuites(data.suites)
+      const response = await fetch('/api/tests/suites');
+      const data = await response.json();
+      setTestSuites(data.suites);
     } catch (error: unknown) {
-      console.error('Failed to load test suites:', error)
+      console.error('Failed to load test suites:', error);
     }
   }
 
   const runTests = async (suitePath?: string) => {
-    setIsRunning(true)
-    setOutput([])
-    setTestResults([])
-    
+    setIsRunning(true);
+    setOutput([]);
+    setTestResults([]);
     try {
       const response = await fetch('/api/tests/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ suite: suitePath, coverage: true })
+        body: JSON.stringify({ suite: suitePath, coverage: true });
       })
       
-      if (!response.ok) throw new Error('Failed to run tests')
-      
+      if (!response.ok) throw new Error('Failed to run tests');
       // Parse the JSON response
-      const data = await response.json()
-      
+      const data = await response.json();
       // Update output with test results
       if (data.output && Array.isArray(data.output)) {
-        setOutput(data.output)
+        setOutput(data.output);
       }
       
       // Parse test results
@@ -106,12 +103,12 @@ export default function TestDashboard() {
             })
           }
         })
-        setTestResults(results)
+        setTestResults(results);
       }
       
       // Update coverage if available
       if (data.coverage) {
-        setCoverage(data.coverage)
+        setCoverage(data.coverage);
       }
       
       // Update suite status
@@ -132,10 +129,10 @@ export default function TestDashboard() {
       }
       
     } catch (error: unknown) {
-      console.error('Test run failed:', error)
-      setOutput(prev => [...prev, `Error: ${error}`])
+      console.error('Test run failed:', error);
+      setOutput(prev => [...prev, `Error: ${error}`]);
     } finally {
-      setIsRunning(false)
+      setIsRunning(false);
     }
   }
 
@@ -232,8 +229,8 @@ export default function TestDashboard() {
                       className="mt-2 w-full"
                       variant="outline"
                       onClick={(e) => {
-                        e.stopPropagation()
-                        runTests(suite.path)
+                        e.stopPropagation();
+                        runTests(suite.path);
                       }}
                       disabled={isRunning}
                     >
@@ -313,7 +310,7 @@ export default function TestDashboard() {
                     {output.length === 0 ? (
                       <span className="text-muted-foreground">No output yet...</span>
                     ) : (
-                      output.join('\n')
+                      output.join('\n');
                     )}
                   </pre>
                 </ScrollArea>

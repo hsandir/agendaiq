@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     Logger.error('System status error', { error: String(error) }, 'system-status');
     return NextResponse.json({
       error: 'Failed to get system status',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     }, { status: 500 });
   }
 }
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
 // Get real package status from npm
 async function getRealPackageStatus() {
   try {
-    const { __stdout } = await execAsync('npm outdated --json', { cwd: process.cwd() });
+    const { stdout } = await execAsync('npm outdated --json', { cwd: process.cwd() });
     const outdatedPackages = JSON.parse(stdout || '{}');
     
     const outdatedList = (Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({
@@ -89,11 +89,11 @@ async function getRealPackageStatus() {
       current: info.current,
       wanted: info.wanted,
       latest: info.latest,
-      type: getUpdateType(info.current, info.latest)
+      type: getUpdateType(info.current, info.latest);
     })));
 
     // Get total package count
-    const { stdout: ____lsOutput  } = await execAsync('npm ls --json --depth=0', { cwd: process.cwd() });
+    const { stdout: lsOutput  } = await execAsync('npm ls --json --depth=0', { cwd: process.cwd() });
     const lsData = JSON.parse(lsOutput || '{}');
     const totalPackages = Object.keys(lsData.dependencies ?? {}).length;
 
@@ -113,7 +113,7 @@ async function getRealPackageStatus() {
           current: info.current,
           wanted: info.wanted,
           latest: info.latest,
-          type: getUpdateType(info.current, info.latest)
+          type: getUpdateType(info.current, info.latest);
         })));
         
         return {
@@ -161,7 +161,7 @@ async function getDatabaseStatus() {
     return {
       connected: false,
       status: 'Disconnected',
-      error: error instanceof Error ? error.message : String(error)
+      error: error instanceof Error ? error.message : String(error);
     };
   }
 } 

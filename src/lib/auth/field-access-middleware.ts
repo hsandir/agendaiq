@@ -35,11 +35,11 @@ export function withFieldAccess<T extends (...args: Record<string, unknown>[]) =
           data.data = applyFieldFiltering(user, model, data?.data);
         } else if (Array.isArray(data)) {
           return NextResponse.json(
-            applyFieldFiltering(user, model, data)
+            applyFieldFiltering(user, model, data);
           );
         } else if (typeof data === 'object') {
           return NextResponse.json(
-            filterFields(user, model, data)
+            filterFields(user, model, data);
           );
         }
         

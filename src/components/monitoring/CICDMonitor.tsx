@@ -96,7 +96,7 @@ export function CICDMonitor() {
       const [pipelineRes, deploymentRes, metricsRes] = await Promise.all([
         fetch('/api/monitoring/pipelines'),
         fetch('/api/monitoring/deployments'),
-        fetch('/api/monitoring/build-metrics')
+        fetch('/api/monitoring/build-metrics');
       ]);
 
       if (pipelineRes.ok) {

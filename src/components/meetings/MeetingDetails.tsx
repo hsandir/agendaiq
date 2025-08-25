@@ -85,7 +85,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
         // Try to fetch agenda items and notes from API
         const [agendaResponse, notesResponse] = await Promise.all([
           fetch(`/api/meetings/${meeting.id}/agenda`),
-          fetch(`/api/meetings/${meeting.id}/notes`)
+          fetch(`/api/meetings/${meeting.id}/notes`);
         ]);
 
         if (agendaResponse.ok) {
@@ -135,7 +135,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            content: newNote.trim()
+            content: newNote.trim();
           }),
         });
 
@@ -192,7 +192,7 @@ export function MeetingDetails({ meeting, isOrganizer, canRespond, onRespond }: 
     setAgendaItems(items =>
       items.map(item =>
         item.id === id ? { ...item, completed: !item.completed } : item
-      )
+      );
     );
   };
 

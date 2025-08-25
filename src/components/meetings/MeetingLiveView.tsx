@@ -213,7 +213,7 @@ export function MeetingLiveView({
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(updates)
+        body: JSON.stringify(updates);
       });
 
       if (!response.ok) {

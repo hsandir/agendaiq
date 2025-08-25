@@ -39,7 +39,7 @@ export const createSuccessResponse = <T>(
   data,
   message,
   requestId,
-  timestamp: new Date().toISOString()
+  timestamp: new Date().toISOString();
 });
 
 export const createErrorResponse = (
@@ -53,7 +53,7 @@ export const createErrorResponse = (
       type: 'INTERNAL_ERROR',
       message: error,
       code: 'GEN_001',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     };
   } else if ('type' in error && ['DATABASE_ERROR', 'AUTH_ERROR', 'VALIDATION_ERROR', 'NETWORK_ERROR', 'UNKNOWN_ERROR'].includes(error?.type)) {
     // It's a SystemError, convert to APIError
@@ -67,7 +67,7 @@ export const createErrorResponse = (
     success: false,
     error: apiError,
     requestId,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString();
   };
 };
 
@@ -88,9 +88,9 @@ export const createPaginatedResponse = <T>(
     limit,
     total,
     hasMore: page * limit < total,
-    totalPages: Math.ceil(total / limit)
+    totalPages: Math.ceil(total / limit);
   },
-  timestamp: new Date().toISOString()
+  timestamp: new Date().toISOString();
 });
 
 // NextResponse helpers
@@ -173,7 +173,7 @@ export const categorizeAPIError = (error: unknown): APIError => {
         message: 'Database operation failed',
         code: 'DB_001',
         details: { originalError: error?.message },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString();
       };
     }
     
@@ -184,7 +184,7 @@ export const categorizeAPIError = (error: unknown): APIError => {
         message: 'Authentication required',
         code: 'AUTH_001',
         details: { originalError: error?.message },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString();
       };
     }
     
@@ -195,7 +195,7 @@ export const categorizeAPIError = (error: unknown): APIError => {
         message: 'Invalid request data',
         code: 'VAL_001',
         details: { originalError: error?.message },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString();
       };
     }
     
@@ -206,7 +206,7 @@ export const categorizeAPIError = (error: unknown): APIError => {
         message: 'Network operation failed',
         code: 'NET_001',
         details: { originalError: error?.message },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString();
       };
     }
     
@@ -216,7 +216,7 @@ export const categorizeAPIError = (error: unknown): APIError => {
       message: 'Internal server error',
       code: 'SYS_001',
       details: { originalError: error?.message },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     };
   }
   
@@ -225,6 +225,6 @@ export const categorizeAPIError = (error: unknown): APIError => {
     message: 'Unknown error occurred',
     code: 'UNK_001',
     details: { originalError: String(error) },
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString();
   };
 };

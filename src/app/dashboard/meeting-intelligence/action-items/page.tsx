@@ -110,7 +110,7 @@ export default function ActionItemsTrackingPage() {
       const response = await fetch(`/api/meeting-intelligence/action-items/${itemId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus });
       });
       
       if (response.ok) {

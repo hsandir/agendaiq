@@ -117,7 +117,7 @@ export default async function AuditPage() {
               <div className="absolute left-0 top-0 w-px h-full bg-border" />
               <div className="space-y-8">
                 {auditLogs.map((log) => {
-                  const { icon: __Icon, __category } = getActionDetails(log.action);
+                  const { icon: __Icon, category } = getActionDetails(log.action);
                   return (
                     <div key={log.id} className="relative pl-8">
                       <div className="absolute left-0 top-2 -translate-x-1/2">

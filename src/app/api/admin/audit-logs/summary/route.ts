@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     console.error('Error fetching audit summary:', error);
     return NextResponse.json({
       error: 'Failed to fetch audit summary information',
-      details: error instanceof Error ? error.message : String(error)
+      details: error instanceof Error ? error.message : String(error);
     }, { status: 500 });
   }
 } 

@@ -29,7 +29,7 @@ export class RealtimeTransport implements LogTransport {
       category: isDev ? (entry as DevLogEntry).category : (entry as AuditLogEntry).category,
       severity,
       tags,
-      correlationId: this.generateCorrelationId(entry)
+      correlationId: this.generateCorrelationId(entry);
     };
   }
 
@@ -154,7 +154,7 @@ export class RealtimeTransport implements LogTransport {
 
   async queryBySeverity(severity: 'low' | 'medium' | 'high' | 'critical', limit = 100): Promise<LiveLogEvent[]> {
     return this.memoryBuffer
-      .filter(event => event.severity === severity)
+      .filter(event => event.severity === severity);
       .slice(0, limit);
   }
 

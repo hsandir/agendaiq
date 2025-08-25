@@ -207,7 +207,7 @@ export default function StaffRoleDragDrop({ initialRoles, onSave }: StaffRoleDra
           // Remove staff from current role
           return {
             ...role,
-            staff: role.staff.filter(s => s.id !== staffId)
+            staff: role.staff.filter(s => s.id !== staffId);
           };
         } else if (role.id === newRoleId) {
           // Add staff to new role

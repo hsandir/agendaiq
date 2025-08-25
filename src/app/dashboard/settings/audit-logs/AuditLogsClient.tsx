@@ -109,7 +109,7 @@ const categorizeError = (error: unknown, context: string): AuditError => {
   return {
     category: ErrorCategory.CLIENT,
     message: `Unknown error ${context}`,
-    details: String(error)
+    details: String(error);
   };
 };
 
@@ -781,7 +781,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        isCritical ? 'bg-muted text-foreground' : getOperationBadge(log.operation)
+                        isCritical ? 'bg-muted text-foreground' : getOperationBadge(log.operation);
                       }`}>
                         {isCritical ? log.action : log.operation}
                       </span>

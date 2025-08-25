@@ -315,7 +315,7 @@ export function RepeatMeetingModal({
                               ...config,
                               weekDays: checked
                                 ? [...days, day.value]
-                                : days.filter(d => d !== day.value)
+                                : days.filter(d => d !== day.value);
                             });
                           }}
                         />
@@ -348,7 +348,7 @@ export function RepeatMeetingModal({
                         ...config, 
                         monthDay: undefined,
                         monthWeek: Math.ceil(date.getDate() / 7),
-                        monthWeekDay: getDay(date)
+                        monthWeekDay: getDay(date);
                       });
                     }
                   }}

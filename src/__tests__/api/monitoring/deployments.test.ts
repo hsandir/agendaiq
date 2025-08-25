@@ -173,7 +173,7 @@ describe('/api/monitoring/deployments', () => {
 
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining('teamId=test-team-id'),
-        expect.any(Object)
+        expect.any(Object);
       );
     });
   });

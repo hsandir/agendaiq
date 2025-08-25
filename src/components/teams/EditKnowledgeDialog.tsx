@@ -246,7 +246,7 @@ export function EditKnowledgeDialog({
       const updatedMetadata = {
         ...metadata,
         editHistory: [...(metadata.editHistory || []), editEntry],
-        lastModified: new Date().toISOString()
+        lastModified: new Date().toISOString();
       };
       
       const updateData = {

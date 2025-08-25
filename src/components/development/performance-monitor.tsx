@@ -72,43 +72,40 @@ interface TestResult {
 export default function PerformanceMonitor() {
   const [metrics, setMetrics] = useState<PerformanceMetric[]>([])
   const [apiEndpoints, setApiEndpoints] = useState<ApiEndpoint[]>([])
-  const [isMonitoring, setIsMonitoring] = useState(false)
-  const [activeTab, setActiveTab] = useState('dashboard')
+  const [isMonitoring, setIsMonitoring] = useState(false);
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [testResults, setTestResults] = useState<TestResult[]>([])
-  const [isRunningTests, setIsRunningTests] = useState(false)
-  const [currentTest, setCurrentTest] = useState('')
-  const [mounted, setMounted] = useState(false)
-  
+  const [isRunningTests, setIsRunningTests] = useState(false);
+  const [currentTest, setCurrentTest] = useState('');
+  const [mounted, setMounted] = useState(false);
   // Use the performance monitoring system we built
-  const { __getMetrics, __getAveragePageLoadTime, __getAPIPerformance, __clearMetrics } = usePerformanceMetrics()
-  const { __setTheme, __theme, __availableThemes } = useTheme()
-
+  const { getMetrics, getAveragePageLoadTime, getAPIPerformance, clearMetrics } = usePerformanceMetrics();
+  const { setTheme, theme, availableThemes } = useTheme();
   useEffect(() => {
-    setMounted(true)
+    setMounted(true);
   }, [])
 
   useEffect(() => {
     // Only load metrics if monitoring is active and component is mounted
     if (isMonitoring && mounted) {
-      loadMetrics()
-      const interval = setInterval(__loadMetrics, 30000) // Changed to 30 seconds
-      return () => clearInterval(interval)
+      loadMetrics();
+      const interval = setInterval(loadMetrics, 30000) // Changed to 30 seconds
+      return () => clearInterval(interval);
     }
-  }, [__isMonitoring, mounted])
+  }, [isMonitoring, mounted])
 
   const loadMetrics = async () => {
     try {
-      const response = await fetch('/api/dev/metrics')
-      if (!response.ok) throw new Error('Failed to fetch metrics')
-      
-      const data = await response.json()
-      setMetrics(data.metrics)
-      setApiEndpoints(data.apiEndpoints)
+      const response = await fetch('/api/dev/metrics');
+      if (!response.ok) throw new Error('Failed to fetch metrics');
+      const data = await response.json();
+      setMetrics(data.metrics);
+      setApiEndpoints(data.apiEndpoints);
     } catch (error: unknown) {
-      console.error('Failed to load metrics:', error)
+      console.error('Failed to load metrics:', error);
       // Show empty state instead of mock data
-      setMetrics([])
-      setApiEndpoints([])
+      setMetrics([]);
+      setApiEndpoints([]);
     }
   }
 
@@ -147,25 +144,25 @@ export default function PerformanceMonitor() {
     }
   }
 
-  const measureOperation = async (operation: __string, fn: () => Promise<any>): Promise<TestResult> => {
-    const startTime = performance.now()
+  const measureOperation = async (operation: string, fn: () => Promise<any>): Promise<TestResult> => {
+    const startTime = performance.now();
     let success = true
     
     try {
-      await fn()
+      await fn();
     } catch (error: unknown) {
       success = false
-      // Only log as __warning, not error
-      console.warn(`Test notice: ${__operation} -`, error instanceof Error ? error.message : 'Test completed with warnings')
+      // Only log as warning, not error
+      console.warn(`Test notice: ${operation} -`, error instanceof Error ? error.message : 'Test completed with warnings');
     }
     
-    const endTime = performance.now()
+    const endTime = performance.now();
     return {
-      __operation,
-      __startTime,
-      __endTime,
+      operation,
+      startTime,
+      endTime,
       duration: Math.round((endTime - startTime) * 100) / __100,
-      __success
+      success
     }
   }
 
@@ -177,30 +174,29 @@ export default function PerformanceMonitor() {
     const originalTheme = theme
     
     for (const themeId of themes) {
-      setCurrentTest(`Testing theme change: ${__themeId}`)
-      const result = await measureOperation(`Theme Change: ${__themeId}`, async () => {
+      setCurrentTest(`Testing theme change: ${themeId}`);
+      const result = await measureOperation(`Theme Change: ${themeId}`, async () => {
         // Test with API call
         try {
           const response = await fetch('/api/user/theme', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({ theme: __themeId })
+            body: JSON.stringify({ theme: themeId });
           })
           
           if (response.ok && typeof setTheme === 'function') {
-            setTheme(themeId)
+            setTheme(themeId);
           }
         } catch (error: unknown) {
-          console.warn('Theme change test:', error)
+          console.warn('Theme change test:', error);
         }
         // Minimal wait
-        await new Promise(resolve => setTimeout(__resolve, 10))
+        await new Promise(resolve => setTimeout(resolve, 10))
       })
-      testResults.push(result)
-      
+      testResults.push(result);
       // Minimal delay between changes
-      await new Promise(resolve => setTimeout(__resolve, 20))
+      await new Promise(resolve => setTimeout(resolve, 20))
     }
     
     // Restore original theme after theme tests
@@ -210,15 +206,15 @@ export default function PerformanceMonitor() {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ theme: __originalTheme })
+          body: JSON.stringify({ theme: originalTheme });
         })
-        setTheme(originalTheme)
+        setTheme(originalTheme);
       } catch (error: unknown) {
-        console.warn('Failed to restore theme:', error)
+        console.warn('Failed to restore theme:', error);
       }
     }
     
-    return __testResults
+    return testResults
   }
 
   const testLayoutPreferences = async () => {
@@ -226,23 +222,23 @@ export default function PerformanceMonitor() {
     const layouts = ['modern', 'compact', 'minimal', 'classic']
     
     for (const layoutId of layouts) {
-      setCurrentTest(`Testing layout preference: ${__layoutId}`)
-      const result = await measureOperation(`Layout API Call: ${__layoutId}`, async () => {
+      setCurrentTest(`Testing layout preference: ${layoutId}`);
+      const result = await measureOperation(`Layout API Call: ${layoutId}`, async () => {
         try {
           const response = await fetch('/api/user/layout', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({ layout: __layoutId })
+            body: JSON.stringify({ layout: layoutId });
           })
           if (!response.ok) {
-            console.warn(`Layout API returned ${response.__status}`);
+            console.warn(`Layout API returned ${response.status}`);
           }
         } catch (error: unknown) {
           console.warn('Layout API test failed:', error);
         }
       })
-      testResults.push(result)
+      testResults.push(result);
     }
     
     return testResults
@@ -256,7 +252,7 @@ export default function PerformanceMonitor() {
     ]
     
     // Test APIs in parallel for better performance
-    setCurrentTest('Testing APIs in parallel')
+    setCurrentTest('Testing APIs in parallel');
     const promises = apis.map(api => 
       measureOperation(api.name, async () => {
         try {
@@ -273,42 +269,38 @@ export default function PerformanceMonitor() {
       })
     )
     
-    const results = await Promise.all(promises)
+    const results = await Promise.all(promises);
     return results
   }
 
   const runAllTests = async () => {
-    setIsRunningTests(true)
-    setTestResults([])
-    
+    setIsRunningTests(true);
+    setTestResults([]);
     // Save current theme before tests
     const originalTheme = theme
     
     try {
       // Test API performance
-      const apiResults = await testAPIPerformance()
-      setTestResults(prev => [...prev, ...apiResults])
-      
+      const apiResults = await testAPIPerformance();
+      setTestResults(prev => [...prev, ...apiResults]);
       // Test theme changes
-      const themeResults = await testThemeChanges()
-      setTestResults(prev => [...prev, ...themeResults])
-      
+      const themeResults = await testThemeChanges();
+      setTestResults(prev => [...prev, ...themeResults]);
       // Test layout preferences  
-      const layoutResults = await testLayoutPreferences()
-      setTestResults(prev => [...prev, ...layoutResults])
-      
+      const layoutResults = await testLayoutPreferences();
+      setTestResults(prev => [...prev, ...layoutResults]);
     } catch (error: unknown) {
-      console.error('Performance test failed:', error)
+      console.error('Performance test failed:', error);
     } finally {
       // Restore original theme after tests
       if (originalTheme && typeof setTheme === 'function') {
         setTimeout(() => {
-          setTheme(originalTheme)
+          setTheme(originalTheme);
         }, 100)
       }
       
-      setIsRunningTests(false)
-      setCurrentTest('')
+      setIsRunningTests(false);
+      setCurrentTest('');
     }
   }
 
@@ -324,7 +316,7 @@ export default function PerformanceMonitor() {
           </Card>
         ) : (
           metrics.map((metric) => {
-          const status = getMetricStatus(metric)
+          const status = getMetricStatus(metric);
           return (
             <Card key={metric.name} className={status === 'critical' ? 'border-destructive' : ''}>
               <CardHeader className="pb-2">

@@ -3,9 +3,9 @@ import { withAuth } from '@/lib/auth/api-auth'
 import { Capability } from '@/lib/auth/policy'
 
 export async function POST(request: NextRequest) {
-  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_HEALTH })
+  const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.OPS_HEALTH });
   if (!authResult.success) {
-    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode })
+    return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
   }
 
   try {
@@ -14,11 +14,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true,
       message: 'Menu configuration updated'
-    })
+    });
   } catch (error) {
     return NextResponse.json(
       { error: 'Failed to generate menu configuration' },
       { status: 500 }
-    )
+    );
   }
 }

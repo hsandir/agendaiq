@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       deployments,
       source: deployments.length > 0 ? 'vercel' : 'none',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     });
   } catch (error: unknown) {
     console.error('Error fetching deployments:', error);

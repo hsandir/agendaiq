@@ -391,7 +391,7 @@ class GlobalErrorTracker {
         deviceInfo: error.context.deviceInfo,
         breadcrumbs: error.breadcrumbs,
         customData: error.customData
-      })
+      });
     });
 
     if (!response.ok) {

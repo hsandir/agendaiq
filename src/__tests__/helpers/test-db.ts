@@ -24,7 +24,7 @@ export function getTestPrismaClient(): PrismaClient {
         db: { url: databaseUrl }
       },
       log: process.env.DEBUG === 'true' ? ['query', 'info', 'warn', 'error'] : [],
-    })
+    });
   }
 
   return prisma
@@ -35,8 +35,7 @@ export function getTestFactory(): TestFactory {
 }
 
 export async function resetTestDatabase() {
-  const prisma = getTestPrismaClient()
-  
+  const prisma = getTestPrismaClient();
   // Clear all data in correct order
   await prisma.$transaction([
     prisma.meeting_audit_logs.deleteMany(),
@@ -59,8 +58,7 @@ export async function resetTestDatabase() {
 }
 
 export async function seedTestDatabase() {
-  const prisma = getTestPrismaClient()
-  
+  const prisma = getTestPrismaClient();
   // Use existing data from copied main database
   const users: UserWithStaff[] = await prisma.users.findMany({
     include: {
@@ -73,8 +71,7 @@ export async function seedTestDatabase() {
         }
       }
     }
-  })
-  
+  });
   if (users.length >= 2) {
     const adminUser = users.find(u => u.staff?.[0]?.role?.is_leadership) || users[0]
     const teacherUser = users.find(u => !u.staff?.[0]?.role?.is_leadership) || users[1]
@@ -86,12 +83,12 @@ export async function seedTestDatabase() {
     }
   }
   
-  throw new Error('Test database should have been seeded with data from main database')
+  throw new Error('Test database should have been seeded with data from main database');
 }
 
 export async function disconnectTestDatabase() {
   if (prisma) {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   }
 }
 
@@ -99,10 +96,9 @@ export async function disconnectTestDatabase() {
 export async function withTransaction<T>(
   fn: (tx: PrismaClient) => Promise<T>
 ): Promise<T> {
-  const prisma = getTestPrismaClient()
-  
+  const prisma = getTestPrismaClient();
   return prisma.$transaction(async (tx) => {
-    await fn(tx as PrismaClient)
+    await fn(tx as PrismaClient);
     throw new Error('Rollback') // Force rollback
   }).catch((error) => {
     if (error instanceof Error && error.message === 'Rollback') {
@@ -114,16 +110,15 @@ export async function withTransaction<T>(
 
 // Helper to create isolated test context
 export async function createTestContext() {
-  await resetTestDatabase()
-  const seededData = await seedTestDatabase()
-  const factory = getTestFactory()
-  
+  await resetTestDatabase();
+  const seededData = await seedTestDatabase();
+  const factory = getTestFactory();
   return {
     prisma: getTestPrismaClient(),
     factory,
     ...seededData,
     cleanup: async () => {
-      await resetTestDatabase()
+      await resetTestDatabase();
     }
   }
 }

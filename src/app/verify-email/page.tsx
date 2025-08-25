@@ -6,7 +6,7 @@ interface PageProps {
 }
 
 export default async function VerifyEmailPage({ searchParams }: PageProps) {
-  const { __token } = await searchParams;
+  const { token } = await searchParams;
 
   if (!token) {
     redirect("/dashboard");

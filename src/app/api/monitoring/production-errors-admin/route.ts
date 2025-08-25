@@ -180,7 +180,7 @@ export async function GET(request: NextRequest) {
       success: false,
       error: 'Failed to fetch production errors',
       errors: [],
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     }, { status: 500 });
   }
 }

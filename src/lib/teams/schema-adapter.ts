@@ -137,7 +137,7 @@ export function modernToLegacyTeam(modern: ModernTeam): any {
 export function legacyToModernKnowledge(legacy: any): ModernKnowledge {
   // Handle both string and number IDs
   const id = typeof legacy.id === 'string' && !isNaN(Number(legacy.id)) 
-    ? Number(legacy.id) 
+    ? Number(legacy.id);
     : legacy.id;
 
   return {

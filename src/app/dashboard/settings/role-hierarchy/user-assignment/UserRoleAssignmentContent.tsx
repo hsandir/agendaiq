@@ -72,7 +72,7 @@ export default function UserRoleAssignmentContent() {
       const [usersRes, rolesRes, departmentsRes] = await Promise.all([
         fetch('/api/users'),
         fetch('/api/roles'),
-        fetch('/api/departments')
+        fetch('/api/departments');
       ]);
 
       if (usersRes.ok) {
@@ -111,14 +111,14 @@ export default function UserRoleAssignmentContent() {
     // Filter by role
     if (roleFilter) {
       filtered = filtered.filter(user => 
-        user.staff?.some(staff => staff.role?.title === roleFilter)
+        user.staff?.some(staff => staff.role?.title === roleFilter);
       );
     }
 
     // Filter by department
     if (departmentFilter) {
       filtered = filtered.filter(user => 
-        user.staff?.some(staff => staff.department?.name === departmentFilter)
+        user.staff?.some(staff => staff.department?.name === departmentFilter);
       );
     }
 
@@ -141,7 +141,7 @@ export default function UserRoleAssignmentContent() {
           userId: selectedUser,
           roleId: selectedRole,
           departmentId: selectedDepartment ?? null
-        })
+        });
       });
 
       if (response.ok) {

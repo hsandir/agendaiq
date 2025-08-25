@@ -265,7 +265,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
           idx === i ? { 
             ...s, 
             status: 'failed',
-            error: String(error)
+            error: String(error);
           } : s
         ));
         failedCount++;
@@ -358,7 +358,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
             errorMessage: errorMessage,
             dryRun: false,
             customSuggestion // Pass the custom suggestion
-          })
+          });
         });
 
         const data = await response.json();
@@ -393,7 +393,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
           errorType: errorType,
           errorMessage: errorMessage,
           dryRun: false
-        })
+        });
       });
 
       const data = await response.json();

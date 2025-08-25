@@ -69,7 +69,7 @@ export function createAuthErrorResponse(
     { 
       error,
       code: statusCode === 401 ? 'UNAUTHORIZED' : 'FORBIDDEN',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     },
     { status: statusCode }
   );
@@ -100,7 +100,7 @@ export function withAPIAuth(
         { 
           error: error instanceof Error ? error.message : 'Internal server error',
           code: 'INTERNAL_ERROR',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString();
         },
         { status: 500 }
       );
@@ -128,7 +128,7 @@ export function hasResourcePermission(
     return false;
   }
 
-  const { __staff } = user;
+  const { staff } = user;
   
   switch (resourceType) {
     case 'meeting':
@@ -256,7 +256,7 @@ export function createValidationErrorResponse(
       error: message,
       code: 'VALIDATION_ERROR',
       missing,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString();
     },
     { status: 400 }
   );

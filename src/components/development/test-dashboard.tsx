@@ -82,59 +82,56 @@ export default function TestDashboard() {
   const [selectedSuite, setSelectedSuite] = useState<string | null>(null)
   const [testResults, setTestResults] = useState<TestResult[]>([])
   const [coverage, setCoverage] = useState<CoverageReport | null>(null)
-  const [isRunning, setIsRunning] = useState(false)
+  const [isRunning, setIsRunning] = useState(false);
   const [output, setOutput] = useState<string[]>([])
   const [filter, setFilter] = useState<string>('')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [testHistory, setTestHistory] = useState<TestHistory[]>([])
   const [untestedFiles, setUntestedFiles] = useState<{ components: string[], apis: string[] }>({ components: [], apis: [] })
-  const [activeTab, setActiveTab] = useState('results')
-  const [showAutofixModal, setShowAutofixModal] = useState(false)
-
+  const [activeTab, setActiveTab] = useState('results');
+  const [showAutofixModal, setShowAutofixModal] = useState(false);
   useEffect(() => {
-    loadTestSuites()
-    loadTestHistory()
-    loadUntestedFiles()
+    loadTestSuites();
+    loadTestHistory();
+    loadUntestedFiles();
   }, [])
 
   const loadTestSuites = async () => {
     try {
-      const response = await fetch('/api/tests/suites')
-      const data = await response.json()
-      setTestSuites(data.suites ?? [])
+      const response = await fetch('/api/tests/suites');
+      const data = await response.json();
+      setTestSuites(data.suites ?? []);
     } catch (error: unknown) {
-      console.error('Failed to load test suites:', error)
+      console.error('Failed to load test suites:', error);
     }
   }
 
   const loadTestHistory = async () => {
     try {
-      const response = await fetch('/api/tests/history')
-      if (!response.ok) throw new Error('Failed to fetch test history')
-      
-      const data = await response.json()
-      setTestHistory(data.history ?? [])
+      const response = await fetch('/api/tests/history');
+      if (!response.ok) throw new Error('Failed to fetch test history');
+      const data = await response.json();
+      setTestHistory(data.history ?? []);
     } catch (error: unknown) {
-      console.error('Failed to load test history:', error)
-      setTestHistory([])
+      console.error('Failed to load test history:', error);
+      setTestHistory([]);
     }
   }
 
   const loadUntestedFiles = async () => {
     try {
-      const response = await fetch('/api/tests/generate')
-      const data = await response.json()
-      setUntestedFiles(data.untested || { components: [], apis: [] })
+      const response = await fetch('/api/tests/generate');
+      const data = await response.json();
+      setUntestedFiles(data.untested || { components: [], apis: [] });
     } catch (error: unknown) {
-      console.error('Failed to load untested files:', error)
+      console.error('Failed to load untested files:', error);
     }
   }
 
   const runTests = async (suitePath?: string, options: { coverage?: boolean, watch?: boolean } = {}) => {
-    setIsRunning(true)
-    setOutput([])
-    setTestResults([])
-    
+    setIsRunning(true);
+    setOutput([]);
+    setTestResults([]);
     try {
       const response = await fetch('/api/tests/run', {
         method: 'POST',
@@ -143,20 +140,19 @@ export default function TestDashboard() {
           suite: suitePath,
           coverage: options.coverage,
           watch: options.watch
-        })
+        });
       })
       
       if (!response.ok) {
-        const error = await response.text()
-        throw new Error(error || 'Failed to run tests')
+        const error = await response.text();
+        throw new Error(error || 'Failed to run tests');
       }
       
       // Handle regular JSON response (non-streaming)
-      const data = await response.json()
-      
+      const data = await response.json();
       // Update output with test results
       if (data.output && Array.isArray(data.output)) {
-        setOutput(data.output)
+        setOutput(data.output);
       }
       
       // Parse test results
@@ -177,12 +173,12 @@ export default function TestDashboard() {
             })
           }
         })
-        setTestResults(results)
+        setTestResults(results);
       }
       
       // Update coverage if available
       if (data.coverage) {
-        setCoverage(data.coverage)
+        setCoverage(data.coverage);
       }
       
       // Update suite status
@@ -203,10 +199,10 @@ export default function TestDashboard() {
       }
       
     } catch (error: unknown) {
-      console.error('Test run failed:', error)
-      setOutput(prev => [...prev, `Error: ${error}`])
+      console.error('Test run failed:', error);
+      setOutput(prev => [...prev, `Error: ${error}`]);
     } finally {
-      setIsRunning(false)
+      setIsRunning(false);
     }
   }
 
@@ -215,16 +211,16 @@ export default function TestDashboard() {
       const response = await fetch('/api/tests/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filePath })
+        body: JSON.stringify({ filePath });
       })
       
-      const data = await response.json()
+      const data = await response.json();
       if (data.success) {
-        await loadTestSuites()
-        await loadUntestedFiles()
+        await loadTestSuites();
+        await loadUntestedFiles();
       }
     } catch (error: unknown) {
-      console.error('Failed to generate test:', error)
+      console.error('Failed to generate test:', error);
     }
   }
 
@@ -244,11 +240,11 @@ export default function TestDashboard() {
     }
     
     const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
     a.href = url
     a.download = `test-report-${new Date().toISOString().split('T')[0]}.json`
-    a.click()
+    a.click();
   }
 
   const getStatusIcon = (status: string) => {
@@ -411,8 +407,8 @@ export default function TestDashboard() {
                       className="mt-2 w-full"
                       variant="outline"
                       onClick={(e) => {
-                        e.stopPropagation()
-                        runTests(suite.path)
+                        e.stopPropagation();
+                        runTests(suite.path);
                       }}
                       disabled={isRunning}
                     >
@@ -568,7 +564,7 @@ export default function TestDashboard() {
                     {output.length === 0 ? (
                       <span className="text-muted-foreground">No output yet...</span>
                     ) : (
-                      output.join('\n')
+                      output.join('\n');
                     )}
                   </pre>
                 </ScrollArea>
@@ -606,7 +602,7 @@ export default function TestDashboard() {
                     <div className="space-y-2">
                       {testHistory
                         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                        .slice(0, 10)
+                        .slice(0, 10);
                         .map((run, index) => (
                         <div key={index} className="p-3 border rounded-lg">
                           <div className="flex justify-between items-center">

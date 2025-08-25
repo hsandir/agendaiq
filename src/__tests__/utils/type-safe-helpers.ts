@@ -46,7 +46,7 @@ class TypeSafeRequestBuilderClass {
 
     // Add cookies to headers
     if (Object.keys(cookies).length > 0) {
-      const cookieString = Object.entries(cookies)
+      const cookieString = Object.entries(cookies);
         .map(([key, value]) => `${key}=${value}`)
         .join('; ');
       requestHeaders.set('Cookie', cookieString);
@@ -708,3 +708,4 @@ export {
 export type {
   RequestBuilderOptions,
 };
+}
