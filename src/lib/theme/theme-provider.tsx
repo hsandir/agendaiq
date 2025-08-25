@@ -72,7 +72,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
         globalThemeState.customTheme = parsed;
         setCustomTheme(parsed);
       } catch (e: unknown) {
-        console.error("Failed to parse custom theme")
+        console.error("Failed to parse custom theme");
       }
     }
 

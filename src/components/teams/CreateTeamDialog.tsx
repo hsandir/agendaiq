@@ -1,127 +1,193 @@
-'use client'
-import React, { useState, useEffect, useCallback } from 'react'import {
+'use client';
+
+import React, { useState, useEffect, useCallback } from 'react';
+import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'import { Button } from '@/components/ui/button'import { Input } from '@/components/ui/input'import { Label } from '@/components/ui/label'import { Textarea } from '@/components/ui/textarea'import {
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'import { Checkbox } from '@/components/ui/checkbox'import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'import { Badge } from '@/components/ui/badge'import { ScrollArea } from '@/components/ui/scroll-area'import { Loader2, Users, UserCheck, Search } from 'lucide-react'import { useToast } from '@/components/ui/use-toast'
+} from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Loader2, Users, UserCheck, Search } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+
 interface CreateTeamDialogProps {
-  open: boolean  onOpenChange: (open: boolean) => void  onSubmit: (data: TeamFormData) => Promise<void>
-;}
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (data: TeamFormData) => Promise<void>;
+}
 
 interface TeamFormData {
-  name: string  description?: string  type: string  purpose: string  initial_members?: number[]; // staff_ids
+  name: string;
+  description?: string;
+  type: string;
+  purpose: string;
+  initial_members?: number[]; // staff_ids
 }
 
 interface StaffMember {
-  id: number  users: {
-    id: number    name: string | null    email: string    image?: string | null  }  role: {
-    id: number    title: string
-  ;}  department: {
-    id: number    name: string
-  ;}}
+  id: number;
+  users: {
+    id: number;
+    name: string | null;
+    email: string;
+    image?: string | null;
+  };
+  role: {
+    id: number;
+    title: string;
+  };
+  department: {
+    id: number;
+    name: string;
+  };
+}
 
 const TEAM_TYPES = [
   { value: 'DEPARTMENT', label: 'Department' },
-  { value: 'PROJECT', label: 'Project Team' ;},
-  { value: 'COMMITTEE', label: 'Committee' ;},
-  { value: 'SUBJECT', label: 'Subject Team' ;},
-  { value: 'GRADE_LEVEL', label: 'Grade Level' ;},
-  { value: 'SPECIAL', label: 'Special Team' ;},
-]
+  { value: 'PROJECT', label: 'Project Team' },
+  { value: 'COMMITTEE', label: 'Committee' },
+  { value: 'SUBJECT', label: 'Subject Team' },
+  { value: 'GRADE_LEVEL', label: 'Grade Level' },
+  { value: 'SPECIAL', label: 'Special Team' },
+];
+
 export function CreateTeamDialog({
   open,
   onOpenChange,
   onSubmit,
 }: CreateTeamDialogProps) {
-  const { _toast } = useToast()  const [loading, setLoading] = useState(false)  const [staffLoading, setStaffLoading] = useState(false)  const [staff, setStaff] = useState<StaffMember[]>([])  const [selectedMembers, setSelectedMembers] = useState<number[]>([])  const [memberSearch, setMemberSearch] = useState('')  const [formData, setFormData] = useState<TeamFormData>({
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [staffLoading, setStaffLoading] = useState(false);
+  const [staff, setStaff] = useState<StaffMember[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  const [memberSearch, setMemberSearch] = useState('');
+  const [formData, setFormData] = useState<TeamFormData>({
     name: '',
     description: '',
     type: 'DEPARTMENT',
     purpose: '',
     initial_members: [],
-  })
+  });
+
   const fetchStaff = useCallback(async () => {
     try {
-      setStaffLoading(true)      const response = await fetch('/api/users?include=staff')      
+      setStaffLoading(true);
+      const response = await fetch('/api/users?include=staff');
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch staff')      }
+        throw new Error('Failed to fetch staff');
+      }
 
-      const data = await response.json() as { users: Array<{ staff: StaffMember[] ;}> }      setStaff(data.users.filter((user) => user.staff && user.staff.length > 0).map((user) => user.staff[0]))    } catch (error) {
-      console.error('Error fetching staff:', error)      toast({
+      const data = await response.json() as { users: Array<{ staff: StaffMember[] }> };
+      setStaff(data.users.filter((user) => user.staff && user.staff.length > 0).map((user) => user.staff[0]));
+    } catch (error) {
+      console.error('Error fetching staff:', error);
+      toast({
         title: 'Error',
         description: 'Failed to load staff members',
         variant: 'destructive',
-      })    } finally {
-      setStaffLoading(false)    }
-  }, [toast])
+      });
+    } finally {
+      setStaffLoading(false);
+    }
+  }, [toast]);
+
   // Fetch staff when dialog opens
   useEffect(() => {
     if (open) {
-      void fetchStaff()    }
-  }, [open, fetchStaff])
+      void fetchStaff();
+    }
+  }, [open, fetchStaff]);
 
   const toggleMember = (staffId: number) => {
     setSelectedMembers(prev => 
       prev.includes(staffId)
         ? prev.filter(id => id !== staffId)
         : [...prev, staffId]
-    )  }
+    );
+  };
+
   const filteredStaff = staff.filter(member => 
     memberSearch === '' || 
     (member.users.name?.toLowerCase().includes(memberSearch.toLowerCase()) ?? false) ||
     member.users.email.toLowerCase().includes(memberSearch.toLowerCase()) ||
     member.role.title.toLowerCase().includes(memberSearch.toLowerCase()) ||
     member.department.name.toLowerCase().includes(memberSearch.toLowerCase())
-  )
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!formData.name.trim()) {
       toast({
         title: 'Error',
         description: 'Team name is required',
         variant: 'destructive',
-      })      return    }
+      });
+      return;
+    }
 
     if (!formData.purpose.trim()) {
       toast({
         title: 'Error',
         description: 'Team purpose is required',
         variant: 'destructive',
-      })      return    }
+      });
+      return;
+    }
 
-    setLoading(true)    try {
+    setLoading(true);
+    try {
       // Include selected members in form data
       const teamDataWithMembers = {
         ...formData,
         initial_members: selectedMembers.length > 0 ? selectedMembers : undefined,
-      }      
-      await onSubmit(teamDataWithMembers)      toast({
+      };
+      
+      await onSubmit(teamDataWithMembers);
+      toast({
         title: 'Success',
         description: 'Team created successfully',
-      })      // Reset form
+      });
+      // Reset form
       setFormData({
         name: '',
         description: '',
         type: 'DEPARTMENT',
         purpose: '',
         initial_members: [],
-      })      setSelectedMembers([])      setMemberSearch('')      onOpenChange(false)    } catch {
+      });
+      setSelectedMembers([]);
+      setMemberSearch('');
+      onOpenChange(false);
+    } catch {
       toast({
         title: 'Error',
         description: 'Failed to create team',
         variant: 'destructive',
-      })    } finally {
-      setLoading(false)    }
-  }
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
@@ -140,7 +206,8 @@ export function CreateTeamDialog({
                 placeholder="Enter team name"
                 value={formData.name}
                 onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value ;})                }
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 disabled={loading}
               />
             </div>
@@ -149,7 +216,8 @@ export function CreateTeamDialog({
               <Select
                 value={formData.type}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, type: value ;})                }
+                  setFormData({ ...formData, type: value })
+                }
                 disabled={loading}
               >
                 <SelectTrigger id="type">
@@ -171,7 +239,8 @@ export function CreateTeamDialog({
                 placeholder="What is the main purpose of this team?"
                 value={formData.purpose}
                 onChange={(e) =>
-                  setFormData({ ...formData, purpose: e.target.value ;})                }
+                  setFormData({ ...formData, purpose: e.target.value })
+                }
                 disabled={loading}
                 rows={2}
               />
@@ -183,7 +252,8 @@ export function CreateTeamDialog({
                 placeholder="Enter team description"
                 value={formData.description}
                 onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value ;})                }
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 disabled={loading}
                 rows={3}
               />
@@ -279,4 +349,5 @@ export function CreateTeamDialog({
         </form>
       </DialogContent>
     </Dialog>
-  )}
+  );
+}

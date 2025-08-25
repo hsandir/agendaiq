@@ -72,9 +72,9 @@ export async function GET(request: NextRequest) {
     );
 
     stats.ipDistribution = Object.fromEntries(
-      Object.entries(stats.ipDistribution);
+      Object.entries(stats.ipDistribution)
         .sort(([,a], [,b]) => (b as number) - (a as number))
-        .slice(0, 10);
+        .slice(0, 10)
     );
 
     return NextResponse.json({

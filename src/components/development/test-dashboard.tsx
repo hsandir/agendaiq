@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -51,7 +51,7 @@ interface TestResult {
   error?: string
   file?: string
   line?: number;
-;}
+}
 
 interface CoverageReport {
   statements: { total: number; covered: number; percentage: number ;}
@@ -87,7 +87,7 @@ export default function TestDashboard() {
   const [filter, setFilter] = useState<string>('')
   const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [testHistory, setTestHistory] = useState<TestHistory[]>([])
-  const [untestedFiles, setUntestedFiles] = useState<{ components: string[], apis: string[] ;}>({ components: [], apis: [] ;})
+  const [untestedFiles, setUntestedFiles] = useState<{ components: string[], apis: string[] }>({ components: [], apis: [] })
   const [activeTab, setActiveTab] = useState('results');
   const [showAutofixModal, setShowAutofixModal] = useState(false);
   useEffect(() => {
@@ -122,7 +122,7 @@ export default function TestDashboard() {
     try {
       const response = await fetch('/api/tests/generate');
       const data = await response.json();
-      setUntestedFiles(data.untested || { components: [], apis: [] ;});
+      setUntestedFiles(data.untested || { components: [], apis: [] });
     } catch (error: unknown) {
       console.error('Failed to load untested files:', error);
     }
@@ -140,7 +140,7 @@ export default function TestDashboard() {
           suite: suitePath,
           coverage: options.coverage,
           watch: options.watch
-        ;})
+        })
       })
       
       if (!response.ok) {
@@ -169,7 +169,7 @@ export default function TestDashboard() {
                 error: test.failureMessages ? test.failureMessages.join('\n') : undefined,
                 file: suite.name,
                 line: 0
-              ;})
+              })
             })
           }
         })
@@ -192,7 +192,7 @@ export default function TestDashboard() {
               failed: data.results?.failed || 0,
               skipped: data.results?.skipped || 0,
               duration: data.results?.duration || 0
-            ;}
+            }
           }
           return suite
         }))

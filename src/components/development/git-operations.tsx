@@ -23,7 +23,7 @@ import {
   Upload,
   Terminal,
   Clock,
-  users,
+  Users,
   Hash,
   AlertCircle,
   ChevronRight,
@@ -504,7 +504,7 @@ export default function GitOperations() {
                           <p className="font-medium text-sm">{commit.message}</p>
                           <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">
-                              <User className="h-3 w-3" />
+                              <Users className="h-3 w-3" />
                               {commit.author}
                             </span>
                             <span className="flex items-center gap-1">
@@ -568,7 +568,7 @@ export default function GitOperations() {
                       key={branch.name}
                       className={`p-3 border rounded-lg ${
                         branch.current ? 'border-blue-500 bg-primary' : 'hover:bg-muted'
-                      ;}`}
+                      }`}
                     >
                       <div className="flex justify-between items-center">
                         <div className="flex items-center gap-2">
@@ -631,7 +631,7 @@ export default function GitOperations() {
                   {terminalOutput.length === 0 ? (
                     <span className="text-muted-foreground">No commands executed yet...</span>
                   ) : (
-                    terminalOutput.join('\n');
+                    terminalOutput.join('\n')
                   )}
                 </pre>
               </ScrollArea>

@@ -310,7 +310,7 @@ export function can(
         capability.includes('manage') || 
         capability.includes('view') ||
         capability.startsWith('meeting:')) {
-      return true
+      return true;
     }
   }
   
@@ -351,7 +351,7 @@ export function isOpsAdmin(user: UserWithCapabilities | null | undefined): boole
 }
 
 export function isAnyAdmin(user: UserWithCapabilities | null | undefined): boolean {
-  return isDevAdmin(user) || isOpsAdmin(user)
+  return isDevAdmin(user) || isOpsAdmin(user);
 }
 
 // Canonical RoleKey check helper

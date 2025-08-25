@@ -38,31 +38,29 @@ export interface RepeatConfig {
   includeAgenda: boolean; // Whether to copy agenda to all meetings
   exceptions?: string[]; // Dates to skip (holidays, etc)
 }
-;
 interface RepeatMeetingModalProps {
   isOpen: boolean;
   onClose: () => void;
   startDate: string;
   endDate: string;
   onConfirm: (config: RepeatConfig) => void
-;}
-;
+}
 const WEEKDAYS = [
-  { value: 1, label: 'Monday', short: 'Mon' ;},
-  { value: 2, label: 'Tuesday', short: 'Tue' ;},
-  { value: 3, label: 'Wednesday', short: 'Wed' ;},
-  { value: 4, label: 'Thursday', short: 'Thu' ;},
-  { value: 5, label: 'Friday', short: 'Fri' ;},
-  { value: 6, label: 'Saturday', short: 'Sat' ;},
-  { value: 0, label: 'Sunday', short: 'Sun' ;},
+  { value: 1, label: 'Monday', short: 'Mon' },
+  { value: 2, label: 'Tuesday', short: 'Tue' },
+  { value: 3, label: 'Wednesday', short: 'Wed' },
+  { value: 4, label: 'Thursday', short: 'Thu' },
+  { value: 5, label: 'Friday', short: 'Fri' },
+  { value: 6, label: 'Saturday', short: 'Sat' },
+  { value: 0, label: 'Sunday', short: 'Sun' },
 ];
 
 const MONTH_WEEKS = [
-  { value: 1, label: 'First' ;},
-  { value: 2, label: 'Second' ;},
-  { value: 3, label: 'Third' ;},
-  { value: 4, label: 'Fourth' ;},
-  { value: -1, label: 'Last' ;},
+  { value: 1, label: 'First' },
+  { value: 2, label: 'Second' },
+  { value: 3, label: 'Third' },
+  { value: 4, label: 'Fourth' },
+  { value: -1, label: 'Last' },
 ];
 
 export function RepeatMeetingModal({ 
@@ -92,7 +90,7 @@ export function RepeatMeetingModal({
     if (config.enabled) {
       const dates = calculateMeetingDates(startDate, config);
       setPreviewDates(dates.slice(0, 10)); // Show first 10 occurrences
-    };
+    }
   }, [config, startDate]);
 
   const calculateMeetingDates = (start: string, conf: RepeatConfig): Date[] => {
@@ -107,7 +105,7 @@ export function RepeatMeetingModal({
       if (isNaN(currentDate.getTime())) {
         console.error('Invalid start date:', start);
         return dates;
-      };
+      }
     } catch (error: unknown) {
       console.error('Error parsing start date:', error);
       return dates;
@@ -121,12 +119,11 @@ export function RepeatMeetingModal({
         endDateLimit = new Date(conf.endDate);
         if (isNaN(endDateLimit.getTime())) {
           endDateLimit = null;
-        };
+        }
       } catch {
         endDateLimit = null;
-      };
+      }
     }
-;
     for (let i = 0; i < maxDates; i++) {
       if (endDateLimit && currentDate > endDateLimit) break;
 
@@ -137,13 +134,12 @@ export function RepeatMeetingModal({
           return !isNaN(exDate.getTime()) && isSameDay(exDate, currentDate);
         } catch {
           return false;
-        };
+        }
       });
       
       if (!isException) {
         dates.push(new Date(currentDate));
       }
-;
       // Calculate next date based on pattern
       switch (conf.pattern) {
         case 'daily':
@@ -163,7 +159,7 @@ export function RepeatMeetingModal({
             currentDate = getMonthlyWeekdayDate(currentDate, conf.monthWeek, conf.monthWeekDay);
           } else {
             currentDate = addMonths(currentDate, 1);
-          };
+          }
           break;
         case 'custom':
           if (conf.weekDays && conf.weekDays.length > 0) {
@@ -175,18 +171,17 @@ export function RepeatMeetingModal({
                 currentDate = nextDate;
                 found = true;
                 break;
-              };
-            };
+              }
+            }
             if (!found) currentDate = addWeeks(currentDate, 1);
           } else {
             currentDate = addDays(currentDate, conf.interval ?? 1);
-          };
+          }
           break;
-      };
+      }
     }
-;
     return dates;
-  };
+  }
   const getMonthlyWeekdayDate = (date: Date, week: number, weekday: number): Date => {
     const nextMonth = addMonths(date, 1);
     const firstDay = startOfMonth(nextMonth);
@@ -196,7 +191,7 @@ export function RepeatMeetingModal({
       const lastDay = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
       for (let d = lastDay; d >= firstDay; d = addDays(d, -1)) {
         if (getDay(d) === weekday) return d;
-      };
+      }
     } else {
       // Nth occurrence of weekday in month
       let count = 0;
@@ -204,19 +199,19 @@ export function RepeatMeetingModal({
         if (getDay(d) === weekday) {
           count++;
           if (count === week) return d;
-        };
-      };
+        }
+      }
     }
-    ;
+    
     return nextMonth;
-  };
+  }
   const handleConfirm = () => {
     onConfirm({
       ...config,
       exceptions: selectedExceptionDates,
     });
     onClose();
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -238,7 +233,7 @@ export function RepeatMeetingModal({
               <Label className="text-base font-semibold mb-3 block">Repeat Pattern</Label>
               <RadioGroup
                 value={config.pattern}
-                onValueChange={(value) => setConfig({ ...config, pattern: value as RepeatConfig['pattern'] ;})}
+                onValueChange={(value) => setConfig({ ...config, pattern: value as RepeatConfig['pattern'] })}
               >
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted">
@@ -292,7 +287,7 @@ export function RepeatMeetingModal({
                       min="1"
                       max="99"
                       value={config.interval}
-                      onChange={(e) => setConfig({ ...config, interval: parseInt(e.target.value) ?? 1 ;})}
+                      onChange={(e) => setConfig({ ...config, interval: parseInt(e.target.value) ?? 1 })}
                       className="w-20"
                     />
                     <span>day(s)</span>
@@ -339,7 +334,7 @@ export function RepeatMeetingModal({
                         monthDay: new Date(startDate).getDate(),
                         monthWeek: undefined,
                         monthWeekDay: undefined
-                      ;});
+                      });
                     } else {
                       const date = new Date(startDate);
                       setConfig({ 
@@ -347,7 +342,7 @@ export function RepeatMeetingModal({
                         monthDay: undefined,
                         monthWeek: Math.ceil(date.getDate() / 7),
                         monthWeekDay: getDay(date)
-                      ;});
+                      });
                     }
                   }}
                 >
@@ -365,7 +360,7 @@ export function RepeatMeetingModal({
                         <select
                           className="border rounded px-2 py-1 text-sm"
                           value={config.monthWeek ?? 1}
-                          onChange={(e) => setConfig({ ...config, monthWeek: parseInt(e.target.value) ;})}
+                          onChange={(e) => setConfig({ ...config, monthWeek: parseInt(e.target.value) })}
                         >
                           {MONTH_WEEKS.map(week => (
                             <option key={week.value} value={week.value}>{week.label}</option>
@@ -374,7 +369,7 @@ export function RepeatMeetingModal({
                         <select
                           className="border rounded px-2 py-1 text-sm"
                           value={config.monthWeekDay ?? 0}
-                          onChange={(e) => setConfig({ ...config, monthWeekDay: parseInt(e.target.value) ;})}
+                          onChange={(e) => setConfig({ ...config, monthWeekDay: parseInt(e.target.value) })}
                         >
                           {WEEKDAYS.map(day => (
                             <option key={day.value} value={day.value}>{day.label}</option>
@@ -392,7 +387,7 @@ export function RepeatMeetingModal({
               <Label className="text-base font-semibold mb-3 block">End Date</Label>
               <RadioGroup
                 value={config.endType}
-                onValueChange={(value) => setConfig({ ...config, endType: value as RepeatConfig['endType'] ;})}
+                onValueChange={(value) => setConfig({ ...config, endType: value as RepeatConfig['endType'] })}
               >
                 <div className="space-y-3">
                   <div className="flex items-center space-x-2">
@@ -408,7 +403,7 @@ export function RepeatMeetingModal({
                         min="1"
                         max="365"
                         value={config.occurrences ?? 10}
-                        onChange={(e) => setConfig({ ...config, occurrences: parseInt(e.target.value) ?? 10 ;})}
+                        onChange={(e) => setConfig({ ...config, occurrences: parseInt(e.target.value) ?? 10 })}
                         className="w-20"
                         disabled={config.endType !== 'after'}
                       />
@@ -422,7 +417,7 @@ export function RepeatMeetingModal({
                       <Input
                         type="date"
                         value={config.endDate ?? ''}
-                        onChange={(e) => setConfig({ ...config, endDate: e.target.value ;})}
+                        onChange={(e) => setConfig({ ...config, endDate: e.target.value })}
                         className="w-40"
                         disabled={config.endType !== 'by'}
                         min={startDate.split('T')[0]}
@@ -444,7 +439,7 @@ export function RepeatMeetingModal({
               <Switch
                 id="include-agenda"
                 checked={config.includeAgenda}
-                onCheckedChange={(checked) => setConfig({ ...config, includeAgenda: checked ;})}
+                onCheckedChange={(checked) => setConfig({ ...config, includeAgenda: checked })}
               />
             </div>
 
@@ -486,7 +481,7 @@ export function RepeatMeetingModal({
                               ×
                             </button>
                           </Badge>
-                        ));}
+                        ))}
                       </div>
                     )}
                   </div>
