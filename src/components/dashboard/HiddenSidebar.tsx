@@ -151,7 +151,7 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
   );
 
   return (
-    <>
+    <div>
       {/* Logo Trigger Button */}
       <div className="fixed top-4 left-4 z-[100]">
         <button
@@ -276,6 +276,6 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
           </div>
         </div>
       </aside>
-    </>
+    </div>
   );
 } 
