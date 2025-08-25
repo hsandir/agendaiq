@@ -44,6 +44,10 @@ function isValidUserData(data: unknown): data is User {
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: "jwt",
+    maxAge: 8 * 60 * 60, // 8 hours - matches JWT
+  },
   jwt: {
     maxAge: 8 * 60 * 60, // 8 hours for JWT token
   },

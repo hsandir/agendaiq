@@ -71,7 +71,7 @@ interface TabsTriggerProps {
 }
 
 const TabsTrigger = ({ value, children, className }: TabsTriggerProps) => {
-  const { value: _selectedValue, _onValueChange } = useTabsContext();
+  const { value: selectedValue, onValueChange } = useTabsContext();
   const isActive = selectedValue === value;
 
   return (

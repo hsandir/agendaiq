@@ -38,9 +38,9 @@ export async function POST(request: NextRequest) {
 
     // Verify the token
     const verified = speakeasy.totp.verify({
-      secret: dbUser?.two_factor_secret,
-      encoding: 'base32',
-      token: body?.token,
+      secret: dbUser.two_factor_secret,
+      encoding: 'base32' as const,
+      token: String(body.token),
       window: 2
     });
 

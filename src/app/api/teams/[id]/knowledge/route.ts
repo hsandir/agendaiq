@@ -6,13 +6,16 @@ import { z } from 'zod';
 import { FEATURES } from '@/lib/features/feature-flags';
 import { randomBytes } from 'crypto';
 
-// Knowledge creation schema
+// Knowledge creation schema - Fixed to match frontend
 const createKnowledgeSchema = z.object({
   title: z.string().min(1).max(200),
-  content: z.string().min(1),
-  type: z.enum(['DOCUMENT', 'LINK', 'NOTE', 'TEMPLATE', 'GUIDE', 'POLICY']),
-  tags: z.array(z.string()).optional(),
-  url: z.string().url().optional(),
+  description: z.string().optional().nullable(),
+  content: z.string().optional().nullable(), // Made optional for file uploads
+  type: z.enum(['DOCUMENT', 'LINK', 'NOTE', 'PRESENTATION', 'SPREADSHEET', 'CODE', 'IMAGE', 'VIDEO', 'OTHER']),
+  category: z.string().min(1), // Added required category
+  tags: z.array(z.string()).optional().nullable(),
+  url: z.string().optional().nullable(),
+  is_public: z.boolean().optional().default(false),
   metadata: z.record(z.unknown()).optional(),
 });
 
@@ -95,7 +98,7 @@ export async function GET(
     }
 
     // Get knowledge resources with search and filtering
-    const { _searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
     const type = searchParams.get('type');
     const tags = searchParams.get('tags')?.split(',');

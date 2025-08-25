@@ -36,7 +36,7 @@ export class MeetingContinuityService {
           assigned_to: true,
           AssignedToRole: true
         }
-      });
+      })
     ]);
 
     return {

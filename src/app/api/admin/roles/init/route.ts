@@ -21,10 +21,10 @@ export async function POST(request: NextRequest) {
     }
 
     const roles = [
-      { title: 'Administrator', priority: 1, department_id: parseInt(defaultDepartment?.id) },
-      { title: 'STEM Chair', priority: 2, department_id: parseInt(defaultDepartment?.id) },
-      { title: 'Department Chair', priority: 3, department_id: parseInt(defaultDepartment?.id) },
-      { title: 'Teacher', priority: 4, department_id: parseInt(defaultDepartment?.id) },
+      { title: 'Administrator', priority: 1, department_id: defaultDepartment.id },
+      { title: 'STEM Chair', priority: 2, department_id: defaultDepartment.id },
+      { title: 'Department Chair', priority: 3, department_id: defaultDepartment.id },
+      { title: 'Teacher', priority: 4, department_id: defaultDepartment.id },
     ];
 
     const createdRoles = [];

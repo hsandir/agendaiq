@@ -33,7 +33,7 @@ export class TestGenerator {
   private static analyzeComponent(content: string, filePath: string): ComponentInfo {
     const fileName = path.basename(filePath, path.extname(filePath))
     const componentName = fileName.split('-').map(part => 
-      part.charAt(0).toUpperCase() + part.slice(1);
+      part.charAt(0).toUpperCase() + part.slice(1)
     ).join('');
     // Extract props from interface or type definition
     // Using [\s\S] instead of . with /s flag for ES2017 compatibility
@@ -258,7 +258,7 @@ describe('${path.basename(info._path, '.ts')} API', () => {
     const isComponent = ext === '.tsx' || (ext === '.jsx' && !filePath.includes('api'))
     
     const testContent = isComponent 
-      ? await this.generateComponentTest(filePath);
+      ? await this.generateComponentTest(filePath)
       : await this.generateApiTest(filePath);
     // Determine test file path
     const relativePath = path.relative('src', filePath);

@@ -23,7 +23,7 @@ export const devLogger = new DevLogger({
     new ConsoleTransport(LogLevel.DEBUG),
     new DatabaseTransport(LogLevel.INFO),
     new FileTransport(LogLevel.DEBUG),
-    new RealtimeTransport(LogLevel.WARN, 'dev-monitoring');
+    new RealtimeTransport(LogLevel.WARN, 'dev-monitoring')
   ],
   context: {
     service: 'AgendaIQ',
@@ -41,7 +41,7 @@ export const auditLogger = new AuditLogger({
   transports: [
     new DatabaseTransport(LogLevel.TRACE), // Audit logs capture everything
     new FileTransport(LogLevel.TRACE),
-    new RealtimeTransport(LogLevel.INFO, 'audit-monitoring');
+    new RealtimeTransport(LogLevel.INFO, 'audit-monitoring')
   ],
   context: {
     service: 'AgendaIQ-Audit',

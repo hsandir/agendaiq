@@ -20,9 +20,10 @@ export async function GET(request: NextRequest) {
 
     const { user } = auth;
 
-    // Get user's organization context
+    // Get user's organization context first (minimal query)
     const currentStaff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: user.id },
+      select: { school_id: true, district_id: true }
     });
 
     if (!currentStaff) {
@@ -32,16 +33,24 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch all staff from the same organization
+    // Build optimized where clause
+    const orgFilter: any[] = [];
+    if (currentStaff.school_id) {
+      orgFilter.push({ school_id: currentStaff.school_id });
+    }
+    if (currentStaff.district_id) {
+      orgFilter.push({ district_id: currentStaff.district_id });
+    }
+
+    // Single optimized query with only required fields
     const staff = await prisma.staff.findMany({
       where: {
-        OR: [
-          { school_id: currentStaff.school_id },
-          { district_id: currentStaff.district_id }
-        ],
+        OR: orgFilter,
         is_active: true
       },
-      include: {
+      select: {
+        id: true,
+        user_id: true,
         users: {
           select: {
             id: true,

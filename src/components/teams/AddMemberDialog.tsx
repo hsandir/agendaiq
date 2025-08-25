@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { MultiSelect, type MultiSelectOption } from '@/components/ui/multi-select';
+// Using individual Select instead of MultiSelect for better UX
 import { Loader2, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -102,14 +102,18 @@ export function AddMemberDialog({
     }
   };
 
-  // Transform staff to MultiSelectOptions (same as MeetingFormStep1)
-  const attendeeOptions: MultiSelectOption[] = availableStaff.map(staff => ({
+  // Transform staff to options for individual selection
+  const attendeeOptions = availableStaff.map(staff => ({
     value: staff.id.toString(),
     label: staff.users.name || staff.users.email,
     email: staff.users.email,
     department: staff.department?.name || null,
     role: staff.role.title || null
   }));
+
+  // Get unique departments and roles for filters (exactly like MeetingFormStep1)
+  const uniqueDepartments = Array.from(new Set(availableStaff.map(s => s.department?.name).filter(Boolean)));
+  const uniqueRoles = Array.from(new Set(availableStaff.map(s => s.role?.title).filter(Boolean)));
 
   const handleAddMembers = async () => {
     if (selectedStaffIds.length === 0) {
@@ -173,20 +177,71 @@ export function AddMemberDialog({
                 <span className="text-sm text-muted-foreground">Loading staff...</span>
               </div>
             ) : (
-              <MultiSelect
-                options={attendeeOptions}
-                selected={selectedStaffIds}
-                onChange={(newSelection) => {
-                  console.log("Staff selected:", newSelection);
-                  setSelectedStaffIds(newSelection);
-                }}
-                placeholder="Select staff members..."
-                label="Team Members"
-                showSearch={true}
-                showDepartmentFilter={false}
-                showRoleFilter={false}
-                maxHeight="300px"
-              />
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Add Team Member</Label>
+                  <Select
+                    value=""
+                    onValueChange={(value) => {
+                      if (value && !selectedStaffIds.includes(value)) {
+                        setSelectedStaffIds([...selectedStaffIds, value]);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a staff member to add..." />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {attendeeOptions
+                        .filter(option => !selectedStaffIds.includes(option.value))
+                        .map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            <div className="flex flex-col">
+                              <span className="font-medium">{option.label}</span>
+                              <span className="text-xs text-muted-foreground">{option.email}</span>
+                              {option.department && (
+                                <span className="text-xs text-muted-foreground">{option.department}</span>
+                              )}
+                            </div>
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Selected Members List */}
+                {selectedStaffIds.length > 0 && (
+                  <div className="space-y-2">
+                    <Label>Selected Members ({selectedStaffIds.length})</Label>
+                    <div className="space-y-2 max-h-[200px] overflow-y-auto border rounded-md p-2">
+                      {selectedStaffIds.map((staffId) => {
+                        const staff = attendeeOptions.find(opt => opt.value === staffId);
+                        if (!staff) return null;
+                        return (
+                          <div key={staffId} className="flex items-center justify-between bg-muted/50 rounded p-2">
+                            <div className="flex-1">
+                              <div className="font-medium text-sm">{staff.label}</div>
+                              <div className="text-xs text-muted-foreground">{staff.email}</div>
+                              {staff.department && (
+                                <div className="text-xs text-muted-foreground">{staff.department}</div>
+                              )}
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedStaffIds(selectedStaffIds.filter(id => id !== staffId));
+                              }}
+                            >
+                              Remove
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 

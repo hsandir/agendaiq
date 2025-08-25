@@ -100,30 +100,31 @@ export class EmailService {
       const result = await transporter.sendMail(mailOptions);
       console.log('Email sent successfully:', result.messageId);
     } catch (error) {
-    if (error instanceof Error) {
-      console.error('Failed to send email:', error);
-      throw new Error(`Email sending failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      if (error instanceof Error) {
+        console.error('Failed to send email:', error);
+        throw new Error(`Email sending failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
     }
   }
 
   async sendMeetingInvite(data: MeetingInviteData): Promise<void> {
-    await this.sendEmail(data)
+    await this.sendEmail(data);
   }
 
   async sendTeamNotification(data: TeamNotificationData): Promise<void> {
-    await this.sendEmail(data)
+    await this.sendEmail(data);
   }
 
   async sendPasswordReset(data: PasswordResetData): Promise<void> {
-    await this.sendEmail(data)
+    await this.sendEmail(data);
   }
 
   async sendVerificationEmail(data: VerificationEmailData): Promise<void> {
-    await this.sendEmail(data)
+    await this.sendEmail(data);
   }
 
   async sendNotification(data: EmailNotificationData): Promise<void> {
-    await this.sendEmail(data)
+    await this.sendEmail(data);
   }
 
   async verifyConnection(): Promise<boolean> {

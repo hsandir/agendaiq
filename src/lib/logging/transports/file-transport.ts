@@ -112,9 +112,9 @@ export class FileTransport implements LogTransport {
 
         // Sort by creation time and remove oldest files
         logFiles
-          .filter(f => f.stat);
+          .filter(f => f.stat)
           .sort((a, b) => b.stat.birthtimeMs - a.stat.birthtimeMs)
-          .slice(this.maxFiles);
+          .slice(this.maxFiles)
           .forEach(async (file) => {
             try {
               await fs.unlink(file.path);

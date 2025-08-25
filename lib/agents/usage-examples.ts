@@ -169,7 +169,8 @@ export async function customAgentIntegration() {
         console.log(`   ✅ Modified: ${filePath}`);
         
       } catch (error) {
-        console.log(`   ❌ Failed to modify: ${filePath} - ${error}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.log(`   ❌ Failed to modify: ${filePath} - ${errorMessage}`);
         throw error;
       }
     }
@@ -305,7 +306,8 @@ export function BrokenComponent() {
   } catch (error) {
     console.log('✅ Error properly caught and handled');
     console.log('✅ Automatic rollback completed');
-    return { success: false, error: error.message };
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return { success: false, error: errorMessage };
   }
 }
 
@@ -379,18 +381,20 @@ export async function runAllExamples() {
     
     try {
       const result = await exampleFunction();
-      results[exampleName as keyof typeof results] = {
+      (results as Record<string, any>)[exampleName] = {
         success: true,
         result
       };
       console.log(`✅ Example ${exampleName} completed successfully`);
       
     } catch (error) {
-      results[exampleName as keyof typeof results] = {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      (results as Record<string, any>)[exampleName] = {
         success: false,
-        error: error.message
+        error: errorMessage
       };
-      console.log(`❌ Example ${exampleName} failed: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.log(`❌ Example ${exampleName} failed: ${errorMessage}`);
     }
     
     // Brief pause between examples
@@ -402,14 +406,15 @@ export async function runAllExamples() {
   console.log('📊 EXAMPLES SUMMARY');
   console.log(`${'='.repeat(60)}`);
   
-  const successful = Object.values(results).filter(r => r.success).length;
+  const successful = Object.values(results).filter((r: any) => r.success).length;
   const total = Object.values(results).length;
   
   console.log(`✅ Successful: ${successful}/${total}`);
   console.log(`❌ Failed: ${total - successful}/${total}`);
   
   Object.entries(results).forEach(([name, result]) => {
-    console.log(`   ${result.success ? '✅' : '❌'} ${name}`);
+    const resultObj = result as { success: boolean };
+    console.log(`   ${resultObj.success ? '✅' : '❌'} ${name}`);
   });
   
   return results;

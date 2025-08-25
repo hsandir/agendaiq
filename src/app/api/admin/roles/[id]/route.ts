@@ -8,7 +8,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const resolvedParams = await params;
-  const { _id } = resolvedParams;
+  const { id } = resolvedParams;
   const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
@@ -27,7 +27,7 @@ export async function PUT(
 
     // Update the role
     const updatedRole = await prisma.role.update({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(resolvedParams.id) },
       data: {
         title,
         priority: typeof priority === 'number' ? priority : undefined,
@@ -59,7 +59,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const resolvedParams = await params;
-  const { _id } = resolvedParams;
+  const { id } = resolvedParams;
   const authResult = await withAuth(request, { requireAuth: true, requireCapability: Capability.ROLE_MANAGE });
   if (!authResult.success) {
     return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
@@ -68,7 +68,7 @@ export async function DELETE(
   try {
     // Delete the role
     await prisma.role.delete({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(resolvedParams.id) },
     });
 
     return NextResponse.json({ message: "Role deleted successfully" });

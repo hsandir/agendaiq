@@ -355,11 +355,14 @@
     }
   }
 
-  /* Custom Scrollbar for Multi-Select */
+  /* Custom Scrollbar for Multi-Select - Enhanced Mouse Wheel Support */
   .custom-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--muted-foreground)) hsl(var(--muted));
     scrollbar-gutter: stable;
+    /* Force enable mouse wheel scrolling */
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
   }
 
   .custom-scrollbar::-webkit-scrollbar {

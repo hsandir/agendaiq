@@ -128,7 +128,7 @@ export class DatabaseTransport implements LogTransport {
         prisma.devLog.findMany({
           where: {
             ...where,
-            ...(query.category ? { category: { in: query.category } } : {});
+            ...(query.category ? { category: { in: query.category } } : {})
           },
           orderBy,
           take: query.limit ?? 100,
@@ -138,7 +138,7 @@ export class DatabaseTransport implements LogTransport {
         prisma.securityLog.findMany({
           where: {
             ...where,
-            ...(query.category ? { category: { in: query.category } } : {});
+            ...(query.category ? { category: { in: query.category } } : {})
           },
           orderBy,
           take: query.limit ?? 100,
