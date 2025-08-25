@@ -703,7 +703,7 @@ describe('Comprehensive Component Tests', () => {
         value: jest.fn().mockImplementation(query => ({
           matches: false,
           media: query,
-          onchange: null,
+          onChange: null,
           addListener: jest.fn(), // deprecated
           removeListener: jest.fn(), // deprecated
           addEventListener: jest.fn(),
@@ -718,7 +718,7 @@ describe('Comprehensive Component Tests', () => {
       (window.matchMedia as jest.Mock).mockImplementation(query => ({
         matches: query === '(max-width: 768px)',
         media: query,
-        onchange: null,
+        onChange: null,
         addListener: jest.fn(),
         removeListener: jest.fn(),
         addEventListener: jest.fn(),
@@ -737,7 +737,7 @@ describe('Comprehensive Component Tests', () => {
       (window.matchMedia as jest.Mock).mockImplementation(query => ({
         matches: query === '(max-width: 1024px)',
         media: query,
-        onchange: null,
+        onChange: null,
         addListener: jest.fn(),
         removeListener: jest.fn(),
         addEventListener: jest.fn(),

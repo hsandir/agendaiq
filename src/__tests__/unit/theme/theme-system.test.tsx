@@ -28,7 +28,7 @@ Object.defineProperty(window, 'matchMedia', {
   value: jest.fn().mockImplementation((query: string): MediaQueryList => ({
     matches: false,
     media: query,
-    onchange: null,
+    onChange: null,
     addListener: jest.fn(),
     removeListener: jest.fn(),
     addEventListener: jest.fn(),
@@ -269,7 +269,7 @@ describe('Theme System Tests', () => {
       window.matchMedia = jest.fn().mockImplementation((query: string): MediaQueryList => ({
         matches: query === '(prefers-color-scheme: dark)',
         media: query,
-        onchange: null,
+        onChange: null,
         addListener: jest.fn(),
         removeListener: jest.fn(),
         addEventListener: jest.fn(),
@@ -282,7 +282,7 @@ describe('Theme System Tests', () => {
       window.matchMedia = jest.fn().mockImplementation((query: string): MediaQueryList => ({
         matches: false,
         media: query,
-        onchange: null,
+        onChange: null,
         addListener: jest.fn(),
         removeListener: jest.fn(),
         addEventListener: jest.fn(),
@@ -343,7 +343,7 @@ describe('Theme System Tests', () => {
       window.matchMedia = jest.fn().mockImplementation((query: string): MediaQueryList => ({
         matches: query === '(prefers-reduced-motion: reduce)',
         media: query,
-        onchange: null,
+        onChange: null,
         addListener: jest.fn(),
         removeListener: jest.fn(),
         addEventListener: jest.fn(),
@@ -378,7 +378,7 @@ describe('Theme System Tests', () => {
       window.matchMedia = jest.fn().mockImplementation((query: string): MediaQueryList => ({
         matches: query === '(max-width: 768px)',
         media: query,
-        onchange: null,
+        onChange: null,
         addListener: jest.fn(),
         removeListener: jest.fn(),
         addEventListener: jest.fn(),

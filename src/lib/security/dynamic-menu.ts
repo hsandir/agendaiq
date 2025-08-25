@@ -399,7 +399,7 @@ export class DynamicMenu {
     switch (condition.type) {
       case 'role':
         const userRole = await this.getUserRole(user);
-        return this.compareValues(userrole, condition.operator, condition.value);
+        return this.compareValues(userRole, condition.operator, condition.value);
         
       case 'permission':
         // Implementation for permission-based conditions

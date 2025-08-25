@@ -15,7 +15,7 @@ import {
   Users,
   Shield,
   Monitor,
-  users,
+  User,
   Lock,
   Bell,
   Search,
@@ -29,11 +29,11 @@ import { cn } from '@/lib/utils';
 
 interface MobileMenuProps {
   user: Record<string, any>;
-  currentrole: Record<string, any> | null;
+  currentRole: Record<string, any> | null;
   isAdmin: boolean;
 }
 
-export function MobileMenu({ user, currentrole, isAdmin }: MobileMenuProps) {
+export function MobileMenu({ user, currentRole, isAdmin }: MobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const pathname = usePathname();
@@ -81,7 +81,7 @@ export function MobileMenu({ user, currentrole, isAdmin }: MobileMenuProps) {
               <h2 className="text-xl font-bold text-foreground">AgendaIQ</h2>
               <p className="text-sm text-muted-foreground">{user.email}</p>
               <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium inline-block mt-1">
-                {currentrole?.title || 'No Role'}
+                {currentRole?.title || 'No Role'}
               </span>
             </div>
             <button

@@ -1,6 +1,7 @@
 import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
 import { getUserCapabilities, can, Capability, isOpsAdmin } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
 
 export default async function DebugCapabilitiesPage() {
   const user = await requireAuth(AuthPresets.requireDevelopment);
@@ -142,15 +143,15 @@ export default async function DebugCapabilitiesPage() {
         <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
           <h2 className="text-xl font-semibold mb-4 text-gray-900">Test Access</h2>
           <div className="space-x-4">
-            <a href="/dashboard/settings/backup" className="text-blue-600 hover:underline">
+            <Link href="/dashboard/settings/backup" className="text-blue-600 hover:underline">
               Backup Page →
-            </a>
-            <a href="/dashboard/settings/audit-logs" className="text-blue-600 hover:underline">
+            </Link>
+            <Link href="/dashboard/settings/audit-logs" className="text-blue-600 hover:underline">
               Audit Logs →
-            </a>
-            <a href="/dashboard/settings/system" className="text-blue-600 hover:underline">
+            </Link>
+            <Link href="/dashboard/settings/system" className="text-blue-600 hover:underline">
               System Settings →
-            </a>
+            </Link>
           </div>
         </div>
       </div>

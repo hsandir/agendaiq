@@ -391,8 +391,8 @@ export async function POST(request: NextRequest) {
               userId: user.id,
               email: user.email,
               passwordValid: isValidPassword,
-              hasstaff: !!(user.staff as Record<string, unknown> | null)?.length,
-              staffrole: user.staff?.[0]?.role?.title,
+              hasStaff: !!(user.staff as Record<string, unknown> | null)?.length,
+              staffRole: user.staff?.[0]?.role?.title,
               timestamp: new Date().toISOString()
             },
             ip,

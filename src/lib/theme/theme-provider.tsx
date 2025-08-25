@@ -124,7 +124,7 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
                 // Silently ignore
               });
           }
-        }, 2000); // 2 second delay to ensure page is fully loaded
+        }, 5000); // 5 second delay to ensure page is fully loaded and avoid navigation flicker
       }
     }
   }, []); // Empty deps - only run once
@@ -188,7 +188,11 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
     const setVar = (name: string, valueHex: string) => {
       try {
         const hslValue = hexToHslVar(valueHex);
-        root.style.setProperty(`--${name}`, hslValue);
+        const currentValue = root.style.getPropertyValue(`--${name}`);
+        // Only update if value changed to prevent unnecessary repaints
+        if (currentValue !== hslValue) {
+          root.style.setProperty(`--${name}`, hslValue);
+        }
       } catch (err: unknown) {
         console.error(`Failed to set CSS variable --${name}:`, err);
       }
@@ -300,35 +304,18 @@ export function ThemeProvider({ children, initialTheme }: ThemeProviderProps) {
         } satisfies Theme)
       : themes.find((t) => t.id === currentThemeId) || themes[0];
 
-  // Don't render anything until mounted to prevent hydration mismatch
-  if (!mounted) {
-    return (
-      <ThemeContext.Provider
-        value={{
-          theme: themes[0], // Default theme for SSR
-          setTheme: () => {},
-          availableThemes: themes,
-          isLoading: false,
-          customTheme: undefined,
-          setCustomTheme: () => {},
-        }}
-      >
-        {children}
-      </ThemeContext.Provider>
-    );
-  }
+  // Always render children, but apply theme styles only when mounted
+  const contextValue = {
+    theme: mounted ? currentTheme : themes[0], // Use current theme if mounted, default otherwise
+    setTheme: handleSetTheme,
+    availableThemes: themes,
+    isLoading,
+    customTheme: mounted ? customTheme : undefined,
+    setCustomTheme: handleSetCustomTheme,
+  };
 
   return (
-    <ThemeContext.Provider
-      value={{
-        theme: currentTheme,
-        setTheme: handleSetTheme,
-        availableThemes: themes,
-        isLoading,
-        customTheme,
-        setCustomTheme: handleSetCustomTheme,
-      }}
-    >
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );

@@ -139,7 +139,7 @@ export function AgendaItemsEditor({
   
   // Import dialog state
   const [showImportDialog, setShowImportDialog] = useState(false)
-  const [selectedPastmeeting, setSelectedPastMeeting] = useState<number | null>(null)
+  const [selectedPastMeeting, setSelectedPastMeeting] = useState<number | null>(null)
   const [importedItems, setImportedItems] = useState<AgendaItemFormData[]>([])
   const [importedMeetingId, setImportedMeetingId] = useState<number | null>(null)
   const [showRemoveConfirmation, setShowRemoveConfirmation] = useState(false)
