@@ -115,7 +115,7 @@ export async function GET(request: NextRequest, props: Props) {
             },
             meeting_action_items: {
               include: {
-                assigned_to: {
+                staff_meeting_action_items_assigned_toTostaff: {
                   include: {
                     users: true
                   }
@@ -129,7 +129,7 @@ export async function GET(request: NextRequest, props: Props) {
         },
         meeting_action_items: {
           include: {
-            assigned_to: {
+            staff_meeting_action_items_assigned_toTostaff: {
               include: {
                 users: true,
                 role: true

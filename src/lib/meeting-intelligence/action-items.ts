@@ -80,7 +80,7 @@ export class ActionItemsService {
             users: true
           }
         },
-        CompletedBy: {
+        staff_meeting_action_items_completed_byTostaff: {
           include: {
             users: true
           }

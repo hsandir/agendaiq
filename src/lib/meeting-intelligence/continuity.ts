@@ -108,7 +108,7 @@ export class MeetingContinuityService {
 
       // Carry forward action items
       if (continuityData.pendingActions.length > 0) {
-        await tx.meetingActionItem.createMany({
+        await tx.meeting_action_items.createMany({
           data: continuityData.pendingActions.map(action => ({
             meeting_id: newMeeting.id,
             title: action.title,

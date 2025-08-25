@@ -350,7 +350,7 @@ export class MeetingSearchService {
             start_time: true
           }
         },
-        assigned_to: {
+        staff_meeting_action_items_assigned_toTostaff: {
           include: {
             users: {
               select: {

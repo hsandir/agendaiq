@@ -65,7 +65,7 @@ export async function GET(request: NextRequest, props: Props) {
         agenda_item_attachments: true,
         meeting_action_items: {
           include: {
-            assigned_to: {
+            staff_meeting_action_items_assigned_toTostaff: {
               include: {
                 users: true
               }

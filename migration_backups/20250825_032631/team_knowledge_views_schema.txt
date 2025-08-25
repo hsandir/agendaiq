@@ -1,0 +1,16 @@
+                                           Table "public.team_knowledge_views"
+    Column    |              Type              | Collation | Nullable |                     Default                      
+--------------+--------------------------------+-----------+----------+--------------------------------------------------
+ id           | integer                        |           | not null | nextval('team_knowledge_views_id_seq'::regclass)
+ knowledge_id | text                           |           | not null | 
+ user_id      | integer                        |           | not null | 
+ viewed_at    | timestamp(6) without time zone |           |          | CURRENT_TIMESTAMP
+Indexes:
+    "team_knowledge_views_pkey" PRIMARY KEY, btree (id)
+    "idx_team_knowledge_views_knowledge_id" btree (knowledge_id)
+    "idx_team_knowledge_views_user_id" btree (user_id)
+    "team_knowledge_views_knowledge_id_user_id_key" UNIQUE, btree (knowledge_id, user_id)
+Foreign-key constraints:
+    "team_knowledge_views_knowledge_id_fkey" FOREIGN KEY (knowledge_id) REFERENCES team_knowledge(id) ON DELETE CASCADE
+    "team_knowledge_views_user_id_fkey" FOREIGN KEY (user_id) REFERENCES users(id)
+

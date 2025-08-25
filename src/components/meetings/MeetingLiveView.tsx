@@ -17,7 +17,7 @@ import {
   AlertCircle,
   MessageSquare,
   Paperclip,
-  users,
+  User,
   ChevronDown,
   ChevronRight,
   Wifi,
@@ -166,7 +166,7 @@ export function MeetingLiveView({
   );
 
   // Set up presence channel for live user tracking
-  const { _members } = usePresenceChannel(
+  const { _members: members } = usePresenceChannel(
     CHANNELS.presence(meeting.id),
     useMemo(() => ({}), [])
   );
@@ -475,7 +475,7 @@ export function MeetingLiveView({
             </div>
 
             {/* Live Users */}
-            {members.length > 0 && (
+            {members && members.length > 0 && (
               <div className="bg-card rounded-xl shadow-sm border border-border p-5">
                 <h3 className="font-semibold text-foreground mb-4 flex items-center">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2" />

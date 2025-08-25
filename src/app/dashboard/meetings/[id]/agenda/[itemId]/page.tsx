@@ -59,7 +59,7 @@ export default async function AgendaItemPage(props: Props) {
       },
       action_items: {
         include: {
-          assigned_to: {
+          staff_meeting_action_items_assigned_toTostaff: {
             include: {
               users: true,
               role: true

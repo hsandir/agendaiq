@@ -375,7 +375,7 @@ export class MeetingAnalyticsService {
     const actionItems = await prisma.meeting_action_items.findMany({
       where,
       include: {
-        assigned_to: {
+        staff_meeting_action_items_assigned_toTostaff: {
           include: {
             users: {
               select: {

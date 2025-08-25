@@ -38,7 +38,7 @@ export class RoleBasedAssignmentService {
       });
 
       // Transfer action items assigned to role
-      await tx.meetingActionItem.updateMany({
+      await tx.meeting_action_items.updateMany({
         where: {
           assigned_to_role: data.roleId,
           assigned_to: data.fromStaffId,
@@ -59,7 +59,7 @@ export class RoleBasedAssignmentService {
             responsible_staff_id: data.toStaffId
           }
         }),
-        tx.meetingActionItem.count({
+        tx.meeting_action_items.count({
           where: {
             assigned_to_role: data.roleId,
             assigned_to: data.toStaffId
@@ -143,7 +143,7 @@ export class RoleBasedAssignmentService {
               start_time: true
             }
           },
-          assigned_to: {
+          staff_meeting_action_items_assigned_toTostaff: {
             select: {
               id: true,
               users: {
@@ -218,7 +218,7 @@ export class RoleBasedAssignmentService {
     return await prisma.role_transitions.findMany({
       where: { role_id: roleId },
       include: {
-        FromStaff: {
+        staff_role_transitions_from_staff_idTostaff: {
           include: {
             users: {
               select: {
@@ -228,7 +228,7 @@ export class RoleBasedAssignmentService {
             }
           }
         },
-        ToStaff: {
+        staff_role_transitions_to_staff_idTostaff: {
           include: {
             users: {
               select: {
@@ -270,7 +270,7 @@ export class RoleBasedAssignmentService {
             title: true
           }
         },
-        assigned_to: {
+        staff_meeting_action_items_assigned_toTostaff: {
           include: {
             users: {
               select: {
@@ -314,7 +314,7 @@ export class RoleBasedAssignmentService {
       }
 
       if (taskIds.actionItems && taskIds.actionItems.length > 0) {
-        const actionUpdate = await tx.meetingActionItem.updateMany({
+        const actionUpdate = await tx.meeting_action_items.updateMany({
           where: {
             id: { in: taskIds.actionItems },
             assigned_to: fromStaffId

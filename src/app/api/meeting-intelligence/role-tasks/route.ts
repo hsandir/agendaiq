@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
                 start_time: true
               }
             },
-            assigned_to: {
+            staff_meeting_action_items_assigned_toTostaff: {
               include: {
                 users: {
                   select: {

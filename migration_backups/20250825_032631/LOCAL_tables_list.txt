@@ -1,0 +1,40 @@
+                List of relations
+ Schema |          Name           | Type  | Owner 
+--------+-------------------------+-------+-------
+ public | _prisma_migrations      | table | hs
+ public | account                 | table | hs
+ public | agenda_item_attachments | table | hs
+ public | agenda_item_comments    | table | hs
+ public | audit_logs              | table | hs
+ public | critical_audit_logs     | table | hs
+ public | department              | table | hs
+ public | dev_logs                | table | hs
+ public | devices                 | table | hs
+ public | district                | table | hs
+ public | meeting                 | table | hs
+ public | meeting_action_items    | table | hs
+ public | meeting_agenda_items    | table | hs
+ public | meeting_attendee        | table | hs
+ public | meeting_audit_logs      | table | hs
+ public | meeting_notes           | table | hs
+ public | meeting_search          | table | hs
+ public | meeting_templates       | table | hs
+ public | meeting_transcripts     | table | hs
+ public | permission              | table | hs
+ public | role                    | table | hs
+ public | role_hierarchy          | table | hs
+ public | role_transitions        | table | hs
+ public | school                  | table | hs
+ public | security_logs           | table | hs
+ public | session                 | table | hs
+ public | staff                   | table | hs
+ public | system_setting          | table | hs
+ public | system_settings         | table | hs
+ public | team_knowledge          | table | hs
+ public | team_knowledge_views    | table | hs
+ public | team_members            | table | hs
+ public | teams                   | table | hs
+ public | users                   | table | hs
+ public | verification_token      | table | hs
+(35 rows)
+

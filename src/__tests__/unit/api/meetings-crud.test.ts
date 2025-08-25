@@ -503,7 +503,7 @@ describe('Meetings CRUD API', () => {
       });
 
       // Add agenda item
-      await context.prisma.meetingAgendaItem.create({
+      await context.prisma.meeting_agenda_items.create({
         data: {
           meeting_id: meeting.id,
           topic: 'Opening Discussion',
