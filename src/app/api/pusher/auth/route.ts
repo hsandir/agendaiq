@@ -71,21 +71,21 @@ export async function POST(request: NextRequest) {
     // Generate auth response
     let authResponse;
     
-    if (channel.startsWith('presence-')) {
+    if (String(channel ?? '').startsWith('presence-')) {
       // For presence channels, include user data
       const presenceData = {
-        user_id: parseInt(user?.id).toString(),
+        user_id: String(user?.id ?? 'unknown'),
         user_info: {
           name: user?.name,
           email: user?.email,
           staff_id: (user.staff as Record<string, unknown> | null)?.id,
-          role: (user.staff as Record<string, unknown> | null)?.role?.key,
+          role: 'unknown',
         }
       };
-      authResponse = pusherServer.authorizeChannel(socketId, channel, presenceData);
+      authResponse = pusherServer.authorizeChannel(String(socketId ?? ''), String(channel ?? ''), presenceData);
     } else {
       // For private channels
-      authResponse = pusherServer.authorizeChannel(socketId, channel);
+      authResponse = pusherServer.authorizeChannel(String(socketId ?? ''), String(channel ?? ''));
     }
 
     return NextResponse.json(authResponse);

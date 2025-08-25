@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json() as Record<string, unknown>;
-    const { _key, _priority, _is_leadership, _category, _description } = body;
+    const { key, priority, is_leadership, category, description } = body;
 
     if (!key || priority === undefined) {
       return NextResponse.json(
@@ -62,12 +62,11 @@ export async function POST(request: NextRequest) {
 
     const role = await prisma.role.create({
       data: {
-        key: key as string,
-        priority: priority as number,
-        is_leadership: (is_leadership as boolean) ?? false,
-        category: category as string,
-        // TODO: Add description field to Role model in schema
-        // description
+        key: String(key),
+        priority: Number(priority),
+        is_leadership: Boolean(is_leadership ?? false),
+        category: String(category ?? ''),
+        title: String(key),
       }
     });
 
@@ -87,7 +86,7 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json() as Record<string, unknown>;
-    const { _id, _key, _priority, _is_leadership, _category, _description } = body;
+    const { id, key, priority, is_leadership, category, description } = body;
 
     if (!id) {
       return NextResponse.json(

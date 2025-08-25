@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json() as Record<string, unknown>;
-    const { _name, _code, _address, _phone, _email, _district_id } = body;
+    const { name, code, address, phone, email, district_id } = body;
 
     if (!name || !code || !district_id) {
       return NextResponse.json(
@@ -142,7 +142,7 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json() as Record<string, unknown>;
-    const { _id, _name, _code, _address, _phone, _email, _district_id } = body;
+    const { id, name, code, address, phone, email, district_id } = body;
 
     if (!id) {
       return NextResponse.json(

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
         name: true,
         address: true,
         code: true,
-        district_id: parseInt(true),
+        district_id: true,
         // TODO: Add these fields to School model in schema
         // city: true,
         // state: true,
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json() as Record<string, unknown>;
-    const { _name, _address, _city, _state, _zipCode, _phone, _website, _logo } = body as { name?: string; address?: string; city?: string; state?: string; zipCode?: string; phone?: string; website?: string; logo?: string };
+    const { name, address, city, state, zipCode, phone, website, logo } = body as { name?: string; address?: string; city?: string; state?: string; zipCode?: string; phone?: string; website?: string; logo?: string };
 
     if (!name || typeof name !== "string" || String(name).trim().length === 0) {
       return new NextResponse("School name is required", { status: 400 });
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
         name: String(name).trim(),
         address: address?.trim(),
         code: `SCH${Date.now().toString().slice(-6)}`, // Generate unique code
-        district_id: parseInt(1), // TODO: Get from request or user's district
+        district_id: 1, // TODO: Get from request or user's district
         // TODO: Add these fields to School model in schema
         // city: city?.trim(),
         // state: state?.trim(),
