@@ -122,6 +122,17 @@ prod_cookies*.txt
 prod_test_cookies*.txt
 lint-errors*.json
 **/node_modules_backup/
+
+# Database migration files (SENSITIVE DATA)
+migration_backups/
+migrations/
+*_migration*.sql
+*_backup*.sql
+*_schema*.sql
+*_schema*.txt
+MIGRATION_*.md
+SUPABASE_*.txt
+LOCAL_*.sql
 organization_structure*.json
 postcss.config*.js
 prisma/migrations/migration_lock*.toml
