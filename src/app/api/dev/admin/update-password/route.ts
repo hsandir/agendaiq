@@ -50,13 +50,8 @@ export async function POST(request: NextRequest) {
 // Also allow GET to list admin users
 export async function GET() {
   try {
-    const adminUsers = await prisma.users.findMany({
-      where: {
-        OR: [
-          { is_system_admin: true },
-          { is_school_admin: true }
-        ]
-      },
+    // Get all users first and see what we have
+    const allUsers = await prisma.users.findMany({
       select: {
         id: true,
         email: true,
@@ -68,22 +63,26 @@ export async function GET() {
           select: {
             id: true,
             role: {
-              select: { key: true, name: true }
+              select: { key: true, title: true }
             }
           }
         }
-      }
+      },
+      take: 10 // Limit to first 10 users
     });
+
+    const adminUsers = allUsers.filter(user => user.is_system_admin || user.is_school_admin);
 
     return NextResponse.json({
       success: true,
       adminUsers,
-      count: adminUsers.length
+      allUsers: allUsers.length,
+      adminCount: adminUsers.length
     });
   } catch (error: unknown) {
     console.error('Failed to fetch admin users:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch admin users' },
+      { error: 'Failed to fetch admin users', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }
