@@ -9,10 +9,11 @@ import {
   EmailNotificationData,
   BaseEmailData
 } from './types';
-import { MeetingInviteTemplate } from './templates/meeting-invite';
-import { TeamNotificationTemplate } from './templates/team-notification';
-import { PasswordResetTemplate } from './templates/password-reset';
-import { VerificationTemplate } from './templates/verification';
+// Dynamic imports to avoid build issues
+const getMeetingInviteTemplate = () => import('./templates/meeting-invite').then(m => m.MeetingInviteTemplate);
+const getTeamNotificationTemplate = () => import('./templates/team-notification').then(m => m.TeamNotificationTemplate);
+const getPasswordResetTemplate = () => import('./templates/password-reset').then(m => m.PasswordResetTemplate);
+const getVerificationTemplate = () => import('./templates/verification').then(m => m.VerificationTemplate);
 
 export class EmailService {
   private static instance: EmailService;
@@ -41,12 +42,16 @@ export class EmailService {
     let html: string;
     
     if ('meetingTitle' in data) {
+      const MeetingInviteTemplate = await getMeetingInviteTemplate();
       html = render(MeetingInviteTemplate({ data: data as MeetingInviteData }));
     } else if ('teamName' in data) {
+      const TeamNotificationTemplate = await getTeamNotificationTemplate();
       html = render(TeamNotificationTemplate({ data: data as TeamNotificationData }));
     } else if ('resetUrl' in data) {
+      const PasswordResetTemplate = await getPasswordResetTemplate();
       html = render(PasswordResetTemplate({ data: data as PasswordResetData }));
     } else if ('verificationUrl' in data) {
+      const VerificationTemplate = await getVerificationTemplate();
       html = render(VerificationTemplate({ data: data as VerificationEmailData }));
     } else {
       // Fallback for generic notifications
