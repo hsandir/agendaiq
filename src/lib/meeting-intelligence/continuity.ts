@@ -20,7 +20,7 @@ export class MeetingContinuityService {
         },
         include: {
           staff: true,
-          ResponsibleRole: true
+          role: true
         }
       }),
       
@@ -33,8 +33,8 @@ export class MeetingContinuityService {
           }
         },
         include: {
-          assigned_to: true,
-          AssignedToRole: true
+          staff_meeting_action_items_assigned_toTostaff: true,
+          role: true
         }
       })
     ]);
@@ -60,7 +60,7 @@ export class MeetingContinuityService {
         assignedToStaffId: item.assigned_to,
         dueDate: item.due_date ?? undefined,
         priority: item.priority,
-        status: item.status as Record<string, unknown>,
+        status: (item.status === 'Pending' || item.status === 'InProgress' || item.status === 'Overdue') ? item.status : 'Pending',
         carryForwardCount: item.carry_forward_count + 1
       }))
     };
@@ -79,6 +79,11 @@ export class MeetingContinuityService {
       // Create the new meeting
       const newMeeting = await tx.meeting.create({
         data: {
+          title: 'Continuation Meeting',
+          department_id: 1,
+          district_id: 1,
+          organizer_id: 1,
+          school_id: 1,
           ...newMeetingData,
           parent_meeting_id: parentMeetingId,
           is_continuation: true
@@ -101,7 +106,8 @@ export class MeetingContinuityService {
             carry_forward_count: item.carryForwardCount,
             order_index: index,
             purpose: 'Discussion',
-            created_at: new Date()
+            created_at: new Date(),
+            updated_at: new Date()
           }))
         });
       }
@@ -120,7 +126,8 @@ export class MeetingContinuityService {
             status: action.status,
             parent_action_id: action.parentActionId,
             carry_forward_count: action.carryForwardCount,
-            created_at: new Date()
+            created_at: new Date(),
+            updated_at: new Date()
           }))
         });
       }
@@ -136,8 +143,8 @@ export class MeetingContinuityService {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        Parentmeeting: true,
-        continuation_meetings: {
+        meeting: true,
+        other_meeting: {
           orderBy: { created_at: 'asc' }
         }
       }
@@ -147,12 +154,12 @@ export class MeetingContinuityService {
 
     // Get the root meeting
     let rootMeeting = meeting;
-    while (rootMeeting.ParentMeeting) {
+    while (rootMeeting.meeting) {
       const parent = await prisma.meeting.findUnique({
         where: { id: rootMeeting.parent_meeting_id! },
         include: { 
-          Parentmeeting: true,
-          continuation_meetings: {
+          meeting: true,
+          other_meeting: {
             orderBy: { created_at: 'asc' }
           }
         }
@@ -214,15 +221,18 @@ export class MeetingContinuityService {
     const countMeetings = (meetings: Record<string, unknown>[]): void => {
       for (const meeting of meetings) {
         stats.totalMeetingsInChain++;
-        stats.totalCarriedItems += meeting.meeting_agenda_items?.length ?? 0;
-        stats.resolvedItems += meeting.meeting_agenda_items?.filter(
-          (i: Record<string, unknown>) => i.status === 'Resolved'
-        ).length ?? 0;
-        stats.pendingItems += meeting.meeting_agenda_items?.filter(
-          (i: Record<string, unknown>) => i.status !== 'Resolved'
-        ).length ?? 0;
+        const agendaItems = meeting.meeting_agenda_items;
+        if (Array.isArray(agendaItems)) {
+          stats.totalCarriedItems += agendaItems.length;
+          stats.resolvedItems += agendaItems.filter(
+            (i: Record<string, unknown>) => i.status === 'Resolved'
+          ).length;
+          stats.pendingItems += agendaItems.filter(
+            (i: Record<string, unknown>) => i.status !== 'Resolved'
+          ).length;
+        }
         
-        if (meeting.children) {
+        if (Array.isArray(meeting.children)) {
           countMeetings(meeting.children);
         }
       }

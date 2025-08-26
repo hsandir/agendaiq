@@ -11,7 +11,7 @@
  */
 
 // Edge runtime check - don't initialize Prisma in edge environment
-if (typeof EdgeRuntime !== 'undefined') {
+if (typeof globalThis !== 'undefined' && 'EdgeRuntime' in globalThis) {
   throw new Error('Prisma cannot be imported in Edge Runtime (middleware). Use edge-compatible functions only.');
 }
 

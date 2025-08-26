@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { EdgeAuditLogger } from '@/lib/audit/edge-audit-logger';
 
+// Extend NextRequest to support audit event storage
+declare module 'next/server' {
+  interface NextRequest {
+    _auditEvent?: Record<string, unknown>;
+  }
+}
+
 /**
  * Edge Runtime compatible middleware for audit logging
  * This version doesn't use Node.js modules and instead queues events for API processing
@@ -18,7 +25,10 @@ export async function auditMiddleware(request: NextRequest): Promise<NextRespons
     const token = await getToken({ req: request });
     if (token?.id) {
       userId = parseInt(token.id); // Convert string id to number
-      staffId = (token as any).staff?.id as number;
+      // Safely access staff property from token
+      if (token.staff && typeof token.staff === 'object' && 'id' in token.staff) {
+        staffId = typeof token.staff.id === 'number' ? token.staff.id : undefined;
+      }
     }
   } catch (error: unknown) {
     // Continue without user context

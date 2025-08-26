@@ -39,7 +39,8 @@ export class ActionItemsService {
         assigned_to_role: data.assignedToRoleId,
         due_date: data.dueDate,
         priority: data.priority ?? 'Medium',
-        status: 'Pending'
+        status: 'Pending',
+        updated_at: new Date()
       },
       include: {
         staff_meeting_action_items_assigned_toTostaff: {
@@ -202,7 +203,7 @@ export class ActionItemsService {
             role: true
           }
         },
-        agenda_item: {
+        meeting_agenda_items: {
           select: {
             topic: true
           }
@@ -224,7 +225,10 @@ export class ActionItemsService {
     dateFrom?: Date;
     dateTo?: Date;
   }) {
-    const where: Record<string, unknown> = {};
+    const where: {
+      meeting?: { department_id: number };
+      created_at?: { gte?: Date; lte?: Date };
+    } = {};
 
     if (filterOptions?.departmentId) {
       where.meeting = {

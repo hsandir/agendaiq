@@ -14,23 +14,33 @@ export class DatabaseTransport implements LogTransport {
     this.level = level
   }
 
-  private mapLogLevelToPrisma(level: LogLevel): string {
+  private mapLogLevelToPrisma(level: LogLevel) {
     switch (level) {
       case LogLevel.TRACE:
-        return 'TRACE';
+        return 'TRACE' ;
       case LogLevel.DEBUG:
-        return 'DEBUG';
+        return 'DEBUG' ;
       case LogLevel.INFO:
-        return 'INFO';
+        return 'INFO' ;
       case LogLevel.WARN:
-        return 'WARN';
+        return 'WARN' ;
       case LogLevel.ERROR:
-        return 'ERROR';
+        return 'ERROR' ;
       case LogLevel.FATAL:
-        return 'FATAL';
+        return 'FATAL' ;
       default:
-        return 'INFO';
+        return 'INFO' ;
     }
+  }
+
+  private mapDevLogCategory(category: string) {
+    const validCategories = ['system', 'database', 'api', 'auth', 'performance', 'error', 'network', 'cache', 'external', 'build'];
+    return validCategories.includes(category) ? category : 'system';
+  }
+
+  private mapAuditLogCategory(category: string) {
+    const validCategories = ['auth', 'data', 'admin', 'security', 'system', 'user', 'api', 'compliance'];
+    return validCategories.includes(category) ? category : 'security';
   }
 
   private mapPrismaToLogLevel(prismaLevel: string): LogLevel {
@@ -80,7 +90,7 @@ export class DatabaseTransport implements LogTransport {
         timestamp: new Date(entry.timestamp),
         level: this.mapLogLevelToPrisma(entry.level),
         message: entry.message,
-        category: entry.category,
+        category: this.mapDevLogCategory(entry.category),
         component: entry.component,
         function: entry.function,
         file: entry.file,
@@ -110,7 +120,7 @@ export class DatabaseTransport implements LogTransport {
         timestamp: new Date(entry.timestamp),
         level: this.mapLogLevelToPrisma(entry.level),
         message: entry.message,
-        category: entry.category,
+        category: this.mapAuditLogCategory(entry.category),
         action: entry.action,
         result: entry.result,
         riskLevel: entry.riskLevel,
@@ -199,7 +209,7 @@ export class DatabaseTransport implements LogTransport {
           message: log.message,
           metadata: log.metadata ? JSON.parse(log.metadata) : undefined,
           context: log.context ? JSON.parse(log.context) : undefined,
-          category: log.category as string,
+          category: String(log.category),
           component: log.component ?? undefined,
           function: log.function ?? undefined,
           file: log.file ?? undefined,
@@ -215,7 +225,7 @@ export class DatabaseTransport implements LogTransport {
           message: log.message,
           metadata: log.metadata ? JSON.parse(log.metadata) : undefined,
           context: log.context ? JSON.parse(log.context) : undefined,
-          category: log.category as string,
+          category: String(log.category),
           action: log.action,
           result: log.result,
           riskLevel: log.risk_level,

@@ -44,15 +44,19 @@ class PerformanceMonitor {
   }
 
   private getLargestContentfulPaint(): number {
-    return new Promise((resolve) => {
+    let lcpValue = 0;
+    try {
       new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
         if (entries.length > 0) {
           const lcp = entries[entries.length - 1];
-          resolve(lcp.startTime);
+          lcpValue = lcp.startTime;
         }
       }).observe({ entryTypes: ['largest-contentful-paint'] });
-    }) as Record<string, unknown>;
+    } catch {
+      // LCP not supported
+    }
+    return lcpValue;
   }
 
   private interceptFetch() {

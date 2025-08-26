@@ -215,7 +215,12 @@ export class MeetingAnalyticsService {
     });
 
     // Group by period
-    const trends: Record<string, unknown> = {};
+    const trends: Record<string, {
+      period: string;
+      meetings: number;
+      actionItems: number;
+      completedActions: number;
+    }> = {};
 
     meetings.forEach(meeting => {
       if (!meeting.start_time) return;
@@ -246,9 +251,10 @@ export class MeetingAnalyticsService {
         };
       }
 
-      trends[periodKey].meetings++;
-      trends[periodKey].actionItems += meeting.meeting_action_items.length;
-      trends[periodKey].completedActions += meeting.meeting_action_items.filter(
+      const trendData = trends[periodKey]!;
+      trendData.meetings++;
+      trendData.actionItems += meeting.meeting_action_items.length;
+      trendData.completedActions += meeting.meeting_action_items.filter(
         a => a.status === 'Completed'
       ).length;
     });
@@ -268,7 +274,10 @@ export class MeetingAnalyticsService {
       dateTo?: Date;
     }
   ) {
-    const where: Record<string, unknown> = {};
+    const where: {
+      staff_id?: number;
+      Meeting?: { start_time: { gte?: Date; lte?: Date } };
+    } = {};
 
     if (staffId) {
       where.staff_id = staffId;
@@ -279,10 +288,10 @@ export class MeetingAnalyticsService {
         start_time: {}
       };
       if (options.dateFrom) {
-        where.meeting.start_time.gte = options.dateFrom;
+        where.Meeting.start_time.gte = options.dateFrom;
       }
       if (options.dateTo) {
-        where.meeting.start_time.lte = options.dateTo;
+        where.Meeting.start_time.lte = options.dateTo;
       }
     }
 
@@ -350,7 +359,11 @@ export class MeetingAnalyticsService {
     dateFrom?: Date;
     dateTo?: Date;
   }) {
-    const where: Record<string, unknown> = {};
+    const where: {
+      assigned_to_role?: number;
+      meeting?: { department_id: number };
+      created_at?: { gte?: Date; lte?: Date };
+    } = {};
 
     if (options?.roleId) {
       where.assigned_to_role = options.roleId;
@@ -413,17 +426,20 @@ export class MeetingAnalyticsService {
     let completedOnTime = 0;
 
     actionItems.forEach(item => {
-      // Count by status
-      const status = item.status.toLowerCase().replace('_', '');
-      if (status in metrics.byStatus) {
-        metrics.byStatus[status]++;
-      }
+      // Count by status with safe property access
+      const statusNormalized = item.status.toLowerCase().replace('_', '');
+      if (statusNormalized === 'pending') metrics.byStatus.pending++;
+      else if (statusNormalized === 'inprogress') metrics.byStatus.inProgress++;
+      else if (statusNormalized === 'completed') metrics.byStatus.completed++;
+      else if (statusNormalized === 'overdue') metrics.byStatus.overdue++;
+      else if (statusNormalized === 'cancelled') metrics.byStatus.cancelled++;
+      else if (statusNormalized === 'deferred') metrics.byStatus.deferred++;
 
-      // Count by priority
-      const priority = item.priority.toLowerCase();
-      if (priority in metrics.byPriority) {
-        metrics.byPriority[priority]++;
-      }
+      // Count by priority with safe property access
+      const priorityNormalized = item.priority.toLowerCase();
+      if (priorityNormalized === 'high') metrics.byPriority.high++;
+      else if (priorityNormalized === 'medium') metrics.byPriority.medium++;
+      else if (priorityNormalized === 'low') metrics.byPriority.low++;
 
       // Calculate completion time
       if (item.status === 'Completed' && item.completed_at) {

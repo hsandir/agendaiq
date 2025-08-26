@@ -240,7 +240,7 @@ export class MeetingSearchService {
             }
           }
         },
-        action_items: {
+        meeting_action_items: {
           select: {
             id: true,
             title: true,
@@ -360,7 +360,7 @@ export class MeetingSearchService {
             role: true
           }
         },
-        agenda_item: {
+        meeting_agenda_items: {
           select: {
             topic: true
           }
