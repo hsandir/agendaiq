@@ -19,7 +19,7 @@ export async function POST(
 
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
-    const knowledgeId = parseInt(resolvedParams.knowledgeId);
+    const knowledgeId = resolvedParams.knowledgeId;
 
     // Update download count
     const knowledge = await prisma.team_knowledge.update({
@@ -34,7 +34,7 @@ export async function POST(
         metadata: {
           update: {
             last_downloaded_at: new Date().toISOString(),
-            last_downloaded_by: auth.user.id
+            last_downloaded_by: auth.user?.id ?? 'unknown'
           }
         }
       }

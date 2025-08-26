@@ -33,7 +33,7 @@ export async function GET(
 
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
-    const knowledgeId = parseInt(resolvedParams.knowledgeId);
+    const knowledgeId = resolvedParams.knowledgeId;
 
     const knowledge = await prisma.team_knowledge.findUnique({
       where: {
@@ -41,7 +41,7 @@ export async function GET(
         team_id: teamId
       },
       include: {
-        created_by: {
+        staff: {
           include: {
             users: {
               select: {
@@ -91,16 +91,16 @@ export async function PUT(
 
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
-    const knowledgeId = parseInt(resolvedParams.knowledgeId);
+    const knowledgeId = resolvedParams.knowledgeId;
     const body = await request.json() as Record<string, unknown>;
 
     // Validate input
     const validatedData = updateKnowledgeSchema.parse(body);
 
     // Check if user is team member
-    const { _user } = auth;
+    const { user } = auth;
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: user?.id ?? 0 }
     });
 
     if (!staff) {
@@ -151,11 +151,11 @@ export async function PUT(
     const updatedKnowledge = await prisma.team_knowledge.update({
       where: { id: knowledgeId },
       data: {
-        ...validatedData,
+        ...(validatedData as any),
         updated_at: new Date()
       },
       include: {
-        created_by: {
+        staff: {
           include: {
             users: {
               select: {
@@ -208,12 +208,12 @@ export async function DELETE(
 
     const resolvedParams = await params;
     const teamId = resolvedParams.id;
-    const knowledgeId = parseInt(resolvedParams.knowledgeId);
+    const knowledgeId = resolvedParams.knowledgeId;
 
     // Check if user is team member
-    const { _user } = auth;
+    const { user } = auth;
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: user?.id ?? 0 }
     });
 
     if (!staff) {

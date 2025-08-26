@@ -109,10 +109,10 @@ export async function GET(request: NextRequest, props: Props) {
         type: 'knowledge_added',
         timestamp: knowledge.created_at,
         user: {
-          id: knowledge.created_by_staff?.users.id,
-          name: knowledge.created_by_staff?.users.name,
-          email: knowledge.created_by_staff?.users.email,
-          image: knowledge.created_by_staff?.users.image
+          id: knowledge.staff?.users.id ?? 0,
+          name: knowledge.staff?.users.name ?? 'Unknown',
+          email: knowledge.staff?.users.email ?? 'unknown@example.com',
+          image: knowledge.staff?.users.image ?? null
         },
         data: {
           title: knowledge.title,

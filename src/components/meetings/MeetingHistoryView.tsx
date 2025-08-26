@@ -47,18 +47,23 @@ export function MeetingHistoryView({ meetingId }: Props) {
   }, [meetingId]);
 
   const fetchHistory = async () => {
+    console.log('🔍 Fetching meeting history for meetingId:', meetingId);
     setLoading(true);
     setError(null);
     try {
       const response = await fetch(`/api/meetings/${meetingId}/history`);
+      console.log('📡 History API response:', response.status, response.ok);
       if (response.ok) {
         const data = await response.json();
+        console.log('📊 History data received:', data);
         setActivities(data.activities || []);
       } else {
         const errorData = await response.json();
+        console.log('❌ History API error:', errorData);
         setError(errorData.error || 'Failed to load history');
       }
     } catch (err: unknown) {
+      console.log('💥 History fetch error:', err);
       setError('Error loading meeting history');
       console.error('Error fetching meeting history:', err);
     } finally {

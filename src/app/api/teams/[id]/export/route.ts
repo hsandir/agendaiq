@@ -18,7 +18,7 @@ export async function GET(request: NextRequest, props: Props) {
       );
     }
 
-    const { _searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const format = searchParams.get('format') || 'json';
     const teamId = params.id;
 
@@ -65,7 +65,7 @@ export async function GET(request: NextRequest, props: Props) {
             downloads_count: true,
             created_at: true,
             updated_at: true,
-            created_by_staff: {
+            staff: {
               include: {
                 users: {
                   select: {
@@ -100,19 +100,19 @@ export async function GET(request: NextRequest, props: Props) {
         updated_at: team.updated_at,
         metadata: team.metadata
       },
-      members: team.team_members.map(member => ({
+      members: (team.team_members || []).map(member => ({
         id: member.id,
         role: member.role,
         joined_at: member.joined_at,
         user: {
-          id: member.staff.users.id,
-          name: member.staff.users.name,
-          email: member.staff.users.email
+          id: member.staff?.users.id ?? 0,
+          name: member.staff?.users.name ?? 'Unknown',
+          email: member.staff?.users.email ?? 'unknown@example.com'
         },
         staff: {
-          id: member.staff.id,
-          role: member.staff.role?.title,
-          department: member.staff.department?.name
+          id: member.staff?.id ?? 0,
+          role: member.staff?.role?.title ?? 'Unknown',
+          department: member.staff?.department?.name ?? 'Unknown'
         }
       })),
       knowledge_resources: team.team_knowledge.map(resource => ({
@@ -127,8 +127,8 @@ export async function GET(request: NextRequest, props: Props) {
         created_at: resource.created_at,
         updated_at: resource.updated_at,
         created_by: {
-          name: resource.created_by_staff?.users.name,
-          email: resource.created_by_staff?.users.email
+          name: resource.staff?.users.name ?? 'Unknown',
+          email: resource.staff?.users.email ?? 'unknown@example.com'
         }
       })),
       export_metadata: {
