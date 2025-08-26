@@ -93,12 +93,16 @@ export class FileTransport implements LogTransport {
         // Clean up old backups
         const dir = path.dirname(filePath);
         const files = await fs.readdir(dir);
-        const logFiles = (files
+        const logFiles: Array<{
+          name: string;
+          path: string; 
+          stat: import('fs').Stats | null;
+        }> = (files
           .filter(f => f.startsWith(path.basename(filePath)))
           .map(f => ({
             name: f,
             path: path.join(dir, f),
-            stat: null as Record<string, unknown>
+            stat: null
           })));
 
         // Get file stats
@@ -112,7 +116,7 @@ export class FileTransport implements LogTransport {
 
         // Sort by creation time and remove oldest files
         logFiles
-          .filter(f => f.stat)
+          .filter((f): f is typeof f & { stat: import('fs').Stats } => f.stat !== null)
           .sort((a, b) => b.stat.birthtimeMs - a.stat.birthtimeMs)
           .slice(this.maxFiles)
           .forEach(async (file) => {

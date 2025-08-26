@@ -219,7 +219,7 @@ async function logAuditTrail(
   };
 
   const result = statusCode < 400 ? 'success' : 
-                 statusCode === 401 ?? statusCode === 403 ? 'blocked' : 'failure';
+                 statusCode === 401 || statusCode === 403 ? 'blocked' : 'failure';
 
   // Determine audit category based on path
   let category = AuditLogCategory.USER_ACTION;

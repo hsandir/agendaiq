@@ -178,7 +178,7 @@ class ErrorTracker {
           return originalXHROpen.call(this, method, url, async);
         }
       }
-      return originalXHROpen.call(this, method, url);
+      return originalXHROpen.call(this, method, url, true);
     };
     
     XMLHttpRequest.prototype.send = function(body?: Document | XMLHttpRequestBodyInit | null) {

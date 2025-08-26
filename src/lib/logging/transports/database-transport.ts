@@ -14,6 +14,44 @@ export class DatabaseTransport implements LogTransport {
     this.level = level
   }
 
+  private mapLogLevelToPrisma(level: LogLevel): string {
+    switch (level) {
+      case LogLevel.TRACE:
+        return 'TRACE';
+      case LogLevel.DEBUG:
+        return 'DEBUG';
+      case LogLevel.INFO:
+        return 'INFO';
+      case LogLevel.WARN:
+        return 'WARN';
+      case LogLevel.ERROR:
+        return 'ERROR';
+      case LogLevel.FATAL:
+        return 'FATAL';
+      default:
+        return 'INFO';
+    }
+  }
+
+  private mapPrismaToLogLevel(prismaLevel: string): LogLevel {
+    switch (prismaLevel) {
+      case 'TRACE':
+        return LogLevel.TRACE;
+      case 'DEBUG':
+        return LogLevel.DEBUG;
+      case 'INFO':
+        return LogLevel.INFO;
+      case 'WARN':
+        return LogLevel.WARN;
+      case 'ERROR':
+        return LogLevel.ERROR;
+      case 'FATAL':
+        return LogLevel.FATAL;
+      default:
+        return LogLevel.INFO;
+    }
+  }
+
   async write(entry: BaseLogEntry): Promise<void> {
     if (entry.level < this.level) {
       return
@@ -40,7 +78,7 @@ export class DatabaseTransport implements LogTransport {
       data: {
         id: entry.id,
         timestamp: new Date(entry.timestamp),
-        level: entry.level,
+        level: this.mapLogLevelToPrisma(entry.level),
         message: entry.message,
         category: entry.category,
         component: entry.component,
@@ -70,7 +108,7 @@ export class DatabaseTransport implements LogTransport {
       data: {
         id: entry.id,
         timestamp: new Date(entry.timestamp),
-        level: entry.level,
+        level: this.mapLogLevelToPrisma(entry.level),
         message: entry.message,
         category: entry.category,
         action: entry.action,
@@ -93,11 +131,17 @@ export class DatabaseTransport implements LogTransport {
   }
 
   async query(query: LogQuery): Promise<BaseLogEntry[]> {
-    const where: Record<string, unknown> = {};
+    const where: {
+      level?: { in: string[] };
+      timestamp?: { gte?: Date; lte?: Date };
+      userId?: number;
+      category?: { in: string[] };
+      [key: string]: unknown;
+    } = {};
 
     // Filter by level
     if (query.level && query.level.length > 0) {
-      where.level = { in: query.level };
+      where.level = { in: query.level.map(level => this.mapLogLevelToPrisma(level)) };
     }
 
     // Filter by date range
@@ -109,7 +153,7 @@ export class DatabaseTransport implements LogTransport {
 
     // Filter by user
     if (query.userId) {
-      where.userId = query.userId;
+      where.userId = parseInt(query.userId);
     }
 
     // Search in message
@@ -151,30 +195,30 @@ export class DatabaseTransport implements LogTransport {
         ...devLogs.map(log => ({
           id: log.id,
           timestamp: log.timestamp.toISOString(),
-          level: log.level as unknown as LogLevel,
+          level: this.mapPrismaToLogLevel(log.level),
           message: log.message,
           metadata: log.metadata ? JSON.parse(log.metadata) : undefined,
           context: log.context ? JSON.parse(log.context) : undefined,
-          category: log.category,
-          component: log.component,
-          function: log.function,
-          file: log.file,
-          line: log.line,
-          stack: log.stack,
+          category: log.category as string,
+          component: log.component ?? undefined,
+          function: log.function ?? undefined,
+          file: log.file ?? undefined,
+          line: log.line ?? undefined,
+          stack: log.stack ?? undefined,
           environment: log.environment,
           performance: log.performance ? JSON.parse(log.performance) : undefined
         } satisfies DevLogEntry)),
         ...auditLogs.map(log => ({
           id: log.id,
           timestamp: log.timestamp.toISOString(),
-          level: log.level as unknown as LogLevel,
+          level: this.mapPrismaToLogLevel(log.level),
           message: log.message,
           metadata: log.metadata ? JSON.parse(log.metadata) : undefined,
           context: log.context ? JSON.parse(log.context) : undefined,
-          category: log.category,
+          category: log.category as string,
           action: log.action,
           result: log.result,
-          riskLevel: log.riskLevel,
+          riskLevel: log.risk_level,
           actor: JSON.parse(log.actor),
           target: log.target ? JSON.parse(log.target) : undefined,
           compliance: log.compliance ? JSON.parse(log.compliance) : undefined,
@@ -229,7 +273,7 @@ export class DatabaseTransport implements LogTransport {
       };
 
       [...devStats, ...auditStats].forEach(stat => {
-        logsByLevel[stat.level as unknown as LogLevel] += stat._count.id;
+        logsByLevel[this.mapPrismaToLogLevel(stat.level)] += stat._count.id;
       });
 
       const totalLogs = Object.values(logsByLevel).reduce((sum, count) => sum + count, 0);

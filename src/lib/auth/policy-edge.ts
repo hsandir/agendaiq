@@ -207,7 +207,7 @@ export function canAccessApi(user: UserWithCapabilities | null, path: string): b
 
   // Development API routes
   if (path.startsWith('/api/dev/')) {
-    return user.roleKey === 'DEV_ADMIN' || user.capabilities?.includes(Capability.DEV_DEBUG);
+    return user.roleKey === 'DEV_ADMIN' || (user.capabilities?.includes(Capability.DEV_DEBUG) ?? false);
   }
 
   // System API routes
@@ -219,7 +219,7 @@ export function canAccessApi(user: UserWithCapabilities | null, path: string): b
 
   // Admin API routes
   if (path.startsWith('/api/admin/')) {
-    return user.is_system_admin || user.is_school_admin;
+    return (user.is_system_admin ?? false) || (user.is_school_admin ?? false);
   }
 
   // Monitoring API routes
@@ -231,9 +231,9 @@ export function canAccessApi(user: UserWithCapabilities | null, path: string): b
 
   // User management API
   if (path.startsWith('/api/users/')) {
-    return user.is_system_admin || 
-           user.is_school_admin ||
-           user.capabilities?.includes(Capability.USER_VIEW);
+    return (user.is_system_admin ?? false) || 
+           (user.is_school_admin ?? false) ||
+           (user.capabilities?.includes(Capability.USER_VIEW) ?? false);
   }
 
   // Meeting API
