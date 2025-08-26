@@ -189,7 +189,7 @@ export async function GET(request: NextRequest) {
     Logger.info('Server metrics fetched successfully', { 
       healthStatus: serverMetrics.health?.overall,
       metricsCount: Object.keys(serverMetrics).length,
-      userId: session.user.id as string
+      userId: auth.user?.id
     }, 'system-metrics');
     
     return NextResponse.json(serverMetrics);

@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     const { type, packages } = (await request.json()) as Record<string, unknown>;
 
     if (type === 'packages') {
-      return await updatePackages(packages);
+      return await updatePackages(Array.isArray(packages) ? packages as string[] : []);
     }
 
     return NextResponse.json(
@@ -109,7 +109,7 @@ async function updatePackages(specificPackages?: string[]) {
       }
 
       // Skip same versions
-      if (pkg.current === pkg.latest ?? pkg.current === pkg.wanted) {
+      if (pkg.current === pkg.latest || pkg.current === pkg.wanted) {
         updateReport.details.push({
           package: pkg.name,
           status: 'skipped',
@@ -252,7 +252,7 @@ async function getDetailedPackageStatus() {
   } catch (error: unknown) {
     if (error && typeof error === 'object' && 'stdout' in error) {
       try {
-        const outdatedPackages = JSON.parse(error.stdout);
+        const outdatedPackages = JSON.parse(String((error as any).stdout || '{}'));
         const outdatedList = (Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({
           name,
           current: info.current,

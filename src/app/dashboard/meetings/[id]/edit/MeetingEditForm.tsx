@@ -13,8 +13,26 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select";
 import { safeFormatDateTime, safeFormatDate, safeFormatTime } from '@/lib/utils/safe-date';
-import { Calendar, Clock, Users, Video, ArrowLeft, Save, X, Plus, Trash2, GripVertical, ChevronUp, ChevronDown, FileText } from "lucide-react";
+import { Calendar, Clock, Users, Video, ArrowLeft, Save, X, Plus, Trash2, GripVertical, ChevronUp, ChevronDown, FileText, MessageSquare } from "lucide-react";
 import { format } from "date-fns";
+import { AgendaItemComments } from "@/components/meetings/AgendaItemComments";
+
+interface Comment {
+  id: number;
+  comment: string;
+  created_at: string | Date;
+  staff: {
+    users: {
+      id: number;
+      name: string | null;
+      email: string;
+    };
+    Role?: {
+      id: number;
+      title: string;
+    };
+  };
+}
 
 interface AgendaItem {
   id: string;
@@ -25,7 +43,8 @@ interface AgendaItem {
   duration_minutes: number;
   responsible_staff_id: string | null;
   status: string;
-  order_index: number
+  order_index: number;
+  agenda_item_comments?: Comment[];
 }
 
 interface MeetingEditFormProps {
@@ -151,6 +170,35 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
     });
     
     setAgendaItems(newItems);
+  };
+  
+  // Handle adding comments to agenda items
+  const handleAddComment = async (itemId: string, content: string) => {
+    try {
+      const response = await fetch(`/api/meetings/${meetingId}/agenda-items/${itemId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        // Update the agenda item with new comment
+        setAgendaItems(agendaItems.map(item => {
+          if (item.id === itemId) {
+            return {
+              ...item,
+              agenda_item_comments: [result.data, ...(item.agenda_item_comments ?? [])]
+            };
+          }
+          return item;
+        }));
+      } else {
+        console.error('Failed to add comment');
+      }
+    } catch (error: unknown) {
+      console.error('Error adding comment:', error);
+    }
   };
   
   // Integrations
@@ -589,6 +637,20 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  {/* Comments Section */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                      <Label>Comments</Label>
+                    </div>
+                    <AgendaItemComments
+                      itemId={parseInt(item.id)}
+                      comments={item.agenda_item_comments ?? []}
+                      onAddComment={(content) => handleAddComment(item.id, content)}
+                      canComment={true}
+                    />
                   </div>
                 </div>
               ))}

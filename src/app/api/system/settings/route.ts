@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     // Convert to a more usable format
     const settingsObject = settings.reduce((acc, setting) => {
-      acc[(setting.key)] = setting.value;
+      (acc as any)[setting.key] = setting.value;
       return acc;
     }, {} satisfies Record<string, unknown>);
 
@@ -51,7 +51,7 @@ export async function PUT(request: NextRequest) {
     const body = await request.json() as Record<string, unknown>;
     const { settings } = body;
 
-    if (!settings ?? typeof settings !== 'object') {
+    if (!settings || typeof settings !== 'object') {
       return NextResponse.json(
         { error: 'Invalid settings data provided' },
         { status: 400 }
@@ -66,8 +66,8 @@ export async function PUT(request: NextRequest) {
       try {
         const updatedSetting = await prisma.system_setting.upsert({
           where: { key },
-          update: { value: value as Record<string, unknown> },
-          create: { key, value: value as Record<string, unknown> }
+          update: { value: value as any },
+          create: { key, value: value as any }
         });
         updatedSettings.push(updatedSetting);
       } catch (error: unknown) {

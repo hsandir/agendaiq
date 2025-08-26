@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     const { pages, type } = (await request.json()) as Record<string, unknown>;
 
     if (type === 'custom' && pages) {
-      return await customHealthCheck(pages);
+      return await customHealthCheck(Array.isArray(pages) ? pages as string[] : []);
     }
 
     return NextResponse.json({ error: 'Invalid request. Use type: "custom" with pages array' }, { status: 400 });
@@ -286,7 +286,7 @@ async function checkPage(url: string, name: string) {
         
         if (json.error) {
           // 401 Unauthorized is expected for protected endpoints without auth
-          if (response.status === 401 ?? json.error === 'Unauthorized') {
+          if (response.status === 401 || json.error === 'Unauthorized') {
             status = 'warning';
             message = `API returned expected auth error: ${json.error}`;
           } else {

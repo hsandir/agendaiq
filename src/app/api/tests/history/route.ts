@@ -66,14 +66,14 @@ export async function POST(request: NextRequest) {
         record_id: Date.now().toString(),
         operation: 'CREATE',
         source: 'SYSTEM',
-        user_id: parseInt(user.id),
-        staff_id: (user.staff as Record<string, unknown> | null)?.id,
+        user_id: Number(user.id) || 0,
+        staff_id: Number((user.staff as any)?.id) || null,
         field_changes: {
-          passed,
-          failed,
-          coverage,
-          duration
-        },
+          passed: Number(passed) || 0,
+          failed: Number(failed) || 0,
+          coverage: Number(coverage) || 0,
+          duration: Number(duration) || 0
+        } as any,
         ip_address: request.headers.get('x-forwarded-for') ?? 'unknown',
         user_agent: request.headers.get('user-agent') ?? 'unknown',
         description: `Test run completed: ${passed} passed, ${failed} failed`

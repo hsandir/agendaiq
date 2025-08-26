@@ -49,6 +49,23 @@ export default async function EditMeetingPage({ params }: PageProps) {
         }
       },
       meeting_agenda_items: {
+        include: {
+          staff: {
+            include: {
+              users: { select: { id: true, name: true, email: true } }
+            }
+          },
+          agenda_item_comments: {
+            include: {
+              staff: {
+                include: {
+                  users: { select: { id: true, name: true, email: true } }
+                }
+              }
+            },
+            orderBy: { created_at: 'desc' }
+          }
+        },
         orderBy: {
           order_index: 'asc'
         }
@@ -149,7 +166,8 @@ export default async function EditMeetingPage({ params }: PageProps) {
       duration_minutes: item.duration_minutes ?? 15,
       responsible_staff_id: item.responsible_staff_id?.toString() || null,
       status: item.status ?? 'Pending',
-      order_index: item.order_index
+      order_index: item.order_index,
+      agenda_item_comments: item.agenda_item_comments ?? []
     }))
   };
 

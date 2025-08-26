@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
     const jestArgs = [];
     
     // Add specific test suite/file if provided
-    if (suite && suite !== 'all') {
-      jestArgs.push(suite);
+    if (validatedData.suite && validatedData.suite !== 'all') {
+      jestArgs.push(validatedData.suite);
     }
     
     // Add coverage flag

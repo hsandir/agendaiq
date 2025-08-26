@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       passwordCheck: {
         providedPassword: password,
         hashExists: !!(user as Record<string, unknown>).hashed_password,
-        hashStartsWith: (user as Record<string, unknown>).hashed_password?.substring(0, 10),
+        hashStartsWith: String((user as Record<string, unknown>).hashed_password || '').substring(0, 10),
         isValid
       }
     });
