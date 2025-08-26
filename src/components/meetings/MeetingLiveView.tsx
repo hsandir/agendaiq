@@ -29,6 +29,7 @@ import {
   FileText
 } from "lucide-react";
 import { AgendaItemLive } from "./AgendaItemLive";
+import { MeetingHistoryView } from "./MeetingHistoryView";
 import { usePusherChannel, usePresenceChannel } from "@/hooks/usePusher";
 import { CHANNELS, EVENTS } from "@/lib/pusher";
 import Link from "next/link";
@@ -92,9 +93,11 @@ export function MeetingLiveView({
   const [typingUsers, setTypingUsers] = useState<Map<number, { userId: number; userName: string }>>(new Map());
   const [isHydrated, setIsHydrated] = useState(false);
   
-  // Set hydrated flag after mount
+  // Set hydrated flag after mount (don't set lastUpdate on initial load)
   useEffect(() => {
     setIsHydrated(true);
+    // lastUpdate should only be set when actual changes happen, not on initial load
+    // Keep empty dependency array to run only once on mount
   }, []);
 
   // Memoize event handlers to prevent unnecessary re-renders
@@ -219,6 +222,9 @@ export function MeetingLiveView({
       if (!response.ok) {
         // Revert on error
         await refreshMeeting();
+      } else {
+        // Update successful - set lastUpdate timestamp
+        setLastUpdate(new Date());
       }
     } catch (error: unknown) {
       console.error("Error updating agenda item:", error);
@@ -353,16 +359,23 @@ export function MeetingLiveView({
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content - 3 columns */}
           <div className="lg:col-span-3">
-            {/* Agenda Header with View Toggle */}
-            <div className="bg-card rounded-xl shadow-sm border border-border p-6 mb-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl font-semibold text-foreground">Agenda Items</h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {agendaItems.length} items • 
-                    {agendaItems.filter(i => i.status === 'Resolved').length} completed
-                  </p>
-                </div>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="agenda">Agenda Items</TabsTrigger>
+                <TabsTrigger value="history">Update History</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="agenda">
+                {/* Agenda Header with View Toggle */}
+                <div className="bg-card rounded-xl shadow-sm border border-border p-6 mb-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold text-foreground">Agenda Items</h2>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {agendaItems.length} items • 
+                        {agendaItems.filter(i => i.status === 'Resolved').length} completed
+                      </p>
+                    </div>
                 <div className="flex items-center gap-3">
                   {/* View Mode Toggle */}
                   <div className="flex items-center bg-muted rounded-lg p-1">
@@ -452,6 +465,15 @@ export function MeetingLiveView({
                 })
               )}
             </div>
+              </TabsContent>
+
+              <TabsContent value="history">
+                <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+                  <h2 className="text-xl font-semibold text-foreground mb-4">Update History</h2>
+                  <p className="text-muted-foreground">Meeting history and updates will appear here</p>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
 
           {/* Sidebar - 1 column */}

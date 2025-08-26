@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await request.json() as Record<string, unknown>;
-    const { _currentPassword, _newPassword, _confirmPassword } = data;
+    const { currentPassword, newPassword, confirmPassword } = data;
 
     if ((newPassword as string) !== (confirmPassword as string)) {
       return new NextResponse("Passwords do not match", { status: 400 });

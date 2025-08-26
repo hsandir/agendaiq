@@ -73,14 +73,54 @@ export const authOptions: NextAuthOptions = {
         trustDevice: { label: "Trust Device", type: "text", optional: true },
       },
       async authorize(credentials, req): Promise<User | null> {
-        console.log('🔐 Login attempt for:', credentials?.email);
+        console.log('🔐 AUTHORIZE START - Login attempt for:', credentials?.email);
+        
+        // Send log to debug endpoint for production troubleshooting
+        try {
+          await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/debug-logs`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'authorize_start',
+              level: 'info',
+              message: `Authorize function called for ${credentials?.email}`,
+              details: {
+                email: credentials?.email,
+                hasPassword: !!credentials?.password,
+                passwordLength: credentials?.password?.length || 0,
+                hasReq: !!req,
+                timestamp: new Date().toISOString()
+              }
+            })
+          }).catch(() => {}); // Ignore fetch errors
+        } catch (e) { /* ignore */ }
+        
         try {
           // TODO: Add proper audit logging for NextAuth callbacks
           // Log login attempt
           // await AuditClient.logAuthEvent('login_attempt', undefined, undefined, req);
 
           if (!credentials?.email || !credentials?.password) {
-            console.error('Missing credentials');
+            console.error('❌ AUTHORIZE: Missing credentials');
+            
+            // Log to debug endpoint
+            try {
+              await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/debug-logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  type: 'authorize_error',
+                  level: 'error',
+                  message: 'Missing credentials in authorize function',
+                  details: {
+                    hasEmail: !!credentials?.email,
+                    hasPassword: !!credentials?.password,
+                    timestamp: new Date().toISOString()
+                  }
+                })
+              }).catch(() => {});
+            } catch (e) { /* ignore */ }
+            
             // await AuditClient.logSecurityEvent('login_missing_credentials', undefined, undefined, req, 'Missing email or password');
             return null; // Return null instead of throwing
           }
@@ -109,7 +149,7 @@ export const authOptions: NextAuthOptions = {
             }
           }
 
-          console.log('🔍 Looking up user in database:', credentials.email);
+          console.log('🔍 AUTHORIZE: Looking up user in database:', credentials.email);
           const user = await prisma.users.findUnique({
             where: { email: credentials.email },
             include: {
@@ -123,10 +163,36 @@ export const authOptions: NextAuthOptions = {
               }
             }
           });
-          console.log('🔍 User found:', !!user, user ? { id: user.id, email: user.email, hasPassword: !!(user as Record<string, unknown>).hashed_password } : null);
+          console.log('🔍 AUTHORIZE: User found:', !!user, user ? { id: user.id, email: user.email, hasPassword: !!(user as Record<string, unknown>).hashed_password } : null);
+
+          // Log database lookup result
+          try {
+            await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/debug-logs`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'authorize_db_lookup',
+                level: user ? 'info' : 'warning',
+                message: `Database lookup for ${credentials.email}: ${user ? 'Found' : 'Not found'}`,
+                details: user ? {
+                  userId: user.id,
+                  email: user.email,
+                  hasPassword: !!(user as Record<string, unknown>).hashed_password,
+                  passwordLength: ((user as Record<string, unknown>).hashed_password as string)?.length || 0,
+                  hasStaff: user.staff?.length > 0,
+                  twoFactorEnabled: (user as Record<string, unknown>).two_factor_enabled,
+                  timestamp: new Date().toISOString()
+                } : {
+                  email: credentials.email,
+                  error: 'USER_NOT_FOUND',
+                  timestamp: new Date().toISOString()
+                }
+              })
+            }).catch(() => {});
+          } catch (e) { /* ignore */ }
 
           if (!user) {
-            console.error('User not found:', credentials.email);
+            console.error('❌ AUTHORIZE: User not found:', credentials.email);
             return null; // Return null for security (don't reveal if user exists)
           }
           
@@ -136,17 +202,38 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Check password using bcrypt
-          console.log('Checking password for user:', user.email);
+          console.log('🔒 AUTHORIZE: Checking password for user:', user.email);
           const isValid = await bcrypt.compare(credentials.password, (user as Record<string, unknown>).hashed_password);
-          console.log('Password valid:', isValid);
+          console.log('🔒 AUTHORIZE: Password valid:', isValid);
+          
+          // Log password validation result
+          try {
+            await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/debug-logs`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'authorize_password_check',
+                level: isValid ? 'info' : 'error',
+                message: `Password validation for ${user.email}: ${isValid ? 'Success' : 'Failed'}`,
+                details: {
+                  email: user.email,
+                  userId: user.id,
+                  passwordValid: isValid,
+                  providedPasswordLength: credentials.password.length,
+                  storedPasswordLength: ((user as Record<string, unknown>).hashed_password as string)?.length || 0,
+                  timestamp: new Date().toISOString()
+                }
+              })
+            }).catch(() => {});
+          } catch (e) { /* ignore */ }
           
           if (!isValid) {
-            console.error('Invalid password for user:', user.email);
+            console.error('❌ AUTHORIZE: Invalid password for user:', user.email);
             // // await AuditClient.logAuthEvent('login_failure', user.id, user.staff[0]?.id, req, 'Password mismatch');
             return null; // Return null for invalid password
           }
           
-          console.log('✅ Password verified successfully for:', user.email);
+          console.log('✅ AUTHORIZE: Password verified successfully for:', user.email);
 
           // Check 2FA if enabled
           if ((user as Record<string, unknown>).two_factor_enabled) {
@@ -226,7 +313,29 @@ export const authOptions: NextAuthOptions = {
             userData.trustDevice = true;
           }
           
-          console.log('✅ Returning user data:', {
+          // Log successful authorize completion
+          try {
+            await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/debug-logs`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'authorize_success',
+                level: 'info',
+                message: `Authorize function returning user data for ${userData.email}`,
+                details: {
+                  userId: userData.id,
+                  email: userData.email,
+                  hasStaff: !!userData.staff,
+                  staffRole: userData.staff?.role?.key,
+                  rememberMe: credentials.rememberMe === 'true',
+                  trustDevice: credentials.trustDevice === 'true',
+                  timestamp: new Date().toISOString()
+                }
+              })
+            }).catch(() => {});
+          } catch (e) { /* ignore */ }
+
+          console.log('✅ AUTHORIZE: Returning user data:', {
             id: userData.id,
             email: userData.email,
             hasStaff: !!userData.staff,

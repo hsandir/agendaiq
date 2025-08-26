@@ -26,6 +26,9 @@ export async function PUT(request: NextRequest) {
     }
 
     const { user } = authResult;
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
 
     // Only system admins and school admins can modify role assignments
     if (!user.is_system_admin && !(user as any).is_school_admin) {
@@ -79,7 +82,6 @@ export async function PUT(request: NextRequest) {
           id: { in: roleIds },
           OR: [
             { department: { school_id: userStaff.school_id } },
-            { department: { district_id: userStaff.district_id } },
             { department_id: null } // Global roles
           ]
         }
@@ -109,8 +111,7 @@ export async function PUT(request: NextRequest) {
         const updated = await tx.staff.update({
           where: { id: assignment.staffId },
           data: { 
-            role_id: assignment.newRoleId,
-            updated_at: new Date()
+            role_id: assignment.newRoleId
           },
           include: {
             users: {

@@ -173,10 +173,9 @@ export function AgendaItemsEditor({
     
     // Sort items by order_index in descending order (newest first)
     const sortedItems = items.sort((a, b) => b.order_index - a.order_index);
-    setAgendaItems(sortedItems);
     
-    // Auto-add a new item if the list is empty and user can edit
-    if (sortedItems.length === 0 && canEdit && !hasAutoAddedNewItem) {
+    // Always auto-add a new item at the top if user can edit - Zero Degradation Protocol
+    if (canEdit && !hasAutoAddedNewItem) {
       const newItem: AgendaItemFormData = {
         topic: '',
         priority: 'Medium',
@@ -186,10 +185,13 @@ export function AgendaItemsEditor({
         future_implications: false,
         carried_forward: false,
         carry_forward_count: 0,
-        order_index: 0
+        order_index: sortedItems.length > 0 ? Math.max(...sortedItems.map(i => i.order_index)) + 1 : 0
       };
-      setAgendaItems([newItem]);
+      // Add the new item at the beginning (top) and keep existing items below
+      setAgendaItems([newItem, ...sortedItems]);
       setHasAutoAddedNewItem(true);
+    } else {
+      setAgendaItems(sortedItems);
     }
   }, [])
 

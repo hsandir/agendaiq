@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       .digest('hex');
 
     // Store token with expiry
-    await prisma.verificationToken.create({
+    await prisma.verification_token.create({
       data: {
         identifier: user?.email,
         token,

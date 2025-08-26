@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   try {
     const auth = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_VIEW 
+      requireCapability: Capability.MEETING_VIEW 
     });
     
     if (!auth.success) {
@@ -19,6 +19,9 @@ export async function GET(request: NextRequest) {
     }
 
     const { user } = auth;
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
 
     // Get user's organization context first (minimal query)
     const currentStaff = await prisma.staff.findFirst({

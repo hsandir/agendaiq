@@ -23,7 +23,7 @@ export async function GET(
     const userId = params.id;
 
     const user = await prisma.users.findUnique({
-      where: { id: userId },
+      where: { id: parseInt(userId) },
       include: {
         staff: {
           include: {
@@ -43,7 +43,7 @@ export async function GET(
     }
 
     // Apply field-level filtering
-    const filteredUser = filterFields(currentusers, 'User', user, user);
+    const filteredUser = filterFields(currentUser, 'User', user, user);
 
     return NextResponse.json({ user: filteredUser });
 
@@ -89,7 +89,7 @@ export async function PUT(
     }
 
     // Validate field-level write access
-    const validation = validateWrite(currentusers, 'User', body, existingUser);
+    const validation = validateWrite(currentUser, 'User', body, existingUser);
     
     if (!validation.valid) {
       return NextResponse.json(
@@ -103,7 +103,7 @@ export async function PUT(
 
     // Update user
     const updatedUser = await prisma.users.update({
-      where: { id: userId },
+      where: { id: parseInt(userId) },
       data: {
         ...(body.name !== undefined && { name: body.name }),
         ...(body.email !== undefined && { email: body.email }),
@@ -115,16 +115,15 @@ export async function PUT(
         }),
         ...(body.remember_devices_enabled !== undefined && { 
           remember_devices_enabled: body.remember_devices_enabled 
-        }),
-        updated_at: new Date()
+        })
       }
     });
 
     // Apply field-level filtering to response
-    const filteredUser = filterFields(currentusers, 'User', updatedusers, updatedUser);
+    const filteredUser = filterFields(currentUser, 'User', updatedUser, updatedUser);
 
     return NextResponse.json({ 
-      user: filteredusers,
+      user: filteredUser,
       message: "User updated successfully" 
     });
 

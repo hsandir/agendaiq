@@ -15,7 +15,11 @@ import {
   GripVertical,
   Clock,
   users,
-  AlertCircle
+  AlertCircle,
+  ArrowUp,
+  ArrowDown,
+  Minimize2,
+  Maximize2
 } from "lucide-react";
 import type { Priority, Purpose, SolutionType, DecisionType, AgendaItemStatus } from "@prisma/client";
 
@@ -70,10 +74,11 @@ export function AgendaItemForm({
   isFirst,
   isLast
 }: AgendaItemFormProps) {
-  // Default to expanded for new items (empty topic), collapsed for existing items
-  const [isExpanded, setIsExpanded] = useState(!item.topic || item.topic === '');
+  // Default to expanded for new items (empty topic and first item), collapsed for existing items
+  // Zero Degradation Protocol: New item at top gets expanded, existing items stay collapsed
+  const [isExpanded, setIsExpanded] = useState((!item.topic || item.topic === '') && index === 0);
 
-  const handleChange = (field: keyof AgendaItemFormData, value: Record<string, unknown>) => {
+  const handleChange = (field: keyof AgendaItemFormData, value: string | number | boolean | undefined) => {
     onUpdate(index, { ...item, [field]: value });
   };
 
@@ -105,8 +110,9 @@ export function AgendaItemForm({
                 variant="ghost"
                 size="sm"
                 onClick={() => onMoveUp(index, 'up')}
+                title="Move item up"
               >
-                <ChevronUp className="h-4 w-4" />
+                <ArrowUp className="h-4 w-4 text-blue-600" />
               </Button>
             )}
             {!isLast && onMoveDown && (
@@ -115,8 +121,9 @@ export function AgendaItemForm({
                 variant="ghost"
                 size="sm"
                 onClick={() => onMoveDown(index, 'down')}
+                title="Move item down"
               >
-                <ChevronDown className="h-4 w-4" />
+                <ArrowDown className="h-4 w-4 text-blue-600" />
               </Button>
             )}
             <Button
@@ -124,8 +131,9 @@ export function AgendaItemForm({
               variant="ghost"
               size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
+              title={isExpanded ? "Collapse item" : "Expand item"}
             >
-              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              {isExpanded ? <Minimize2 className="h-4 w-4 text-gray-600" /> : <Maximize2 className="h-4 w-4 text-gray-600" />}
             </Button>
             <Button
               type="button"

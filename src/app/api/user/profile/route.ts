@@ -63,8 +63,8 @@ export async function PUT(request: NextRequest) {
     const { name, phone } = body;
 
     const updateData: { name?: string; phone?: string } = {};
-    if (name !== undefined) updateData.name = name;
-    if (phone !== undefined) updateData.phone = phone;
+    if (name !== undefined) updateData.name = name as string | undefined;
+    if (phone !== undefined) updateData.phone = phone as string | undefined;
 
     const updatedUser = await prisma.users.update({
       where: { email: user.email },

@@ -104,7 +104,7 @@ export async function PUT(request: NextRequest) {
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: (user.staff as Record<string, unknown> | null)?.id ?? undefined,
+      staffId: ((user.staff as Record<string, unknown> | null)?.id as number | undefined) ?? undefined,
       source: 'WEB_UI',
       description: `Theme changed to ${themeToSave}`,
     }).catch(err => console.error('Audit log failed:', err));

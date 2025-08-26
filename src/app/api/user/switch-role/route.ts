@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json() as Record<string, unknown>;
     const { role } = body;
 
-    if (!role || !['admin', 'user'].includes(role)) {
+    if (!role || !['admin', 'user'].includes(role as string)) {
       return NextResponse.json(
         { error: "Invalid role. Must be 'admin' or 'user'" },
         { status: 400 }
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     await prisma.staff.update({
       where: { id: staffRecord?.id },
       data: { 
-        role_id: parseInt(targetRole?.id)
+        role_id: parseInt(targetRole?.id.toString() || '0')
       }
     });
 

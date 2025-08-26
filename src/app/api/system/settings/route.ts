@@ -20,9 +20,9 @@ export async function GET(request: NextRequest) {
 
     // Convert to a more usable format
     const settingsObject = settings.reduce((acc, setting) => {
-      (acc as any)[setting.key] = setting.value;
+      acc[setting.key] = setting.value;
       return acc;
-    }, {} satisfies Record<string, unknown>);
+    }, {} as Record<string, unknown>);
 
     return NextResponse.json({
       success: true,

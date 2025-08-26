@@ -67,13 +67,13 @@ export async function POST(request: NextRequest) {
         operation: 'CREATE',
         source: 'SYSTEM',
         user_id: Number(user.id) || 0,
-        staff_id: Number((user.staff as any)?.id) || null,
+        staff_id: (user.staff as { id?: number })?.id || null,
         field_changes: {
           passed: Number(passed) || 0,
           failed: Number(failed) || 0,
           coverage: Number(coverage) || 0,
           duration: Number(duration) || 0
-        } as any,
+        },
         ip_address: request.headers.get('x-forwarded-for') ?? 'unknown',
         user_agent: request.headers.get('user-agent') ?? 'unknown',
         description: `Test run completed: ${passed} passed, ${failed} failed`

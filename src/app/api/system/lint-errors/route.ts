@@ -160,7 +160,7 @@ async function getLintSummary() {
   } catch (error: unknown) {
     // ESLint might return non-zero exit code for errors, parse the output anyway
     try {
-      const errorOutput = (error as any)?.stdout || '[]';
+      const errorOutput = (error as { stdout?: string })?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const summary = results.reduce((acc, result) => {
         acc.totalFiles++;
@@ -241,7 +241,7 @@ async function getLintDetails(severity: string, limit: number, offset: number) {
 
   } catch (error: unknown) {
     try {
-      const errorOutput = (error as any)?.stdout || '[]';
+      const errorOutput = (error as { stdout?: string })?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const allErrors: (LintError & { filePath: string })[] = [];
       results.forEach(result => {
@@ -305,7 +305,7 @@ async function getFixableErrors() {
 
   } catch (error: unknown) {
     try {
-      const errorOutput = (error as any)?.stdout || '[]';
+      const errorOutput = (error as { stdout?: string })?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const fixableErrors: (LintError & { filePath: string })[] = [];
       results.forEach(result => {
@@ -360,7 +360,7 @@ async function autoFixErrors() {
   } catch (error: unknown) {
     // Even if some errors remain, auto-fix might have worked partially
     try {
-      const errorOutput = (error as any)?.stdout || '[]';
+      const errorOutput = (error as { stdout?: string })?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const remainingErrors = results.reduce((sum, result) => sum + result.errorCount, 0);
       const remainingWarnings = results.reduce((sum, result) => sum + result.warningCount, 0);

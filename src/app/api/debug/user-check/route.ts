@@ -1,16 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcrypt';
 
 export async function GET(request: NextRequest) {
   try {
+    console.log('=== DEBUG USER CHECK START ===');
+    
     const email = request.nextUrl.searchParams.get('email');
+    console.log('Requested email:', email);
     
     if (!email) {
       return NextResponse.json({ error: 'Email parameter required' }, { status: 400 });
     }
 
-    // Look up the user
+    // Test basic database connection first
+    console.log('Testing database connection...');
+    const { prisma } = await import('@/lib/prisma');
+    
+    // Simple query to test connection
+    console.log('Testing basic query...');
+    const userCount = await prisma.users.count();
+    console.log('User count:', userCount);
+
+    // Look up the specific user
+    console.log('Looking up user:', email);
     const user = await prisma.users.findUnique({
       where: { email },
       select: {
@@ -20,24 +31,18 @@ export async function GET(request: NextRequest) {
         hashed_password: true,
         two_factor_enabled: true,
         is_system_admin: true,
-        is_school_admin: true,
-        staff: {
-          select: {
-            id: true,
-            role: {
-              select: {
-                key: true,
-                category: true
-              }
-            }
-          }
-        }
+        is_school_admin: true
       }
     });
 
+    console.log('User found:', !!user);
+    
     if (!user) {
+      console.log('User not found in database');
       return NextResponse.json({
+        success: true,
         exists: false,
+        userCount,
         message: `User ${email} not found in database`
       });
     }
@@ -46,15 +51,23 @@ export async function GET(request: NextRequest) {
     let passwordTest = null;
     if (email === 'admin@school.edu' && user.hashed_password) {
       try {
+        console.log('Testing password hash...');
+        const bcrypt = await import('bcrypt');
         const testPassword = '1234';
-        passwordTest = await bcrypt.compare(testPassword, user.hashed_password);
+        passwordTest = await bcrypt.default.compare(testPassword, user.hashed_password);
+        console.log('Password test result:', passwordTest);
       } catch (error) {
+        console.error('Password test error:', error);
         passwordTest = `Error testing password: ${error}`;
       }
     }
 
+    console.log('=== DEBUG USER CHECK END ===');
+    
     return NextResponse.json({
+      success: true,
       exists: true,
+      userCount,
       user: {
         id: user.id,
         email: user.email,
@@ -64,16 +77,20 @@ export async function GET(request: NextRequest) {
         twoFactorEnabled: user.two_factor_enabled,
         isSystemAdmin: user.is_system_admin,
         isSchoolAdmin: user.is_school_admin,
-        hasStaff: user.staff.length > 0,
-        staffRole: user.staff[0]?.role?.key || null,
         passwordTest: passwordTest
       }
     });
   } catch (error) {
-    console.error('User check error:', error);
+    console.error('=== DEBUG USER CHECK ERROR ===');
+    console.error('Error:', error);
+    console.error('Error message:', error instanceof Error ? error.message : String(error));
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+    
     return NextResponse.json({
+      success: false,
       error: 'Database error',
-      details: error instanceof Error ? error.message : String(error)
+      details: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : null
     }, { status: 500 });
   }
 }

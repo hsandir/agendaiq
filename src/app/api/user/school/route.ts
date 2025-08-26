@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     // Validate school exists
     const school = await prisma.school.findUnique({
-      where: { id: schoolId },
+      where: { id: schoolId as number },
     });
 
     if (!school) {
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     // Update staff record's school
     await prisma.staff.update({
       where: { id: userStaff?.id },
-      data: { school_id: parseInt(schoolId) },
+      data: { school_id: parseInt(schoolId as string) },
     });
 
     // Get updated user with staff

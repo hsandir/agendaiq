@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    if (!records ?? records.length === 0) {
+    if (!records || records.length === 0) {
       return NextResponse.json({ 
         error: 'CSV file is empty or has no valid data rows.',
         hint: 'Please ensure your file contains data rows below the header row'
@@ -208,16 +208,16 @@ export async function POST(request: NextRequest) {
         if (!record.Email || !emailSchema.safeParse(record.Email).success) {
           recordErrors.push('Invalid email format');
         }
-        if (!record.Name ?? record.String(Name).trim().length === 0) {
+        if (!record.Name || String(record.Name).trim().length === 0) {
           recordErrors.push('Name is required');
         }
         if (!record.StaffId || !staffIdSchema.safeParse(record.StaffId).success) {
           recordErrors.push('Staff ID must be 3-15 characters');
         }
-        if (!record.role ?? record.String(Role).trim().length === 0) {
+        if (!record.role || String(record.Role).trim().length === 0) {
           recordErrors.push('Role is required');
         }
-        if (!record.department ?? record.String(Department).trim().length === 0) {
+        if (!record.department || String(record.Department).trim().length === 0) {
           recordErrors.push('Department is required');
         }
 
@@ -471,8 +471,8 @@ export async function POST(request: NextRequest) {
               await prisma.staff.update({
                 where: { id: existingUser.staff[0].id },
                 data: {
-                  role_id: parseInt(role.id),
-                  department_id: parseInt(department.id)
+                  role_id: role.id,
+                  department_id: department.id
                 }
               });
             } else {
@@ -484,8 +484,8 @@ export async function POST(request: NextRequest) {
               await prisma.staff.create({
                 data: {
                   user_id: parseInt(existingUser.id),
-                  role_id: parseInt(role.id),
-                  department_id: parseInt(department.id),
+                  role_id: role.id,
+                  department_id: department.id,
                   school_id: parseInt(adminStaff).school.id,
                   district_id: parseInt(adminStaff).district.id,
                 }

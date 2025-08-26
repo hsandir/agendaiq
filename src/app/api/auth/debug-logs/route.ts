@@ -273,6 +273,98 @@ export async function GET(request: NextRequest) {
         allHeaders: Object.keys(allHeaders).length
       }
     });
+
+    // PRODUCTION DIAGNOSTICS: Test admin@school.edu user directly
+    let productionUserTest = { tested: false, result: null as any };
+    try {
+      console.log('=== PRODUCTION DIAGNOSTICS: Testing admin@school.edu ===');
+      const adminUser = await prisma.users.findUnique({
+        where: { email: 'admin@school.edu' },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          hashed_password: true,
+          two_factor_enabled: true,
+          is_system_admin: true,
+          is_school_admin: true,
+          staff: {
+            select: {
+              id: true,
+              role: {
+                select: {
+                  key: true,
+                  category: true
+                }
+              }
+            }
+          }
+        }
+      });
+
+      if (!adminUser) {
+        productionUserTest = {
+          tested: true,
+          result: {
+            exists: false,
+            error: 'USER_NOT_FOUND',
+            message: 'admin@school.edu not found in production database'
+          }
+        };
+        console.log('❌ admin@school.edu not found');
+      } else {
+        // Test password
+        let passwordTest = null;
+        if (adminUser.hashed_password) {
+          try {
+            passwordTest = await bcrypt.compare('1234', adminUser.hashed_password);
+            console.log('🔐 Password test result:', passwordTest);
+          } catch (error) {
+            passwordTest = `Error: ${error}`;
+            console.error('❌ Password test error:', error);
+          }
+        }
+
+        productionUserTest = {
+          tested: true,
+          result: {
+            exists: true,
+            user: {
+              id: adminUser.id,
+              email: adminUser.email,
+              name: adminUser.name,
+              hasPassword: !!adminUser.hashed_password,
+              passwordLength: adminUser.hashed_password?.length || 0,
+              twoFactorEnabled: adminUser.two_factor_enabled,
+              isSystemAdmin: adminUser.is_system_admin,
+              isSchoolAdmin: adminUser.is_school_admin,
+              hasStaff: adminUser.staff.length > 0,
+              staffRole: adminUser.staff[0]?.role?.key || null,
+              passwordTest: passwordTest
+            }
+          }
+        };
+        console.log('✅ admin@school.edu found:', productionUserTest.result);
+      }
+    } catch (error) {
+      productionUserTest = {
+        tested: true,
+        result: {
+          error: 'DATABASE_ERROR',
+          message: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : null
+        }
+      };
+      console.error('❌ Production user test error:', error);
+    }
+
+    // Add production diagnostics log
+    addLog({
+      type: 'production_diagnostics',
+      level: 'critical',
+      message: 'Production admin@school.edu user test',
+      details: productionUserTest
+    });
     
     // Add process information
     const processInfo = {
