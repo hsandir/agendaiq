@@ -60,8 +60,8 @@ export async function middleware(request: NextRequest) {
 
   // Check if route is explicitly public (default-secure posture)
   if (isPublicRoute(path)) {
-    // If user is already authenticated and trying to access signin, redirect to dashboard
-    if (token && path === '/auth/signin') {
+    // If user is already authenticated and trying to access auth pages, redirect to dashboard
+    if (token && (path === '/auth/signin' || path === '/auth/forgot-password')) {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
     // Public route - allow access without authentication
