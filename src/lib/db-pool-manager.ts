@@ -171,10 +171,23 @@ export const dbPool = DatabasePoolManager.getInstance();
 
 // Export client getter for backward compatibility
 export const getPooledPrismaClient = (): PrismaClient => {
+  // For build time compatibility - don't initialize during build
+  if (process.env.NODE_ENV === 'development' || typeof window === 'undefined') {
+    try {
+      return dbPool.getClient();
+    } catch (error) {
+      // If pool not initialized, return raw client for build compatibility
+      if (error instanceof Error && error.message.includes('not initialized')) {
+        console.warn('⚠️  Database pool not initialized, using raw Prisma client');
+        return dbPool['prismaClient']; // Access private member for fallback
+      }
+      throw error;
+    }
+  }
   return dbPool.getClient();
 };
 
-// Initialize pool on module load (server-side only)
-if (typeof window === 'undefined') {
+// Initialize pool on module load (server-side only, not during build)
+if (typeof window === 'undefined' && process.env.NODE_ENV !== 'production') {
   dbPool.initialize().catch(console.error);
 }

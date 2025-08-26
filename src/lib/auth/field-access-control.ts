@@ -2,8 +2,8 @@
 // This system controls which fields users can view/edit based on their roles
 
 import { User } from "next-auth";
-import { AuthenticatedUser, UserWithCapabilities } from "./auth-utils";
-import { can, isRole, RoleKey, Capability } from "./policy";
+import { AuthenticatedUser } from "./auth-utils";
+import { can, isRole, RoleKey, Capability, UserWithCapabilities } from "./policy";
 
 export interface FieldAccessRule {
   field: string;
@@ -190,8 +190,8 @@ function checkAccess(
   return false;
 }
 
-// Type guard to check if user is UserWithCapabilities
-function isUserWithCapabilities(user: User | AuthenticatedUser): user is UserWithCapabilities {
+// Type guard to check if user is AuthenticatedUser (which extends UserWithCapabilities)
+function isUserWithCapabilities(user: User | AuthenticatedUser): user is AuthenticatedUser {
   return 'capabilities' in user || 'staff' in user;
 }
 
@@ -250,7 +250,7 @@ export function filterFields<T extends Record<string, unknown>>(
 
   for (const [field, value] of Object.entries(data)) {
     if (canReadField(user, model, field, record)) {
-      filtered[field as keyof T] = value;
+      filtered[field as keyof T] = value as T[keyof T];
     }
   }
 

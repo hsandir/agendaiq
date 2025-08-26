@@ -8,15 +8,15 @@ interface MeetingInviteTemplateProps {
 
 export function MeetingInviteTemplate({ data }: MeetingInviteTemplateProps) {
   const {
-    _meetingTitle,
-    _meetingDescription,
-    _startTime,
-    _endTime,
-    _location,
-    _organizer,
-    _attendees,
-    _meetingUrl,
-    _agendaItems
+    meetingTitle,
+    meetingDescription,
+    startTime,
+    endTime,
+    location,
+    organizer,
+    attendees,
+    meetingUrl,
+    agendaItems
   } = data;
 
   const formatDateTime = (dateString: string) => {

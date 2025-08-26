@@ -232,8 +232,8 @@ export function getEnvironmentReport(): {
   };
 }
 
-// Initialize validation on module load (server-side only)
-if (typeof window === 'undefined') {
+// Initialize validation on module load (server-side only, not during build)
+if (typeof window === 'undefined' && process.env.NODE_ENV !== 'production') {
   console.log('🔍 Environment Validation System initialized');
   assertEnvironment();
 }

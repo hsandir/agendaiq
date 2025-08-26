@@ -3,7 +3,7 @@ import { getToken, JWT } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 import { rateLimitMiddleware } from "@/lib/middleware/rate-limit-middleware";
 import { auditMiddleware } from "@/lib/middleware/audit-middleware";
-import { canAccessRoute, canAccessApi, UserWithCapabilities } from "@/lib/auth/policy";
+import { canAccessRoute, canAccessApi, UserWithCapabilities } from "@/lib/auth/policy-edge";
 import { isPublicRoute, isPublicApiRoute } from "@/lib/auth/public-routes";
 
 interface NextAuthToken {

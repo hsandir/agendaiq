@@ -10,16 +10,15 @@ import {
 } from "./field-access-control";
 
 // Middleware to apply field-level access control to API responses
-export function withFieldAccess<T extends (...args: Record<string, unknown>[]) => Promise<NextResponse>>(
+export function withFieldAccess<T extends (request: NextRequest, ...args: unknown[]) => Promise<NextResponse>>(
   handler: T,
   model: string
 ): T {
-  return (async (...args: Parameters<T>) => {
-    const response = await handler(...args);
+  return (async (request: NextRequest, ...otherArgs: unknown[]) => {
+    const response = await handler(request, ...otherArgs);
     
-    // Get the request and user from args
-    const request = args[0] as NextRequest;
-    const user = request.user as User;
+    // Get user from request context (would need to be set by auth middleware)
+    const user = (request as NextRequest & { user?: User }).user;
     
     if (!user) {
       return response;

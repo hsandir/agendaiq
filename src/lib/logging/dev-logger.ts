@@ -74,7 +74,7 @@ export class DevLogger {
       message,
       metadata: { ...this.context, ...metadata },
       context,
-      component: this.context.component,
+      component: typeof this.context.component === 'string' ? this.context.component : undefined,
       function: func,
       file,
       line,

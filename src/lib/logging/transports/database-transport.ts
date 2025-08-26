@@ -36,7 +36,7 @@ export class DatabaseTransport implements LogTransport {
   }
 
   private async writeDevLog(entry: DevLogEntry): Promise<void> {
-    await prisma.devLog.create({
+    await prisma.dev_logs.create({
       data: {
         id: entry.id,
         timestamp: new Date(entry.timestamp),
@@ -66,7 +66,7 @@ export class DatabaseTransport implements LogTransport {
   }
 
   private async writeAuditLog(entry: AuditLogEntry): Promise<void> {
-    await prisma.securityLog.create({
+    await prisma.security_logs.create({
       data: {
         id: entry.id,
         timestamp: new Date(entry.timestamp),
@@ -125,7 +125,7 @@ export class DatabaseTransport implements LogTransport {
       // Query both dev and audit logs
       const [devLogs, auditLogs] = await Promise.all([
         // Query development logs
-        prisma.devLog.findMany({
+        prisma.dev_logs.findMany({
           where: {
             ...where,
             ...(query.category ? { category: { in: query.category } } : {})
@@ -135,7 +135,7 @@ export class DatabaseTransport implements LogTransport {
           skip: query.offset ?? 0
         }),
         // Query audit logs
-        prisma.securityLog.findMany({
+        prisma.security_logs.findMany({
           where: {
             ...where,
             ...(query.category ? { category: { in: query.category } } : {})
@@ -199,7 +199,7 @@ export class DatabaseTransport implements LogTransport {
   async stats(): Promise<LogStats> {
     try {
       const [devStats, auditStats] = await Promise.all([
-        prisma.devLog.groupBy({
+        prisma.dev_logs.groupBy({
           by: ['level'],
           _count: { id: true },
           where: {
@@ -208,7 +208,7 @@ export class DatabaseTransport implements LogTransport {
             }
           }
         }),
-        prisma.securityLog.groupBy({
+        prisma.security_logs.groupBy({
           by: ['level'],
           _count: { id: true },
           where: {

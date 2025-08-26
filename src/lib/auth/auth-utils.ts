@@ -15,6 +15,9 @@ import {
   isRole,
 } from './policy';
 
+// Export UserWithCapabilities for use in other files
+export type { UserWithCapabilities };
+
 // Types for better type safety - extend UserWithCapabilities
 export interface AuthenticatedUser extends UserWithCapabilities {
   staff?: {
@@ -102,7 +105,7 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
       name: dbUser.name,
       is_system_admin: dbUser.is_system_admin,
       is_school_admin: dbUser.is_school_admin,
-      staff: dbUser.staff && dbUser.staff.length > 0 ? {
+      staff: dbUser.staff && dbUser.staff.length > 0 ? [{
         id: dbUser.staff[0].id,
         role: {
           id: dbUser.staff[0].role.id,
@@ -116,7 +119,7 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
           id: dbUser.staff[0].school.id,
           name: dbUser.staff[0].school.name
         }
-      } : null
+      }] : undefined
     });
 
     // User successfully retrieved with capabilities
@@ -133,10 +136,20 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
           category: dbUser.staff[0]?.role?.category || null,
           is_leadership: dbUser.staff[0]?.role?.is_leadership || false
         } : undefined,
+        department: {
+          id: dbUser.staff[0]?.department?.id || 0,
+          name: dbUser.staff[0]?.department?.name || '',
+          code: dbUser.staff[0]?.department?.code || ''
+        },
+        school: {
+          id: dbUser.staff[0]?.school?.id || 0,
+          name: dbUser.staff[0]?.school?.name || '',
+          code: dbUser.staff[0]?.school?.code || null
+        },
         district: {
-          id: 0,
-          name: '',
-          code: null
+          id: dbUser.staff[0]?.district?.id || 0,
+          name: dbUser.staff[0]?.district?.name || '',
+          code: dbUser.staff[0]?.district?.code || null
         }
       } : undefined
     };

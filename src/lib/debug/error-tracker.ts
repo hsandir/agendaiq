@@ -1,4 +1,13 @@
 // Global Error Tracking System
+
+// Extend XMLHttpRequest interface for tracking
+declare global {
+  interface XMLHttpRequest {
+    _method?: string;
+    _url?: string;
+  }
+}
+
 export interface ErrorDetail {
   id: string;
   timestamp: string;
@@ -157,13 +166,22 @@ class ErrorTracker {
     const originalXHROpen = XMLHttpRequest.prototype.open;
     const originalXHRSend = XMLHttpRequest.prototype.send;
     
-    XMLHttpRequest.prototype.open = function(method: string, url: string, ...args: any[]) {
+    XMLHttpRequest.prototype.open = function(method: string, url: string, async?: boolean, user?: string | null, password?: string | null) {
       this._method = method;
       this._url = url;
-      return originalXHROpen.apply(this, [method, url, ...args] as any);
+      if (async !== undefined) {
+        if (user !== undefined && password !== undefined) {
+          return originalXHROpen.call(this, method, url, async, user, password);
+        } else if (user !== undefined) {
+          return originalXHROpen.call(this, method, url, async, user);
+        } else {
+          return originalXHROpen.call(this, method, url, async);
+        }
+      }
+      return originalXHROpen.call(this, method, url);
     };
     
-    XMLHttpRequest.prototype.send = function(...args: any[]) {
+    XMLHttpRequest.prototype.send = function(body?: Document | XMLHttpRequestBodyInit | null) {
       this.addEventListener('error', () => {
         ErrorTrackerInstance.trackError({
           type: 'network',
@@ -186,7 +204,7 @@ class ErrorTracker {
         }
       });
       
-      return originalXHRSend.apply(this, args);
+      return originalXHRSend.call(this, body);
     };
   }
 
@@ -198,11 +216,12 @@ class ErrorTracker {
       
     const error: ErrorDetail = {
       id: `error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      timestamp,
+      type: errorInfo.type || 'error',
+      message: errorInfo.message || 'Unknown error',
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
       ...errorInfo,
       timestamp, // Override to ensure it's always our validated timestamp
-    } as ErrorDetail;
+    };
 
     this.errors.unshift(error);
     

@@ -1,5 +1,4 @@
 /// <reference types="node" />
-import { dbPool, getPooledPrismaClient } from './db-pool-manager';
 
 /**
  * Enhanced Prisma Client with Connection Pool Management
@@ -8,7 +7,15 @@ import { dbPool, getPooledPrismaClient } from './db-pool-manager';
  * - Backward compatible with existing prisma usage
  * - Adds connection pool management and retry logic
  * - Enhanced monitoring and health checks
+ * - Edge runtime safe (doesn't initialize in middleware)
  */
+
+// Edge runtime check - don't initialize Prisma in edge environment
+if (typeof EdgeRuntime !== 'undefined') {
+  throw new Error('Prisma cannot be imported in Edge Runtime (middleware). Use edge-compatible functions only.');
+}
+
+import { dbPool, getPooledPrismaClient } from './db-pool-manager';
 
 // Main export for backward compatibility
 export const prisma = getPooledPrismaClient();

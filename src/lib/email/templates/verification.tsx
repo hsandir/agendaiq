@@ -7,7 +7,7 @@ interface VerificationTemplateProps {
 }
 
 export function VerificationTemplate({ data }: VerificationTemplateProps) {
-  const { _userName, _verificationUrl, _expiresIn } = data;
+  const { userName, verificationUrl, expiresIn } = data;
 
   return (
     <BaseEmailTemplate
