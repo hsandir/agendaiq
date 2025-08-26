@@ -279,6 +279,7 @@ export const authOptions: NextAuthOptions = {
                 id: staff.id,
                 role: {
                   id: staff.role.id,
+                  title: staff.role.title,
                   key: staff.role.key,
                   category: staff.role.category,
                   is_leadership: staff.role.is_leadership
@@ -472,26 +473,15 @@ export const authOptions: NextAuthOptions = {
               token.staff = {
                 id: staff.id,
                 role: {
-                  key: staff.role.key,
-                  category: staff.role.category,
-                  is_leadership: staff.role.is_leadership
+                  title: staff.role.title
                 },
                 department: {
-                  id: staff.department.id,
-                  name: staff.department.name,
-                  code: staff.department.code
+                  name: staff.department.name
                 },
                 school: {
-                  id: staff.school.id,
-                  name: staff.school.name,
-                  code: staff.school.code
-                },
-                district: {
-                  id: staff.district.id,
-                  name: staff.district.name,
-                  code: staff.district.code
+                  name: staff.school.name
                 }
-              } satisfies Record<string, unknown>;
+              };
             }
           }
         } catch (error: unknown) {

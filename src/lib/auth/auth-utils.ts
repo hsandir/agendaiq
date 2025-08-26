@@ -107,23 +107,15 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
         role: {
           id: dbUser.staff[0].role.id,
           key: dbUser.staff[0].role.key,
-          category: dbUser.staff[0].role.category,
-          is_leadership: dbUser.staff[0].role.is_leadership
+          title: dbUser.staff[0].role.title
         },
         department: {
           id: dbUser.staff[0].department.id,
-          name: dbUser.staff[0].department.name,
-          code: dbUser.staff[0].department.code
+          name: dbUser.staff[0].department.name
         },
         school: {
           id: dbUser.staff[0].school.id,
-          name: dbUser.staff[0].school.name,
-          code: dbUser.staff[0].school.code
-        },
-        district: {
-          id: dbUser.staff[0].district.id,
-          name: dbUser.staff[0].district.name,
-          code: dbUser.staff[0].district.code
+          name: dbUser.staff[0].school.name
         }
       } : null
     });

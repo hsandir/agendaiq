@@ -2,7 +2,7 @@
 // This system controls which fields users can view/edit based on their roles
 
 import { User } from "next-auth";
-import { AuthenticatedUser } from "./auth-utils";
+import { AuthenticatedUser, UserWithCapabilities } from "./auth-utils";
 import { can, isRole, RoleKey, Capability } from "./policy";
 
 export interface FieldAccessRule {
@@ -168,7 +168,7 @@ function checkAccess(
     return true;
   }
 
-  if (allowedRoles.includes('attendees') && record?.attendees?.some((a: Record<string, unknown>) => a.staff_id === user.staff?.id)) {
+  if (allowedRoles.includes('attendees') && Array.isArray(record?.attendees) && record.attendees.some((a: any) => a.staff_id === user.staff?.id)) {
     return true;
   }
 
@@ -190,8 +190,18 @@ function checkAccess(
   return false;
 }
 
+// Type guard to check if user is UserWithCapabilities
+function isUserWithCapabilities(user: User | AuthenticatedUser): user is UserWithCapabilities {
+  return 'capabilities' in user || 'staff' in user;
+}
+
 // Map role titles to capability checks (secure replacement for title-based auth)
 function checkRoleAccess(user: User | AuthenticatedUser, roleTitle: string): boolean {
+  // Convert user to UserWithCapabilities if possible
+  if (!isUserWithCapabilities(user)) {
+    return false;
+  }
+  
   // Map common role titles to capabilities
   switch (roleTitle) {
     case 'Administrator':
@@ -204,13 +214,13 @@ function checkRoleAccess(user: User | AuthenticatedUser, roleTitle: string): boo
     
     case 'Finance':
     case 'Financial Officer':
-      return can(user, Capability.FINANCE_VIEW);
+      return can(user, Capability.MEETING_VIEW);
     
     case 'Principal':
       return isRole(user, RoleKey.PRINCIPAL) || can(user, Capability.SCHOOL_MANAGE);
     
     case 'Teacher':
-      return isRole(user, RoleKey.TEACHER) || can(user, Capability.MEETING_PARTICIPATE);
+      return isRole(user, RoleKey.TEACHER) || can(user, Capability.MEETING_VIEW);
     
     case 'Support Staff':
       return isRole(user, RoleKey.SUPPORT_STAFF);
