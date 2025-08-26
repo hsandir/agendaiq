@@ -166,7 +166,7 @@ export async function POST(request: NextRequest, props: Props) {
     if (isSingleAddition) {
       // For single item addition, just add it without deleting existing items
       // Remove id field if it exists to avoid unique constraint error
-      const { id: itemId, ...itemData } = result.data.items[0];
+      const { id: _itemId, ...itemData } = result.data.items[0] as any;
       const newItem = await prisma.meeting_agenda_items.create({
         data: {
           meeting_id: meetingId,
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest, props: Props) {
       // Remove id field from each item to avoid unique constraint errors
       await prisma.meeting_agenda_items.createMany({
         data: result.data.items.map(item => {
-          const { id: itemId, ...itemData } = item;
+          const { id: _itemId, ...itemData } = item as any;
           return {
             meeting_id: meetingId,
             ...itemData,
@@ -295,8 +295,15 @@ export async function PUT(request: NextRequest, props: Props) {
     const meetingId = parseInt(params.id);
     const body = await request.json() as Record<string, unknown>;
     
+    console.log('PUT agenda items request:', {
+      meetingId,
+      itemCount: Array.isArray(body.items) ? body.items.length : 0,
+      items: body.items
+    });
+
     const result = createAgendaItemsSchema.safeParse(body);
     if (!result.success) {
+      console.error('PUT validation failed:', result.error.issues);
       return NextResponse.json(
         { error: "Invalid input data", details: result.error.issues },
         { status: 400 }

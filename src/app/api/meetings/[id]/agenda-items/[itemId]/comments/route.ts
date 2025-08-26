@@ -129,7 +129,7 @@ export async function POST(
     // Create the comment
     const comment = await prisma.agenda_item_comments.create({
       data: {
-        content: validationResult.data.content,
+        comment: validationResult.data.content,
         agenda_item_id: itemId,
         staff_id: user.staff?.id ?? 0
       },

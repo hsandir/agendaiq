@@ -91,6 +91,11 @@ export default async function MeetingLivePage(props: Props) {
         id: true,
         topic: true,
         problem_statement: true,
+        proposed_solution: true,
+        decisions_actions: true,
+        solution_type: true,
+        decision_type: true,
+        future_implications: true,
         staff_initials: true,
         order_index: true,
         status: true,
@@ -98,11 +103,27 @@ export default async function MeetingLivePage(props: Props) {
         duration_minutes: true,
         priority: true,
         purpose: true,
+        created_at: true,
+        updated_at: true,
         staff: {
           select: {
             id: true,
             users: { select: { id: true, name: true, email: true } }
           }
+        },
+        agenda_item_comments: {
+          select: {
+            id: true,
+            comment: true,
+            created_at: true,
+            staff: {
+              select: {
+                users: { select: { id: true, name: true, email: true } }
+              }
+            }
+          },
+          orderBy: { created_at: 'desc' },
+          take: 10
         },
         _count: {
           select: {
@@ -126,6 +147,7 @@ export default async function MeetingLivePage(props: Props) {
         priority: true,
         due_date: true,
         created_at: true,
+        updated_at: true,
         assigned_to: true,
         staff_meeting_action_items_assigned_toTostaff: {
           select: {

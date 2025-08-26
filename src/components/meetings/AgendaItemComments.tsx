@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageSquare, Send, users } from "lucide-react";
+import { MessageSquare, Send, User } from "lucide-react";
 import { format } from "date-fns";
 import { getSafeDate } from '@/lib/utils/safe-date';
 

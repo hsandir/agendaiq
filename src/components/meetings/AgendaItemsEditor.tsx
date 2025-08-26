@@ -300,11 +300,13 @@ export function AgendaItemsEditor({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          items: agendaItems.map((item, index) => ({
-            ...item,
-            // Reverse the order index so newest items get higher indices
-            order_index: agendaItems.length - 1 - index
-          }))
+          items: agendaItems
+            .filter(item => item.topic && item.topic.trim() !== '') // Filter out empty items
+            .map((item, index) => ({
+              ...item,
+              // Reverse the order index so newest items get higher indices
+              order_index: agendaItems.length - 1 - index
+            }))
         }),
       })
 

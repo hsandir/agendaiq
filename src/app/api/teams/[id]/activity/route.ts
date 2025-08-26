@@ -21,7 +21,7 @@ export async function GET(request: NextRequest, props: Props) {
     }
     const authResult = await withAuth(request, {
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_VIEW
+      requireCapability: Capability.MEETING_VIEW
     });
     if (!authResult.success) {
       return NextResponse.json(
@@ -92,14 +92,14 @@ export async function GET(request: NextRequest, props: Props) {
         type: 'member_joined',
         timestamp: member.joined_at,
         user: {
-          id: member.staff.users.id,
-          name: member.staff.users.name,
-          email: member.staff.users.email,
-          image: member.staff.users.image
+          id: member.staff?.users.id ?? 0,
+          name: member.staff?.users.name ?? 'Unknown',
+          email: member.staff?.users.email ?? 'unknown@example.com',
+          image: member.staff?.users.image ?? null
         },
         data: {
           role: member.role,
-          staff_role: member.staff.role.title
+          staff_role: member.staff?.role.title ?? 'Unknown'
         }
       })),
       

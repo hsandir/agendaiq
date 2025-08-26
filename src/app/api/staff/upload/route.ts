@@ -477,24 +477,24 @@ export async function POST(request: NextRequest) {
               });
             } else {
               // Validate admin staff has complete organizational data
-              if (!adminStaff.school?.id || !adminStaff.district?.id) {
+              if (!_adminStaff.school?.id || !_adminStaff.district?.id) {
                 throw new Error('Admin staff member must have complete organizational data');
               }
 
               await prisma.staff.create({
                 data: {
-                  user_id: parseInt(existingUser.id),
+                  user_id: existingUser.id,
                   role_id: role.id,
                   department_id: department.id,
-                  school_id: parseInt(adminStaff).school.id,
-                  district_id: parseInt(adminStaff).district.id,
+                  school_id: _adminStaff.school.id,
+                  district_id: _adminStaff.district.id,
                 }
               });
             }
             updated++;
           } else {
             // Validate admin staff has complete organizational data
-            if (!adminStaff.school?.id || !adminStaff.district?.id) {
+            if (!_adminStaff.school?.id || !_adminStaff.district?.id) {
               throw new Error('Admin staff member must have complete organizational data');
             }
 
@@ -503,18 +503,18 @@ export async function POST(request: NextRequest) {
               data: {
                 email: record.email,
                 name: record.name,
-                staff_id: record.staffId,
-                email_verified: new Date()
+                email_verified: new Date(),
+                updated_at: new Date()
               }
             });
 
             await prisma.staff.create({
               data: {
-                user_id: parseInt(newUser.id),
-                role_id: parseInt(role.id),
-                department_id: parseInt(department.id),
-                school_id: parseInt(adminStaff).school.id,
-                district_id: parseInt(adminStaff).district.id,
+                user_id: newUser.id,
+                role_id: role.id,
+                department_id: department.id,
+                school_id: _adminStaff.school.id,
+                district_id: _adminStaff.district.id,
               }
             });
             created++;

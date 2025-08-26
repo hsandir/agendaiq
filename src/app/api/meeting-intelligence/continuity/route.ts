@@ -37,7 +37,6 @@ export async function GET(request: NextRequest) {
         parent_meeting_id: { not: null }
       },
       include: {
-        parent_meeting: true,
         continuation_meetings: {
           include: {
             meeting_agenda_items: true,
