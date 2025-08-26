@@ -11,7 +11,7 @@ export default async function DebugCapabilitiesPage() {
   
   // Get user's role permissions
   const userWithRole = await prisma.users.findUnique({
-    where: { id: parseInt(user.id) },
+    where: { id: user.id },
     include: {
       staff: {
         include: {
@@ -26,20 +26,15 @@ export default async function DebugCapabilitiesPage() {
     userId: user.id,
     email: user.email,
     is_system_admin: user.is_system_admin ?? false,
-    is_school_admin: (user as Record<string, unknown>).is_school_admin ?? false,
+    is_school_admin: (user as unknown as Record<string, unknown>).is_school_admin ?? false,
     
     // Role info
     roleKey: userWithRole?.staff?.[0]?.role?.key || 'No Key',
     roleId: userWithRole?.staff?.[0]?.role?.id,
     
-    // Permissions from database
-    permissionCount: userWithRole?.staff?.[0]?.role?.permission?.length ?? 0,
-    permissions: userWithRole?.staff?.[0]?.role?.permission?.map(p => ({
-      id: p.id,
-      capability: p.capability,
-      resource: p.resource,
-      action: p.action
-    })) || [],
+    // Permissions from database (no permissions table currently)
+    permissionCount: 0,
+    permissions: [] as any[],
     
     // Computed capabilities
     capabilities: capabilities,

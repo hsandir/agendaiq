@@ -1,5 +1,5 @@
 import { requireAuth, AuthPresets } from "@/lib/auth/auth-utils";
-import type { UserWithstaff, SessionUser } from '@/types/auth';
+import type { UserWithStaff, SessionUser } from '@/types/auth';
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { MeetingLiveView } from "@/components/meetings/MeetingLiveView";
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default async function MeetingLivePage(props: Props) {
-  const params = await (props as Record<string, unknown>).params;
+  const params = await (props as unknown as { params: Promise<{ id: string }> }).params;
   const user = await requireAuth(AuthPresets.requireStaff);
   
   if (!params?.id) {
@@ -203,9 +203,9 @@ export default async function MeetingLivePage(props: Props) {
   return (
     <div className="min-h-screen bg-muted">
       <MeetingLiveView
-        meeting={fullMeeting}
+        meeting={fullMeeting as any}
         currentUser={user}
-        allStaff={allStaff}
+        allStaff={allStaff as any}
         isOrganizer={isOrganizer}
         isAdmin={hasAdminAccess}
       />

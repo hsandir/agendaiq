@@ -74,7 +74,7 @@ export default function MeetingSearchPage() {
   
   // Perform search
   const performSearch = useCallback(async () => {
-    if (!debouncedQuery ?? debouncedQuery.length < 2) {
+    if (!debouncedQuery || debouncedQuery.length < 2) {
       setMeetings([]);
       setAgendaItems([]);
       setActionItems([]);

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { users, Settings, Lock, UserCheck, Calendar, Users, FileText } from "lucide-react";
+import { UserPlus, Settings, Lock, UserCheck, Calendar, Users, FileText } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Meeting Audit Log",
@@ -122,7 +122,7 @@ export default async function AuditPage() {
                     <div key={log.id} className="relative pl-8">
                       <div className="absolute left-0 top-2 -translate-x-1/2">
                         <div className="p-1 rounded-full bg-background border">
-                          <Icon className="h-4 w-4" />
+                          <__Icon className="h-4 w-4" />
                         </div>
                       </div>
                       <div className="space-y-1">

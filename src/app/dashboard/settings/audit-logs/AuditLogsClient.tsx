@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Download as FiDownload, Eye as FiEye, Trash2 as FiTrash2, Edit as FiEdit, RefreshCw as FiRefreshCw, User as FiUser, Users as FiUserIcon, Database as FiDatabase, Activity as FiActivity, Shield as FiShield, AlertTriangle as FiAlertTriangle } from 'lucide-react';
-import { isrole, RoleKey } from '@/lib/auth/policy';
-import type { UserWithstaff, SessionUser } from '@/types/auth';
+import { isRole, RoleKey } from '@/lib/auth/policy';
+import type { UserWithStaff, SessionUser } from '@/types/auth';
 
 // User interface for authentication context
 interface AuthUser {
@@ -399,7 +399,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
   // Permission validation helper
   const canViewAuditDetails = useCallback((log: AuditLog): boolean => {
     // Ops Admin can view all logs
-    if ((user as Record<string, unknown>).is_school_admin || isRole(user as any, RoleKey.OPS_ADMIN)) {
+    if ((user as unknown as Record<string, unknown>).is_school_admin || isRole(user as any, RoleKey.OPS_ADMIN)) {
       return true;
     }
 
@@ -407,19 +407,19 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
     if (user.staff?.role?.is_leadership) {
       // Can view logs from same user or their own staff actions
       if (isCriticalLog(log)) {
-        return log.user_id === user.id ?? log.staff_id === user.staff.id;
+        return log.user_id === user.id || log.staff_id === user.staff.id;
       } else {
         // For legacy logs, check the User/Staff relations
-        return log.users?.id === user.id ?? log.staff?.id === user.staff.id;
+        return log.users?.id === user.id || log.staff?.id === user.staff.id;
       }
     }
 
     // Regular staff can only view their own audit logs
     if (isCriticalLog(log)) {
-      return log.user_id === user.id ?? log.staff_id === user.staff?.id;
+      return log.user_id === user.id || log.staff_id === user.staff?.id;
     } else {
       // For legacy logs, check the User/Staff relations
-      return log.users?.id === user.id ?? log.staff?.id === user.staff?.id;
+      return log.users?.id === user.id || log.staff?.id === user.staff?.id;
     }
   }, [user]);
 
@@ -792,7 +792,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                           <div className="font-medium">{log.users.name ?? log.users.email}</div>
                           {log.staff && (
                             <div className="text-muted-foreground text-xs">
-                              {log.staff.role.title} - {log.staff.department.name}
+                              {log.staff.role.label} - {log.staff.department.name}
                             </div>
                           )}
                         </div>

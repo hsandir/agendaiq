@@ -37,13 +37,6 @@ export async function GET(request: NextRequest) {
         parent_meeting_id: { not: null }
       },
       include: {
-        continuation_meetings: {
-          include: {
-            meeting_agenda_items: true,
-            meeting_action_items: true,
-            meeting_attendee: true
-          }
-        },
         meeting_agenda_items: true,
         meeting_action_items: true,
         meeting_attendee: true,
@@ -126,7 +119,7 @@ export async function GET(request: NextRequest) {
         : 0,
       longestChain: Math.max(...chains.map(c => c.totalMeetings), 0),
       totalCarriedItems: meetings.reduce((sum, m) => 
-        sum + m.meeting_agenda_items.filter((i: { carried_forward: boolean }) => i.carried_forward).length, 0
+        sum + (m.meeting_agenda_items as { carried_forward: boolean }[]).filter((i: { carried_forward: boolean }) => i.carried_forward).length, 0
       ),
       resolutionRate: chains.reduce((sum, c) => sum + c.efficiency, 0) / (chains.length ?? 1),
       averageResolutionTime: 7 // Simplified - would need more complex calculation

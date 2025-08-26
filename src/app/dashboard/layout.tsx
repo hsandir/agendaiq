@@ -55,7 +55,7 @@ export default async function DashboardLayout({
           name: user.name ?? undefined,
           staff_id: userWithStaff?.staff?.[0]?.id ?? null,
         }}
-        userWithStaff={userWithStaff}
+        userWithstaff={userWithStaff}
       >
         {children}
       </DashboardLayoutClient>

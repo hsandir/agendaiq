@@ -397,10 +397,10 @@ export default function MeetingContinuityPage() {
                     
                     <div>
                       <h3 className="font-semibold text-foreground text-lg">
-                        {chain.rootMeeting.title}
+                        {chain.rootmeeting.title}
                       </h3>
                       <p className="text-sm text-muted-foreground">
-                        Started {new Date(chain.rootMeeting.date).toLocaleDateString()}
+                        Started {new Date(chain.rootmeeting.date).toLocaleDateString()}
                         {' • '}{chain.totalMeetings} meetings in chain
                       </p>
                     </div>

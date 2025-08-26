@@ -9,7 +9,7 @@ export default async function MeetingIntelligenceDashboard() {
   
   // Get analytics data with error handling
   let analytics;
-  let overdueItems;
+  let overdueItems: any[];
   let actionStats;
   
   try {
@@ -222,7 +222,7 @@ export default async function MeetingIntelligenceDashboard() {
       )}
       
       {/* Department Breakdown */}
-      {analytics.departmentBreakdown.length > 0 && (
+      {analytics.departmentBreakdown && analytics.departmentBreakdown.length > 0 && (
         <div className="bg-card border border-border rounded-lg p-6">
           <h2 className="text-xl font-semibold text-foreground mb-4">
             Department Performance
@@ -249,7 +249,7 @@ export default async function MeetingIntelligenceDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {analytics.departmentBreakdown.map((dept: any) => (
+                {analytics.departmentBreakdown && analytics.departmentBreakdown.map((dept: any) => (
                   <tr key={dept.departmentId} className="border-b border-border">
                     <td className="py-3 text-sm text-foreground">
                       {dept.departmentName}

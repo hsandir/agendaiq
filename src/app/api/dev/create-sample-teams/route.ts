@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { withAuth } from '@/lib/auth/api-auth';
 import { Capability } from '@/lib/auth/policy';
+import { randomBytes } from 'crypto';
 
 export async function GET(request: NextRequest) {
   // Skip auth for dev endpoint
@@ -42,32 +43,41 @@ export async function GET(request: NextRequest) {
     // Create Team 1: Curriculum Development Team
     const team1 = await prisma.teams.create({
       data: {
+        id: randomBytes(16).toString('hex'),
         name: 'Curriculum Development Team',
+        code: `TEAM_${Date.now()}_${randomBytes(4).toString('hex').toUpperCase()}`,
         description: 'Responsible for developing and updating curriculum standards across all grade levels',
+        type: 'DEPARTMENT',
         purpose: 'To ensure our curriculum meets state standards and student learning objectives',
-        created_by: staffMembers[0].id,
+        created_by: users[0].id,
         created_at: new Date('2024-01-15'),
         updated_at: new Date('2024-01-15')
-      }
+      } as any
     });
 
     // Add team members to Team 1
     await prisma.team_members.createMany({
       data: [
         {
+          id: randomBytes(16).toString('hex'),
           team_id: team1.id,
+          user_id: users[0].id,
           staff_id: staffMembers[0].id,
           role: 'LEAD',
           joined_at: new Date('2024-01-15')
         },
         {
+          id: randomBytes(16).toString('hex'),
           team_id: team1.id,
+          user_id: users[1].id,
           staff_id: staffMembers[1].id,
           role: 'MEMBER',
           joined_at: new Date('2024-01-16')
         },
         {
+          id: randomBytes(16).toString('hex'),
           team_id: team1.id,
+          user_id: users[2].id,
           staff_id: staffMembers[2].id,
           role: 'MEMBER',
           joined_at: new Date('2024-01-17')
@@ -78,32 +88,41 @@ export async function GET(request: NextRequest) {
     // Create Team 2: Technology Integration Team
     const team2 = await prisma.teams.create({
       data: {
+        id: randomBytes(16).toString('hex'),
         name: 'Technology Integration Team',
+        code: `TEAM_${Date.now() + 1}_${randomBytes(4).toString('hex').toUpperCase()}`,
         description: 'Leading digital transformation and technology integration in education',
+        type: 'PROJECT',
         purpose: 'To implement and optimize technology solutions for enhanced learning experiences',
-        created_by: staffMembers[1].id,
+        created_by: users[1].id,
         created_at: new Date('2024-02-01'),
         updated_at: new Date('2024-02-01')
-      }
+      } as any
     });
 
     // Add team members to Team 2
     await prisma.team_members.createMany({
       data: [
         {
+          id: randomBytes(16).toString('hex'),
           team_id: team2.id,
+          user_id: users[1].id,
           staff_id: staffMembers[1].id,
           role: 'LEAD',
           joined_at: new Date('2024-02-01')
         },
         {
+          id: randomBytes(16).toString('hex'),
           team_id: team2.id,
+          user_id: users[3] ? users[3].id : users[0].id,
           staff_id: staffMembers[3] ? staffMembers[3].id : staffMembers[0].id,
           role: 'MEMBER',
           joined_at: new Date('2024-02-02')
         },
         {
+          id: randomBytes(16).toString('hex'),
           team_id: team2.id,
+          user_id: users[4] ? users[4].id : users[2].id,
           staff_id: staffMembers[4] ? staffMembers[4].id : staffMembers[2].id,
           role: 'MEMBER',
           joined_at: new Date('2024-02-03')
@@ -114,32 +133,41 @@ export async function GET(request: NextRequest) {
     // Create Team 3: Student Wellness Committee
     const team3 = await prisma.teams.create({
       data: {
+        id: randomBytes(16).toString('hex'),
         name: 'Student Wellness Committee',
+        code: `TEAM_${Date.now() + 2}_${randomBytes(4).toString('hex').toUpperCase()}`,
         description: 'Focused on student mental health, physical wellness, and overall well-being',
+        type: 'COMMITTEE',
         purpose: 'To develop and implement comprehensive wellness programs for student success',
-        created_by: staffMembers[2].id,
+        created_by: users[2].id,
         created_at: new Date('2024-03-01'),
         updated_at: new Date('2024-03-01')
-      }
+      } as any
     });
 
     // Add team members to Team 3
     await prisma.team_members.createMany({
       data: [
         {
+          id: randomBytes(16).toString('hex'),
           team_id: team3.id,
+          user_id: users[2].id,
           staff_id: staffMembers[2].id,
           role: 'LEAD',
           joined_at: new Date('2024-03-01')
         },
         {
+          id: randomBytes(16).toString('hex'),
           team_id: team3.id,
+          user_id: users[0].id,
           staff_id: staffMembers[0].id,
           role: 'MEMBER',
           joined_at: new Date('2024-03-02')
         },
         {
+          id: randomBytes(16).toString('hex'),
           team_id: team3.id,
+          user_id: users[5] ? users[5].id : users[1].id,
           staff_id: staffMembers[5] ? staffMembers[5].id : staffMembers[1].id,
           role: 'MEMBER',
           joined_at: new Date('2024-03-03')
@@ -157,9 +185,11 @@ export async function GET(request: NextRequest) {
         organizer_id: staffMembers[0].id,
         team_id: team1.id,
         status: 'COMPLETED',
-        created_at: new Date('2024-03-10'),
-        updated_at: new Date('2024-03-15')
-      }
+        department_id: staffMembers[0].department_id || 1,
+        school_id: staffMembers[0].school_id || 1,
+        district_id: staffMembers[0].district_id || 1,
+        created_at: new Date('2024-03-10')
+      } as any
     });
 
     const team1Meeting2 = await prisma.meeting.create({
@@ -171,69 +201,81 @@ export async function GET(request: NextRequest) {
         organizer_id: staffMembers[0].id,
         team_id: team1.id,
         status: 'COMPLETED',
-        created_at: new Date('2024-04-15'),
-        updated_at: new Date('2024-04-20')
-      }
+        department_id: staffMembers[0].department_id || 1,
+        school_id: staffMembers[0].school_id || 1,
+        district_id: staffMembers[0].district_id || 1,
+        created_at: new Date('2024-04-15')
+      } as any
     });
 
     // Create agenda items for Team 1 Meeting 1
-    await prisma.meeting_agenda_item.createMany({
+    await prisma.meeting_agenda_items.createMany({
       data: [
         {
           meeting_id: team1Meeting1.id,
-          title: 'Math Standards Alignment Review',
-          description: 'Review current math curriculum alignment with new state standards',
-          order: 1,
-          duration: 30,
-          status: 'DISCUSSED',
+          topic: 'Math Standards Alignment Review',
+          problem_statement: 'Review current math curriculum alignment with new state standards',
+          purpose: 'Discussion',
+          order_index: 1,
+          duration_minutes: 30,
+          status: 'Resolved',
           responsible_staff_id: staffMembers[1].id,
-          created_at: new Date('2024-03-10')
+          created_at: new Date('2024-03-10'),
+          updated_at: new Date('2024-03-10')
         },
         {
           meeting_id: team1Meeting1.id,
-          title: 'English Language Arts Updates',
-          description: 'Proposed changes to ELA curriculum for next academic year',
-          order: 2,
-          duration: 45,
-          status: 'APPROVED',
+          topic: 'English Language Arts Updates',
+          problem_statement: 'Proposed changes to ELA curriculum for next academic year',
+          purpose: 'Decision',
+          order_index: 2,
+          duration_minutes: 45,
+          status: 'Resolved',
           responsible_staff_id: staffMembers[2].id,
-          created_at: new Date('2024-03-10')
+          created_at: new Date('2024-03-10'),
+          updated_at: new Date('2024-03-10')
         },
         {
           meeting_id: team1Meeting1.id,
-          title: 'Assessment Strategy Discussion',
-          description: 'Review and update assessment methodologies across all subjects',
-          order: 3,
-          duration: 45,
-          status: 'PENDING',
+          topic: 'Assessment Strategy Discussion',
+          problem_statement: 'Review and update assessment methodologies across all subjects',
+          purpose: 'Discussion',
+          order_index: 3,
+          duration_minutes: 45,
+          status: 'Pending',
           responsible_staff_id: staffMembers[0].id,
-          created_at: new Date('2024-03-10')
+          created_at: new Date('2024-03-10'),
+          updated_at: new Date('2024-03-10')
         }
       ]
     });
 
     // Create agenda items for Team 1 Meeting 2
-    await prisma.meeting_agenda_item.createMany({
+    await prisma.meeting_agenda_items.createMany({
       data: [
         {
           meeting_id: team1Meeting2.id,
-          title: 'New Lab Equipment Integration',
-          description: 'Plan for integrating new laboratory equipment into science curriculum',
-          order: 1,
-          duration: 40,
-          status: 'APPROVED',
+          topic: 'New Lab Equipment Integration',
+          problem_statement: 'Plan for integrating new laboratory equipment into science curriculum',
+          purpose: 'Decision',
+          order_index: 1,
+          duration_minutes: 40,
+          status: 'Resolved',
           responsible_staff_id: staffMembers[1].id,
-          created_at: new Date('2024-04-15')
+          created_at: new Date('2024-04-15'),
+          updated_at: new Date('2024-04-15')
         },
         {
           meeting_id: team1Meeting2.id,
-          title: 'Teacher Training Schedule',
-          description: 'Schedule professional development sessions for science teachers',
-          order: 2,
-          duration: 35,
-          status: 'IN_PROGRESS',
+          topic: 'Teacher Training Schedule',
+          problem_statement: 'Schedule professional development sessions for science teachers',
+          purpose: 'Information_Sharing',
+          order_index: 2,
+          duration_minutes: 35,
+          status: 'Ongoing',
           responsible_staff_id: staffMembers[2].id,
-          created_at: new Date('2024-04-15')
+          created_at: new Date('2024-04-15'),
+          updated_at: new Date('2024-04-15')
         }
       ]
     });
@@ -248,33 +290,39 @@ export async function GET(request: NextRequest) {
         organizer_id: staffMembers[1].id,
         team_id: team2.id,
         status: 'COMPLETED',
-        created_at: new Date('2024-03-20'),
-        updated_at: new Date('2024-03-25')
-      }
+        department_id: staffMembers[1].department_id || 1,
+        school_id: staffMembers[1].school_id || 1,
+        district_id: staffMembers[1].district_id || 1,
+        created_at: new Date('2024-03-20')
+      } as any
     });
 
     // Create agenda items for Team 2
-    await prisma.meeting_agenda_item.createMany({
+    await prisma.meeting_agenda_items.createMany({
       data: [
         {
           meeting_id: team2Meeting1.id,
-          title: 'Learning Management System Review',
-          description: 'Compare and evaluate different LMS options for district adoption',
-          order: 1,
-          duration: 45,
-          status: 'APPROVED',
+          topic: 'Learning Management System Review',
+          problem_statement: 'Compare and evaluate different LMS options for district adoption',
+          purpose: 'Decision',
+          order_index: 1,
+          duration_minutes: 45,
+          status: 'Resolved',
           responsible_staff_id: staffMembers[1].id,
-          created_at: new Date('2024-03-20')
+          created_at: new Date('2024-03-20'),
+          updated_at: new Date('2024-03-20')
         },
         {
           meeting_id: team2Meeting1.id,
-          title: 'Digital Citizenship Curriculum',
-          description: 'Develop comprehensive digital citizenship training program',
-          order: 2,
-          duration: 30,
-          status: 'IN_PROGRESS',
+          topic: 'Digital Citizenship Curriculum',
+          problem_statement: 'Develop comprehensive digital citizenship training program',
+          purpose: 'Information_Sharing',
+          order_index: 2,
+          duration_minutes: 30,
+          status: 'Ongoing',
           responsible_staff_id: staffMembers[3] ? staffMembers[3].id : staffMembers[0].id,
-          created_at: new Date('2024-03-20')
+          created_at: new Date('2024-03-20'),
+          updated_at: new Date('2024-03-20')
         }
       ]
     });
@@ -289,33 +337,39 @@ export async function GET(request: NextRequest) {
         organizer_id: staffMembers[2].id,
         team_id: team3.id,
         status: 'COMPLETED',
-        created_at: new Date('2024-04-01'),
-        updated_at: new Date('2024-04-05')
-      }
+        department_id: staffMembers[2].department_id || 1,
+        school_id: staffMembers[2].school_id || 1,
+        district_id: staffMembers[2].district_id || 1,
+        created_at: new Date('2024-04-01')
+      } as any
     });
 
     // Create agenda items for Team 3
-    await prisma.meeting_agenda_item.createMany({
+    await prisma.meeting_agenda_items.createMany({
       data: [
         {
           meeting_id: team3Meeting1.id,
-          title: 'Counselor Staffing Review',
-          description: 'Evaluate current counseling staff capacity and needs',
-          order: 1,
-          duration: 40,
-          status: 'APPROVED',
+          topic: 'Counselor Staffing Review',
+          problem_statement: 'Evaluate current counseling staff capacity and needs',
+          purpose: 'Discussion',
+          order_index: 1,
+          duration_minutes: 40,
+          status: 'Resolved',
           responsible_staff_id: staffMembers[2].id,
-          created_at: new Date('2024-04-01')
+          created_at: new Date('2024-04-01'),
+          updated_at: new Date('2024-04-01')
         },
         {
           meeting_id: team3Meeting1.id,
-          title: 'Wellness Program Activities',
-          description: 'Plan weekly wellness activities and stress reduction programs',
-          order: 2,
-          duration: 35,
-          status: 'IN_PROGRESS',
+          topic: 'Wellness Program Activities',
+          problem_statement: 'Plan weekly wellness activities and stress reduction programs',
+          purpose: 'Information_Sharing',
+          order_index: 2,
+          duration_minutes: 35,
+          status: 'Ongoing',
           responsible_staff_id: staffMembers[0].id,
-          created_at: new Date('2024-04-01')
+          created_at: new Date('2024-04-01'),
+          updated_at: new Date('2024-04-01')
         }
       ]
     });
@@ -364,43 +418,46 @@ export async function GET(request: NextRequest) {
     await prisma.team_knowledge.createMany({
       data: [
         {
+          id: randomBytes(16).toString('hex'),
           team_id: team1.id,
           title: 'State Curriculum Standards Guide',
           content: 'Comprehensive guide to state curriculum standards and alignment requirements for all subjects.',
-          type: 'GUIDE',
+          type: 'DOCUMENT',
+          category: 'Standards',
           tags: ['curriculum', 'standards', 'alignment'],
           created_by: users[0].id,
           created_by_staff_id: staffMembers[0].id,
           is_pinned: true,
-          views_count: 15,
-          downloads_count: 3,
-          created_at: new Date('2024-01-20')
+          created_at: new Date('2024-01-20'),
+          updated_at: new Date('2024-01-20')
         },
         {
+          id: randomBytes(16).toString('hex'),
           team_id: team2.id,
           title: 'EdTech Platform Comparison',
           content: 'Detailed comparison of educational technology platforms including features, pricing, and implementation requirements.',
           type: 'DOCUMENT',
+          category: 'Technology',
           tags: ['technology', 'platforms', 'comparison'],
           created_by: users[1].id,
           created_by_staff_id: staffMembers[1].id,
           is_pinned: true,
-          views_count: 22,
-          downloads_count: 7,
-          created_at: new Date('2024-02-15')
+          created_at: new Date('2024-02-15'),
+          updated_at: new Date('2024-02-15')
         },
         {
+          id: randomBytes(16).toString('hex'),
           team_id: team3.id,
           title: 'Student Wellness Program Framework',
           content: 'Comprehensive framework for implementing student wellness programs including mental health support.',
-          type: 'POLICY',
+          type: 'DOCUMENT',
+          category: 'Policy',
           tags: ['wellness', 'mental-health', 'framework'],
           created_by: users[2].id,
           created_by_staff_id: staffMembers[2].id,
           is_pinned: true,
-          views_count: 18,
-          downloads_count: 4,
-          created_at: new Date('2024-03-05')
+          created_at: new Date('2024-03-05'),
+          updated_at: new Date('2024-03-05')
         }
       ]
     });

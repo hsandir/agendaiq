@@ -10,7 +10,7 @@ interface Props {
 
 export default async function AgendaItemPage(props: Props) {
   const user = await requireAuth(AuthPresets.requireAuth);
-  const params = await (props as Record<string, unknown>).params;
+  const params = await (props as unknown as { params: Promise<{ id: string; itemId: string }> }).params;
 
   const meetingId = parseInt(params.id);
   const itemId = parseInt(params.itemId);
@@ -96,10 +96,10 @@ export default async function AgendaItemPage(props: Props) {
 
   return (
     <AgendaItemDetail
-      item={agendaItem as Record<string, unknown>}
-      meeting={agendaItem.meeting as Record<string, unknown>}
+      item={agendaItem as any}
+      meeting={agendaItem.meeting as any}
       currentUser={user}
-      allStaff={allStaff as Record<string, unknown>}
+      allStaff={allStaff as any}
       canEdit={isOrganizer ?? (hasAdminAccess || isResponsible)}
     />
   );

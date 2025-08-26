@@ -73,7 +73,7 @@ export default function RoleHierarchyVisualizationContent() {
                 <div>
                   <label className="block text-sm font-medium text-foreground">Department</label>
                   <p className="mt-1 text-sm text-foreground">
-                    {selectedRole.department?.name || 'No Department'}
+                    {(selectedRole as any).Department?.name || 'No Department'}
                   </p>
                 </div>
                 

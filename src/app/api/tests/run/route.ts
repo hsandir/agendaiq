@@ -20,22 +20,22 @@ export async function POST(request: NextRequest) {
     const jestArgs = [];
     
     // Add specific test suite/file if provided
-    if (validatedData.suite && validatedData.suite !== 'all') {
-      jestArgs.push(validatedData.suite);
+    if (_suite && _suite !== 'all') {
+      jestArgs.push(String(_suite));
     }
     
     // Add coverage flag
-    if (coverage) {
+    if (_coverage) {
       jestArgs.push('--coverage');
     }
     
     // Add watch flag
-    if (watch) {
+    if (_watch) {
       jestArgs.push('--watch');
     }
     
     // Add JSON output for parsing only if not in watch mode
-    if (!watch) {
+    if (!_watch) {
       jestArgs.push('--json', '--outputFile=test-results.json');
     }
     
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Try to read coverage data if coverage was requested
-      if (coverage) {
+      if (_coverage) {
         try {
           const coveragePath = path.join(process.cwd(), 'coverage', 'coverage-summary.json');
           const coverageContent = await fs.readFile(coveragePath, 'utf-8');
@@ -137,6 +137,8 @@ export async function POST(request: NextRequest) {
       const coverageData = null;
       
       try {
+        const fs = require('fs').promises;
+        const path = require('path');
         const resultsPath = path.join(process.cwd(), 'test-results.json');
         const resultsContent = await fs.readFile(resultsPath, 'utf-8');
         testResults = JSON.parse(resultsContent);

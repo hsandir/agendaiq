@@ -127,7 +127,7 @@ export default function MeetingAnalyticsPage() {
           
           <select
             value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
+            onChange={(e) => setTimeRange(e.target.value as "month" | "week" | "quarter" | "year")}
             className="px-3 py-2 border border-border rounded-lg bg-background text-foreground text-sm"
           >
             <option value="week">Last Week</option>

@@ -13,7 +13,7 @@ import {
   Calendar,
   ChevronRight,
   Filter,
-  users,
+  User,
   Briefcase,
   BarChart3
 } from 'lucide-react';
@@ -95,7 +95,7 @@ export default function RoleTasksPage() {
       // Ensure all tasks have proper structure
       const safeRoles = (data.roles ?? []).map((roleData: Record<string, unknown>) => ({
         ...roleData,
-        tasks: (roleData.tasks ?? []).map((task: Record<string, unknown>) => ({
+        tasks: ((roleData.tasks as Record<string, unknown>[]) ?? []).map((task: Record<string, unknown>) => ({
           ...task,
           meeting: task.meeting || { id: 0, title: 'Unknown', date: new Date().toISOString() }
         }))

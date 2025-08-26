@@ -900,7 +900,7 @@ export default function AuthDebugPage() {
               {testResults && (
                 <div className="space-y-4">
                   {testResults.error && (
-                    <Alert variant="destructive">
+                    <Alert>
                       <XCircle className="h-4 w-4" />
                       <AlertDescription>
                         {testResults.error}

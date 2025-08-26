@@ -24,7 +24,7 @@ export async function GET(
 
     const auth = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_VIEW 
+      requireCapability: Capability.MEETING_VIEW 
     });
     
     if (!auth.success) {
@@ -37,7 +37,7 @@ export async function GET(
 
     // Get user's staff record
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: user?.id ?? 0 }
     });
 
     if (!staff) {
@@ -106,7 +106,7 @@ export async function GET(
 
     // Check if user has access to this team
     const isMember = team.team_members.some(member => member.staff_id === staff.id);
-    const isAdmin = user.is_system_admin || (user as Record<string, unknown>).is_school_admin;
+    const isAdmin = user?.is_system_admin || (user as unknown as Record<string, unknown>)?.is_school_admin;
 
     if (!isMember && !isAdmin) {
       return NextResponse.json(
@@ -147,7 +147,7 @@ export async function PUT(
 
     const auth = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_UPDATE 
+      requireCapability: Capability.MEETING_EDIT 
     });
     
     if (!auth.success) {
@@ -172,7 +172,7 @@ export async function PUT(
 
     // Get user's staff record
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: user?.id ?? 0 }
     });
 
     if (!staff) {
@@ -202,7 +202,7 @@ export async function PUT(
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
 
-    if (!isTeamLead && !user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
+    if (!isTeamLead && !user?.is_system_admin && !(user as unknown as Record<string, unknown>)?.is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to update this team' },
         { status: 403 }
@@ -216,9 +216,9 @@ export async function PUT(
         ...(validatedData.name && { name: validatedData.name }),
         ...(validatedData.description !== undefined && { description: validatedData.description }),
         ...(validatedData.is_active !== undefined && { is_active: validatedData.is_active }),
-        ...(validatedData.metadata && { metadata: validatedData.metadata }),
+        ...(validatedData.metadata && { metadata: validatedData.metadata as any }),
         updated_at: new Date()
-      },
+      } as any,
       include: {
         team_members: {
           include: {
@@ -279,7 +279,7 @@ export async function DELETE(
 
     const auth = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_DELETE 
+      requireCapability: Capability.MEETING_DELETE 
     });
     
     if (!auth.success) {
@@ -291,7 +291,7 @@ export async function DELETE(
     const teamId = resolvedParams.id;
 
     // Only admins can delete teams
-    if (!user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
+    if (!user?.is_system_admin && !(user as unknown as Record<string, unknown>)?.is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to delete teams' },
         { status: 403 }

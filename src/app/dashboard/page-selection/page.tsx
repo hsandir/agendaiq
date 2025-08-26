@@ -428,7 +428,7 @@ export default function PageSelectionPage() {
       </Card>
 
       {message && (
-        <Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
+        <Alert>
           {message.type === 'success' && <CheckCircle className="h-4 w-4" />}
           {message.type === 'error' && <XCircle className="h-4 w-4" />}
           {message.type === 'info' && <AlertCircle className="h-4 w-4" />}

@@ -111,14 +111,14 @@ export default function UserRoleAssignmentContent() {
     // Filter by role
     if (roleFilter) {
       filtered = filtered.filter(user => 
-        user.staff?.some(staff => staff.role?.title === roleFilter)
+        (user as any).Staff?.some((staff: any) => staff.role?.title === roleFilter)
       );
     }
 
     // Filter by department
     if (departmentFilter) {
       filtered = filtered.filter(user => 
-        user.staff?.some(staff => staff.department?.name === departmentFilter)
+        (user as any).Staff?.some((staff: any) => staff.department?.name === departmentFilter)
       );
     }
 
@@ -364,13 +364,13 @@ export default function UserRoleAssignmentContent() {
                 </div>
                 
                 <div className="flex items-center space-x-4">
-                  {user.staff && user.staff.length > 0 && (
+                  {(user as any).Staff && (user as any).Staff.length > 0 && (
                     <div className="text-right">
                       <div className="text-sm font-medium text-foreground">
-                        {user.staff[0].role?.title || 'No Role'}
+                        {(user as any).Staff[0].role?.title || 'No Role'}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {user.staff[0].department?.name || 'No Department'}
+                        {(user as any).Staff[0].department?.name || 'No Department'}
                       </div>
                     </div>
                   )}

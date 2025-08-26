@@ -15,16 +15,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: auth.error }, { status: auth.statusCode });
     }
     // Get list of test files from Jest
-    const { _stdout } = await execAsync('npm test -- --listTests', {
+    const { stdout } = await execAsync('npm test -- --listTests', {
       cwd: process.cwd(),
-      env: { ...process._env, CI: 'true' }
+      env: { ...process.env, CI: 'true' }
     });
 
     // Parse test files from output
     const testFiles = stdout
       .split('\n')
       .filter((line: string) => line.trim() && line.includes('tests__'))
-      .map(filePath => filePath.trim());
+      .map((filePath: any) => filePath.trim());
 
     // Group tests by category
     const suiteMap = new Map();
@@ -132,7 +132,6 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
-    if (error instanceof Error) {
     console.error('Error discovering test suites:', error);
     
     // Return empty array if Jest is not configured or no tests found
@@ -145,6 +144,4 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
   }
-}
-
 }

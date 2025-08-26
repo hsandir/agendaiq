@@ -13,7 +13,7 @@ export default async function MeetingTemplatesPage() {
   const user = await requireAuth(AuthPresets.requireMeetingCreate);
 
   // Fetch meeting templates from database
-  const templates = await prisma.meetingTemplate.findMany({
+  const templates = await prisma.meeting_templates.findMany({
     include: {
       staff: {
         include: {

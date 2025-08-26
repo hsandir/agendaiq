@@ -90,14 +90,39 @@ export function MeetingLiveView({
   const [isConnected, setIsConnected] = useState(false);
   // Initialize with meeting's most recent update time
   const [lastUpdate, setLastUpdate] = useState<Date | null>(() => {
-    const agendaUpdates = meeting.meeting_agenda_items.map(item => new Date(item.updated_at || item.created_at));
-    const actionUpdates = meeting.meeting_action_items.map(item => new Date((item as any).updated_at || (item as any).created_at));
-    const allUpdates = [
-      new Date(meeting.updated_at),
-      ...agendaUpdates,
-      ...actionUpdates
-    ];
-    return allUpdates.length > 0 ? new Date(Math.max(...allUpdates.map(d => d.getTime()))) : null;
+    const validDates: Date[] = [];
+    
+    // Add meeting update time
+    if (meeting.updated_at) {
+      const meetingDate = new Date(meeting.updated_at);
+      if (!isNaN(meetingDate.getTime())) {
+        validDates.push(meetingDate);
+      }
+    }
+    
+    // Add agenda item update times
+    meeting.meeting_agenda_items.forEach(item => {
+      const timestamp = item.updated_at || item.created_at;
+      if (timestamp) {
+        const date = new Date(timestamp);
+        if (!isNaN(date.getTime())) {
+          validDates.push(date);
+        }
+      }
+    });
+    
+    // Add action item update times
+    meeting.meeting_action_items.forEach(item => {
+      const timestamp = (item as any).updated_at || (item as any).created_at;
+      if (timestamp) {
+        const date = new Date(timestamp);
+        if (!isNaN(date.getTime())) {
+          validDates.push(date);
+        }
+      }
+    });
+    
+    return validDates.length > 0 ? new Date(Math.max(...validDates.map(d => d.getTime()))) : null;
   });
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
   const [typingUsers, setTypingUsers] = useState<Map<number, { userId: number; userName: string }>>(new Map());

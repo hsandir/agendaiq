@@ -9,7 +9,7 @@ export default async function CreateFirstAdminPage() {
   // This page requires system admin or dev admin role
   const user = await requireAuth({
     requireAuth: true,
-    requireAdminrole: true
+    requireAdminRole: true
   });
 
   // Check if there are already users in the system

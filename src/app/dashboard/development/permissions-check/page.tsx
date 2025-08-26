@@ -301,7 +301,7 @@ export default function PermissionsCheckPage() {
   useEffect(() => {
     if (user) {
       // Get user capabilities from session
-      setUserCapabilities((user as Record<string, unknown>).capabilities ?? []);
+      setUserCapabilities(((user as Record<string, unknown>).capabilities as string[]) ?? []);
       setLoading(false);
     } else if (!authLoading) {
       setLoading(false);
@@ -316,14 +316,14 @@ export default function PermissionsCheckPage() {
     if (authType === 'requireAuth') return true;
     
     // System admin has all access
-    if (user.is_system_admin) return true;
+    if ((user as Record<string, unknown>).is_system_admin) return true;
     
     // Check admin flags for specific auth types
     if (authType === 'requireDevAdmin' && is(RoleKey.DEV_ADMIN)) return true;
     if (authType === 'requireOpsAdmin' && is(RoleKey.OPS_ADMIN)) return true;
     
     // If no capabilities required, access is granted
-    if (!capabilities ?? capabilities.length === 0) return true;
+    if (!capabilities || capabilities.length === 0) return true;
     
     // Check if user has ALL required capabilities using can() helper
     const hasAllCapabilities = capabilities.every(cap => {
@@ -372,16 +372,16 @@ export default function PermissionsCheckPage() {
         {/* User Info Card */}
         <div className="bg-white rounded-lg shadow p-6 mb-6 border border-gray-200">
           <h2 className="text-xl font-semibold mb-4 text-gray-900">Current User</h2>
-          {session?.user ? (
+          {user ? (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-gray-700">
               <div>
-                <strong className="text-gray-900">Email:</strong> {session.user.email}
+                <strong className="text-gray-900">Email:</strong> {String((user as Record<string, unknown>).email)}
               </div>
               <div>
-                <strong className="text-gray-900">System Admin:</strong> {session.user.is_system_admin ? '✅' : '❌'}
+                <strong className="text-gray-900">System Admin:</strong> {(user as Record<string, unknown>).is_system_admin ? '✅' : '❌'}
               </div>
               <div>
-                <strong className="text-gray-900">School Admin:</strong> {session.user?.is_school_admin ? '✅' : '❌'}
+                <strong className="text-gray-900">School Admin:</strong> {(user as Record<string, unknown>)?.is_school_admin ? '✅' : '❌'}
               </div>
               <div className="md:col-span-3">
                 <strong className="text-gray-900">Capabilities ({userCapabilities.length}):</strong>
@@ -553,8 +553,8 @@ export default function PermissionsCheckPage() {
               <tbody className="divide-y divide-gray-200">
                 {API_ROUTES.map((route, idx) => {
                   const hasAccess = userCapabilities.includes(route.capability) || 
-                                   session?.user?.is_system_admin ||
-                                   (session?.user?.is_school_admin && route.capability.startsWith('ops:'));
+                                   (user as Record<string, unknown>)?.is_system_admin ||
+                                   ((user as Record<string, unknown>)?.is_school_admin && route.capability.startsWith('ops:'));
                   return (
                     <tr key={idx} className={hasAccess ? '' : 'bg-red-50'}>
                       <td className="px-4 py-2 text-sm font-mono text-gray-800">{route.path}</td>

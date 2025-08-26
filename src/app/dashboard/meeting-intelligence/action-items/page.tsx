@@ -6,7 +6,8 @@ import {
   Clock, 
   AlertCircle, 
   Calendar,
-  users,
+  User,
+  Users,
   Filter,
   ChevronRight,
   Target,
@@ -333,7 +334,7 @@ export default function ActionItemsTrackingPage() {
                     <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <User className="h-3 w-3" />
-                        <span>role: {item.assignedRole.label}</span>
+                        <span>role: {item.assignedrole.label}</span>
                         {item.assignedStaff && (
                           <span className="ml-1">({item.assignedStaff.name})</span>
                         )}

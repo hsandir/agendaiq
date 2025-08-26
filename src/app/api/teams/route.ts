@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
      
     const auth: APIAuthResult = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_VIEW 
+      requireCapability: Capability.MEETING_VIEW 
     });
     
     if (!auth.success) {
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
 
     // Get user's organization context
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id },
+      where: { user_id: user?.id ?? 0 },
       include: {
         school: true,
         district: true,
@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
       const isMember = team.team_members.some(member => member.staff_id === staff.id);
       
       // Admins can see all teams
-      const isAdmin = user.is_system_admin ?? (user as Record<string, unknown>).is_school_admin;
+      const isAdmin = user?.is_system_admin ?? (user as unknown as Record<string, unknown>)?.is_school_admin;
       
       return isMember || isAdmin;
     });
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
      
     const auth: APIAuthResult = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_CREATE 
+      requireCapability: Capability.MEETING_CREATE 
     });
     
     if (!auth.success) {
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
 
     // Get user's organization context
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id },
+      where: { user_id: user?.id ?? 0 },
       include: {
         school: true,
         district: true,
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Only leadership or admins can create teams
-    if (!staff.role.is_leadership && !user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
+    if (!staff.role.is_leadership && !user?.is_system_admin && !(user as unknown as Record<string, unknown>)?.is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to create teams' },
         { status: 403 }
@@ -195,11 +195,11 @@ export async function POST(request: NextRequest) {
           purpose: validatedData.purpose,
           school_id: staff.school_id,
           district_id: staff.district_id,
-          created_by: user.id,
-          metadata: validatedData.metadata ?? {},
+          created_by: user?.id ?? 0,
+          metadata: (validatedData.metadata ?? {}) as any,
           is_active: true,
           updated_at: new Date()
-        }
+        } as any
       });
 
       // Add the creator as a team lead
@@ -207,7 +207,7 @@ export async function POST(request: NextRequest) {
         data: {
           id: randomBytes(16).toString('hex'),
           team_id: newTeam.id,
-          user_id: user.id,
+          user_id: user?.id ?? 0,
           staff_id: staff.id,
           role: 'LEAD',
           joined_at: new Date()
@@ -315,7 +315,7 @@ export async function PUT(request: NextRequest) {
      
     const auth: APIAuthResult = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_UPDATE 
+      requireCapability: Capability.MEETING_EDIT 
     });
     
     if (!auth.success) {
@@ -325,7 +325,7 @@ export async function PUT(request: NextRequest) {
     const { user } = auth;
 
     // Get team ID from query params
-    const { _searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const teamId = searchParams.get('id');
 
     if (!teamId) {
@@ -341,7 +341,7 @@ export async function PUT(request: NextRequest) {
 
     // Get user's staff record
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: user?.id ?? 0 }
     });
 
     if (!staff) {
@@ -371,7 +371,7 @@ export async function PUT(request: NextRequest) {
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
 
-    if (!isTeamLead && !user.is_system_admin && !((user as Record<string, unknown>).is_school_admin)) {
+    if (!isTeamLead && !user?.is_system_admin && !((user as unknown as Record<string, unknown>)?.is_school_admin)) {
       return NextResponse.json(
         { error: 'You do not have permission to update this team' },
         { status: 403 }
@@ -385,9 +385,9 @@ export async function PUT(request: NextRequest) {
         ...(validatedData.name && { name: validatedData.name }),
         ...(validatedData.description !== undefined && { description: validatedData.description }),
         ...(validatedData.is_active !== undefined && { is_active: validatedData.is_active }),
-        ...(validatedData.metadata && { metadata: validatedData.metadata }),
+        ...(validatedData.metadata && { metadata: validatedData.metadata as any }),
         updated_at: new Date()
-      },
+      } as any,
       include: {
         team_members: {
           include: {
@@ -446,7 +446,7 @@ export async function DELETE(request: NextRequest) {
      
     const auth: APIAuthResult = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_DELETE 
+      requireCapability: Capability.MEETING_DELETE 
     });
     
     if (!auth.success) {
@@ -456,7 +456,7 @@ export async function DELETE(request: NextRequest) {
     const { user } = auth;
 
     // Get team ID from query params
-    const { _searchParams } = new URL(request.url);
+    const { searchParams } = new URL(request.url);
     const teamId = searchParams.get('id');
 
     if (!teamId) {
@@ -467,7 +467,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Only admins can delete teams
-    if (!user.is_system_admin && !((user as Record<string, unknown>).is_school_admin)) {
+    if (!user?.is_system_admin && !((user as unknown as Record<string, unknown>)?.is_school_admin)) {
       return NextResponse.json(
         { error: 'You do not have permission to delete teams' },
         { status: 403 }

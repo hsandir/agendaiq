@@ -89,7 +89,7 @@ export default async function PermissionsPage() {
         "View system logs",
         "Manage integrations"
       ],
-      roles: roles.filter(role => role.id === RoleID.OPS_ADMIN || role.id === RoleID.DEV_ADMIN)
+      roles: roles.filter(role => role.key === 'OPS_ADMIN' || role.key === 'DEV_ADMIN')
     }
   ];
 

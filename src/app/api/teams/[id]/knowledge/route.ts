@@ -52,7 +52,7 @@ export async function GET(
 
     const auth = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_VIEW 
+      requireCapability: Capability.MEETING_VIEW 
     });
     
     if (!auth.success) {
@@ -65,7 +65,7 @@ export async function GET(
 
     // Get user's staff record
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: user?.id ?? 0 }
     });
 
     if (!staff) {
@@ -92,7 +92,7 @@ export async function GET(
 
     // Check if user is team member or admin
     const isMember = team.team_members.some(member => member.staff_id === staff.id);
-    const isAdmin = user.is_system_admin || (user as Record<string, unknown>).is_school_admin;
+    const isAdmin = user?.is_system_admin || (user as unknown as Record<string, unknown>)?.is_school_admin;
 
     if (!isMember && !isAdmin) {
       return NextResponse.json(
@@ -218,7 +218,7 @@ export async function POST(
 
     const auth = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_CREATE 
+      requireCapability: Capability.MEETING_CREATE 
     });
     
     if (!auth.success) {
@@ -235,7 +235,7 @@ export async function POST(
 
     // Get user's staff record
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: user?.id ?? 0 }
     });
 
     if (!staff) {
@@ -263,7 +263,7 @@ export async function POST(
     // Check if user is team member
     const isMember = team.team_members.some(member => member.staff_id === staff.id);
 
-    if (!isMember && !user.is_system_admin && !(user as Record<string, unknown>).is_school_admin) {
+    if (!isMember && !user?.is_system_admin && !(user as unknown as Record<string, unknown>)?.is_school_admin) {
       return NextResponse.json(
         { error: 'You must be a team member to add knowledge resources' },
         { status: 403 }
@@ -277,13 +277,13 @@ export async function POST(
         team_id: teamId,
         title: validatedData.title,
         description: validatedData.description,
-        content: validatedData.content,
+        content: validatedData.content || '',
         type: validatedData.type,
         category: validatedData.category,
         tags: validatedData.tags || [],
         url: validatedData.url,
-        metadata: validatedData.metadata || {},
-        created_by: user.id,
+        metadata: (validatedData.metadata || {}) as any,
+        created_by: user?.id ? parseInt(String(user.id)) : 0,
         created_by_staff_id: staff.id,
         is_pinned: false,
         created_at: new Date(),
@@ -350,7 +350,7 @@ export async function PUT(
 
     const auth = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_UPDATE 
+      requireCapability: Capability.MEETING_EDIT 
     });
     
     if (!auth.success) {
@@ -378,7 +378,7 @@ export async function PUT(
 
     // Get user's staff record
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: user?.id ?? 0 }
     });
 
     if (!staff) {
@@ -408,11 +408,11 @@ export async function PUT(
     }
 
     // Check permissions: creator, team lead, or admin can edit
-    const isCreator = knowledge.created_by === user.id;
+    const isCreator = knowledge.created_by === user?.id;
     const isTeamLead = knowledge.teams.team_members.some(
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
-    const isAdmin = user.is_system_admin || (user as Record<string, unknown>).is_school_admin;
+    const isAdmin = user?.is_system_admin || (user as unknown as Record<string, unknown>)?.is_school_admin;
 
     if (!isCreator && !isTeamLead && !isAdmin) {
       return NextResponse.json(
@@ -433,10 +433,10 @@ export async function PUT(
         ...(validatedData.tags !== undefined && { tags: validatedData.tags || [] }),
         ...(validatedData.url !== undefined && { url: validatedData.url }),
         ...(validatedData.is_public !== undefined && { is_public: validatedData.is_public }),
-        ...(validatedData.metadata && { metadata: validatedData.metadata }),
+        ...(validatedData.metadata && { metadata: validatedData.metadata as any }),
         ...(validatedData.is_pinned !== undefined && { is_pinned: validatedData.is_pinned }),
         updated_at: new Date(),
-      },
+      } as any,
       include: {
         staff: {
           include: {
@@ -498,7 +498,7 @@ export async function DELETE(
 
     const auth = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_DELETE 
+      requireCapability: Capability.MEETING_DELETE 
     });
     
     if (!auth.success) {
@@ -522,7 +522,7 @@ export async function DELETE(
 
     // Get user's staff record
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: user?.id ?? 0 }
     });
 
     if (!staff) {
@@ -552,11 +552,11 @@ export async function DELETE(
     }
 
     // Check permissions: creator, team lead, or admin can delete
-    const isCreator = knowledge.created_by === user.id;
+    const isCreator = knowledge.created_by === user?.id;
     const isTeamLead = knowledge.teams.team_members.some(
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
-    const isAdmin = user.is_system_admin || (user as Record<string, unknown>).is_school_admin;
+    const isAdmin = user?.is_system_admin || (user as unknown as Record<string, unknown>)?.is_school_admin;
 
     if (!isCreator && !isTeamLead && !isAdmin) {
       return NextResponse.json(
@@ -566,7 +566,7 @@ export async function DELETE(
     }
 
     // Delete associated views first
-    await prisma.team_knowledge_view.deleteMany({
+    await prisma.team_knowledge_views.deleteMany({
       where: { knowledge_id: knowledgeId }
     });
 

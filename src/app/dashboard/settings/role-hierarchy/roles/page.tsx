@@ -192,7 +192,7 @@ export default async function RolePage() {
             <div>
               <h4 className="text-sm font-medium text-foreground mb-3">Staff Role Distribution</h4>
               <p className="text-xs text-muted-foreground mb-4">Drag staff members between roles to change their assignments</p>
-              <RolesPageClient departments={departments} roles={roles} />
+              <RolesPageClient departments={departments as any} roles={roles as any} />
             </div>
           </div>
         </CardContent>
