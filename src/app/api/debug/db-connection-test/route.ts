@@ -5,6 +5,14 @@ export async function GET(request: NextRequest) {
   const testResults = {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
+    env_vars_check: {
+      DATABASE_URL_exists: !!process.env.DATABASE_URL,
+      DATABASE_URL_length: process.env.DATABASE_URL?.length || 0,
+      DIRECT_URL_exists: !!process.env.DIRECT_URL,
+      DIRECT_URL_length: process.env.DIRECT_URL?.length || 0,
+      NEXTAUTH_SECRET_exists: !!process.env.NEXTAUTH_SECRET,
+      NEXTAUTH_SECRET_length: process.env.NEXTAUTH_SECRET?.length || 0
+    },
     tests: [] as any[]
   };
 
