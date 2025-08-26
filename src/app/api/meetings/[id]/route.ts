@@ -331,6 +331,58 @@ export async function PATCH(
       }
     }
 
+    // Update agenda items if provided - Zero Degradation Protocol
+    if (body.agendaItems && Array.isArray(body.agendaItems)) {
+      // Get existing agenda items for comparison
+      const existingItems = await prisma.meeting_agenda_items.findMany({
+        where: { meeting_id: meetingId }
+      });
+
+      // Create array of item IDs to keep (existing items being updated)
+      const itemsToKeep = body.agendaItems
+        .filter((item: any) => item.id && !isNaN(parseInt(item.id)))
+        .map((item: any) => parseInt(item.id));
+
+      // Remove items that are no longer in the list
+      await prisma.meeting_agenda_items.deleteMany({
+        where: {
+          meeting_id: meetingId,
+          NOT: {
+            id: { in: itemsToKeep }
+          }
+        }
+      });
+
+      // Update existing items and create new ones
+      for (const item of body.agendaItems) {
+        const itemData = {
+          meeting_id: meetingId,
+          topic: item.topic || '',
+          problem_statement: item.description || null,
+          purpose: item.purpose || 'Discussion',
+          priority: item.priority || 'Medium',
+          duration_minutes: item.duration_minutes || 15,
+          responsible_staff_id: item.responsible_staff_id || null,
+          status: item.status || 'Pending',
+          order_index: item.order_index || 0,
+          updated_at: new Date()
+        };
+
+        if (item.id && !isNaN(parseInt(item.id))) {
+          // Update existing item
+          await prisma.meeting_agenda_items.update({
+            where: { id: parseInt(item.id) },
+            data: itemData
+          });
+        } else {
+          // Create new item
+          await prisma.meeting_agenda_items.create({
+            data: itemData
+          });
+        }
+      }
+    }
+
     // Create audit log entry for meeting update
     await prisma.meeting_audit_logs.create({
       data: {

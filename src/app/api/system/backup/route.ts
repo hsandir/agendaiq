@@ -54,15 +54,15 @@ export async function POST(request: NextRequest) {
     const { type, message, restore, components  } = (await request.json()) as Record<string, unknown>;
 
     if (type === 'create') {
-      return await createBackup(message);
+      return await createBackup(String(message || ''));
     } else if (type === 'full-system') {
-      return await createFullSystemBackup(components);
+      return await createFullSystemBackup(Array.isArray(components) ? components as string[] : []);
     } else if (type === 'github-push') {
-      return await pushToGitHub(message);
+      return await pushToGitHub(String(message || ''));
     } else if (type === 'auto-backup') {
-      return await autoBackup(message);
+      return await autoBackup(String(message || ''));
     } else if (type === 'restore' && restore) {
-      return await restoreBackup(restore);
+      return await restoreBackup(String(restore || ''));
     }
 
     return NextResponse.json({ error: 'Invalid backup type' }, { status: 400 });

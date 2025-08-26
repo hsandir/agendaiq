@@ -169,8 +169,8 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
     value: user.id,
     label: user.name,
     email: user.email,
-    role: user.staff?.[0]?.role?.title,
-    department: 'department' in user ? (user as Record<string, unknown>).department : null
+    role: user.role, // Fixed: use correct path
+    department: user.department
   }));
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -584,7 +584,7 @@ export function MeetingEditForm({ meeting, users, meetingId, isStep2 }: MeetingE
                         <SelectItem value="none">None</SelectItem>
                         {users.map(user => (
                           <SelectItem key={user.id} value={user.id}>
-                            {user.name} ({user.staff?.[0]?.role?.title || "No role"});
+                            {user.name} ({user.role || "No role"})
                           </SelectItem>
                         ))}
                       </SelectContent>

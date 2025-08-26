@@ -124,12 +124,12 @@ export async function PUT(request: NextRequest) {
       const updatedSchool = await prisma.school.update({
         where: { id: school?.id },
         data: {
-          name: schoolName?.trim(),
-          address: address?.trim(),
+          name: String(schoolName || '').trim(),
+          address: String(address || '').trim(),
         },
       });
 
-      return NextResponse.json({ district: updateddistrict, school: updatedSchool });
+      return NextResponse.json({ district: updatedDistrict, school: updatedSchool });
     }
 
     return NextResponse.json({ district: updatedDistrict });
