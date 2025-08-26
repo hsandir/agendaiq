@@ -111,16 +111,16 @@ export class RealtimeTransport implements LogTransport {
       const liveEvent = this.convertToLiveEvent(entry);
       
       // Broadcast to monitoring channel
-      await pusherServer.trigger(this.channel, 'log-event', liveEvent);
+      await pusherServer.trigger(this.channel, 'log-event', { ...liveEvent });
       
       // Also broadcast to user-specific channels for high-severity events
       if (liveEvent.severity === 'critical' || liveEvent.severity === 'high') {
         if (entry.context?.userId) {
-          await pusherServer.trigger(`user-${entry.context.userId}`, 'critical-log', liveEvent);
+          await pusherServer.trigger(`user-${entry.context.userId}`, 'critical-log', { ...liveEvent });
         }
         
         // Broadcast to admin channel
-        await pusherServer.trigger('admin-alerts', 'critical-log', liveEvent);
+        await pusherServer.trigger('admin-alerts', 'critical-log', { ...liveEvent });
       }
       
       // Store in memory for dashboard queries (keep last 1000 events)
@@ -164,11 +164,16 @@ export class RealtimeTransport implements LogTransport {
     bySource: Record<string, number>;
     byCategory: Record<string, number>;
   }> {
-    const stats = {
+    const stats: {
+      total: number;
+      bySeverity: Record<string, number>;
+      bySource: Record<string, number>;
+      byCategory: Record<string, number>;
+    } = {
       total: this.memoryBuffer.length,
-      bySeverity: {} satisfies Record<string, number>,
-      bySource: {} satisfies Record<string, number>,
-      byCategory: {} satisfies Record<string, number>
+      bySeverity: {},
+      bySource: {},
+      byCategory: {}
     };
 
     this.memoryBuffer.forEach(event => {

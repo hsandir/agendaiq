@@ -205,7 +205,7 @@ export class DatabaseTransport implements LogTransport {
           file: log.file ?? undefined,
           line: log.line ?? undefined,
           stack: log.stack ?? undefined,
-          environment: log.environment,
+          environment: log.environment as 'development' | 'staging' | 'production',
           performance: log.performance ? JSON.parse(log.performance) : undefined
         } satisfies DevLogEntry)),
         ...auditLogs.map(log => ({
