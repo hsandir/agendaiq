@@ -9,9 +9,9 @@ export async function GET(request: NextRequest) {
   };
 
   // Test 1: Current DATABASE_URL from env
+  const currentUrl = process.env.DATABASE_URL;
   try {
     console.log('=== DB CONNECTION TEST 1: Current DATABASE_URL ===');
-    const currentUrl = process.env.DATABASE_URL;
     console.log('DATABASE_URL length:', currentUrl?.length);
     console.log('DATABASE_URL preview:', currentUrl?.substring(0, 50) + '...');
     
@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
       test: 'Current DATABASE_URL',
       status: 'SUCCESS',
       url_preview: currentUrl?.substring(0, 50) + '...',
+      url_length: currentUrl?.length,
       result: result1
     });
   } catch (error: any) {
@@ -37,14 +38,17 @@ export async function GET(request: NextRequest) {
       test: 'Current DATABASE_URL', 
       status: 'FAILED',
       error: error.message,
-      code: error.code
+      code: error.code,
+      url_length: currentUrl?.length,
+      url_preview: currentUrl?.substring(0, 50) + '...',
+      url_last_10_chars: currentUrl?.slice(-10)
     });
   }
 
-  // Test 2: Current DIRECT_URL from env  
+  // Test 2: Current DIRECT_URL from env
+  const directUrl = process.env.DIRECT_URL;  
   try {
     console.log('=== DB CONNECTION TEST 2: Current DIRECT_URL ===');
-    const directUrl = process.env.DIRECT_URL;
     console.log('DIRECT_URL length:', directUrl?.length);
     console.log('DIRECT_URL preview:', directUrl?.substring(0, 50) + '...');
     
@@ -63,6 +67,7 @@ export async function GET(request: NextRequest) {
       test: 'Current DIRECT_URL',
       status: 'SUCCESS', 
       url_preview: directUrl?.substring(0, 50) + '...',
+      url_length: directUrl?.length,
       result: result2
     });
   } catch (error: any) {
@@ -70,7 +75,10 @@ export async function GET(request: NextRequest) {
       test: 'Current DIRECT_URL',
       status: 'FAILED',
       error: error.message,
-      code: error.code
+      code: error.code,
+      url_length: directUrl?.length,
+      url_preview: directUrl?.substring(0, 50) + '...',
+      url_last_10_chars: directUrl?.slice(-10)
     });
   }
 
