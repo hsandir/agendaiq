@@ -269,7 +269,7 @@ export const authOptions: NextAuthOptions = {
             }
           }
 
-          const staff = user.staff[0];
+          const staff = user.staff && user.staff.length > 0 ? user.staff[0] : null;
           const userData = {
             id: String(user.id), // Ensure string conversion for NextAuth
             email: user.email,
