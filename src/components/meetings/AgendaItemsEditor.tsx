@@ -333,7 +333,7 @@ export function AgendaItemsEditor({
         </div>
         <Button
           variant="ghost"
-          onClick={() => router.push(`/dashboard/meetings/${meeting.id}/edit`)}
+          onClick={() => router.push(`/dashboard/meetings/${meeting.id}/live`)}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Meeting
@@ -447,7 +447,7 @@ export function AgendaItemsEditor({
         <div className="flex justify-end gap-3">
           <Button
             variant="outline"
-            onClick={() => router.push(`/dashboard/meetings/${meeting.id}`)}
+            onClick={() => router.push(`/dashboard/meetings/${meeting.id}/live`)}
           >
             Cancel
           </Button>

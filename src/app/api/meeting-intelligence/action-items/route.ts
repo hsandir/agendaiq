@@ -83,8 +83,7 @@ export async function GET(request: NextRequest) {
             },
             role: true
           }
-        },
-        assigned_to_role: true
+        }
       },
       orderBy: [
         { priority: 'desc' },
@@ -106,18 +105,11 @@ export async function GET(request: NextRequest) {
         dueDate: item.due_date?.toISOString(),
         created_at: item.created_at.toISOString(),
         completedAt: item.completed_at?.toISOString(),
-        assignedrole: item.assigned_to_role ? {
-          id: item.assigned_to_role.id,
-          label: item.assigned_to_role.key ?? 'UNASSIGNED'
-        } : {
+        assignedrole: {
           id: 0,
           label: 'UNASSIGNED'
         },
-        assignedstaff: item.staff_meeting_action_items_assigned_toTostaff ? {
-          id: item.staff_meeting_action_items_assigned_toTostaff.id,
-          name: item.staff_meeting_action_items_assigned_toTostaff.users.name ?? 'Unknown',
-          email: item.staff_meeting_action_items_assigned_toTostaff.users.email
-        } : undefined,
+        assignedstaff: undefined,
         meeting: item.meeting ? {
           id: item.meeting.id,
           title: item.meeting.title,

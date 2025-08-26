@@ -127,6 +127,22 @@ export function MeetingLiveView({
     }
   }, []);
 
+  const agendaItemsUpdatedHandler = useCallback((data: unknown) => {
+    const typedData = data as Record<string, unknown>;
+    if (Array.isArray(typedData.items)) {
+      setAgendaItems(typedData.items as any[]);
+      setLastUpdate(new Date());
+    }
+  }, []);
+
+  const agendaItemsBulkAddedHandler = useCallback((data: unknown) => {
+    const typedData = data as Record<string, unknown>;
+    if (Array.isArray(typedData.items)) {
+      setAgendaItems(prev => [...prev, ...typedData.items as any[]]);
+      setLastUpdate(new Date());
+    }
+  }, []);
+
   const userTypingHandler = useCallback((data: unknown) => {
     const typedData = data as Record<string, unknown>;
     if (typeof typedData.itemId === 'number' && typeof typedData.userId === 'number' && typeof typedData.userName === 'string') {
@@ -173,12 +189,14 @@ export function MeetingLiveView({
     [EVENTS.AGENDA_ITEM_UPDATED]: agendaItemUpdatedHandler,
     [EVENTS.AGENDA_ITEM_ADDED]: agendaItemAddedHandler,
     [EVENTS.AGENDA_ITEM_DELETED]: agendaItemDeletedHandler,
+    'agenda-items-updated': agendaItemsUpdatedHandler,
+    'agenda-items-bulk-added': agendaItemsBulkAddedHandler,
     [EVENTS.USER_TYPING]: userTypingHandler,
     [EVENTS.USER_STOPPED_TYPING]: userStoppedTypingHandler,
     'comment-added': commentAddedHandler,
     'pusher:subscription_succeeded': subscriptionSucceededHandler,
     'pusher:subscription_error': subscriptionErrorHandler
-  }), [agendaItemUpdatedHandler, agendaItemAddedHandler, agendaItemDeletedHandler, userTypingHandler, userStoppedTypingHandler, commentAddedHandler, subscriptionSucceededHandler, subscriptionErrorHandler]);
+  }), [agendaItemUpdatedHandler, agendaItemAddedHandler, agendaItemDeletedHandler, agendaItemsUpdatedHandler, agendaItemsBulkAddedHandler, userTypingHandler, userStoppedTypingHandler, commentAddedHandler, subscriptionSucceededHandler, subscriptionErrorHandler]);
 
   const channel = usePusherChannel(
     CHANNELS.meeting(meeting.id),

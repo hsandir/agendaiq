@@ -78,7 +78,7 @@ export async function PUT(
 
     // Get existing user
     const existingUser = await prisma.users.findUnique({
-      where: { id: userId }
+      where: { id: parseInt(userId) }
     });
 
     if (!existingUser) {

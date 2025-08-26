@@ -34,17 +34,10 @@ export async function GET(request: NextRequest) {
     // Fetch meetings with parent-child relationships
     const meetings = await prisma.meeting.findMany({
       where: {
-        OR: [
-          { parent_meeting_id: { not: null } },
-          { 
-            continuation_meetings: {
-              some: {}
-            }
-          }
-        ]
+        parent_meeting_id: { not: null }
       },
       include: {
-        Parentmeeting: true,
+        parent_meeting: true,
         continuation_meetings: {
           include: {
             meeting_agenda_items: true,
@@ -52,16 +45,8 @@ export async function GET(request: NextRequest) {
             meeting_attendee: true
           }
         },
-        meeting_agenda_items: {
-          include: {
-            Responsiblerole: true
-          }
-        },
-        meeting_action_items: {
-          include: {
-            assigned_to: true
-          }
-        },
+        meeting_agenda_items: true,
+        meeting_action_items: true,
         meeting_attendee: true,
         department: true
       },
@@ -92,7 +77,7 @@ export async function GET(request: NextRequest) {
         const rootMeeting = meetings.find(m => m.id === rootId) || meeting;
         chainsMap.set(chainId, {
           id: chainId,
-          rootmeeting: {
+          rootMeeting: {
             id: rootMeeting.id,
             title: rootMeeting.title,
             date: rootMeeting.start_time?.toISOString() || new Date().toISOString(),
@@ -112,7 +97,7 @@ export async function GET(request: NextRequest) {
     chainsMap.forEach((chain, chainId) => {
       const rootMeeting = meetings.find(m => m.id === chainId);
       if (rootMeeting) {
-        chain.meetings = [buildMeetingNode(rootmeeting, meetings)];
+        chain.meetings = [buildMeetingNode(rootMeeting, meetings)];
         
         // Calculate chain stats
         const allMeetingsInChain = getAllMeetingsInChain(chain.meetings[0]);

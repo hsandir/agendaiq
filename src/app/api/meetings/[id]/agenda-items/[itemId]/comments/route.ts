@@ -100,7 +100,7 @@ export async function POST(
         meeting: {
           include: {
             meeting_attendee: {
-              where: { staff_id: (user.staff as Record<string, unknown> | null)?.id || -1 }
+              where: { staff_id: user.staff?.id ?? -1 }
             }
           }
         }
@@ -115,7 +115,7 @@ export async function POST(
     }
 
     // Check permissions
-    const isOrganizer = agendaItem.meeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
+    const isOrganizer = agendaItem.meeting.organizer_id === user.staff?.id;
     const isAttendee = agendaItem.meeting.meeting_attendee.length > 0;
     const hasAdminAccess = isAnyAdmin(user);
 
@@ -129,9 +129,9 @@ export async function POST(
     // Create the comment
     const comment = await prisma.agenda_item_comments.create({
       data: {
-        comment: validationResult.data.content,
+        content: validationResult.data.content,
         agenda_item_id: itemId,
-        staff_id: user.staff!.id
+        staff_id: user.staff?.id ?? 0
       },
       include: {
         staff: {

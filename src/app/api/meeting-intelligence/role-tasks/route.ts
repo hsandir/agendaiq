@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       roleWhereConditions.is_leadership = true;
     } else if (filter === 'active') {
       // Roles with active tasks
-      roleWhereConditions.action_items = {
+      roleWhereConditions.meeting_action_items = {
         some: {
           status: {
             not: 'Completed'
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       };
     } else if (filter === 'overdue') {
       // Roles with overdue tasks
-      roleWhereConditions.action_items = {
+      roleWhereConditions.meeting_action_items = {
         some: {
           due_date: {
             lt: new Date()
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
             }
           }
         },
-        AgendaItems: {
+        meeting_agenda_items: {
           include: {
             meeting: {
               select: {
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
             }
           }
         },
-        action_items: {
+        meeting_action_items: {
           include: {
             meeting: {
               select: {
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
     // Transform roles with tasks
     const now = new Date();
     const rolesWithTasks = roles.map(role => {
-      const tasks = role.action_items.map((item) => {
+      const tasks = role.meeting_action_items.map((item) => {
         const isOverdue = item.due_date && item.due_date < now && item.status !== 'Completed';
         
         return {
@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
           priority: item.priority ?? 'Medium',
           dueDate: item.due_date?.toISOString(),
           assignedAt: item.created_at.toISOString(),
-          meeting: item.Meeting ? {
+          meeting: item.meeting ? {
             id: item.meeting.id,
             title: item.meeting.title,
             date: item.meeting.start_time?.toISOString() || new Date().toISOString()

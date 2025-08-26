@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     // Parse test files from output
     const testFiles = stdout
       .split('\n')
-      .filter(line => line.trim() && line.includes('tests__'))
+      .filter((line: string) => line.trim() && line.includes('tests__'))
       .map(filePath => filePath.trim());
 
     // Group tests by category

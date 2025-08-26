@@ -48,9 +48,9 @@ export async function POST(request: NextRequest) {
 
     try {
       // Execute the test command
-      const { _stdout, _stderr } = await execAsync(_command, {
+      const { stdout, stderr } = await execAsync(command, {
         cwd: process.cwd(),
-        env: { ...process._env, CI: 'true' } // Run in CI mode to avoid interactive _prompts
+        env: { ...process.env, CI: 'true' } // Run in CI mode to avoid interactive prompts
       });
 
       // Try to read the test results JSON file
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
           functions: coverageData.total.functions,
           lines: coverageData.total.lines,
         } : null,
-        output: stdout.split('\n').filter(line => line.trim()),
+        output: stdout.split('\n').filter((line: string) => line.trim()),
         timestamp: new Date().toISOString(),
       } : {
         success: stderr.includes('FAIL') ? false : true,
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
           skipped: 0,
           duration: 0
         },
-        output: [...stdout.split('\n'), ...stderr.split('\n')].filter(line => line.trim()),
+        output: [...stdout.split('\n'), ...stderr.split('\n')].filter((line: string) => line.trim()),
         timestamp: new Date().toISOString(),
       };
 
@@ -150,10 +150,10 @@ export async function POST(request: NextRequest) {
       // Parse the output for display
       const output = [];
       if (execError.stdout) {
-        output.push(...execError.stdout.split('\n').filter(line => line.trim()));
+        output.push(...execError.stdout.split('\n').filter((line: string) => line.trim()));
       }
       if (execError.stderr) {
-        output.push(...execError.stderr.split('\n').filter(line => line.trim()));
+        output.push(...execError.stderr.split('\n').filter((line: string) => line.trim()));
       }
       
       return NextResponse.json({

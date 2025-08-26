@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
         topic: item.topic,
         problemStatement: item.problem_statement,
         status: item.status ?? 'Pending',
-        meeting: item.Meeting ? {
+        meeting: item.meeting ? {
           id: item.meeting.id,
           title: item.meeting.title,
           startTime: item.meeting.start_time?.toISOString()
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
         description: item.description,
         status: item.status ?? 'pending',
         dueDate: item.due_date?.toISOString(),
-        meeting: item.Meeting ? {
+        meeting: item.meeting ? {
           id: item.meeting.id,
           title: item.meeting.title
         } : undefined,

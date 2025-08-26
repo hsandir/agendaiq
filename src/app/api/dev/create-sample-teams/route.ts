@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     await prisma.team_knowledge.deleteMany();
     await prisma.meeting_notes.deleteMany();
     await prisma.meeting_attendee.deleteMany();
-    await prisma.meeting_agenda_item.deleteMany();
+    await prisma.meeting_agenda_items.deleteMany();
     await prisma.meeting.deleteMany({ where: { team_id: { not: null } } });
     await prisma.team_members.deleteMany();
     await prisma.teams.deleteMany();
