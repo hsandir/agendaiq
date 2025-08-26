@@ -344,7 +344,7 @@ export function TeamKnowledge({ teamId, canEdit = false }: TeamKnowledgeProps) {
 
   if (error) {
     return (
-      <Alert variant="destructive">
+      <Alert className="border-destructive text-destructive">
         <AlertDescription>{error}</AlertDescription>
       </Alert>
     );

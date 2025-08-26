@@ -279,11 +279,11 @@ export function CreateKnowledgeDialog({
       };
       
       const isEditMode = !!editData;
-      const url = isEditMode 
+      const apiUrl = isEditMode 
         ? `/api/teams/${teamId}/knowledge?knowledge_id=${editData.id}`
         : `/api/teams/${teamId}/knowledge`;
       
-      const response = await fetch(url, {
+      const response = await fetch(apiUrl, {
         method: isEditMode ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(knowledgeData),

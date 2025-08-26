@@ -184,7 +184,7 @@ export default function TestDashboard() {
       // Update suite status
       if (suitePath && data.success !== undefined) {
         setTestSuites(prev => prev.map(suite => {
-          if (suite.path === suitePath || suite.files?.includes(suitePath)) {
+          if (suite.path === suitePath || suite.path.includes(suitePath)) {
             return {
               ...suite,
               status: data.success ? 'passed' : 'failed',
@@ -684,7 +684,15 @@ export default function TestDashboard() {
         isOpen={showAutofixModal}
         onClose={() => setShowAutofixModal(false)}
         type="test"
-        failedItems={testResults.filter(r => r.status === 'failed')}
+        failedItems={testResults.filter(r => r.status === 'failed').map(r => ({ 
+          suite: r.suite, 
+          test: r.test, 
+          status: r.status, 
+          duration: r.duration, 
+          error: r.error, 
+          file: r.file, 
+          line: r.line 
+        }))}
       />
     </div>
   )

@@ -84,13 +84,13 @@ export default function RoleHierarchyVisualizationContent() {
                   </p>
                 </div>
                 
-                {selectedRole.staff && selectedRole.staff.length > 0 && (
+                {(selectedRole as any).Staff && (selectedRole as any).Staff.length > 0 && (
                   <div className="md:col-span-2 lg:col-span-3">
                     <label className="block text-sm font-medium text-foreground">
-                      Staff Members ({selectedRole.staff.length})
+                      Staff Members ({(selectedRole as any).Staff.length})
                     </label>
                     <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {selectedRole.staff.map((staff) => (
+                      {(selectedRole as any).Staff.map((staff: any) => (
                         <div key={staff.id} className="text-sm text-foreground bg-muted p-2 rounded">
                           <div className="font-medium">{staff.users.name}</div>
                           <div className="text-muted-foreground">{staff.users.email}</div>

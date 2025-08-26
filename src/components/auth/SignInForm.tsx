@@ -118,25 +118,25 @@ function SignInFormContent() {
       } else {
         // Regular login attempt - use controlled inputs (Zero Degradation Protocol)
         // Note: FormData fallback maintained for compatibility
-        const formEmail = email || (new FormData(e.currentTarget).get('email') as string);
-        const formPassword = password || (new FormData(e.currentTarget).get('password') as string);
-        email = formEmail;
-        password = formPassword;
+        const formEmail = email! || (new FormData(e.currentTarget).get('email') as string) || '';
+        const formPassword = password! || (new FormData(e.currentTarget).get('password') as string) || '';
+        setEmail(formEmail);
+        setPassword(formPassword);
 
         // Store login attempt in localStorage before attempting signin
         const attemptData = {
-          email,
+          email: formEmail,
           timestamp: new Date().toISOString(),
           rememberMe,
           trustDevice
         };
         localStorage.setItem('lastLoginAttempt', JSON.stringify(attemptData));
 
-        console.log('🔐 Attempting login with:', { email, rememberMe, trustDevice });
+        console.log('🔐 Attempting login with:', { email: formEmail, rememberMe, trustDevice });
 
         const result = await signIn('credentials', {
-          email,
-          password,
+          email: formEmail,
+          password: formPassword,
           rememberMe: rememberMe.toString(),
           trustDevice: trustDevice.toString(),
           redirect: false,
@@ -147,7 +147,7 @@ function SignInFormContent() {
         if (result?.error === '2FA_REQUIRED') {
           // User has 2FA enabled, show 2FA input
           setRequires2FA(true);
-          setTempCredentials({ email, password });
+          setTempCredentials({ email: formEmail, password: formPassword });
           setError('');
           setErrorDetails(null);
         } else if (result?.error) {

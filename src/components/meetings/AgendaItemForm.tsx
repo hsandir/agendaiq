@@ -14,7 +14,6 @@ import {
   X, 
   GripVertical,
   Clock,
-  users,
   AlertCircle,
   ArrowUp,
   ArrowDown,

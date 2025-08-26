@@ -18,17 +18,17 @@ interface SchoolClientProps {
   initialschool: School | null
 }
 
-export default function SchoolClient({ initialSchool }: SchoolClientProps) {
+export default function SchoolClient({ initialschool }: SchoolClientProps) {
   const router = useRouter();
-  const [school, setSchool] = useState<School | null>(initialSchool);
-  const [isLoading, setIsLoading] = useState(!initialSchool);
+  const [school, setSchool] = useState<School | null>(initialschool);
+  const [isLoading, setIsLoading] = useState(!initialschool);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
     const fetchSchool = async () => {
-      if (initialSchool) return; // Already have data
+      if (initialschool) return; // Already have data
       
       try {
         const response = await fetch('/api/school');
@@ -47,7 +47,7 @@ export default function SchoolClient({ initialSchool }: SchoolClientProps) {
     };
 
     fetchSchool();
-  }, [initialSchool]);
+  }, [initialschool]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

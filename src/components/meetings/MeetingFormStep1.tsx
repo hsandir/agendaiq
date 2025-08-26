@@ -66,7 +66,7 @@ interface MeetingFormStep1Props {
     endTime: string;
     repeatType: string;
     repeatEndDate: string;
-    repeatConfig?: Record<string, unknown>;
+    repeatConfig?: RepeatConfig;
     calendarIntegration: string;
     meetingType: string;
     zoomMeetingId: string;
@@ -138,15 +138,15 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
   const [showRepeatModal, setShowRepeatModal] = useState(false);
   const [repeatConfig, setRepeatConfig] = useState<RepeatConfig | null>(null);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [selectedPreviousmeeting, setSelectedPreviousMeeting] = useState<any>(null);
+  const [selectedPreviousMeeting, setSelectedPreviousMeeting] = useState<any>(null);
 
   // Transform users to MultiSelectOptions
   const attendeeOptions: MultiSelectOption[] = users.map(user => ({
     value: user.id,
     label: user.name,
     email: user.email,
-    department: 'department' in user ? (user as Record<string, unknown>).department : null,
-    role: 'role' in user ? (user as Record<string, unknown>).role : null
+    department: 'department' in user ? String(user.department ?? '') : undefined,
+    role: 'role' in user ? String(user.role ?? '') : undefined
   }));
   
   console.log("Attendee options created:", attendeeOptions.length, "options");
@@ -204,16 +204,16 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     }
   };
 
-  const handleSelectPreviousMeeting = (meeting: Record<string, unknown>) => {
+  const handleSelectPreviousMeeting = (meeting: any) => {
     setSelectedPreviousMeeting(meeting);
-    setParentMeetingId(meeting.id);
-    setTitle(`${meeting.title} (Continuation)`);
-    setDescription(meeting.description ?? "");
-    setMeetingType(meeting.meeting_type ?? "regular");
+    setParentMeetingId(Number(meeting.id));
+    setTitle(String(meeting.title ?? '') + ' (Continuation)');
+    setDescription(String(meeting.description ?? ""));
+    setMeetingType(String(meeting.meeting_type ?? "regular"));
     
     // Set attendees if available
     if (meeting.attendees && Array.isArray(meeting.attendees)) {
-      const attendeeIds = (meeting.attendees.map((a: Record<string, unknown>) => a.id ?? a.staff_id).filter(Boolean));
+      const attendeeIds = meeting.attendees.map((a: any) => String(a.id ?? a.staff_id)).filter(Boolean);
       setSelectedAttendees(attendeeIds);
     }
     
@@ -221,18 +221,18 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     setIsContinuation(true);
   };
 
-  const handleSelectMultipleMeetings = (meetings: Record<string, unknown>[], options: { importAgendaItems: boolean; importAttendees: boolean }) => {
+  const handleSelectMultipleMeetings = (meetings: any[], options: { importAgendaItems: boolean; importAttendees: boolean }) => {
     // Use the first meeting as the base
     const baseMeeting = meetings[0];
     setSelectedPreviousMeeting(baseMeeting);
-    setParentMeetingId(baseMeeting.id);
+    setParentMeetingId(Number(baseMeeting.id));
     
     // Create title from all selected meetings
-    const titles = (meetings.map(m => m.title).join(', '));
+    const titles = meetings.map(m => String(m.title ?? '')).join(', ');
     setTitle(`Continuation of: ${titles}`);
     
     // Combine descriptions
-    const descriptions = (meetings.map(m => m.description).filter(Boolean));
+    const descriptions = meetings.map(m => String(m.description ?? '')).filter(Boolean);
     if (descriptions.length > 0) {
       setDescription(`Combined from previous meetings:\n${descriptions.join('\n\n')}`);
     }
@@ -242,8 +242,8 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       const allAttendees = new Set<string>();
       meetings.forEach(meeting => {
         if (meeting.attendees && Array.isArray(meeting.attendees)) {
-          meeting.attendees.forEach((a: Record<string, unknown>) => {
-            const id = a.id ?? a.staff_id;
+          meeting.attendees.forEach((a: any) => {
+            const id = String(a.id ?? a.staff_id ?? '');
             if (id) allAttendees.add(id);
           });
         }
@@ -253,7 +253,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
     
     // Store the parent meeting ID (use the first selected meeting as parent)
     if (meetings.length > 0) {
-      setParentMeetingId(meetings[0].id);
+      setParentMeetingId(Number(meetings[0].id));
     }
     
     setIsContinuation(true);
@@ -339,7 +339,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
         endTime,
         repeatType,
         repeatEndDate: calculatedEndDate,
-        repeatConfig,
+        repeatConfig: repeatConfig ?? undefined,
         calendarIntegration,
         meetingType,
         zoomMeetingId,
@@ -672,7 +672,7 @@ export function MeetingFormStep1({ users, departments, roles, onSubmit }: Meetin
       <MeetingHistoryModal
         isOpen={showHistoryModal}
         onClose={() => setShowHistoryModal(false)}
-        onSelectMeeting={handleSelectPreviousMeeting}
+        onSelectmeeting={handleSelectPreviousMeeting}
         multiSelect={isContinuation}
         onSelectMultipleMeetings={handleSelectMultipleMeetings}
       />

@@ -149,7 +149,7 @@ export function validateRequiredFields<T extends Record<string, unknown>>(
   const errors: ValidationError[] = [];
   
   for (const field of requiredFields) {
-    if (data[field] === undefined ?? data[field] === null ?? data[field] === '') {
+    if (data[field] === undefined || data[field] === null || data[field] === '') {
       errors.push({
         field: String(field),
         message: `${String(field)} is required`,

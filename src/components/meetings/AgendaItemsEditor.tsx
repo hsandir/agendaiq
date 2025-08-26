@@ -29,7 +29,6 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  users,
   Target,
   Flag,
   Lightbulb,
@@ -38,6 +37,7 @@ import {
 } from 'lucide-react'
 import { AgendaItemForm, type AgendaItemFormData } from './AgendaItemForm'
 import type { AuthenticatedUser } from '@/lib/auth/auth-utils'
+import type { Priority, Purpose, SolutionType, DecisionType, AgendaItemStatus } from '@prisma/client'
 import { safeFormatDate } from '@/lib/utils/safe-date'
 
 interface Meeting {
@@ -157,13 +157,13 @@ export function AgendaItemsEditor({
       problem_statement: item.problem_statement ?? undefined,
       staff_initials: item.staff_initials ?? undefined,
       responsible_staff_id: item.responsible_staff_id ?? undefined,
-      priority: item.priority as Record<string, unknown>,
-      purpose: item.purpose as Record<string, unknown>,
+      priority: item.priority as Priority,
+      purpose: item.purpose as Purpose,
       proposed_solution: item.proposed_solution ?? undefined,
-      solution_type: item.solution_type as Record<string, unknown> || undefined,
+      solution_type: item.solution_type as SolutionType | undefined,
       decisions_actions: item.decisions_actions ?? undefined,
-      decision_type: item.decision_type as Record<string, unknown> || undefined,
-      status: item.status as Record<string, unknown>,
+      decision_type: item.decision_type as DecisionType | undefined,
+      status: item.status as AgendaItemStatus,
       future_implications: item.future_implications ?? false,
       duration_minutes: item.duration_minutes ?? 15,
       carried_forward: item.carried_forward,
@@ -178,9 +178,9 @@ export function AgendaItemsEditor({
     if (canEdit && !hasAutoAddedNewItem) {
       const newItem: AgendaItemFormData = {
         topic: '',
-        priority: 'Medium',
-        purpose: 'Discussion',
-        status: 'Pending',
+        priority: 'Medium' as Priority,
+        purpose: 'Discussion' as Purpose,
+        status: 'Pending' as AgendaItemStatus,
         duration_minutes: 15,
         future_implications: false,
         carried_forward: false,
@@ -198,9 +198,9 @@ export function AgendaItemsEditor({
   const addAgendaItem = () => {
     const newItem: AgendaItemFormData = {
       topic: '',
-      priority: 'Medium',
-      purpose: 'Discussion',
-      status: 'Pending',
+      priority: 'Medium' as Priority,
+      purpose: 'Discussion' as Purpose,
+      status: 'Pending' as AgendaItemStatus,
       duration_minutes: 15,
       future_implications: false,
       carried_forward: false,
@@ -263,7 +263,7 @@ export function AgendaItemsEditor({
           future_implications: item.future_implications ?? false,
           duration_minutes: item.duration_minutes ?? 15,
           carried_forward: true,
-          carry_forward_count: (item.carry_forward_count ?? 0) + 1,
+          carry_forward_count: (typeof item.carry_forward_count === 'number' ? item.carry_forward_count : 0) + 1,
           order_index: agendaItems.length + index,
           parent_item_id: item.id // Link to original item
         }))

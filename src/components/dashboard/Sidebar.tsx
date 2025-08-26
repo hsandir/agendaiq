@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import clsx from "clsx";
 import { sidebarItems } from "@/components/layout/SidebarItems";
@@ -98,7 +98,7 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
   }, [pathname, isInitialized, expandedItems]);
 
   const isActive = (path: string) => {
-    return pathname === path ?? pathname?.startsWith(path + "/")
+    return pathname === path || pathname?.startsWith(path + "/")
   };
 
   const toggleExpanded = (href: string) => {
@@ -225,7 +225,7 @@ export function Sidebar({ onSettingsClick }: SidebarProps = {}) {
                         href={item.href}
                         className="flex items-center px-4 py-2 text-sm font-medium rounded-md text-muted-foreground"
                       >
-                        {item.icon && <item.icon className="mr-3 h-5 w-5" />}
+                        {item.icon && React.createElement(item.icon as any, { className: "mr-3 h-5 w-5" })}
                         {item.label}
                       </Link>
                     </div>

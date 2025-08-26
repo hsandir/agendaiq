@@ -183,14 +183,14 @@ export function RoleHierarchyManagement() {
               <div>
                 <h4 className="font-medium">{role.title}</h4>
                 <p className="text-sm text-muted-foreground">
-                  department: {role.department?.name ?? 'None'}
+                  department: {role.Department?.name ?? 'None'}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Priority: {role.priority || 'Not set'}
                 </p>
-                {role.staff && role.staff.length > 0 && (
+                {role.Staff && role.Staff.length > 0 && (
                   <p className="text-sm text-muted-foreground">
-                    staff: {role.staff.length} member{role.staff.length !== 1 ? 's' : ''}
+                    staff: {role.Staff.length} member{role.Staff.length !== 1 ? 's' : ''}
                   </p>
                 )}
               </div>

@@ -182,19 +182,19 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
     items.forEach(item => {
       const errorMessage = item.error ?? item.logs ?? '';
       
-      if (errorMessage.includes('npm') || errorMessage.includes('node_modules')) {
+      if (typeof errorMessage === 'string' && (errorMessage.includes('npm') || errorMessage.includes('node_modules'))) {
         errorTypes.add('dependency');
       }
-      if (errorMessage.includes('Type error') || errorMessage.includes('TS')) {
+      if (typeof errorMessage === 'string' && (errorMessage.includes('Type error') || errorMessage.includes('TS'))) {
         errorTypes.add('typescript');
       }
-      if (errorMessage.includes('ESLint') || errorMessage.includes('Prettier')) {
+      if (typeof errorMessage === 'string' && (errorMessage.includes('ESLint') || errorMessage.includes('Prettier'))) {
         errorTypes.add('lint');
       }
-      if (errorMessage.includes('test failed') || errorMessage.includes('expect')) {
+      if (typeof errorMessage === 'string' && (errorMessage.includes('test failed') || errorMessage.includes('expect'))) {
         errorTypes.add('test');
       }
-      if (errorMessage.includes('build failed') || errorMessage.includes('webpack')) {
+      if (typeof errorMessage === 'string' && (errorMessage.includes('build failed') || errorMessage.includes('webpack'))) {
         errorTypes.add('build');
       }
     });
@@ -330,7 +330,7 @@ export default function AutofixModal({ isOpen, onClose, type, failedItems }: Aut
       
       // Find matching suggestion for this step
       const matchingSuggestion = suggestions.find((s: Record<string, unknown>) => 
-        s.id === step.id ?? s.commands.some((cmd: string) => cmd.includes(step.command!.split(' ')[0]))
+        s.id === step.id || (s.commands as string[])?.some((cmd: string) => cmd.includes(step.command!.split(' ')[0]))
       );
       
       if (!matchingSuggestion) {

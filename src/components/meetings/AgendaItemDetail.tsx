@@ -22,7 +22,6 @@ import {
   Save, 
   X, 
   User,
-  users, 
   Calendar,
   Clock,
   AlertCircle,
@@ -628,7 +627,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
             </Button>
             <Button 
               onClick={saveChanges}
-              disabled={!ongoingChoice ?? isSaving}
+              disabled={!ongoingChoice || isSaving}
               className="bg-primary hover:bg-primary"
             >
               {isSaving ? 'Saving...' : 'Continue'}

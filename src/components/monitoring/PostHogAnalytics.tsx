@@ -117,7 +117,7 @@ export default function PostHogAnalytics() {
       };
 
       // Check if PostHog is initialized and has data
-      if (typeof window !== 'undefined' && posthog && posthog.isFeatureEnabled) {
+      if (typeof window !== 'undefined' && posthog && typeof posthog.isFeatureEnabled === 'function') {
         // Get distinct ID count (approximate unique users)
         const distinctId = posthog.get_distinct_id();
         if (distinctId) {
@@ -131,8 +131,8 @@ export default function PostHogAnalytics() {
         }
 
         // Check for feature flags and properties
-        const featureFlags = posthog.getFeatureFlags ? posthog.getFeatureFlags() : [];
-        const properties = posthog.getFeatureFlagPayloads ? posthog.getFeatureFlagPayloads() : {};
+        const featureFlags = typeof posthog.getFeatureFlag === 'function' ? Object.keys(posthog.getFeatureFlag || {}) : [];
+        const properties = typeof posthog.getFeatureFlagPayload === 'function' ? {} : {};
         
         // Try to fetch real events from PostHog API (if we have access)
         try {
@@ -413,7 +413,7 @@ export default function PostHogAnalytics() {
                     <p className="font-medium">Dead Clicks</p>
                     <p className="text-sm text-muted-foreground">Clicks with no response</p>
                   </div>
-                  <Badge variant="warning">7</Badge>
+                  <Badge variant="destructive">7</Badge>
                 </div>
               </div>
             </CardContent>

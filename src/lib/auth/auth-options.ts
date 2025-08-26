@@ -203,7 +203,7 @@ export const authOptions: NextAuthOptions = {
 
           // Check password using bcrypt
           console.log('🔒 AUTHORIZE: Checking password for user:', user.email);
-          const isValid = await bcrypt.compare(credentials.password, (user as Record<string, unknown>).hashed_password);
+          const isValid = user.hashed_password ? await bcrypt.compare(credentials.password, user.hashed_password) : false;
           console.log('🔒 AUTHORIZE: Password valid:', isValid);
           
           // Log password validation result
@@ -243,7 +243,7 @@ export const authOptions: NextAuthOptions = {
 
             // Verify the 2FA code
             const isValidToken = speakeasy.totp.verify({
-              secret: (user as Record<string, unknown>).two_factor_secret!,
+              secret: user.two_factor_secret!,
               encoding: 'base32',
               token: credentials.twoFactorCode,
               window: 2
@@ -251,7 +251,7 @@ export const authOptions: NextAuthOptions = {
 
             // Check backup codes if TOTP fails
             if (!isValidToken) {
-              const isBackupCode = (user as Record<string, unknown>).backup_codes.includes(credentials.twoFactorCode);
+              const isBackupCode = user.backup_codes?.includes(credentials.twoFactorCode);
               
               if (!isBackupCode) {
                 // // await AuditClient.logAuthEvent('login_failure', user.id, user.staff[0]?.id, req, '2FA code invalid');
@@ -261,9 +261,9 @@ export const authOptions: NextAuthOptions = {
 
               // Remove used backup code
               await prisma.users.update({
-                where: { id: parseInt(user.id) },
+                where: { id: user.id },
                 data: {
-                  backup_codes: (user as Record<string, unknown>).backup_codes.filter(code => code !== credentials.twoFactorCode)
+                  backup_codes: user.backup_codes?.filter(code => code !== credentials.twoFactorCode) || []
                 }
               });
             }
@@ -305,13 +305,13 @@ export const authOptions: NextAuthOptions = {
           // Log successful login
           // await AuditClient.logAuthEvent('login_success', userData.id, staff?.id, req);
           
-          // Add rememberMe flag to user data
-          if (credentials.rememberMe === 'true') {
-            userData.rememberMe = true;
-          }
-          if (credentials.trustDevice === 'true') {
-            userData.trustDevice = true;
-          }
+          // Add rememberMe flag to user data - handled in session callback
+          // if (credentials.rememberMe === 'true') {
+          //   userData.rememberMe = true;
+          // }
+          // if (credentials.trustDevice === 'true') {
+          //   userData.trustDevice = true;
+          // }
           
           // Log successful authorize completion
           try {
@@ -339,8 +339,8 @@ export const authOptions: NextAuthOptions = {
             id: userData.id,
             email: userData.email,
             hasStaff: !!userData.staff,
-            rememberMe: userData.rememberMe,
-            trustDevice: userData.trustDevice
+            // rememberMe: userData.rememberMe,
+            // trustDevice: userData.trustDevice
           });
           
           return userData;
@@ -531,11 +531,6 @@ export const authOptions: NextAuthOptions = {
     signIn: '/auth/signin',
     error: '/auth/error',
     verifyRequest: '/auth/verify',
-  },
-  session: {
-    strategy: 'jwt',
-    maxAge: 8 * 60 * 60, // 8 hours (reasonable for work day)
-    updateAge: 60 * 60, // Update session every hour
   },
   debug: process.env.NODE_ENV === 'development',
 }; 

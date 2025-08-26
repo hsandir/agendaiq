@@ -14,7 +14,6 @@ import { safeFormat } from "@/lib/utils/safe-format";
 import {
   Plus,
   Trash2,
-  users,
   Calendar,
   Clock,
   AlertCircle,
@@ -46,10 +45,23 @@ export interface ActionItem {
   tags?: string[];
 }
 
+export interface Attendee {
+  id: string;
+  name: string;
+  role?: string;
+  department?: string;
+}
+
+interface AgendaItemForAction {
+  id: number;
+  title: string;
+  topic: string;
+}
+
 interface MeetingActionItemsProps {
   meetingId?: number;
-  agendaItems?: Record<string, unknown>[];
-  attendees: Record<string, unknown>[];
+  agendaItems?: AgendaItemForAction[];
+  attendees: Attendee[];
   actionItems: ActionItem[];
   onChange: (items: ActionItem[]) => void;
   readOnly?: boolean;
@@ -86,8 +98,14 @@ export function MeetingActionItems({
 
     const selectedAttendee = attendees.find(a => a.id === newItem.assignedTo);
     const item: ActionItem = {
-      ...newItem as ActionItem,
-      assignedTorole: selectedAttendee?.role,
+      id: Date.now(), // Temporary ID
+      title: newItem.title,
+      description: newItem.description ?? '',
+      assignedTo: newItem.assignedTo,
+      priority: newItem.priority ?? 'medium',
+      dueDate: newItem.dueDate,
+      status: 'pending' as const,
+      assignedToRole: selectedAttendee?.role,
       department: selectedAttendee?.department
     };
 
@@ -304,7 +322,7 @@ export function MeetingActionItems({
                 <Label>Priority</Label>
                 <Select
                   value={newItem.priority ?? "medium"}
-                  onValueChange={(value: Record<string, unknown>) => setNewItem({ ...newItem, priority: value })}
+                  onValueChange={(value) => setNewItem({ ...newItem, priority: value as ActionItem['priority'] })}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -330,7 +348,7 @@ export function MeetingActionItems({
                     <SelectItem value="none">None</SelectItem>
                     {agendaItems.map((item, index) => (
                       <SelectItem key={index} value={index.toString()}>
-                        #{index + 1}: {item.title}
+                        #{index + 1}: {item.title || item.topic}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -355,7 +373,7 @@ export function MeetingActionItems({
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <User className="h-5 w-5 text-muted-foreground" />
+                    <Users className="h-5 w-5 text-muted-foreground" />
                     <div>
                       <h3 className="font-semibold">{assignee?.name ?? "Unknown"}</h3>
                       <p className="text-sm text-muted-foreground">
@@ -424,9 +442,9 @@ export function MeetingActionItems({
                                       <Label className="text-xs">Status</Label>
                                       <Select
                                         value={item.status}
-                                        onValueChange={(value: Record<string, unknown>) => 
+                                        onValueChange={(value) => 
                                           updateActionItem(item.originalIndex, { 
-                                            status: value,
+                                            status: value as ActionItem['status'],
                                             completedDate: value === "completed" ? new Date().toISOString() : undefined
                                           })
                                         }
@@ -446,8 +464,8 @@ export function MeetingActionItems({
                                       <Label className="text-xs">Priority</Label>
                                       <Select
                                         value={item.priority}
-                                        onValueChange={(value: Record<string, unknown>) => 
-                                          updateActionItem(item.originalIndex, { priority: value })
+                                        onValueChange={(value) => 
+                                          updateActionItem(item.originalIndex, { priority: value as ActionItem['priority'] })
                                         }
                                       >
                                         <SelectTrigger className="h-8">

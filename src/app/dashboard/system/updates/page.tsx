@@ -707,7 +707,7 @@ export default function UpdatesPage() {
                       <Button 
                         size="sm" 
                         variant={compatibility.recommendation === 'avoid' ? 'outline' : 'default'}
-                        onClick={() => performUpdate(update.name)}
+                        onClick={() => performUpdate([update.name])}
                         disabled={isUpdating || compatibility.recommendation === 'avoid'}
                         className={compatibility.recommendation === 'avoid' ? 'opacity-50' : ''}
                       >

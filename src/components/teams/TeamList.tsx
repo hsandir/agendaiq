@@ -186,7 +186,7 @@ export function TeamList() {
 
   if (error) {
     return (
-      <Alert variant="destructive">
+      <Alert className="border-destructive text-destructive">
         <AlertDescription>{error}</AlertDescription>
       </Alert>
     );

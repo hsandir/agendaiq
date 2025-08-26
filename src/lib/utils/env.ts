@@ -161,4 +161,11 @@ export function assertEnvironment() {
 if (typeof window === 'undefined') {
   // Server-side only
   assertEnvironment();
+  
+  // Import enhanced validation system  
+  import('../env-validation').then(validation => {
+    console.log('🔧 Enhanced Environment Validation loaded');
+  }).catch(() => {
+    console.log('⚠️  Enhanced Environment Validation not available');
+  });
 }

@@ -362,7 +362,7 @@ export default function TeamSettingsPage() {
   if (error || !team) {
     return (
       <div className="container mx-auto py-6">
-        <Alert variant="destructive">
+        <Alert className="bg-destructive/10 text-destructive border-destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error || 'Team not found'}</AlertDescription>
@@ -1066,7 +1066,7 @@ export default function TeamSettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Alert variant="destructive" className="mb-4">
+              <Alert className="bg-destructive/10 text-destructive border-destructive mb-4">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Warning</AlertTitle>
                 <AlertDescription>
@@ -1095,7 +1095,7 @@ export default function TeamSettingsPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <Alert variant="destructive">
+            <Alert className="bg-destructive/10 text-destructive border-destructive">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
                 You are about to delete <strong>{team.name}</strong> with {team._count.team_members} members and {team._count.team_knowledge} resources.

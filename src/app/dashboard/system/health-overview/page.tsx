@@ -64,7 +64,7 @@ export default function HealthOverviewPage() {
             name: result.name,
             status: result.status === 'success' ? 'pass' as const : 
                    result.status === 'warning' ? 'warning' as const : 'fail' as const,
-            lastCheck: new Date(result.timestamp).toLocaleString()
+            lastCheck: new Date(result.timestamp as string | number | Date).toLocaleString()
           })) || []
         });
       }

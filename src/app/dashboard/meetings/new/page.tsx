@@ -372,7 +372,7 @@ export default async function NewMeetingPage() {
             users={users} 
             departments={transformedDepartments}
             roles={transformedRoles}
-            onSubmit={createMeeting} 
+            onSubmit={createMeeting as any} 
           />
         </div>
       </div>

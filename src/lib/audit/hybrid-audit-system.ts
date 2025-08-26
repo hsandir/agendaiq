@@ -104,7 +104,7 @@ class HybridAuditSystem {
     if (event.targetUserId && event.targetUserId !== event.userId) score += 15;
 
     // Unknown IP addresses are suspicious
-    if (!event.ipAddress ?? event.ipAddress === 'unknown') score += 10;
+    if (!event.ipAddress || event.ipAddress === 'unknown') score += 10;
 
     // Error messages indicate problems
     if (event.errorMessage) score += 10;
@@ -315,10 +315,10 @@ class HybridAuditSystem {
         ...(userId && { user_id: userId })
       },
       include: {
-        users: {
+        users_critical_audit_logs_user_idTousers: {
           select: { id: true, email: true, name: true }
         },
-        staff: {
+        staff_critical_audit_logs_staff_idTostaff: {
           select: { id: true, role: { select: { title: true } } }
         }
       },
@@ -341,10 +341,10 @@ class HybridAuditSystem {
         timestamp: { gte: since }
       },
       include: {
-        users: {
+        users_critical_audit_logs_user_idTousers: {
           select: { id: true, email: true, name: true }
         },
-        staff: {
+        staff_critical_audit_logs_staff_idTostaff: {
           select: { id: true, role: { select: { title: true } } }
         }
       },

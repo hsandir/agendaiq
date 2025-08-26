@@ -26,13 +26,14 @@ import {
   Briefcase,
   LogOut,
   Bug,
-  UserPlus
+  UserPlus,
+  type LucideIcon
 } from "lucide-react";
 
 export interface NavigationItem {
   href: string;
   label: string;
-  icon: Record<string, unknown>;
+  icon: LucideIcon;
   children?: NavigationItem[];
 }
 

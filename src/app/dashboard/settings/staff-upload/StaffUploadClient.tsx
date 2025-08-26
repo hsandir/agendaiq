@@ -128,7 +128,7 @@ export default function StaffUploadClient() {
   };
 
   const handleUpload = async () => {
-    if (!file ?? previewData.length === 0) {
+    if (!file || previewData.length === 0) {
       setError('Please preview the file first');
       return;
     }
@@ -144,7 +144,7 @@ export default function StaffUploadClient() {
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', file!);
       formData.append('action', 'upload');
       formData.append('selectedRows', JSON.stringify(Array.from(selectedRecords)));
       formData.append('actions', JSON.stringify(Object.fromEntries(recordActions)));
@@ -355,7 +355,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
             <div className="flex space-x-4">
               <button
                 onClick={handlePreview}
-                disabled={!file ?? isLoading}
+                disabled={!file || isLoading}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-foreground bg-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
@@ -368,7 +368,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
 
               <button
                 onClick={handleUpload}
-                disabled={!showPreview ?? selectedRecords.size === 0 ?? isLoading}
+                disabled={!showPreview || selectedRecords.size === 0 || isLoading}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-foreground bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (

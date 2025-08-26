@@ -115,7 +115,7 @@ export default function SystemSettingsClient({ initialSettings }: SystemSettings
         </div>
         <Button 
           onClick={handleSave} 
-          disabled={!hasChanges ?? isLoading}
+          disabled={!hasChanges || isLoading}
           className="ml-auto"
         >
           {isLoading ? "Saving..." : "Save Changes"}

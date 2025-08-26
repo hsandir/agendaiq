@@ -115,7 +115,7 @@ export default function DependenciesPage() {
 
     // Node.js uyumluluğu kontrolü
     const nodeVersion = process.version || '18.20.8';
-    const needsNewerNode = checkNodeVersionRequirement(name, latest);
+    const needsNewerNode = checkNodeVersionRequirement(name as string, latest as string);
 
     if (needsNewerNode) {
       return {
@@ -128,7 +128,7 @@ export default function DependenciesPage() {
       };
     }
 
-    if (safePackages.includes(name)) {
+    if (safePackages.includes(name as string)) {
       return {
         risk: 'low',
         recommendation: 'safe',
@@ -149,7 +149,7 @@ export default function DependenciesPage() {
     }
 
     if (type === 'minor') {
-      if (criticalPackages.includes(name)) {
+      if (criticalPackages.includes(name as string)) {
         return {
           risk: 'medium',
           recommendation: 'caution',
@@ -168,7 +168,7 @@ export default function DependenciesPage() {
     }
 
     if (type === 'major') {
-      if (highRiskPackages.includes(name)) {
+      if (highRiskPackages.includes(name as string)) {
         return {
           risk: 'high',
           recommendation: 'avoid',
@@ -470,15 +470,15 @@ export default function DependenciesPage() {
             const compatibility = assessCompatibility(pkg);
             
             realDependencies.push({
-              name: pkg.name,
-              currentVersion: pkg.current,
-              requiredVersion: pkg.wanted,
-              latestVersion: pkg.latest,
+              name: pkg.name as string,
+              currentVersion: pkg.current as string,
+              requiredVersion: pkg.wanted as string,
+              latestVersion: pkg.latest as string,
               status: pkg.type === 'major' ? 'outdated' : 'ok',
               description: `Package needs ${pkg.type} update - ${compatibility.reason}`,
               lastUpdated: 'Recently checked',
               size: 'Unknown',
-              type: pkg.type,
+              type: pkg.type as "major" | "minor" | "patch",
               compatibility
             });
           });
@@ -535,10 +535,10 @@ export default function DependenciesPage() {
             const compatibility = assessCompatibility(pkg);
             
             realDependencies.push({
-              name: pkg.name,
-              currentVersion: pkg.current,
-              requiredVersion: pkg.wanted,
-              latestVersion: pkg.latest,
+              name: pkg.name as string,
+              currentVersion: pkg.current as string,
+              requiredVersion: pkg.wanted as string,
+              latestVersion: pkg.latest as string,
               status: pkg.current === pkg.latest ? 'ok' : 'outdated',
               description: `${pkg.name} - ${compatibility.reason}`,
               lastUpdated: 'Up to date',

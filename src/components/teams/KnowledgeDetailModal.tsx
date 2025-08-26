@@ -57,7 +57,8 @@ import {
   MoreVertical,
   Printer,
   Mail,
-  Loader2
+  Loader2,
+  Building
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { toast } from 'sonner';
@@ -69,6 +70,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { EditKnowledgeDialog } from './EditKnowledgeDialog';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
 
 interface TeamKnowledge {
   id: number;
@@ -132,6 +134,10 @@ export function KnowledgeDetailModal({
   const [isDeleting, setIsDeleting] = useState(false);
   const [relatedResources, setRelatedResources] = useState<TeamKnowledge[]>([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [copyLinkLoading, setCopyLinkLoading] = useState(false);
 
   const resourceType = RESOURCE_TYPES[knowledge.type as keyof typeof RESOURCE_TYPES] || RESOURCE_TYPES.OTHER;
   const ResourceIcon = resourceType.icon;
@@ -147,62 +153,95 @@ export function KnowledgeDetailModal({
 
   const trackView = async () => {
     try {
-      await fetch(`/api/teams/${teamId}/knowledge/${knowledge.id}/view`, {
+      const response = await fetch(`/api/teams/${teamId}/knowledge/${knowledge.id}/view`, {
         method: 'POST',
       });
+      if (!response.ok) {
+        throw new Error('Failed to track view');
+      }
     } catch (error) {
       console.error('Error tracking view:', error);
+      // Don't show error to user, this is background tracking
     }
   };
 
   const loadRelatedResources = async () => {
+    if (!knowledge.category) return;
+    
     setLoadingRelated(true);
     try {
-      const response = await fetch(`/api/teams/${teamId}/knowledge?category=${knowledge.category}&limit=5`);
-      if (response.ok) {
-        const data = await response.json();
-        setRelatedResources(data.knowledge.filter((k: TeamKnowledge) => k.id !== knowledge.id))
+      const response = await fetch(`/api/teams/${teamId}/knowledge?category=${encodeURIComponent(knowledge.category)}&limit=5`);
+      if (!response.ok) {
+        throw new Error('Failed to load related resources');
       }
+      
+      const data = await response.json();
+      const filtered = data.knowledge?.filter((k: TeamKnowledge) => k.id !== knowledge.id) || [];
+      setRelatedResources(filtered);
     } catch (error) {
       console.error('Error loading related resources:', error);
+      setError('Failed to load related resources');
     } finally {
       setLoadingRelated(false);
     }
   };
 
   const handleDownload = async () => {
-    if (knowledge.url) {
-      try {
-        // Track download
-        await fetch(`/api/teams/${teamId}/knowledge/${knowledge.id}/download`, {
-          method: 'POST',
-        });
+    if (!knowledge.url) return;
+    
+    setIsDownloading(true);
+    try {
+      // Track download
+      await fetch(`/api/teams/${teamId}/knowledge/${knowledge.id}/download`, {
+        method: 'POST',
+      });
+      
+      // For external links, open in new tab
+      if (knowledge.type === 'LINK') {
+        window.open(knowledge.url, '_blank');
+        toast.success('Link opened in new tab');
+      } else {
+        // For files, trigger download
+        const response = await fetch(knowledge.url);
+        if (!response.ok) throw new Error('Download failed');
         
-        // For external links, open in new tab
-        if (knowledge.type === 'LINK') {
-          window.open(knowledge.url, '_blank');
-        } else {
-          // For files, trigger download
-          const link = document.createElement('a');
-          link.href = knowledge.url;
-          link.download = knowledge.title;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
+        const blob = await response.blob();
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = knowledge.title;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
         
-        toast.success('Download started');
-      } catch (error) {
-        console.error('Error downloading:', error);
-        toast.error('Failed to download resource');
+        toast.success('Download completed');
       }
+    } catch (error) {
+      console.error('Error downloading:', error);
+      toast.error('Failed to download resource');
+    } finally {
+      setIsDownloading(false);
     }
   };
 
-  const handleCopyLink = () => {
-    const url = `${window.location.origin}/dashboard/teams/${teamId}/knowledge/${knowledge.id}`;
-    navigator.clipboard.writeText(url);
-    toast.success('Link copied to clipboard');
+  const handleCopyLink = async () => {
+    setCopyLinkLoading(true);
+    try {
+      const url = `${window.location.origin}/dashboard/teams/${teamId}/knowledge/${knowledge.id}`;
+      await navigator.clipboard.writeText(url);
+      toast.success('Link copied to clipboard');
+    } catch (error) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = `${window.location.origin}/dashboard/teams/${teamId}/knowledge/${knowledge.id}`;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      toast.success('Link copied to clipboard');
+    } finally {
+      setCopyLinkLoading(false);
+    }
   };
 
   const handleShare = async () => {
@@ -282,6 +321,14 @@ Link: ${window.location.origin}/dashboard/teams/${teamId}/knowledge/${knowledge.
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[900px] max-h-[90vh] overflow-hidden flex flex-col p-0">
+          <ErrorBoundary
+            title="Knowledge Detail Error"
+            showDetails={process.env.NODE_ENV === 'development'}
+            onError={(error, errorInfo) => {
+              console.error('KnowledgeDetailModal error:', error, errorInfo);
+              toast.error('Failed to display knowledge details');
+            }}
+          >
           {/* Header */}
           <div className="p-6 pb-0">
             <DialogHeader>
@@ -758,6 +805,7 @@ Link: ${window.location.origin}/dashboard/teams/${teamId}/knowledge/${knowledge.
               </TabsContent>
             </ScrollArea>
           </Tabs>
+          </ErrorBoundary>
         </DialogContent>
       </Dialog>
 

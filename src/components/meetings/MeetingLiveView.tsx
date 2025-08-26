@@ -39,13 +39,14 @@ import type {
   meeting_agenda_items, 
   meeting_attendee, 
   staff as Staff, 
-  User as PrismaUser,
+  users as PrismaUser,
   department as Department,
   role as Role
 } from "@prisma/client";
 import type { AuthenticatedUser } from '@/lib/auth/auth-utils';
 
 interface ExtendedMeeting extends Meeting {
+  updated_at?: Date | string | null;
   department: Department;
   staff: Staff & { users: PrismaUser; role: Role };
   meeting_attendee: (meeting_attendee & { 
@@ -57,11 +58,54 @@ interface ExtendedMeeting extends Meeting {
   })[];
   meeting_agenda_items: (meeting_agenda_items & {
     staff?: (Staff & { users: PrismaUser }) | null;
-    agenda_item_comments: Array<Record<string, unknown>>;
-    meeting_action_items: Array<Record<string, unknown>>;
+    agenda_item_comments?: Array<{
+      id: number;
+      comment: string;
+      created_at: string | Date;
+      staff: { users: { id: number; name: string | null; email: string; } };
+    }>;
+    meeting_action_items?: Array<{
+      id: number;
+      title: string;
+      description: string;
+      assigned_to?: string;
+    }>;
+    comments?: Array<{
+      id: number;
+      comment: string;
+      created_at: string | Date;
+      staff: { users: { id: number; name: string | null; email: string; } };
+    }>;
   })[];
-  meeting_action_items: Array<Record<string, unknown>>;
+  meeting_action_items: Array<{
+    id: number;
+    title: string;
+    description: string;
+    assigned_to?: string;
+  }>;
 }
+
+type ExtendedAgendaItem = meeting_agenda_items & {
+  staff?: (Staff & { users: PrismaUser }) | null;
+  agenda_item_comments?: Array<{
+    id: number;
+    comment: string;
+    created_at: string | Date;
+    staff: { users: { id: number; name: string | null; email: string; } };
+  }>;
+  meeting_action_items?: Array<{
+    id: number;
+    title: string;
+    description: string;
+    assigned_to?: string;
+  }>;
+  comments?: Array<{
+    id: number;
+    comment: string;
+    created_at: string | Date;
+    staff: { users: { id: number; name: string | null; email: string; } };
+  }>;
+};
 
 interface ExtendedStaff extends Staff {
   users: PrismaUser;
@@ -113,8 +157,8 @@ export function MeetingLiveView({
     
     // Add action item update times
     meeting.meeting_action_items.forEach(item => {
-      const timestamp = (item as any).updated_at || (item as any).created_at;
-      if (timestamp) {
+      const timestamp = (item as Record<string, unknown>).updated_at || (item as Record<string, unknown>).created_at;
+      if (timestamp && (typeof timestamp === 'string' || timestamp instanceof Date)) {
         const date = new Date(timestamp);
         if (!isNaN(date.getTime())) {
           validDates.push(date);
@@ -140,16 +184,16 @@ export function MeetingLiveView({
     const typedData = data as Record<string, unknown>;
     if (typeof typedData.itemId === 'number' && typedData.updates && typeof typedData.updates === 'object') {
       setAgendaItems(prev => prev.map(item => 
-        item.id === typedData.itemId ? { ...item, ...(typedData.updates as Record<string, any>) } : item
+        item.id === typedData.itemId ? { ...item, ...(typedData.updates as Record<string, unknown>) } : item
       ));
       setLastUpdate(new Date());
     }
   }, []);
 
   const agendaItemAddedHandler = useCallback((data: unknown) => {
-    const typedData = data as Record<string, unknown>;
-    if (typedData.item && typeof typedData.item === 'object') {
-      setAgendaItems(prev => [...prev, typedData.item as Record<string, unknown>]);
+    const typedData = data as { item?: meeting_agenda_items };
+    if (typedData.item) {
+      setAgendaItems(prev => [...prev, typedData.item as ExtendedAgendaItem]);
       setLastUpdate(new Date());
     }
   }, []);

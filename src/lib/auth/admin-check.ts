@@ -6,7 +6,7 @@
  * 3. Role level = 0 (system level)
  */
 
-import { isrole, RoleKey } from '@/lib/auth/policy';
+import { isRole, RoleKey } from '@/lib/auth/policy';
 
 interface UserWithStaff {
   is_admin?: boolean;
@@ -47,5 +47,5 @@ export function isUserLeadership(user: UserWithStaff | null | undefined): boolea
   // Treat Ops Admin and Dev Admin as leadership for UI gates
   if (isUserAdmin(user)) return true;
   // If role carries leadership flag, allow
-  return !!user.staff?.[0]?.role?.is_leadership;
+  return !!user.Staff?.[0]?.Role?.is_leadership;
 }

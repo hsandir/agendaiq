@@ -301,7 +301,7 @@ export default function MockDataTrackerPage() {
           </div>
 
           {/* Status Alert */}
-          {(report.mockOnlyFiles > 0 ?? report.apiFallbackFiles > 0) && (
+          {(report.mockOnlyFiles > 0 || report.apiFallbackFiles > 0) && (
             <Alert className="mb-6">
               <Zap className="h-4 w-4" />
               <AlertDescription>
@@ -373,7 +373,7 @@ export default function MockDataTrackerPage() {
                         <div className="flex space-x-2">
                           {item.type === 'page' && (
                             <Button variant="outline" size="sm" asChild>
-                              <Link href={item.path as Record<string, unknown>}>
+                              <Link href={item.path as string}>
                                 <ExternalLink className="w-3 h-3 mr-1" />
                                 View Page
                               </Link>

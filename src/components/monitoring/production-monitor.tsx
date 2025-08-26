@@ -85,7 +85,7 @@ export default function ProductionMonitor() {
         const data = await adminResponse.json();
         setIsAdmin(true);
         return data.errors ?? [];
-      } else if (adminResponse.status === 401 ?? adminResponse.status === 403) {
+      } else if (adminResponse.status === 401 || adminResponse.status === 403) {
         // User is not admin
         setIsAdmin(false);
         return [{

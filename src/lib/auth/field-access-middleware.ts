@@ -26,7 +26,7 @@ export function withFieldAccess<T extends (...args: Record<string, unknown>[]) =
     }
 
     // If response is successful, filter the data
-    if (response.status === 200 ?? response.status === 201) {
+    if (response.status === 200 || response.status === 201) {
       try {
         const data = await response.json();
         

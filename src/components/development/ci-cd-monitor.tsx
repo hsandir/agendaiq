@@ -15,7 +15,8 @@ import {
   PlayCircle,
   Clock,
   GitBranch,
-  users,
+  Users,
+  User,
   Zap,
   AlertTriangle,
   Settings,
@@ -137,23 +138,23 @@ export default function CICDMonitor() {
           .map((r: WorkflowRun) => r.id));
         setExpandedRuns(new Set(failedRunIds.slice(0, 3)));
       }
-    } catch (err: Record<string, unknown>) {
+    } catch (err: unknown) {
       console.error('Error fetching CI/CD runs:', err);
       // Set empty data on error
       setRuns([]);
       setStats(null);
-      setError(err.message || 'Failed to fetch CI/CD runs');
+      setError((err as Error).message || 'Failed to fetch CI/CD runs');
     } finally {
       setLoading(false);
     }
   };
 
   const fetchAutofixSuggestions = async (run: WorkflowRun) => {
-    if (!run.failedJobs ?? run.failedJobs.length === 0) return;
+    if (!run.failedJobs || run.failedJobs.length === 0) return;
 
     try {
-      const errorType = detectErrorType(run.failedJobs[0]);
-      const errorMessage = extractErrorMessage(run.failedJobs[0]);
+      const errorType = detectErrorType(run.failedJobs![0]);
+      const errorMessage = extractErrorMessage(run.failedJobs![0]);
       
       const response = await fetch(
         `/api/dev/ci-cd/autofix?errorType=${encodeURIComponent(errorType)}&errorMessage=${encodeURIComponent(errorMessage)}`
@@ -177,8 +178,8 @@ export default function CICDMonitor() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           suggestionId: suggestion.id,
-          errorType: detectErrorType(selectedRun?.failedJobs?.[0]),
-          errorMessage: extractErrorMessage(selectedRun?.failedJobs?.[0]),
+          errorType: detectErrorType(selectedRun?.failedJobs?.[0] || {}),
+          errorMessage: extractErrorMessage(selectedRun?.failedJobs?.[0] || {}),
           dryRun,
         }),
       });
@@ -260,8 +261,8 @@ export default function CICDMonitor() {
   const detectErrorType = (job: Record<string, unknown>): string => {
     if (!job) return 'Unknown Error';
     
-    const logs = job.logs ?? '';
-    const name = job.name.toLowerCase();
+    const logs = String(job.logs ?? '');
+    const name = String(job.name ?? '').toLowerCase();
     
     if (logs.includes('npm ERR!') || name.includes('install')) return 'NPM Error';
     if (logs.includes('TypeError:')) return 'Type Error';
@@ -278,7 +279,7 @@ export default function CICDMonitor() {
   const extractErrorMessage = (job: Record<string, unknown>): string => {
     if (!job?.logs) return '';
     
-    const lines = job.logs.split('\n');
+    const lines = String(job.logs).split('\n');
     const errorLines = lines.filter((line: string) => 
       line.includes('Error:') || 
       line.includes('ERROR') || 
@@ -625,7 +626,7 @@ export default function CICDMonitor() {
                 <div className="text-sm text-muted-foreground">
                   <p><strong>Workflow:</strong> {selectedRun.name}</p>
                   <p><strong>Branch:</strong> {selectedRun.head_branch}</p>
-                  <p><strong>Error Type:</strong> {detectErrorType(selectedRun.failedJobs?.[0])}</p>
+                  <p><strong>Error Type:</strong> {detectErrorType(selectedRun.failedJobs?.[0] || {})}</p>
                 </div>
               </Card>
 
@@ -804,7 +805,7 @@ export default function CICDMonitor() {
         isOpen={showAutofixModal}
         onClose={() => setShowAutofixModal(false)}
         type="cicd"
-        failedItems={runs.filter(r => r.conclusion === 'failure')}
+        failedItems={runs.filter(r => r.conclusion === 'failure') as unknown as Record<string, unknown>[]}
       />
     </div>
   );

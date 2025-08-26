@@ -161,7 +161,7 @@ export default function PerformanceMonitor() {
       operation,
       startTime,
       endTime,
-      duration: Math.round((endTime - startTime) * 100) / __100,
+      duration: Math.round((endTime - startTime) * 100) / 100,
       success
     }
   }
@@ -208,7 +208,7 @@ export default function PerformanceMonitor() {
           credentials: 'include',
           body: JSON.stringify({ theme: originalTheme })
         })
-        setTheme(originalTheme);
+        setTheme(typeof originalTheme === 'string' ? originalTheme : originalTheme?.id || 'standard');
       } catch (error: unknown) {
         console.warn('Failed to restore theme:', error);
       }
@@ -295,7 +295,7 @@ export default function PerformanceMonitor() {
       // Restore original theme after tests
       if (originalTheme && typeof setTheme === 'function') {
         setTimeout(() => {
-          setTheme(originalTheme);
+          setTheme(typeof originalTheme === 'string' ? originalTheme : originalTheme?.id || 'standard');
         }, 100)
       }
       

@@ -61,13 +61,13 @@ interface DraggableStaffCardProps {
 // Draggable staff member card
 function DraggableStaffCard({ staff, isDragging }: DraggableStaffCardProps) {
   const {
-    _attributes,
-    _listeners,
-    _setNodeRef,
-    _transform,
-    _transition,
-    isDragging: _isSortableDragging,
-  } = useSortable({ id: staff._id });
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging: isSortableDragging,
+  } = useSortable({ id: staff.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -163,7 +163,7 @@ function RoleContainer({ role, children }: { role: Role; children: React.ReactNo
 }
 
 export default function StaffRoleDragDrop({ initialRoles, onSave }: StaffRoleDragDropProps) {
-  const { _toast } = useToast();
+  const { toast } = useToast();
   const [roles, setRoles] = useState<Role[]>(initialRoles);
   const [activeStaff, setActiveStaff] = useState<StaffMember | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
@@ -177,7 +177,7 @@ export default function StaffRoleDragDrop({ initialRoles, onSave }: StaffRoleDra
   }, [roles]);
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const { _active, _over } = event;
+    const { active, over } = event;
     setActiveStaff(null);
 
     if (!over) return;

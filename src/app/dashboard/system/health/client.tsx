@@ -28,7 +28,7 @@ import {
 import { AuthenticatedUser } from '@/lib/auth/auth-utils'
 
 interface HealthClientProps {
-  user: _AuthenticatedUser
+  user: AuthenticatedUser
 }
 
 interface HealthMetric {

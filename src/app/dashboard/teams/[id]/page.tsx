@@ -354,7 +354,7 @@ export default function TeamDetailPage() {
   if (error || !team) {
     return (
       <div className="container mx-auto py-6">
-        <Alert variant="destructive">
+        <Alert className="bg-destructive/10 text-destructive border-destructive">
           <AlertDescription>{error || 'Team not found'}</AlertDescription>
         </Alert>
       </div>
@@ -691,7 +691,7 @@ export default function TeamDetailPage() {
                               <DropdownMenuContent align="end">
                                 {item.url && (
                                   <>
-                                    <DropdownMenuItem onClick={() => window.open(item.url, '_blank')}>
+                                    <DropdownMenuItem onClick={() => window.open(item.url || '', '_blank')}>
                                       {item.type === 'LINK' ? (
                                         <>
                                           <ExternalLink className="mr-2 h-4 w-4" />
@@ -728,7 +728,10 @@ export default function TeamDetailPage() {
                                     }
                                   } else {
                                     await navigator.clipboard.writeText(window.location.href);
-                                    toast.success('Team link copied to clipboard!');
+                                    toast({ 
+                                      title: "Success",
+                                      description: "Team link copied to clipboard!"
+                                    });
                                   }
                                 }}>
                                   <Share2 className="mr-2 h-4 w-4" />

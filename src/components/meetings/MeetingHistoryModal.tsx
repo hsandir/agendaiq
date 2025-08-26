@@ -29,7 +29,6 @@ import {
   ChevronRight,
   Filter,
   FolderOpen,
-  users,
   Hash,
   CheckCircle,
   XCircle,
@@ -79,8 +78,8 @@ export function MeetingHistoryModal({
   onClose,
   onSelectmeeting,
   currentUserId,
-  currentdepartment,
-  currentrole,
+  currentDepartment,
+  currentRole,
   multiSelect = false,
   onSelectMultipleMeetings
 }: MeetingHistoryModalProps) {
@@ -183,7 +182,7 @@ export function MeetingHistoryModal({
         onClose();
       }
     } else if (selectedMeeting) {
-      onSelectMeeting(selectedMeeting);
+      onSelectmeeting(selectedMeeting);
       onClose();
     }
   };
@@ -193,7 +192,7 @@ export function MeetingHistoryModal({
       if (searchQuery && !meeting.title.toLowerCase().includes(searchQuery.toLowerCase())) {
         return false;
       }
-      if (onlyWithActionItems && (!meeting.actionItems ?? meeting.actionItems === 0)) {
+      if (onlyWithActionItems && (!meeting.actionItems || meeting.actionItems === 0)) {
         return false;
       }
       return true;
@@ -376,7 +375,7 @@ export function MeetingHistoryModal({
                               <span>{safeFormat(meeting.start_time, "HH:mm")} - {safeFormat(meeting.end_time, "HH:mm")}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <User className="h-4 w-4 text-muted-foreground" />
+                              <Users className="h-4 w-4 text-muted-foreground" />
                               <span>{meeting.organizer.name}</span>
                             </div>
                             <div className="flex items-center gap-2">
