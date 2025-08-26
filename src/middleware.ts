@@ -90,6 +90,7 @@ export async function middleware(request: NextRequest) {
                     path.startsWith('/api/test-login') ||
                     path.startsWith('/api/debug/user-capabilities') ||
                     path.startsWith('/api/debug/user-check') ||
+                    path.startsWith('/api/debug/db-connection-test') ||
                     path.startsWith('/api/user') || // User preference endpoints with lightweight auth
                     path.startsWith('/api/tests'); // Test runner API endpoints (development only)
     
