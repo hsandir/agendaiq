@@ -106,8 +106,7 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
         id: dbUser.staff[0].id,
         role: {
           id: dbUser.staff[0].role.id,
-          key: dbUser.staff[0].role.key,
-          title: dbUser.staff[0].role.title
+          key: dbUser.staff[0].role.key
         },
         department: {
           id: dbUser.staff[0].department.id,
@@ -122,7 +121,27 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
 
     // User successfully retrieved with capabilities
 
-    return userWithCapabilities;
+    // Convert userWithCapabilities to AuthenticatedUser format
+    const authenticatedUser: AuthenticatedUser = {
+      ...userWithCapabilities,
+      staff: userWithCapabilities.staff ? {
+        ...userWithCapabilities.staff,
+        role: userWithCapabilities.staff.role ? {
+          ...userWithCapabilities.staff.role,
+          title: dbUser.staff[0]?.role?.title || '',
+          priority: dbUser.staff[0]?.role?.priority || 0,
+          category: dbUser.staff[0]?.role?.category || null,
+          is_leadership: dbUser.staff[0]?.role?.is_leadership || false
+        } : undefined,
+        district: {
+          id: 0,
+          name: '',
+          code: null
+        }
+      } : undefined
+    };
+    
+    return authenticatedUser;
   } catch (error: unknown) {
     Logger.error('Error getting current user:', { error });
     return null;

@@ -1,31 +1,32 @@
 /// <reference types="node" />
-import { PrismaClient } from '@prisma/client';
+import { dbPool, getPooledPrismaClient } from './db-pool-manager';
 
 /**
- * Unified Prisma Client Singleton
+ * Enhanced Prisma Client with Connection Pool Management
  * 
- * Combines best practices from both previous implementations:
- * - Factory pattern for type safety
- * - Global singleton for development hot reload
- * - Production-optimized configuration
+ * Zero Degradation Protocol: Maintains existing API while adding pool management
+ * - Backward compatible with existing prisma usage
+ * - Adds connection pool management and retry logic
+ * - Enhanced monitoring and health checks
  */
-const prismaClientSingleton = () => {
-  return new PrismaClient({
-    log: process.env.NODE_ENV === 'development' 
-      ? ['query', 'info', 'warn', 'error'] 
-      : ['error'],
-    errorFormat: process.env.NODE_ENV === 'development' ? 'pretty' : 'minimal',
-  });
-};
 
-type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>;
+// Main export for backward compatibility
+export const prisma = getPooledPrismaClient();
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClientSingleton | undefined;
-};
-
-export const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
-} 
+// Enhanced database operations with connection pool management
+export const db = {
+  // Get the raw client (same as prisma export)
+  client: prisma,
+  
+  // Execute with automatic retry logic
+  executeWithRetry: dbPool.executeWithRetry.bind(dbPool),
+  
+  // Get pool metrics
+  getMetrics: dbPool.getMetrics.bind(dbPool),
+  
+  // Health check
+  healthCheck: dbPool.healthCheck.bind(dbPool),
+  
+  // Graceful shutdown
+  shutdown: dbPool.gracefulShutdown.bind(dbPool)
+}; 
