@@ -98,19 +98,9 @@ export async function middleware(request: NextRequest) {
   // Protect API routes
   if (path.startsWith("/api/")) {
     // Skip auth for public endpoints ONLY
-    // SECURITY: Dev/test/debug endpoints require authentication and proper capabilities
+    // SECURITY: All debug endpoints require authentication and proper capabilities
     // Use our centralized public API routes whitelist
-    const isPublic = isPublicApiRoute(path) || 
-                    // Temporary debug endpoints (should be removed in production)
-                    path.startsWith('/api/test-login') ||
-                    path.startsWith('/api/debug/user-capabilities') ||
-                    path.startsWith('/api/debug/user-check') ||
-                    path.startsWith('/api/debug/db-connection-test') ||
-                    path.startsWith('/api/debug/db-schema-check') ||
-                    path.startsWith('/api/debug/test-auth-direct') ||
-                    path.startsWith('/api/debug/middleware-token') ||
-                    path.startsWith('/api/user') || // User preference endpoints with lightweight auth
-                    path.startsWith('/api/tests'); // Test runner API endpoints (development only)
+    const isPublic = isPublicApiRoute(path);
     
     if (!isPublic && !token) {
       return NextResponse.json(

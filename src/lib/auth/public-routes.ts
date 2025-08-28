@@ -51,12 +51,6 @@ export const PUBLIC_API_ROUTES = [
   '/api/error-capture',
   '/api/errors',
   
-  // Temporary admin password update (REMOVE AFTER USE!)
-  '/api/dev/admin/update-password',
-  
-  // Temporary database backup/restore (REMOVE AFTER USE!)
-  '/api/dev/database/backup-production',
-  
 ] as const;
 
 // Helper types for TypeScript

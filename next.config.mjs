@@ -65,14 +65,14 @@ const nextConfig = {
   // External packages for server components
   serverExternalPackages: ['prisma', '@prisma/client'],
   
-  // Temporarily disable ESLint during build
+  // ESLint during build
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   
-  // Temporarily disable TypeScript checks during build for v2 files
+  // TypeScript checks during build
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   
   // Production optimizations
