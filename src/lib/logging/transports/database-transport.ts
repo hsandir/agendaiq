@@ -70,68 +70,50 @@ export class DatabaseTransport implements LogTransport {
     }
   }
 
-  private buildDevLogsWhere(query: LogQuery) {
-    const where = {};
-    
-    if (query.level && query.level.length > 0) {
-      where.level = { in: query.level.map(level => this.mapLogLevelToPrisma(level)) };
-    }
-    
-    if (query.startDate || query.endDate) {
-      const timestampCondition = {};
-      if (query.startDate) timestampCondition.gte = query.startDate;
-      if (query.endDate) timestampCondition.lte = query.endDate;
-      where.timestamp = timestampCondition;
-    }
-    
-    if (query.userId) {
-      const userId = Number(query.userId);
-      if (!isNaN(userId)) {
-        where.user_id = userId;
-      }
-    }
-    
-    if (query.search) {
-      where.message = { contains: query.search, mode: 'insensitive' };
-    }
-    
-    if (query.category) {
-      where.category = { in: query.category };
-    }
-    
-    return where;
+  private buildDevLogsWhere(query: LogQuery): object {
+    return {
+      ...(query.level && query.level.length > 0 && {
+        level: { in: query.level.map(level => this.mapLogLevelToPrisma(level)) }
+      }),
+      ...((query.startDate || query.endDate) && {
+        timestamp: {
+          ...(query.startDate && { gte: query.startDate }),
+          ...(query.endDate && { lte: query.endDate })
+        }
+      }),
+      ...(query.userId && {
+        user_id: Number(query.userId) || undefined
+      }),
+      ...(query.search && {
+        message: { contains: query.search, mode: 'insensitive' }
+      }),
+      ...(query.category && {
+        category: { in: query.category }
+      })
+    };
   }
 
-  private buildSecurityLogsWhere(query: LogQuery) {
-    const where = {};
-    
-    if (query.level && query.level.length > 0) {
-      where.level = { in: query.level.map(level => this.mapLogLevelToPrisma(level)) };
-    }
-    
-    if (query.startDate || query.endDate) {
-      const timestampCondition = {};
-      if (query.startDate) timestampCondition.gte = query.startDate;
-      if (query.endDate) timestampCondition.lte = query.endDate;
-      where.timestamp = timestampCondition;
-    }
-    
-    if (query.userId) {
-      const userId = Number(query.userId);
-      if (!isNaN(userId)) {
-        where.user_id = userId;
-      }
-    }
-    
-    if (query.search) {
-      where.message = { contains: query.search, mode: 'insensitive' };
-    }
-    
-    if (query.category) {
-      where.category = { in: query.category };
-    }
-    
-    return where;
+  private buildSecurityLogsWhere(query: LogQuery): object {
+    return {
+      ...(query.level && query.level.length > 0 && {
+        level: { in: query.level.map(level => this.mapLogLevelToPrisma(level)) }
+      }),
+      ...((query.startDate || query.endDate) && {
+        timestamp: {
+          ...(query.startDate && { gte: query.startDate }),
+          ...(query.endDate && { lte: query.endDate })
+        }
+      }),
+      ...(query.userId && {
+        user_id: Number(query.userId) || undefined
+      }),
+      ...(query.search && {
+        message: { contains: query.search, mode: 'insensitive' }
+      }),
+      ...(query.category && {
+        category: { in: query.category }
+      })
+    };
   }
 
   async write(entry: BaseLogEntry): Promise<void> {
@@ -249,7 +231,7 @@ export class DatabaseTransport implements LogTransport {
           message: log.message,
           metadata: log.metadata ? JSON.parse(log.metadata) : undefined,
           context: log.context ? JSON.parse(log.context) : undefined,
-          category: String(log.category),
+          category: log.category,
           component: log.component ?? undefined,
           function: log.function ?? undefined,
           file: log.file ?? undefined,
@@ -265,7 +247,7 @@ export class DatabaseTransport implements LogTransport {
           message: log.message,
           metadata: log.metadata ? JSON.parse(log.metadata) : undefined,
           context: log.context ? JSON.parse(log.context) : undefined,
-          category: String(log.category),
+          category: log.category,
           action: log.action,
           result: log.result,
           risk_level: log.risk_level,
