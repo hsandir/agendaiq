@@ -70,6 +70,38 @@ export class DatabaseTransport implements LogTransport {
     }
   }
 
+  private mapPrismaToDevLogCategory(prismaCategory: string): string {
+    switch (prismaCategory) {
+      case 'system': return 'system';
+      case 'database': return 'database';
+      case 'api': return 'api';
+      case 'auth': return 'auth';
+      case 'performance': return 'performance';
+      case 'error': return 'error';
+      case 'network': return 'network';
+      case 'cache': return 'cache';
+      case 'external': return 'external';
+      case 'build': return 'build';
+      default: return 'system';
+    }
+  }
+
+  private mapPrismaToAuditLogCategory(prismaCategory: string): string {
+    switch (prismaCategory) {
+      case 'login_attempt': return 'login_attempt';
+      case 'data_access': return 'data_access';
+      case 'data_modification': return 'data_modification';
+      case 'admin_action': return 'admin_action';
+      case 'security_violation': return 'security_violation';
+      case 'user_action': return 'user_action';
+      case 'permission_check': return 'permission_check';
+      case 'compliance': return 'compliance';
+      case 'export': return 'export';
+      case 'import': return 'import';
+      default: return 'security_violation';
+    }
+  }
+
   private buildDevLogsWhere(query: LogQuery): object {
     return {
       ...(query.level && query.level.length > 0 && {
@@ -231,7 +263,7 @@ export class DatabaseTransport implements LogTransport {
           message: log.message,
           metadata: log.metadata ? JSON.parse(log.metadata) : undefined,
           context: log.context ? JSON.parse(log.context) : undefined,
-          category: log.category,
+          category: this.mapPrismaToDevLogCategory(log.category),
           component: log.component ?? undefined,
           function: log.function ?? undefined,
           file: log.file ?? undefined,
@@ -247,7 +279,7 @@ export class DatabaseTransport implements LogTransport {
           message: log.message,
           metadata: log.metadata ? JSON.parse(log.metadata) : undefined,
           context: log.context ? JSON.parse(log.context) : undefined,
-          category: log.category,
+          category: this.mapPrismaToAuditLogCategory(log.category),
           action: log.action,
           result: log.result,
           risk_level: log.risk_level,
