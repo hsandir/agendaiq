@@ -45,20 +45,27 @@ function tokenToUser(token: JWT | NextAuthToken | null): UserWithCapabilities | 
 }
 
 export async function middleware(request: NextRequest) {
+  console.error(`🚨 MIDDLEWARE RUNNING!!! PATH: ${request.nextUrl.pathname}`);
   try {
     const path = request.nextUrl.pathname;
+    console.log(`🔍 MIDDLEWARE DEBUG: Processing path: ${path}`);
+    console.log(`🔍 MIDDLEWARE DEBUG: USER-AGENT: ${request.headers.get('user-agent')}`);
     
     // Check if route is explicitly public (default-secure posture) FIRST
     // This prevents getToken() from blocking public routes
     const isPublic = isPublicRoute(path);
+    console.log(`🔍 MIDDLEWARE DEBUG: isPublicRoute(${path}): ${isPublic}`);
     if (isPublic) {
+      console.log(`✅ MIDDLEWARE DEBUG: Allowing public route: ${path}`);
       return NextResponse.next(); // Allow access to public routes immediately
     }
     
     // Check if this is a public API route early
     if (path.startsWith("/api/")) {
       const isPublicApi = isPublicApiRoute(path);
+      console.log(`🔍 MIDDLEWARE DEBUG: isPublicApiRoute(${path}): ${isPublicApi}`);
       if (isPublicApi) {
+        console.log(`✅ MIDDLEWARE DEBUG: Allowing public API route: ${path}`);
         return NextResponse.next(); // Allow access to public API routes immediately
       }
     }
@@ -73,7 +80,9 @@ export async function middleware(request: NextRequest) {
 
     let token;
     try {
+      console.log(`🔍 MIDDLEWARE DEBUG: Getting token for: ${path}`);
       token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+      console.log(`🔍 MIDDLEWARE DEBUG: Token result: ${token ? 'EXISTS' : 'NULL'}`);
     } catch (error: unknown) {
       console.error('❌ MIDDLEWARE ERROR: Error getting token in middleware:', error);
       token = null;
@@ -145,18 +154,12 @@ export async function middleware(request: NextRequest) {
     response.headers.set('X-XSS-Protection', '1; mode=block');
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
     
+    console.log(`✅ MIDDLEWARE DEBUG: Request completed successfully for: ${path}`);
     return response;
   } catch (error: unknown) {
     console.error('❌ MIDDLEWARE FATAL ERROR:', error);
-    // On error, redirect to signin for authentication errors
-    if (request.nextUrl.pathname.startsWith('/dashboard')) {
-      return NextResponse.redirect(new URL('/auth/signin', request.url));
-    }
-    // For API routes, return proper error response
-    if (request.nextUrl.pathname.startsWith('/api/')) {
-      return NextResponse.json({ error: 'Authentication service unavailable' }, { status: 503 });
-    }
-    // For other routes, allow to proceed
+    console.error('❌ MIDDLEWARE: Allowing request to proceed due to error');
+    // On error, allow the request to proceed
     return NextResponse.next();
   }
 }
