@@ -62,110 +62,144 @@ export async function GET(request: NextRequest, props: Props) {
       return NextResponse.json({ error: "Invalid meeting ID" }, { status: 400 });
     }
 
-    const meeting = await prisma.meeting.findUnique({
+    // Fetch basic meeting info first
+    const basicMeeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        Department: true,
-        District: true,
-        School: true,
-        Staff: {
+        department: true,
+        district: true,
+        school: true,
+        staff: {
           include: {
-            User: true,
-            Role: true
-          }
-        },
-        MeetingAttendee: {
-          include: {
-            Staff: {
-              include: {
-                User: true,
-                Role: true,
-                Department: true
-              }
-            }
-          }
-        },
-        MeetingNote: {
-          include: {
-            Staff: {
-              include: {
-                User: true
-              }
-            }
-          },
-          orderBy: {
-            created_at: 'desc'
-          }
-        },
-        MeetingAgendaItems: {
-          include: {
-            ResponsibleStaff: {
-              include: {
-                User: true
-              }
-            },
-            Comments: {
-              include: {
-                Staff: {
-                  include: {
-                    User: true
-                  }
-                }
-              }
-            },
-            ActionItems: {
-              include: {
-                AssignedTo: {
-                  include: {
-                    User: true
-                  }
-                }
-              }
-            }
-          },
-          orderBy: {
-            order_index: 'asc'
-          }
-        },
-        MeetingActionItems: {
-          include: {
-            AssignedTo: {
-              include: {
-                User: true,
-                Role: true
-              }
-            }
-          }
-        },
-        ParentMeeting: true,
-        ContinuationMeetings: {
-          orderBy: {
-            start_time: 'desc'
+            users: true,
+            role: true
           }
         }
       }
     });
 
-    if (!meeting) {
+    if (!basicMeeting) {
       return NextResponse.json({ error: "Meeting not found" }, { status: 404 });
     }
 
-    // Check if user is authorized to view this meeting
+    // Check if user is authorized to view this meeting early
     const hasAdminAccess = isAnyAdmin(user);
-    const isOrganizer = meeting.organizer_id === user.staff?.id;
-    const isAttendee = meeting.MeetingAttendee.some(ma => ma.staff_id === user.staff?.id);
-    const isSameDepartment = meeting.department_id === user.staff?.department?.id;
+    const isOrganizer = basicMeeting.organizer_id === Number((user.staff as any)?.id ?? 0);
+    
+    // Quick attendee check for authorization
+    const attendeeCheck = await prisma.meeting_attendee.findFirst({
+      where: {
+        meeting_id: meetingId,
+        staff_id: Number((user.staff as any)?.id ?? 0) || -1
+      }
+    });
+    
+    const isAttendee = !!attendeeCheck;
+    const isSameDepartment = basicMeeting.department_id === (user.staff as any)?.department_id;
 
     if (!hasAdminAccess && !isOrganizer && !isAttendee && !isSameDepartment) {
       return NextResponse.json({ error: "Not authorized to view this meeting" }, { status: 403 });
     }
 
+    // Fetch related data in parallel for authorized users
+    const [attendees, agendaItems, actionItems, notes] = await Promise.all([
+      // Fetch attendees
+      prisma.meeting_attendee.findMany({
+        where: { meeting_id: meetingId },
+        include: {
+          staff: {
+            include: {
+              users: { select: { id: true, name: true, email: true } },
+              role: { select: { id: true, title: true, key: true } },
+              department: { select: { id: true, name: true } }
+            }
+          }
+        }
+      }),
+      
+      // Fetch agenda items
+      prisma.meeting_agenda_items.findMany({
+        where: { meeting_id: meetingId },
+        include: {
+          staff: {
+            include: {
+              users: { select: { id: true, name: true, email: true } }
+            }
+          },
+          agenda_item_comments: {
+            include: {
+              staff: {
+                include: {
+                  users: { select: { id: true, name: true, email: true } }
+                }
+              }
+            },
+            orderBy: { created_at: 'desc' },
+            take: 10 // Limit comments for performance
+          },
+          meeting_action_items: {
+            include: {
+              staff_meeting_action_items_assigned_toTostaff: {
+                include: {
+                  users: { select: { id: true, name: true, email: true } }
+                }
+              }
+            },
+            take: 20 // Limit action items per agenda item
+          }
+        },
+        orderBy: { order_index: 'asc' },
+        take: 50 // Limit agenda items
+      }),
+      
+      // Fetch action items
+      prisma.meeting_action_items.findMany({
+        where: { meeting_id: meetingId },
+        include: {
+          staff_meeting_action_items_assigned_toTostaff: {
+            include: {
+              users: { select: { id: true, name: true, email: true } },
+              role: { select: { id: true, title: true } }
+            }
+          }
+        },
+        orderBy: { created_at: 'desc' },
+        take: 100 // Limit action items
+      }),
+      
+      // Fetch notes
+      prisma.meeting_notes.findMany({
+        where: { meeting_id: meetingId },
+        include: {
+          staff: {
+            include: {
+              users: { select: { id: true, name: true, email: true } }
+            }
+          }
+        },
+        orderBy: { created_at: 'desc' },
+        take: 20 // Limit notes
+      })
+    ]);
+
+    // Combine the data
+    const meeting = {
+      ...basicMeeting,
+      meeting_attendee: attendees,
+      meeting_agenda_items: agendaItems,
+      meeting_action_items: actionItems,
+      meeting_notes: notes,
+      parent_meeting: null, // Skip for now to improve performance
+      continuation_meetings: [] // Skip for now to improve performance
+    };
+
+
     // Audit log the view
-    await prisma.meetingAuditLog.create({
+    await prisma.meeting_audit_logs.create({
       data: {
         meeting_id: meetingId,
-        user_id: parseInt(user.id),
-        staff_id: user.staff?.id,
+        user_id: user.id,
+        staff_id: Number((user.staff as any)?.id ?? 0),
         action: 'VIEW',
         details: 'Viewed meeting details',
         ip_address: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
@@ -213,7 +247,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid meeting ID" }, { status: 400 });
     }
 
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     
     // Validate request data
     const validationResult = updateMeetingSchema.safeParse(body);
@@ -230,7 +264,7 @@ export async function PATCH(
     // Check permissions
     const existingMeeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
-      include: { MeetingAttendee: true }
+      include: { meeting_attendee: true }
     });
 
     if (!existingMeeting) {
@@ -238,7 +272,7 @@ export async function PATCH(
     }
 
     const hasAdminAccess = isAnyAdmin(user);
-    const isOrganizer = existingMeeting.organizer_id === user.staff?.id;
+    const isOrganizer = existingMeeting.organizer_id === Number((user.staff as any)?.id ?? 0);
 
     if (!hasAdminAccess && !isOrganizer) {
       return NextResponse.json({ error: "Not authorized to edit this meeting" }, { status: 403 });
@@ -253,7 +287,7 @@ export async function PATCH(
       agenda: existingMeeting.agenda,
       notes: existingMeeting.notes,
       status: existingMeeting.status,
-      attendee_count: existingMeeting.MeetingAttendee.length
+      attendee_count: existingMeeting.meeting_attendee.length
     };
 
     // Prepare update data with proper types
@@ -269,8 +303,8 @@ export async function PATCH(
     if (body.agenda !== undefined) updateData.agenda = body.agenda;
     if (body.notes !== undefined) updateData.notes = body.notes;
     if (body.status !== undefined) updateData.status = body.status;
-    if (body.start_time !== undefined) updateData.start_time = new Date(body.start_time);
-    if (body.end_time !== undefined) updateData.end_time = new Date(body.end_time);
+    if (body.start_time !== undefined) updateData.start_time = new Date(String(body.start_time));
+    if (body.end_time !== undefined) updateData.end_time = new Date(String(body.end_time));
 
     // Update meeting
     const updatedMeeting = await prisma.meeting.update({
@@ -281,13 +315,13 @@ export async function PATCH(
     // Update attendees if provided
     if (body.attendeeIds && Array.isArray(body.attendeeIds)) {
       // Remove existing attendees
-      await prisma.meetingAttendee.deleteMany({
+      await prisma.meeting_attendee.deleteMany({
         where: { meeting_id: meetingId }
       });
 
       // Add new attendees
       if (body.attendeeIds.length > 0) {
-        await prisma.meetingAttendee.createMany({
+        await prisma.meeting_attendee.createMany({
           data: body.attendeeIds.map((staffId: string) => ({
             meeting_id: meetingId,
             staff_id: parseInt(staffId),
@@ -297,12 +331,64 @@ export async function PATCH(
       }
     }
 
+    // Update agenda items if provided - Zero Degradation Protocol
+    if (body.agendaItems && Array.isArray(body.agendaItems)) {
+      // Get existing agenda items for comparison
+      const existingItems = await prisma.meeting_agenda_items.findMany({
+        where: { meeting_id: meetingId }
+      });
+
+      // Create array of item IDs to keep (existing items being updated)
+      const itemsToKeep = body.agendaItems
+        .filter((item: any) => item.id && !isNaN(parseInt(item.id)))
+        .map((item: any) => parseInt(item.id));
+
+      // Remove items that are no longer in the list
+      await prisma.meeting_agenda_items.deleteMany({
+        where: {
+          meeting_id: meetingId,
+          NOT: {
+            id: { in: itemsToKeep }
+          }
+        }
+      });
+
+      // Update existing items and create new ones
+      for (const item of body.agendaItems) {
+        const itemData = {
+          meeting_id: meetingId,
+          topic: item.topic || '',
+          problem_statement: item.description || null,
+          purpose: item.purpose || 'Discussion',
+          priority: item.priority || 'Medium',
+          duration_minutes: item.duration_minutes || 15,
+          responsible_staff_id: item.responsible_staff_id || null,
+          status: item.status || 'Pending',
+          order_index: item.order_index || 0,
+          updated_at: new Date()
+        };
+
+        if (item.id && !isNaN(parseInt(item.id))) {
+          // Update existing item
+          await prisma.meeting_agenda_items.update({
+            where: { id: parseInt(item.id) },
+            data: itemData
+          });
+        } else {
+          // Create new item
+          await prisma.meeting_agenda_items.create({
+            data: itemData
+          });
+        }
+      }
+    }
+
     // Create audit log entry for meeting update
-    await prisma.meetingAuditLog.create({
+    await prisma.meeting_audit_logs.create({
       data: {
         meeting_id: updatedMeeting.id,
-        user_id: parseInt(user.id),
-        staff_id: user.staff?.id,
+        user_id: user.id,
+        staff_id: Number((user.staff as any)?.id ?? 0),
         action: 'UPDATE',
         details: `Updated meeting: ${updatedMeeting.title}`,
         changes: {

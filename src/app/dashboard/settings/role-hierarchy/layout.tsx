@@ -31,7 +31,7 @@ const submenuItems = [
 export default function RoleHierarchyLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   const pathname = usePathname();
 
@@ -45,7 +45,7 @@ export default function RoleHierarchyLayout({
             return (
               <Link
                 key={item.href}
-                href={item.href as Record<string, unknown>}
+                href={item.href}
                 className={cn(
                   'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
                   isActive

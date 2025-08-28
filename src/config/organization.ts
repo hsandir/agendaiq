@@ -44,11 +44,11 @@ export const organizationConfig = {
 export const getOrganizationDefaults = () => organizationConfig;
 
 export const isSystemRole = (roleTitle: string): boolean => {
-  return organizationConfig.systemRoles.includes(roleTitle);
+  return organizationConfig.systemRoles.includes(roleTitle)
 };
 
 export const isSystemDepartment = (departmentName: string): boolean => {
-  return organizationConfig.systemDepartments.includes(departmentName);
+  return organizationConfig.systemDepartments.includes(departmentName)
 };
 
 export default organizationConfig; 

@@ -21,7 +21,7 @@ import {
   ArrowLeft, 
   Save, 
   X, 
-  User, 
+  User,
   Calendar,
   Clock,
   AlertCircle,
@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { getSafeDate, safeFormatDate } from '@/lib/utils/safe-date';
+import { toast } from 'sonner';
 import type { 
   AgendaItemWithRelations, 
   MeetingWithRelations, 
@@ -46,9 +47,9 @@ import { AgendaItemStatus, Purpose, SolutionType, DecisionType } from '@prisma/c
 interface Props {
   item: AgendaItemWithRelations;
   meeting: MeetingWithRelations;
-  currentUser: _AuthenticatedUser;
+  currentUser: AuthenticatedUser;
   allStaff: StaffForAssignment[];
-  canEdit: boolean;
+  canEdit: boolean
 }
 
 export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit }: Props) {
@@ -95,6 +96,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
 
       if (response.ok) {
         setIsEditing(false);
+        toast.success('Agenda item updated successfully');
         
         // Handle ongoing status actions
         if (editData.status === 'Ongoing' && ongoingChoice) {
@@ -107,10 +109,15 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
           }
         }
         
-        router.refresh();
+        // Redirect back to agenda items list
+        router.push(`/dashboard/meetings/${meeting.id}/agenda`);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        toast.error(errorData.error || 'Failed to update agenda item');
       }
     } catch (error: unknown) {
       console.error('Error saving:', error);
+      toast.error('Failed to update agenda item');
     } finally {
       setIsSaving(false);
       setShowOngoingDialog(false);
@@ -200,7 +207,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
       case 'High': return 'bg-destructive/10 text-destructive';
       case 'Medium': return 'bg-yellow-100 text-yellow-700';
       case 'Low': return 'bg-green-100 text-green-700';
-      default: return 'bg-muted text-foreground';
+      default: return 'bg-muted text-foreground'
     }
   };
 
@@ -209,7 +216,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
       case 'Resolved': return <CheckCircle className="h-5 w-5 text-green-600" />;
       case 'Ongoing': return <Clock className="h-5 w-5 text-yellow-600" />;
       case 'Deferred': return <XCircle className="h-5 w-5 text-destructive" />;
-      default: return <AlertCircle className="h-5 w-5 text-muted-foreground" />;
+      default: return <AlertCircle className="h-5 w-5 text-muted-foreground" />
     }
   };
 
@@ -351,7 +358,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
             <div className="bg-card rounded-xl shadow-sm border border-border p-6">
               <AgendaItemComments
                 itemId={item.id}
-                comments={item.Comments ?? []}
+                comments={item.agenda_item_comments ?? []}
                 onAddComment={handleAddComment}
                 canComment={true}
               />
@@ -474,7 +481,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                       value={editData.responsible_staff_id?.toString() ?? 'none'}
                       onValueChange={(value) => setEditData({ 
                         ...editData, 
-                        responsible_staff_id: value === 'none' ? null : parseInt(value) 
+                        responsible_staff_id: value === 'none' ? null : parseInt(value)
                       })}
                     >
                       <SelectTrigger className="mt-1">
@@ -484,21 +491,21 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                         <SelectItem value="none">None</SelectItem>
                         {allStaff.map((s) => (
                           <SelectItem key={s.id} value={s.id.toString()}>
-                            {s.User.name ?? s.User.email}
+                            {s.users.name ?? s.users.email}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   ) : (
                     <div className="mt-1">
-                      {item.ResponsibleStaff ? (
+                      {item.staff ? (
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
                             <User className="h-4 w-4 text-primary" />
                           </div>
                           <div>
-                            <p className="font-medium text-foreground">{item.ResponsibleStaff.User.name ?? item.ResponsibleStaff.User.email}</p>
-                            <p className="text-xs text-muted-foreground">{item.ResponsibleStaff.Role.title}</p>
+                            <p className="font-medium text-foreground">{item.staff.users.name ?? item.staff.users.email}</p>
+                            <p className="text-xs text-muted-foreground">{item.staff.role.title}</p>
                           </div>
                         </div>
                       ) : (
@@ -558,9 +565,9 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
                 )}
               </div>
               
-              {item.Attachments?.length > 0 ? (
+              {item.agenda_item_attachments?.length > 0 ? (
                 <div className="space-y-2">
-                  {item.Attachments.map((attachment) => (
+                  {item.agenda_item_attachments.map((attachment) => (
                     <div key={attachment.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted">
                       <FileText className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm text-foreground">{attachment.file_name}</span>
@@ -620,7 +627,7 @@ export function AgendaItemDetail({ item, meeting, currentUser, allStaff, canEdit
             </Button>
             <Button 
               onClick={saveChanges}
-              disabled={!ongoingChoice ?? isSaving}
+              disabled={!ongoingChoice || isSaving}
               className="bg-primary hover:bg-primary"
             >
               {isSaving ? 'Saving...' : 'Continue'}

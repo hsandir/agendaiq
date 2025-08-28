@@ -44,15 +44,19 @@ class PerformanceMonitor {
   }
 
   private getLargestContentfulPaint(): number {
-    return new Promise((resolve) => {
+    let lcpValue = 0;
+    try {
       new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
         if (entries.length > 0) {
           const lcp = entries[entries.length - 1];
-          resolve(lcp.startTime);
+          lcpValue = lcp.startTime;
         }
       }).observe({ entryTypes: ['largest-contentful-paint'] });
-    }) as Record<string, unknown>;
+    } catch {
+      // LCP not supported
+    }
+    return lcpValue;
   }
 
   private interceptFetch() {
@@ -119,7 +123,7 @@ class PerformanceMonitor {
     // Log performance issues in development
     if (process.env.NODE_ENV === 'development') {
       if (name === 'page_load_time' && value > 150) {
-        console.warn(`🐌 Slow page load: ${value.toFixed(2)}ms (target: <150ms)`);
+        console.warn(`🐌 Slow page load: ${value.toFixed(2)}ms (target: <150ms)`)
       }
       if (name.startsWith('api_') && value > 100) {
         console.warn(`🐌 Slow API call: ${name} took ${value.toFixed(2)}ms`);

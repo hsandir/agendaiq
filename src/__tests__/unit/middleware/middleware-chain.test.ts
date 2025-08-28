@@ -40,7 +40,7 @@ describe('Middleware Chain Tests', () => {
         }
       } as unknown as NextRequest;
       
-      const { RateLimiters } = await import('@/lib/utils/rate-limit');
+      const { __RateLimiters } = await import('@/lib/utils/rate-limit');
       (RateLimiters.api.check as jest.Mock).mockResolvedValue({ success: true });
       
       const result = await rateLimitMiddleware(request);
@@ -59,7 +59,7 @@ describe('Middleware Chain Tests', () => {
         }
       } as unknown as NextRequest;
       
-      const { RateLimiters } = await import('@/lib/utils/rate-limit');
+      const { __RateLimiters } = await import('@/lib/utils/rate-limit');
       (RateLimiters.api.check as jest.Mock).mockResolvedValue({ 
         success: false, 
         error: 'Rate limit exceeded' 
@@ -142,7 +142,7 @@ describe('Middleware Chain Tests', () => {
           url: `http://localhost:3000${path}`,
           headers: new Headers(),
           method: 'GET',
-          nextUrl: new URL(`http://localhost:3000${path}`)
+          nextUrl: new URL(`http://localhost:3000${path}`);
         } as unknown as NextRequest;
         const response = await middleware(request);
         
@@ -173,7 +173,7 @@ describe('Middleware Chain Tests', () => {
           url: `http://localhost:3000${path}`,
           headers,
           method: 'GET',
-          nextUrl: new URL(`http://localhost:3000${path}`)
+          nextUrl: new URL(`http://localhost:3000${path}`);
         } as unknown as NextRequest;
         const response = await middleware(request);
         

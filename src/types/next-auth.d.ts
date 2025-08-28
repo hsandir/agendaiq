@@ -1,5 +1,5 @@
 import 'next-auth';
-// // import { Role, Department } // Unused imports commented out // Unused imports commented out from '@prisma/client';
+// // import { role, department } // Unused imports commented out // Unused imports commented out from '@prisma/client';
 
 declare module 'next-auth' {
   interface User {
@@ -10,7 +10,7 @@ declare module 'next-auth' {
       id: number;
       role: { 
         title: string;
-        is_leadership: boolean;
+        is_leadership: boolean
       };
       department: { name: string };
       school: { name: string };
@@ -25,7 +25,7 @@ declare module 'next-auth' {
         id: number;
         role: { 
           title: string;
-          is_leadership: boolean;
+          is_leadership: boolean
         };
         department: { name: string };
         school: { name: string };

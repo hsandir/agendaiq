@@ -6,7 +6,7 @@
 import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/monitoring/pipelines/route';
 import { withAuth } from '@/lib/auth/api-auth';
-import { getMockOctokit, MockWorkflowRunsResponse } from '@/__tests__/types/octokit-mock';
+import { getMockOctokit, MockWorkflowRunsResponse } from '@/tests__/types/octokit-mock';
 import type { AuthResult } from '@/lib/auth/auth-types';
 
 // Mock dependencies
@@ -15,7 +15,7 @@ jest.mock('@octokit/rest');
 
 describe('/api/monitoring/pipelines', () => {
   const mockRequest = (url: string = 'http://localhost:3000/api/monitoring/pipelines') => {
-    return new NextRequest(url);
+    return new NextRequest(url)
   };
 
   beforeEach(() => {
@@ -34,11 +34,12 @@ describe('/api/monitoring/pipelines', () => {
   describe('Authentication', () => {
     it('should require staff authentication', async () => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
+      const authResult: AuthResult = {
         success: false,
         error: 'Authentication required',
         statusCode: 401
-      });
+      };
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce(authResult);
 
       const request = mockRequest();
       const response = await GET(request);
@@ -53,10 +54,11 @@ describe('/api/monitoring/pipelines', () => {
   describe('GitHub Integration', () => {
     beforeEach(() => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
+      const authResult: AuthResult = {
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
-      } as AuthResult);
+      };
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce(authResult);
     });
 
     it('should return empty runs when GitHub token is not configured', async () => {
@@ -116,7 +118,7 @@ describe('/api/monitoring/pipelines', () => {
       const MockedOctokit = getMockOctokit();
       (MockedOctokit as jest.Mock).mockImplementation(() => ({
         actions: {
-          listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: mockWorkflowRuns })
+          listWorkflowRunsForRepo: jest.fn().mockResolvedValue({ data: mockWorkflowRuns });
         }
       }));
 
@@ -139,10 +141,11 @@ describe('/api/monitoring/pipelines', () => {
   describe('Status Mapping', () => {
     beforeEach(() => {
       const mockWithAuth = withAuth as jest.MockedFunction<typeof withAuth>;
-      (mockWithAuth as jest.Mock).mockResolvedValueOnce({
+      const authResult: AuthResult = {
         success: true,
         user: { id: 'test-user', staff: { role: { title: 'Administrator' } } }
-      } as AuthResult);
+      };
+      (mockWithAuth as jest.Mock).mockResolvedValueOnce(authResult);
     });
 
     it('should map GitHub statuses correctly', async () => {
@@ -170,7 +173,7 @@ describe('/api/monitoring/pipelines', () => {
                   updated_at: '2024-01-10T10:00:00Z'
                 }]
               }
-            })
+            });
           }
         }));
 

@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { RateLimiters, getClientIdentifier } from '@/lib/utils/rate-limit';
 
+// Rate limiter interface
+interface RateLimiter {
+  check: (request: Request, limit: number, token: string) => Promise<{ success: boolean; limit: number; remaining: number; reset: number; error?: string }>;
+  createErrorResponse: (result: { success: boolean; limit: number; remaining: number; reset: number; error?: string }) => NextResponse;
+}
+
 // Route-specific rate limiting configuration
-const ROUTE_RATE_LIMITS: Record<string, { limiter: Record<string, unknown>; limit: number }> = {
+const ROUTE_RATE_LIMITS: Record<string, { limiter: RateLimiter; limit: number }> = {
   // Authentication routes
   '/api/auth/register': { limiter: RateLimiters.registration, limit: 3 },
   '/api/auth/forgot-password': { limiter: RateLimiters.passwordReset, limit: 5 },
@@ -48,7 +54,7 @@ export async function rateLimitMiddleware(request: NextRequest): Promise<NextRes
  * Helper function to check if a route should be rate limited
  */
 export function shouldRateLimit(pathname: string): boolean {
-  return Object.keys(ROUTE_RATE_LIMITS).some(route => pathname.startsWith(route));
+  return Object.keys(ROUTE_RATE_LIMITS).some(route => pathname.startsWith(route))
 }
 
 /**

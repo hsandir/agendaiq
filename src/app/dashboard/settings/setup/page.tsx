@@ -14,7 +14,7 @@ interface School {
   state: string | null;
   zipCode: string | null;
   phone: string | null;
-  website: string | null;
+  website: string | null
 }
 
 export default function SetupPage() {
@@ -39,7 +39,7 @@ export default function SetupPage() {
       if (!res.ok) throw new Error(data.error || "Failed to fetch schools");
       setSchools(Array.isArray(data) ? data : [data]);
     } catch (e: unknown) {
-      setError((e instanceof Error ? e.message : String(e)) || "Failed to fetch schools");
+      setError((e instanceof Error ? e.message : String(e)) || "Failed to fetch schools")
     } finally {
       setLoading(false);
     }
@@ -71,7 +71,7 @@ export default function SetupPage() {
       if (!res.ok) throw new Error("Failed to delete school");
       await fetchSchools();
     } catch (e: unknown) {
-      alert((e instanceof Error ? e.message : String(e)) || "Failed to delete school");
+      alert((e instanceof Error ? e.message : String(e)) || "Failed to delete school")
     } finally {
       setSaving(false);
     }
@@ -92,7 +92,7 @@ export default function SetupPage() {
       closeModal();
       await fetchSchools();
     } catch (e: unknown) {
-      alert((e instanceof Error ? e.message : String(e)) || "Failed to save school");
+      alert((e instanceof Error ? e.message : String(e)) || "Failed to save school")
     } finally {
       setSaving(false);
     }

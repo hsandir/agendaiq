@@ -29,7 +29,7 @@ export class ActionItemsService {
       }
     }
 
-    return await prisma.meetingActionItem.create({
+    return await prisma.meeting_action_items.create({
       data: {
         meeting_id: data.meetingId,
         agenda_item_id: data.agendaItemId,
@@ -39,13 +39,14 @@ export class ActionItemsService {
         assigned_to_role: data.assignedToRoleId,
         due_date: data.dueDate,
         priority: data.priority ?? 'Medium',
-        status: 'Pending'
+        status: 'Pending',
+        updated_at: new Date()
       },
       include: {
-        AssignedTo: {
+        staff_meeting_action_items_assigned_toTostaff: {
           include: {
-            User: true,
-            Role: true
+            users: true,
+            role: true
           }
         }
       }
@@ -71,18 +72,18 @@ export class ActionItemsService {
       updateData.completed_by = completedBy;
     }
 
-    return await prisma.meetingActionItem.update({
+    return await prisma.meeting_action_items.update({
       where: { id: actionItemId },
       data: updateData,
       include: {
-        AssignedTo: {
+        staff_meeting_action_items_assigned_toTostaff: {
           include: {
-            User: true
+            users: true
           }
         },
-        CompletedBy: {
+        staff_meeting_action_items_completed_byTostaff: {
           include: {
-            User: true
+            users: true
           }
         }
       }
@@ -115,26 +116,26 @@ export class ActionItemsService {
     }
 
     if (filterOptions?.departmentId) {
-      where.Meeting = {
-        department_id: parseInt(filterOptions).departmentId
+      where.meeting = {
+        department_id: filterOptions.departmentId
       };
     }
 
-    const overdueItems = await prisma.meetingActionItem.findMany({
+    const overdueItems = await prisma.meeting_action_items.findMany({
       where,
       include: {
-        Meeting: {
+        meeting: {
           select: {
             id: true,
             title: true,
             start_time: true
           }
         },
-        AssignedTo: {
+        staff_meeting_action_items_assigned_toTostaff: {
           include: {
-            User: true,
-            Role: true,
-            Department: true
+            users: true,
+            role: true,
+            department: true
           }
         }
       },
@@ -147,7 +148,7 @@ export class ActionItemsService {
     // Update status to Overdue
     const overdueIds = (overdueItems.map(item => item.id));
     if (overdueIds.length > 0) {
-      await prisma.meetingActionItem.updateMany({
+      await prisma.meeting_action_items.updateMany({
         where: {
           id: { in: overdueIds },
           status: { not: 'Overdue' }
@@ -176,8 +177,8 @@ export class ActionItemsService {
     const where: Record<string, unknown> = { status };
 
     if (options?.departmentId) {
-      where.Meeting = {
-        department_id: parseInt(options).departmentId
+      where.meeting = {
+        department_id: options.departmentId
       };
     }
 
@@ -185,24 +186,24 @@ export class ActionItemsService {
       where.assigned_to_role = options.roleId;
     }
 
-    return await prisma.meetingActionItem.findMany({
+    return await prisma.meeting_action_items.findMany({
       where,
       include: {
-        Meeting: {
+        meeting: {
           select: {
             id: true,
             title: true,
             start_time: true,
-            Department: true
+            department: true
           }
         },
-        AssignedTo: {
+        staff_meeting_action_items_assigned_toTostaff: {
           include: {
-            User: true,
-            Role: true
+            users: true,
+            role: true
           }
         },
-        AgendaItem: {
+        meeting_agenda_items: {
           select: {
             topic: true
           }
@@ -224,11 +225,14 @@ export class ActionItemsService {
     dateFrom?: Date;
     dateTo?: Date;
   }) {
-    const where: Record<string, unknown> = {};
+    const where: {
+      meeting?: { department_id: number };
+      created_at?: { gte?: Date; lte?: Date };
+    } = {};
 
     if (filterOptions?.departmentId) {
-      where.Meeting = {
-        department_id: parseInt(filterOptions).departmentId
+      where.meeting = {
+        department_id: filterOptions.departmentId
       };
     }
 
@@ -251,20 +255,20 @@ export class ActionItemsService {
       cancelled,
       deferred
     ] = await Promise.all([
-      prisma.meetingActionItem.count({ where }),
-      prisma.meetingActionItem.count({ where: { ...where, status: 'Pending' } }),
-      prisma.meetingActionItem.count({ where: { ...where, status: 'InProgress' } }),
-      prisma.meetingActionItem.count({ where: { ...where, status: 'Completed' } }),
-      prisma.meetingActionItem.count({ where: { ...where, status: 'Overdue' } }),
-      prisma.meetingActionItem.count({ where: { ...where, status: 'Cancelled' } }),
-      prisma.meetingActionItem.count({ where: { ...where, status: 'Deferred' } })
+      prisma.meeting_action_items.count({ where }),
+      prisma.meeting_action_items.count({ where: { ...where, status: 'Pending' } }),
+      prisma.meeting_action_items.count({ where: { ...where, status: 'InProgress' } }),
+      prisma.meeting_action_items.count({ where: { ...where, status: 'Completed' } }),
+      prisma.meeting_action_items.count({ where: { ...where, status: 'Overdue' } }),
+      prisma.meeting_action_items.count({ where: { ...where, status: 'Cancelled' } }),
+      prisma.meeting_action_items.count({ where: { ...where, status: 'Deferred' } })
     ]);
 
     const completionRate = total > 0 ? (completed / total) * 100 : 0;
     const overdueRate = total > 0 ? (overdue / total) * 100 : 0;
 
     // Average completion time
-    const completedItems = await prisma.meetingActionItem.findMany({
+    const completedItems = await prisma.meeting_action_items.findMany({
       where: {
         ...where,
         status: 'Completed',
@@ -325,17 +329,17 @@ export class ActionItemsService {
       where.assigned_to = staffId;
     }
 
-    const items = await prisma.meetingActionItem.findMany({
+    const items = await prisma.meeting_action_items.findMany({
       where,
       include: {
-        Meeting: {
+        meeting: {
           select: {
             title: true
           }
         },
-        AssignedTo: {
+        staff_meeting_action_items_assigned_toTostaff: {
           include: {
-            User: true
+            users: true
           }
         }
       },
@@ -369,7 +373,7 @@ export class ActionItemsService {
       assignedTo?: number;
     }
   ) {
-    return await prisma.meetingActionItem.updateMany({
+    return await prisma.meeting_action_items.updateMany({
       where: {
         id: { in: actionItemIds }
       },

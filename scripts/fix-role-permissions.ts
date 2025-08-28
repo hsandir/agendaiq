@@ -98,7 +98,8 @@ async function fixRolePermissions() {
             role_id: role.id,
             capability: capability,
             resource: parts.length > 1 ? parts[0] : capability.split('_')[0].toLowerCase(),
-            action: parts.length > 1 ? parts.slice(1).join(':') : capability.split('_').slice(1).join('_').toLowerCase()
+            action: parts.length > 1 ? parts.slice(1).join(':') : capability.split('_').slice(1).join('_').toLowerCase(),
+            updated_at: new Date()
           }
         });
       }
@@ -132,7 +133,8 @@ async function fixRolePermissions() {
               role_id: role.id,
               capability: capability,
               resource: capability.split(':')[0],
-              action: capability.split(':')[1] || 'access'
+              action: capability.split(':')[1] || 'access',
+              updated_at: new Date()
             }
           });
         }

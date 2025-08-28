@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from '@/lib/auth/api-auth';
+import { withAuth } from '../../../../lib/auth/api-auth';
 import { hash, compare } from "bcryptjs";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "../../../../lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
-    const data = await request.json();
+    const data = await request.json() as Record<string, unknown>;
     const { currentPassword, newPassword, confirmPassword } = data;
 
     if ((newPassword as string) !== (confirmPassword as string)) {
@@ -21,24 +21,24 @@ export async function POST(request: NextRequest) {
       return new NextResponse("Password must be at least 8 characters long", { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { email: auth.user.email! },
-      select: { hashedPassword: true },
+      select: { hashed_password: true },
     });
 
-    if (!user?.hashedPassword) {
+    if (!user?.hashed_password) {
       return new NextResponse("No password set", { status: 400 });
     }
 
-    const isValid = await compare(currentPassword as string, user?.hashedPassword);
+    const isValid = await compare(currentPassword as string, user?.hashed_password);
     if (!isValid) {
       return new NextResponse("Current password is incorrect", { status: 400 });
     }
 
     const hashedPassword = await hash(newPassword as string, 12);
-    await prisma.user.update({
+    await prisma.users.update({
       where: { email: auth.user.email! },
-      data: { hashedPassword },
+      data: { hashed_password: hashedPassword },
     });
 
     return new NextResponse("Password updated successfully", { status: 200 });

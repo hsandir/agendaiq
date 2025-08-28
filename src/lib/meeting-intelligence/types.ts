@@ -30,7 +30,7 @@ export interface PendingActionItem {
   dueDate?: Date;
   priority: 'Low' | 'Medium' | 'High';
   status: 'Pending' | 'InProgress' | 'Overdue';
-  carryForwardCount: number;
+  carryForwardCount: number
 }
 
 export interface RoleTransitionData {
@@ -63,7 +63,7 @@ export interface MeetingSearchResult {
   excerpt: string;
   relevance: number;
   date: Date;
-  matchedIn: 'title' | 'agenda' | 'notes' | 'actions' | 'transcript';
+  matchedIn: 'title' | 'agenda' | 'notes' | 'actions' | 'transcript'
 }
 
 export interface MeetingAnalytics {
@@ -83,14 +83,14 @@ export interface DepartmentStats {
   meetingCount: number;
   actionItemCount: number;
   completionRate: number;
-  averageAttendance: number;
+  averageAttendance: number
 }
 
 export interface AIPlaceholder {
   type: 'summary' | 'actionExtraction' | 'transcription' | 'smartSearch';
   input: Record<string, unknown>;
   manualFallback?: Record<string, unknown>;
-  futureImplementation: string;
+  futureImplementation: string
 }
 
 export const ActionItemStatus = {

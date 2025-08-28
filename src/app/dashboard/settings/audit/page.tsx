@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth/auth-options";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Settings, Lock, UserCheck, Calendar, Users, FileText } from "lucide-react";
+import { UserPlus, Settings, Lock, UserCheck, Calendar, Users, FileText } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Meeting Audit Log",
@@ -16,20 +16,20 @@ export default async function AuditPage() {
   const user = await requireAuth(AuthPresets.requireAuth);
   
   // Check if user is admin
-  const userDetails = await prisma.user.findUnique({
+  const userDetails = await prisma.users.findUnique({
     where: {
       email: user.email!
     },
     include: { 
-      Staff: {
+      staff: {
         include: {
-          Role: true
+          role: true
         }
       }
     }
   });
 
-  if (!userDetails || (userDetails.Staff?.[0]?.Role?.title !== "Administrator")) {
+  if (!userDetails || (userDetails.staff?.[0]?.role?.title !== "Administrator")) {
     redirect("/dashboard");
   }
 
@@ -37,12 +37,12 @@ export default async function AuditPage() {
   // Fetch real meeting audit logs
   // const auditLogs = await prisma.meetingAuditLog.findMany({
   //   include: {
-  //     User: true,
-  //     Meeting: {
+  //     users: true,
+  //     meeting: {
   //       include: {
-  //         Staff: {
+  //         staff: {
   //           include: {
-  //             User: true
+  //             users: true
   //           }
   //         }
   //       }
@@ -59,12 +59,12 @@ export default async function AuditPage() {
     id: number;
     action: string;
     created_at: string;
-    Meeting: {
-      title: string;
+    meeting: {
+      title: string
     };
-    User: {
+    users: {
       name?: string | null;
-      email: string;
+      email: string
     };
     details?: Record<string, unknown>;
   }
@@ -85,7 +85,7 @@ export default async function AuditPage() {
       case 'attendee_added':
         return { icon: Users, category: 'attendee' };
       case 'attendee_removed':
-        return { icon: User, category: 'attendee' };
+        return { icon: UserPlus, category: 'attendee' };
       case 'note_added':
         return { icon: FileText, category: 'content' };
       default:
@@ -117,12 +117,12 @@ export default async function AuditPage() {
               <div className="absolute left-0 top-0 w-px h-full bg-border" />
               <div className="space-y-8">
                 {auditLogs.map((log) => {
-                  const { icon: Icon, category } = getActionDetails(log.action);
+                  const { icon: __Icon, category } = getActionDetails(log.action);
                   return (
                     <div key={log.id} className="relative pl-8">
                       <div className="absolute left-0 top-2 -translate-x-1/2">
                         <div className="p-1 rounded-full bg-background border">
-                          <Icon className="h-4 w-4" />
+                          <__Icon className="h-4 w-4" />
                         </div>
                       </div>
                       <div className="space-y-1">
@@ -135,10 +135,10 @@ export default async function AuditPage() {
                           </div>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Meeting: {log.Meeting.title}
+                          meeting: {log.meeting.title}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          By: {log.User.name ?? log.User.email}
+                          By: {log.users.name ?? log.users.email}
                         </p>
                         {log.details && typeof log.details === 'object' && (
                           <p className="text-sm text-muted-foreground">

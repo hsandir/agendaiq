@@ -21,7 +21,7 @@ interface ValidationResult {
   errors?: Array<{
     path: string;
     message: string;
-    code: string;
+    code: string
   }>;
   error?: string;
 }
@@ -97,7 +97,7 @@ export async function validateField(fieldName: string, value: any, schema: Valid
 export async function validateBulk(validations: Array<{
   id: string;
   schema: string;
-  data: any;
+  data: any
 }>): Promise<Array<{
   id: string;
   success: boolean;

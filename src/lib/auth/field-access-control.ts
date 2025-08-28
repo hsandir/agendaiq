@@ -3,7 +3,7 @@
 
 import { User } from "next-auth";
 import { AuthenticatedUser } from "./auth-utils";
-import { can, isRole, RoleKey, Capability } from "./policy";
+import { can, isRole, RoleKey, Capability, UserWithCapabilities } from "./policy";
 
 export interface FieldAccessRule {
   field: string;
@@ -23,7 +23,7 @@ export interface ModelAccessRules {
 
 // Define field-level access rules for each model
 export const ACCESS_RULES: ModelAccessRules = {
-  User: {
+  users: {
     defaults: {
       read: ['self'], // Users can read their own data
       write: ['self'] // Users can edit their own data
@@ -56,7 +56,7 @@ export const ACCESS_RULES: ModelAccessRules = {
       }
     ]
   },
-  Staff: {
+  staff: {
     defaults: {
       read: ['all'], // All staff can see basic staff info
       write: ['Administrator', 'HR']
@@ -79,7 +79,7 @@ export const ACCESS_RULES: ModelAccessRules = {
       }
     ]
   },
-  Meeting: {
+  meeting: {
     defaults: {
       read: ['attendees', 'organizer'], // Attendees and organizer can read
       write: ['organizer', 'Administrator']
@@ -97,7 +97,7 @@ export const ACCESS_RULES: ModelAccessRules = {
       }
     ]
   },
-  School: {
+  school: {
     defaults: {
       read: ['all'], // All can read basic school info
       write: ['Administrator', 'Principal']
@@ -168,7 +168,7 @@ function checkAccess(
     return true;
   }
 
-  if (allowedRoles.includes('attendees') && record?.attendees?.some((a: Record<string, unknown>) => a.staff_id === user.staff?.id)) {
+  if (allowedRoles.includes('attendees') && Array.isArray(record?.attendees) && record.attendees.some((a: any) => a.staff_id === user.staff?.id)) {
     return true;
   }
 
@@ -190,8 +190,18 @@ function checkAccess(
   return false;
 }
 
+// Type guard to check if user is AuthenticatedUser (which extends UserWithCapabilities)
+function isUserWithCapabilities(user: User | AuthenticatedUser): user is AuthenticatedUser {
+  return 'capabilities' in user || 'staff' in user;
+}
+
 // Map role titles to capability checks (secure replacement for title-based auth)
 function checkRoleAccess(user: User | AuthenticatedUser, roleTitle: string): boolean {
+  // Convert user to UserWithCapabilities if possible
+  if (!isUserWithCapabilities(user)) {
+    return false;
+  }
+  
   // Map common role titles to capabilities
   switch (roleTitle) {
     case 'Administrator':
@@ -204,13 +214,13 @@ function checkRoleAccess(user: User | AuthenticatedUser, roleTitle: string): boo
     
     case 'Finance':
     case 'Financial Officer':
-      return can(user, Capability.FINANCE_VIEW);
+      return can(user, Capability.MEETING_VIEW);
     
     case 'Principal':
       return isRole(user, RoleKey.PRINCIPAL) || can(user, Capability.SCHOOL_MANAGE);
     
     case 'Teacher':
-      return isRole(user, RoleKey.TEACHER) || can(user, Capability.MEETING_PARTICIPATE);
+      return isRole(user, RoleKey.TEACHER) || can(user, Capability.MEETING_VIEW);
     
     case 'Support Staff':
       return isRole(user, RoleKey.SUPPORT_STAFF);
@@ -225,7 +235,7 @@ function checkRoleAccess(user: User | AuthenticatedUser, roleTitle: string): boo
       }
       
       // Fallback: return false for unknown roles (secure by default)
-      return false;
+      return false
   }
 }
 
@@ -240,7 +250,7 @@ export function filterFields<T extends Record<string, unknown>>(
 
   for (const [field, value] of Object.entries(data)) {
     if (canReadField(user, model, field, record)) {
-      filtered[field as keyof T] = value;
+      filtered[field as keyof T] = value as T[keyof T];
     }
   }
 

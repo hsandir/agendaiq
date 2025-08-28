@@ -7,20 +7,20 @@ interface ConflictItem {
   field: string;
   existing: unknown;
   new: unknown;
-  action: string;
+  action: string
 }
 
 interface ActionItem {
   id: string;
   label: string;
-  type: string;
+  type: string
 }
 
 interface ExistingData {
   name: string;
   staffId: string;
   role: string;
-  department: string;
+  department: string
 }
 
 interface ProcessedRecord {
@@ -43,7 +43,7 @@ interface PreviewSummary {
   total: number;
   valid: number;
   conflicts: number;
-  errors: number;
+  errors: number
 }
 
 export default function StaffUploadClient() {
@@ -121,14 +121,14 @@ export default function StaffUploadClient() {
 
       setSuccess(`Preview completed! Found ${data.summary?.total ?? 0} records - ${data.summary?.valid ?? 0} valid, ${data.summary?.conflicts ?? 0} with issues.`);
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Preview failed');
+      setError(error instanceof Error ? error.message : 'Preview failed')
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleUpload = async () => {
-    if (!file ?? previewData.length === 0) {
+    if (!file || previewData.length === 0) {
       setError('Please preview the file first');
       return;
     }
@@ -144,7 +144,7 @@ export default function StaffUploadClient() {
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', file!);
       formData.append('action', 'upload');
       formData.append('selectedRows', JSON.stringify(Array.from(selectedRecords)));
       formData.append('actions', JSON.stringify(Object.fromEntries(recordActions)));
@@ -174,7 +174,7 @@ export default function StaffUploadClient() {
       const fileInput = document.getElementById('file-upload') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Upload failed');
+      setError(error instanceof Error ? error.message : 'Upload failed')
     } finally {
       setIsLoading(false);
     }
@@ -233,7 +233,7 @@ export default function StaffUploadClient() {
   };
 
   const downloadTemplate = () => {
-    const csvContent = `Email,Name,StaffId,Role,Department
+    const csvContent = `Email,Name,StaffId,role,Department
 new.teacher1@school.edu,John Smith,STAFF001,Mathematics Teacher,Mathematics Department
 new.teacher2@school.edu,Jane Doe,STAFF002,Science Teacher,Science Department
 update.existing@school.edu,Updated Name,STAFF003,English/Language Arts Teacher,Language Arts Department
@@ -255,7 +255,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-destructive/10 text-destructive">
           Error
         </span>
-      );
+      )
     }
     if (record.status === 'create') {
       return (
@@ -302,7 +302,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
               <h3 className="text-sm font-medium text-primary">Upload Instructions</h3>
               <div className="mt-2 text-sm text-primary">
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>Use CSV format with columns: Email, Name, StaffId, Role, Department</li>
+                  <li>Use CSV format with columns: Email, Name, StaffId, role, Department</li>
                   <li>Email addresses must be unique and valid</li>
                   <li>Staff IDs must be 3-15 characters and unique</li>
                   <li>Roles and Departments must exist in the system</li>
@@ -355,7 +355,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
             <div className="flex space-x-4">
               <button
                 onClick={handlePreview}
-                disabled={!file ?? isLoading}
+                disabled={!file || isLoading}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-foreground bg-primary hover:bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
@@ -368,7 +368,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
 
               <button
                 onClick={handleUpload}
-                disabled={!showPreview ?? selectedRecords.size === 0 ?? isLoading}
+                disabled={!showPreview || selectedRecords.size === 0 || isLoading}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-foreground bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
@@ -575,7 +575,7 @@ conflicting.role@school.edu,Role Conflict Test,CONF001,Department Head – Mathe
                           {record.actions.length > 0 && (
                             <div className="space-y-2">
                               <select
-                                value={recordActions.get(record.rowNumber) || record.actions[0]?.id ?? ''}
+                                value={recordActions.get(record.rowNumber) || (record.actions[0]?.id ?? '')}
                                 onChange={(e) => {
                                   const action = e.target.value;
                                   if (action === 'partial') {

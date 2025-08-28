@@ -12,8 +12,8 @@ import bcrypt from 'bcryptjs';
 import { authenticator } from 'otplib';
 
 // Test utilities
-import { createTestUser, cleanupTestData } from '../helpers/test-db';
-import type { AuthenticatedUser, StaffWithRelations } from '@/types';
+import { createTestusers, cleanupTestData } from '../helpers/test-db';
+import type { Authenticatedusers, StaffWithRelations } from '@/types';
 
 // Mock rate limiter
 jest.mock('@/lib/utils/rate-limit');
@@ -73,7 +73,7 @@ describe('Authentication Security Tests', () => {
           }),
         });
 
-        const { POST } = await import('@/app/api/auth/register/route');
+        const { __POST } = await import('@/app/api/auth/register/route');
         const response = await POST(request);
         const data = await response.json() as { error?: string };
 
@@ -95,17 +95,17 @@ describe('Authentication Security Tests', () => {
         }),
       });
 
-      const { POST } = await import('@/app/api/auth/register/route');
+      const { __POST } = await import('@/app/api/auth/register/route');
         const response = await POST(request);
 
       if (response.ok) {
-        const user = await prisma.user.findUnique({
+        const user = await prisma.users.findUnique({
           where: { email }
         });
 
-        expect(user?.hashedPassword).toBeDefined();
-        expect(user?.hashedPassword).not.toBe(password);
-        expect(user?.hashedPassword?.startsWith('$2')).toBe(true); // bcrypt hash
+        expect(user?.hashed_password).toBeDefined();
+        expect(user?.hashed_password).not.toBe(password);
+        expect(user?.hashed_password?.startsWith('$2')).toBe(true); // bcrypt hash
       }
     });
 
@@ -342,7 +342,7 @@ describe('Authentication Security Tests', () => {
 
         // The auth system should safely handle these inputs
         // without executing SQL injection
-        const { POST } = await import('@/app/api/auth/[...nextauth]/route');
+        const { __POST } = await import('@/app/api/auth/[...nextauth]/route');
         const response = await POST(request);
         
         // Should either return 401 (invalid credentials) or 400 (bad request)
@@ -369,7 +369,7 @@ describe('Authentication Security Tests', () => {
           }),
         });
 
-        const { POST } = await import('@/app/api/auth/register/route');
+        const { __POST } = await import('@/app/api/auth/register/route');
         const response = await POST(request);
         
         if (response.ok) {
@@ -377,7 +377,7 @@ describe('Authentication Security Tests', () => {
           // If registration succeeds, name should be sanitized
           if (data.user?.name) {
             expect(data.user.name).not.toContain('<script');
-            expect(data.user.name).not.toContain('javascript:');
+            expect(data.user.name).not.toContain('javascript:')
           }
         }
       }
@@ -404,7 +404,7 @@ describe('Authentication Security Tests', () => {
           }),
         });
 
-        const { POST } = await import('@/app/api/auth/register/route');
+        const { __POST } = await import('@/app/api/auth/register/route');
         const response = await POST(request);
         const data = await response.json() as { error?: string };
 
@@ -472,7 +472,7 @@ describe('Authentication Security Tests', () => {
       }
 
       // Cleanup
-      await prisma.user.deleteMany({
+      await prisma.users.deleteMany({
         where: {
           email: {
             in: ['teacher@agendaiq.com', 'admin@agendaiq.com']

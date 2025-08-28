@@ -11,7 +11,7 @@ export class MeetingContinuityService {
   static async getUnresolvedItems(meetingId: number): Promise<MeetingContinuityData> {
     const [agendaItems, actionItems] = await Promise.all([
       // Get unresolved agenda items
-      prisma.meetingAgendaItem.findMany({
+      prisma.meeting_agenda_items.findMany({
         where: {
           meeting_id: meetingId,
           status: {
@@ -19,13 +19,13 @@ export class MeetingContinuityService {
           }
         },
         include: {
-          ResponsibleStaff: true,
-          ResponsibleRole: true
+          staff: true,
+          role: true
         }
       }),
       
       // Get incomplete action items
-      prisma.meetingActionItem.findMany({
+      prisma.meeting_action_items.findMany({
         where: {
           meeting_id: meetingId,
           status: {
@@ -33,8 +33,8 @@ export class MeetingContinuityService {
           }
         },
         include: {
-          AssignedTo: true,
-          AssignedToRole: true
+          staff_meeting_action_items_assigned_toTostaff: true,
+          role: true
         }
       })
     ]);
@@ -60,7 +60,7 @@ export class MeetingContinuityService {
         assignedToStaffId: item.assigned_to,
         dueDate: item.due_date ?? undefined,
         priority: item.priority,
-        status: item.status as Record<string, unknown>,
+        status: (item.status === 'Pending' || item.status === 'InProgress' || item.status === 'Overdue') ? item.status : 'Pending',
         carryForwardCount: item.carry_forward_count + 1
       }))
     };
@@ -79,6 +79,11 @@ export class MeetingContinuityService {
       // Create the new meeting
       const newMeeting = await tx.meeting.create({
         data: {
+          title: 'Continuation Meeting',
+          department_id: 1,
+          district_id: 1,
+          organizer_id: 1,
+          school_id: 1,
           ...newMeetingData,
           parent_meeting_id: parentMeetingId,
           is_continuation: true
@@ -87,13 +92,13 @@ export class MeetingContinuityService {
 
       // Carry forward agenda items
       if (continuityData.carriedItems.length > 0) {
-        await tx.meetingAgendaItem.createMany({
+        await tx.meeting_agenda_items.createMany({
           data: continuityData.carriedItems.map((item, index) => ({
             meeting_id: newMeeting.id,
             topic: `[Carried Forward] ${item.topic}`,
             problem_statement: item.problemStatement,
             responsible_staff_id: item.responsibleStaffId,
-            responsible_role_id: parseInt(item).responsibleRoleId,
+            responsible_role_id: item.responsibleRoleId,
             priority: item.priority,
             status: 'Pending',
             parent_item_id: item.parentItemId,
@@ -101,14 +106,15 @@ export class MeetingContinuityService {
             carry_forward_count: item.carryForwardCount,
             order_index: index,
             purpose: 'Discussion',
-            created_at: new Date()
+            created_at: new Date(),
+            updated_at: new Date()
           }))
         });
       }
 
       // Carry forward action items
       if (continuityData.pendingActions.length > 0) {
-        await tx.meetingActionItem.createMany({
+        await tx.meeting_action_items.createMany({
           data: continuityData.pendingActions.map(action => ({
             meeting_id: newMeeting.id,
             title: action.title,
@@ -120,7 +126,8 @@ export class MeetingContinuityService {
             status: action.status,
             parent_action_id: action.parentActionId,
             carry_forward_count: action.carryForwardCount,
-            created_at: new Date()
+            created_at: new Date(),
+            updated_at: new Date()
           }))
         });
       }
@@ -136,8 +143,8 @@ export class MeetingContinuityService {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        ParentMeeting: true,
-        ContinuationMeetings: {
+        meeting: true,
+        other_meeting: {
           orderBy: { created_at: 'asc' }
         }
       }
@@ -147,12 +154,12 @@ export class MeetingContinuityService {
 
     // Get the root meeting
     let rootMeeting = meeting;
-    while (rootMeeting.ParentMeeting) {
+    while (rootMeeting.meeting) {
       const parent = await prisma.meeting.findUnique({
         where: { id: rootMeeting.parent_meeting_id! },
         include: { 
-          ParentMeeting: true,
-          ContinuationMeetings: {
+          meeting: true,
+          other_meeting: {
             orderBy: { created_at: 'asc' }
           }
         }
@@ -166,11 +173,11 @@ export class MeetingContinuityService {
       const children = await prisma.meeting.findMany({
         where: { parent_meeting_id: id },
         include: {
-          MeetingAgendaItems: { 
+          meeting_agenda_items: { 
             where: { carried_forward: true },
             select: { id: true, topic: true, status: true }
           },
-          MeetingActionItems: {
+          meeting_action_items: {
             where: { parent_action_id: { not: null } },
             select: { id: true, title: true, status: true }
           }
@@ -191,7 +198,7 @@ export class MeetingContinuityService {
     return {
       root: rootMeeting,
       chain: await getAllDescendants(rootMeeting.id),
-      currentMeeting: meeting
+      currentmeeting: meeting
     };
   }
 
@@ -214,15 +221,18 @@ export class MeetingContinuityService {
     const countMeetings = (meetings: Record<string, unknown>[]): void => {
       for (const meeting of meetings) {
         stats.totalMeetingsInChain++;
-        stats.totalCarriedItems += meeting.MeetingAgendaItems?.length ?? 0;
-        stats.resolvedItems += meeting.MeetingAgendaItems?.filter(
-          (i: Record<string, unknown>) => i.status === 'Resolved'
-        ).length ?? 0;
-        stats.pendingItems += meeting.MeetingAgendaItems?.filter(
-          (i: Record<string, unknown>) => i.status !== 'Resolved'
-        ).length ?? 0;
+        const agendaItems = meeting.meeting_agenda_items;
+        if (Array.isArray(agendaItems)) {
+          stats.totalCarriedItems += agendaItems.length;
+          stats.resolvedItems += agendaItems.filter(
+            (i: Record<string, unknown>) => i.status === 'Resolved'
+          ).length;
+          stats.pendingItems += agendaItems.filter(
+            (i: Record<string, unknown>) => i.status !== 'Resolved'
+          ).length;
+        }
         
-        if (meeting.children) {
+        if (Array.isArray(meeting.children)) {
           countMeetings(meeting.children);
         }
       }
@@ -231,7 +241,7 @@ export class MeetingContinuityService {
     countMeetings(chain.chain);
     
     if (stats.totalCarriedItems > 0) {
-      const items = await prisma.meetingAgendaItem.findMany({
+      const items = await prisma.meeting_agenda_items.findMany({
         where: { 
           meeting_id: meetingId,
           carried_forward: true

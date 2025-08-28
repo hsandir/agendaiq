@@ -68,9 +68,9 @@ async function fixReactVersionMismatch() {
     for (const command of fixCommands) {
       try {
         console.log(`Running: ${command}`);
-        const { stdout, stderr } = await execAsync(__command, { 
+        const { stdout, stderr } = await execAsync(command, { 
           cwd: process.cwd(),
-          timeout: 120000 // 2 __minutes
+          timeout: 120000 // 2 minutes
         });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
@@ -137,7 +137,7 @@ async function fixNodeModulesIssues() {
     const results = [];
     for (const command of fixCommands) {
       try {
-        const { stdout } = await execAsync(__command, { cwd: process.cwd(), timeout: __120000 });
+        const { stdout } = await execAsync(command, { cwd: process.cwd(), timeout: 120000 });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
@@ -230,7 +230,7 @@ module.exports = {
     const results = [];
     for (const command of commands) {
       try {
-        const { stdout } = await execAsync(__command, { cwd: process.cwd(), timeout: __60000 });
+        const { stdout } = await execAsync(command, { cwd: process.cwd(), timeout: 60000 });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
@@ -264,7 +264,7 @@ async function fixNextCacheIssues() {
     const results = [];
     for (const command of commands) {
       try {
-        const { stdout } = await execAsync(__command, { cwd: process.cwd(), timeout: __30000 });
+        const { stdout } = await execAsync(command, { cwd: process.cwd(), timeout: 30000 });
         results.push({ command, success: true, output: stdout });
       } catch (error: unknown) {
         results.push({ command, success: false, error: error instanceof Error ? error.message : "Unknown error" });
@@ -314,7 +314,7 @@ async function autoFixAllErrors() {
       reactFix: FixResult | null;
       nodeFix: FixResult | null;
       tailwindFix: FixResult | null;
-      cacheFix: FixResult | null;
+      cacheFix: FixResult | null
     } = {
       reactFix: null,
       nodeFix: null,

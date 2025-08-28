@@ -30,7 +30,7 @@ export function TwoFactorSetup() {
       setManualKey(data?.manualEntryKey);
       setStep('verify');
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : "An error occurred")
     } finally {
       setIsLoading(false);
     }
@@ -53,10 +53,10 @@ export function TwoFactorSetup() {
         throw new Error(data?.error || "Failed to verify code");
       }
 
-      setBackupCodes(data?.backupCodes);
+      setBackupCodes(data?.backup_codes);
       setStep('complete');
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : "An error occurred")
     } finally {
       setIsLoading(false);
     }
@@ -163,7 +163,7 @@ export function TwoFactorSetup() {
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -204,5 +204,5 @@ export function TwoFactorSetup() {
         </div>
       </div>
     </div>
-  );
+  )
 }

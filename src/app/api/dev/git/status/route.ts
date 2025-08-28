@@ -21,15 +21,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
     // Get current branch
-    const { stdout: ___branch  } = await execAsync('git rev-parse --abbrev-ref HEAD');
+    const { stdout: branch  } = await execAsync('git rev-parse --abbrev-ref HEAD');
     
     // Get status
-    const { stdout: ___statusOutput  } = await execAsync('git status --porcelain');
+    const { stdout: statusOutput  } = await execAsync('git status --porcelain');
     
     // Get ahead/behind info
     let ahead = 0, behind = 0;
     try {
-      const { stdout: ___revList  } = await execAsync(`git rev-list --left-right --count origin/${String(branch).trim()}...HEAD`);
+      const { stdout: revList  } = await execAsync(`git rev-list --left-right --count origin/${String(branch).trim()}...HEAD`);
       const [behindStr, aheadStr] = String(revList).trim().split('\t');
       behind = parseInt(behindStr) ?? 0;
       ahead = parseInt(aheadStr) ?? 0;
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         error: 'Failed to get git status',
-        details: error instanceof Error ? error.message : String(error) 
+        details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
     );

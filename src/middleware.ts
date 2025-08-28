@@ -3,7 +3,7 @@ import { getToken, JWT } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
 import { rateLimitMiddleware } from "@/lib/middleware/rate-limit-middleware";
 import { auditMiddleware } from "@/lib/middleware/audit-middleware";
-import { canAccessRoute, canAccessApi, UserWithCapabilities } from "@/lib/auth/policy";
+import { canAccessRoute, canAccessApi, UserWithCapabilities } from "@/lib/auth/policy-edge";
 import { isPublicRoute, isPublicApiRoute } from "@/lib/auth/public-routes";
 
 interface NextAuthToken {
@@ -45,24 +45,39 @@ function tokenToUser(token: JWT | NextAuthToken | null): UserWithCapabilities | 
 }
 
 export async function middleware(request: NextRequest) {
-  const path = request.nextUrl.pathname;
-  
-  
-  // Apply rate limiting to API routes first
-  if (path.startsWith("/api/")) {
-    const rateLimitResponse = await rateLimitMiddleware(request);
-    if (rateLimitResponse) {
-      return rateLimitResponse;
+  try {
+    const path = request.nextUrl.pathname;
+    
+    // Check if route is explicitly public (default-secure posture) FIRST
+    // This prevents getToken() from blocking public routes
+    const isPublic = isPublicRoute(path);
+    if (isPublic) {
+      return NextResponse.next(); // Allow access to public routes immediately
     }
-  }
+    
+    // Check if this is a public API route early
+    if (path.startsWith("/api/")) {
+      const isPublicApi = isPublicApiRoute(path);
+      if (isPublicApi) {
+        return NextResponse.next(); // Allow access to public API routes immediately
+      }
+    }
+    
+    // Apply rate limiting to API routes first
+    if (path.startsWith("/api/")) {
+      const rateLimitResponse = await rateLimitMiddleware(request);
+      if (rateLimitResponse) {
+        return rateLimitResponse;
+      }
+    }
 
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-
-  // Check if route is explicitly public (default-secure posture)
-  if (isPublicRoute(path)) {
-    // Public route - allow access without authentication
-    return NextResponse.next();
-  }
+    let token;
+    try {
+      token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    } catch (error: unknown) {
+      console.error('❌ MIDDLEWARE ERROR: Error getting token in middleware:', error);
+      token = null;
+    }
 
   // Protect dashboard routes - require authentication
   if (path.startsWith("/dashboard")) {
@@ -83,14 +98,9 @@ export async function middleware(request: NextRequest) {
   // Protect API routes
   if (path.startsWith("/api/")) {
     // Skip auth for public endpoints ONLY
-    // SECURITY: Dev/test/debug endpoints require authentication and proper capabilities
+    // SECURITY: All debug endpoints require authentication and proper capabilities
     // Use our centralized public API routes whitelist
-    const isPublic = isPublicApiRoute(path) || 
-                    // Temporary debug endpoints (should be removed in production)
-                    path.startsWith('/api/test-login') ||
-                    path.startsWith('/api/debug/user-capabilities') ||
-                    path.startsWith('/api/user') || // User preference endpoints with lightweight auth
-                    path.startsWith('/api/tests'); // Test runner API endpoints (development only)
+    const isPublic = isPublicApiRoute(path);
     
     if (!isPublic && !token) {
       return NextResponse.json(
@@ -117,20 +127,32 @@ export async function middleware(request: NextRequest) {
     return auditResponse;
   }
   
-  // Add security headers
-  const response = NextResponse.next();
-  
-  response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('X-Frame-Options', 'DENY');
-  response.headers.set('X-XSS-Protection', '1; mode=block');
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  
-  return response;
+    // Add security headers
+    const response = NextResponse.next();
+    
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('X-XSS-Protection', '1; mode=block');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    
+    return response;
+  } catch (error: unknown) {
+    console.error('❌ MIDDLEWARE FATAL ERROR:', error);
+    // On error, redirect to signin for authentication errors
+    if (request.nextUrl.pathname.startsWith('/dashboard')) {
+      return NextResponse.redirect(new URL('/auth/signin', request.url));
+    }
+    // For API routes, return proper error response
+    if (request.nextUrl.pathname.startsWith('/api/')) {
+      return NextResponse.json({ error: 'Authentication service unavailable' }, { status: 503 });
+    }
+    // For other routes, allow to proceed
+    return NextResponse.next();
+  }
 }
 
 export const config = {
   matcher: [
-    "/dashboard/:path*",
-    "/api/:path*",
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 }; 

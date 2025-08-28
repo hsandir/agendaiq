@@ -4,6 +4,7 @@ import { withAuth } from '@/lib/auth/api-auth';
 import { Capability } from '@/lib/auth/policy';
 import { z } from 'zod';
 import { FEATURES } from '@/lib/features/feature-flags';
+import { randomBytes } from 'crypto';
 
 // Member addition schema
 const addMemberSchema = z.object({
@@ -22,7 +23,7 @@ const updateMemberSchema = z.object({
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check feature flag
@@ -35,7 +36,7 @@ export async function GET(
 
     const auth = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_VIEW 
+      requireCapability: Capability.MEETING_VIEW 
     });
     
     if (!auth.success) {
@@ -43,10 +44,11 @@ export async function GET(
     }
 
     const { user } = auth;
-    const teamId = parseInt(params.id);
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
 
     // Check if team exists
-    const team = await prisma.team.findUnique({
+    const team = await prisma.teams.findUnique({
       where: { id: teamId },
       include: {
         team_members: {
@@ -73,7 +75,7 @@ export async function GET(
 
     // Get user's staff record
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: user?.id ?? 0 }
     });
 
     if (!staff) {
@@ -85,7 +87,7 @@ export async function GET(
 
     // Check if user has access to view team members
     const isMember = team.team_members.some(member => member.staff_id === staff.id);
-    const isAdmin = user.is_system_admin || user.is_school_admin;
+    const isAdmin = user?.is_system_admin || (user as unknown as Record<string, unknown>)?.is_school_admin;
 
     if (!isMember && !isAdmin) {
       return NextResponse.json(
@@ -114,7 +116,7 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check feature flag
@@ -127,7 +129,7 @@ export async function POST(
 
     const auth = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_UPDATE 
+      requireCapability: Capability.MEETING_EDIT 
     });
     
     if (!auth.success) {
@@ -135,15 +137,16 @@ export async function POST(
     }
 
     const { user } = auth;
-    const teamId = parseInt(params.id);
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const validatedData = addMemberSchema.parse(body);
 
     // Get user's staff record
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: user?.id ?? 0 }
     });
 
     if (!staff) {
@@ -154,7 +157,7 @@ export async function POST(
     }
 
     // Check if team exists
-    const team = await prisma.team.findUnique({
+    const team = await prisma.teams.findUnique({
       where: { id: teamId },
       include: {
         team_members: true
@@ -173,7 +176,7 @@ export async function POST(
       member => member.staff_id === staff.id && member.role === 'LEAD'
     );
 
-    if (!isTeamLead && !user.is_system_admin && !user.is_school_admin) {
+    if (!isTeamLead && !user?.is_system_admin && !(user as unknown as Record<string, unknown>)?.is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to add members to this team' },
         { status: 403 }
@@ -205,9 +208,11 @@ export async function POST(
     }
 
     // Add the member
-    const newMember = await prisma.teamMember.create({
+    const newMember = await prisma.team_members.create({
       data: {
+        id: randomBytes(16).toString('hex'),
         team_id: teamId,
+        user_id: staffToAdd.user_id,
         staff_id: validatedData.staff_id,
         role: validatedData.role,
         joined_at: new Date()
@@ -251,7 +256,7 @@ export async function POST(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check feature flag
@@ -264,7 +269,7 @@ export async function PUT(
 
     const auth = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_UPDATE 
+      requireCapability: Capability.MEETING_EDIT 
     });
     
     if (!auth.success) {
@@ -272,7 +277,8 @@ export async function PUT(
     }
 
     const { user } = auth;
-    const teamId = parseInt(params.id);
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
 
     // Get member ID from query params
     const { searchParams } = new URL(request.url);
@@ -286,12 +292,12 @@ export async function PUT(
     }
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const validatedData = updateMemberSchema.parse(body);
 
     // Get user's staff record
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: user?.id ?? 0 }
     });
 
     if (!staff) {
@@ -302,13 +308,13 @@ export async function PUT(
     }
 
     // Check if team and member exist
-    const teamMember = await prisma.teamMember.findFirst({
+    const teamMember = await prisma.team_members.findFirst({
       where: {
         team_id: teamId,
-        id: parseInt(memberId)
+        id: memberId
       },
       include: {
-        team: {
+        teams: {
           include: {
             team_members: true
           }
@@ -324,11 +330,11 @@ export async function PUT(
     }
 
     // Check if user is team lead or admin
-    const isTeamLead = teamMember.team.team_members.some(
-      member => member.staff_id === staff.id && member.role === 'LEAD'
+    const isTeamLead = teamMember.teams.team_members.some(
+      (member: any) => member.staff_id === staff.id && member.role === 'LEAD'
     );
 
-    if (!isTeamLead && !user.is_system_admin && !user.is_school_admin) {
+    if (!isTeamLead && !user?.is_system_admin && !(user as unknown as Record<string, unknown>)?.is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to update team members' },
         { status: 403 }
@@ -337,7 +343,7 @@ export async function PUT(
 
     // Prevent removing the last lead
     if (teamMember.role === 'LEAD' && validatedData.role === 'MEMBER') {
-      const leadCount = teamMember.team.team_members.filter(m => m.role === 'LEAD').length;
+      const leadCount = teamMember.teams.team_members.filter((m: any) => m.role === 'LEAD').length;
       if (leadCount <= 1) {
         return NextResponse.json(
           { error: 'Cannot remove the last team lead' },
@@ -347,8 +353,8 @@ export async function PUT(
     }
 
     // Update the member
-    const updatedMember = await prisma.teamMember.update({
-      where: { id: parseInt(memberId) },
+    const updatedMember = await prisma.team_members.update({
+      where: { id: memberId },
       data: {
         role: validatedData.role
       },
@@ -391,7 +397,7 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check feature flag
@@ -404,7 +410,7 @@ export async function DELETE(
 
     const auth = await withAuth(request, { 
       requireAuth: true,
-      requireCapability: Capability.MEETINGS_UPDATE 
+      requireCapability: Capability.MEETING_EDIT 
     });
     
     if (!auth.success) {
@@ -412,7 +418,8 @@ export async function DELETE(
     }
 
     const { user } = auth;
-    const teamId = parseInt(params.id);
+    const resolvedParams = await params;
+    const teamId = resolvedParams.id;
 
     // Get member ID from query params
     const { searchParams } = new URL(request.url);
@@ -427,7 +434,7 @@ export async function DELETE(
 
     // Get user's staff record
     const staff = await prisma.staff.findFirst({
-      where: { user_id: user.id }
+      where: { user_id: user?.id ?? 0 }
     });
 
     if (!staff) {
@@ -438,13 +445,13 @@ export async function DELETE(
     }
 
     // Check if team and member exist
-    const teamMember = await prisma.teamMember.findFirst({
+    const teamMember = await prisma.team_members.findFirst({
       where: {
         team_id: teamId,
-        id: parseInt(memberId)
+        id: memberId
       },
       include: {
-        team: {
+        teams: {
           include: {
             team_members: true
           }
@@ -460,12 +467,12 @@ export async function DELETE(
     }
 
     // Check if user is team lead or admin (or removing themselves)
-    const isTeamLead = teamMember.team.team_members.some(
-      member => member.staff_id === staff.id && member.role === 'LEAD'
+    const isTeamLead = teamMember.teams.team_members.some(
+      (member: any) => member.staff_id === staff.id && member.role === 'LEAD'
     );
     const isRemovingSelf = teamMember.staff_id === staff.id;
 
-    if (!isTeamLead && !isRemovingSelf && !user.is_system_admin && !user.is_school_admin) {
+    if (!isTeamLead && !isRemovingSelf && !user?.is_system_admin && !(user as unknown as Record<string, unknown>)?.is_school_admin) {
       return NextResponse.json(
         { error: 'You do not have permission to remove team members' },
         { status: 403 }
@@ -474,7 +481,7 @@ export async function DELETE(
 
     // Prevent removing the last lead
     if (teamMember.role === 'LEAD') {
-      const leadCount = teamMember.team.team_members.filter(m => m.role === 'LEAD').length;
+      const leadCount = teamMember.teams.team_members.filter((m: any) => m.role === 'LEAD').length;
       if (leadCount <= 1) {
         return NextResponse.json(
           { error: 'Cannot remove the last team lead' },
@@ -484,8 +491,8 @@ export async function DELETE(
     }
 
     // Remove the member
-    await prisma.teamMember.delete({
-      where: { id: parseInt(memberId) }
+    await prisma.team_members.delete({
+      where: { id: memberId }
     });
 
     return NextResponse.json({

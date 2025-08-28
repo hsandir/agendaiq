@@ -13,12 +13,12 @@ import { Loader2 } from 'lucide-react';
 interface Department {
   id: string;
   code: string;
-  name: string;
+  name: string
 }
 
 interface Role {
   id: string;
-  name: string;
+  name: string
 }
 
 interface User {
@@ -32,8 +32,8 @@ interface User {
   loginNotifications: boolean;
   rememberDevices: boolean;
   suspiciousAlerts: boolean;
-  twoFactorEnabled: boolean;
-  schoolId: string | null;
+  two_factor_enabled: boolean;
+  schoolId: string | null
 }
 
 export function RoleManagementForm() {
@@ -265,7 +265,7 @@ export function RoleManagementForm() {
                     <Switch
                       id="twoFactorEnabled"
                       name="twoFactorEnabled"
-                      defaultChecked={selectedUser.twoFactorEnabled}
+                      defaultChecked={selectedUser.two_factor_enabled}
                     />
                   </div>
                 </div>

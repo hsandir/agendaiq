@@ -42,7 +42,7 @@ export default function ProfilePage() {
           schoolId: data.school?.id ?? '',
         });
       } catch (error: unknown) {
-        setError('Failed to load profile');
+        setError('Failed to load profile')
       }
     };
 
@@ -88,7 +88,7 @@ export default function ProfilePage() {
 
       setSuccess(true);
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to update profile');
+      setError(error instanceof Error ? error.message : 'Failed to update profile')
     } finally {
       setIsLoading(false);
     }

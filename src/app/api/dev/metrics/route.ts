@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     const dbConnectionCount = Number(dbResult[0]?.count ?? 0);
     
     // Get application metrics from recent audit logs
-    const recentLogs = await prisma.auditLog.findMany({
+    const recentLogs = await prisma.audit_logs.findMany({
       where: {
         created_at: {
           gte: new Date(Date.now() - 60000) // Last minute
@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
     ];
 
     // Get API endpoint metrics
-    const endpointStats = await prisma.auditLog.groupBy({
+    const endpointStats = await prisma.audit_logs.groupBy({
       by: ['table_name'],
       where: {
         created_at: {
@@ -111,7 +111,7 @@ export async function GET(request: NextRequest) {
     const apiEndpoints = (await Promise.all(
       endpointStats.slice(0, 10).map(async (stat) => {
         // Get error count for this endpoint
-        const errorLogs = await prisma.auditLog.count({
+        const errorLogs = await prisma.audit_logs.count({
           where: {
             table_name: stat.table_name,
             operation: 'ERROR',
@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
         const errorRate = totalRequests > 0 ? (errorLogs / totalRequests) * 100 : 0;
         
         // Calculate average time between requests for this endpoint
-        const requestTimes = await prisma.auditLog.findMany({
+        const requestTimes = await prisma.audit_logs.findMany({
           where: {
             table_name: stat.table_name,
             created_at: {

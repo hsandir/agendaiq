@@ -11,24 +11,24 @@ interface School {
   state: string | null;
   zipCode: string | null;
   phone: string | null;
-  website: string | null;
+  website: string | null
 }
 
 interface SchoolClientProps {
-  initialSchool: School | null;
+  initialschool: School | null
 }
 
-export default function SchoolClient({ initialSchool }: SchoolClientProps) {
+export default function SchoolClient({ initialschool }: SchoolClientProps) {
   const router = useRouter();
-  const [school, setSchool] = useState<School | null>(initialSchool);
-  const [isLoading, setIsLoading] = useState(!initialSchool);
+  const [school, setSchool] = useState<School | null>(initialschool);
+  const [isLoading, setIsLoading] = useState(!initialschool);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
     const fetchSchool = async () => {
-      if (initialSchool) return; // Already have data
+      if (initialschool) return; // Already have data
       
       try {
         const response = await fetch('/api/school');
@@ -40,14 +40,14 @@ export default function SchoolClient({ initialSchool }: SchoolClientProps) {
 
         setSchool(data);
       } catch (error: unknown) {
-        setError(error instanceof Error ? error.message : 'Failed to load school data');
+        setError(error instanceof Error ? error.message : 'Failed to load school data')
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchSchool();
-  }, [initialSchool]);
+  }, [initialschool]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -85,7 +85,7 @@ export default function SchoolClient({ initialSchool }: SchoolClientProps) {
       setSchool(data);
       setSuccess('School information updated successfully');
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to update school information');
+      setError(error instanceof Error ? error.message : 'Failed to update school information')
     } finally {
       setIsSaving(false);
     }

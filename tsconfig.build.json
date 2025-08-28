@@ -1,0 +1,35 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "node_modules",
+    "test-utils", 
+    "**/*.test.ts", 
+    "**/*.test.tsx", 
+    "__tests__", 
+    "__mocks__", 
+    "jest.setup.js", 
+    "jest.config.js", 
+    "backups", 
+    "scripts",
+    "**/*.backup.*",
+    "src/lib/performance/**",
+    "src/lib/monitoring/**", 
+    "src/lib/testing/**",
+    "src/lib/sentry/**", 
+    "src/lib/posthog/**",
+    "src/lib/security/dynamic-menu.ts", 
+    "src/lib/security/dynamic-rbac-simple.ts", 
+    "src/lib/utils/rate-limit-advanced.ts",
+    "src/__tests__/**",
+    "src/lib/utils/api-test-helpers.ts",
+    "src/lib/meeting-intelligence/**",
+    "src/lib/middleware/**",
+    "src/app/api/admin/audit-logs/**",
+    "src/app/api/admin/rate-limits/**",
+    "src/app/api/auth/debug-logs/**"
+  ]
+}

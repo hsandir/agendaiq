@@ -11,16 +11,16 @@ export async function GET(request: NextRequest) {
       return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: auth.user.id },
-      include: { Staff: { include: { School: true } } },
+      include: { staff: { include: { school: true } } },
     });
 
-    if (!user?.Staff?.[0]?.School) {
+    if (!user?.staff?.[0]?.school) {
       return new NextResponse("School not found", { status: 404 });
     }
 
-    return new NextResponse(JSON.stringify(user.Staff[0].School), {
+    return new NextResponse(JSON.stringify(user.staff[0].school), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       return new NextResponse("Unauthorized", { status: auth.statusCode || 401 });
     }
 
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const { schoolId } = body;
 
     if (!schoolId) {
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     // Validate school exists
     const school = await prisma.school.findUnique({
-      where: { id: schoolId },
+      where: { id: schoolId as number },
     });
 
     if (!school) {
@@ -66,16 +66,16 @@ export async function POST(request: NextRequest) {
     // Update staff record's school
     await prisma.staff.update({
       where: { id: userStaff?.id },
-      data: { school_id: parseInt(schoolId) },
+      data: { school_id: parseInt(schoolId as string) },
     });
 
     // Get updated user with staff
-    const updatedUser = await prisma.user.findUnique({
+    const updatedUser = await prisma.users.findUnique({
       where: { id: auth.user.id },
-      include: { Staff: { include: { School: true } } },
+      include: { staff: { include: { school: true } } },
     });
 
-    return new NextResponse(JSON.stringify(updatedUser?.Staff?.[0]?.School), {
+    return new NextResponse(JSON.stringify(updatedUser?.staff?.[0]?.school), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });

@@ -33,7 +33,7 @@ interface AutofixSuggestion {
     action: 'create' | 'modify' | 'delete';
     content?: string;
   }>;
-  preventive: boolean;
+  preventive: boolean
 }
 
 // GET /api/dev/ci-cd/autofix - Get autofix suggestions for an error
@@ -75,18 +75,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
 
-    const body = await request.json();
-    const { __suggestionId, __errorType, __errorMessage, dryRun = __true, __customSuggestion  } = body;
+    const body = await request.json() as Record<string, unknown>;
+    const { suggestionId, errorType, errorMessage, dryRun = true, customSuggestion  } = body;
 
     // Use custom suggestion if provided, otherwise generate and find
     let suggestion: AutofixSuggestion;
     
     if (customSuggestion) {
-      suggestion = customSuggestion;
+      suggestion = customSuggestion as AutofixSuggestion;
       console.log('Using custom suggestion:', suggestion.title);
     } else {
       // Generate suggestions and find the one to apply
-      const suggestions = await generateAutofixSuggestions(errorType ?? '', errorMessage ?? '');
+      const suggestions = await generateAutofixSuggestions(String(errorType ?? ''), String(errorMessage ?? ''));
       const found = suggestions.find(s => s.id === suggestionId);
       
       if (!found) {
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     for (const command of suggestion.commands) {
       try {
         if (!dryRun) {
-          const { stdout, stderr } = await execAsync(__command, {
+          const { stdout, stderr } = await execAsync(command, {
             cwd: process.cwd(),
           });
           results.applied.push(`Command: ${command}\nOutput: ${stdout ?? stderr}`);

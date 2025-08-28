@@ -13,7 +13,7 @@ interface StoredError extends ErrorReport {
     description: string;
     impact: string;
     solutions: string[];
-    priorityScore: number;
+    priorityScore: number
   };
   resolved: boolean;
   priority: number;
@@ -30,7 +30,7 @@ interface PageAnalytics {
   recentErrors: number;
   criticalCount: number;
   highCount: number;
-  averagePriority: number;
+  averagePriority: number
 }
 
 // In-memory storage for real-time errors (Redis can be used in production)
@@ -51,7 +51,7 @@ interface ErrorReport {
     type: string;
     os: string;
     browser: string;
-    viewport: string;
+    viewport: string
   };
 }
 
@@ -209,8 +209,8 @@ export async function PATCH(request: NextRequest) {
     for (const [page, errors] of errorStore.entries()) {
       const errorIndex = errors.findIndex(err => err.id === errorId);
       if (errorIndex !== -1) {
-        errors[errorIndex].resolved = resolved;
-        errors[errorIndex].resolvedAt = new Date().toISOString();
+        errors[errorIndex].resolved = Boolean(resolved);
+        errors[errorIndex].resolvedAt = new Date().toISOString()
         errorStore.set(page, errors);
         break;
       }

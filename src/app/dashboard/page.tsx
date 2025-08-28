@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { Calendar, Users, FileText } from "lucide-react";
 import { isUserAdmin } from "@/lib/auth/admin-check";
 import { safeFormatDateTime } from '@/lib/utils/safe-date';
+import Link from 'next/link';
 // Removed DashboardContent for simplicity
 
 export default async function DashboardPage() {
@@ -15,14 +16,14 @@ export default async function DashboardPage() {
   const districtCount = await prisma.district.count();
   
   // Get user with staff information first
-  const userWithStaff = await prisma.user.findUnique({
+  const userWithStaff = await prisma.users.findUnique({
     where: { email: user.email! },
     include: {
-      Staff: {
+      staff: {
         include: {
-          Role: true,
-          Department: true,
-          School: true
+          role: true,
+          department: true,
+          school: true
         }
       }
     },
@@ -54,19 +55,22 @@ export default async function DashboardPage() {
   }
   
   const userId = userWithStaff?.id;
-  const staffId = userWithStaff?.Staff?.[0]?.id;
+  const staffId = userWithStaff?.staff?.[0]?.id;
   
   if (!userId) {
     redirect("/auth/signin");
   }
   
-  // Fetch upcoming meetings for the user
+  // Fetch upcoming meetings for the user (next 7 days)
+  const oneWeekFromNow = new Date();
+  oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
+  
   const upcomingMeetings = staffId ? await prisma.meeting.findMany({
     where: {
       OR: [
         { organizer_id: staffId },
         {
-          MeetingAttendee: {
+          meeting_attendee: {
             some: {
               staff_id: staffId,
               status: "ACCEPTED",
@@ -76,6 +80,7 @@ export default async function DashboardPage() {
       ],
       start_time: {
         gte: new Date(),
+        lte: oneWeekFromNow,
       },
     },
     select: {
@@ -87,10 +92,10 @@ export default async function DashboardPage() {
       status: true,
       organizer_id: true,
       created_at: true,
-      Staff: {
+      staff: {
         select: {
           id: true,
-          User: {
+          users: {
             select: {
               id: true,
               name: true,
@@ -99,15 +104,15 @@ export default async function DashboardPage() {
           }
         }
       },
-      MeetingAttendee: {
+      meeting_attendee: {
         select: {
           id: true,
           staff_id: true,
           status: true,
-          Staff: {
+          staff: {
             select: {
               id: true,
-              User: {
+              users: {
                 select: {
                   id: true,
                   name: true,
@@ -131,11 +136,12 @@ export default async function DashboardPage() {
       where: {
         start_time: {
           gte: new Date(),
+          lte: oneWeekFromNow,
         },
         OR: [
           { organizer_id: staffId },
           {
-            MeetingAttendee: {
+            meeting_attendee: {
               some: {
                 staff_id: staffId,
                 status: "ACCEPTED",
@@ -150,7 +156,7 @@ export default async function DashboardPage() {
         organizer_id: staffId,
       },
     }),
-    prisma.meetingNote.count({
+    prisma.meeting_notes.count({
       where: {
         staff_id: staffId,
       },
@@ -165,7 +171,7 @@ export default async function DashboardPage() {
         OR: [
           { organizer_id: staffId },
           {
-            MeetingAttendee: {
+            meeting_attendee: {
               some: {
                 staff_id: staffId
               }
@@ -178,21 +184,21 @@ export default async function DashboardPage() {
       },
       take: 3,
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         },
         _count: {
           select: {
-            MeetingAgendaItems: true,
-            MeetingAttendee: true
+            meeting_agenda_items: true,
+            meeting_attendee: true
           }
         }
       }
     }),
     // Recent notes
-    prisma.meetingNote.findMany({
+    prisma.meeting_notes.findMany({
       where: {
         staff_id: staffId
       },
@@ -201,7 +207,7 @@ export default async function DashboardPage() {
       },
       take: 3,
       include: {
-        Meeting: true
+        meeting: true
       }
     })
   ]) : [[], []];
@@ -217,13 +223,13 @@ export default async function DashboardPage() {
       {/* Welcome Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground mb-2">Welcome back, {user.name}</h1>
-        {userWithStaff?.Staff?.[0]?.School && (
+        {userWithStaff?.staff?.[0]?.school && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>{userWithStaff.Staff[0].School.name}</span>
-            {userWithStaff.Staff[0].School.address && (
+            <span>{userWithStaff.staff[0].school.name}</span>
+            {userWithStaff.staff[0].school.address && (
               <>
                 <span>•</span>
-                <span>{userWithStaff.Staff[0].School.address}</span>
+                <span>{userWithStaff.staff[0].school.address}</span>
               </>
             )}
           </div>
@@ -252,13 +258,13 @@ export default async function DashboardPage() {
         {/* Left Column - Meetings */}
         <section className="card p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-foreground">Today's Meetings</h2>
-            <a
+            <h2 className="text-xl font-semibold text-foreground">Upcoming Meetings</h2>
+            <Link
               href="/dashboard/meetings"
               className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"
             >
               View all →
-            </a>
+            </Link>
           </div>
           
           <div className="space-y-4">
@@ -285,7 +291,7 @@ export default async function DashboardPage() {
               <div className="text-center py-12">
                 <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">No upcoming meetings scheduled</p>
-                <a
+                <Link
                   href="/dashboard/meetings"
                   className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors"
                 >
@@ -293,7 +299,7 @@ export default async function DashboardPage() {
                     <path d="M11 5h2v14h-2zM5 11h14v2H5z"/>
                   </svg>
                   Schedule Meeting
-                </a>
+                </Link>
               </div>
             )}
           </div>
@@ -310,9 +316,9 @@ export default async function DashboardPage() {
                 <div key={meeting.id} className="p-4 bg-background/30 rounded-lg border border-border/30">
                   <p className="font-medium text-foreground mb-1">{meeting.title}</p>
                   <ul className="text-sm text-muted-foreground space-y-1 pl-4">
-                    <li>• {meeting._count.MeetingAgendaItems} agenda items</li>
-                    <li>• {meeting._count.MeetingAttendee} attendees</li>
-                    <li>• Organized by {meeting.Staff.User.name ?? meeting.Staff.User.email}</li>
+                    <li>• {meeting._count.meeting_agenda_items} agenda items</li>
+                    <li>• {meeting._count.meeting_attendee} attendees</li>
+                    <li>• Organized by {meeting.staff.users.name ?? meeting.staff.users.email}</li>
                   </ul>
                   <div className="text-xs text-muted-foreground mt-3 text-right">
                     {meeting.created_at ? new Date(meeting.created_at).toLocaleString() : 'Recently'}
@@ -331,7 +337,7 @@ export default async function DashboardPage() {
                 <p className="font-medium text-foreground mb-1">Recent Notes</p>
                 <ul className="text-sm text-muted-foreground space-y-1 pl-4">
                   {recentActivity[1].slice(0, 3).map((note) => (
-                    <li key={note.id}>• Note for: {note.Meeting.title}</li>
+                    <li key={note.id}>• Note for: {note.meeting.title}</li>
                   ))}
                 </ul>
                 <div className="text-xs text-muted-foreground mt-3 text-right">
@@ -345,31 +351,31 @@ export default async function DashboardPage() {
           <div className="mt-8 pt-6 border-t border-border/30">
             <h3 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wide">Quick Actions</h3>
             <div className="space-y-3">
-              <a 
+              <Link 
                 href="/dashboard/meetings" 
                 className="flex items-center gap-3 p-3 bg-primary/5 hover:bg-primary/10 rounded-lg transition-colors group"
               >
                 <Calendar className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium text-foreground group-hover:text-primary">Create Meeting</span>
-              </a>
-              <a 
+              </Link>
+              <Link 
                 href="/dashboard/notes" 
                 className="flex items-center gap-3 p-3 bg-background/30 hover:bg-background/50 rounded-lg transition-colors group"
               >
                 <FileText className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
                 <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground">Add Notes</span>
-              </a>
-              <a 
-                href="/dashboard/team" 
+              </Link>
+              <Link 
+                href="/dashboard/teams" 
                 className="flex items-center gap-3 p-3 bg-background/30 hover:bg-background/50 rounded-lg transition-colors group"
               >
                 <Users className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
                 <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground">View Team</span>
-              </a>
+              </Link>
             </div>
           </div>
         </section>
       </div>
     </div>
-  );
+  )
 } 

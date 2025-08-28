@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     
     // Get commit history with stats
     const { stdout } = await execAsync(
-      `git log --pretty=format:'%H|%h|%an|%ar|%s' --stat -n ${__limit}`
+      `git log --pretty=format:'%H|%h|%an|%ar|%s' --stat -n ${limit}`
     );
     
     const commits: Array<{
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       message: string;
       files: number;
       insertions: number;
-      deletions: number;
+      deletions: number
     }> = [];
     const lines = stdout.split('\n');
     
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       message: string;
       files: number;
       insertions: number;
-      deletions: number;
+      deletions: number
     } | null = null;
     
     for (const line of lines) {
@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         error: 'Failed to get commit history',
-        details: error instanceof Error ? error.message : String(error) 
+        details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
     );

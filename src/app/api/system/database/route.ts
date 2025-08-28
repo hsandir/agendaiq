@@ -39,10 +39,9 @@ export async function GET(request: NextRequest) {
       connection_string_template: `postgresql://[username]:[password]@${url?.hostname}:${url.port ?? '5432'}/${url.pathname.substring(1)}`,
       prisma_schema: 'Located at: prisma/schema.prisma',
       tables: [
-        'User', 'District', 'School', 'Department', 'Role', 'Staff',
-        'Meeting', 'MeetingAttendee', 'MeetingNote', 'SystemSetting',
-        'UserSetting', 'ZoomIntegration', 'MeetingAuditLog', 'Account',
-        'Session', 'VerificationToken', 'Device', 'LoginHistory'
+        'users', 'district', 'school', 'department', 'role', 'staff',
+        'meeting', 'meeting_attendee', 'meeting_notes', 'system_settings',
+        'account', 'session', 'verification_token', 'devices'
       ]
     };
 
@@ -56,7 +55,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         error: 'Failed to parse database configuration',
-        details: error instanceof Error ? error.message : String(error) 
+        details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
     );

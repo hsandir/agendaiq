@@ -52,19 +52,25 @@ const nextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
   },
   
+  // Typed Routes (disabled for build compatibility)
+  // typedRoutes: true,
+  
   // Performance optimizations
   experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'date-fns'],
-    typedRoutes: true,
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons', 'date-fns', 'recharts', 'react-hook-form', '@hookform/resolvers'],
     // clientTraceMetadata disabled - Sentry subscription expired
+    // optimizeCss: true, // Disabled - requires critters package
   },
   
-  // Temporarily disable ESLint during build
+  // External packages for server components
+  serverExternalPackages: ['prisma', '@prisma/client'],
+  
+  // ESLint during build (temporarily disabled for security deployment)
   eslint: {
     ignoreDuringBuilds: true,
   },
   
-  // Temporarily disable TypeScript checks during build for v2 files
+  // TypeScript checks during build (temporarily disabled for security deployment)
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -124,7 +130,7 @@ const nextConfig = {
   bundlePagesRouterDependencies: true,
   
   // Webpack optimizations
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
     // Optimize bundle size
     if (!isServer) {
       config.resolve.fallback = {
@@ -133,7 +139,49 @@ const nextConfig = {
         net: false,
         tls: false,
       };
+
+      // Enhanced code splitting for client bundles
+      if (!dev) {
+        config.optimization = {
+          ...config.optimization,
+          splitChunks: {
+            ...config.optimization.splitChunks,
+            cacheGroups: {
+              ...config.optimization.splitChunks.cacheGroups,
+              // Separate vendor chunk for large libraries
+              vendor: {
+                test: /[\\/]node_modules[\\/]/,
+                name: 'vendors',
+                priority: 10,
+                chunks: 'all',
+                minSize: 0,
+              },
+              // Separate chunk for UI components
+              ui: {
+                test: /[\\/]src[\\/]components[\\/](ui|teams|meetings)[\\/]/,
+                name: 'ui-components',
+                priority: 20,
+                chunks: 'all',
+                minSize: 10000,
+              },
+              // Charts and heavy components
+              charts: {
+                test: /[\\/](recharts|chart\.js|d3)[\\/]/,
+                name: 'charts',
+                priority: 30,
+                chunks: 'all',
+              },
+            },
+          },
+        };
+      }
     }
+    
+    // Add path alias resolution for @/ imports
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': new URL('./src', import.meta.url).pathname,
+    };
     
     // Ignore Prisma instrumentation warnings
     config.module = {

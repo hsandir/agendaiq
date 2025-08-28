@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       console.log('📊 Performance Metric:', {
         name: metric.name,
         value: `${metric.value}ms`,
-        timestamp: new Date(metric.timestamp).toLocaleTimeString(),
+        timestamp: new Date(Number(metric.timestamp || Date.now())).toLocaleTimeString(),
         url: metric.url
       });
     }

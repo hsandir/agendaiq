@@ -20,16 +20,15 @@ test.describe('API Performance Tests', () => {
     const responseTimes: number[] = []
 
     // Warm up
-    await request.get('/api/meetings')
-
+    await request.get('/api/meetings');
     // Run performance test
     for (let i = 0; i < iterations; i++) {
-      const start = Date.now()
-      const response = await request.get('/api/meetings')
+      const start = Date.now();
+      const response = await request.get('/api/meetings');
       const duration = Date.now() - start
       
-      expect(response.ok()).toBeTruthy()
-      responseTimes.push(duration)
+      expect(response.ok()).toBeTruthy();
+      responseTimes.push(duration);
     }
 
     // Calculate percentiles
@@ -38,14 +37,13 @@ test.describe('API Performance Tests', () => {
     const p99 = responseTimes[Math.floor(iterations * 0.99)]
     const avg = responseTimes.reduce((a, b) => a + b, 0) / iterations
 
-    console.log(`GET /api/meetings Performance:`)
+    console.log(`GET /api/meetings Performance:`);
     console.log(`  Average: ${avg.toFixed(2)}ms`)
-    console.log(`  P95: ${p95}ms`)
-    console.log(`  P99: ${p99}ms`)
-
+    console.log(`  P95: ${p95}ms`);
+    console.log(`  P99: ${p99}ms`);
     // Assert performance thresholds
-    expect(p95).toBeLessThan(PERFORMANCE_THRESHOLDS.api.p95)
-    expect(p99).toBeLessThan(PERFORMANCE_THRESHOLDS.api.p99)
+    expect(p95).toBeLessThan(PERFORMANCE_THRESHOLDS.api.p95);
+    expect(p99).toBeLessThan(PERFORMANCE_THRESHOLDS.api.p99);
   })
 
   test('POST /api/meetings performance', async ({ request }) => {
@@ -60,18 +58,18 @@ test.describe('API Performance Tests', () => {
     }
 
     for (let i = 0; i < iterations; i++) {
-      const start = Date.now()
+      const start = Date.now();
       const response = await request.post('/api/meetings', {
         data: meetingData,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer test-token',
         }
-      })
+      });
       const duration = Date.now() - start
       
-      expect(response.ok()).toBeTruthy()
-      responseTimes.push(duration)
+      expect(response.ok()).toBeTruthy();
+      responseTimes.push(duration);
     }
 
     responseTimes.sort((a, b) => a - b)
@@ -79,7 +77,7 @@ test.describe('API Performance Tests', () => {
     const p99 = responseTimes[Math.floor(iterations * 0.99)]
 
     expect(p95).toBeLessThan(PERFORMANCE_THRESHOLDS.api.p95 * 1.5) // Allow 50% more time for POST
-    expect(p99).toBeLessThan(PERFORMANCE_THRESHOLDS.api.p99 * 1.5)
+    expect(p99).toBeLessThan(PERFORMANCE_THRESHOLDS.api.p99 * 1.5);
   })
 
   test('Concurrent API requests performance', async ({ request }) => {
@@ -87,19 +85,18 @@ test.describe('API Performance Tests', () => {
     const iterations = 5
 
     for (let i = 0; i < iterations; i++) {
-      const start = Date.now()
-      
+      const start = Date.now();
       // Send concurrent requests
       const promises = Array(concurrentRequests).fill(null).map(() => 
-        request.get('/api/meetings')
+        request.get('/api/meetings');
       )
       
-      const responses = await Promise.all(promises)
+      const responses = await Promise.all(promises);
       const duration = Date.now() - start
       
       // All requests should succeed
       responses.forEach(response => {
-        expect(response.ok()).toBeTruthy()
+        expect(response.ok()).toBeTruthy();
       })
       
       // Average time per request
@@ -107,7 +104,7 @@ test.describe('API Performance Tests', () => {
       console.log(`Concurrent requests (${concurrentRequests}): ${avgTimePerRequest.toFixed(2)}ms per request`)
       
       // Should handle concurrent requests efficiently
-      expect(avgTimePerRequest).toBeLessThan(PERFORMANCE_THRESHOLDS.api.p95 * 2)
+      expect(avgTimePerRequest).toBeLessThan(PERFORMANCE_THRESHOLDS.api.p95 * 2);
     }
   })
 })
@@ -115,16 +112,13 @@ test.describe('API Performance Tests', () => {
 test.describe('Page Load Performance', () => {
   test('Dashboard page performance metrics', async ({ page }) => {
     // Navigate to page
-    await page.goto('/dashboard')
-    
+    await page.goto('/dashboard');
     // Wait for page to be fully loaded
-    await page.waitForLoadState('networkidle')
-    
+    await page.waitForLoadState('networkidle');
     // Get performance metrics
     const metrics = await page.evaluate(() => {
       const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
-      const paint = performance.getEntriesByType('paint')
-      
+      const paint = performance.getEntriesByType('paint');
       return {
         // Navigation timing
         domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
@@ -145,37 +139,34 @@ test.describe('Page Load Performance', () => {
     // Measure LCP
     const lcp = await page.evaluate(() => new Promise<number>(resolve => {
       new PerformanceObserver((list) => {
-        const entries = list.getEntries()
+        const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1] as PerformanceEntry & { startTime: number }
-        resolve(lastEntry.startTime)
-      }).observe({ entryTypes: ['largest-contentful-paint'] })
+        resolve(lastEntry.startTime);
+      }).observe({ entryTypes: ['largest-contentful-paint'] });
     }))
     
-    console.log('Dashboard Performance Metrics:')
+    console.log('Dashboard Performance Metrics:');
     console.log(`  FCP: ${metrics.fcp.toFixed(2)}ms`)
     console.log(`  LCP: ${lcp.toFixed(2)}ms`)
     console.log(`  DOM Content Loaded: ${metrics.domContentLoaded.toFixed(2)}ms`)
-    console.log(`  Resources: ${metrics.resources}`)
+    console.log(`  Resources: ${metrics.resources}`);
     console.log(`  Total Resource Size: ${(metrics.totalResourceSize / 1024 / 1024).toFixed(2)}MB`)
     
     // Assert performance thresholds
-    expect(metrics.fcp).toBeLessThan(PERFORMANCE_THRESHOLDS.page.fcp)
-    expect(lcp).toBeLessThan(PERFORMANCE_THRESHOLDS.page.lcp)
+    expect(metrics.fcp).toBeLessThan(PERFORMANCE_THRESHOLDS.page.fcp);
+    expect(lcp).toBeLessThan(PERFORMANCE_THRESHOLDS.page.lcp);
   })
 
   test('Meeting list page with data performance', async ({ page }) => {
-    await page.goto('/dashboard/meetings')
-    
+    await page.goto('/dashboard/meetings');
     // Measure time to interactive
-    const start = Date.now()
-    await page.waitForSelector('[data-testid="meeting-card"]')
+    const start = Date.now();
+    await page.waitForSelector('[data-testid="meeting-card"]');
     const timeToInteractive = Date.now() - start
     
-    console.log(`Meeting List Time to Interactive: ${timeToInteractive}ms`)
-    
+    console.log(`Meeting List Time to Interactive: ${timeToInteractive}ms`);
     // Should be interactive quickly
-    expect(timeToInteractive).toBeLessThan(3000)
-    
+    expect(timeToInteractive).toBeLessThan(3000);
     // Check for layout shifts
     const cls = await page.evaluate(() => {
       return new Promise<number>(resolve => {
@@ -186,21 +177,20 @@ test.describe('Page Load Performance', () => {
               cls += (entry as PerformanceEntry & { value: number }).value
             }
           }
-          resolve(cls)
-        }).observe({ entryTypes: ['layout-shift'] })
-        
+          resolve(cls);
+        }).observe({ entryTypes: ['layout-shift'] });
         // Wait a bit for any layout shifts
         setTimeout(() => resolve(cls), 2000)
       })
     })
     
-    console.log(`Cumulative Layout Shift: ${cls}`)
-    expect(cls).toBeLessThan(PERFORMANCE_THRESHOLDS.page.cls)
+    console.log(`Cumulative Layout Shift: ${cls}`);
+    expect(cls).toBeLessThan(PERFORMANCE_THRESHOLDS.page.cls);
   })
 
   test('Memory usage during navigation', async ({ page }) => {
     if (!page.context().browser()?.browserType().name().includes('chromium')) {
-      test.skip()
+      test.skip();
       return
     }
 
@@ -208,15 +198,14 @@ test.describe('Page Load Performance', () => {
     const memorySnapshots: number[] = []
 
     for (const url of pages) {
-      await page.goto(url)
-      await page.waitForLoadState('networkidle')
-      
+      await page.goto(url);
+      await page.waitForLoadState('networkidle');
       // Get memory usage
       const metrics = await page.evaluate(() => {
         return (performance as Performance & { memory?: { usedJSHeapSize?: number } }).memory?.usedJSHeapSize ?? 0
       })
       
-      memorySnapshots.push(metrics)
+      memorySnapshots.push(metrics);
       console.log(`Memory usage at ${url}: ${(metrics / 1024 / 1024).toFixed(2)}MB`)
     }
 
@@ -227,7 +216,7 @@ test.describe('Page Load Performance', () => {
     console.log(`Memory growth: ${(memoryGrowth / 1024 / 1024).toFixed(2)}MB (${growthPercentage.toFixed(2)}%)`)
     
     // Memory growth should be reasonable (less than 50%)
-    expect(growthPercentage).toBeLessThan(50)
+    expect(growthPercentage).toBeLessThan(50);
   })
 })
 
@@ -239,24 +228,24 @@ test.describe('Load Testing', () => {
 
     // Create multiple browser contexts (users)
     for (let i = 0; i < userCount; i++) {
-      const context = await browser.newContext()
-      const page = await context.newPage()
-      contexts.push(context)
-      pages.push(page)
+      const context = await browser.newContext();
+      const page = await context.newPage();
+      contexts.push(context);
+      pages.push(page);
     }
 
     // All users navigate simultaneously
-    const start = Date.now()
+    const start = Date.now();
     await Promise.all(pages.map(page => page.goto('/dashboard/meetings')))
     const loadTime = Date.now() - start
 
-    console.log(`${userCount} concurrent users load time: ${loadTime}ms`)
+    console.log(`${userCount} concurrent users load time: ${loadTime}ms`);
     console.log(`Average per user: ${(loadTime / userCount).toFixed(2)}ms`)
 
     // Clean up
     await Promise.all(contexts.map(context => context.close()))
 
     // Should handle concurrent users efficiently
-    expect(loadTime / userCount).toBeLessThan(3000)
+    expect(loadTime / userCount).toBeLessThan(3000);
   })
 })

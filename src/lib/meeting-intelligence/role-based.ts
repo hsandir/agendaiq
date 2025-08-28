@@ -11,9 +11,9 @@ export class RoleBasedAssignmentService {
   static async handleRoleTransition(data: RoleTransitionData) {
     return await prisma.$transaction(async (tx) => {
       // Create transition record
-      const transition = await tx.roleTransition.create({
+      const transition = await tx.role_transitions.create({
         data: {
-          role_id: parseInt(data).roleId,
+          role_id: data.roleId,
           from_staff_id: data.fromStaffId,
           to_staff_id: data.toStaffId,
           pending_tasks: data.pendingTasks,
@@ -24,9 +24,9 @@ export class RoleBasedAssignmentService {
       });
 
       // Transfer agenda items assigned to role
-      await tx.meetingAgendaItem.updateMany({
+      await tx.meeting_agenda_items.updateMany({
         where: {
-          responsible_role_id: parseInt(data).roleId,
+          responsible_role_id: data.roleId,
           responsible_staff_id: data.fromStaffId,
           status: {
             in: ['Pending', 'Ongoing', 'Deferred']
@@ -38,7 +38,7 @@ export class RoleBasedAssignmentService {
       });
 
       // Transfer action items assigned to role
-      await tx.meetingActionItem.updateMany({
+      await tx.meeting_action_items.updateMany({
         where: {
           assigned_to_role: data.roleId,
           assigned_to: data.fromStaffId,
@@ -53,13 +53,13 @@ export class RoleBasedAssignmentService {
 
       // Get summary of transferred items
       const [transferredAgendaItems, transferredActionItems] = await Promise.all([
-        tx.meetingAgendaItem.count({
+        tx.meeting_agenda_items.count({
           where: {
-            responsible_role_id: parseInt(data).roleId,
+            responsible_role_id: data.roleId,
             responsible_staff_id: data.toStaffId
           }
         }),
-        tx.meetingActionItem.count({
+        tx.meeting_action_items.count({
           where: {
             assigned_to_role: data.roleId,
             assigned_to: data.toStaffId
@@ -99,23 +99,23 @@ export class RoleBasedAssignmentService {
         };
 
     const [agendaItems, actionItems] = await Promise.all([
-      prisma.meetingAgendaItem.findMany({
+      prisma.meeting_agenda_items.findMany({
         where: {
-          responsible_role_id: parseInt(roleId),
+          responsible_role_id: roleId,
           ...agendaStatusFilter
         },
         include: {
-          Meeting: {
+          meeting: {
             select: {
               id: true,
               title: true,
               start_time: true
             }
           },
-          ResponsibleStaff: {
+          staff: {
             select: {
               id: true,
-              User: {
+              users: {
                 select: {
                   name: true,
                   email: true
@@ -130,23 +130,23 @@ export class RoleBasedAssignmentService {
         ]
       }),
       
-      prisma.meetingActionItem.findMany({
+      prisma.meeting_action_items.findMany({
         where: {
           assigned_to_role: roleId,
           ...actionStatusFilter
         },
         include: {
-          Meeting: {
+          meeting: {
             select: {
               id: true,
               title: true,
               start_time: true
             }
           },
-          AssignedTo: {
+          staff_meeting_action_items_assigned_toTostaff: {
             select: {
               id: true,
-              User: {
+              users: {
                 select: {
                   name: true,
                   email: true
@@ -180,7 +180,7 @@ export class RoleBasedAssignmentService {
     // Get current role holder
     const currentRoleHolder = await prisma.staff.findFirst({
       where: {
-        role_id: parseInt(roleId),
+        role_id: roleId,
         is_active: true
       },
       orderBy: {
@@ -193,15 +193,15 @@ export class RoleBasedAssignmentService {
     }
 
     if (taskType === 'agenda') {
-      return await prisma.meetingAgendaItem.update({
+      return await prisma.meeting_agenda_items.update({
         where: { id: taskId },
         data: {
-          responsible_role_id: parseInt(roleId),
+          responsible_role_id: roleId,
           responsible_staff_id: currentRoleHolder.id
         }
       });
     } else {
-      return await prisma.meetingActionItem.update({
+      return await prisma.meeting_action_items.update({
         where: { id: taskId },
         data: {
           assigned_to_role: roleId,
@@ -215,12 +215,12 @@ export class RoleBasedAssignmentService {
    * Get role transition history
    */
   static async getRoleTransitionHistory(roleId: number) {
-    return await prisma.roleTransition.findMany({
-      where: { role_id: parseInt(roleId) },
+    return await prisma.role_transitions.findMany({
+      where: { role_id: roleId },
       include: {
-        FromStaff: {
+        staff_role_transitions_from_staff_idTostaff: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true,
                 email: true
@@ -228,9 +228,9 @@ export class RoleBasedAssignmentService {
             }
           }
         },
-        ToStaff: {
+        staff_role_transitions_to_staff_idTostaff: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true,
                 email: true
@@ -238,7 +238,7 @@ export class RoleBasedAssignmentService {
             }
           }
         },
-        Role: true
+        role: true
       },
       orderBy: {
         transition_date: 'desc'
@@ -253,7 +253,7 @@ export class RoleBasedAssignmentService {
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + days);
 
-    return await prisma.meetingActionItem.findMany({
+    return await prisma.meeting_action_items.findMany({
       where: {
         assigned_to_role: roleId,
         status: {
@@ -265,14 +265,14 @@ export class RoleBasedAssignmentService {
         }
       },
       include: {
-        Meeting: {
+        meeting: {
           select: {
             title: true
           }
         },
-        AssignedTo: {
+        staff_meeting_action_items_assigned_toTostaff: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true
               }
@@ -301,7 +301,7 @@ export class RoleBasedAssignmentService {
       };
 
       if (taskIds.agendaItems && taskIds.agendaItems.length > 0) {
-        const agendaUpdate = await tx.meetingAgendaItem.updateMany({
+        const agendaUpdate = await tx.meeting_agenda_items.updateMany({
           where: {
             id: { in: taskIds.agendaItems },
             responsible_staff_id: fromStaffId
@@ -314,7 +314,7 @@ export class RoleBasedAssignmentService {
       }
 
       if (taskIds.actionItems && taskIds.actionItems.length > 0) {
-        const actionUpdate = await tx.meetingActionItem.updateMany({
+        const actionUpdate = await tx.meeting_action_items.updateMany({
           where: {
             id: { in: taskIds.actionItems },
             assigned_to: fromStaffId

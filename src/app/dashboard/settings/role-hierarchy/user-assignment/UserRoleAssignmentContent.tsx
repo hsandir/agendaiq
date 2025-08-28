@@ -13,11 +13,11 @@ interface User {
     id: string;
     Role?: {
       id: number;
-      title: string;
+      title: string
     };
     Department?: {
       id: number;
-      name: string;
+      name: string
     };
   }>;
 }
@@ -27,13 +27,13 @@ interface Role {
   title: string;
   Department?: {
     id: number;
-    name: string;
+    name: string
   };
 }
 
 interface Department {
   id: number;
-  name: string;
+  name: string
 }
 
 export default function UserRoleAssignmentContent() {
@@ -72,7 +72,7 @@ export default function UserRoleAssignmentContent() {
       const [usersRes, rolesRes, departmentsRes] = await Promise.all([
         fetch('/api/users'),
         fetch('/api/roles'),
-        fetch('/api/departments')
+        fetch('/api/departments'),
       ]);
 
       if (usersRes.ok) {
@@ -111,14 +111,14 @@ export default function UserRoleAssignmentContent() {
     // Filter by role
     if (roleFilter) {
       filtered = filtered.filter(user => 
-        user.Staff?.some(staff => staff.Role?.title === roleFilter)
+        (user as any).Staff?.some((staff: any) => staff.role?.title === roleFilter)
       );
     }
 
     // Filter by department
     if (departmentFilter) {
       filtered = filtered.filter(user => 
-        user.Staff?.some(staff => staff.Department?.name === departmentFilter)
+        (user as any).Staff?.some((staff: any) => staff.department?.name === departmentFilter)
       );
     }
 
@@ -364,13 +364,13 @@ export default function UserRoleAssignmentContent() {
                 </div>
                 
                 <div className="flex items-center space-x-4">
-                  {user.Staff && user.Staff.length > 0 && (
+                  {(user as any).Staff && (user as any).Staff.length > 0 && (
                     <div className="text-right">
                       <div className="text-sm font-medium text-foreground">
-                        {user.Staff[0].Role?.title || 'No Role'}
+                        {(user as any).Staff[0].role?.title || 'No Role'}
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {user.Staff[0].Department?.name || 'No Department'}
+                        {(user as any).Staff[0].department?.name || 'No Department'}
                       </div>
                     </div>
                   )}

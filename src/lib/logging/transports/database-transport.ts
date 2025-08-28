@@ -3,7 +3,7 @@
  * Stores logs in PostgreSQL database with full querying support
  */
 
-import { LogTransport, LogLevel, BaseLogEntry, DevLogEntry, AuditLogEntry, LogQuery, LogStats } from '../types';
+import { LogTransport, LogLevel, BaseLogEntry, DevLogEntry, AuditLogEntry, LogQuery, LogStats, DevLogCategory, AuditLogCategory } from '../types';
 import { prisma } from '@/lib/prisma';
 
 export class DatabaseTransport implements LogTransport {
@@ -11,12 +11,155 @@ export class DatabaseTransport implements LogTransport {
   level: LogLevel;
 
   constructor(level: LogLevel = LogLevel.INFO) {
-    this.level = level;
+    this.level = level
+  }
+
+  private mapLogLevelToPrisma(level: LogLevel) {
+    switch (level) {
+      case LogLevel.TRACE: return 'TRACE';
+      case LogLevel.DEBUG: return 'DEBUG';
+      case LogLevel.INFO: return 'INFO';
+      case LogLevel.WARN: return 'WARN';
+      case LogLevel.ERROR: return 'ERROR';
+      case LogLevel.FATAL: return 'FATAL';
+      default: return 'INFO';
+    }
+  }
+
+  private mapDevLogCategory(category: string) {
+    switch (category.toLowerCase()) {
+      case 'system': return 'system';
+      case 'database': return 'database';
+      case 'api': return 'api';
+      case 'auth': return 'auth';
+      case 'performance': return 'performance';
+      case 'error': return 'error';
+      case 'network': return 'network';
+      case 'cache': return 'cache';
+      case 'external': return 'external';
+      case 'build': return 'build';
+      default: return 'system';
+    }
+  }
+
+  private mapAuditLogCategory(category: string) {
+    switch (category.toLowerCase()) {
+      case 'login_attempt': return 'login_attempt';
+      case 'data_access': return 'data_access';
+      case 'data_modification': return 'data_modification';
+      case 'admin_action': return 'admin_action';
+      case 'security_violation': return 'security_violation';
+      case 'user_action': return 'user_action';
+      case 'permission_check': return 'permission_check';
+      case 'compliance': return 'compliance';
+      case 'export': return 'export';
+      case 'import': return 'import';
+      default: return 'security_violation';
+    }
+  }
+
+  private mapPrismaToLogLevel(prismaLevel: string): LogLevel {
+    switch (prismaLevel) {
+      case 'TRACE': return LogLevel.TRACE;
+      case 'DEBUG': return LogLevel.DEBUG;
+      case 'INFO': return LogLevel.INFO;
+      case 'WARN': return LogLevel.WARN;
+      case 'ERROR': return LogLevel.ERROR;
+      case 'FATAL': return LogLevel.FATAL;
+      default: return LogLevel.INFO;
+    }
+  }
+
+  private mapPrismaToDevLogCategory(prismaCategory: string): DevLogCategory {
+    switch (prismaCategory) {
+      case 'system': return DevLogCategory.SYSTEM;
+      case 'database': return DevLogCategory.DATABASE;
+      case 'api': return DevLogCategory.API;
+      case 'auth': return DevLogCategory.AUTH;
+      case 'performance': return DevLogCategory.PERFORMANCE;
+      case 'error': return DevLogCategory.ERROR;
+      case 'network': return DevLogCategory.NETWORK;
+      case 'cache': return DevLogCategory.CACHE;
+      case 'external': return DevLogCategory.EXTERNAL;
+      case 'build': return DevLogCategory.BUILD;
+      default: return DevLogCategory.SYSTEM;
+    }
+  }
+
+  private mapPrismaToAuditLogCategory(prismaCategory: string): AuditLogCategory {
+    switch (prismaCategory) {
+      case 'login_attempt': return AuditLogCategory.LOGIN_ATTEMPT;
+      case 'data_access': return AuditLogCategory.DATA_ACCESS;
+      case 'data_modification': return AuditLogCategory.DATA_MODIFICATION;
+      case 'admin_action': return AuditLogCategory.ADMIN_ACTION;
+      case 'security_violation': return AuditLogCategory.SECURITY_VIOLATION;
+      case 'user_action': return AuditLogCategory.USER_ACTION;
+      case 'permission_check': return AuditLogCategory.PERMISSION_CHECK;
+      case 'compliance': return AuditLogCategory.COMPLIANCE;
+      case 'export': return AuditLogCategory.EXPORT;
+      case 'import': return AuditLogCategory.IMPORT;
+      default: return AuditLogCategory.SECURITY_VIOLATION;
+    }
+  }
+
+  private validateEnvironment(env: string): 'development' | 'staging' | 'production' {
+    switch (env) {
+      case 'development': return 'development';
+      case 'staging': return 'staging'; 
+      case 'production': return 'production';
+      default: return 'development';
+    }
+  }
+
+  private buildDevLogsWhere(query: LogQuery): object {
+    return {
+      ...(query.level && query.level.length > 0 && {
+        level: { in: query.level.map(level => this.mapLogLevelToPrisma(level)) }
+      }),
+      ...((query.startDate || query.endDate) && {
+        timestamp: {
+          ...(query.startDate && { gte: query.startDate }),
+          ...(query.endDate && { lte: query.endDate })
+        }
+      }),
+      ...(query.userId && {
+        user_id: Number(query.userId) || undefined
+      }),
+      ...(query.search && {
+        message: { contains: query.search, mode: 'insensitive' }
+      }),
+      ...(query.category && {
+        category: { in: query.category }
+      })
+    };
+  }
+
+  private buildSecurityLogsWhere(query: LogQuery): object {
+    return {
+      ...(query.level && query.level.length > 0 && {
+        level: { in: query.level.map(level => this.mapLogLevelToPrisma(level)) }
+      }),
+      ...((query.startDate || query.endDate) && {
+        timestamp: {
+          ...(query.startDate && { gte: query.startDate }),
+          ...(query.endDate && { lte: query.endDate })
+        }
+      }),
+      ...(query.userId && {
+        user_id: Number(query.userId) || undefined
+      }),
+      ...(query.search && {
+        message: { contains: query.search, mode: 'insensitive' }
+      }),
+      ...(query.category && {
+        category: { in: query.category }
+      })
+    };
   }
 
   async write(entry: BaseLogEntry): Promise<void> {
     if (entry.level < this.level) {
-      return;
+      return
     }
 
     try {
@@ -36,13 +179,13 @@ export class DatabaseTransport implements LogTransport {
   }
 
   private async writeDevLog(entry: DevLogEntry): Promise<void> {
-    await prisma.devLog.create({
+    await prisma.dev_logs.create({
       data: {
         id: entry.id,
         timestamp: new Date(entry.timestamp),
-        level: entry.level,
+        level: this.mapLogLevelToPrisma(entry.level),
         message: entry.message,
-        category: entry.category,
+        category: this.mapDevLogCategory(entry.category),
         component: entry.component,
         function: entry.function,
         file: entry.file,
@@ -52,94 +195,68 @@ export class DatabaseTransport implements LogTransport {
         context: entry.context ? JSON.stringify(entry.context) : null,
         metadata: entry.metadata ? JSON.stringify(entry.metadata) : null,
         performance: entry.performance ? JSON.stringify(entry.performance) : null,
-        userId: entry.context?.userId ? parseInt(entry.context.userId) : null,
-        staffId: entry.context?.staffId ? parseInt(entry.context.staffId) : null,
-        sessionId: entry.context?.sessionId,
-        userAgent: entry.context?.userAgent,
+        user_id: entry.context?.userId ? Number(entry.context.userId) || null : null,
+        staff_id: entry.context?.staffId ? Number(entry.context.staffId) || null : null,
+        session_id: entry.context?.sessionId,
+        user_agent: entry.context?.userAgent,
         ip: entry.context?.ip,
         path: entry.context?.path,
         method: entry.context?.method,
-        statusCode: entry.context?.statusCode,
-        duration: entry.context?.duration
+        status_code: entry.context?.statusCode,
+        duration: entry.context?.duration,
+        created_at: new Date(),
+        updated_at: new Date()
       }
     });
   }
 
   private async writeAuditLog(entry: AuditLogEntry): Promise<void> {
-    await prisma.securityLog.create({
+    await prisma.security_logs.create({
       data: {
         id: entry.id,
         timestamp: new Date(entry.timestamp),
-        level: entry.level,
+        level: this.mapLogLevelToPrisma(entry.level),
         message: entry.message,
-        category: entry.category,
+        category: this.mapAuditLogCategory(entry.category),
         action: entry.action,
         result: entry.result,
-        riskLevel: entry.riskLevel,
+        risk_level: entry.riskLevel,
         actor: JSON.stringify(entry.actor),
         target: entry.target ? JSON.stringify(entry.target) : null,
         context: entry.context ? JSON.stringify(entry.context) : null,
         metadata: entry.metadata ? JSON.stringify(entry.metadata) : null,
         compliance: entry.compliance ? JSON.stringify(entry.compliance) : null,
         location: entry.location ? JSON.stringify(entry.location) : null,
-        userId: parseInt(entry.actor.userId),
-        staffId: entry.actor.staffId ? parseInt(entry.actor.staffId) : null,
-        userAgent: entry.context?.userAgent,
+        user_id: Number(entry.actor.userId) || 0,
+        staff_id: entry.actor.staffId ? Number(entry.actor.staffId) || null : null,
+        user_agent: entry.context?.userAgent,
         ip: entry.context?.ip,
         path: entry.context?.path,
-        method: entry.context?.method
+        method: entry.context?.method,
+        created_at: new Date(),
+        updated_at: new Date()
       }
     });
   }
 
   async query(query: LogQuery): Promise<BaseLogEntry[]> {
-    const where: Record<string, unknown> = {};
-
-    // Filter by level
-    if (query.level && query.level.length > 0) {
-      where.level = { in: query.level };
-    }
-
-    // Filter by date range
-    if (query.startDate ?? query.endDate) {
-      where.timestamp = {};
-      if (query.startDate) where.timestamp.gte = query.startDate;
-      if (query.endDate) where.timestamp.lte = query.endDate;
-    }
-
-    // Filter by user
-    if (query.userId) {
-      where.userId = query.userId;
-    }
-
-    // Search in message
-    if (query.search) {
-      where.message = { contains: query.search, mode: 'insensitive' };
-    }
-
     const orderBy = {
       [query.orderBy ?? 'timestamp']: query.orderDirection ?? 'desc'
     };
 
     try {
-      // Query both dev and audit logs
+      // Query both dev and audit logs with type-safe where builders
       const [devLogs, auditLogs] = await Promise.all([
         // Query development logs
-        prisma.devLog.findMany({
-          where: {
-            ...where,
-            ...(query.category ? { category: { in: query.category } } : {})
-          },
+        prisma.dev_logs.findMany({
+          where: this.buildDevLogsWhere(query),
           orderBy,
           take: query.limit ?? 100,
           skip: query.offset ?? 0
         }),
-        // Query audit logs
-        prisma.securityLog.findMany({
-          where: {
-            ...where,
-            ...(query.category ? { category: { in: query.category } } : {})
-          },
+        // Query audit logs  
+        prisma.security_logs.findMany({
+          where: this.buildSecurityLogsWhere(query),
           orderBy,
           take: query.limit ?? 100,
           skip: query.offset ?? 0
@@ -151,30 +268,30 @@ export class DatabaseTransport implements LogTransport {
         ...devLogs.map(log => ({
           id: log.id,
           timestamp: log.timestamp.toISOString(),
-          level: log.level as unknown as LogLevel,
+          level: this.mapPrismaToLogLevel(log.level),
           message: log.message,
           metadata: log.metadata ? JSON.parse(log.metadata) : undefined,
           context: log.context ? JSON.parse(log.context) : undefined,
-          category: log.category,
-          component: log.component,
-          function: log.function,
-          file: log.file,
-          line: log.line,
-          stack: log.stack,
-          environment: log.environment,
+          category: this.mapPrismaToDevLogCategory(log.category),
+          component: log.component ?? undefined,
+          function: log.function ?? undefined,
+          file: log.file ?? undefined,
+          line: log.line ?? undefined,
+          stack: log.stack ?? undefined,
+          environment: this.validateEnvironment(log.environment),
           performance: log.performance ? JSON.parse(log.performance) : undefined
         } satisfies DevLogEntry)),
         ...auditLogs.map(log => ({
           id: log.id,
           timestamp: log.timestamp.toISOString(),
-          level: log.level as unknown as LogLevel,
+          level: this.mapPrismaToLogLevel(log.level),
           message: log.message,
           metadata: log.metadata ? JSON.parse(log.metadata) : undefined,
           context: log.context ? JSON.parse(log.context) : undefined,
-          category: log.category,
+          category: this.mapPrismaToAuditLogCategory(log.category),
           action: log.action,
           result: log.result,
-          riskLevel: log.riskLevel,
+          risk_level: log.risk_level,
           actor: JSON.parse(log.actor),
           target: log.target ? JSON.parse(log.target) : undefined,
           compliance: log.compliance ? JSON.parse(log.compliance) : undefined,
@@ -199,7 +316,7 @@ export class DatabaseTransport implements LogTransport {
   async stats(): Promise<LogStats> {
     try {
       const [devStats, auditStats] = await Promise.all([
-        prisma.devLog.groupBy({
+        prisma.dev_logs.groupBy({
           by: ['level'],
           _count: { id: true },
           where: {
@@ -208,7 +325,7 @@ export class DatabaseTransport implements LogTransport {
             }
           }
         }),
-        prisma.securityLog.groupBy({
+        prisma.security_logs.groupBy({
           by: ['level'],
           _count: { id: true },
           where: {
@@ -229,7 +346,7 @@ export class DatabaseTransport implements LogTransport {
       };
 
       [...devStats, ...auditStats].forEach(stat => {
-        logsByLevel[stat.level as unknown as LogLevel] += stat._count.id;
+        logsByLevel[this.mapPrismaToLogLevel(stat.level)] += stat._count.id;
       });
 
       const totalLogs = Object.values(logsByLevel).reduce((sum, count) => sum + count, 0);

@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get layout preference using Prisma client (avoids case/permission issues)
-    const userData = await prisma.user.findUnique({
+    const userData = await prisma.users.findUnique({
       where: { id: user.id },
       select: { layout_preference: true },
     });
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/user/layout - Update user's layout preference (for compatibility)
 export async function POST(request: NextRequest) {
-  return PUT(request);
+  return PUT(request)
 }
 
 // PUT /api/user/layout - Update user's layout preference
@@ -81,14 +81,14 @@ export async function PUT(request: NextRequest) {
   const user = auth.user;
 
   try {
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const validatedData = layoutSchema.parse(body);
     
     // Use layoutId if provided, otherwise use layout
     const layoutToSave = validatedData.layoutId ?? validatedData.layout ?? 'modern';
 
     // Update user's layout preference (optimized query)
-    await prisma.user.update({
+    await prisma.users.update({
       where: { id: user.id },
       data: { layout_preference: layoutToSave },
       select: { id: true }, // Only select what we need
@@ -103,7 +103,7 @@ export async function PUT(request: NextRequest) {
       recordId: user.id.toString(),
       operation: 'UPDATE',
       userId: user.id,
-      staffId: user.staff?.id ?? undefined,
+      staffId: (user.staff as { id?: number })?.id || undefined,
       source: 'WEB_UI',
       description: `Layout changed to ${layoutToSave}`,
     }).catch(err => console.error('Audit log failed:', err));

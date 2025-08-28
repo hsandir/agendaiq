@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const { userId, roleId } = body;
 
     if (!userId || !roleId) {
@@ -36,13 +36,13 @@ export async function POST(request: NextRequest) {
     // Update the staff record's role
     await prisma.staff.update({
       where: { id: userStaff?.id },
-      data: { role_id: parseInt(roleId) },
+      data: { role_id: parseInt(roleId as string) },
     });
 
     // Get updated user with staff
-    const updatedUser = await prisma.user.findUnique({
-      where: { id: userId },
-      include: { Staff: { include: { Role: true, Department: true } } },
+    const updatedUser = await prisma.users.findUnique({
+      where: { id: userId as number },
+      include: { staff: { include: { role: true, department: true } } },
     });
 
     return NextResponse.json(updatedUser);

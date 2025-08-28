@@ -45,8 +45,8 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category') as AuditCategory | null;
     const userId = searchParams.get('userId') ? Number(searchParams.get('userId')) : undefined;
     const staffId = searchParams.get('staffId') ? Number(searchParams.get('staffId')) : undefined;
-    const startDate = searchParams.get('startDate') ? new Date(searchParams.get('startDate')!) : undefined;
-    const endDate = searchParams.get('endDate') ? new Date(searchParams.get('endDate')!) : undefined;
+    const startDate = searchParams.get('startDate') ? new Date(searchParams.get('startDate') as string) : undefined;
+    const endDate = searchParams.get('endDate') ? new Date(searchParams.get('endDate') as string) : undefined;
     const maxRecords = Math.min(10000, parseInt(searchParams.get('maxRecords') ?? '1000'));
 
     if (!['csv', 'json'].includes(format)) {
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       if (logType === 'critical') {
         data = criticalLogs;
       } else {
-        data.push(...criticalLogs.map(log => ({ ...log, source: 'critical' })));
+        data.push(...(criticalLogs as SortableAuditRecord[]).map(log => ({ ...log, source: 'critical' })));
       }
     }
 
@@ -78,8 +78,8 @@ export async function GET(request: NextRequest) {
       const processedLegacyLogs = legacyLogs.map(log => ({
         ...log,
         created_at: log.created_at instanceof Date ? log.created_at.toISOString() : log?.created_at,
-        User: log.User ?? undefined,
-        Staff: log.Staff ?? undefined
+        users: log.users ?? undefined,
+        staff: log.staff ?? undefined
       })) as SortableAuditRecord[];
 
       if (logType === 'legacy') {
@@ -130,7 +130,7 @@ export async function GET(request: NextRequest) {
 
       const csvRows = data.map((log: SortableAuditRecord) => {
         const timestamp = new Date(log.timestamp ?? log.created_at ?? '').toISOString();
-        const type = log?.source || (log.category ? 'critical' : 'legacy');
+        const type = log?.source ?? (log.category ? 'critical' : 'legacy');
         const categoryOrTable = log.category ?? log.table_name ?? '';
         const actionOrOperation = log.action ?? log.operation ?? '';
         const userEmail = log.User?.email ?? '';

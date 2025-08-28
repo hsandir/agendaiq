@@ -63,9 +63,10 @@ function generateSampleLogs(): LiveLogEvent[] {
     logs.push({
       id: `log-${now}-${i}`,
       timestamp: new Date(now - Math.floor(Math.random() * 60000)).toISOString(), // Within last minute
-      severity,
-      source,
-      category,
+      severity: severity === 'error' ? 'critical' : severity === 'warning' ? 'high' : severity === 'info' ? 'medium' : 'low',
+      source: source === 'client' || source === 'database' || source === 'api' || source === 'server' ? 'dev' : 'audit',
+      category: 'GENERAL' as any,
+      level: severity as any,
       message,
       metadata: {
         userId: Math.random() > 0.5 ? `user-${Math.floor(Math.random() * 100)}` : undefined,

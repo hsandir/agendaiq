@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default async function MeetingLivePage(props: Props) {
-  const params = await props.params;
+  const params = await (props as unknown as { params: Promise<{ id: string }> }).params;
   const user = await requireAuth(AuthPresets.requireStaff);
   
   if (!params?.id) {
@@ -26,13 +26,13 @@ export default async function MeetingLivePage(props: Props) {
   const meeting = await prisma.meeting.findUnique({
     where: { id: meetingId },
     include: {
-      Department: true,
-      District: true,
-      School: true,
-      Staff: {
+      department: true,
+      district: true,
+      school: true,
+      staff: {
         include: {
-          User: true,
-          Role: true
+          users: true,
+          role: true
         }
       }
     }
@@ -43,7 +43,7 @@ export default async function MeetingLivePage(props: Props) {
   }
 
   // Check if user is authorized - do a separate simple query
-  const attendeeCheck = await prisma.meetingAttendee.findFirst({
+  const attendeeCheck = await prisma.meeting_attendee.findFirst({
     where: {
       meeting_id: meetingId,
       staff_id: user.staff?.id || -1
@@ -58,74 +58,121 @@ export default async function MeetingLivePage(props: Props) {
     notFound();
   }
 
-  // Fetch attendees separately with less nesting
-  const attendees = await prisma.meetingAttendee.findMany({
-    where: { meeting_id: meetingId },
-    include: {
-      Staff: {
-        include: {
-          User: true,
-          Role: true,
-          Department: true
+  // Fetch all meeting data in one optimized query using Promise.all
+  const [attendees, agendaItems, actionItems] = await Promise.all([
+    // Fetch attendees with minimal required data
+    prisma.meeting_attendee.findMany({
+      where: { meeting_id: meetingId },
+      select: {
+        id: true,
+        status: true,
+        staff_id: true,
+        staff: {
+          select: {
+            id: true,
+            users: {
+              select: { id: true, name: true, email: true }
+            },
+            role: {
+              select: { id: true, title: true }
+            },
+            department: {
+              select: { id: true, name: true }
+            }
+          }
         }
       }
-    }
-  });
+    }),
 
-  // Fetch agenda items separately with less nesting
-  const agendaItems = await prisma.meetingAgendaItem.findMany({
-    where: { meeting_id: meetingId },
-    select: {
-      id: true,
-      topic: true,
-      problem_statement: true,
-      staff_initials: true,
-      order_index: true,
-      status: true,
-      responsible_staff_id: true,
-      duration_minutes: true,
-      priority: true,
-      purpose: true,
-      ResponsibleStaff: {
-        include: {
-          User: true
+    // Fetch agenda items with minimal data
+    prisma.meeting_agenda_items.findMany({
+      where: { meeting_id: meetingId },
+      select: {
+        id: true,
+        topic: true,
+        problem_statement: true,
+        proposed_solution: true,
+        decisions_actions: true,
+        solution_type: true,
+        decision_type: true,
+        future_implications: true,
+        staff_initials: true,
+        order_index: true,
+        status: true,
+        responsible_staff_id: true,
+        duration_minutes: true,
+        priority: true,
+        purpose: true,
+        created_at: true,
+        updated_at: true,
+        staff: {
+          select: {
+            id: true,
+            users: { select: { id: true, name: true, email: true } }
+          }
+        },
+        agenda_item_comments: {
+          select: {
+            id: true,
+            comment: true,
+            created_at: true,
+            staff: {
+              select: {
+                users: { select: { id: true, name: true, email: true } }
+              }
+            }
+          },
+          orderBy: { created_at: 'desc' },
+          take: 10
+        },
+        _count: {
+          select: {
+            agenda_item_comments: true,
+            meeting_action_items: true
+          }
         }
       },
-      _count: {
-        select: {
-          Comments: true,
-          ActionItems: true
-        }
-      }
-    },
-    orderBy: {
-      order_index: 'asc'
-    }
-  });
+      orderBy: { order_index: 'asc' },
+      take: 50 // Limit for performance
+    }),
 
-  // Fetch action items separately
-  const actionItems = await prisma.meetingActionItem.findMany({
-    where: { meeting_id: meetingId },
-    include: {
-      AssignedTo: {
-        include: {
-          User: true,
-          Role: true
+    // Fetch action items with minimal data
+    prisma.meeting_action_items.findMany({
+      where: { meeting_id: meetingId },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        status: true,
+        priority: true,
+        due_date: true,
+        created_at: true,
+        updated_at: true,
+        assigned_to: true,
+        staff_meeting_action_items_assigned_toTostaff: {
+          select: {
+            id: true,
+            users: { select: { id: true, name: true, email: true } },
+            role: { select: { id: true, title: true } }
+          }
         }
-      }
-    }
-  });
+      },
+      orderBy: { created_at: 'desc' },
+      take: 100 // Limit for performance
+    }),
+  ]);
 
   // Combine the data
   const fullMeeting = {
     ...meeting,
-    MeetingAttendee: attendees,
-    MeetingAgendaItems: agendaItems,
-    MeetingActionItems: actionItems
+    meeting_attendee: attendees,
+    meeting_agenda_items: agendaItems,
+    meeting_action_items: actionItems
   };
 
   // Get only relevant staff for assignment dropdowns (same department/school)
-  const allStaff = await prisma.staff.findMany({
+  // Only fetch if user is organizer or admin (can assign tasks)
+  const allStaff = (isOrganizer || hasAdminAccess) ? await prisma.staff.findMany({
     where: {
       OR: [
         // Same department
@@ -133,43 +180,32 @@ export default async function MeetingLivePage(props: Props) {
         // Leadership roles from same school
         { 
           school_id: user.staff?.school?.id,
-          Role: {
-            is_leadership: true
-          }
+          role: { is_leadership: true }
         }
       ]
     },
     select: {
       id: true,
-      User: {
-        select: {
-          id: true,
-          name: true,
-          email: true
-        }
+      users: {
+        select: { id: true, name: true, email: true }
       },
-      Role: {
-        select: {
-          id: true,
-          title: true
-        }
+      role: {
+        select: { id: true, title: true }
       },
-      Department: {
-        select: {
-          id: true,
-          name: true
-        }
+      department: {
+        select: { id: true, name: true }
       }
     },
-    take: 50 // Limit to 50 staff for performance
-  });
+    orderBy: { users: { name: 'asc' } },
+    take: 30 // Reduced limit for better performance
+  }) : [];
 
   return (
     <div className="min-h-screen bg-muted">
       <MeetingLiveView
-        meeting={fullMeeting}
+        meeting={fullMeeting as any}
         currentUser={user}
-        allStaff={allStaff}
+        allStaff={allStaff as any}
         isOrganizer={isOrganizer}
         isAdmin={hasAdminAccess}
       />

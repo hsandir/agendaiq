@@ -12,10 +12,20 @@ interface Device {
   browser: string;
   ip_address: string;
   last_active: string;
-  is_trusted: boolean;
+  is_trusted: boolean
 }
 
-export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
+interface User {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  two_factor_enabled?: boolean;
+  login_notifications_enabled?: boolean;
+  suspicious_activity_alerts?: boolean;
+  remember_trusted_devices?: boolean;
+}
+
+export function SecuritySettings({ user }: { user: User }) {
   const [devices, setDevices] = useState<Device[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [show2FASetup, setShow2FASetup] = useState(false);
@@ -236,7 +246,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
             <span className="text-sm">Suspicious activity alerts</span>
             <input
               type="checkbox"
-              checked={user.suspicious_alerts_enabled}
+              checked={user.suspicious_activity_alerts}
               className="h-4 w-4 text-primary rounded focus:ring-ring"
               disabled
             />
@@ -246,7 +256,7 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
             <span className="text-sm">Remember trusted devices</span>
             <input
               type="checkbox"
-              checked={user.remember_devices_enabled}
+              checked={user.remember_trusted_devices}
               className="h-4 w-4 text-primary rounded focus:ring-ring"
               disabled
             />
@@ -254,5 +264,5 @@ export function SecuritySettings({ user }: { user: Record<string, unknown> }) {
         </div>
       </section>
     </div>
-  );
+  )
 }

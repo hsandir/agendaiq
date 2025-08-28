@@ -17,7 +17,7 @@ try {
 export interface EmailOptions {
   to: string;
   subject: string;
-  html: string;
+  html: string
 }
 
 export async function sendEmail({ to, subject, html }: EmailOptions) {

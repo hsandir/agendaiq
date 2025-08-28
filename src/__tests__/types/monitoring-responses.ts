@@ -16,10 +16,10 @@ export interface SentryIssue {
   isRegression: boolean;
   platform: string;
   lastRelease?: {
-    version: string;
+    version: string
   };
   assignedTo?: {
-    name: string;
+    name: string
   };
 }
 
@@ -36,11 +36,11 @@ export interface ErrorStats {
   newIssues24h: number;
   resolvedIssues24h: number;
   p95ResponseTime: number;
-  affectedUsers: number;
+  affectedUsers: number
 }
 
 export interface ErrorStatsResponse {
-  stats: ErrorStats;
+  stats: ErrorStats
 }
 
 export interface ReleaseHealth {
@@ -50,11 +50,11 @@ export interface ReleaseHealth {
   sessionCount: number;
   errorCount: number;
   newIssues: number;
-  status: 'healthy' | 'degraded' | 'critical';
+  status: 'healthy' | 'degraded' | 'critical'
 }
 
 export interface ReleaseHealthResponse {
-  release: ReleaseHealth;
+  release: ReleaseHealth
 }
 
 export interface SentryStatsData {

@@ -1,4 +1,4 @@
-import { prisma } from './prisma';
+import { prisma } from '@/lib/prisma';
 
 export async function initializeTestData() {
   try {
@@ -51,7 +51,7 @@ export async function initializeTestData() {
       { name: 'History', code: 'HIST' },
     ];
 
-    const createdDepartments: Record<string, unknown>[] = [];
+    const createdDepartments: Array<{ id: number; name: string; code: string; school_id: number }> = [];
     for (const dept of departments) {
       const department = await prisma.department.upsert({
         where: { code: dept.code },
@@ -66,7 +66,12 @@ export async function initializeTestData() {
     }
 
     // Create test users with different roles
-    const users = [
+    const users: Array<{
+      email: string;
+      name: string;
+      roleId: number;
+      departmentId: number;
+    }> = [
       {
         email: 'admin@cjcollegeprep.org',
         name: 'Admin User',
@@ -107,13 +112,14 @@ export async function initializeTestData() {
 
     for (const userData of users) {
       // Create user
-      const user = await prisma.user.upsert({
+      const user = await prisma.users.upsert({
         where: { email: userData.email },
         update: {},
         create: {
           email: userData.email,
           name: userData.name,
-          hashedPassword: '$2b$10$xvCqgBtCYhHCg1aG7UYu6.6cuzckuI9E0JQH3vMXrH.kLWCVF5/OW', // password: "password"
+          hashed_password: '$2b$10$xvCqgBtCYhHCg1aG7UYu6.6cuzckuI9E0JQH3vMXrH.kLWCVF5/OW', // password: "password"
+          updated_at: new Date(),
         },
       });
 
@@ -126,8 +132,8 @@ export async function initializeTestData() {
         await prisma.staff.create({
           data: {
             user_id: user.id,
-            role_id: parseInt(userData).roleId,
-            department_id: parseInt(userData).departmentId,
+            role_id: userData.roleId,
+            department_id: userData.departmentId,
             school_id: school.id,
             district_id: district.id,
           },

@@ -11,7 +11,7 @@ export const mockSession: Session = {
     id: '1',
     email: 'test@example.com',
     name: 'Test User',
-    emailVerified: true,
+    email_verified: true,
     is_active: true,
     staff: {
       id: '1',
@@ -78,7 +78,7 @@ export function renderWithProviders(
     )
   }
 
-  return render(ui, { wrapper: Wrapper, ...renderOptions })
+  return render(ui, { wrapper: Wrapper, ...renderOptions });
 }
 
 // API test helpers
@@ -97,10 +97,10 @@ export const createMockRequest = (
   }
 
   if (body) {
-    init.body = JSON.stringify(body)
+    init.body = JSON.stringify(body);
   }
 
-  return new Request(url, init)
+  return new Request(url, init);
 }
 
 export const createMockNextRequest = (
@@ -108,7 +108,7 @@ export const createMockNextRequest = (
   body?: unknown,
   headers?: Record<string, string>
 ) => {
-  const request = createMockRequest(method, body, headers)
+  const request = createMockRequest(method, body, headers);
   return {
     ...request,
     json: async () => body,
@@ -118,7 +118,7 @@ export const createMockNextRequest = (
   } as Request & {
     json: () => Promise<unknown>;
     text: () => Promise<string>;
-    formData: () => Promise<FormData>;
+    formData: () => Promise<FormData>
   }
 }
 
@@ -128,7 +128,7 @@ export const createTestUser = (overrides?: Record<string, unknown>) => ({
   email: 'test@example.com',
   name: 'Test User',
   password: '$2a$10$hashedpassword',
-  emailVerified: true,
+  email_verified: true,
   is_active: true,
   google_id: null,
   preferences: {},

@@ -26,8 +26,9 @@ export default async function AuditLogsPage() {
         staff: user.staff ? {
           id: user.staff.id,
           role: {
+            id: user.staff.role?.id ?? 0,
             key: user.staff.role?.key ?? '',
-            label: user.staff.role?.label ?? user.staff.role?.key ?? 'Unknown',
+            label: user.staff.role?.title ?? user.staff.role?.key ?? 'Unknown',
             priority: user.staff.role?.priority ?? 0,
             is_leadership: user.staff.role?.is_leadership ?? false
           },

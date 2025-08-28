@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from '@/lib/auth/api-auth';
-import { Capability } from '@/lib/auth/policy';
-import { prisma } from "@/lib/prisma";
+import { withAuth } from '../../../../lib/auth/api-auth';
+import { Capability } from '../../../../lib/auth/policy';
+import { prisma } from "../../../../lib/prisma";
 
 export async function GET(request: NextRequest) {
   const authResult = await withAuth(request, { requireAuth: true, requireStaff: true, requireCapability: Capability?.USER_MANAGE });
@@ -12,10 +12,10 @@ export async function GET(request: NextRequest) {
     // Get all roles from the database
     const roles = await prisma.role.findMany({
       include: {
-        Department: true,
-        Staff: {
+        department: true,
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       },
@@ -40,8 +40,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
   }
   try {
-    const body = await request.json();
-    const { __title, __priority, category, __department_id  } = body;
+    const body = await request.json() as Record<string, unknown>;
+    const { title, priority, category, department_id } = body;
 
     if (!title) {
       return NextResponse.json(
@@ -53,13 +53,13 @@ export async function POST(request: NextRequest) {
     // Create the new role
     const newRole = await prisma.role.create({
       data: {
-        title,
-        priority: priority ?? 10,
-        category,
-        department_id
+        title: title as string,
+        priority: (priority as number) ?? 10,
+        category: category as string,
+        department_id: department_id as number
       },
       include: {
-        Department: true
+        department: true
       }
     });
 

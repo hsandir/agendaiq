@@ -12,16 +12,16 @@ interface MeetingNode {
   agendaItems: {
     total: number;
     resolved: number;
-    carriedForward: number;
+    carriedForward: number
   };
   actionItems: {
     total: number;
     completed: number;
     pending: number;
-    overdue: number;
+    overdue: number
   };
   attendeeCount: number;
-  duration: number;
+  duration: number
 }
 
 export async function GET(request: NextRequest) {
@@ -34,36 +34,13 @@ export async function GET(request: NextRequest) {
     // Fetch meetings with parent-child relationships
     const meetings = await prisma.meeting.findMany({
       where: {
-        OR: [
-          { parent_meeting_id: { not: null } },
-          { 
-            ContinuationMeetings: {
-              some: {}
-            }
-          }
-        ]
+        parent_meeting_id: { not: null }
       },
       include: {
-        ParentMeeting: true,
-        ContinuationMeetings: {
-          include: {
-            MeetingAgendaItems: true,
-            MeetingActionItems: true,
-            MeetingAttendee: true
-          }
-        },
-        MeetingAgendaItems: {
-          include: {
-            ResponsibleRole: true
-          }
-        },
-        MeetingActionItems: {
-          include: {
-            AssignedToRole: true
-          }
-        },
-        MeetingAttendee: true,
-        Department: true
+        meeting_agenda_items: true,
+        meeting_action_items: true,
+        meeting_attendee: true,
+        department: true
       },
       orderBy: {
         start_time: 'desc'
@@ -78,7 +55,7 @@ export async function GET(request: NextRequest) {
       let rootId = meeting.id;
       let parentId = meeting.parent_meeting_id;
       
-      // Traverse up to find root (without ParentMeeting object)
+      // Traverse up to find root (without ParentMeeting object);
       while (parentId) {
         const parent = meetings.find(m => m.id === parentId);
         if (!parent) break;
@@ -142,7 +119,7 @@ export async function GET(request: NextRequest) {
         : 0,
       longestChain: Math.max(...chains.map(c => c.totalMeetings), 0),
       totalCarriedItems: meetings.reduce((sum, m) => 
-        sum + m.MeetingAgendaItems.filter((i: { carried_forward: boolean }) => i.carried_forward).length, 0
+        sum + (m.meeting_agenda_items as { carried_forward: boolean }[]).filter((i: { carried_forward: boolean }) => i.carried_forward).length, 0
       ),
       resolutionRate: chains.reduce((sum, c) => sum + c.efficiency, 0) / (chains.length ?? 1),
       averageResolutionTime: 7 // Simplified - would need more complex calculation
@@ -173,19 +150,19 @@ function buildMeetingNode(meeting: Record<string, unknown>, allMeetings: Record<
     parentId: meeting.parent_meeting_id,
     children: children.map(child => buildMeetingNode(child, allMeetings)),
     agendaItems: {
-      total: (meeting.MeetingAgendaItems as unknown[]).length,
-      resolved: (meeting.MeetingAgendaItems as { status: string }[]).filter(i => i.status === 'Resolved').length,
-      carriedForward: (meeting.MeetingAgendaItems as { carried_forward: boolean }[]).filter(i => i.carried_forward).length
+      total: (meeting.meeting_agenda_items as unknown[]).length,
+      resolved: (meeting.meeting_agenda_items as { status: string }[]).filter(i => i.status === 'Resolved').length,
+      carriedForward: (meeting.meeting_agenda_items as { carried_forward: boolean }[]).filter(i => i.carried_forward).length
     },
     actionItems: {
-      total: (meeting.MeetingActionItems as unknown[]).length,
-      completed: (meeting.MeetingActionItems as { status: string }[]).filter(i => i.status === 'Completed').length,
-      pending: (meeting.MeetingActionItems as { status: string }[]).filter(i => i.status === 'Pending').length,
-      overdue: (meeting.MeetingActionItems as { due_date?: Date; status: string }[]).filter(i => {
+      total: (meeting.meeting_action_items as unknown[]).length,
+      completed: (meeting.meeting_action_items as { status: string }[]).filter(i => i.status === 'Completed').length,
+      pending: (meeting.meeting_action_items as { status: string }[]).filter(i => i.status === 'Pending').length,
+      overdue: (meeting.meeting_action_items as { due_date?: Date; status: string }[]).filter(i => {
         return i.due_date && i.due_date < new Date() && i.status !== 'Completed';
       }).length
     },
-    attendeeCount: (meeting.MeetingAttendee as unknown[]).length,
+    attendeeCount: (meeting.meeting_attendee as unknown[]).length,
     duration: meeting.start_time && meeting.end_time
       ? Math.round(((meeting.end_time as Date).getTime() - (meeting.start_time as Date).getTime()) / 60000)
       : 60

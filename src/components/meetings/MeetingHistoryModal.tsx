@@ -29,7 +29,6 @@ import {
   ChevronRight,
   Filter,
   FolderOpen,
-  User,
   Hash,
   CheckCircle,
   XCircle,
@@ -47,7 +46,7 @@ interface Meeting {
   organizer: {
     name: string;
     role: string;
-    department: string;
+    department: string
   };
   attendees: number;
   agendaItems: number;
@@ -60,24 +59,24 @@ interface Meeting {
 
 interface ImportOptions {
   importAgendaItems: boolean;
-  importAttendees: boolean;
+  importAttendees: boolean
 }
 
 interface MeetingHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectMeeting: (meeting: Meeting) => void;
+  onSelectmeeting: (meeting: Meeting) => void;
   currentUserId?: string;
   currentDepartment?: string;
   currentRole?: string;
   multiSelect?: boolean;
-  onSelectMultipleMeetings?: (meetings: Meeting[], options: ImportOptions) => void;
+  onSelectMultipleMeetings?: (meetings: Meeting[], options: ImportOptions) => void
 }
 
 export function MeetingHistoryModal({
   isOpen,
   onClose,
-  onSelectMeeting,
+  onSelectmeeting,
   currentUserId,
   currentDepartment,
   currentRole,
@@ -139,7 +138,7 @@ export function MeetingHistoryModal({
       case "in_progress":
         return <AlertCircle className="h-4 w-4 text-yellow-500" />;
       default:
-        return <Clock className="h-4 w-4 text-muted-foreground" />;
+        return <Clock className="h-4 w-4 text-muted-foreground" />
     }
   };
 
@@ -154,7 +153,7 @@ export function MeetingHistoryModal({
       case "all_hands":
         return "bg-orange-100 text-orange-800";
       default:
-        return "bg-muted text-foreground";
+        return "bg-muted text-foreground"
     }
   };
 
@@ -183,7 +182,7 @@ export function MeetingHistoryModal({
         onClose();
       }
     } else if (selectedMeeting) {
-      onSelectMeeting(selectedMeeting);
+      onSelectmeeting(selectedMeeting);
       onClose();
     }
   };
@@ -193,7 +192,7 @@ export function MeetingHistoryModal({
       if (searchQuery && !meeting.title.toLowerCase().includes(searchQuery.toLowerCase())) {
         return false;
       }
-      if (onlyWithActionItems && (!meeting.actionItems ?? meeting.actionItems === 0)) {
+      if (onlyWithActionItems && (!meeting.actionItems || meeting.actionItems === 0)) {
         return false;
       }
       return true;
@@ -376,7 +375,7 @@ export function MeetingHistoryModal({
                               <span>{safeFormat(meeting.start_time, "HH:mm")} - {safeFormat(meeting.end_time, "HH:mm")}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <User className="h-4 w-4 text-muted-foreground" />
+                              <Users className="h-4 w-4 text-muted-foreground" />
                               <span>{meeting.organizer.name}</span>
                             </div>
                             <div className="flex items-center gap-2">

@@ -35,13 +35,13 @@ interface TeamMember {
       image?: string | null;
     };
     role: {
-      title: string;
+      title: string
     };
   };
 }
 
 interface Team {
-  id: number;
+  id: string;
   name: string;
   description?: string | null;
   type: string;
@@ -51,7 +51,7 @@ interface Team {
   team_members: TeamMember[];
   _count: {
     team_members: number;
-    team_knowledge: number;
+    team_knowledge: number
   };
 }
 
@@ -81,16 +81,33 @@ export function TeamList() {
   const fetchTeams = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/teams');
+      console.log('🔄 Fetching teams from /api/teams');
+      
+      const response = await fetch('/api/teams', {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      console.log('📡 Teams response status:', response.status, response.statusText);
       
       if (!response.ok) {
-        throw new Error('Failed to fetch teams');
+        const errorText = await response.text();
+        console.log('❌ Teams error response:', errorText);
+        throw new Error(`Failed to fetch teams: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
+      console.log('✅ Teams data received:', data);
       setTeams(data.teams);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      if (err instanceof Error) {
+        console.error('🚨 Teams fetch error:', err);
+        setError(err.message);
+      } else {
+        setError('An error occurred');
+      }
     } finally {
       setLoading(false);
     }
@@ -100,6 +117,7 @@ export function TeamList() {
     try {
       const response = await fetch('/api/teams', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -129,7 +147,7 @@ export function TeamList() {
       case 'GRADE_LEVEL':
         return <BookOpen className="h-4 w-4" />;
       default:
-        return <Users className="h-4 w-4" />;
+        return <Users className="h-4 w-4" />
     }
   };
 
@@ -146,7 +164,7 @@ export function TeamList() {
       case 'GRADE_LEVEL':
         return 'bg-pink-100 text-pink-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-100 text-gray-800'
     }
   };
 
@@ -168,7 +186,7 @@ export function TeamList() {
 
   if (error) {
     return (
-      <Alert variant="destructive">
+      <Alert className="border-destructive text-destructive">
         <AlertDescription>{error}</AlertDescription>
       </Alert>
     );

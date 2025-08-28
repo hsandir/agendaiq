@@ -41,7 +41,7 @@ interface RawError {
   message: string;
   stack?: string;
   url: string;
-  userAgent: string;
+  userAgent: string
 }
 
 export default function LocalMonitor() {
@@ -283,9 +283,9 @@ export default function LocalMonitor() {
       case 'high': return <XCircle className="h-4 w-4 text-orange-500" />;
       case 'medium': return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
       case 'low': return <CheckCircle className="h-4 w-4 text-blue-500" />;
-      default: return <AlertTriangle className="h-4 w-4 text-gray-500" />;
+      default: return <AlertTriangle className="h-4 w-4 text-gray-500" />
     }
-  };
+  ;};
 
   return (
     <div className="space-y-6">

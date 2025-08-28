@@ -30,11 +30,11 @@ interface WorkflowRun {
   updated_at: string;
   actor: {
     login: string;
-    avatar_url: string;
+    avatar_url: string
   };
   run_number: number;
   event: string;
-  run_attempt: number;
+  run_attempt: number
 }
 
 interface WorkflowJob {
@@ -49,11 +49,11 @@ interface WorkflowJob {
     conclusion: string | null;
     number: number;
     started_at: string | null;
-    completed_at: string | null;
+    completed_at: string | null
   }>;
   started_at: string;
   completed_at: string | null;
-  html_url: string;
+  html_url: string
 }
 
 // Removed mock data - require real GitHub token
@@ -141,7 +141,7 @@ interface WorkflowJob {
 
   const successfulRuns = mockRuns.filter(r => r.conclusion !== 'failure');
   const allRuns = [...failedRuns, ...successfulRuns].sort((a, b) => 
-    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   );
 
   return {
@@ -354,8 +354,8 @@ export async function POST(request: NextRequest) {
     // Development endpoint - no auth required in dev mode
     console.log('CI/CD POST API called');
 
-    const body = await request.json();
-    const { __action, __runId, __workflowId, branch = 'main'  } = body;
+    const body = await request.json() as Record<string, unknown>;
+    const { action, runId, workflowId, branch = 'main'  } = body;
 
     if (!GITHUB_TOKEN) {
       return NextResponse.json(

@@ -45,7 +45,7 @@ export const viewport = {
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -72,3 +72,4 @@ export default function RootLayout({
     </html>
   );
 }
+/* Force complete rebuild 1756355027 */

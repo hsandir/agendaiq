@@ -48,15 +48,15 @@ export class MeetingAnalyticsService {
           id: true,
           start_time: true,
           end_time: true,
-          MeetingAttendee: true,
-          MeetingAgendaItems: {
+          meeting_attendee: true,
+          meeting_agenda_items: {
             where: { carried_forward: true }
           }
         }
       }),
-      prisma.meetingActionItem.findMany({
+      prisma.meeting_action_items.findMany({
         where: {
-          Meeting: where
+          meeting: where
         },
         select: {
           status: true
@@ -89,11 +89,11 @@ export class MeetingAnalyticsService {
     const averageDuration = meetingsWithDuration > 0 ? totalDuration / meetingsWithDuration : 0;
 
     // Calculate participation rate
-    const totalAttendees = meetings.reduce((sum, m) => sum + m.MeetingAttendee.length, 0);
+    const totalAttendees = meetings.reduce((sum, m) => sum + m.meeting_attendee.length, 0);
     const participationRate = totalMeetings > 0 ? totalAttendees / totalMeetings : 0;
 
     // Calculate carry forward rate
-    const meetingsWithCarriedItems = meetings.filter(m => m.MeetingAgendaItems.length > 0).length;
+    const meetingsWithCarriedItems = meetings.filter(m => m.meeting_agenda_items.length > 0).length;
     const carryForwardRate = totalMeetings > 0 ? (meetingsWithCarriedItems / totalMeetings) * 100 : 0;
 
     // Get department breakdown
@@ -121,7 +121,7 @@ export class MeetingAnalyticsService {
     const stats: DepartmentStats[] = [];
 
     for (const deptId of departmentIds) {
-      const where = { ...baseWhere, department_id: parseInt(deptId) };
+      const where = { ...baseWhere, department_id: deptId };
 
       const [
         department,
@@ -134,16 +134,16 @@ export class MeetingAnalyticsService {
           select: { name: true }
         }),
         prisma.meeting.count({ where }),
-        prisma.meetingActionItem.findMany({
+        prisma.meeting_action_items.findMany({
           where: {
-            Meeting: where
+            meeting: where
           },
           select: { status: true }
         }),
         prisma.meeting.findMany({
           where,
           select: {
-            MeetingAttendee: true
+            meeting_attendee: true
           }
         })
       ]);
@@ -155,7 +155,7 @@ export class MeetingAnalyticsService {
         ? (completedActions / actionItems.length) * 100 
         : 0;
 
-      const totalAttendees = attendanceData.reduce((sum, m) => sum + m.MeetingAttendee.length, 0);
+      const totalAttendees = attendanceData.reduce((sum, m) => sum + m.meeting_attendee.length, 0);
       const averageAttendance = meetingCount > 0 ? totalAttendees / meetingCount : 0;
 
       stats.push({
@@ -203,7 +203,7 @@ export class MeetingAnalyticsService {
       select: {
         id: true,
         start_time: true,
-        MeetingActionItems: {
+        meeting_action_items: {
           select: {
             status: true
           }
@@ -215,7 +215,12 @@ export class MeetingAnalyticsService {
     });
 
     // Group by period
-    const trends: Record<string, unknown> = {};
+    const trends: Record<string, {
+      period: string;
+      meetings: number;
+      actionItems: number;
+      completedActions: number;
+    }> = {};
 
     meetings.forEach(meeting => {
       if (!meeting.start_time) return;
@@ -246,9 +251,10 @@ export class MeetingAnalyticsService {
         };
       }
 
-      trends[periodKey].meetings++;
-      trends[periodKey].actionItems += meeting.MeetingActionItems.length;
-      trends[periodKey].completedActions += meeting.MeetingActionItems.filter(
+      const trendData = trends[periodKey]!;
+      trendData.meetings++;
+      trendData.actionItems += meeting.meeting_action_items.length;
+      trendData.completedActions += meeting.meeting_action_items.filter(
         a => a.status === 'Completed'
       ).length;
     });
@@ -268,7 +274,10 @@ export class MeetingAnalyticsService {
       dateTo?: Date;
     }
   ) {
-    const where: Record<string, unknown> = {};
+    const where: {
+      staff_id?: number;
+      Meeting?: { start_time: { gte?: Date; lte?: Date } };
+    } = {};
 
     if (staffId) {
       where.staff_id = staffId;
@@ -286,22 +295,22 @@ export class MeetingAnalyticsService {
       }
     }
 
-    const attendance = await prisma.meetingAttendee.findMany({
+    const attendance = await prisma.meeting_attendee.findMany({
       where,
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true,
                 email: true
               }
             },
-            Role: true,
-            Department: true
+            role: true,
+            department: true
           }
         },
-        Meeting: {
+        meeting: {
           select: {
             title: true,
             start_time: true
@@ -319,20 +328,20 @@ export class MeetingAnalyticsService {
       if (!staffStats[staffId]) {
         staffStats[staffId] = {
           staffId,
-          name: record.Staff.User.name,
-          email: record.Staff.User.email,
-          role: record.Staff.Role.key ?? record.Staff.Role.id,
-          department: record.Staff.Department.name,
+          name: record.staff.users.name,
+          email: record.staff.users.email,
+          role: record.staff.role.key ?? record.staff.role.id,
+          department: record.staff.department.name,
           meetingsAttended: 0,
-          lastMeeting: null
+          lastmeeting: null
         };
       }
 
       staffStats[staffId].meetingsAttended++;
       
       if (!staffStats[staffId].lastMeeting || 
-          (record.Meeting.start_time && record.Meeting.start_time > staffStats[staffId].lastMeeting)) {
-        staffStats[staffId].lastMeeting = record.Meeting.start_time;
+          (record.meeting.start_time && record.meeting.start_time > staffStats[staffId].lastMeeting)) {
+        staffStats[staffId].lastMeeting = record.meeting.start_time;
       }
     });
 
@@ -350,15 +359,19 @@ export class MeetingAnalyticsService {
     dateFrom?: Date;
     dateTo?: Date;
   }) {
-    const where: Record<string, unknown> = {};
+    const where: {
+      assigned_to_role?: number;
+      meeting?: { department_id: number };
+      created_at?: { gte?: Date; lte?: Date };
+    } = {};
 
     if (options?.roleId) {
       where.assigned_to_role = options.roleId;
     }
 
     if (options?.departmentId) {
-      where.Meeting = {
-        department_id: parseInt(options).departmentId
+      where.meeting = {
+        department_id: options.departmentId
       };
     }
 
@@ -372,17 +385,17 @@ export class MeetingAnalyticsService {
       }
     }
 
-    const actionItems = await prisma.meetingActionItem.findMany({
+    const actionItems = await prisma.meeting_action_items.findMany({
       where,
       include: {
-        AssignedTo: {
+        staff_meeting_action_items_assigned_toTostaff: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true
               }
             },
-            Role: true
+            role: true
           }
         }
       }
@@ -413,17 +426,20 @@ export class MeetingAnalyticsService {
     let completedOnTime = 0;
 
     actionItems.forEach(item => {
-      // Count by status
-      const status = item.status.toLowerCase().replace('_', '');
-      if (status in metrics.byStatus) {
-        metrics.byStatus[status]++;
-      }
+      // Count by status with safe property access
+      const statusNormalized = item.status.toLowerCase().replace('_', '');
+      if (statusNormalized === 'pending') metrics.byStatus.pending++;
+      else if (statusNormalized === 'inprogress') metrics.byStatus.inProgress++;
+      else if (statusNormalized === 'completed') metrics.byStatus.completed++;
+      else if (statusNormalized === 'overdue') metrics.byStatus.overdue++;
+      else if (statusNormalized === 'cancelled') metrics.byStatus.cancelled++;
+      else if (statusNormalized === 'deferred') metrics.byStatus.deferred++;
 
-      // Count by priority
-      const priority = item.priority.toLowerCase();
-      if (priority in metrics.byPriority) {
-        metrics.byPriority[priority]++;
-      }
+      // Count by priority with safe property access
+      const priorityNormalized = item.priority.toLowerCase();
+      if (priorityNormalized === 'high') metrics.byPriority.high++;
+      else if (priorityNormalized === 'medium') metrics.byPriority.medium++;
+      else if (priorityNormalized === 'low') metrics.byPriority.low++;
 
       // Calculate completion time
       if (item.status === 'Completed' && item.completed_at) {
@@ -463,9 +479,9 @@ export class MeetingAnalyticsService {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        MeetingAgendaItems: true,
-        MeetingActionItems: true,
-        MeetingAttendee: true
+        meeting_agenda_items: true,
+        meeting_action_items: true,
+        meeting_attendee: true
       }
     });
 
@@ -490,8 +506,8 @@ export class MeetingAnalyticsService {
     }
 
     // Factor 2: Agenda completion
-    const totalAgendaItems = meeting.MeetingAgendaItems.length;
-    const resolvedItems = meeting.MeetingAgendaItems.filter(i => i.status === 'Resolved').length;
+    const totalAgendaItems = meeting.meeting_agenda_items.length;
+    const resolvedItems = meeting.meeting_agenda_items.filter(i => i.status === 'Resolved').length;
     if (totalAgendaItems > 0) {
       const completionRate = (resolvedItems / totalAgendaItems) * 20;
       score += completionRate;
@@ -503,7 +519,7 @@ export class MeetingAnalyticsService {
     }
 
     // Factor 3: Action items generated
-    const actionItemsCount = meeting.MeetingActionItems.length;
+    const actionItemsCount = meeting.meeting_action_items.length;
     if (actionItemsCount > 0) {
       score += Math.min(20, actionItemsCount * 4);
       factors.push({ 
@@ -514,7 +530,7 @@ export class MeetingAnalyticsService {
     }
 
     // Factor 4: Attendance rate
-    const attendanceCount = meeting.MeetingAttendee.length;
+    const attendanceCount = meeting.meeting_attendee.length;
     if (attendanceCount >= 3) {
       score += 20;
       factors.push({ 

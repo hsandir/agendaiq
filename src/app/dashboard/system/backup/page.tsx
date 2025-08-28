@@ -44,7 +44,7 @@ interface BackupStatus {
   lastCommit: string;
   githubStatus: 'connected' | 'disconnected' | 'unknown';
   backupCount: number;
-  diskUsage: string;
+  diskUsage: string
 }
 
 export default function BackupManagementPage() {
@@ -225,7 +225,7 @@ export default function BackupManagementPage() {
       case 'disconnected':
         return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Disconnected</Badge>;
       default:
-        return <Badge variant="secondary">Unknown</Badge>;
+        return <Badge variant="secondary">Unknown</Badge>
     }
   };
 

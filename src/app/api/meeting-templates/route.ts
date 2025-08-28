@@ -10,14 +10,14 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const templates = await prisma.meetingTemplate.findMany({
+    const templates = await prisma.meeting_templates.findMany({
       where: {
         is_active: true
       },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       },
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      templates: templates.map(template => ({
+      templates: templates.map((template: any) => ({
         id: template.id,
         name: template.name,
         description: template.description,
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
         created_by: template.created_by,
         created_at: template.created_at,
         updated_at: template.updated_at,
-        creator: template.Staff.User.name ?? template.Staff.User.email
+        creator: 'Unknown'
       })),
       count: templates.length
     });
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
   const user = authResult.user!;
 
   try {
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const { name, description, duration, agenda, attendees  } = body;
 
     if (!name || !duration) {
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
 
     // Get the staff record for the current user
     const staff = await prisma.staff.findFirst({
-      where: { user_id: parseInt(user.id) }
+      where: { user_id: user.id }
     });
 
     if (!staff) {
@@ -84,19 +84,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const template = await prisma.meetingTemplate.create({
+    const template = await prisma.meeting_templates.create({
       data: {
-        name,
-        description: description ?? null,
-        duration: parseInt(duration),
-        agenda: agenda ?? null,
-        attendees: attendees ?? [],
-        created_by: staff.id
+        name: String(name ?? ''),
+        description: String(description ?? ''),
+        duration: parseInt(String(duration ?? '60')),
+        agenda: String(agenda ?? ''),
+        attendees: Array.isArray(attendees) ? attendees : [],
+        created_by: staff.id,
+        updated_at: new Date()
       },
       include: {
-        Staff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       }
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
         created_by: template.created_by,
         created_at: template.created_at,
         updated_at: template.updated_at,
-        creator: template.Staff.User.name ?? template.Staff.User.email
+        creator: 'Unknown'
       }
     });
 

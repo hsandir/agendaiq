@@ -19,6 +19,10 @@ function SignInFormContent() {
   const [tempCredentials, setTempCredentials] = useState<{email: string, password: string} | null>(null);
   const [debugMode, setDebugMode] = useState(false);
   const [lastAttempt, setLastAttempt] = useState<{email: string, timestamp: string} | null>(null);
+  
+  // Add controlled input states for Zero Degradation Protocol
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   // Check URL parameters for errors on mount
   useEffect(() => {
@@ -112,25 +116,27 @@ function SignInFormContent() {
           setError(errorInfo.message);
         }
       } else {
-        // Regular login attempt
-        const formData = new FormData(e.currentTarget);
-        email = formData.get('email') as string;
-        password = formData.get('password') as string;
+        // Regular login attempt - use controlled inputs (Zero Degradation Protocol)
+        // Note: FormData fallback maintained for compatibility
+        const formEmail = email! || (new FormData(e.currentTarget).get('email') as string) || '';
+        const formPassword = password! || (new FormData(e.currentTarget).get('password') as string) || '';
+        setEmail(formEmail);
+        setPassword(formPassword);
 
         // Store login attempt in localStorage before attempting signin
         const attemptData = {
-          email,
+          email: formEmail,
           timestamp: new Date().toISOString(),
           rememberMe,
           trustDevice
         };
         localStorage.setItem('lastLoginAttempt', JSON.stringify(attemptData));
 
-        console.log('🔐 Attempting login with:', { email, rememberMe, trustDevice });
+        console.log('🔐 Attempting login with:', { email: formEmail, rememberMe, trustDevice });
 
         const result = await signIn('credentials', {
-          email,
-          password,
+          email: formEmail,
+          password: formPassword,
           rememberMe: rememberMe.toString(),
           trustDevice: trustDevice.toString(),
           redirect: false,
@@ -141,7 +147,7 @@ function SignInFormContent() {
         if (result?.error === '2FA_REQUIRED') {
           // User has 2FA enabled, show 2FA input
           setRequires2FA(true);
-          setTempCredentials({ email, password });
+          setTempCredentials({ email: formEmail, password: formPassword });
           setError('');
           setErrorDetails(null);
         } else if (result?.error) {
@@ -187,6 +193,8 @@ function SignInFormContent() {
                 type="email"
                 autoComplete="email"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 aria-label="Email address"
                 aria-required="true"
                 className="relative block w-full rounded-t-md border-0 py-1.5 text-foreground ring-1 ring-inset ring-gray-300 placeholder:text-muted-foreground focus:z-10 focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"
@@ -203,6 +211,8 @@ function SignInFormContent() {
                 type="password"
                 autoComplete="current-password"
                 required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 aria-label="Password"
                 aria-required="true"
                 className="relative block w-full rounded-b-md border-0 py-1.5 text-foreground ring-1 ring-inset ring-gray-300 placeholder:text-muted-foreground focus:z-10 focus:ring-2 focus:ring-inset focus:ring-ring sm:text-sm sm:leading-6"

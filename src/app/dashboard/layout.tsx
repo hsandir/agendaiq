@@ -25,25 +25,24 @@ function PreloadResources() {
 export default async function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   const user = await requireAuth(AuthPresets.requireAuth);
 
   // Get user with staff and role information
-  const userWithStaff = await prisma.user.findUnique({
+  const userWithStaff = await prisma.users.findUnique({
     where: { email: user.email! },
     include: {
-      Staff: {
+      staff: {
         include: {
-          Role: true,
-          Department: true,
-          School: true
+          role: true,
+          department: true,
+          school: true
         }
       }
     },
   });
 
-  const currentRole = userWithStaff?.Staff?.[0]?.Role ?? null;
   const isAdmin = isUserAdmin(userWithStaff);
 
   return (
@@ -54,10 +53,9 @@ export default async function DashboardLayout({
         user={{
           email: user.email,
           name: user.name ?? undefined,
-          staff_id: userWithStaff?.Staff?.[0]?.id ?? null,
+          staff_id: userWithStaff?.staff?.[0]?.id ?? null,
         }}
-        currentRole={currentRole}
-        userWithStaff={userWithStaff}
+        userWithstaff={userWithStaff}
       >
         {children}
       </DashboardLayoutClient>

@@ -14,7 +14,7 @@ export default async function VerifyEmailPage({ searchParams }: PageProps) {
 
   try {
     // Find and validate token
-    const verificationToken = await prisma.verificationToken.findUnique({
+    const verificationToken = await prisma.verification_token.findUnique({
       where: { token },
     });
 
@@ -37,7 +37,7 @@ export default async function VerifyEmailPage({ searchParams }: PageProps) {
 
     if (verificationToken.expires < new Date()) {
       // Delete expired token
-      await prisma.verificationToken.delete({
+      await prisma.verification_token.delete({
         where: { token },
       });
 
@@ -58,13 +58,13 @@ export default async function VerifyEmailPage({ searchParams }: PageProps) {
     }
 
     // Update user's email verification status
-    await prisma.user.update({
+    await prisma.users.update({
       where: { email: verificationToken.identifier },
-      data: { emailVerified: new Date() },
+      data: { email_verified: new Date() },
     });
 
     // Delete used token
-    await prisma.verificationToken.delete({
+    await prisma.verification_token.delete({
       where: { token },
     });
 

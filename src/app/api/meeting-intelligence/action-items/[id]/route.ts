@@ -21,7 +21,7 @@ export async function PATCH(
       updateData.completed_at = new Date();
     }
     
-    const updated = await prisma.meetingActionItem.update({
+    const updated = await prisma.meeting_action_items.update({
       where: { id: itemId },
       data: updateData
     });

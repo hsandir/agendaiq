@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { User } from "next-auth";
+import { users } from "@prisma/client";
 import { 
   canReadField, 
   canWriteField, 
@@ -9,23 +10,22 @@ import {
 } from "./field-access-control";
 
 // Middleware to apply field-level access control to API responses
-export function withFieldAccess<T extends (...args: Record<string, unknown>[]) => Promise<NextResponse>>(
+export function withFieldAccess<T extends (request: NextRequest, ...args: unknown[]) => Promise<NextResponse>>(
   handler: T,
   model: string
 ): T {
-  return (async (...args: Parameters<T>) => {
-    const response = await handler(...args);
+  return (async (request: NextRequest, ...otherArgs: unknown[]) => {
+    const response = await handler(request, ...otherArgs);
     
-    // Get the request and user from args
-    const request = args[0] as NextRequest;
-    const user = request.user as User;
+    // Get user from request context (would need to be set by auth middleware)
+    const user = (request as NextRequest & { user?: User }).user;
     
     if (!user) {
       return response;
     }
 
     // If response is successful, filter the data
-    if (response.status === 200 ?? response.status === 201) {
+    if (response.status === 200 || response.status === 201) {
       try {
         const data = await response.json();
         
@@ -55,7 +55,7 @@ export function withFieldAccess<T extends (...args: Record<string, unknown>[]) =
 
 // Validate write operations
 export async function validateFieldWrite(
-  user: User,
+  user: users,
   model: string,
   data: Record<string, unknown>,
   existingRecord?: Record<string, unknown>
@@ -72,7 +72,7 @@ export const GET = withFieldAccess(
       return NextResponse.json({ error: authResult?.error }, { status: authResult?.statusCode });
     }
 
-    const users = await prisma.user.findMany();
+    const users = await prisma.users.findMany();
     return NextResponse.json({ data: users });
   },
   'User'

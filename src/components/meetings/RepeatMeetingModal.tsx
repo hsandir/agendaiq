@@ -38,15 +38,13 @@ export interface RepeatConfig {
   includeAgenda: boolean; // Whether to copy agenda to all meetings
   exceptions?: string[]; // Dates to skip (holidays, etc)
 }
-
 interface RepeatMeetingModalProps {
   isOpen: boolean;
   onClose: () => void;
   startDate: string;
   endDate: string;
-  onConfirm: (config: RepeatConfig) => void;
+  onConfirm: (config: RepeatConfig) => void
 }
-
 const WEEKDAYS = [
   { value: 1, label: 'Monday', short: 'Mon' },
   { value: 2, label: 'Tuesday', short: 'Tue' },
@@ -112,7 +110,7 @@ export function RepeatMeetingModal({
       console.error('Error parsing start date:', error);
       return dates;
     }
-    
+    ;
     const maxDates = conf.endType === 'after' ? (conf.occurrences ?? 10) : 52; // Max 52 for preview
     let endDateLimit: Date | null = null;
     
@@ -126,7 +124,6 @@ export function RepeatMeetingModal({
         endDateLimit = null;
       }
     }
-
     for (let i = 0; i < maxDates; i++) {
       if (endDateLimit && currentDate > endDateLimit) break;
 
@@ -143,7 +140,6 @@ export function RepeatMeetingModal({
       if (!isException) {
         dates.push(new Date(currentDate));
       }
-
       // Calculate next date based on pattern
       switch (conf.pattern) {
         case 'daily':
@@ -184,10 +180,8 @@ export function RepeatMeetingModal({
           break;
       }
     }
-
     return dates;
-  };
-
+  }
   const getMonthlyWeekdayDate = (date: Date, week: number, weekday: number): Date => {
     const nextMonth = addMonths(date, 1);
     const firstDay = startOfMonth(nextMonth);
@@ -210,15 +204,14 @@ export function RepeatMeetingModal({
     }
     
     return nextMonth;
-  };
-
+  }
   const handleConfirm = () => {
     onConfirm({
       ...config,
       exceptions: selectedExceptionDates,
     });
     onClose();
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

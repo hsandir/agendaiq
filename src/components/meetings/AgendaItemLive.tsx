@@ -28,25 +28,44 @@ import {
   MessageSquare,
   Paperclip
 } from "lucide-react";
-import type { MeetingAgendaItem, Staff, User as PrismaUser } from "@prisma/client";
+import type { meeting_agenda_items, staff, users as PrismaUser, Priority, Purpose, SolutionType, DecisionType, AgendaItemStatus } from "@prisma/client";
 import { usePusherChannel } from "@/hooks/usePusher";
 import { CHANNELS, EVENTS } from "@/lib/pusher";
 import { AgendaItemComments } from "./AgendaItemComments";
 import { CreateMeetingModal } from "./CreateMeetingModal";
 import Link from "next/link";
 
-interface ExtendedAgendaItem extends MeetingAgendaItem {
-  ResponsibleStaff?: (Staff & { User: PrismaUser }) | null;
-  Comments: Record<string, unknown>[];
-  ActionItems: Record<string, unknown>[];
+interface Comment {
+  id: number;
+  comment: string;
+  created_at: string | Date;
+  staff: {
+    users: { id: number; name: string | null; email: string; };
+    Role?: { id: number; title: string; };
+  };
+}
+
+interface ActionItem {
+  id: number;
+  title: string;
+  description: string;
+  assigned_to?: string;
+}
+
+interface ExtendedAgendaItem extends meeting_agenda_items {
+  staff?: (staff & { users: PrismaUser }) | null;
+  agenda_item_comments?: Comment[];
+  meeting_action_items?: ActionItem[];
+  comments?: Comment[];
+  action_items?: ActionItem[];
 }
 
 interface Props {
   item: ExtendedAgendaItem;
-  staff: (Staff & { User: PrismaUser })[];
+  staff: (staff & { users: PrismaUser })[];
   isExpanded: boolean;
   onToggleExpand: () => void;
-  onUpdate: (updates: Partial<MeetingAgendaItem>) => void;
+  onUpdate: (updates: Partial<meeting_agenda_items>) => void;
   canEdit: boolean;
   currentUserId?: number;
   currentUserName?: string;
@@ -147,9 +166,8 @@ export function AgendaItemLive({
     
     // Use whisper for client events (works with presence channels)
     try {
-      const presenceChannel = channel as Record<string, unknown>;
-      if (presenceChannel.whisper) {
-        presenceChannel.whisper(EVENTS.USER_TYPING, {
+      if ('whisper' in channel && typeof channel.whisper === 'function') {
+        channel.whisper(EVENTS.USER_TYPING, {
           itemId: item.id,
           userId: currentUserId,
           userName: currentUserName
@@ -175,9 +193,8 @@ export function AgendaItemLive({
     
     // Use whisper for client events (works with presence channels)
     try {
-      const presenceChannel = channel as Record<string, unknown>;
-      if (presenceChannel.whisper) {
-        presenceChannel.whisper(EVENTS.USER_STOPPED_TYPING, {
+      if ('whisper' in channel && typeof channel.whisper === 'function') {
+        channel.whisper(EVENTS.USER_STOPPED_TYPING, {
           itemId: item.id,
           userId: currentUserId
         });
@@ -191,7 +208,7 @@ export function AgendaItemLive({
     }
   };
 
-  const handleInputChange = (field: string, value: Record<string, unknown>) => {
+  const handleInputChange = (field: string, value: string | boolean | number | null) => {
     setEditData({ ...editData, [field]: value });
     emitTyping();
   };
@@ -229,7 +246,7 @@ export function AgendaItemLive({
       case 'High': return 'bg-destructive/10 text-destructive';
       case 'Medium': return 'bg-yellow-100 text-yellow-700';
       case 'Low': return 'bg-green-100 text-green-700';
-      default: return 'bg-muted text-foreground';
+      default: return 'bg-muted text-foreground'
     }
   };
 
@@ -240,7 +257,7 @@ export function AgendaItemLive({
       case 'Pending': return 'bg-muted text-foreground';
       case 'Assigned_to_local': return 'bg-primary text-primary-foreground';
       case 'Deferred': return 'bg-orange-100 text-orange-700';
-      default: return 'bg-muted text-foreground';
+      default: return 'bg-muted text-foreground'
     }
   };
 
@@ -282,11 +299,11 @@ export function AgendaItemLive({
               )}
               
               {/* Assigned User Pill */}
-              {item.ResponsibleStaff && !isEditing && (
+              {item.staff && !isEditing && (
                 <div className="flex items-center gap-2 mt-2">
                   <div className="flex items-center gap-1.5 bg-primary text-primary-foreground px-2.5 py-1 rounded-full text-xs font-medium">
                     <User className="h-3 w-3" />
-                    <span>{item.ResponsibleStaff.User.name}</span>
+                    <span>{item.staff.users.name}</span>
                   </div>
                 </div>
               )}
@@ -362,7 +379,7 @@ export function AgendaItemLive({
                 value={editData.responsible_staff_id?.toString() ?? 'none'}
                 onValueChange={(value) => setEditData({ 
                   ...editData, 
-                  responsible_staff_id: value === 'none' ? null : parseInt(value) 
+                  responsible_staff_id: value === 'none' ? null : parseInt(value)
                 })}
               >
                 <SelectTrigger className="mt-1">
@@ -372,7 +389,7 @@ export function AgendaItemLive({
                   <SelectItem value="none">None</SelectItem>
                   {staff.map((s) => (
                     <SelectItem key={s.id} value={s.id.toString()}>
-                      {s.User.name} ({s.User.email})
+                      {s.users.name} ({s.users.email})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -381,7 +398,7 @@ export function AgendaItemLive({
               <div className="mt-1 flex items-center space-x-2">
                 <User className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm">
-                  {item.ResponsibleStaff ? item.ResponsibleStaff.User.name : 'Unassigned'}
+                  {item.staff ? item.staff.users.name : 'Unassigned'}
                   {item.staff_initials && ` (${item.staff_initials})`}
                 </span>
               </div>
@@ -427,7 +444,7 @@ export function AgendaItemLive({
                 <label className="text-sm font-medium text-foreground">Purpose</label>
                 <Select
                   value={editData.purpose}
-                  onValueChange={(value: Record<string, unknown>) => setEditData({ ...editData, purpose: value })}
+                  onValueChange={(value) => setEditData({ ...editData, purpose: value as Purpose })}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue />
@@ -447,7 +464,7 @@ export function AgendaItemLive({
                   value={editData.solution_type ?? 'none'}
                   onValueChange={(value) => setEditData({ 
                     ...editData, 
-                    solution_type: value === 'none' ? null : value as Record<string, unknown>
+                    solution_type: value === 'none' ? null : value as SolutionType
                   })}
                 >
                   <SelectTrigger className="mt-1">
@@ -468,7 +485,7 @@ export function AgendaItemLive({
                   value={editData.decision_type ?? 'none'}
                   onValueChange={(value) => setEditData({ 
                     ...editData, 
-                    decision_type: value === 'none' ? null : value as Record<string, unknown>
+                    decision_type: value === 'none' ? null : value as DecisionType
                   })}
                 >
                   <SelectTrigger className="mt-1">
@@ -511,7 +528,7 @@ export function AgendaItemLive({
                 <label className="text-sm font-medium text-foreground">Status</label>
                 <Select
                   value={editData.status}
-                  onValueChange={(value: Record<string, unknown>) => setEditData({ ...editData, status: value })}
+                  onValueChange={(value) => setEditData({ ...editData, status: value as AgendaItemStatus })}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue />
@@ -527,7 +544,7 @@ export function AgendaItemLive({
                 <label className="text-sm font-medium text-foreground">Priority</label>
                 <Select
                   value={editData.priority}
-                  onValueChange={(value: Record<string, unknown>) => setEditData({ ...editData, priority: value })}
+                  onValueChange={(value) => setEditData({ ...editData, priority: value as Priority })}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue />
@@ -575,11 +592,11 @@ export function AgendaItemLive({
                   onClick={() => setShowComments(!showComments)}
                 >
                   <MessageSquare className="h-4 w-4" />
-                  <span>{item.Comments?.length ?? 0} Comments</span>
+                  <span>{item.agenda_item_comments?.length ?? 0} Comments</span>
                 </button>
                 <div className="flex items-center space-x-1">
                   <Paperclip className="h-4 w-4" />
-                  <span>{item.ActionItems?.length ?? 0}</span>
+                  <span>{item.meeting_action_items?.length ?? 0}</span>
                 </div>
                 {item.future_implications && !isEditing && (
                   <div className="flex items-center space-x-1 text-yellow-600">
@@ -608,7 +625,7 @@ export function AgendaItemLive({
               <div className="mt-4 pt-4 border-t">
                 <AgendaItemComments
                   itemId={item.id}
-                  comments={item.Comments ?? []}
+                  comments={item.agenda_item_comments ?? []}
                   onAddComment={handleAddComment}
                   canComment={canEdit}
                 />

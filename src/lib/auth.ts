@@ -14,7 +14,7 @@ declare module "next-auth" {
 
 declare module "next-auth/jwt" {
   interface JWT {
-    id: string;
+    id: string
   }
 }
 
@@ -40,15 +40,15 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
+        const user = await prisma.users.findUnique({
           where: { email: credentials?.email },
         });
 
-        if (!user?.hashedPassword) {
+        if (!user?.hashed_password) {
           return null;
         }
 
-        const isValid = await compare(credentials?.password, user?.hashedPassword);
+        const isValid = await compare(credentials?.password, user?.hashed_password);
         if (!isValid) {
           return null;
         }

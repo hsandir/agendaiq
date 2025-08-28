@@ -13,7 +13,7 @@ interface User {
 }
 
 interface ProfileFormProps {
-  user: User;
+  user: User
 }
 
 export function ProfileForm({ user }: ProfileFormProps) {
@@ -49,7 +49,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
       setSuccess('Profile updated successfully');
       router.refresh();
     } catch (error: unknown) {
-      setError('Failed to update profile');
+      setError('Failed to update profile')
     } finally {
       setIsLoading(false);
     }

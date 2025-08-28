@@ -10,7 +10,7 @@ export class MeetingSearchService {
    */
   static async searchMeetings(query: MeetingSearchQuery): Promise<{
     results: MeetingSearchResult[];
-    total: number;
+    total: number
   }> {
     const searchTerm = query.query.toLowerCase();
     const limit = query.limit ?? 20;
@@ -36,7 +36,7 @@ export class MeetingSearchService {
     // Filter conditions
     if (query.filters) {
       if (query.filters.departmentId) {
-        whereConditions.push({ department_id: parseInt(query).filters.departmentId });
+        whereConditions.push({ department_id: query.filters.departmentId });
       }
       
       if (query.filters.staffId) {
@@ -44,7 +44,7 @@ export class MeetingSearchService {
           OR: [
             { organizer_id: query.filters.staffId },
             {
-              MeetingAttendee: {
+              meeting_attendee: {
                 some: { staff_id: query.filters.staffId }
               }
             }
@@ -79,17 +79,17 @@ export class MeetingSearchService {
       prisma.meeting.findMany({
         where,
         include: {
-          Department: true,
-          Staff: {
+          department: true,
+          staff: {
             include: {
-              User: {
+              users: {
                 select: {
                   name: true
                 }
               }
             }
           },
-          MeetingAgendaItems: {
+          meeting_agenda_items: {
             where: searchTerm ? {
               OR: [
                 { topic: { contains: searchTerm, mode: 'insensitive' } },
@@ -100,7 +100,7 @@ export class MeetingSearchService {
             } : undefined,
             take: 3
           },
-          MeetingActionItems: {
+          meeting_action_items: {
             where: searchTerm ? {
               OR: [
                 { title: { contains: searchTerm, mode: 'insensitive' } },
@@ -151,16 +151,16 @@ export class MeetingSearchService {
           excerpt = this.highlightText(meeting.action_items, searchTerm);
         }
         // Check agenda items
-        else if (meeting.MeetingAgendaItems.length > 0) {
+        else if (meeting.meeting_agenda_items.length > 0) {
           relevance += 5;
           matchedIn = 'agenda';
-          excerpt = meeting.MeetingAgendaItems[0].topic;
+          excerpt = meeting.meeting_agenda_items[0].topic;
         }
         // Check action items
-        else if (meeting.MeetingActionItems.length > 0) {
+        else if (meeting.meeting_action_items.length > 0) {
           relevance += 4;
           matchedIn = 'actions';
-          excerpt = meeting.MeetingActionItems[0].title;
+          excerpt = meeting.meeting_action_items[0].title;
         }
       } else {
         excerpt = meeting.description ?? meeting.title;
@@ -216,31 +216,31 @@ export class MeetingSearchService {
     }
 
     if (filters?.departmentId) {
-      where.Meeting = {
-        department_id: parseInt(filters).departmentId
+      where.meeting = {
+        department_id: filters.departmentId
       };
     }
 
-    return await prisma.meetingAgendaItem.findMany({
+    return await prisma.meeting_agenda_items.findMany({
       where,
       include: {
-        Meeting: {
+        meeting: {
           select: {
             id: true,
             title: true,
             start_time: true
           }
         },
-        ResponsibleStaff: {
+        staff: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true
               }
             }
           }
         },
-        ActionItems: {
+        meeting_action_items: {
           select: {
             id: true,
             title: true,
@@ -249,7 +249,7 @@ export class MeetingSearchService {
         }
       },
       orderBy: [
-        { Meeting: { start_time: 'desc' } },
+        { meeting: { start_time: 'desc' } },
         { order_index: 'asc' }
       ],
       take: 50
@@ -263,7 +263,7 @@ export class MeetingSearchService {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        MeetingAgendaItems: {
+        meeting_agenda_items: {
           select: { topic: true }
         }
       }
@@ -274,7 +274,7 @@ export class MeetingSearchService {
     // Extract keywords from title and agenda items
     const keywords = [
       ...meeting.title.toLowerCase().split(' '),
-      ...meeting.MeetingAgendaItems.flatMap(item => 
+      ...meeting.meeting_agenda_items.flatMap(item => 
         item.topic.toLowerCase().split(' ')
       )
     ].filter(word => word.length > 3);
@@ -294,7 +294,7 @@ export class MeetingSearchService {
         id: true,
         title: true,
         start_time: true,
-        Department: {
+        department: {
           select: {
             name: true
           }
@@ -340,27 +340,27 @@ export class MeetingSearchService {
       where.assigned_to_role = filters.assignedToRoleId;
     }
 
-    return await prisma.meetingActionItem.findMany({
+    return await prisma.meeting_action_items.findMany({
       where,
       include: {
-        Meeting: {
+        meeting: {
           select: {
             id: true,
             title: true,
             start_time: true
           }
         },
-        AssignedTo: {
+        staff_meeting_action_items_assigned_toTostaff: {
           include: {
-            User: {
+            users: {
               select: {
                 name: true
               }
             },
-            Role: true
+            role: true
           }
         },
-        AgendaItem: {
+        meeting_agenda_items: {
           select: {
             topic: true
           }
@@ -395,7 +395,7 @@ export class MeetingSearchService {
     }
 
     if (type === 'all' || type === 'agenda') {
-      const agendaItems = await prisma.meetingAgendaItem.findMany({
+      const agendaItems = await prisma.meeting_agenda_items.findMany({
         where: {
           topic: { contains: searchTerm, mode: 'insensitive' }
         },
@@ -407,7 +407,7 @@ export class MeetingSearchService {
     }
 
     if (type === 'all' || type === 'actions') {
-      const actionItems = await prisma.meetingActionItem.findMany({
+      const actionItems = await prisma.meeting_action_items.findMany({
         where: {
           title: { contains: searchTerm, mode: 'insensitive' }
         },

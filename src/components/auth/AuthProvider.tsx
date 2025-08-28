@@ -13,7 +13,7 @@ function SentryUserSync() {
     if (session?.user) {
       // Set user context in Sentry when user logs in
       setSentryUser({
-        id: session.user.id as string,
+        id: Number(session.user.id),
         email: session.user.email ?? undefined,
         name: session.user.name ?? undefined,
         staff: session.user.staff ? {

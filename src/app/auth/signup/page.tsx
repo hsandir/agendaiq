@@ -40,7 +40,7 @@ export default function SignUpPage() {
 
       router.push("/auth/signin?registered=true");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred during sign up");
+      setError(error instanceof Error ? error.message : "An error occurred during sign up")
     } finally {
       setIsLoading(false);
     }
@@ -131,5 +131,5 @@ export default function SignUpPage() {
         </form>
       </div>
     </div>
-  );
+  )
 } 

@@ -16,5 +16,5 @@ export default async function SchoolSettingsPage() {
   // This ensures real-time data and proper error handling
   const initialSchool = null;
 
-  return <SchoolClient initialSchool={initialSchool} />;
+  return <SchoolClient initialschool={initialSchool} />;
 } 

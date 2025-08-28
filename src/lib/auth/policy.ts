@@ -140,7 +140,6 @@ export const RoutePolicy: Record<string, Capability | Capability[]> = {
   '/dashboard/page-selection': Capability.OPS_HEALTH,
   
   // Development Tools
-  '/dashboard/development': Capability.DEV_DEBUG,
   '/dashboard/development/permissions-check': Capability.DEV_DEBUG,
   '/dashboard/development/performance': Capability.DEV_DEBUG,
   
@@ -224,11 +223,11 @@ export interface UserWithCapabilities {
     };
     department?: {
       id: number;
-      name: string;
+      name: string
     };
     school?: {
       id: number;
-      name: string;
+      name: string
     };
   };
 }
@@ -236,14 +235,14 @@ export interface UserWithCapabilities {
 // Get user's capabilities from database
 export async function getUserCapabilities(userId: number): Promise<string[]> {
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: userId },
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: {
+            role: {
               include: {
-                Permissions: true
+                permission: true
               }
             }
           }
@@ -269,13 +268,15 @@ export async function getUserCapabilities(userId: number): Promise<string[]> {
     }
     
     // Get capabilities from role permissions (type-safe)
-    const perms = user.Staff?.[0]?.Role?.Permissions;
+    const perms = user.staff?.[0]?.role?.permission;
     if (Array.isArray(perms)) {
       const result: string[] = [];
       for (const perm of perms) {
         if (perm && typeof perm === 'object' && 'capability' in perm) {
-          const cap = (perm as { capability: unknown }).capability;
-          if (typeof cap === 'string') result.push(cap);
+          const permObj = perm;
+          if ('capability' in permObj && typeof permObj.capability === 'string') {
+            result.push(permObj.capability);
+          }
         }
       }
       if (result.length > 0) return result;
@@ -447,48 +448,31 @@ type MinimalUserInput = {
   name?: string | null;
   is_system_admin?: boolean;
   is_school_admin?: boolean;
-  staff?: MinimalStaff | null;
-  Staff?: Array<{
+  staff?: Array<{
     id: number;
-    Role: MinimalRole;
-    Department?: MinimalDepartment;
-    School?: MinimalSchool;
+    role: MinimalRole;
+    department?: MinimalDepartment;
+    school?: MinimalSchool;
   }>;
 };
 
 export async function enrichUserWithCapabilities(user: MinimalUserInput): Promise<UserWithCapabilities> {
   const capabilities = await getUserCapabilities(user.id);
 
-  const normalizedStaff: UserWithCapabilities['staff'] = user.staff
+  const normalizedStaff: UserWithCapabilities['staff'] = user.staff && user.staff.length > 0
     ? {
-        id: user.staff.id,
-        role: user.staff.role
+        id: user.staff[0].id,
+        role: user.staff[0].role
           ? {
-              id: typeof user.staff.role.id === 'number' ? user.staff.role.id : 0,
-              key: user.staff.role.key ?? undefined,
+              id: user.staff[0].role.id || 0,
+              key: user.staff[0].role.key || undefined,
             }
           : undefined,
-        department: user.staff.department
-          ? { id: user.staff.department.id, name: user.staff.department.name }
+        department: user.staff[0].department
+          ? { id: user.staff[0].department.id, name: user.staff[0].department.name }
           : undefined,
-        school: user.staff.school
-          ? { id: user.staff.school.id, name: user.staff.school.name }
-          : undefined,
-      }
-    : user.Staff && user.Staff.length > 0
-    ? {
-        id: user.Staff[0].id,
-        role: user.Staff[0].Role
-          ? {
-              id: typeof user.Staff[0].Role.id === 'number' ? user.Staff[0].Role.id : 0,
-              key: user.Staff[0].Role.key ?? undefined,
-            }
-          : undefined,
-        department: user.Staff[0].Department
-          ? { id: user.Staff[0].Department.id, name: user.Staff[0].Department.name }
-          : undefined,
-        school: user.Staff[0].School
-          ? { id: user.Staff[0].School.id, name: user.Staff[0].School.name }
+        school: user.staff[0].school
+          ? { id: user.staff[0].school.id, name: user.staff[0].school.name }
           : undefined,
       }
     : undefined;
@@ -502,7 +486,7 @@ export async function enrichUserWithCapabilities(user: MinimalUserInput): Promis
     capabilities,
     roleKey:
       (normalizedStaff?.role?.key) ||
-      (user.Staff?.[0]?.Role?.key) ||
+      (user.staff?.[0]?.role?.key) ||
       undefined,
     staff: normalizedStaff,
   };

@@ -22,14 +22,14 @@ export async function GET(
     const currentUser = authResult.user!;
     const userId = params.id;
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
+    const user = await prisma.users.findUnique({
+      where: { id: parseInt(userId) },
       include: {
-        Staff: {
+        staff: {
           include: {
-            Role: true,
-            Department: true,
-            School: true
+            role: true,
+            department: true,
+            school: true
           }
         }
       }
@@ -74,11 +74,11 @@ export async function PUT(
 
     const currentUser = authResult.user!;
     const userId = params.id;
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
 
     // Get existing user
-    const existingUser = await prisma.user.findUnique({
-      where: { id: userId }
+    const existingUser = await prisma.users.findUnique({
+      where: { id: parseInt(userId) }
     });
 
     if (!existingUser) {
@@ -102,21 +102,20 @@ export async function PUT(
     }
 
     // Update user
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
+    const updatedUser = await prisma.users.update({
+      where: { id: parseInt(userId) },
       data: {
-        ...(body.name !== undefined && { name: body.name }),
-        ...(body.email !== undefined && { email: body.email }),
+        ...(body.name !== undefined && { name: body.name as string }),
+        ...(body.email !== undefined && { email: body.email as string }),
         ...(body.login_notifications_enabled !== undefined && { 
-          login_notifications_enabled: body.login_notifications_enabled 
+          login_notifications_enabled: body.login_notifications_enabled as boolean
         }),
         ...(body.suspicious_alerts_enabled !== undefined && { 
-          suspicious_alerts_enabled: body.suspicious_alerts_enabled 
+          suspicious_alerts_enabled: body.suspicious_alerts_enabled as boolean 
         }),
         ...(body.remember_devices_enabled !== undefined && { 
-          remember_devices_enabled: body.remember_devices_enabled 
-        }),
-        updated_at: new Date()
+          remember_devices_enabled: body.remember_devices_enabled as boolean
+        })
       }
     });
 

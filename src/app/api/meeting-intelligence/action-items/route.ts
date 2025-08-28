@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withAuth } from '@/lib/auth/api-auth';
-import { prisma } from '@/lib/prisma';
+import { withAuth } from '../../../../lib/auth/api-auth';
+import { prisma } from '../../../../lib/prisma';
 
 export async function GET(request: NextRequest) {
   const authResult = await withAuth(request);
@@ -21,19 +21,19 @@ export async function GET(request: NextRequest) {
     
     // Filter by ownership
     if (filter === 'my' && user.staff) {
-      whereConditions.assigned_to_id = user.staff.id;
-    } else if (filter === 'team' && user.staff?.department) {
+      whereConditions.assigned_to = user.staff.id;
+    } else if (filter === 'team' && (user.staff as Record<string, unknown> | null)?.department) {
       // Get team members
       const teamMembers = await prisma.staff.findMany({
         where: {
           OR: [
-            { department_id: parseInt(user).staff.department.id },
-            { manager_id: parseInt(user).staff.id }
+            { department_id: (user.staff as { department?: { id: number } })?.department?.id },
+            { manager_id: (user.staff as { id: number })?.id }
           ]
         },
         select: { id: true }
       });
-      whereConditions.assigned_to_id = {
+      whereConditions.assigned_to = {
         in: teamMembers.map(m => m.id)
       };
     } else if (filter === 'overdue') {
@@ -62,29 +62,28 @@ export async function GET(request: NextRequest) {
     }
     
     // Fetch action items
-    const actionItems = await prisma.meetingActionItem.findMany({
+    const actionItems = await prisma.meeting_action_items.findMany({
       where: whereConditions,
       include: {
-        Meeting: {
+        meeting: {
           select: {
             id: true,
             title: true,
             start_time: true
           }
         },
-        AssignedTo: {
+        staff_meeting_action_items_assigned_toTostaff: {
           include: {
-            User: {
+            users: {
               select: {
                 id: true,
                 name: true,
                 email: true
               }
             },
-            Role: true
+            role: true
           }
-        },
-        AssignedToRole: true
+        }
       },
       orderBy: [
         { priority: 'desc' },
@@ -104,24 +103,17 @@ export async function GET(request: NextRequest) {
         status: isOverdue ? 'overdue' : item.status,
         priority: item.priority ?? 'Medium',
         dueDate: item.due_date?.toISOString(),
-        createdAt: item.created_at.toISOString(),
+        created_at: item.created_at.toISOString(),
         completedAt: item.completed_at?.toISOString(),
-        assignedRole: item.AssignedToRole ? {
-          id: item.AssignedToRole.id,
-          label: item.AssignedToRole.key ?? 'UNASSIGNED'
-        } : {
+        assignedrole: {
           id: 0,
           label: 'UNASSIGNED'
         },
-        assignedStaff: item.AssignedTo ? {
-          id: item.AssignedTo.id,
-          name: item.AssignedTo.User.name ?? 'Unknown',
-          email: item.AssignedTo.User.email
-        } : undefined,
-        meeting: item.Meeting ? {
-          id: item.Meeting.id,
-          title: item.Meeting.title,
-          date: item.Meeting.start_time?.toISOString() || new Date().toISOString()
+        assignedstaff: undefined,
+        meeting: item.meeting ? {
+          id: item.meeting.id,
+          title: item.meeting.title,
+          date: item.meeting.start_time?.toISOString() ?? new Date().toISOString()
         } : undefined,
         carriedForwardCount: item.carry_forward_count ?? 0,
         parentItemId: item.parent_action_id
@@ -175,8 +167,8 @@ export async function PATCH(request: NextRequest) {
       updateData.completed_at = new Date();
     }
     
-    const updated = await prisma.meetingActionItem.update({
-      where: { id: itemId },
+    const updated = await prisma.meeting_action_items.update({
+      where: { id: itemId as number },
       data: updateData
     });
     

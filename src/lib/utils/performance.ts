@@ -13,7 +13,7 @@ interface PerformanceMetrics {
     rss: number;
     heapTotal: number;
     heapUsed: number;
-    external: number;
+    external: number
   };
 }
 
@@ -44,7 +44,7 @@ export class PerformanceMonitor {
         const duration = Date.now() - startTime;
         const endMemory = process.memoryUsage();
         
-        const metrics: _PerformanceMetrics = {
+        const metrics: PerformanceMetrics = {
           route,
           method,
           duration,
@@ -65,7 +65,7 @@ export class PerformanceMonitor {
       .catch((error) => {
         const duration = Date.now() - startTime;
         
-        const metrics: _PerformanceMetrics = {
+        const metrics: PerformanceMetrics = {
           route,
           method,
           duration,
@@ -119,7 +119,7 @@ export class PerformanceMonitor {
   }
 
   // Log performance metrics
-  private static logPerformanceMetrics(metrics: _PerformanceMetrics, error?: unknown) {
+  private static logPerformanceMetrics(metrics: PerformanceMetrics, error?: unknown) {
     const logData = {
       ...metrics,
       ...(error ? { error: String(error) } : {})

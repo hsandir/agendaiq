@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -129,7 +129,7 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsOpen(false);
+        setIsOpen(false)
       }
     };
 
@@ -151,7 +151,7 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
   );
 
   return (
-    <>
+    <div>
       {/* Logo Trigger Button */}
       <div className="fixed top-4 left-4 z-[100]">
         <button
@@ -218,7 +218,7 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
         >
           <nav className="px-6 space-y-8" aria-label="Settings navigation">
             {validNavigation.map((section) => {
-              if (!section ?? section.adminOnly && !isAdmin) return null;
+              if (!section || (section.adminOnly && !isAdmin)) return null;
 
               return (
                 <div key={section.title}>
@@ -239,7 +239,7 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
                       return (
                         <li key={item.href} role="none">
                           <Link
-                            href={item.href as Record<string, unknown>}
+                            href={item.href as string}
                             onClick={() => setIsOpen(false)}
                             className={cn(
                               "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
@@ -260,11 +260,11 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
                             {item.label}
                           </Link>
                         </li>
-                      );
+                      )
                     })}
                   </ul>
                 </div>
-              );
+              )
             })}
           </nav>
         </div>
@@ -276,6 +276,6 @@ export function HiddenSidebar({ isAdmin, isOpen: externalIsOpen, onToggle }: Hid
           </div>
         </div>
       </aside>
-    </>
+    </div>
   );
 } 

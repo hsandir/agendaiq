@@ -21,7 +21,7 @@ export async function POST(
     }
     const user = authResult.user!;
 
-    const meetingId = params.id;
+    const meetingId = parseInt(params.id);
     const itemId = parseInt(params.itemId);
 
     if (isNaN(meetingId) || isNaN(itemId)) {
@@ -32,20 +32,20 @@ export async function POST(
     }
 
     // Check if user has access
-    const agendaItem = await prisma.meetingAgendaItem.findUnique({
+    const agendaItem = await prisma.meeting_agenda_items.findUnique({
       where: { id: itemId },
       include: {
-        Meeting: {
+        meeting: {
           include: {
-            MeetingAttendee: {
-              where: { staff_id: user.staff?.id || -1 }
+            meeting_attendee: {
+              where: { staff_id: (user.staff as Record<string, unknown> | null)?.id || -1 }
             }
           }
         }
       }
     });
 
-    if (!agendaItem ?? agendaItem.meeting_id !== meetingId) {
+    if (!agendaItem || agendaItem.meeting_id !== meetingId) {
       return NextResponse.json(
         { error: 'Agenda item not found' },
         { status: 404 }
@@ -53,8 +53,8 @@ export async function POST(
     }
 
     // Check permissions
-    const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
-    const isAttendee = agendaItem.Meeting.MeetingAttendee.length > 0;
+    const isOrganizer = agendaItem.meeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
+    const isAttendee = agendaItem.meeting.meeting_attendee.length > 0;
     const hasAdminAccess = isAnyAdmin(user);
 
     if (!isOrganizer && !isAttendee && !hasAdminAccess) {
@@ -94,14 +94,15 @@ export async function POST(
     await writeFile(filePath, buffer);
 
     // Create database record
-    const attachment = await prisma.agendaItemAttachment.create({
+    const attachment = await prisma.agenda_item_attachments.create({
       data: {
         agenda_item_id: itemId,
         file_name: file.name,
         file_url: `/uploads/agenda-items/${fileName}`,
         file_size: file.size,
         content_type: file.type,
-        uploaded_by_id: user.staff!.id
+        uploaded_by_id: user.staff!.id,
+        updated_at: new Date()
       }
     });
 
@@ -141,12 +142,12 @@ export async function GET(
       );
     }
 
-    const attachments = await prisma.agendaItemAttachment.findMany({
+    const attachments = await prisma.agenda_item_attachments.findMany({
       where: { agenda_item_id: itemId },
       include: {
-        UploadedBy: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         }
       },

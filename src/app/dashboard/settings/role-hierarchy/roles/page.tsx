@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
-import { Users as FiUsers, UserCheck as FiUserCheck, TrendingUp as FiTrendingUp, Eye as FiEye, Edit3 as FiEdit3, Settings as FiSettings, Shield as FiShield, Home as FiHome, User as FiUserPlus } from 'lucide-react';
+import { Users as FiUsers, UserCheck as FiUserCheck, TrendingUp as FiTrendingUp, Eye as FiEye, Edit3 as FiEdit3, Settings as FiSettings, Shield as FiShield, Home as FiHome, UserPlus as FiUserPlus } from 'lucide-react';
 import RolesPageClient from '@/components/settings/RolesPageClient';
 
 export const metadata: Metadata = {
@@ -20,10 +20,12 @@ export default async function RolePage() {
   // Fetch real role and organizational data
   const roles = await prisma.role.findMany({
     include: {
-      Department: true,
-      Staff: {
+      department: true,
+      staff: {
         include: {
-          User: true
+          users: true,
+          department: true,
+          role: true
         }
       }
     },
@@ -34,10 +36,10 @@ export default async function RolePage() {
 
   const departments = await prisma.department.findMany({
     include: {
-      Staff: {
+      staff: {
         include: {
-          User: true,
-          Role: true
+          users: true,
+          role: true
         }
       }
     }
@@ -46,17 +48,17 @@ export default async function RolePage() {
   // Calculate real statistics
   const totalRoles = roles.length;
   const leadershipRoles = roles.filter(role => role.is_leadership).length;
-  const totalStaff = roles.reduce((acc, role) => acc + role.Staff.length, 0);
+  const totalStaff = roles.reduce((acc, role) => acc + role.staff.length, 0);
   const totalDepartments = departments.length;
   const activeUsers = roles.reduce((acc, role) => 
-    acc + role.Staff.filter(staff => staff.User.emailVerified).length, 0
+    acc + role.staff.filter(staff => staff.users.email_verified).length, 0
   );
 
   // Role distribution by department
   const roleDistribution = (departments.map(dept => ({
     name: dept.name,
-    count: dept.Staff.length,
-    roles: dept.Staff.map(staff => staff.Role?.title).filter(Boolean)
+    count: dept.staff.length,
+    roles: dept.staff.map(staff => staff.role?.title).filter(Boolean)
   })));
 
   // Leadership hierarchy
@@ -66,8 +68,8 @@ export default async function RolePage() {
     .map(role => ({
       title: role.title,
       priority: role.priority,
-      staffCount: role.Staff.length,
-      department: role.Department?.name || 'No Department'
+      staffCount: role.staff.length,
+      department: role.department?.name || 'No Department'
     })));
 
   return (
@@ -186,10 +188,11 @@ export default async function RolePage() {
               </div>
             </div>
 
-            {/* Department Role Distribution with Drag & Drop */}
+            {/* Role Staff Distribution with Drag & Drop */}
             <div>
-              <h4 className="text-sm font-medium text-foreground mb-3">Department Role Distribution</h4>
-              <RolesPageClient departments={departments} roles={roles} />
+              <h4 className="text-sm font-medium text-foreground mb-3">Staff Role Distribution</h4>
+              <p className="text-xs text-muted-foreground mb-4">Drag staff members between roles to change their assignments</p>
+              <RolesPageClient departments={departments as any} roles={roles as any} />
             </div>
           </div>
         </CardContent>
@@ -301,7 +304,7 @@ export default async function RolePage() {
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    {role.Department?.name || 'No Department'} • {role.Staff.length} staff members
+                    {role.department?.name || 'No Department'} • {role.staff.length} staff members
                   </p>
                 </div>
                 <div className="text-right">

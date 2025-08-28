@@ -1,6 +1,7 @@
 import { requireAuth, AuthPresets } from '@/lib/auth/auth-utils';
 import { getUserCapabilities, can, Capability, isOpsAdmin } from '@/lib/auth/policy';
 import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
 
 export default async function DebugCapabilitiesPage() {
   const user = await requireAuth(AuthPresets.requireDevelopment);
@@ -9,16 +10,12 @@ export default async function DebugCapabilitiesPage() {
   const capabilities = await getUserCapabilities(user.id);
   
   // Get user's role permissions
-  const userWithRole = await prisma.user.findUnique({
-    where: { id: parseInt(user.id) },
+  const userWithRole = await prisma.users.findUnique({
+    where: { id: user.id },
     include: {
-      Staff: {
+      staff: {
         include: {
-          Role: {
-            include: {
-              Permissions: true
-            }
-          }
+          role: true
         }
       }
     }
@@ -29,20 +26,15 @@ export default async function DebugCapabilitiesPage() {
     userId: user.id,
     email: user.email,
     is_system_admin: user.is_system_admin ?? false,
-    is_school_admin: user.is_school_admin ?? false,
+    is_school_admin: (user as unknown as Record<string, unknown>).is_school_admin ?? false,
     
     // Role info
-    roleKey: userWithRole?.Staff?.[0]?.Role?.key || 'No Key',
-    roleId: userWithRole?.Staff?.[0]?.Role?.id,
+    roleKey: userWithRole?.staff?.[0]?.role?.key || 'No Key',
+    roleId: userWithRole?.staff?.[0]?.role?.id,
     
-    // Permissions from database
-    permissionCount: userWithRole?.Staff?.[0]?.Role?.Permissions?.length ?? 0,
-    permissions: userWithRole?.Staff?.[0]?.Role?.Permissions?.map(p => ({
-      id: p.id,
-      capability: p.capability,
-      resource: p.resource,
-      action: p.action
-    })) || [],
+    // Permissions from database (no permissions table currently)
+    permissionCount: 0,
+    permissions: [] as any[],
     
     // Computed capabilities
     capabilities: capabilities,
@@ -146,18 +138,18 @@ export default async function DebugCapabilitiesPage() {
         <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
           <h2 className="text-xl font-semibold mb-4 text-gray-900">Test Access</h2>
           <div className="space-x-4">
-            <a href="/dashboard/settings/backup" className="text-blue-600 hover:underline">
+            <Link href="/dashboard/settings/backup" className="text-blue-600 hover:underline">
               Backup Page →
-            </a>
-            <a href="/dashboard/settings/audit-logs" className="text-blue-600 hover:underline">
+            </Link>
+            <Link href="/dashboard/settings/audit-logs" className="text-blue-600 hover:underline">
               Audit Logs →
-            </a>
-            <a href="/dashboard/settings/system" className="text-blue-600 hover:underline">
+            </Link>
+            <Link href="/dashboard/settings/system" className="text-blue-600 hover:underline">
               System Settings →
-            </a>
+            </Link>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     const { pages, type } = (await request.json()) as Record<string, unknown>;
 
     if (type === 'custom' && pages) {
-      return await customHealthCheck(pages);
+      return await customHealthCheck(Array.isArray(pages) ? pages as string[] : []);
     }
 
     return NextResponse.json({ error: 'Invalid request. Use type: "custom" with pages array' }, { status: 400 });
@@ -253,7 +253,7 @@ async function checkPage(url: string, name: string) {
           text.includes('500 - Internal Server Error') ||
           text.includes('This application has no explicit mapping for') ||
           text.includes('Whitelabel Error Page') ||
-          (text.includes('Error:') && !text.includes('__next_error')) ||
+          (text.includes('Error:') && !text.includes('next_error')) ||
           (text.includes('Exception:') && !text.includes('NotFound'));
 
         // Check for actual 404 pages (not Next.js dev components)
@@ -271,7 +271,7 @@ async function checkPage(url: string, name: string) {
         details.contentLength = text.length;
         details.hasTitle = text.includes('<title>');
         details.hasBody = text.includes('<body');
-        details.hasNextDevError = text.includes('__next_error') || text.includes('NotFound');
+        details.hasNextDevError = text.includes('next_error') || text.includes('NotFound');
       } catch {
         // If we can't read the text, that's ok for status check
       }
@@ -286,7 +286,7 @@ async function checkPage(url: string, name: string) {
         
         if (json.error) {
           // 401 Unauthorized is expected for protected endpoints without auth
-          if (response.status === 401 ?? json.error === 'Unauthorized') {
+          if (response.status === 401 || json.error === 'Unauthorized') {
             status = 'warning';
             message = `API returned expected auth error: ${json.error}`;
           } else {

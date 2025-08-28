@@ -173,7 +173,7 @@ export class PostHogProvider implements IMonitoringProvider {
   getStats(): {
     errors: number;
     warnings: number;
-    transactions: number;
+    transactions: number
   } {
     // PostHog doesn't provide real-time stats like this
     // Return placeholder values

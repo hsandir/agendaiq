@@ -31,7 +31,7 @@ export async function PATCH(
     }
     const user = authResult.user!;
 
-    const meetingId = params.id;
+    const meetingId = parseInt(params.id);
     const itemId = parseInt(params.itemId);
 
     if (isNaN(meetingId) || isNaN(itemId)) {
@@ -42,7 +42,7 @@ export async function PATCH(
     }
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const validationResult = updateSchema.safeParse(body);
 
     if (!validationResult.success) {
@@ -53,13 +53,13 @@ export async function PATCH(
     }
 
     // Check if agenda item exists and user has permission
-    const agendaItem = await prisma.meetingAgendaItem.findUnique({
+    const agendaItem = await prisma.meeting_agenda_items.findUnique({
       where: { id: itemId },
       include: {
-        Meeting: {
+        meeting: {
           include: {
-            MeetingAttendee: {
-              where: { staff_id: user.staff?.id || -1 }
+            meeting_attendee: {
+              where: { staff_id: (user.staff as Record<string, unknown> | null)?.id || -1 }
             }
           }
         }
@@ -74,9 +74,9 @@ export async function PATCH(
     }
 
     // Check permissions
-    const isOrganizer = agendaItem.Meeting.organizer_id === user.staff?.id;
+    const isOrganizer = agendaItem.meeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
     const hasAdminAccess = isAnyAdmin(user);
-    const isResponsible = agendaItem.responsible_staff_id === user.staff?.id;
+    const isResponsible = agendaItem.responsible_staff_id === (user.staff as Record<string, unknown> | null)?.id;
 
     if (!isOrganizer && !hasAdminAccess && !isResponsible) {
       return NextResponse.json(
@@ -86,17 +86,17 @@ export async function PATCH(
     }
 
     // Update the agenda item
-    const updatedItem = await prisma.meetingAgendaItem.update({
+    const updatedItem = await prisma.meeting_agenda_items.update({
       where: { id: itemId },
       data: validationResult.data,
       include: {
-        ResponsibleStaff: {
+        staff: {
           include: {
-            User: true
+            users: true
           }
         },
-        Comments: true,
-        ActionItems: true
+        agenda_item_comments: true,
+        meeting_action_items: true
       }
     });
 
@@ -145,7 +145,7 @@ export async function DELETE(
     }
     const user = authResult.user!;
 
-    const meetingId = params.id;
+    const meetingId = parseInt(params.id);
     const itemId = parseInt(params.itemId);
 
     if (isNaN(meetingId) || isNaN(itemId)) {
@@ -156,7 +156,7 @@ export async function DELETE(
     }
 
     // Delete the agenda item
-    await prisma.meetingAgendaItem.delete({
+    await prisma.meeting_agenda_items.delete({
       where: { id: itemId }
     });
 

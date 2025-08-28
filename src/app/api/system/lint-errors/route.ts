@@ -21,13 +21,13 @@ interface LintError {
   endColumn?: number;
   fix?: {
     range: [number, number];
-    text: string;
+    text: string
   };
   suggestions?: Array<{
     desc: string;
     fix: {
       range: [number, number];
-      text: string;
+      text: string
     };
   }>;
 }
@@ -83,15 +83,15 @@ export async function POST(request: NextRequest) {
     if (!auth.success) {
       return NextResponse.json({ error: auth.error }, { status: auth.statusCode });
     }
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const { action, filePath, fixes } = body;
 
     if (action === 'fix') {
-      return await fixLintErrors(filePath, fixes);
+      return await fixLintErrors(String(filePath || ''), Array.isArray(fixes) ? fixes as Record<string, unknown>[] : []);
     } else if (action === 'autofix') {
       return await autoFixErrors();
     } else if (action === 'report') {
-      return await reportErrorsToAdmin(fixes);
+      return await reportErrorsToAdmin(Array.isArray(fixes) ? fixes as Record<string, unknown>[] : []);
     }
 
     return NextResponse.json({ error: 'Invalid action. Use: fix, autofix, or report' }, { status: 400 });
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
 async function getLintSummary() {
   try {
     const { stdout, stderr } = await execAsync('npx eslint src/ --format json', { 
-      cwd: process.cwd() 
+      cwd: process.cwd()
     });
     
     const results: LintResult[] = JSON.parse(stdout || '[]');
@@ -120,7 +120,7 @@ async function getLintSummary() {
       acc.fixableErrors += result.fixableErrorCount;
       acc.fixableWarnings += result.fixableWarningCount;
       
-      if (result.errorCount > 0 ?? result.warningCount > 0) {
+      if (result.errorCount > 0 || result.warningCount > 0) {
         acc.filesWithIssues++;
       }
       
@@ -160,7 +160,7 @@ async function getLintSummary() {
   } catch (error: unknown) {
     // ESLint might return non-zero exit code for errors, parse the output anyway
     try {
-      const errorOutput = error?.stdout || '[]';
+      const errorOutput = (error as { stdout?: string })?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const summary = results.reduce((acc, result) => {
         acc.totalFiles++;
@@ -169,7 +169,7 @@ async function getLintSummary() {
         acc.fixableErrors += result.fixableErrorCount;
         acc.fixableWarnings += result.fixableWarningCount;
         
-        if (result.errorCount > 0 ?? result.warningCount > 0) {
+        if (result.errorCount > 0 || result.warningCount > 0) {
           acc.filesWithIssues++;
         }
         
@@ -198,7 +198,7 @@ async function getLintSummary() {
 async function getLintDetails(severity: string, limit: number, offset: number) {
   try {
     const { stdout } = await execAsync('npx eslint src/ --format json', { 
-      cwd: process.cwd() 
+      cwd: process.cwd()
     });
     
     const results: LintResult[] = JSON.parse(stdout || '[]');
@@ -241,7 +241,7 @@ async function getLintDetails(severity: string, limit: number, offset: number) {
 
   } catch (error: unknown) {
     try {
-      const errorOutput = error?.stdout || '[]';
+      const errorOutput = (error as { stdout?: string })?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const allErrors: (LintError & { filePath: string })[] = [];
       results.forEach(result => {
@@ -279,7 +279,7 @@ async function getLintDetails(severity: string, limit: number, offset: number) {
 async function getFixableErrors() {
   try {
     const { stdout } = await execAsync('npx eslint src/ --format json', { 
-      cwd: process.cwd() 
+      cwd: process.cwd()
     });
     
     const results: LintResult[] = JSON.parse(stdout || '[]');
@@ -305,7 +305,7 @@ async function getFixableErrors() {
 
   } catch (error: unknown) {
     try {
-      const errorOutput = error?.stdout || '[]';
+      const errorOutput = (error as { stdout?: string })?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const fixableErrors: (LintError & { filePath: string })[] = [];
       results.forEach(result => {
@@ -335,7 +335,7 @@ async function autoFixErrors() {
   try {
     // Run ESLint with --fix flag
     const { stdout, stderr } = await execAsync('npx eslint src/ --fix --format json', { 
-      cwd: process.cwd() 
+      cwd: process.cwd()
     });
     
     // Get remaining errors after auto-fix
@@ -360,7 +360,7 @@ async function autoFixErrors() {
   } catch (error: unknown) {
     // Even if some errors remain, auto-fix might have worked partially
     try {
-      const errorOutput = error?.stdout || '[]';
+      const errorOutput = (error as { stdout?: string })?.stdout || '[]';
       const results: LintResult[] = JSON.parse(errorOutput);
       const remainingErrors = results.reduce((sum, result) => sum + result.errorCount, 0);
       const remainingWarnings = results.reduce((sum, result) => sum + result.warningCount, 0);
@@ -459,7 +459,7 @@ async function getTypeCastingViolations() {
       content: string;
       severity: 'critical';
       type: 'DANGEROUS_TYPE_CASTING';
-      suggestion: string;
+      suggestion: string
     }> = [];
 
     if (stdout) {
@@ -497,7 +497,7 @@ async function getTypeCastingViolations() {
             line: parseInt(lineNumber),
             content: content.trim(),
             severity: 'critical',
-            type: 'CHAINED_TYPE_CASTING',
+            type: 'DANGEROUS_TYPE_CASTING',
             suggestion: 'Avoid chained type assertions - use single proper type assertion or type guards'
           });
         }

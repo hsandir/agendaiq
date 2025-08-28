@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface TabsContextValue {
   value: string;
-  onValueChange: (value: string) => void;
+  onValueChange: (value: string) => void
 }
 
 const TabsContext = React.createContext<TabsContextValue | undefined>(undefined);
@@ -32,7 +32,7 @@ const Tabs = ({ value, defaultValue, onValueChange, children, className }: TabsP
   const actualValue = value !== undefined ? value : internalValue;
   const handleValueChange = (newValue: string) => {
     if (value === undefined) {
-      setInternalValue(newValue);
+      setInternalValue(newValue)
     }
     onValueChange?.(newValue);
   };

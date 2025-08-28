@@ -10,7 +10,7 @@ export class ConsoleTransport implements LogTransport {
   level: LogLevel;
 
   constructor(level: LogLevel = LogLevel.INFO) {
-    this.level = level;
+    this.level = level
   }
 
   private getColorForLevel(level: LogLevel): string {
@@ -84,7 +84,7 @@ export class ConsoleTransport implements LogTransport {
 
   async write(entry: BaseLogEntry): Promise<void> {
     if (entry.level < this.level) {
-      return;
+      return
     }
 
     const formatted = this.formatEntry(entry);

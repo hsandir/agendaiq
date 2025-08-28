@@ -33,7 +33,7 @@ export class FeatureErrorBoundary extends Component<Props, State> {
     console.error(`Feature error in ${this.props.feature}:`, error, errorInfo);
   }
 
-  public render() {
+  public render(): React.ReactNode {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return <>{this.props.fallback}</>;

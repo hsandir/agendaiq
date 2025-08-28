@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Download as FiDownload, Eye as FiEye, Trash2 as FiTrash2, Edit as FiEdit, RefreshCw as FiRefreshCw, User as FiUser, Database as FiDatabase, Activity as FiActivity, Shield as FiShield, AlertTriangle as FiAlertTriangle } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Download as FiDownload, Eye as FiEye, Trash2 as FiTrash2, Edit as FiEdit, RefreshCw as FiRefreshCw, User as FiUser, Users as FiUserIcon, Database as FiDatabase, Activity as FiActivity, Shield as FiShield, AlertTriangle as FiAlertTriangle } from 'lucide-react';
 import { isRole, RoleKey } from '@/lib/auth/policy';
 import type { UserWithStaff, SessionUser } from '@/types/auth';
 
@@ -18,17 +18,17 @@ interface AuthUser {
       key?: string;  // Legacy RoleKey - optional
       label: string;
       priority: number;
-      is_leadership: boolean;
+      is_leadership: boolean
     };
     department: {
-      name: string;
+      name: string
     };
   };
 }
 
 // Component props interface
 interface AuditLogsClientProps {
-  user: AuthUser;
+  user: AuthUser
 }
 
 // Enhanced error handling types
@@ -132,11 +132,11 @@ interface LegacyAuditLog {
   ip_address: string | null;
   user_agent: string | null;
   created_at: string;
-  User: { id: number; email: string; name: string | null } | null;
-  Staff: { 
+  users: { id: number; email: string; name: string | null } | null;
+  staff: { 
     id: number; 
-    Role: { label: string }; 
-    Department: { name: string } 
+    role: { label: string }; 
+    department: { name: string } 
   } | null;
 }
 
@@ -155,11 +155,11 @@ interface CriticalAuditLog {
   error_message: string | null;
   description: string | null;
   timestamp: string;
-  User: { id: number; email: string; name: string | null } | null;
-  Staff: { 
+  users: { id: number; email: string; name: string | null } | null;
+  staff: { 
     id: number; 
-    Role: { label: string }; 
-    Department: { name: string } 
+    role: { label: string }; 
+    department: { name: string } 
   } | null;
 }
 
@@ -167,11 +167,11 @@ type AuditLog = LegacyAuditLog | CriticalAuditLog;
 
 // Type guards
 function isCriticalLog(log: AuditLog): log is CriticalAuditLog {
-  return 'category' in log && 'risk_score' in log;
+  return 'category' in log && 'risk_score' in log
 }
 
 function isLegacyLog(log: AuditLog): log is LegacyAuditLog {
-  return 'table_name' in log && 'operation' in log;
+  return 'table_name' in log && 'operation' in log
 }
 
 interface AuditSummary {
@@ -189,7 +189,7 @@ interface HighRiskStats {
   ipDistribution: Record<string, number>;
   timeRange: {
     from: string;
-    to: string;
+    to: string
   };
 }
 
@@ -205,7 +205,7 @@ interface Filters {
   endDate: string;
   minRiskScore: string;
   success: string;
-  search: string;
+  search: string
 }
 
 export default function AuditLogsClient({ user }: AuditLogsClientProps) {
@@ -393,33 +393,33 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-US');
+    return new Date(dateString).toLocaleString('en-US')
   };
 
   // Permission validation helper
   const canViewAuditDetails = useCallback((log: AuditLog): boolean => {
     // Ops Admin can view all logs
-    if (user.is_school_admin || isRole(user as any, RoleKey.OPS_ADMIN)) {
+    if ((user as unknown as Record<string, unknown>).is_school_admin || isRole(user as any, RoleKey.OPS_ADMIN)) {
       return true;
     }
 
     // Leadership can view logs from their own organization
-    if (user.staff?.Role?.is_leadership) {
+    if (user.staff?.role?.is_leadership) {
       // Can view logs from same user or their own staff actions
       if (isCriticalLog(log)) {
-        return log.user_id === user.id ?? log.staff_id === user.staff.id;
+        return log.user_id === user.id || log.staff_id === user.staff.id;
       } else {
         // For legacy logs, check the User/Staff relations
-        return log.User?.id === user.id ?? log.Staff?.id === user.staff.id;
+        return log.users?.id === user.id || log.staff?.id === user.staff.id;
       }
     }
 
     // Regular staff can only view their own audit logs
     if (isCriticalLog(log)) {
-      return log.user_id === user.id ?? log.staff_id === user.staff?.id;
+      return log.user_id === user.id || log.staff_id === user.staff?.id;
     } else {
       // For legacy logs, check the User/Staff relations
-      return log.User?.id === user.id ?? log.Staff?.id === user.staff?.id;
+      return log.users?.id === user.id || log.staff?.id === user.staff?.id;
     }
   }, [user]);
 
@@ -787,12 +787,12 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                      {log.User ? (
+                      {log.users ? (
                         <div>
-                          <div className="font-medium">{log.User.name ?? log.User.email}</div>
-                          {log.Staff && (
+                          <div className="font-medium">{log.users.name ?? log.users.email}</div>
+                          {log.staff && (
                             <div className="text-muted-foreground text-xs">
-                              {log.Staff.Role.title} - {log.Staff.Department.name}
+                              {log.staff.role.label} - {log.staff.department.name}
                             </div>
                           )}
                         </div>
@@ -821,7 +821,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                     <td className="px-6 py-4 text-sm text-foreground">
                       <div className="max-w-xs truncate">
                         {isCritical ? (
-                          log.error_message ?? log.description || 'No description'
+                          log.error_message ?? (log.description || 'No description')
                         ) : (
                           log.description || 'No description'
                         )}
@@ -857,7 +857,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                       )}
                     </td>
                   </tr>
-                );
+                )
               })}
             </tbody>
           </table>
@@ -937,7 +937,7 @@ export default function AuditLogsClient({ user }: AuditLogsClientProps) {
                     <div>
                       <label className="text-sm font-medium text-foreground">User/Staff ID</label>
                       <p className="text-sm text-foreground">
-                        User: {selectedLog.user_id || 'N/A'}, Staff: {selectedLog.staff_id || 'N/A'}
+                        users: {selectedLog.user_id || 'N/A'}, staff: {selectedLog.staff_id || 'N/A'}
                       </p>
                     </div>
                   </>

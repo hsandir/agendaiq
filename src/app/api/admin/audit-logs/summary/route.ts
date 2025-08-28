@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request?.url);
-    const days = searchParams.get('days') ? parseInt(searchParams.get('days')!) : 30;
+    const days = searchParams.get('days') ? parseInt(searchParams.get('days') as string) : 30;
 
     const summary = await AuditLogger.getAuditSummary(days);
 

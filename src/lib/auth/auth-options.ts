@@ -44,6 +44,10 @@ function isValidUserData(data: unknown): data is User {
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: "jwt",
+    maxAge: 8 * 60 * 60, // 8 hours - matches JWT
+  },
   jwt: {
     maxAge: 8 * 60 * 60, // 8 hours for JWT token
   },
@@ -69,14 +73,54 @@ export const authOptions: NextAuthOptions = {
         trustDevice: { label: "Trust Device", type: "text", optional: true },
       },
       async authorize(credentials, req): Promise<User | null> {
-        console.log('🔐 Login attempt for:', credentials?.email);
+        console.log('🔐 AUTHORIZE START - Login attempt for:', credentials?.email);
+        
+        // Send log to debug endpoint for production troubleshooting
+        try {
+          await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/debug-logs`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'authorize_start',
+              level: 'info',
+              message: `Authorize function called for ${credentials?.email}`,
+              details: {
+                email: credentials?.email,
+                hasPassword: !!credentials?.password,
+                passwordLength: credentials?.password?.length || 0,
+                hasReq: !!req,
+                timestamp: new Date().toISOString()
+              }
+            })
+          }).catch(() => {}); // Ignore fetch errors
+        } catch (e) { /* ignore */ }
+        
         try {
           // TODO: Add proper audit logging for NextAuth callbacks
           // Log login attempt
           // await AuditClient.logAuthEvent('login_attempt', undefined, undefined, req);
 
           if (!credentials?.email || !credentials?.password) {
-            console.error('Missing credentials');
+            console.error('❌ AUTHORIZE: Missing credentials');
+            
+            // Log to debug endpoint
+            try {
+              await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/debug-logs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  type: 'authorize_error',
+                  level: 'error',
+                  message: 'Missing credentials in authorize function',
+                  details: {
+                    hasEmail: !!credentials?.email,
+                    hasPassword: !!credentials?.password,
+                    timestamp: new Date().toISOString()
+                  }
+                })
+              }).catch(() => {});
+            } catch (e) { /* ignore */ }
+            
             // await AuditClient.logSecurityEvent('login_missing_credentials', undefined, undefined, req, 'Missing email or password');
             return null; // Return null instead of throwing
           }
@@ -105,47 +149,94 @@ export const authOptions: NextAuthOptions = {
             }
           }
 
-          console.log('🔍 Looking up user in database:', credentials.email);
-          const user = await prisma.user.findUnique({
+          console.log('🔍 AUTHORIZE: Looking up user in database:', credentials.email);
+          const user = await prisma.users.findUnique({
             where: { email: credentials.email },
             include: {
-              Staff: {
+              staff: {
                 include: {
-                  Role: true,
-                  Department: true,
-                  School: true,
-                  District: true
+                  role: true,
+                  department: true,
+                  school: true,
+                  district: true
                 }
               }
             }
           });
-          console.log('🔍 User found:', !!user, user ? { id: user.id, email: user.email, hasPassword: !!user.hashedPassword } : null);
+          console.log('🔍 AUTHORIZE: User found:', !!user, user ? { id: user.id, email: user.email, hasPassword: !!(user as Record<string, unknown>).hashed_password } : null);
+
+          // Log database lookup result
+          try {
+            await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/debug-logs`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'authorize_db_lookup',
+                level: user ? 'info' : 'warning',
+                message: `Database lookup for ${credentials.email}: ${user ? 'Found' : 'Not found'}`,
+                details: user ? {
+                  userId: user.id,
+                  email: user.email,
+                  hasPassword: !!(user as Record<string, unknown>).hashed_password,
+                  passwordLength: ((user as Record<string, unknown>).hashed_password as string)?.length || 0,
+                  hasStaff: user.staff?.length > 0,
+                  twoFactorEnabled: (user as Record<string, unknown>).two_factor_enabled,
+                  timestamp: new Date().toISOString()
+                } : {
+                  email: credentials.email,
+                  error: 'USER_NOT_FOUND',
+                  timestamp: new Date().toISOString()
+                }
+              })
+            }).catch(() => {});
+          } catch (e) { /* ignore */ }
 
           if (!user) {
-            console.error('User not found:', credentials.email);
+            console.error('❌ AUTHORIZE: User not found:', credentials.email);
             return null; // Return null for security (don't reveal if user exists)
           }
           
-          if (!user.hashedPassword) {
+          if (!(user as Record<string, unknown>).hashed_password) {
             console.error('User has no password:', credentials.email);
             return null; // Return null instead of throwing
           }
 
           // Check password using bcrypt
-          console.log('Checking password for user:', user.email);
-          const isValid = await bcrypt.compare(credentials.password, user.hashedPassword);
-          console.log('Password valid:', isValid);
+          console.log('🔒 AUTHORIZE: Checking password for user:', user.email);
+          const isValid = user.hashed_password ? await bcrypt.compare(credentials.password, user.hashed_password) : false;
+          console.log('🔒 AUTHORIZE: Password valid:', isValid);
+          
+          // Log password validation result
+          try {
+            await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/debug-logs`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'authorize_password_check',
+                level: isValid ? 'info' : 'error',
+                message: `Password validation for ${user.email}: ${isValid ? 'Success' : 'Failed'}`,
+                details: {
+                  email: user.email,
+                  userId: user.id,
+                  passwordValid: isValid,
+                  providedPasswordLength: credentials.password.length,
+                  storedPasswordLength: ((user as Record<string, unknown>).hashed_password as string)?.length || 0,
+                  timestamp: new Date().toISOString()
+                }
+              })
+            }).catch(() => {});
+          } catch (e) { /* ignore */ }
           
           if (!isValid) {
-            console.error('Invalid password for user:', user.email);
-            // // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, 'Password mismatch');
+            console.error('❌ AUTHORIZE: Invalid password for user:', user.email);
+            // // await AuditClient.logAuthEvent('login_failure', user.id, user.staff[0]?.id, req, 'Password mismatch');
             return null; // Return null for invalid password
           }
           
-          console.log('✅ Password verified successfully for:', user.email);
+          console.log('✅ AUTHORIZE: Password verified successfully for:', user.email);
 
           // Check 2FA if enabled
-          if (user.two_factor_enabled) {
+          if ((user as Record<string, unknown>).two_factor_enabled) {
             if (!credentials.twoFactorCode) {
               throw new Error("2FA_REQUIRED");
             }
@@ -160,25 +251,25 @@ export const authOptions: NextAuthOptions = {
 
             // Check backup codes if TOTP fails
             if (!isValidToken) {
-              const isBackupCode = user.backup_codes.includes(credentials.twoFactorCode);
+              const isBackupCode = user.backup_codes?.includes(credentials.twoFactorCode);
               
               if (!isBackupCode) {
-                // // await AuditClient.logAuthEvent('login_failure', user.id, user.Staff[0]?.id, req, '2FA code invalid');
+                // // await AuditClient.logAuthEvent('login_failure', user.id, user.staff[0]?.id, req, '2FA code invalid');
                 console.error('Invalid 2FA code and not a backup code');
                 return null; // Return null for invalid 2FA
               }
 
               // Remove used backup code
-              await prisma.user.update({
-                where: { id: parseInt(user.id) },
+              await prisma.users.update({
+                where: { id: user.id },
                 data: {
-                  backup_codes: user.backup_codes.filter(code => code !== credentials.twoFactorCode)
+                  backup_codes: user.backup_codes?.filter(code => code !== credentials.twoFactorCode) || []
                 }
               });
             }
           }
 
-          const staff = user.Staff[0];
+          const staff = user.staff && user.staff.length > 0 ? user.staff[0] : null;
           const userData = {
             id: String(user.id), // Ensure string conversion for NextAuth
             email: user.email,
@@ -187,25 +278,26 @@ export const authOptions: NextAuthOptions = {
               staff: {
                 id: staff.id,
                 role: {
-                  id: staff.Role.id,
-                  key: staff.Role.key,
-                  category: staff.Role.category,
-                  is_leadership: staff.Role.is_leadership
+                  id: staff.role.id,
+                  title: staff.role.title,
+                  key: staff.role.key,
+                  category: staff.role.category,
+                  is_leadership: staff.role.is_leadership
                 },
                 department: {
-                  id: staff.Department.id,
-                  name: staff.Department.name,
-                  code: staff.Department.code
+                  id: staff.department.id,
+                  name: staff.department.name,
+                  code: staff.department.code
                 },
                 school: {
-                  id: staff.School.id,
-                  name: staff.School.name,
-                  code: staff.School.code
+                  id: staff.school.id,
+                  name: staff.school.name,
+                  code: staff.school.code
                 },
                 district: {
-                  id: staff.District.id,
-                  name: staff.District.name,
-                  code: staff.District.code
+                  id: staff.district.id,
+                  name: staff.district.name,
+                  code: staff.district.code
                 }
               }
             })
@@ -214,20 +306,42 @@ export const authOptions: NextAuthOptions = {
           // Log successful login
           // await AuditClient.logAuthEvent('login_success', userData.id, staff?.id, req);
           
-          // Add rememberMe flag to user data
-          if (credentials.rememberMe === 'true') {
-            userData.rememberMe = true;
-          }
-          if (credentials.trustDevice === 'true') {
-            userData.trustDevice = true;
-          }
+          // Add rememberMe flag to user data - handled in session callback
+          // if (credentials.rememberMe === 'true') {
+          //   userData.rememberMe = true;
+          // }
+          // if (credentials.trustDevice === 'true') {
+          //   userData.trustDevice = true;
+          // }
           
-          console.log('✅ Returning user data:', {
+          // Log successful authorize completion
+          try {
+            await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/debug-logs`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'authorize_success',
+                level: 'info',
+                message: `Authorize function returning user data for ${userData.email}`,
+                details: {
+                  userId: userData.id,
+                  email: userData.email,
+                  hasStaff: !!userData.staff,
+                  staffRole: userData.staff?.role?.key,
+                  rememberMe: credentials.rememberMe === 'true',
+                  trustDevice: credentials.trustDevice === 'true',
+                  timestamp: new Date().toISOString()
+                }
+              })
+            }).catch(() => {});
+          } catch (e) { /* ignore */ }
+
+          console.log('✅ AUTHORIZE: Returning user data:', {
             id: userData.id,
             email: userData.email,
             hasStaff: !!userData.staff,
-            rememberMe: userData.rememberMe,
-            trustDevice: userData.trustDevice
+            // rememberMe: userData.rememberMe,
+            // trustDevice: userData.trustDevice
           });
           
           return userData;
@@ -259,13 +373,13 @@ export const authOptions: NextAuthOptions = {
           return '/auth/signin?error=unauthorized_domain';
         }
 
-        const existingUser = await prisma.user.findUnique({
+        const existingUser = await prisma.users.findUnique({
           where: { email: user.email! }
         });
 
         // If it's the first user ever, make them admin
         if (!existingUser) {
-          const userCount = await prisma.user.count();
+          const userCount = await prisma.users.count();
           if (userCount === 0) {
             // This will be the first user, they'll get admin privileges when created
             return true;
@@ -273,12 +387,12 @@ export const authOptions: NextAuthOptions = {
           
           // Check if there's an existing credentials account
           // This prevents OAuth takeover of credentials accounts
-          const credentialsUser = await prisma.user.findUnique({
+          const credentialsUser = await prisma.users.findUnique({
             where: { email: user.email! },
-            include: { Account: true }
+            include: { account: true }
           });
           
-          if (credentialsUser && !credentialsUser.Account?.some(a => a.provider === 'google')) {
+          if (credentialsUser && !credentialsUser.account?.some(a => a.provider === 'google')) {
             // User exists with credentials, needs to link accounts manually
             return '/auth/signin?error=account_linking_required';
           }
@@ -302,7 +416,7 @@ export const authOptions: NextAuthOptions = {
         }
         
         // Handle rememberMe and trustDevice flags
-        if ('rememberMe' in user && user.rememberMe) {
+        if ('rememberMe' in user && (user as Record<string, unknown>).rememberMe) {
           token.rememberMe = true;
           // Set longer expiry for remember me (7 days)
           const maxAge = 7 * 24 * 60 * 60; // 7 days in seconds
@@ -313,7 +427,7 @@ export const authOptions: NextAuthOptions = {
           token.exp = Math.floor(Date.now() / 1000) + maxAge;
         }
         
-        if ('trustDevice' in user && user.trustDevice) {
+        if ('trustDevice' in user && (user as Record<string, unknown>).trustDevice) {
           token.trustDevice = true;
         }
       }
@@ -329,19 +443,15 @@ export const authOptions: NextAuthOptions = {
 
       if (token.email && (trigger === 'signIn' || needsRefresh)) {
         try {
-          const dbUser = await prisma.user.findUnique({
+          const dbUser = await prisma.users.findUnique({
             where: { email: token.email },
             include: {
-              Staff: {
+              staff: {
                 include: {
-                  Role: {
-                    include: {
-                      Permissions: true
-                    }
-                  },
-                  Department: true,
-                  School: true,
-                  District: true
+                  role: true,
+                  department: true,
+                  school: true,
+                  district: true
                 }
               }
             }
@@ -358,31 +468,20 @@ export const authOptions: NextAuthOptions = {
             (token as unknown as { capsRefreshedAt?: number }).capsRefreshedAt = nowSec;
             
             // Add staff info if available
-            if (dbUser.Staff && dbUser.Staff.length > 0) {
-              const staff = dbUser.Staff[0];
+            if (dbUser.staff && dbUser.staff.length > 0) {
+              const staff = dbUser.staff[0];
               token.staff = {
                 id: staff.id,
                 role: {
-                  key: staff.Role.key,
-                  category: staff.Role.category,
-                  is_leadership: staff.Role.is_leadership
+                  title: staff.role.title
                 },
                 department: {
-                  id: staff.Department.id,
-                  name: staff.Department.name,
-                  code: staff.Department.code
+                  name: staff.department.name
                 },
                 school: {
-                  id: staff.School.id,
-                  name: staff.School.name,
-                  code: staff.School.code
-                },
-                district: {
-                  id: staff.District.id,
-                  name: staff.District.name,
-                  code: staff.District.code
+                  name: staff.school.name
                 }
-              } satisfies Record<string, unknown>;
+              };
             }
           }
         } catch (error: unknown) {
@@ -403,8 +502,8 @@ export const authOptions: NextAuthOptions = {
       }
       // Add admin flags and capabilities to session
       session.user.is_system_admin = token.is_system_admin as boolean;
-      session.user.is_school_admin = token.is_school_admin as boolean;
-      session.user.capabilities = token.capabilities as string[];
+      (session.user as Record<string, unknown>).is_school_admin = token.is_school_admin as boolean;
+      (session.user as Record<string, unknown>).capabilities = token.capabilities as string[];
       
       // Handle remember me expiry
       if (token.rememberMe) {
@@ -422,11 +521,6 @@ export const authOptions: NextAuthOptions = {
     signIn: '/auth/signin',
     error: '/auth/error',
     verifyRequest: '/auth/verify',
-  },
-  session: {
-    strategy: 'jwt',
-    maxAge: 8 * 60 * 60, // 8 hours (reasonable for work day)
-    updateAge: 60 * 60, // Update session every hour
   },
   debug: process.env.NODE_ENV === 'development',
 }; 

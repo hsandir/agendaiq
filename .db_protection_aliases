@@ -1,0 +1,19 @@
+# DATABASE PROTECTION ALIASES
+# Bu dosyayı .bashrc, .zshrc veya shell config'inize ekleyin
+
+# Tehlikeli komutları engelle
+alias prisma\ migrate\ reset='echo "⛔ DATABASE RESET FORBIDDEN! Use: npm run db:migrate" && false'
+alias prisma\ db\ push\ --force-reset='echo "⛔ FORCE RESET FORBIDDEN! Use: npm run db:migrate" && false'  
+alias prisma\ db\ push\ --accept-data-loss='echo "⛔ DATA LOSS COMMAND FORBIDDEN!" && false'
+alias npx\ prisma\ migrate\ reset='echo "⛔ DATABASE RESET FORBIDDEN! See CLAUDE.md" && false'
+alias npm\ run\ db:reset='echo "⛔ DATABASE RESET FORBIDDEN! See CLAUDE.md" && false'
+
+# Güvenli alternatifler öneri
+alias db-safe-migrate='echo "✅ Running safe migration..." && npm run db:migrate'
+alias db-backup='echo "💾 Creating database backup..." && node scripts/backup-database.js'
+alias db-status='echo "📊 Database status..." && npx prisma studio'
+
+# Claude için özel koruma
+alias claude-db-help='echo "🤖 CLAUDE: Never use db:reset commands! Use db:migrate instead. See CLAUDE.md for full policy."'
+
+echo "🛡️ Database protection aliases loaded. Type 'claude-db-help' for Claude instructions."

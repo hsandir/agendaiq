@@ -8,7 +8,7 @@ const Switch = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement> & {
     checked?: boolean;
-    onCheckedChange?: (checked: boolean) => void;
+    onCheckedChange?: (checked: boolean) => void
   }
 >(({ className, checked = false, onCheckedChange, ...props }, ref) => (
   <button

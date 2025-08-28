@@ -20,15 +20,15 @@ export async function POST(request: NextRequest) {
     if (!authResult.success) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
-    const errorData = await request.json();
+    const errorData = await request.json() as Record<string, unknown>;
     
     const capturedError: ErrorData = {
-      message: errorData?.message || 'Unknown error',
-      stack: errorData?.stack,
-      url: errorData.url ?? request?.url,
+      message: String(errorData?.message ?? 'Unknown error'),
+      stack: errorData?.stack ? String(errorData.stack) : undefined,
+      url: String(errorData?.url ?? request?.url ?? 'Unknown'),
       userAgent: request.headers.get('user-agent') ?? 'Unknown',
       timestamp: new Date().toISOString(),
-      userId: errorData?.userId
+      userId: errorData?.userId ? String(errorData.userId) : undefined
     };
     
     errors.push(capturedError);

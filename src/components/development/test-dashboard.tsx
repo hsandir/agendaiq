@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -32,109 +32,106 @@ import {
 } from 'lucide-react'
 
 interface TestSuite {
-  name: string
-  path: string
-  tests: number
-  passed?: number
-  failed?: number
-  skipped?: number
-  duration?: number
-  status: 'idle' | 'running' | 'passed' | 'failed'
-  category: 'unit' | 'integration' | 'e2e' | 'performance'
+  name: string;
+  path: string;
+  tests: number;
+  passed?: number;
+  failed?: number;
+  skipped?: number;
+  duration?: number;
+  status: 'idle' | 'running' | 'passed' | 'failed';
+  category: 'unit' | 'integration' | 'e2e' | 'performance';
 }
 
 interface TestResult {
-  suite: string
-  test: string
-  status: 'passed' | 'failed' | 'skipped'
-  duration: number
-  error?: string
-  file?: string
-  line?: number
+  suite: string;
+  test: string;
+  status: 'passed' | 'failed' | 'skipped';
+  duration: number;
+  error?: string;
+  file?: string;
+  line?: number;
 }
 
 interface CoverageReport {
-  statements: { total: number; covered: number; percentage: number }
-  branches: { total: number; covered: number; percentage: number }
-  functions: { total: number; covered: number; percentage: number }
-  lines: { total: number; covered: number; percentage: number }
+  statements: { total: number; covered: number; percentage: number ;}
+  branches: { total: number; covered: number; percentage: number ;}
+  functions: { total: number; covered: number; percentage: number ;}
+  lines: { total: number; covered: number; percentage: number ;}
   files?: {
     [key: string]: {
-      statements: { total: number; covered: number; percentage: number }
-      branches: { total: number; covered: number; percentage: number }
-      functions: { total: number; covered: number; percentage: number }
-      lines: { total: number; covered: number; percentage: number }
+      statements: { total: number; covered: number; percentage: number ;}
+      branches: { total: number; covered: number; percentage: number ;}
+      functions: { total: number; covered: number; percentage: number ;}
+      lines: { total: number; covered: number; percentage: number ;}
       uncoveredLines?: number[]
     }
   }
 }
 
 interface TestHistory {
-  date: string
-  passed: number
-  failed: number
-  coverage: number
-  duration: number
+  date: string;
+  passed: number;
+  failed: number;
+  coverage: number;
+  duration: number;
 }
 
 export default function TestDashboard() {
-  const [testSuites, setTestSuites] = useState<TestSuite[]>([])
-  const [selectedSuite, setSelectedSuite] = useState<string | null>(null)
-  const [testResults, setTestResults] = useState<TestResult[]>([])
-  const [coverage, setCoverage] = useState<CoverageReport | null>(null)
-  const [isRunning, setIsRunning] = useState(false)
-  const [output, setOutput] = useState<string[]>([])
-  const [filter, setFilter] = useState<string>('')
-  const [categoryFilter, setCategoryFilter] = useState<string>('all')
-  const [testHistory, setTestHistory] = useState<TestHistory[]>([])
-  const [untestedFiles, setUntestedFiles] = useState<{ components: string[], apis: string[] }>({ components: [], apis: [] })
-  const [activeTab, setActiveTab] = useState('results')
-  const [showAutofixModal, setShowAutofixModal] = useState(false)
-
+  const [testSuites, setTestSuites] = useState<TestSuite[]>([]);
+  const [selectedSuite, setSelectedSuite] = useState<string | null>(null);
+  const [testResults, setTestResults] = useState<TestResult[]>([]);
+  const [coverage, setCoverage] = useState<CoverageReport | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
+  const [output, setOutput] = useState<string[]>([]);
+  const [filter, setFilter] = useState<string>('');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [testHistory, setTestHistory] = useState<TestHistory[]>([]);
+  const [untestedFiles, setUntestedFiles] = useState<{ components: string[], apis: string[] }>({ components: [], apis: [] });
+  const [activeTab, setActiveTab] = useState('results');
+  const [showAutofixModal, setShowAutofixModal] = useState(false);
   useEffect(() => {
-    loadTestSuites()
-    loadTestHistory()
-    loadUntestedFiles()
-  }, [])
+    loadTestSuites();
+    loadTestHistory();
+    loadUntestedFiles();
+  }, []);
 
   const loadTestSuites = async () => {
     try {
-      const response = await fetch('/api/tests/suites')
-      const data = await response.json()
-      setTestSuites(data.suites ?? [])
+      const response = await fetch('/api/tests/suites');
+      const data = await response.json();
+      setTestSuites(data.suites ?? []);
     } catch (error: unknown) {
-      console.error('Failed to load test suites:', error)
+      console.error('Failed to load test suites:', error);
     }
-  }
+  };
 
   const loadTestHistory = async () => {
     try {
-      const response = await fetch('/api/tests/history')
-      if (!response.ok) throw new Error('Failed to fetch test history')
-      
-      const data = await response.json()
-      setTestHistory(data.history ?? [])
+      const response = await fetch('/api/tests/history');
+      if (!response.ok) throw new Error('Failed to fetch test history');
+      const data = await response.json();
+      setTestHistory(data.history ?? []);
     } catch (error: unknown) {
-      console.error('Failed to load test history:', error)
-      setTestHistory([])
+      console.error('Failed to load test history:', error);
+      setTestHistory([]);
     }
-  }
+  };
 
   const loadUntestedFiles = async () => {
     try {
-      const response = await fetch('/api/tests/generate')
-      const data = await response.json()
-      setUntestedFiles(data.untested || { components: [], apis: [] })
+      const response = await fetch('/api/tests/generate');
+      const data = await response.json();
+      setUntestedFiles(data.untested || { components: [], apis: [] });
     } catch (error: unknown) {
-      console.error('Failed to load untested files:', error)
+      console.error('Failed to load untested files:', error);
     }
-  }
+  };
 
   const runTests = async (suitePath?: string, options: { coverage?: boolean, watch?: boolean } = {}) => {
-    setIsRunning(true)
-    setOutput([])
-    setTestResults([])
-    
+    setIsRunning(true);
+    setOutput([]);
+    setTestResults([]);
     try {
       const response = await fetch('/api/tests/run', {
         method: 'POST',
@@ -147,16 +144,15 @@ export default function TestDashboard() {
       })
       
       if (!response.ok) {
-        const error = await response.text()
-        throw new Error(error || 'Failed to run tests')
+        const error = await response.text();
+        throw new Error(error || 'Failed to run tests');
       }
       
       // Handle regular JSON response (non-streaming)
-      const data = await response.json()
-      
+      const data = await response.json();
       // Update output with test results
       if (data.output && Array.isArray(data.output)) {
-        setOutput(data.output)
+        setOutput(data.output);
       }
       
       // Parse test results
@@ -177,18 +173,18 @@ export default function TestDashboard() {
             })
           }
         })
-        setTestResults(results)
+        setTestResults(results);
       }
       
       // Update coverage if available
       if (data.coverage) {
-        setCoverage(data.coverage)
+        setCoverage(data.coverage);
       }
       
       // Update suite status
       if (suitePath && data.success !== undefined) {
         setTestSuites(prev => prev.map(suite => {
-          if (suite.path === suitePath || suite.files?.includes(suitePath)) {
+          if (suite.path === suitePath || suite.path.includes(suitePath)) {
             return {
               ...suite,
               status: data.success ? 'passed' : 'failed',
@@ -203,10 +199,10 @@ export default function TestDashboard() {
       }
       
     } catch (error: unknown) {
-      console.error('Test run failed:', error)
-      setOutput(prev => [...prev, `Error: ${error}`])
+      console.error('Test run failed:', error);
+      setOutput(prev => [...prev, `Error: ${error}`]);
     } finally {
-      setIsRunning(false)
+      setIsRunning(false);
     }
   }
 
@@ -218,13 +214,13 @@ export default function TestDashboard() {
         body: JSON.stringify({ filePath })
       })
       
-      const data = await response.json()
+      const data = await response.json();
       if (data.success) {
-        await loadTestSuites()
-        await loadUntestedFiles()
+        await loadTestSuites();
+        await loadUntestedFiles();
       }
     } catch (error: unknown) {
-      console.error('Failed to generate test:', error)
+      console.error('Failed to generate test:', error);
     }
   }
 
@@ -244,11 +240,11 @@ export default function TestDashboard() {
     }
     
     const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
     a.href = url
     a.download = `test-report-${new Date().toISOString().split('T')[0]}.json`
-    a.click()
+    a.click();
   }
 
   const getStatusIcon = (status: string) => {
@@ -261,7 +257,7 @@ export default function TestDashboard() {
         return <Loader2Icon className="h-4 w-4 animate-spin text-primary" />
       default:
         return <ClockIcon className="h-4 w-4 text-muted-foreground" />
-    }
+    ;}
   }
 
   const getCoverageColor = (percentage: number) => {
@@ -277,7 +273,7 @@ export default function TestDashboard() {
       case 'e2e': return 'outline'
       case 'performance': return 'destructive'
       default: return 'default'
-    }
+    ;}
   }
 
   const filteredSuites = testSuites.filter(suite => {
@@ -411,8 +407,8 @@ export default function TestDashboard() {
                       className="mt-2 w-full"
                       variant="outline"
                       onClick={(e) => {
-                        e.stopPropagation()
-                        runTests(suite.path)
+                        e.stopPropagation();
+                        runTests(suite.path);
                       }}
                       disabled={isRunning}
                     >
@@ -688,7 +684,15 @@ export default function TestDashboard() {
         isOpen={showAutofixModal}
         onClose={() => setShowAutofixModal(false)}
         type="test"
-        failedItems={testResults.filter(r => r.status === 'failed')}
+        failedItems={testResults.filter(r => r.status === 'failed').map(r => ({ 
+          suite: r.suite, 
+          test: r.test, 
+          status: r.status, 
+          duration: r.duration, 
+          error: r.error, 
+          file: r.file, 
+          line: r.line 
+        }))}
       />
     </div>
   )

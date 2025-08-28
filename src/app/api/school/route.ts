@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withAuth } from '@/lib/auth/api-auth';
-import { Capability } from '@/lib/auth/policy';
-import { prisma } from "@/lib/prisma";
+import { withAuth } from '../../../lib/auth/api-auth';
+import { Capability } from '../../../lib/auth/policy';
+import { prisma } from "../../../lib/prisma";
 
 // School update data interface
 interface SchoolUpdateData {
@@ -24,15 +24,15 @@ export async function GET(request: NextRequest) {
 
   try {
     // Get user and check role through staff
-    const userRecord = await prisma.user.findUnique({
+    const userRecord = await prisma.users.findUnique({
       where: { email: user.email },
       include: { 
-        Staff: {
+        staff: {
           include: {
-            Role: true,
-            School: {
+            role: true,
+            school: {
               include: {
-                District: true
+                district: true
               }
             }
           }
@@ -40,25 +40,25 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    if (!userRecord || (!userRecord.Staff ?? (userRecord.Staff.length === 0))) {
+    if (!userRecord || !userRecord.staff || userRecord.staff.length === 0) {
       return NextResponse.json({ error: "User staff record not found" }, { status: 404 });
     }
 
-    const staffRecord = userRecord.Staff[0];
+    const staffRecord = userRecord.staff[0];
 
-    if (staffRecord.Role?.title === "Administrator") {
+    if (staffRecord.role?.title === "Administrator") {
       // Admin: return all schools
       const schools = await prisma.school.findMany({
-        include: { District: true },
+        include: { district: true },
         orderBy: { name: "asc" },
       });
       return NextResponse.json(schools);
     } else {
       // Non-admin: return only user's school
-      if (!staffRecord.School) {
+      if (!staffRecord.school) {
         return NextResponse.json({ error: "No school assigned" }, { status: 404 });
       }
-      return NextResponse.json(staffRecord.School);
+      return NextResponse.json(staffRecord.school);
     }
   } catch (error: unknown) {
     console.error("Error fetching schools:", error);
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const { name, code, address, phone, email, district_id } = body;
 
     if (!name || !code || !district_id) {
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
         district_id: district_id as number,
       },
       include: {
-        District: true,
+        district: true,
       },
     });
 
@@ -141,7 +141,7 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const { id, name, code, address, phone, email, district_id } = body;
 
     if (!id) {
@@ -192,18 +192,18 @@ export async function PUT(request: NextRequest) {
     }
 
     const updateData: SchoolUpdateData = {};
-    if (name !== undefined) updateData.name = name;
-    if (code !== undefined) updateData.code = code;
-    if (address !== undefined) updateData.address = address;
-    if (phone !== undefined) updateData.phone = phone;
-    if (email !== undefined) updateData.email = email;
-    if (district_id !== undefined) updateData.district_id = district_id;
+    if (name !== undefined) updateData.name = name as string;
+    if (code !== undefined) updateData.code = code as string;
+    if (address !== undefined) updateData.address = address as string;
+    if (phone !== undefined) updateData.phone = phone as string;
+    if (email !== undefined) updateData.email = email as string;
+    if (district_id !== undefined) updateData.district_id = district_id as number;
 
     const school = await prisma.school.update({
       where: { id: id as number },
       data: updateData,
       include: {
-        District: true,
+        district: true,
       },
     });
 

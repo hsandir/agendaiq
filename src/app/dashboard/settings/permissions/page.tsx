@@ -19,10 +19,10 @@ export default async function PermissionsPage() {
   // Fetch real permission data from database
   const roles = await prisma.role.findMany({
     include: {
-      Department: true,
-      Staff: {
+      department: true,
+      staff: {
         include: {
-          User: true
+          users: true
         }
       }
     },
@@ -33,7 +33,7 @@ export default async function PermissionsPage() {
 
   // Calculate permission statistics
   const totalRoles = roles.length;
-  const totalUsers = roles.reduce((acc, role) => acc + role.Staff.length, 0);
+  const totalUsers = roles.reduce((acc, role) => acc + role.staff.length, 0);
   const leadershipRoles = roles.filter(role => role.is_leadership).length;
   const regularRoles = totalRoles - leadershipRoles;
 
@@ -89,7 +89,7 @@ export default async function PermissionsPage() {
         "View system logs",
         "Manage integrations"
       ],
-      roles: roles.filter(role => role.id === RoleID.OPS_ADMIN || role.id === RoleID.DEV_ADMIN)
+      roles: roles.filter(role => role.key === 'OPS_ADMIN' || role.key === 'DEV_ADMIN')
     }
   ];
 
@@ -171,7 +171,7 @@ export default async function PermissionsPage() {
             <CardContent className="space-y-4">
               {/* Permissions List */}
               <div className="space-y-3">
-                <h4 className="text-sm font-medium text-foreground">Available Permissions:</h4>
+                <h4 className="text-sm font-medium text-foreground">Available permission:</h4>
                 <div className="grid gap-2">
                   {category.permissions.map((permission, index) => (
                     <div key={index} className="flex items-center space-x-2 text-sm">
@@ -202,15 +202,15 @@ export default async function PermissionsPage() {
               </div>
 
               {/* Department Information */}
-              {category.roles.some(role => role.Department) && (
+              {category.roles.some(role => role.department) && (
                 <div className="space-y-3">
                   <h4 className="text-sm font-medium text-foreground">Department Access:</h4>
                   <div className="flex flex-wrap gap-2">
                     {category.roles
-                      .filter(role => role.Department)
+                      .filter(role => role.department)
                       .map((role) => (
                         <Badge key={role.id} variant="secondary" className="text-xs">
-                          {role.Department?.name}
+                          {role.department?.name}
                         </Badge>
                       ))}
                   </div>

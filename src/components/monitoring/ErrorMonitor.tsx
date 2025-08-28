@@ -55,7 +55,7 @@ interface ErrorStats {
   newIssues24h: number;
   resolvedIssues24h: number;
   p95ResponseTime: number;
-  affectedUsers: number;
+  affectedUsers: number
 }
 
 interface ReleaseHealth {
@@ -65,7 +65,7 @@ interface ReleaseHealth {
   sessionCount: number;
   errorCount: number;
   newIssues: number;
-  status: 'healthy' | 'degraded' | 'critical';
+  status: 'healthy' | 'degraded' | 'critical'
 }
 
 export function ErrorMonitor() {
@@ -202,7 +202,7 @@ export function ErrorMonitor() {
       case 'info':
         return <AlertCircle className="h-5 w-5 text-blue-500" />;
       default:
-        return <Bug className="h-5 w-5 text-gray-500" />;
+        return <Bug className="h-5 w-5 text-gray-500" />
     }
   };
 

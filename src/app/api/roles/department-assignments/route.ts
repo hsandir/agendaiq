@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     const user = authResult.user!;
 
     // Parse and validate request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const result = assignmentSchema.safeParse(body);
     
     if (!result.success) {
@@ -41,9 +41,9 @@ export async function POST(request: NextRequest) {
     const updatePromises = assignments.map(async ({ roleId, departmentId }) => {
       const role = await prisma.role.update({
         where: { id: roleId },
-        data: { department_id: parseInt(departmentId) },
+        data: { department_id: departmentId ? parseInt(String(departmentId)) : null },
         include: {
-          Department: true
+          department: true
         }
       });
 
@@ -53,9 +53,9 @@ export async function POST(request: NextRequest) {
         recordId: roleId.toString(),
         operation: 'UPDATE',
         userId: user.id,
-        staffId: user.staff?.id,
+        staffId: Number((user.staff as any)?.id ?? 0),
         source: 'SYSTEM', 
-        description: `Role "${role.key ?? 'UNKNOWN_ROLE'}" assigned to department: ${role.Department?.name ?? 'Unassigned'}`
+        description: `Role "${role.key ?? 'UNKNOWN_ROLE'}" assigned to department: ${role.department?.name ?? 'Unassigned'}`
       });
 
       return role;

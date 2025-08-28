@@ -16,14 +16,14 @@ expect.extend(toHaveNoViolations);
 // import { renderWithProviders } from '../utils/test-utils';
 
 // Types
-import type { AuthenticatedUser, StaffWithRelations } from '@/types';
+import type { Authenticatedusers, StaffWithRelations } from '@/types';
 
 // Mock data factory
 /* const createMockUser = (overrides: Partial<AuthenticatedUser> = {}): AuthenticatedUser => ({
   id: 1,
   email: 'test@agendaiq.com',
   name: 'Test User',
-  hashedPassword: null,
+  hashed_password: null,
   is_admin: false,
   is_system_admin: false,
   created_at: new Date(),
@@ -53,7 +53,7 @@ import type { AuthenticatedUser, StaffWithRelations } from '@/types';
 //     is_leadership: false,
 //     capabilities: [],
 //     created_at: new Date(),
-//     updated_at: new Date()
+//     updated_at: new Date();
 //   },
 //   Department: {
 //     id: 1,
@@ -61,7 +61,7 @@ import type { AuthenticatedUser, StaffWithRelations } from '@/types';
 //     code: 'MATH',
 //     school_id: 1,
 //     created_at: new Date(),
-//     updated_at: new Date()
+//     updated_at: new Date();
 //   },
 //   School: {
 //     id: 1,
@@ -70,7 +70,7 @@ import type { AuthenticatedUser, StaffWithRelations } from '@/types';
 //     district_id: 1,
 //     address: '123 School St',
 //     created_at: new Date(),
-//     updated_at: new Date()
+//     updated_at: new Date();
 //   },
 //   District: {
 //     id: 1,
@@ -78,7 +78,7 @@ import type { AuthenticatedUser, StaffWithRelations } from '@/types';
 //     code: 'TD001',
 //     address: '123 District Ave',
 //     created_at: new Date(),
-//     updated_at: new Date()
+//     updated_at: new Date();
 //   },
 //   ...overrides
 }); */
@@ -220,9 +220,9 @@ describe('Comprehensive Component Tests', () => {
         const passwordInput = screen.getByTestId('password-input');
         const submitButton = screen.getByTestId('submit-button');
 
-        await user.type(emailInput, 'test@example.com');
-        await user.type(passwordInput, 'password123');
-        await user.click(submitButton);
+        await (user as Record<string, unknown>).type(emailInput, 'test@example.com');
+        await (user as Record<string, unknown>).type(passwordInput, 'password123');
+        await (user as Record<string, unknown>).click(submitButton);
 
         await waitFor(() => {
           expect(mockSubmit).toHaveBeenCalledWith({
@@ -264,13 +264,13 @@ describe('Comprehensive Component Tests', () => {
         const submitButton = screen.getByTestId('submit-button');
 
         // Tab through form elements
-        await user.tab();
+        await (user as Record<string, unknown>).tab();
         expect(emailInput).toHaveFocus();
 
-        await user.tab();
+        await (user as Record<string, unknown>).tab();
         expect(passwordInput).toHaveFocus();
 
-        await user.tab();
+        await (user as Record<string, unknown>).tab();
         expect(submitButton).toHaveFocus();
       });
 
@@ -279,7 +279,7 @@ describe('Comprehensive Component Tests', () => {
         render(<SignInForm onSubmit={mockSubmit} />);
 
         const emailInput = screen.getByTestId('email-input');
-        await user.type(emailInput, 'invalid-email');
+        await (user as Record<string, unknown>).type(emailInput, 'invalid-email');
         
         // Check HTML5 validation
         expect(emailInput).toHaveAttribute('type', 'email');
@@ -305,10 +305,10 @@ describe('Comprehensive Component Tests', () => {
         status: string;
         organizer: {
           name: string;
-          email: string;
+          email: string
         };
         attendeeCount: number;
-        agendaItemCount: number;
+        agendaItemCount: number
       };
       onEdit?: (id: number) => void;
       onDelete?: (id: number) => void;
@@ -383,7 +383,7 @@ describe('Comprehensive Component Tests', () => {
 
       it('should handle missing optional fields', () => {
         const minimalMeeting = {
-          ...mockMeeting,
+          ...mockmeeting,
           description: undefined,
           location: undefined
         };
@@ -433,10 +433,10 @@ describe('Comprehensive Component Tests', () => {
           />
         );
 
-        await user.click(screen.getByTestId('edit-button'));
+        await (user as Record<string, unknown>).click(screen.getByTestId('edit-button'));
         expect(mockEdit).toHaveBeenCalledWith(1);
 
-        await user.click(screen.getByTestId('delete-button'));
+        await (user as Record<string, unknown>).click(screen.getByTestId('delete-button'));
         expect(mockDelete).toHaveBeenCalledWith(1);
       });
 
@@ -456,7 +456,7 @@ describe('Comprehensive Component Tests', () => {
 
       it('should handle long text content properly', () => {
         const longMeeting = {
-          ...mockMeeting,
+          ...mockmeeting,
           title: 'A'.repeat(100),
           description: 'B'.repeat(500),
           location: 'C'.repeat(50)
@@ -484,7 +484,7 @@ describe('Comprehensive Component Tests', () => {
         completedMeetings: number;
         totalStaff: number;
         activeUsers: number;
-        pendingAgendaItems: number;
+        pendingAgendaItems: number
       };
       loading?: boolean;
       error?: string | null;
@@ -634,8 +634,8 @@ describe('Comprehensive Component Tests', () => {
         const searchInput = screen.getByTestId('search-input');
         const searchButton = screen.getByTestId('search-button');
 
-        await user.type(searchInput, 'test query');
-        await user.click(searchButton);
+        await (user as Record<string, unknown>).type(searchInput, 'test query');
+        await (user as Record<string, unknown>).click(searchButton);
 
         expect(mockSearch).toHaveBeenCalledWith('test query');
       });
@@ -647,7 +647,7 @@ describe('Comprehensive Component Tests', () => {
         render(<MockSearchComponent onSearch={mockSearch} />);
 
         const searchInput = screen.getByTestId('search-input');
-        await user.type(searchInput, 'test query{enter}');
+        await (user as Record<string, unknown>).type(searchInput, 'test query{enter}');
 
         expect(mockSearch).toHaveBeenCalledWith('test query');
       });
@@ -703,7 +703,7 @@ describe('Comprehensive Component Tests', () => {
         value: jest.fn().mockImplementation(query => ({
           matches: false,
           media: query,
-          onchange: null,
+          onChange: null,
           addListener: jest.fn(), // deprecated
           removeListener: jest.fn(), // deprecated
           addEventListener: jest.fn(),
@@ -718,7 +718,7 @@ describe('Comprehensive Component Tests', () => {
       (window.matchMedia as jest.Mock).mockImplementation(query => ({
         matches: query === '(max-width: 768px)',
         media: query,
-        onchange: null,
+        onChange: null,
         addListener: jest.fn(),
         removeListener: jest.fn(),
         addEventListener: jest.fn(),
@@ -737,7 +737,7 @@ describe('Comprehensive Component Tests', () => {
       (window.matchMedia as jest.Mock).mockImplementation(query => ({
         matches: query === '(max-width: 1024px)',
         media: query,
-        onchange: null,
+        onChange: null,
         addListener: jest.fn(),
         removeListener: jest.fn(),
         addEventListener: jest.fn(),
@@ -784,11 +784,11 @@ describe('Comprehensive Component Tests', () => {
       const searchInput = screen.getByTestId('search-input');
 
       // Rapidly type and change input
-      await user.type(searchInput, 'a');
-      await user.clear(searchInput);
-      await user.type(searchInput, 'b');
-      await user.clear(searchInput);
-      await user.type(searchInput, 'final query');
+      await (user as Record<string, unknown>).type(searchInput, 'a');
+      await (user as Record<string, unknown>).clear(searchInput);
+      await (user as Record<string, unknown>).type(searchInput, 'b');
+      await (user as Record<string, unknown>).clear(searchInput);
+      await (user as Record<string, unknown>).type(searchInput, 'final query');
 
       // Component should handle rapid changes without errors
       expect(searchInput).toHaveValue('final query');

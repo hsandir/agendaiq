@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
-import { prisma } from "@/lib/prisma";
-import { RateLimiters, getClientIdentifier } from "@/lib/utils/rate-limit";
+import { prisma } from "../../../../lib/prisma";
+import { RateLimiters, getClientIdentifier } from "../../../../lib/utils/rate-limit";
 import { z } from "zod";
 
 export async function POST(request: Request) {
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       return RateLimiters.registration.createErrorResponse(rateLimitResult);
     }
 
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
 
     // SECURITY FIX: Add input validation schema
     const signupSchema = z.object({
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     const { email, password } = validationResult.data;
 
     // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await prisma.users.findUnique({
       where: { email },
     });
 
@@ -48,17 +48,18 @@ export async function POST(request: Request) {
     }
 
     // Hash password
-    const hashedPassword = await hash(password, 12);
+    const hashed_password = await hash(password, 12);
 
     // Check if this is the first user
-    const userCount = await prisma.user.count();
+    const userCount = await prisma.users.count();
     const isFirstUser = userCount === 0;
 
     // Create user
-    const user = await prisma.user.create({
+    const user = await prisma.users.create({
       data: {
         email,
-        hashedPassword,
+        hashed_password,
+        updated_at: new Date(),
       },
     });
 
@@ -81,11 +82,11 @@ export async function POST(request: Request) {
           if (defaultDepartment) {
             await prisma.staff.create({
               data: {
-                user_id: parseInt(user.id),
-                role_id: parseInt(adminRole.id),
-                school_id: parseInt(defaultSchool.id),
-                district_id: parseInt(defaultDistrict.id),
-                department_id: parseInt(defaultDepartment.id),
+                user_id: user.id,
+                role_id: adminRole.id,
+                school_id: defaultSchool.id,
+                district_id: defaultDistrict.id,
+                department_id: defaultDepartment.id,
               },
             });
           }
@@ -94,16 +95,16 @@ export async function POST(request: Request) {
     }
 
     // Get user with staff for response
-    const userWithStaff = await prisma.user.findUnique({
+    const userWithStaff = await prisma.users.findUnique({
       where: { id: user.id },
-      include: { Staff: { include: { Role: true } } },
+      include: { staff: { include: { role: true } } },
     });
 
     return NextResponse.json({
       user: {
         id: user.id,
         email: user.email,
-        staff: userWithStaff?.Staff,
+        staff: userWithStaff?.staff,
       },
     });
   } catch (error: unknown) {

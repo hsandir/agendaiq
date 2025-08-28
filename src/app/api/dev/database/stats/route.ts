@@ -26,13 +26,13 @@ export async function GET(request: NextRequest) {
     try {
       // Count records in main tables
       const counts = await Promise.all([
-        prisma.user.count().catch(() => 0),
+        prisma.users.count().catch(() => 0),
         prisma.staff.count().catch(() => 0),
         prisma.school.count().catch(() => 0),
         prisma.district.count().catch(() => 0),
         prisma.meeting.count().catch(() => 0),
-        prisma.meetingAgendaItem.count().catch(() => 0),
-        prisma.auditLog.count().catch(() => 0),
+        prisma.meeting_agenda_items.count().catch(() => 0),
+        prisma.audit_logs.count().catch(() => 0),
         prisma.role.count().catch(() => 0),
         prisma.department.count().catch(() => 0),
       ]);

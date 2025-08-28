@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ErrorBoundary } from '/Users/hs/Project/agendaiq/src/components/error-boundary'
-import { renderWithProviders } from '@/__tests__/utils/test-utils'
+import { renderWithProviders } from '@/tests__/utils/test-utils'
 
 describe('ErrorBoundary', () => {
   const defaultProps = {
@@ -10,10 +10,9 @@ describe('ErrorBoundary', () => {
   }
 
   it('renders without crashing', () => {
-    renderWithProviders(<ErrorBoundary {...defaultProps} />)
-    
+    renderWithProviders(<ErrorBoundary {...defaultProps} />);
     // Add specific assertions based on component content
-    expect(screen.getByRole('region')).toBeInTheDocument()
+    expect(screen.getByRole('region')).toBeInTheDocument();
   })
 
   
@@ -23,11 +22,10 @@ describe('ErrorBoundary', () => {
   
 
   it('handles side effects', async () => {
-    renderWithProviders(<ErrorBoundary {...defaultProps} />)
-    
+    renderWithProviders(<ErrorBoundary {...defaultProps} />);
     // Wait for effects to complete
     await waitFor(() => {
-      expect(screen.getByTestId('loaded-content')).toBeInTheDocument()
+      expect(screen.getByTestId('loaded-content')).toBeInTheDocument();
     })
   })
 
@@ -35,16 +33,14 @@ describe('ErrorBoundary', () => {
 
   it('applies custom className', () => {
     const { container } = renderWithProviders(
-      <ErrorBoundary {...__defaultProps} className="custom-class" />
-    )
-    
-    expect(container.firstChild).toHaveClass('custom-class')
+      <ErrorBoundary {...defaultProps} className="custom-class" />
+    );
+    expect(container.firstChild).toHaveClass('custom-class');
   })
 
   it('is accessible', () => {
-    const { container } = renderWithProviders(<ErrorBoundary {...__defaultProps} />)
-    
+    const { container } = renderWithProviders(<ErrorBoundary {...defaultProps} />);
     // Basic accessibility checks
-    expect(container.firstChild).toHaveAttribute('role')
+    expect(container.firstChild).toHaveAttribute('role');
   })
 })

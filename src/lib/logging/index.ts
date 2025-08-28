@@ -5,7 +5,7 @@
 
 import { DevLogger } from './dev-logger';
 import { AuditLogger } from './audit-logger';
-import { LogLevel, LoggerConfig } from './types';
+import { LogLevel, LoggerConfig, DevLogCategory } from './types';
 
 // Transport imports
 import { ConsoleTransport } from './transports/console-transport';
@@ -113,7 +113,7 @@ export { RealtimeTransport } from './transports/realtime-transport';
 export async function initializeLogging() {
   // Log system startup
   await devLogger.info(
-    'SYSTEM' as Record<string, unknown>,
+    DevLogCategory.SYSTEM,
     'Logging system initialized',
     {
       transports: devLogger['transports'].map(t => t.name),
@@ -146,7 +146,7 @@ export async function initializeLogging() {
  */
 export async function shutdownLogging() {
   await devLogger.info(
-    'SYSTEM' as Record<string, unknown>,
+    DevLogCategory.SYSTEM,
     'Shutting down logging system'
   );
   

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, RefreshCw } from "lucide-react";
@@ -14,19 +14,21 @@ interface Meeting {
   startTime: string;
   endTime: string;
   zoomLink?: string;
-  status: string;
+  status: string
 }
 
-export default function MeetingsPageClient() {
+function MeetingsPageClient() {
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const fetchMeetings = async () => {
+  const fetchMeetings = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
+      console.log('🔄 Fetching meetings from /api/meetings');
+      
       const response = await fetch('/api/meetings', {
         credentials: 'include',
         headers: {
@@ -34,18 +36,24 @@ export default function MeetingsPageClient() {
         },
       });
       
+      console.log('📡 Response status:', response.status, response.statusText);
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch meetings');
+        const errorText = await response.text();
+        console.log('❌ Error response:', errorText);
+        throw new Error(`Failed to fetch meetings: ${response.status} ${response.statusText}`);
       }
       
       const data = await response.json();
+      console.log('✅ Meetings data received:', data);
       setMeetings(data.meetings ?? []);
     } catch (err: unknown) {
+      console.error('🚨 Fetch error:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch meetings');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchMeetings();
@@ -104,3 +112,5 @@ export default function MeetingsPageClient() {
     </div>
   );
 }
+
+export default memo(MeetingsPageClient);

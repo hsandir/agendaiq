@@ -1,10 +1,10 @@
 import posthog from 'posthog-js';
-import { User } from '@prisma/client';
+import { users } from '@prisma/client';
 
 /**
  * Sets user context in PostHog for better analytics and error tracking
  */
-export function setPostHogUser(user: Partial<User> & { 
+export function setPostHogUser(user: Partial<users> & { 
   staff?: { 
     id: string | number; 
     role: { key?: string | null; title?: string | null } 
@@ -12,13 +12,13 @@ export function setPostHogUser(user: Partial<User> & {
 }) {
   if (typeof window !== 'undefined' && posthog) {
     // Identify user in PostHog
-    posthog.identify(user.id, {
+    posthog.identify(user.id?.toString(), {
       email: user.email,
       name: user.name,
       staffId: typeof user.staff?.id === 'number' ? user.staff?.id : Number(user.staff?.id),
       roleKey: user.staff?.role.key ?? 'unknown',
       roleTitle: user.staff?.role.key ?? 'unknown',
-      createdAt: user.createdAt,
+      created_at: user.created_at,
     });
 
     // Set user properties for error tracking

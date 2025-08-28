@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 interface User {
   id: string;
   name: string | null;
-  email: string | null;
+  email: string | null
 }
 
 interface MeetingFormProps {

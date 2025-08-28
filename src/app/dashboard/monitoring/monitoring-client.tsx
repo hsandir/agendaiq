@@ -112,5 +112,5 @@ export default function MonitoringClient({ user }: MonitoringClientProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

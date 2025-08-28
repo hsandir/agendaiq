@@ -42,7 +42,7 @@ export interface MockOctokitActions {
 }
 
 export interface MockOctokit {
-  actions: MockOctokitActions;
+  actions: MockOctokitActions
 }
 
 export type MockOctokitConstructor = jest.MockedClass<new () => MockOctokit>;

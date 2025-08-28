@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     const metricWithTime: WebVitalsMetric & {
       timestamp: string;
       userAgent: string;
-      ip: string;
+      ip: string
     } = {
       ...metrics,
       timestamp: new Date().toISOString(),
@@ -99,10 +99,10 @@ export async function GET(request: NextRequest) {
 }
 
 function calculatePercentiles(metricName: string) {
-  const values = (webVitalsBuffer
+  const values = webVitalsBuffer
     .filter(m => m.name === metricName)
     .map(m => m?.value)
-    .sort((a, b) => a - b));
+    .sort((a, b) => a - b);
 
   if (values.length === 0) {
     return { p50: null, p75: null, p95: null, p99: null };
@@ -132,7 +132,7 @@ async function getApplicationMetrics() {
 async function getDatabaseMetrics() {
   try {
     const [userCount, meetingCount, sessionCount] = await Promise.all([
-      prisma.user.count(),
+      prisma.users.count(),
       prisma.meeting.count(),
       prisma.session.count(),
     ]);

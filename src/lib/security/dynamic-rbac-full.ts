@@ -21,7 +21,7 @@ export interface AccessResult {
   reason: string;
   appliedRules: string[];
   context: AccessContext;
-  timestamp: Date;
+  timestamp: Date
 }
 
 export interface RolePermission {
@@ -33,8 +33,8 @@ export interface RolePermission {
   priority: number;
   granted: boolean;
   conditions?: Record<string, unknown>;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date
 }
 
 // Staff with role relation type
@@ -43,17 +43,17 @@ interface StaffWithRole {
   user_id: number;
   school_id: number;
   department_id: number;
-  Role: {
+  role: {
     id: number;
     department_id?: number;
   };
-  School: {
+  school: {
     id: number;
-    name: string;
+    name: string
   };
-  Department: {
+  department: {
     id: number;
-    name: string;
+    name: string
   };
 }
 
@@ -107,16 +107,16 @@ export class DynamicRBAC {
         // Check direct role permissions
         const directAccess = await this.checkDirectRolePermissions(
           context.user,
-          staff.Role,
+          staff.role,
           context.resource,
           context.action
         );
         
         if (directAccess.granted) {
-          appliedRules.push(`direct_role_${staff.Role.id}`);
+          appliedRules.push(`direct_role_${staff.role.id}`);
           return {
             granted: true,
-            reason: `Access granted through role id: ${staff.Role.id}`,
+            reason: `Access granted through role id: ${staff.role.id}`,
             appliedRules,
             context,
             timestamp: new Date()
@@ -125,13 +125,13 @@ export class DynamicRBAC {
 
         // Check inherited permissions from role hierarchy
         const inheritedAccess = await this.checkInheritedPermissions(
-          staff.Role,
+          staff.role,
           context.resource,
           context.action
         );
 
         if (inheritedAccess.granted) {
-          appliedRules.push(`inherited_role_${staff.Role.id}`);
+          appliedRules.push(`inherited_role_${staff.role.id}`);
           return {
             granted: true,
             reason: `Access granted through role hierarchy: ${inheritedAccess.reason}`,
@@ -145,7 +145,7 @@ export class DynamicRBAC {
         const contextAccess = await this.checkContextualPermissions(context, staff);
         
         if (contextAccess.granted) {
-          appliedRules.push(`contextual_role_${staff.Role.id}`);
+          appliedRules.push(`contextual_role_${staff.role.id}`);
           return {
             granted: true,
             reason: `Access granted through context: ${contextAccess.reason}`,
@@ -196,19 +196,19 @@ export class DynamicRBAC {
       const staffRecords = await prisma.staff.findMany({
         where: { user_id: userId },
         include: {
-          Role: {
+          role: {
             select: {
               id: true,
               department_id: true
             }
           },
-          School: {
+          school: {
             select: {
               id: true,
               name: true
             }
           },
-          Department: {
+          department: {
             select: {
               id: true,
               name: true
@@ -223,17 +223,17 @@ export class DynamicRBAC {
         user_id: record.user_id,
         school_id: record.school_id,
         department_id: record.department_id,
-        Role: {
-          id: record.Role.id,
-          department_id: record.Role.department_id ?? undefined
+        role: {
+          id: record.role.id,
+          department_id: record.role.department_id ?? undefined
         },
-        School: {
-          id: record.School.id,
-          name: record.School.name
+        school: {
+          id: record.school.id,
+          name: record.school.name
         },
-        Department: {
-          id: record.Department.id,
-          name: record.Department.name
+        department: {
+          id: record.department.id,
+          name: record.department.name
         }
       }));
 
@@ -252,7 +252,7 @@ export class DynamicRBAC {
   // Check direct role permissions
   private async checkDirectRolePermissions(
     user: _AuthenticatedUser,
-    role: StaffWithRole['Role'],
+    role: StaffWithRole['role'],
     resource: string,
     action: string
   ): Promise<{ granted: boolean; reason?: string }> {
@@ -281,7 +281,7 @@ export class DynamicRBAC {
 
   // Check inherited permissions from role hierarchy
   private async checkInheritedPermissions(
-    role: StaffWithRole['Role'],
+    role: StaffWithRole['role'],
     resource: string,
     action: string
   ): Promise<{ granted: boolean; reason?: string }> {
@@ -404,7 +404,7 @@ export class DynamicRBAC {
 
     try {
       // Get role hierarchy relationships
-      const hierarchyRecords = await prisma.roleHierarchy.findMany({
+      const hierarchyRecords = await prisma.role_hierarchy.findMany({
         where: { child_role_id: parseInt(roleId) },
         select: { parent_role_id: true }
       });
@@ -482,7 +482,7 @@ export class DynamicRBAC {
   async getUserRoles(user: _AuthenticatedUser): Promise<string[]> {
     const userStaff = await this.getUserStaff(user);
     // Expose role ids as strings to avoid relying on titles
-    return userStaff.map(staff => staff.Role.id.toString());
+    return userStaff.map(staff => staff.role.id.toString());
   }
 
   // Get user's departments
@@ -527,7 +527,7 @@ export class DynamicRBAC {
   // Get child roles
   private async getChildRoles(roleId: string): Promise<string[]> {
     try {
-      const hierarchyRecords = await prisma.roleHierarchy.findMany({
+      const hierarchyRecords = await prisma.role_hierarchy.findMany({
         where: { parent_role_id: parseInt(roleId) },
         select: { child_role_id: true }
       });
@@ -583,7 +583,7 @@ export class DynamicRBAC {
   }
 
   // Generate permissions based on role
-  private generateRolePermissions(role: StaffWithRole['Role']): RolePermission[] {
+  private generateRolePermissions(role: StaffWithRole['role']): RolePermission[] {
     const permissions: RolePermission[] = [];
     const now = new Date();
 
@@ -596,8 +596,8 @@ export class DynamicRBAC {
       scope: 'own',
       priority: 1,
       granted: true,
-      createdAt: now,
-      updatedAt: now
+      created_at: now,
+      updated_at: now
     });
 
     return permissions;

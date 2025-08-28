@@ -66,7 +66,7 @@ function mapVercelStatus(state: string): 'success' | 'failed' | 'in_progress' {
     case 'INITIALIZING':
       return 'in_progress';
     default:
-      return 'in_progress';
+      return 'in_progress'
   }
 }
 

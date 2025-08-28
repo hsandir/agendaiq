@@ -18,13 +18,13 @@ export function safeFormat(
   fallback: string = 'Invalid date'
 ): string {
   if (!dateValue) {
-    return fallback;
+    return fallback
   }
 
   try {
     const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
     
-    if (!date ?? isNaN(date.getTime())) {
+    if (!date || isNaN(date.getTime())) {
       return fallback;
     }
 
@@ -42,13 +42,13 @@ export function safeFormat(
  */
 export function safeParseDate(dateValue: string | Date | null | undefined): Date | null {
   if (!dateValue) {
-    return null;
+    return null
   }
 
   try {
     const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
     
-    if (!date ?? isNaN(date.getTime())) {
+    if (!date || isNaN(date.getTime())) {
       return null;
     }
 

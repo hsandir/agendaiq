@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const user = authResult.user!;
 
     // Get the request body
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const socketId = body?.socket_id;
     const channel = body?.channel_name;
 
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Extract meeting ID from channel name
-    const meetingIdMatch = channel.match(/meeting-(\d+)$/);
+    const meetingIdMatch = String(channel ?? '').match(/meeting-(\d+)$/);
     if (!meetingIdMatch) {
       return NextResponse.json(
         { error: 'Invalid channel name' },
@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
     const meeting = await prisma.meeting.findUnique({
       where: { id: meetingId },
       include: {
-        MeetingAttendee: {
-          where: { staff_id: user.staff?.id || -1 }
+        meeting_attendee: {
+          where: { staff_id: (user.staff as Record<string, unknown> | null)?.id || -1 }
         }
       }
     });
@@ -57,8 +57,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is authorized
-    const isOrganizer = meeting.organizer_id === user.staff?.id;
-    const isAttendee = meeting.MeetingAttendee.length > 0;
+    const isOrganizer = meeting.organizer_id === (user.staff as Record<string, unknown> | null)?.id;
+    const isAttendee = meeting.meeting_attendee.length > 0;
     const isAdmin = isRole(user, RoleKey.OPS_ADMIN);
 
     if (!isOrganizer && !isAttendee && !isAdmin) {
@@ -71,21 +71,21 @@ export async function POST(request: NextRequest) {
     // Generate auth response
     let authResponse;
     
-    if (channel.startsWith('presence-')) {
+    if (String(channel ?? '').startsWith('presence-')) {
       // For presence channels, include user data
       const presenceData = {
-        user_id: parseInt(user?.id).toString(),
+        user_id: String(user?.id ?? 'unknown'),
         user_info: {
           name: user?.name,
           email: user?.email,
-          staff_id: user.staff?.id,
-          role: user.staff?.role?.key,
+          staff_id: (user.staff as Record<string, unknown> | null)?.id,
+          role: 'unknown',
         }
       };
-      authResponse = pusherServer.authorizeChannel(socketId, channel, presenceData);
+      authResponse = pusherServer.authorizeChannel(String(socketId ?? ''), String(channel ?? ''), presenceData);
     } else {
       // For private channels
-      authResponse = pusherServer.authorizeChannel(socketId, channel);
+      authResponse = pusherServer.authorizeChannel(String(socketId ?? ''), String(channel ?? ''));
     }
 
     return NextResponse.json(authResponse);

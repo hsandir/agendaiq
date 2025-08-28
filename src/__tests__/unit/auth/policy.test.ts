@@ -9,7 +9,7 @@ import { prisma } from '@/lib/prisma';
 // Mock Prisma
 jest.mock('@/lib/prisma', () => ({
   prisma: {
-    user: {
+    users: {
       findUnique: jest.fn(),
     },
   },
@@ -157,11 +157,11 @@ describe('Policy Unit Tests', () => {
 
   describe('AUTH-POL-06: getUserCapabilities()', () => {
     it('should return all capabilities for system admin', async () => {
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue({
+      (prisma.users.findUnique as jest.Mock).mockResolvedValue({
         id: 1,
         is_system_admin: true,
         is_school_admin: false,
-        Staff: [],
+        staff: [],
       });
 
       const capabilities = await getUserCapabilities(1);
@@ -174,11 +174,11 @@ describe('Policy Unit Tests', () => {
     });
 
     it('should filter dev capabilities for school admin', async () => {
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue({
+      (prisma.users.findUnique as jest.Mock).mockResolvedValue({
         id: 2,
         is_system_admin: false,
         is_school_admin: true,
-        Staff: [],
+        staff: [],
       });
 
       const capabilities = await getUserCapabilities(2);
@@ -193,13 +193,13 @@ describe('Policy Unit Tests', () => {
     });
 
     it('should map role permissions to capabilities', async () => {
-      (prisma.user.findUnique as jest.Mock).mockResolvedValue({
+      (prisma.users.findUnique as jest.Mock).mockResolvedValue({
         id: 3,
         is_system_admin: false,
         is_school_admin: false,
-        Staff: [{
-          Role: {
-            Permissions: [
+        staff: [{
+          role: {
+            permission: [
               { capability: Capability.MEETING_CREATE },
               { capability: Capability.MEETING_VIEW },
             ],

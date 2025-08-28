@@ -46,10 +46,10 @@ interface SystemStatus {
       current: string;
       wanted: string;
       latest: string;
-      type: 'minor' | 'major' | 'patch';
+      type: 'minor' | 'major' | 'patch'
     }>;
     vulnerabilities: number;
-    total: number;
+    total: number
   };
   database: {
     connected: boolean;
@@ -74,12 +74,12 @@ interface SystemStatus {
       name: string;
       type: string;
       suggestedVersion: string;
-      foundIn: string;
+      foundIn: string
     }>;
     total: number;
-    suggestion: string | null;
+    suggestion: string | null
   };
-  timestamp: string;
+  timestamp: string
 }
 
 interface HealthChecks {
@@ -90,7 +90,7 @@ interface HealthChecks {
   checks: Array<{
     name: string;
     status: 'pass' | 'warning' | 'fail';
-    message: string;
+    message: string
   }>;
 }
 
@@ -102,7 +102,7 @@ interface PostHogMetrics {
   sessionRecordings: number;
   lastHour: {
     events: number;
-    errors: number;
+    errors: number
   };
 }
 
@@ -230,7 +230,7 @@ export default function SystemManagementPage() {
       case 'critical':
         return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />Critical</Badge>;
       default:
-        return <Badge variant="secondary">Unknown</Badge>;
+        return <Badge variant="secondary">Unknown</Badge>
     }
   };
 

@@ -13,8 +13,8 @@ export async function GET(request: NextRequest) {
 
     const schools = await prisma.school.findMany({
       include: { 
-        District: true,
-        Department: true,
+        district: true,
+        department: true,
       },
     });
 
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const { districtName, schoolName, address } = body;
 
     if (!districtName || !schoolName) {
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
         name: (schoolName as string)?.trim(),
         address: (address as string | undefined)?.trim(),
         code: `SCH${Date.now().toString().slice(-6)}`, // Generate unique code
-        district_id: parseInt(district?.id),
+        district_id: district?.id ?? 0,
       },
     });
 
@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: authResult.error }, { status: authResult.statusCode });
     }
 
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
     const { districtName, schoolName, address } = body;
 
     if (!districtName || !schoolName) {
@@ -117,15 +117,15 @@ export async function PUT(request: NextRequest) {
     });
 
     const school = await prisma.school.findFirst({
-      where: { district_id: parseInt(district?.id) },
+      where: { district_id: district?.id ?? 0 },
     });
 
     if (school) {
       const updatedSchool = await prisma.school.update({
         where: { id: school?.id },
         data: {
-          name: schoolName?.trim(),
-          address: address?.trim(),
+          name: String(schoolName || '').trim(),
+          address: String(address || '').trim(),
         },
       });
 

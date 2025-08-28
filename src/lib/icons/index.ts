@@ -3,7 +3,7 @@ import React from 'react';
 
 // Feather Icons - Most commonly used
 export { 
-  User as FiUser, 
+  User as Fiusers, 
   Mail as FiMail, 
   Lock as FiLock, 
   AlertCircle as FiAlertCircle,

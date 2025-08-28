@@ -19,20 +19,21 @@ import {
   UserCog,
   Palette,
   Monitor,
-  User,
   ShieldCheck,
   Server,
   Code,
   Video,
   Briefcase,
   LogOut,
-  Bug
+  Bug,
+  UserPlus,
+  type LucideIcon
 } from "lucide-react";
 
 export interface NavigationItem {
   href: string;
   label: string;
-  icon: Record<string, unknown>;
+  icon: LucideIcon;
   children?: NavigationItem[];
 }
 
@@ -110,12 +111,12 @@ export const sidebarItems: NavigationSection[] = [
           {
             href: "/dashboard/settings/profile",
             label: "Account",
-            icon: User,
+            icon: UserPlus,
             children: [
               {
                 href: "/dashboard/settings/profile",
                 label: "Profile",
-                icon: User,
+                icon: UserPlus,
               },
               {
                 href: "/dashboard/settings/interface",

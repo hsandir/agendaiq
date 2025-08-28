@@ -5,26 +5,26 @@
 
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { NextRequest, NextResponse } from 'next/server';
-import { createTestContext } from '@/__tests__/helpers/test-db';
+import { createTestContext } from '@/tests__/helpers/test-db';
 import { 
   TypeSafeRequestBuilder, 
   TypeSafeMockFactory, 
   TypeSafeValidators,
   TypeSafeTestDB 
-} from '@/__tests__/utils/type-safe-helpers';
-import type { TestContext } from '@/__tests__/types/test-context';
+} from '@/tests__/utils/type-safe-helpers';
+import type { TestContext } from '@/tests__/types/test-context';
 import bcrypt from 'bcryptjs';
 
 // Mock NextAuth
 jest.mock('next-auth/react', () => ({
   signIn: jest.fn(),
   signOut: jest.fn(),
-  getSession: jest.fn(),
+  getsession: jest.fn(),
 }));
 
 jest.mock('next-auth', () => ({
   default: jest.fn(),
-  getServerSession: jest.fn(),
+  getServersession: jest.fn(),
 }));
 
 // Define input/output types
@@ -41,7 +41,7 @@ interface LoginOutput {
     id: string;
     email: string;
     name: string;
-    role: string;
+    role: string
   };
   requiresTwoFactor?: boolean;
   error?: string;
@@ -72,12 +72,12 @@ describe('Authentication Login API', () => {
       const testPassword = 'TestPassword123!';
       const hashedPassword = await bcrypt.hash(testPassword, 10);
       
-      const _testUser = await context.prisma.user.create({
+      const _testUser = await context.prisma.users.create({
         data: {
           email: 'test@example.com',
           name: 'Test User',
           hashedPassword,
-          emailVerified: new Date(),
+          email_verified: new Date(),
           is_active: true,
           two_factor_enabled: false,
         },
@@ -116,14 +116,14 @@ describe('Authentication Login API', () => {
       };
 
       // Validate the login would succeed
-      const user = await context.prisma.user.findUnique({
+      const user = await context.prisma.users.findUnique({
         where: { email: loginData.email },
       });
 
       expect(user).toBeDefined();
       expect(user?.is_active).toBe(true);
       
-      const passwordValid = await bcrypt.compare(loginData.password, user?.hashedPassword ?? '');
+      const passwordValid = await bcrypt.compare(loginData.password, user?.hashed_password ?? '');
       expect(passwordValid).toBe(true);
     });
 
@@ -146,12 +146,12 @@ describe('Authentication Login API', () => {
 
     it('should reject invalid passwords', async () => {
       // Create test user
-      const _testUser = await context.prisma.user.create({
+      const _testUser = await context.prisma.users.create({
         data: {
           email: 'test@example.com',
           name: 'Test User',
-          hashedPassword: await bcrypt.hash('CorrectPassword123!', 10),
-          emailVerified: new Date(),
+          hashed_password: await bcrypt.hash('CorrectPassword123!', 10),
+          email_verified: new Date(),
           is_active: true,
           two_factor_enabled: false,
         },
@@ -162,11 +162,11 @@ describe('Authentication Login API', () => {
         password: 'WrongPassword123!',
       };
 
-      const user = await context.prisma.user.findUnique({
+      const user = await context.prisma.users.findUnique({
         where: { email: loginData.email },
       });
 
-      const passwordValid = await bcrypt.compare(loginData.password, user?.hashedPassword ?? '');
+      const passwordValid = await bcrypt.compare(loginData.password, user?.hashed_password ?? '');
       expect(passwordValid).toBe(false);
     });
 
@@ -176,7 +176,7 @@ describe('Authentication Login API', () => {
         password: 'TestPassword123!',
       };
 
-      const user = await context.prisma.user.findUnique({
+      const user = await context.prisma.users.findUnique({
         where: { email: loginData.email },
       });
 
@@ -185,12 +185,12 @@ describe('Authentication Login API', () => {
 
     it('should reject inactive user accounts', async () => {
       // Create inactive test user
-      const _testUser = await context.prisma.user.create({
+      const _testUser = await context.prisma.users.create({
         data: {
           email: 'inactive@example.com',
           name: 'Inactive User',
-          hashedPassword: await bcrypt.hash('TestPassword123!', 10),
-          emailVerified: new Date(),
+          hashed_password: await bcrypt.hash('TestPassword123!', 10),
+          email_verified: new Date(),
           is_active: false, // Inactive account
           two_factor_enabled: false,
         },
@@ -201,7 +201,7 @@ describe('Authentication Login API', () => {
         password: 'TestPassword123!',
       };
 
-      const user = await context.prisma.user.findUnique({
+      const user = await context.prisma.users.findUnique({
         where: { email: loginData.email },
       });
 
@@ -216,12 +216,12 @@ describe('Authentication Login API', () => {
   describe('Two-Factor Authentication', () => {
     it('should require 2FA for enabled users', async () => {
       // Create user with 2FA enabled
-      const _testUser = await context.prisma.user.create({
+      const _testUser = await context.prisma.users.create({
         data: {
           email: '2fa@example.com',
           name: '2FA User',
-          hashedPassword: await bcrypt.hash('TestPassword123!', 10),
-          emailVerified: new Date(),
+          hashed_password: await bcrypt.hash('TestPassword123!', 10),
+          email_verified: new Date(),
           is_active: true,
           two_factor_enabled: true,
           two_factor_secret: 'test-2fa-secret',
@@ -233,14 +233,14 @@ describe('Authentication Login API', () => {
         password: 'TestPassword123!',
       };
 
-      const user = await context.prisma.user.findUnique({
+      const user = await context.prisma.users.findUnique({
         where: { email: loginData.email },
       });
 
       expect(user?.two_factor_enabled).toBe(true);
       
       // First step should succeed but require 2FA
-      const passwordValid = await bcrypt.compare(loginData.password, user?.hashedPassword ?? '');
+      const passwordValid = await bcrypt.compare(loginData.password, user?.hashed_password ?? '');
       expect(passwordValid).toBe(true);
       
       // Should indicate 2FA is required
@@ -280,12 +280,12 @@ describe('Authentication Login API', () => {
   describe('Account Security', () => {
     it('should handle account lockout after failed attempts', async () => {
       // Create test user
-      const _testUser = await context.prisma.user.create({
+      const _testUser = await context.prisma.users.create({
         data: {
           email: 'lockout@example.com',
           name: 'Lockout User',
-          hashedPassword: await bcrypt.hash('TestPassword123!', 10),
-          emailVerified: new Date(),
+          hashed_password: await bcrypt.hash('TestPassword123!', 10),
+          email_verified: new Date(),
           is_active: true,
           two_factor_enabled: false,
           failed_login_attempts: 5, // Already at limit
@@ -293,7 +293,7 @@ describe('Authentication Login API', () => {
         },
       });
 
-      const user = await context.prisma.user.findUnique({
+      const user = await context.prisma.users.findUnique({
         where: { email: 'lockout@example.com' },
       });
 
@@ -304,12 +304,12 @@ describe('Authentication Login API', () => {
 
     it('should increment failed login attempts', async () => {
       // Create test user
-      const _testUser = await context.prisma.user.create({
+      const _testUser = await context.prisma.users.create({
         data: {
           email: 'failcount@example.com',
           name: 'Fail Count User',
-          hashedPassword: await bcrypt.hash('TestPassword123!', 10),
-          emailVerified: new Date(),
+          hashed_password: await bcrypt.hash('TestPassword123!', 10),
+          email_verified: new Date(),
           is_active: true,
           two_factor_enabled: false,
           failed_login_attempts: 2,
@@ -317,7 +317,7 @@ describe('Authentication Login API', () => {
       });
 
       // Simulate failed login attempt
-      const updatedUser = await context.prisma.user.update({
+      const updatedUser = await context.prisma.users.update({
         where: { id: _testUser.id },
         data: {
           failed_login_attempts: { increment: 1 },
@@ -332,12 +332,12 @@ describe('Authentication Login API', () => {
     it('should reset failed attempts on successful login', async () => {
       // Create test user with failed attempts
       const testPassword = 'TestPassword123!';
-      const _testUser = await context.prisma.user.create({
+      const _testUser = await context.prisma.users.create({
         data: {
           email: 'reset@example.com',
           name: 'Reset User',
-          hashedPassword: await bcrypt.hash(testPassword, 10),
-          emailVerified: new Date(),
+          hashed_password: await bcrypt.hash(testPassword, 10),
+          email_verified: new Date(),
           is_active: true,
           two_factor_enabled: false,
           failed_login_attempts: 3,
@@ -345,11 +345,11 @@ describe('Authentication Login API', () => {
       });
 
       // Simulate successful login
-      const passwordValid = await bcrypt.compare(testPassword, testUser.hashedPassword);
+      const passwordValid = await bcrypt.compare(testPassword, testUser.hashed_password);
       expect(passwordValid).toBe(true);
 
       // Reset failed attempts
-      const updatedUser = await context.prisma.user.update({
+      const updatedUser = await context.prisma.users.update({
         where: { id: _testUser.id },
         data: {
           failed_login_attempts: 0,
@@ -446,7 +446,7 @@ describe('Authentication Login API', () => {
       // These inputs should be safely handled by Prisma
       // The test ensures they don't cause database issues
       for (const input of maliciousInputs) {
-        const user = await context.prisma.user.findUnique({
+        const user = await context.prisma.users.findUnique({
           where: { email: input.email },
         });
         expect(user).toBeNull(); // Should not find any user
@@ -623,12 +623,12 @@ describe('Authentication Login API', () => {
   describe('Error Handling', () => {
     it('should handle database connection errors gracefully', async () => {
       // Mock database error
-      jest.spyOn(context.prisma.user, 'findUnique').mockRejectedValueOnce(
-        new Error('Database connection failed')
+      jest.spyOn(context.prisma.users, 'findUnique').mockRejectedValueOnce(
+        new Error('Database connection failed');
       );
 
       try {
-        await context.prisma.user.findUnique({
+        await context.prisma.users.findUnique({
           where: { email: 'test@example.com' },
         });
         expect(true).toBe(false); // Should not reach here

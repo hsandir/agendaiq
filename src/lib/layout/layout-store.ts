@@ -31,7 +31,7 @@ class LayoutStore {
   }
   
   setInitialized(value: boolean): void {
-    this.initialized = value;
+    this.initialized = value
   }
   
   getLastSyncTime(): number {
@@ -39,7 +39,7 @@ class LayoutStore {
   }
   
   setLastSyncTime(time: number): void {
-    this.lastSyncTime = time;
+    this.lastSyncTime = time
   }
   
   getCurrentLayout(): string | null {
@@ -47,7 +47,7 @@ class LayoutStore {
   }
   
   setCurrentLayout(layout: string): void {
-    this.currentLayout = layout;
+    this.currentLayout = layout
   }
   
   needsSync(): boolean {

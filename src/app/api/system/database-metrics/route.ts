@@ -11,26 +11,26 @@ interface DatabaseMetrics {
     database: string;
     username: string;
     connected: boolean;
-    uptime: string;
+    uptime: string
   };
   statistics: {
     tables: number;
     totalRecords: number;
     totalSize: string;
     activeConnections: number;
-    maxConnections: number;
+    maxConnections: number
   };
   performance: {
     avgQueryTime: number;
     slowQueries: number;
     queriesPerSecond: number;
-    cacheHitRatio: number;
+    cacheHitRatio: number
   };
   tables: Array<{
     name: string;
     rows: number;
     size: string;
-    lastAccess: string;
+    lastAccess: string
   }>;
 }
 
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
       districtCount,
       sessionCount
     ] = await Promise.all([
-      prisma.user.count(),
+      prisma.users.count(),
       prisma.staff.count(),
       prisma.meeting.count(),
       prisma.department.count(),

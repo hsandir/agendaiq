@@ -24,7 +24,7 @@ export interface LoggerConfig {
   enableDebug: boolean;
   enableConsole: boolean;
   enableFile: boolean;
-  maxLogSize: number;
+  maxLogSize: number
 }
 
 export class Logger {

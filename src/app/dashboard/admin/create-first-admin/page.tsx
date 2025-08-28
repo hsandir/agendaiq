@@ -13,7 +13,7 @@ export default async function CreateFirstAdminPage() {
   });
 
   // Check if there are already users in the system
-  const userCount = await prisma.user.count();
+  const userCount = await prisma.users.count();
   const districtCount = await prisma.district.count();
   const schoolCount = await prisma.school.count();
 
@@ -52,26 +52,26 @@ export default async function CreateFirstAdminPage() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   // Get pre-created admin users from database
-  const adminUsers = await prisma.user.findMany({
+  const adminUsers = await prisma.users.findMany({
     where: {
       OR: [
         { is_admin: true },
         { is_system_admin: true },
-        { Staff: { some: { Role: { key: { in: ['DEV_ADMIN', 'OPS_ADMIN'] } } } } }
+        { staff: { some: { role: { key: { in: ['DEV_ADMIN', 'OPS_ADMIN'] } } } } }
       ]
     },
     select: {
       id: true,
       email: true,
       name: true,
-      hashedPassword: true,
-      Staff: {
+      hashed_password: true,
+      staff: {
         select: {
-          Role: {
+          role: {
             select: {
               title: true,
               key: true

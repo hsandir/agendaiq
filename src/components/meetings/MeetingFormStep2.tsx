@@ -19,7 +19,7 @@ interface Attendee {
   name: string;
   email: string;
   role: string;
-  department: string;
+  department: string
 }
 
 interface AgendaItem {
@@ -28,7 +28,7 @@ interface AgendaItem {
   description: string;
   duration: number;
   presenter_id?: number;
-  order: number;
+  order: number
 }
 
 interface Props {

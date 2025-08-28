@@ -26,7 +26,7 @@ interface RateLimitMetrics {
     topOffenders: Array<{
       identifier: string;
       blockedRequests: number;
-      totalRequests: number;
+      totalRequests: number
     }>;
   };
   details: Record<string, {
@@ -35,7 +35,7 @@ interface RateLimitMetrics {
     allowedRequests: number;
     uniqueClients: number;
     averageResponseTime: number;
-    peakRequestsPerMinute: number;
+    peakRequestsPerMinute: number
   }>;
 }
 

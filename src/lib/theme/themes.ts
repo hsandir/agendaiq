@@ -89,12 +89,12 @@ export interface Theme {
     overlay: string;
     shadow: string;
     scrollbar: string;
-    scrollbarThumb: string;
+    scrollbarThumb: string
   };
   fonts: {
     primary: string;
     secondary: string;
-    mono: string;
+    mono: string
   };
   spacing: {
     xs: string;
@@ -102,7 +102,7 @@ export interface Theme {
     md: string;
     lg: string;
     xl: string;
-    xxl: string;
+    xxl: string
   };
   borderRadius: {
     none: string;
@@ -110,14 +110,14 @@ export interface Theme {
     md: string;
     lg: string;
     xl: string;
-    full: string;
+    full: string
   };
   shadows: {
     none: string;
     sm: string;
     md: string;
     lg: string;
-    xl: string;
+    xl: string
   };
 }
 
@@ -1352,7 +1352,7 @@ export const themes: Theme[] = [
 
 // Get theme by ID
 export const getThemeById = (id: string): Theme => {
-  return themes.find(theme => theme.id === id) || classicLightTheme;
+  return themes.find(theme => theme.id === id) || classicLightTheme
 };
 
 // Default theme

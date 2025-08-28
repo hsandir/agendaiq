@@ -64,27 +64,26 @@ interface DevelopmentClientProps {
 }
 
 export default function DevelopmentClient({ user }: DevelopmentClientProps) {
-  const [activeTab, setActiveTab] = useState('tests')
+  const [activeTab, setActiveTab] = useState('tests');
   const [stats, setStats] = useState({
     testCoverage: { value: 0, formatted: '0%', changeFormatted: '+0%' },
     buildStatus: { status: 'unknown', timeFormatted: 'N/A' },
     apiHealth: { status: 'unknown', message: 'Loading...' },
     activeErrors: { count: 0, requiresAttention: false }
-  })
-
+  });
   useEffect(() => {
-    loadStats()
+    loadStats();
   }, [])
 
   const loadStats = async () => {
     try {
-      const response = await fetch('/api/dev/stats')
+      const response = await fetch('/api/dev/stats');
       if (response.ok) {
-        const data = await response.json()
-        setStats(data)
+        const data = await response.json();
+        setStats(data);
       }
     } catch (error: unknown) {
-      console.error('Failed to load stats:', error)
+      console.error('Failed to load stats:', error);
     }
   }
 

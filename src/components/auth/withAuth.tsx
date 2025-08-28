@@ -21,7 +21,8 @@ export function withAuth<P extends object>(
   requirements: AuthRequirements = {}
 ) {
   return function ProtectedComponent(props: P) {
-    const { is, user, loading, isAuthenticated } = useAuthorization();
+    const { is, user, loading } = useAuthorization();
+    const isAuthenticated = !!user;
     const router = useRouter();
     
     useEffect(() => {
@@ -34,7 +35,7 @@ export function withAuth<P extends object>(
       }
       
       // Check staff requirement
-      if (requirements?.requireStaff && !user?.staff) {
+      if (requirements?.requireStaff && !(user as any)?.staff) {
         router.push('/dashboard');
         return;
       }
@@ -69,7 +70,7 @@ export function withAuth<P extends object>(
       return null;
     }
     
-    if (requirements?.requireStaff && !user?.staff) {
+    if (requirements?.requireStaff && !(user as any)?.staff) {
       return null;
     }
     

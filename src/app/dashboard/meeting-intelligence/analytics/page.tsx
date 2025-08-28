@@ -25,9 +25,14 @@ interface MeetingMetrics {
   onTimeStartRate: number;
   actionItemCompletionRate: number;
   meetingsByType: { type: string; count: number }[];
-  meetingsByDepartment: { department: string; count: number; efficiency: number }[];
+  meetingsBydepartment: { department: string; count: number; efficiency: number }[];
   trendData: { month: string; meetings: number; efficiency: number }[];
   topContributors: { name: string; role: string; contributions: number }[];
+}
+
+interface InsightItem {
+  type: 'success' | 'warning' | 'error';
+  message: string;
 }
 
 interface DepartmentPerformance {
@@ -36,12 +41,13 @@ interface DepartmentPerformance {
   avgDuration: number;
   actionItems: number;
   completionRate: number;
-  efficiency: number;
+  efficiency: number
 }
 
 export default function MeetingAnalyticsPage() {
   const [metrics, setMetrics] = useState<MeetingMetrics | null>(null);
   const [departmentPerformance, setDepartmentPerformance] = useState<DepartmentPerformance[]>([]);
+  const [insights, setInsights] = useState<InsightItem[]>([]);
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
   const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
@@ -63,6 +69,7 @@ export default function MeetingAnalyticsPage() {
       
       setMetrics(data.metrics);
       setDepartmentPerformance(data.departmentPerformance ?? []);
+      setInsights(data.insights ?? []);
     } catch (error: unknown) {
       console.error('Failed to fetch analytics:', error);
     } finally {
@@ -127,7 +134,7 @@ export default function MeetingAnalyticsPage() {
           
           <select
             value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
+            onChange={(e) => setTimeRange(e.target.value as "month" | "week" | "quarter" | "year")}
             className="px-3 py-2 border border-border rounded-lg bg-background text-foreground text-sm"
           >
             <option value="week">Last Week</option>
@@ -340,26 +347,30 @@ export default function MeetingAnalyticsPage() {
           Quick Insights
         </h3>
         <div className="space-y-2">
-          <div className="flex items-start gap-2">
-            <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
-            <p className="text-sm text-blue-800 dark:text-blue-200">
-              Meeting efficiency has improved by 15% over the last month
-            </p>
-          </div>
-          <div className="flex items-start gap-2">
-            <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
-            <p className="text-sm text-blue-800 dark:text-blue-200">
-              Consider reducing meeting duration - average exceeds optimal by 10 minutes
-            </p>
-          </div>
-          <div className="flex items-start gap-2">
-            <XCircle className="h-5 w-5 text-red-600 mt-0.5" />
-            <p className="text-sm text-blue-800 dark:text-blue-200">
-              23% of action items are overdue - follow-up recommended
-            </p>
-          </div>
+          {insights.length > 0 ? insights.map((insight, index) => {
+            const Icon = insight.type === 'success' ? CheckCircle : 
+                      insight.type === 'warning' ? AlertCircle : XCircle;
+            const iconColor = insight.type === 'success' ? 'text-green-600' : 
+                             insight.type === 'warning' ? 'text-yellow-600' : 'text-red-600';
+            
+            return (
+              <div key={index} className="flex items-start gap-2">
+                <Icon className={`h-5 w-5 ${iconColor} mt-0.5`} />
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  {insight.message}
+                </p>
+              </div>
+            );
+          }) : (
+            <div className="flex items-start gap-2">
+              <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                No specific insights available - all metrics appear normal
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
-  );
+  )
 }

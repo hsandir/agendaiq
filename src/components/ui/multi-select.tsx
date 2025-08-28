@@ -238,8 +238,12 @@ export function MultiSelect({
 
           {/* Options List */}
           <div
-            className="overflow-auto p-1"
-            style={{ maxHeight }}
+            className="p-1 scroll-smooth custom-scrollbar"
+            style={{ 
+              height: maxHeight,
+              overflowY: 'scroll',
+              overflowX: 'hidden'
+            }}
           >
             {filteredOptions.length === 0 ? (
               <div className="py-6 text-center text-sm text-muted-foreground">

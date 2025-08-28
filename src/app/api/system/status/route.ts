@@ -93,7 +93,7 @@ async function getRealPackageStatus() {
     })));
 
     // Get total package count
-    const { stdout: __lsOutput  } = await execAsync('npm ls --json --depth=0', { cwd: process.cwd() });
+    const { stdout: lsOutput  } = await execAsync('npm ls --json --depth=0', { cwd: process.cwd() });
     const lsData = JSON.parse(lsOutput || '{}');
     const totalPackages = Object.keys(lsData.dependencies ?? {}).length;
 
@@ -103,11 +103,11 @@ async function getRealPackageStatus() {
       outdatedCount: outdatedList.length,
       vulnerabilities: 0 // This would need npm audit for real data
     };
-  } catch (error: Record<string, unknown>) {
+  } catch (error: unknown) {
     // If npm outdated fails but has stdout (common with outdated packages)
-    if (error?.stdout) {
+    if ((error as any)?.stdout) {
       try {
-        const outdatedPackages = JSON.parse(error.stdout);
+        const outdatedPackages = JSON.parse((error as any).stdout);
         const outdatedList = (Object.entries(outdatedPackages).map(([name, info]: [string, any]) => ({
           name,
           current: info.current,

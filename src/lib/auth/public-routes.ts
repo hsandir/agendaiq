@@ -50,6 +50,7 @@ export const PUBLIC_API_ROUTES = [
   // Error reporting (public for client-side error reporting)
   '/api/error-capture',
   '/api/errors',
+  
 ] as const;
 
 // Helper types for TypeScript
@@ -64,7 +65,7 @@ export type PublicApiRoute = typeof PUBLIC_API_ROUTES[number];
 export function isPublicRoute(path: string): boolean {
   // Exact match check
   if (PUBLIC_ROUTES.includes(path as PublicRoute)) {
-    return true;
+    return true
   }
   
   // Pattern matching for auth routes
@@ -83,7 +84,7 @@ export function isPublicRoute(path: string): boolean {
 export function isPublicApiRoute(path: string): boolean {
   // Exact match check
   if (PUBLIC_API_ROUTES.includes(path as PublicApiRoute)) {
-    return true;
+    return true
   }
   
   // Pattern matching for auth APIs
