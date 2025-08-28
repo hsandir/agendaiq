@@ -152,13 +152,70 @@ export async function GET(request: NextRequest) {
         : 100
     })));
     
-    // Trend data (simplified)
-    const trendData = [
-      { month: 'Jan', meetings: 12, efficiency: 75 },
-      { month: 'Feb', meetings: 15, efficiency: 78 },
-      { month: 'Mar', meetings: 18, efficiency: 82 },
-      { month: 'Apr', meetings: totalMeetings, efficiency: actionItemCompletionRate }
-    ];
+    // Generate real trend data based on actual meeting data
+    const trendData = [];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    // Group meetings by month
+    const monthlyData = new Map();
+    meetings.forEach(meeting => {
+      if (meeting.start_time) {
+        const date = new Date(meeting.start_time);
+        const monthKey = `${date.getFullYear()}-${String(date.getMonth()).padStart(2, '0')}`;
+        const monthName = monthNames[date.getMonth()];
+        
+        if (!monthlyData.has(monthKey)) {
+          monthlyData.set(monthKey, {
+            month: monthName,
+            meetings: 0,
+            totalActionItems: 0,
+            completedActionItems: 0
+          });
+        }
+        
+        const monthData = monthlyData.get(monthKey);
+        monthData.meetings++;
+        monthData.totalActionItems += meeting.meeting_action_items.length;
+        monthData.completedActionItems += meeting.meeting_action_items.filter(
+          (item: { status: string }) => item.status === 'Completed'
+        ).length;
+      }
+    });
+    
+    // Convert to trend data with efficiency calculation
+    Array.from(monthlyData.values())
+      .sort((a, b) => a.month.localeCompare(b.month))
+      .forEach(monthData => {
+        const efficiency = monthData.totalActionItems > 0 
+          ? Math.round((monthData.completedActionItems / monthData.totalActionItems) * 100)
+          : 100;
+          
+        trendData.push({
+          month: monthData.month,
+          meetings: monthData.meetings,
+          efficiency
+        });
+      });
+    
+    // Ensure we have at least 4 data points for display
+    if (trendData.length < 4) {
+      const currentMonth = new Date().getMonth();
+      const currentYear = new Date().getFullYear();
+      
+      for (let i = 3; i >= 0; i--) {
+        const monthIndex = (currentMonth - i + 12) % 12;
+        const year = currentMonth - i < 0 ? currentYear - 1 : currentYear;
+        const monthKey = `${year}-${String(monthIndex).padStart(2, '0')}`;
+        
+        if (!monthlyData.has(monthKey)) {
+          trendData.push({
+            month: monthNames[monthIndex],
+            meetings: 0,
+            efficiency: 0
+          });
+        }
+      }
+    }
     
     // Top contributors
     const contributorMap = new Map();
@@ -180,6 +237,82 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => b.contributions - a.contributions)
       .slice(0, 5);
     
+    // Calculate Quick Insights based on real data
+    const insights = [];
+    
+    // 1. Efficiency trend comparison (current vs previous period)
+    if (trendData.length >= 2) {
+      const currentEfficiency = trendData[trendData.length - 1].efficiency;
+      const previousEfficiency = trendData[trendData.length - 2].efficiency;
+      const efficiencyChange = currentEfficiency - previousEfficiency;
+      
+      if (efficiencyChange > 0) {
+        insights.push({
+          type: 'success',
+          message: `Meeting efficiency has improved by ${Math.abs(efficiencyChange)}% over the last period`
+        });
+      } else if (efficiencyChange < -5) {
+        insights.push({
+          type: 'error',
+          message: `Meeting efficiency has decreased by ${Math.abs(efficiencyChange)}% over the last period`
+        });
+      }
+    }
+    
+    // 2. Meeting duration analysis
+    const optimalDuration = 60; // minutes
+    if (averageDuration > optimalDuration) {
+      const excess = averageDuration - optimalDuration;
+      insights.push({
+        type: 'warning',
+        message: `Consider reducing meeting duration - average exceeds optimal by ${excess} minutes`
+      });
+    } else if (averageDuration > 0 && averageDuration <= optimalDuration) {
+      insights.push({
+        type: 'success',
+        message: `Meeting duration is optimal at ${averageDuration} minutes on average`
+      });
+    }
+    
+    // 3. Action items overdue analysis
+    const allActionItems = meetings.flatMap(m => m.meeting_action_items);
+    const overdueItems = allActionItems.filter((item: { status: string; due_date: Date | null }) => {
+      return item.due_date && new Date() > new Date(item.due_date) && item.status !== 'Completed';
+    });
+    
+    if (allActionItems.length > 0) {
+      const overduePercentage = Math.round((overdueItems.length / allActionItems.length) * 100);
+      if (overduePercentage > 20) {
+        insights.push({
+          type: 'error',
+          message: `${overduePercentage}% of action items are overdue - follow-up recommended`
+        });
+      } else if (overduePercentage > 10) {
+        insights.push({
+          type: 'warning',
+          message: `${overduePercentage}% of action items are overdue - monitoring recommended`
+        });
+      } else {
+        insights.push({
+          type: 'success',
+          message: `Action items are well managed - only ${overduePercentage}% are overdue`
+        });
+      }
+    }
+    
+    // 4. Meeting frequency analysis
+    if (totalMeetings > 0) {
+      const daysInPeriod = Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+      const meetingsPerDay = totalMeetings / daysInPeriod;
+      
+      if (meetingsPerDay > 2) {
+        insights.push({
+          type: 'warning',
+          message: `High meeting frequency detected (${meetingsPerDay.toFixed(1)} meetings/day) - consider consolidating`
+        });
+      }
+    }
+    
     return NextResponse.json({
       metrics: {
         totalMeetings,
@@ -193,7 +326,8 @@ export async function GET(request: NextRequest) {
         trendData,
         topContributors
       },
-      departmentPerformance
+      departmentPerformance,
+      insights
     });
     
   } catch (error: unknown) {

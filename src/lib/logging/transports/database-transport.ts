@@ -71,75 +71,67 @@ export class DatabaseTransport implements LogTransport {
   }
 
   private buildDevLogsWhere(query: LogQuery) {
-    const conditions = [];
+    const where = {};
     
     if (query.level && query.level.length > 0) {
-      conditions.push({
-        level: { in: query.level.map(level => this.mapLogLevelToPrisma(level)) }
-      });
+      where.level = { in: query.level.map(level => this.mapLogLevelToPrisma(level)) };
     }
     
     if (query.startDate || query.endDate) {
-      const timestampCondition = {} as { gte?: Date; lte?: Date };
+      const timestampCondition = {};
       if (query.startDate) timestampCondition.gte = query.startDate;
       if (query.endDate) timestampCondition.lte = query.endDate;
-      conditions.push({ timestamp: timestampCondition });
+      where.timestamp = timestampCondition;
     }
     
     if (query.userId) {
       const userId = Number(query.userId);
       if (!isNaN(userId)) {
-        conditions.push({ user_id: userId });
+        where.user_id = userId;
       }
     }
     
     if (query.search) {
-      conditions.push({
-        message: { contains: query.search, mode: 'insensitive' }
-      });
+      where.message = { contains: query.search, mode: 'insensitive' };
     }
     
     if (query.category) {
-      conditions.push({ category: { in: query.category } });
+      where.category = { in: query.category };
     }
     
-    return conditions.length > 0 ? { AND: conditions } : {};
+    return where;
   }
 
   private buildSecurityLogsWhere(query: LogQuery) {
-    const conditions = [];
+    const where = {};
     
     if (query.level && query.level.length > 0) {
-      conditions.push({
-        level: { in: query.level.map(level => this.mapLogLevelToPrisma(level)) }
-      });
+      where.level = { in: query.level.map(level => this.mapLogLevelToPrisma(level)) };
     }
     
     if (query.startDate || query.endDate) {
-      const timestampCondition = {} as { gte?: Date; lte?: Date };
+      const timestampCondition = {};
       if (query.startDate) timestampCondition.gte = query.startDate;
       if (query.endDate) timestampCondition.lte = query.endDate;
-      conditions.push({ timestamp: timestampCondition });
+      where.timestamp = timestampCondition;
     }
     
     if (query.userId) {
       const userId = Number(query.userId);
       if (!isNaN(userId)) {
-        conditions.push({ user_id: userId });
+        where.user_id = userId;
       }
     }
     
     if (query.search) {
-      conditions.push({
-        message: { contains: query.search, mode: 'insensitive' }
-      });
+      where.message = { contains: query.search, mode: 'insensitive' };
     }
     
     if (query.category) {
-      conditions.push({ category: { in: query.category } });
+      where.category = { in: query.category };
     }
     
-    return conditions.length > 0 ? { AND: conditions } : {};
+    return where;
   }
 
   async write(entry: BaseLogEntry): Promise<void> {
