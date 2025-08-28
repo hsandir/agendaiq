@@ -3,7 +3,7 @@
  * Stores logs in PostgreSQL database with full querying support
  */
 
-import { LogTransport, LogLevel, BaseLogEntry, DevLogEntry, AuditLogEntry, LogQuery, LogStats } from '../types';
+import { LogTransport, LogLevel, BaseLogEntry, DevLogEntry, AuditLogEntry, LogQuery, LogStats, DevLogCategory, AuditLogCategory } from '../types';
 import { prisma } from '@/lib/prisma';
 
 export class DatabaseTransport implements LogTransport {
@@ -70,35 +70,44 @@ export class DatabaseTransport implements LogTransport {
     }
   }
 
-  private mapPrismaToDevLogCategory(prismaCategory: string): string {
+  private mapPrismaToDevLogCategory(prismaCategory: string): DevLogCategory {
     switch (prismaCategory) {
-      case 'system': return 'system';
-      case 'database': return 'database';
-      case 'api': return 'api';
-      case 'auth': return 'auth';
-      case 'performance': return 'performance';
-      case 'error': return 'error';
-      case 'network': return 'network';
-      case 'cache': return 'cache';
-      case 'external': return 'external';
-      case 'build': return 'build';
-      default: return 'system';
+      case 'system': return DevLogCategory.SYSTEM;
+      case 'database': return DevLogCategory.DATABASE;
+      case 'api': return DevLogCategory.API;
+      case 'auth': return DevLogCategory.AUTH;
+      case 'performance': return DevLogCategory.PERFORMANCE;
+      case 'error': return DevLogCategory.ERROR;
+      case 'network': return DevLogCategory.NETWORK;
+      case 'cache': return DevLogCategory.CACHE;
+      case 'external': return DevLogCategory.EXTERNAL;
+      case 'build': return DevLogCategory.BUILD;
+      default: return DevLogCategory.SYSTEM;
     }
   }
 
-  private mapPrismaToAuditLogCategory(prismaCategory: string): string {
+  private mapPrismaToAuditLogCategory(prismaCategory: string): AuditLogCategory {
     switch (prismaCategory) {
-      case 'login_attempt': return 'login_attempt';
-      case 'data_access': return 'data_access';
-      case 'data_modification': return 'data_modification';
-      case 'admin_action': return 'admin_action';
-      case 'security_violation': return 'security_violation';
-      case 'user_action': return 'user_action';
-      case 'permission_check': return 'permission_check';
-      case 'compliance': return 'compliance';
-      case 'export': return 'export';
-      case 'import': return 'import';
-      default: return 'security_violation';
+      case 'login_attempt': return AuditLogCategory.LOGIN_ATTEMPT;
+      case 'data_access': return AuditLogCategory.DATA_ACCESS;
+      case 'data_modification': return AuditLogCategory.DATA_MODIFICATION;
+      case 'admin_action': return AuditLogCategory.ADMIN_ACTION;
+      case 'security_violation': return AuditLogCategory.SECURITY_VIOLATION;
+      case 'user_action': return AuditLogCategory.USER_ACTION;
+      case 'permission_check': return AuditLogCategory.PERMISSION_CHECK;
+      case 'compliance': return AuditLogCategory.COMPLIANCE;
+      case 'export': return AuditLogCategory.EXPORT;
+      case 'import': return AuditLogCategory.IMPORT;
+      default: return AuditLogCategory.SECURITY_VIOLATION;
+    }
+  }
+
+  private validateEnvironment(env: string): 'development' | 'staging' | 'production' {
+    switch (env) {
+      case 'development': return 'development';
+      case 'staging': return 'staging'; 
+      case 'production': return 'production';
+      default: return 'development';
     }
   }
 
@@ -269,7 +278,7 @@ export class DatabaseTransport implements LogTransport {
           file: log.file ?? undefined,
           line: log.line ?? undefined,
           stack: log.stack ?? undefined,
-          environment: ['development', 'staging', 'production'].includes(log.environment) ? log.environment : 'development',
+          environment: this.validateEnvironment(log.environment),
           performance: log.performance ? JSON.parse(log.performance) : undefined
         } satisfies DevLogEntry)),
         ...auditLogs.map(log => ({

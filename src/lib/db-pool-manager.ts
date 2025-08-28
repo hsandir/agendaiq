@@ -65,7 +65,7 @@ class DatabasePoolManager {
       errorFormat: process.env.NODE_ENV === 'development' ? 'pretty' : 'minimal',
       datasources: {
         db: {
-          url: process.env.DATABASE_URL
+          url: process.env.DATABASE_URL || process.env.DIRECT_URL || 'postgresql://localhost:5432/temp'
         }
       }
     });
