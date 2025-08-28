@@ -107,26 +107,39 @@ export class DatabaseTransport implements LogTransport {
   }
 
   private buildSecurityLogsWhere(query: LogQuery) {
-    return {
-      ...(query.level && query.level.length > 0 && {
+    const conditions = [];
+    
+    if (query.level && query.level.length > 0) {
+      conditions.push({
         level: { in: query.level.map(level => this.mapLogLevelToPrisma(level)) }
-      }),
-      ...((query.startDate || query.endDate) && {
-        timestamp: {
-          ...(query.startDate && { gte: query.startDate }),
-          ...(query.endDate && { lte: query.endDate })
-        }
-      }),
-      ...(query.userId && {
-        user_id: Number(query.userId) || undefined
-      }),
-      ...(query.search && {
-        message: { contains: query.search, mode: 'insensitive' as const }
-      }),
-      ...(query.category && {
-        category: { in: query.category }
-      })
-    };
+      });
+    }
+    
+    if (query.startDate || query.endDate) {
+      const timestampCondition = {} as { gte?: Date; lte?: Date };
+      if (query.startDate) timestampCondition.gte = query.startDate;
+      if (query.endDate) timestampCondition.lte = query.endDate;
+      conditions.push({ timestamp: timestampCondition });
+    }
+    
+    if (query.userId) {
+      const userId = Number(query.userId);
+      if (!isNaN(userId)) {
+        conditions.push({ user_id: userId });
+      }
+    }
+    
+    if (query.search) {
+      conditions.push({
+        message: { contains: query.search, mode: 'insensitive' }
+      });
+    }
+    
+    if (query.category) {
+      conditions.push({ category: { in: query.category } });
+    }
+    
+    return conditions.length > 0 ? { AND: conditions } : {};
   }
 
   async write(entry: BaseLogEntry): Promise<void> {

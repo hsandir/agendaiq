@@ -57,8 +57,6 @@ export const PUBLIC_API_ROUTES = [
   // Temporary database backup/restore (REMOVE AFTER USE!)
   '/api/dev/database/backup-production',
   
-  // Emergency debug endpoint (REMOVE AFTER USE!)
-  '/api/debug/production-db-test',
 ] as const;
 
 // Helper types for TypeScript
