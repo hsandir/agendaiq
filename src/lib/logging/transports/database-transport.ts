@@ -291,7 +291,7 @@ export class DatabaseTransport implements LogTransport {
           category: this.mapPrismaToAuditLogCategory(log.category),
           action: log.action,
           result: log.result,
-          risk_level: log.risk_level,
+          riskLevel: log.risk_level,
           actor: JSON.parse(log.actor),
           target: log.target ? JSON.parse(log.target) : undefined,
           compliance: log.compliance ? JSON.parse(log.compliance) : undefined,
