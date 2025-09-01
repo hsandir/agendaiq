@@ -107,7 +107,7 @@ export default function SchoolClient({ initialschool }: SchoolClientProps) {
             School Settings
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Update your school's information
+            Update your school&apos;s information
           </p>
         </div>
       </div>

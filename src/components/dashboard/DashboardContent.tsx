@@ -122,7 +122,7 @@ export function DashboardContent({
   const renderMeetingsList = () => (
     <section className="card p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-foreground">Today's Meetings</h2>
+        <h2 className="text-xl font-semibold text-foreground">Today{'\''}s Meetings</h2>
         <Link
           href="/dashboard/meetings"
           className="text-sm text-primary hover:text-primary/80 font-medium transition-colors"

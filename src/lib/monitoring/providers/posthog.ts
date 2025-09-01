@@ -5,11 +5,11 @@
 
 import posthog from 'posthog-js';
 import { PostHog } from 'posthog-node';
-import { IMonitoringProvider } from '../types';
+import { MonitoringProvider } from '../types';
 import { MonitoringConfig } from '../types';
 import { captureException, trackEvent } from '@/lib/posthog/posthog-utils';
 
-export class PostHogProvider implements IMonitoringProvider {
+export class PostHogProvider implements MonitoringProvider {
   private config: MonitoringConfig;
   private serverClient?: PostHog;
   
@@ -30,6 +30,10 @@ export class PostHogProvider implements IMonitoringProvider {
   async initialize(): Promise<void> {
     // PostHog is already initialized in instrumentation-client.ts
     console.log('PostHog monitoring provider initialized');
+  }
+  
+  init(config: MonitoringConfig): void {
+    this.config = config;
   }
   
   captureException(error: Error, context?: Record<string, any>): void {
@@ -123,6 +127,12 @@ export class PostHogProvider implements IMonitoringProvider {
     };
   }
   
+  finishTransaction(transaction: any): void {
+    if (transaction && transaction.finish) {
+      transaction.finish();
+    }
+  }
+  
   startSpan(name: string): any {
     const startTime = Date.now();
     
@@ -143,6 +153,12 @@ export class PostHogProvider implements IMonitoringProvider {
   setTag(key: string, value: string): void {
     if (typeof window !== 'undefined' && posthog) {
       posthog.setPersonProperties({ [key]: value });
+    }
+  }
+  
+  setTags(tags: Record<string, string>): void {
+    if (typeof window !== 'undefined' && posthog) {
+      posthog.setPersonProperties(tags);
     }
   }
   

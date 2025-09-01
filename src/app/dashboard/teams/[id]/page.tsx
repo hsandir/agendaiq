@@ -848,7 +848,7 @@ export default function TeamDetailPage() {
                       <BookOpen className="h-12 w-12 text-muted-foreground mb-4" />
                       <h3 className="text-lg font-semibold mb-2">No Resources Yet</h3>
                       <p className="text-muted-foreground mb-4">
-                        Start building your team's knowledge base
+                        Start building your team&apos;s knowledge base
                       </p>
                       <Button onClick={() => setShowCreateKnowledgeDialog(true)}>
                         <Plus className="mr-2 h-4 w-4" />
@@ -911,13 +911,13 @@ export default function TeamDetailPage() {
                           return (
                             <>
                               <strong>{activity.user?.name || activity.user?.email?.split('@')[0]}</strong> added a new {activity.data.type.toLowerCase()} 
-                              <strong className="ml-1">"{activity.data.title}"</strong>
+                              <strong className="ml-1">{'"'}{activity.data.title}{'"'}</strong>
                             </>
                           );
                         case 'team_created':
                           return (
                             <>
-                              Team <strong>"{activity.data.team_name}"</strong> was created
+                              Team <strong>{'"'}{activity.data.team_name}{'"'}</strong> was created
                             </>
                           );
                         default:

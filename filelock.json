@@ -1,6 +1,1 @@
-{
-  "locked_files": [],
-  "session_id": "claude_session_1",
-  "timestamp": "2025-08-26T00:00:00Z",
-  "current_file": "src/components/meetings/MeetingLiveView.tsx"
-}
+{"locked": true, "current_task": "react/no-unescaped-entities manual fix", "progress": "10/36 completed", "eslint_improvement": "-18 errors (-10.5%)", "typescript_improvement": "-35 errors (-97.2%)", "time": "Mon Sep 1 03:12:17 EDT 2025"}

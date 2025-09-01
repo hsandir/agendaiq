@@ -325,8 +325,8 @@ export function maskSensitiveData(str: string): string {
 }
 
 // Helper to remove sensitive fields from objects
-export function removeSensitiveFields<T>(obj: T): T {
-  if (!obj ?? typeof obj !== 'object') return obj;
+export function removeSensitiveFields<T extends object>(obj: T): T {
+  if (!obj || typeof obj !== 'object') return obj;
   
   const cleaned = Array.isArray(obj) ? [...obj] : { ...obj };
   
@@ -334,20 +334,23 @@ export function removeSensitiveFields<T>(obj: T): T {
     return cleaned.map(item => removeSensitiveFields(item)) as T;
   }
   
-  Object.keys(cleaned).forEach(key => {
-    const lowerKey = key.toLowerCase();
-    
-    // Check if field name is sensitive
-    if (SENSITIVE_FIELDS.some(field => lowerKey.includes(field.toLowerCase()))) {
-      cleaned[key] = '[REDACTED]';
-    } else if (typeof cleaned[key] === 'object' && cleaned[key] !== null) {
-      // Recursively clean nested objects
-      cleaned[key] = removeSensitiveFields(cleaned[key] as Record<string, unknown>);
-    } else if (typeof cleaned[key] === 'string') {
-      // Mask sensitive patterns in string values
-      cleaned[key] = maskSensitiveData(cleaned[key] as string);
+  for (const key in cleaned) {
+    if (Object.prototype.hasOwnProperty.call(cleaned, key)) {
+      const lowerKey = key.toLowerCase();
+      const value = cleaned[key];
+      
+      // Check if field name is sensitive
+      if (SENSITIVE_FIELDS.some(field => lowerKey.includes(field.toLowerCase()))) {
+        Object.assign(cleaned, { [key]: '[REDACTED]' });
+      } else if (typeof value === 'object' && value !== null) {
+        // Recursively clean nested objects
+        Object.assign(cleaned, { [key]: removeSensitiveFields(value) });
+      } else if (typeof value === 'string') {
+        // Mask sensitive patterns in string values
+        Object.assign(cleaned, { [key]: maskSensitiveData(value) });
+      }
     }
-  });
+  }
   
   return cleaned as T;
 }

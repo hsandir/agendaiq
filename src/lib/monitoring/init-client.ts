@@ -80,7 +80,7 @@ export function useMonitoringUser() {
 
     if (session?.user) {
       // Set user context for monitoring
-      setMonitoringUser({
+      setMonitoringusers({
         id: session.user.id as string,
         username: session.user.name ?? undefined,
         // Never send email directly
@@ -99,7 +99,7 @@ export function useMonitoringUser() {
       });
     } else {
       // Clear user context on logout
-      setMonitoringUser(null);
+      setMonitoringusers(null);
 
       // Add breadcrumb for logout
       addBreadcrumb({

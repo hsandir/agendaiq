@@ -338,7 +338,7 @@ export default function MeetingSearchPage() {
           <div className="text-center py-12">
             <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <p className="text-muted-foreground">
-              No results found for "{debouncedQuery}"
+              No results found for &quot;{debouncedQuery}&quot;
             </p>
             <p className="text-sm text-muted-foreground mt-2">
               Try different keywords or filters
@@ -358,19 +358,19 @@ export default function MeetingSearchPage() {
                 onClick={() => setSearchQuery('budget')}
                 className="px-4 py-2 border border-border rounded-lg text-sm hover:bg-muted"
               >
-                Try: "budget"
+                Try: &quot;budget&quot;
               </button>
               <button
                 onClick={() => setSearchQuery('planning')}
                 className="px-4 py-2 border border-border rounded-lg text-sm hover:bg-muted"
               >
-                Try: "planning"
+                Try: &quot;planning&quot;
               </button>
               <button
                 onClick={() => setSearchQuery('staff')}
                 className="px-4 py-2 border border-border rounded-lg text-sm hover:bg-muted"
               >
-                Try: "staff"
+                Try: &quot;staff&quot;
               </button>
             </div>
           </div>

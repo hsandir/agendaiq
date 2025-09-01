@@ -4,7 +4,7 @@
  */
 
 export interface MonitoringConfig {
-  provider: 'sentry' | 'datadog' | 'newrelic' | 'custom';
+  provider: 'sentry' | 'datadog' | 'newrelic' | 'posthog' | 'custom' | 'disabled';
   enabled: boolean;
   environment: 'development' | 'staging' | 'production';
   debug?: boolean;

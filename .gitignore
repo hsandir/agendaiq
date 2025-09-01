@@ -153,15 +153,12 @@ add-*.sql
 .env.development
 .env.test
 organization_structure*.json
-postcss.config*.js
 prisma/migrations/migration_lock*.toml
 prisma/schema*.prisma
 schema*.sql
 seed*.js
 staff*.csv
 staff*.xlsx
-tailwind.config*.js
-next.config*.js
 .env.local
 dev.log
 .trash/
@@ -181,6 +178,84 @@ test_*.js
 # API test routes that may expose passwords
 src/app/api/test-login/
 .claude/validation-status.json
+
+# Claude Code internal tooling (never commit)
+.claude/
+
+# === FAZ 1: CRITICAL SECURITY FILES ===
+# Cookie files with sensitive data
+*cookies*.txt
+admin_cookies.txt
+browser-cookies.txt
+final_cookies.txt
+prod_cookies*.txt
+production_cookies*.txt
+test-cookies.txt
+
+# Production scripts with credentials
+check_prod_user*.js
+setup_prod_admin.js
+update_prod_users.js
+fix_prod_admin.js
+test_prod_auth.js
+
+# Debug logs with sensitive info
+dev-server.log
+supabase_*.txt
+SUPABASE_*.txt
+supabase_*.log
+production-error-analysis.json
+
+# Internal development directories
+.internal/
+.agent-backups/
+.manual-backups/
+
+# Backup & Archive Directories  
+.v2-backup/
+backup-v2-files/
+.cursor/
+.husky/
+.swc/
+.venv/
+coverage/
+
+# Temporary development scripts (root level)
+api_performance_test.js
+bulk-fix-eslint.js
+check_all_passwords.js
+check_env_vars.js
+comprehensive-syntax-fix.js
+debug-public-routes.js
+final-eslint-fix.js
+final-syntax-fix.js
+fix-agent-errors.js
+fix-all-syntax.js
+fix-eslint-warnings.js
+fix-jsx-fragments.js
+interface-semicolon-fix.js
+jsx-specific-fix.js
+quick-semicolon-fix.js
+restore-backup.js
+test_local_auth.js
+test-safe-agent*.js
+test-semicolon-fix.js
+validate-and-fix.js
+zero-degradation-system.js
+
+# Performance and debug files
+performance-quick-test.json
+response.txt
+typescript-errors.log
+filelock.json
+
+# Development tooling files (should not be deployed)
+jest.setup.js
+playwright.config.ts
+production-error-analysis.json
+*.backup
+tsconfig.build.json
+tsconfig.eslint.json
 
 # Team V2 files (separate development)
 src/app/api/teams-v2/

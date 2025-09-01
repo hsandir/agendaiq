@@ -222,7 +222,7 @@ export function ApiPerformanceTest() {
         
         {results.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
-            Click "Run Tests" to compare API performance
+            Click {'"'}Run Tests{'"'} to compare API performance
           </div>
         )}
       </CardContent>

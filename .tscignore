@@ -1,0 +1,24 @@
+# TypeScript ignore file for cleaner error reporting
+
+# Trash and backup directories
+trash/
+**/trash/
+backup/
+**/backup/
+**/linter-changes-backup-*/
+
+# Node modules (already ignored but explicit)
+node_modules/
+**/node_modules/
+
+# Build outputs
+.next/
+dist/
+build/
+
+# Test coverage
+coverage/
+
+# Cache directories
+.cache/
+*.tsbuildinfo

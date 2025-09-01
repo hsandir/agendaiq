@@ -64,7 +64,7 @@ class DisabledSentryProvider implements MonitoringProvider {
   }
 
   finishTransaction(transaction: Transaction): void {
-    const duration = Date.now() - transaction.startTimestamp;
+    const duration = transaction.startTimestamp ? Date.now() - transaction.startTimestamp : 0;
     console.log(`Transaction finished: ${transaction.name} (${duration}ms)`);
   }
 

@@ -232,7 +232,7 @@ export function InterfaceSettingsClient() {
             Theme Selection
           </h2>
           <p className="text-muted-foreground">
-            Pick a color scheme that's comfortable for your eyes and work environment.
+            Pick a color scheme that&apos;s comfortable for your eyes and work environment.
           </p>
         </div>
         

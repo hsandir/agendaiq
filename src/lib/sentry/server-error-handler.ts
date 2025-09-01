@@ -110,8 +110,13 @@ export function withErrorHandler<T extends (...args: Record<string, unknown>[]) 
     try {
       return await handler(...args)
     } catch (error: unknown) {
-      const request = args[0] as NextRequest;
-      return handleServerError(error, request, defaultOptions);
+      const firstArg = args[0];
+      if (firstArg && typeof firstArg === 'object' && 'nextUrl' in firstArg) {
+        return handleServerError(error, firstArg as unknown as NextRequest, defaultOptions);
+      } else {
+        // Fallback: create a minimal NextRequest-like object or re-throw
+        throw error;
+      }
     }
   }) as T;
 }
